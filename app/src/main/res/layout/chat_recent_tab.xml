@@ -21,131 +21,129 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="56dp">
-                <ImageView
-                    android:id="@+id/collapse_btn"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="16dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_collapse_acc"/>
-                <ImageView
-                    android:id="@+id/close_btn"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="16dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/close_banner"
-                    android:visibility="gone" />
-                <TextView
-                    android:id="@+id/invite_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left|center_vertical"
-                    android:layout_marginLeft="32dp"
-                    android:layout_marginRight="52dp"
-                    android:layout_toRightOf="@+id/collapse_btn"
-                    android:fontFamily="Roboto"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:lineSpacingExtra="0.3dp"
-                    android:text="@string/see_local_contacts_on_mega"
-                    android:layout_centerVertical="true"
-                    android:textColor="@color/name_my_account"/>
-                <TextView
-                    android:id="@+id/more_contacts_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="20dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/contact_invite"
-                    android:textAllCaps="true"
-                    android:textColor="@color/accentColor"
-                    android:visibility="gone" />
-            </RelativeLayout>
-            <FrameLayout
-                android:id="@+id/contacts_list_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
                 <RelativeLayout
-                    android:id="@+id/request_permission_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp">
+                    <ImageView
+                        android:id="@+id/collapse_btn"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="16dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_collapse_acc"/>
+                    <ImageView
+                        android:id="@+id/close_btn"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="16dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/close_banner"
+                        android:visibility="gone" />
+                    <TextView
+                        android:id="@+id/invite_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left|center_vertical"
+                        android:layout_marginLeft="32dp"
+                        android:layout_marginRight="52dp"
+                        android:layout_toRightOf="@+id/collapse_btn"
+                        android:fontFamily="Roboto"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:lineSpacingExtra="0.3dp"
+                        android:text="@string/see_local_contacts_on_mega"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/name_my_account"/>
+                    <TextView
+                        android:id="@+id/more_contacts_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="20dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/contact_invite"
+                        android:textAllCaps="true"
+                        android:textColor="@color/accentColor"
+                        android:visibility="gone" />
+                </RelativeLayout>
+                <FrameLayout
+                    android:id="@+id/contacts_list_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone">
-                    <TextView
-                        android:id="@+id/request_permission_message"
-                        android:layout_width="wrap_content"
-                        android:layout_height="60dp"
-                        android:fontFamily="Roboto"
-                        android:textColor="#8A000000"
-                        android:layout_marginLeft="72dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:text="@string/allow_acces_contact_subtitle"
-                        android:textSize="14sp"/>
-
-                    <Button
-                        android:id="@+id/dismiss_button"
-                        style="@style/AccentBorderBackgroundBorderlessButton"
-                        android:background="@null"
-                        android:layout_height="36dp"
-                        android:layout_below="@id/request_permission_message"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="122dp"
-                        android:layout_marginBottom="16dp"
-                        android:minWidth="82dp"
-                        android:text="@string/general_dismiss"
-                        android:textSize="14sp" />
-
-                    <Button
-                        android:id="@+id/allow_button"
-                        style="@style/AccentBorderBackgroundBorderlessButton"
-                        android:layout_height="36dp"
-                        android:layout_below="@id/request_permission_message"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:minWidth="82dp"
-                        android:text="@string/general_allow"
-                        android:textSize="14sp" />
-                </RelativeLayout>
-                <RelativeLayout
-                    android:id="@+id/contacts_list_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/contacts_list"
+                    <RelativeLayout
+                        android:id="@+id/request_permission_layout"
                         android:layout_width="match_parent"
-                        android:layout_marginLeft="16dp"
-                        android:layout_toLeftOf="@+id/more_contacts"
-                        android:layout_height="88dp"
-                    />
-                    <ImageView
-                        android:id="@+id/more_contacts"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginRight="8dp"
-                        android:src="@drawable/ic_right_arrow"/>
-                </RelativeLayout>
-            </FrameLayout>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/divider_upgrade_account"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"/>
+                        android:layout_height="wrap_content"
+                        android:visibility="gone">
+                        <TextView
+                            android:id="@+id/request_permission_message"
+                            android:layout_width="wrap_content"
+                            android:layout_height="60dp"
+                            android:fontFamily="Roboto"
+                            android:textColor="#8A000000"
+                            android:layout_marginLeft="72dp"
+                            android:layout_marginRight="16dp"
+                            android:layout_marginBottom="16dp"
+                            android:text="@string/allow_acces_contact_subtitle"
+                            android:textSize="14sp"/>
+
+                        <Button
+                            android:id="@+id/dismiss_button"
+                            style="@style/AccentBorderBackgroundBorderlessButton"
+                            android:background="@null"
+                            android:layout_height="36dp"
+                            android:layout_below="@id/request_permission_message"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="122dp"
+                            android:layout_marginBottom="16dp"
+                            android:minWidth="82dp"
+                            android:text="@string/general_dismiss"
+                            android:textSize="14sp" />
+
+                        <Button
+                            android:id="@+id/allow_button"
+                            style="@style/AccentBorderBackgroundBorderlessButton"
+                            android:layout_height="36dp"
+                            android:layout_below="@id/request_permission_message"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="16dp"
+                            android:layout_marginBottom="16dp"
+                            android:minWidth="82dp"
+                            android:text="@string/general_allow"
+                            android:textSize="14sp" />
+                    </RelativeLayout>
+                    <RelativeLayout
+                        android:id="@+id/contacts_list_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/contacts_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="88dp"/>
+
+                        <TextView
+                            android:id="@+id/more_contacts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:layout_below="@id/contacts_list"
+                            android:ellipsize="end"
+                            android:text="@string/invite_more"
+                            android:textColor="@color/accentColor"
+                            android:paddingBottom="12dp"
+                            android:paddingLeft="22dp"
+                            android:paddingRight="22dp"
+                            android:textSize="14sp" />
+                    </RelativeLayout>
+                </FrameLayout>
             </LinearLayout>
         </android.support.design.widget.AppBarLayout>
 

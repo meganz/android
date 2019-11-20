@@ -65,16 +65,15 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_add_avatar, parent, false);
 
         ContactViewHolder holder = new ContactViewHolder(v);
+        holder.clickableArea = v.findViewById(R.id.item_layout_add);
         holder.itemLayout = v.findViewById(R.id.chip_layout);
         holder.textViewInitialLetter = v.findViewById(R.id.contact_list_initial_letter);
         holder.textViewName = v.findViewById(R.id.name_chip);
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
         holder.avatar = v.findViewById(R.id.add_rounded_avatar);
-        holder.avatar.setOnClickListener(this);
-        holder.avatar.setTag(holder);
         holder.addIcon = v.findViewById(R.id.add_icon_chip);
-        holder.addIcon.setOnClickListener(this);
-        holder.addIcon.setTag(holder);
+        holder.clickableArea.setOnClickListener(this);
+        holder.clickableArea.setTag(holder);
         v.setTag(holder);
         return holder;
     }
@@ -181,7 +180,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
         public RoundedImageView avatar;
 
-        RelativeLayout itemLayout;
+        RelativeLayout itemLayout, clickableArea;
 
         ContactViewHolder(View itemView) {
             super(itemView);

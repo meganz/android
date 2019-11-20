@@ -12,13 +12,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.os.SystemClock;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -120,11 +120,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private Button allowBtn;
     private RelativeLayout contactsListLayout;
     private RecyclerView contactsList;
-    private ImageView moreContacts;
+    private TextView moreContacts;
     private TextView moreContactsTitle;
     private TextView actionBarTitle, actionBarSubtitle;
 
-    public static final int CONTACTS_COUNT = 4;
+    private AppBarLayout appBarLayout;
 
     private static boolean isExpand;
     private static boolean isFirstTime = true;
@@ -202,26 +202,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         contactGetter.setMegaContactUpdater(this);
     }
 
-    /*
-        Just disable scroll
-     */
-    private class DisableScrollLayoutManager extends GridLayoutManager {
-
-        public DisableScrollLayoutManager(Context context, int spanCount, int orientation, boolean reverseLayout) {
-            super(context, spanCount, orientation, reverseLayout);
-        }
-
-        @Override
-        public boolean canScrollHorizontally() {
-            return false;
-        }
-
-        @Override
-        public boolean canScrollVertically() {
-            return false;
-        }
-    }
-
     @Override
     public void onFinish(List<MegaContactGetter.MegaContact> megaContacts) {
         if (!isAdded()) {
@@ -243,7 +223,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             moreContactsTitle.setVisibility(View.GONE);
 
             adapter = new ContactsHorizontalAdapter((Activity) context, this, megaContacts);
-            contactsList.setLayoutManager(new DisableScrollLayoutManager(getContext(), CONTACTS_COUNT, GridLayoutManager.VERTICAL, false));
+            contactsList.setLayoutManager(new LinearLayoutManager(getContext(),  LinearLayoutManager.HORIZONTAL, false));
             contactsList.setAdapter(adapter);
         } else {
             noContacts();
@@ -304,7 +284,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     }
                 } else {
-                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                    if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
+                        appBarLayout.setElevation(px2dp(4, outMetrics));
+                    } else {
+                        appBarLayout.setElevation(0);
+                    }
                 }
             } else if (context instanceof ArchivedChatsActivity) {
                 if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
@@ -326,6 +310,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         density = getResources().getDisplayMetrics().density;
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
+        appBarLayout = v.findViewById(R.id.linear_layout_add);
         aB = ((AppCompatActivity) context).getSupportActionBar();
         emptyLayoutContainer = v.findViewById(R.id.scroller);
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
