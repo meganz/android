@@ -1369,7 +1369,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         if (isFileAvailable(offlineParent)) {
             File offlineFile = new File(offlineParent, node.getName());
-            if (isFileAvailable(offlineFile)) {
+            if (isFileAvailable(offlineFile)
+                    && isFileDownloadedLatest(offlineFile, node)) {
                 return;
             }
         }

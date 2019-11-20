@@ -797,7 +797,8 @@ public class NodeController {
                     String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
                     MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
-                    if(localPath != null){
+                    if (localPath != null
+                            && isFileDownloadedLatest(new File(localPath), tempNode)) {
                         logDebug("localPath != null");
                         try {
                             logDebug("Call to copyFile: localPath: " + localPath+" node name: " + tempNode.getName());
