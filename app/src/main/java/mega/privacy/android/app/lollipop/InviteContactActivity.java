@@ -290,11 +290,6 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_invite_contact, menu);
-
-        MenuItem scanQrMenuItem = menu.findItem(R.id.action_more);
-        scanQrMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_more, R.color.black));
-        scanQrMenuItem.setVisible(true);
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -304,6 +299,10 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         switch (id) {
             case android.R.id.home: {
                 onBackPressed();
+                break;
+            }
+            case R.id.action_my_qr: {
+                initMyQr();
                 break;
             }
             case R.id.action_more: {
@@ -460,6 +459,15 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         logDebug("initScanQR");
         Intent intent = new Intent(this, QRCodeActivity.class);
         intent.putExtra(INVITE_CONTACT_SCAN_QR, true);
+        startQRActivity(intent);
+    }
+
+    private void initMyQr(){
+        Intent intent = new Intent(this, QRCodeActivity.class);
+        startQRActivity(intent);
+    }
+
+    private void startQRActivity(Intent intent){
         startActivityForResult(intent, SCAN_QR_FOR_INVITE_CONTACTS);
     }
 

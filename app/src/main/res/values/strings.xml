@@ -2539,6 +2539,7 @@
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
 
     <string name="invite_contact_chooser_title" context="Title of popup when user click 'Share' button on invite contact page">Invite a friend via</string>
+    <string name="invite_contact_action_button" context="Action button label">Invite a friend via...</string>
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
