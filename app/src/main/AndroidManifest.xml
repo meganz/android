@@ -192,6 +192,12 @@
             android:theme="@style/Theme.Megaactionbar">
         </activity>
 
+        <activity
+            android:name="mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Megaactionbar">
+        </activity>
+
         <activity android:name="mega.privacy.android.app.providers.PinFileProviderActivity"
             android:label="@string/app_name">
         </activity>
@@ -419,6 +425,11 @@
             android:launchMode="singleTask"
             android:label="@string/app_name">
         </activity>
+	    <activity android:name=".SMSVerificationActivity"
+	              android:theme="@style/SMSVerificationStyle"/>
+
+	    <activity android:name=".SMSVerificationReceiveTxtActivity"
+	              android:theme="@style/SMSVerificationReceiveTxtActivityTheme"/>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity"

@@ -3101,8 +3101,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         logDebug("onBackPressed");
         retryConnectionsAndSignalPresence();
 
-        closeChat(true);
-
         if(emojiKeyboard!=null && (emojiKeyboard.getLetterKeyboardShown() || emojiKeyboard.getEmojiKeyboardShown())){
             emojiKeyboard.hideBothKeyboard(this);
         }else{
@@ -3115,6 +3113,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (handlerKeyboard != null){
                     handlerKeyboard.removeCallbacksAndMessages(null);
                 }
+                closeChat(true);
                 ifAnonymousModeLogin(false);
             }
         }
