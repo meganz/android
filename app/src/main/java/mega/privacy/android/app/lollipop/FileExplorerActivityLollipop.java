@@ -3240,7 +3240,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			c = (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
 		}
 
-		if (c != null && c.isAdded()) {
+		if (c.isAdded()) {
 			return c;
 		}
 
@@ -3263,7 +3263,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			iS = (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
 		}
 
-		if (iS != null && iS.isAdded()) {
+		if (iS.isAdded()) {
 			return iS;
 		}
 
@@ -3286,7 +3286,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			cD = (CloudDriveExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
 		}
 
-		if (cD != null && cD.isAdded()) {
+		if (cD.isAdded()) {
 			return cD;
 		}
 
