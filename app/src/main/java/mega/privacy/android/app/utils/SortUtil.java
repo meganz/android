@@ -123,9 +123,13 @@ public class SortUtil {
                 continue;
             }
             if (node.getType().equals(FOLDER)) {
-                foldersOrder.add(node.getName());
+                if (!foldersOrder.contains(node.getName())) {
+                    foldersOrder.add(node.getName());
+                }
             } else {
-                filesOrder.add(node.getName());
+                if (!filesOrder.contains(node.getName())) {
+                    filesOrder.add(node.getName());
+                }
             }
         }
 
@@ -144,7 +148,7 @@ public class SortUtil {
                     continue;
                 }
                 String nameOffline = offline.getName();
-                if (name.equals(nameOffline)) {
+                if (name.equals(nameOffline) && !tempOffline.contains(offline)) {
                     tempOffline.add(offline);
                 }
             }
@@ -158,7 +162,7 @@ public class SortUtil {
                     continue;
                 }
                 String nameOffline = offline.getName();
-                if (name.equals(nameOffline)) {
+                if (name.equals(nameOffline) && !tempOffline.contains(offline)) {
                     tempOffline.add(offline);
                 }
             }
