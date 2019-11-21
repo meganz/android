@@ -1,6 +1,6 @@
 LOCAL_PATH:= $(call my-dir)
 
-CFLAGS := -Wpointer-arith -Wwrite-strings -Wunused -Winline -Wnested-externs -Wmissing-declarations -Wmissing-prototypes -Wno-long-long -Wfloat-equal -Wno-multichar -Wsign-compare -Wno-format-nonliteral -Wendif-labels -Wstrict-prototypes -Wdeclaration-after-statement -Wno-system-headers -Wno-nested-externs -DHAVE_CONFIG_H
+CFLAGS := -Wpointer-arith -Wwrite-strings -Wunused -Winline -Wnested-externs -Wmissing-declarations -Wmissing-prototypes -Wno-long-long -Wfloat-equal -Wno-multichar -Wsign-compare -Wno-format-nonliteral -Wendif-labels -Wstrict-prototypes -Wdeclaration-after-statement -Wno-system-headers -Wno-nested-externs -DHAVE_CONFIG_H -DBUILDING_LIBCURL
 
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/curl/lib/Makefile.inc
