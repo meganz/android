@@ -2,6 +2,8 @@ package mega.privacy.android.app.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import mega.privacy.android.app.MegaOffline;
 import nz.mega.sdk.MegaNode;
@@ -112,6 +114,15 @@ public class SortUtil {
         if (mOffList.size() <= 0) {
             return;
         }
+
+        Map<String, MegaOffline> map = new HashMap<>();
+        for (MegaOffline megaOffline : mOffList) {
+            map.put(megaOffline.getPath() + megaOffline.getName(), megaOffline);
+        }
+
+        mOffList.clear();
+        mOffList.addAll(map.values());
+        map.clear();
 
         ArrayList<String> foldersOrder = new ArrayList<>();
         ArrayList<String> filesOrder = new ArrayList<>();
