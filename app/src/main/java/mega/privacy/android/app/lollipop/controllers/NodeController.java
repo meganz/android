@@ -1003,7 +1003,9 @@ public class NodeController {
                             destFile = destDir;
                         }
 
-                        if(destFile.exists() && (document.getSize() == destFile.length())){
+                        if (destFile.exists()
+                                && (document.getSize() == destFile.length())
+                                && isFileDownloadedLatest(destFile, document)) {
                             numberOfNodesAlreadyDownloaded++;
                             logWarning(destFile.getAbsolutePath() + " already downloaded");
                         }
