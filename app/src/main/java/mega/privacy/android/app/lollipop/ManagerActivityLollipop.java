@@ -130,6 +130,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
@@ -143,8 +144,8 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
-import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -202,11 +203,13 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
 import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
+import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -256,34 +259,36 @@ import static mega.privacy.android.app.utils.Util.*;
 public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
+    private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
+    public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
+    private final String INDEX_CLOUD = "INDEX_CLOUD";
+
+	private final int ERROR_TAB = -1;
+	private final int CLOUD_TAB = 0;
+	private final int RECENTS_TAB = 1;
+	private final int INCOMING_TAB = 0;
+	private final int OUTGOING_TAB = 1;
+	private final int CONTACTS_TAB = 0;
+	private final int SENT_REQUESTS_TAB = 1;
+	private final int RECEIVED_REQUESTS_TAB = 2;
+	private final int GENERAL_TAB = 0;
+	private final int STORAGE_TAB = 1;
+
+	private final int CLOUD_DRIVE_BNV = 0;
+	private final int CAMERA_UPLOADS_BNV = 1;
+	private final int CHAT_BNV = 2;
+	private final int SHARED_BNV = 3;
+	private final int OFFLINE_BNV = 4;
+	private final int HIDDEN_BNV = 5;
+	private final int MEDIA_UPLOADS_BNV = 6;
+
+	private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
 	private static final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
 	private static final String OFFLINE_SEARCH_PATHS = "OFFLINE_SEARCH_PATHS";
 	public static final String OFFLINE_SEARCH_QUERY = "OFFLINE_SEARCH_QUERY:";
 	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
-
-	private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
-	private static final String INDEX_CLOUD = "INDEX_CLOUD";
-
-	private static final int ERROR_TAB = -1;
-	private static final int CLOUD_TAB = 0;
-	private static final int RECENTS_TAB = 1;
-	private static final int INCOMING_TAB = 0;
-	private static final int OUTGOING_TAB = 1;
-	private static final int CONTACTS_TAB = 0;
-	private static final int SENT_REQUESTS_TAB = 1;
-	private static final int RECEIVED_REQUESTS_TAB = 2;
-	private static final int GENERAL_TAB = 0;
-	private static final int STORAGE_TAB = 1;
-
-	private static final int CLOUD_DRIVE_BNV = 0;
-	private static final int CAMERA_UPLOADS_BNV = 1;
-	private static final int CHAT_BNV = 2;
-	private static final int SHARED_BNV = 3;
-	private static final int OFFLINE_BNV = 4;
-	private static final int HIDDEN_BNV = 5;
-	private static final int MEDIA_UPLOADS_BNV = 6;
 
 	public int accountFragment;
 
@@ -303,6 +308,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	TextView getProText;
 	TextView leftCancelButton;
 	TextView rightUpgradeButton;
+	TextView addPhoneNumberButton;
+	TextView addPhoneNumberLabel;
 	FloatingActionButton fabButton;
 
 	AlertDialog evaluateAppDialog;
@@ -376,6 +383,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public boolean openSettingsStorage = false;
     public boolean openSettingsQR = false;
 	boolean newAccount = false;
+	public boolean newCreationAccount;
 
 	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
 	private boolean isStorageStatusDialogShown = false;
@@ -383,13 +391,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private boolean userNameChanged;
 	private boolean userEmailChanged;
 
+	private LinearLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
 
     float elevation = 0;
+    private boolean isSMSDialogShowing;
+    private String bonusStorageSMS = "GB";
+    private final static String STATE_KEY_SMS_DIALOG =  "isSMSDialogShowing";
+    private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 
-	public enum FragmentTag {
+    public enum FragmentTag {
 		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
-		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS;
+		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION;
 
 		public String getTag () {
 			switch (this) {
@@ -421,6 +434,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				case TURN_ON_NOTIFICATIONS: return "tonF";
 				case EXPORT_RECOVERY_KEY: return "eRKeyF";
 				case PERMISSIONS: return "pF";
+                case SMS_VERIFICATION: return "svF";
 			}
 			return null;
 		}
@@ -465,7 +479,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	BottomNavigationViewEx bNV;
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
-	FrameLayout accountInfoFrame;
+    RelativeLayout accountInfoFrame;
 	private EmojiTextView nVDisplayName;
 	TextView nVEmail;
 	RoundedImageView nVPictureProfile;
@@ -599,6 +613,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private TurnOnNotificationsFragment tonF;
 	private ExportRecoveryKeyFragment eRKeyF;
 	private PermissionsFragment pF;
+	private SMSVerificationFragment svF;
 
 	ProgressDialog statusDialog;
 
@@ -619,6 +634,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private AlertDialog setPinDialog;
 	private AlertDialog alertDialogTransferOverquota;
 	private AlertDialog alertDialogStorageStatus;
+	private AlertDialog alertDialogSMSVerification;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -703,7 +719,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private long idJoinToChatLink = -1;
 
 	private boolean onAskingPermissionsFragment = false;
+	public boolean onAskingSMSVerificationFragment = false;
 
+	private BroadcastReceiver refreshAddPhoneNumberButtonReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context,Intent intent) {
+            if (intent != null && intent.getAction() == BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER) {
+                if(drawerLayout != null) {
+                    drawerLayout.closeDrawer(Gravity.LEFT);
+                }
+                refreshAddPhoneNumberButton();
+            }
+        }
+    };
 	private EditText openLinkText;
 	private RelativeLayout openLinkError;
 	private TextView openLinkErrorText;
@@ -716,11 +744,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null){
 				if (intent.getAction() == ACTION_STORAGE_STATE_CHANGED) {
-					int newStorageState =
-							intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
-					checkStorageStatus(newStorageState, false);
-					updateAccountDetailsVisibleInfo();
-					return;
+                    int newStorageState =
+                            intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
+                    checkStorageStatus(newStorageState, false);
+                    updateAccountDetailsVisibleInfo();
+                    return;
 				}
 
 				int actionType = intent.getIntExtra("actionType", -1);
@@ -1785,6 +1813,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
+		outState.putBoolean(STATE_KEY_SMS_DIALOG, isSMSDialogShowing);
+		outState.putString(STATE_KEY_SMS_BONUS, bonusStorageSMS);
 
 		if(parentHandleIncoming!=-1){
 			outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
@@ -1863,6 +1893,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (onAskingPermissionsFragment && pF != null) {
 			getSupportFragmentManager().putFragment(outState, FragmentTag.PERMISSIONS.getTag(), pF);
 		}
+        outState.putBoolean("onAskingSMSVerificationFragment", onAskingSMSVerificationFragment);
+        svF = (SMSVerificationFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.SMS_VERIFICATION.getTag());
+        if (onAskingSMSVerificationFragment && svF != null) {
+            getSupportFragmentManager().putFragment(outState, FragmentTag.SMS_VERIFICATION.getTag(), svF);
+        }
 		outState.putFloat("elevation", abL.getElevation());
 		outState.putInt("storageState", storageState);
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
@@ -1919,6 +1954,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
+			isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false);
+			bonusStorageSMS = savedInstanceState.getString(STATE_KEY_SMS_BONUS);
 			searchDate = savedInstanceState.getLongArray("searchDate");
 			firstLogin = savedInstanceState.getBoolean("firstLogin");
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
@@ -1954,6 +1991,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (onAskingPermissionsFragment) {
 				pF = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.PERMISSIONS.getTag());
 			}
+            onAskingSMSVerificationFragment = savedInstanceState.getBoolean("onAskingSMSVerificationFragment", false);
+            if (onAskingSMSVerificationFragment) {
+                svF = (SMSVerificationFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.SMS_VERIFICATION.getTag());
+            }
 			elevation = savedInstanceState.getFloat("elevation", 0);
 			storageState = savedInstanceState.getInt("storageState", MegaApiJava.STORAGE_STATE_UNKNOWN);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
@@ -1995,10 +2036,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			localBroadcastManager.registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
 
             localBroadcastManager.registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
+
+            localBroadcastManager.registerReceiver(refreshAddPhoneNumberButtonReceiver,
+                    new IntentFilter(BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER));
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
-
+        smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
 		cC = new ContactController(this);
 		aC = new AccountController(this);
@@ -2220,6 +2264,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				setContactStatus();
 
 				if (!refreshStorageInfo) return;
+                showAddPhoneNumberInMenu();
 				refreshAccountInfo();
 			}
 		});
@@ -2248,6 +2293,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_grey_button));
 		}
         upgradeAccount.setOnClickListener(this);
+
+        navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
+
+        addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
+        addPhoneNumberButton.setOnClickListener(this);
+
+        addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
+        megaApi.getAccountAchievements(this);
 
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
@@ -2338,7 +2391,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
 
-		accountInfoFrame = (FrameLayout) findViewById(R.id.navigation_drawer_account_view);
+		accountInfoFrame = findViewById(R.id.navigation_drawer_account_view);
         accountInfoFrame.setOnClickListener(this);
 
         nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
@@ -3047,6 +3100,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        	if (intent != null){
 	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					newAccount = getIntent().getBooleanExtra("newAccount", false);
+					newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
 
                     //reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra("newAccount");
@@ -3100,8 +3154,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        		}
 	        		else{
 						firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
-						if (firstLogin){
-							logDebug("Intent firstLogin==true");
+                        if (firstLogin){
+							logDebug("intent firstLogin==true");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 							setIntent(null);
 						}
@@ -3114,12 +3168,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        	if (intentRec != null){
 					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					newAccount = getIntent().getBooleanExtra("newAccount", false);
-
+                    newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
 					//reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra("newAccount");
                     getIntent().removeExtra("upgradeAccount");
 					firstLogin = intentRec.getBooleanExtra("firstLogin", firstLogin);
-					if(upgradeAccount){
+                    if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
 
@@ -3214,9 +3268,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		setContactStatus();
 
-		if (firstTimeAfterInstallation) {
-			askForAccess();
-		}
+        if (firstTimeAfterInstallation) {
+            //haven't verified phone number
+            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
+                askForSMSVerification();
+            } else {
+                askForAccess();
+            }
+        } else if (firstLogin && !newCreationAccount) {
+            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
+                askForSMSVerification();
+            }
+        }
 
 		if (openLinkDialogIsShown) {
 			showOpenLinkDialog();
@@ -3249,7 +3312,37 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	void askForAccess () {
+	private void askForSMSVerification() {
+        //If mobile device, only portrait mode is allowed
+        if (!isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            logDebug("mobile only portrait mode");
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        smsDialogTimeChecker.update();
+        onAskingSMSVerificationFragment = true;
+        if (svF == null) {
+            svF = new SMSVerificationFragment();
+        }
+        replaceFragment(svF, FragmentTag.SMS_VERIFICATION.getTag());
+        tabLayoutContacts.setVisibility(View.GONE);
+        viewPagerContacts.setVisibility(View.GONE);
+        tabLayoutShares.setVisibility(View.GONE);
+        viewPagerShares.setVisibility(View.GONE);
+        tabLayoutMyAccount.setVisibility(View.GONE);
+        viewPagerMyAccount.setVisibility(View.GONE);
+        tabLayoutTransfers.setVisibility(View.GONE);
+        viewPagerTransfers.setVisibility(View.GONE);
+        abL.setVisibility(View.GONE);
+
+        fragmentContainer.setVisibility(View.VISIBLE);
+        drawerLayout.closeDrawer(Gravity.LEFT);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        supportInvalidateOptionsMenu();
+        hideFabButton();
+        showHideBottomNavigationView(true);
+    }
+
+	public void askForAccess () {
     	//If mobile device, only portrait mode is allowed
 		if (!isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			logDebug("Mobile only portrait mode");
@@ -3281,6 +3374,29 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			showHideBottomNavigationView(true);
 		}
 	}
+
+	public void destroySMSVerificationFragment() {
+        //In mobile, allow all orientation after permission screen
+        if (!isTablet(this)) {
+            logDebug("mobile, all orientation");
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        }
+        onAskingSMSVerificationFragment = false;
+        svF = null;
+        if(!firstTimeAfterInstallation) {
+            tB.setVisibility(View.VISIBLE);
+            abL.setVisibility(View.VISIBLE);
+
+            deleteCurrentFragment();
+
+
+            changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
+
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            supportInvalidateOptionsMenu();
+            selectDrawerItemLollipop(drawerItem);
+        }
+    }
 
 	public void destroyPermissionsFragment () {
 		//In mobile, allow all orientation after permission screen
@@ -4396,7 +4512,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			megaChatApi.removeChatCallListener(this);
 
 		}
-
+        if (alertDialogSMSVerification != null) {
+            alertDialogSMSVerification.dismiss();
+        }
 		isStorageStatusDialogShown = false;
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
@@ -4405,6 +4523,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateOrder);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateView);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
 		unregisterReceiver(cameraUploadLauncherReceiver);
 
 		cancelSearch();
@@ -4462,6 +4581,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	public boolean isFirstLogin() {
+        return firstLogin;
+    }
+
 	public void selectDrawerItemCloudDrive(){
 		logDebug("selectDrawerItemCloudDrive");
 
@@ -4514,7 +4637,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			firstTimeAfterInstallation = false;
             dbH.setFirstTime(false);
 		}
-	}
+        checkBeforeShow();
+    }
+
+    public void checkBeforeShow() {
+        //This account hasn't verified a phone number and first login.
+        if (canVoluntaryVerifyPhoneNumber() && (smsDialogTimeChecker.shouldShow() || isSMSDialogShowing) && !newCreationAccount) {
+            showSMSVerificationDialog();
+        }
+    }
 
 	public void setToolbarTitle(){
 		logDebug("setToolbarTitle");
@@ -6132,7 +6263,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		logDebug("onCreateOptionsMenuLollipop");
-
+		// Force update the toolbar title to make the the tile length to be updated
+		setToolbarTitle();
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_manager, menu);
@@ -8414,7 +8546,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
 		}
 
-		if (onAskingPermissionsFragment) {
+		if (onAskingPermissionsFragment || onAskingSMSVerificationFragment) {
 			return;
 		}
 
@@ -12039,6 +12171,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("onClick");
 
 		switch(v.getId()){
+			case R.id.navigation_drawer_add_phone_number_button:{
+                Intent intent = new Intent(this,SMSVerificationActivity.class) ;
+                startActivity(intent);
+				break;
+			}
 			case R.id.btnLeft_cancel:{
 				getProLayout.setVisibility(View.GONE);
 				break;
@@ -13703,6 +13840,54 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				true, preWarning);
 	}
 
+	public void showSMSVerificationDialog() {
+	    isSMSDialogShowing = true;
+        smsDialogTimeChecker.update();
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);
+        dialogBuilder.setView(dialogView);
+
+        TextView msg = dialogView.findViewById(R.id.sv_dialog_msg);
+        boolean isAchievementUser = megaApi.isAchievementsEnabled();
+        logDebug("is achievement user: " + isAchievementUser);
+        if (isAchievementUser) {
+            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+            msg.setText(message);
+        } else {
+            msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
+        }
+
+        dialogView.findViewById(R.id.sv_btn_horizontal_not_now).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                alertDialogSMSVerification.dismiss();
+            }
+        });
+        dialogView.findViewById(R.id.sv_btn_horizontal_add).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),SMSVerificationActivity.class));
+                alertDialogSMSVerification.dismiss();
+            }
+        });
+        if(alertDialogSMSVerification == null) {
+            alertDialogSMSVerification = dialogBuilder.create();
+            alertDialogSMSVerification.setCancelable(false);
+            alertDialogSMSVerification.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    isSMSDialogShowing = false;
+                }
+            });
+            alertDialogSMSVerification.setCanceledOnTouchOutside(false);
+        }
+        alertDialogSMSVerification.show();
+    }
+
 	/**
 	 * Method to show a dialog to indicate the storage status.
 	 * @param storageState Storage status.
@@ -14435,7 +14620,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else if (e.getErrorCode() != MegaError.API_ESID){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 			}
-		}
+		} else if(request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                bonusStorageSMS = getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE));
+            }
+            showAddPhoneNumberInMenu();
+            checkBeforeShow();
+        }
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
 			logDebug("TYPE_SET_ATTR_USER");
 			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
@@ -17069,6 +17260,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else if (option == COLOR_STATUS_BAR_ZERO) {
 				window.setStatusBarColor(0);
 			}
+            else if (option == COLOR_STATUS_BAR_SMS_VERIFICATION) {
+                window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_sms_verification));
+            }
+			else if (option == COLOR_STATUS_BAR_SEARCH_DELAY){
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_search));
+					}
+				}, 300);
+			}
 		}
 		if (option == COLOR_STATUS_BAR_ACCENT){
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -17682,6 +17884,30 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public void setAccountFragmentPreUpgradeAccount (int accountFragment) {
 		this.accountFragmentPreUpgradeAccount = accountFragment;
 	}
+
+    private void refreshAddPhoneNumberButton(){
+        navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+        if(maFLol != null){
+            maFLol.updateAddPhoneNumberLabel();
+        }
+    }
+
+    private void showAddPhoneNumberInMenu(){
+	    if(megaApi == null){
+	        return;
+        }
+        if(canVoluntaryVerifyPhoneNumber()) {
+            if(megaApi.isAchievementsEnabled()) {
+                String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+                addPhoneNumberLabel.setText(message);
+            } else {
+                addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
+            }
+            navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
+        } else {
+            navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+        }
+    }
 
 	public void deleteInviteContactHandle(){
 		handleInviteContact = -1;
