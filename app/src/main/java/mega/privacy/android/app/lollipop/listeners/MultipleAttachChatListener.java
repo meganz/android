@@ -2,6 +2,8 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 
+import java.util.ArrayList;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -9,6 +11,7 @@ import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -27,6 +30,8 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
     int error = 0;
     int max_items = 0;
     long chatId = -1;
+
+    private ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
 
     public MultipleAttachChatListener(Context context, long chatId, int counter) {
         super();
@@ -53,6 +58,8 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
             error++;
             logError("Attach node error: " + e.getErrorString() + "__" + e.getErrorCode());
         }
+
+        messages.add(new AndroidMegaChatMessage(request.getMegaChatMessage()));
 
         logDebug("Counter: " + counter);
         logDebug("Error: " + error);
@@ -134,7 +141,9 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
                 }
             } else if (context instanceof ChatActivityLollipop) {
                 if (success > 0) {
+                    ((ChatActivityLollipop) context).sendMessagesToUI(messages);
                     ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, success, success), -1);
+
                 } else {
                     ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }

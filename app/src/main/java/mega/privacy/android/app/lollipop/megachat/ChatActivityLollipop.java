@@ -3478,6 +3478,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void sendMessagesToUI(ArrayList<AndroidMegaChatMessage> messages) {
+        for (AndroidMegaChatMessage message : messages) {
+            sendMessageToUI(message);
+        }
+    }
+
     public void editMessage(String text){
         logDebug("editMessage: ");
         MegaChatMessage msgEdited = null;
