@@ -160,6 +160,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			((FileExplorerActivityLollipop) context).clearQuerySearch();
+			getNodes();
 			setNodes(nodes);
 			clearSelections();
 			adapter.setMultipleSelect(false);

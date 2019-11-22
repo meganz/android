@@ -28,15 +28,21 @@ public abstract class RotatableFragment extends Fragment {
 
     private int lastPlaceHolderCount;
 
-    private void reDoTheSelectionAfterRotation() {
+    private boolean waitingForSearchedNodes;
+
+    public void reDoTheSelectionAfterRotation() {
         logDebug("Reselect items");
+        setWaitingForSearchedNodes(false);
+
+        if (selectedItems == null) return;
+
         RotatableAdapter adapter = getAdapter();
         if (adapter != null) {
             int folderCount = adapter.getFolderCount();
             logDebug("Folders: " + folderCount);
             int currentPlaceHolderCount = adapter.getPlaceholderCount();
             logDebug("Place holder: " + currentPlaceHolderCount);
-            if (selectedItems != null && selectedItems.size() > 0) {
+            if (selectedItems.size() > 0) {
                 activateActionMode();
                 for (int selectedItem : selectedItems) {
                     if (isList()) {
@@ -92,10 +98,18 @@ public abstract class RotatableFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (selectedItems != null) {
+
+        if (!isWaitingForSearchedNodes()) {
             reDoTheSelectionAfterRotation();
             selectedItems = null;
         }
     }
 
+    public boolean isWaitingForSearchedNodes() {
+        return waitingForSearchedNodes;
+    }
+
+    public void setWaitingForSearchedNodes(boolean waitingForSearchedNodes) {
+        this.waitingForSearchedNodes = waitingForSearchedNodes;
+    }
 }

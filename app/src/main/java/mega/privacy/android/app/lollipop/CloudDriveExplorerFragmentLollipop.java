@@ -162,6 +162,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			((FileExplorerActivityLollipop) context).clearQuerySearch();
+			getNodes();
 			setNodes(nodes);
 			clearSelections();
 			adapter.setMultipleSelect(false);
