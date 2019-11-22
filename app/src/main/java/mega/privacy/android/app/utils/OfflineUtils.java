@@ -202,7 +202,7 @@ public class OfflineUtils {
             MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
             if (offlineNode != null) {
                 File offlineFile = getOfflineFile(context, offlineNode);
-                if (isFileAvailable(offlineFile) && offlineFile.length() == node.getSize()) return true;
+                if (isFileAvailable(offlineFile) && isFileDownloadedLatest(offlineFile, node)) return true;
             }
         }
 
