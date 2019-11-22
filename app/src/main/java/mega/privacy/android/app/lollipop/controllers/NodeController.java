@@ -795,7 +795,7 @@ public class NodeController {
                 if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
                     logDebug("ISFILE");
                     String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
-                    //Check if the file is already downloaded
+                    //Check if the file is already downloaded, and downloaded file is the latest version
                     MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
                     if (localPath != null
                             && isFileDownloadedLatest(new File(localPath), tempNode)) {

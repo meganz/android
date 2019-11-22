@@ -115,6 +115,7 @@ public class SortUtil {
             return;
         }
 
+        //To remove the redundant offline record
         Map<String, MegaOffline> map = new HashMap<>();
         for (MegaOffline megaOffline : mOffList) {
             map.put(megaOffline.getPath() + megaOffline.getName(), megaOffline);
