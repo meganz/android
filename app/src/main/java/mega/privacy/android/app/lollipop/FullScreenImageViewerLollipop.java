@@ -2571,7 +2571,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				tB.animate().translationY(0).setDuration(400L).start();
 				bottomLayout.animate().translationY(0).setDuration(400L).start();
 				getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-				//getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
 		}
 	}
