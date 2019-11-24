@@ -22,17 +22,18 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
+import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 
+import static mega.privacy.android.app.utils.Constants.PIN_4;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.Constants.*;
 
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 47;
+	private static final int DATABASE_VERSION = 48;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -49,6 +50,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_NODE_ATTACHMENTS = "nodeattachments";
 	private static final String TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle";
 	private static final String TABLE_SYNC_RECORDS = "syncrecords";
+	private static final String TABLE_MEGA_CONTACTS = "megacontacts";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -76,6 +78,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CHARGING_ON_SIZE = "chargingOnSize";
     private static final String KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = "shouldclearcamsyncrecords";
     private static final String KEY_KEEP_FILE_NAMES = "keepFileNames";
+    private static final String KEY_SHOW_INVITE_BANNER = "showinvitebanner";
     private static final String KEY_PIN_LOCK_ENABLED = "pinlockenabled";
     private static final String KEY_PIN_LOCK_TYPE = "pinlocktype";
     private static final String KEY_PIN_LOCK_CODE = "pinlockcode";
@@ -208,6 +211,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_PENDING_MSG_TRANSFER_TAG = "transfertag";
 	private static final String KEY_PENDING_MSG_STATE = "state";
 
+	private static final String KEY_MEGA_CONTACTS_ID = "userid";
+	private static final String KEY_MEGA_CONTACTS_HANDLE = "handle";
+	private static final String KEY_MEGA_CONTACTS_LOCAL_NAME = "localname";
+	private static final String KEY_MEGA_CONTACTS_EMAIL = "email";
+	private static final String KEY_MEGA_CONTACTS_PHONE_NUMBER = "phonenumber";
+    private static final String CREATE_MEGA_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_MEGA_CONTACTS + "("
+            + KEY_ID + " INTEGER PRIMARY KEY, "
+            + KEY_MEGA_CONTACTS_ID + " TEXT,"
+            + KEY_MEGA_CONTACTS_HANDLE + " TEXT,"
+            + KEY_MEGA_CONTACTS_LOCAL_NAME + " TEXT,"
+            + KEY_MEGA_CONTACTS_EMAIL + " TEXT,"
+            + KEY_MEGA_CONTACTS_PHONE_NUMBER + " TEXT)";
+
     private static DatabaseHandler instance;
 
     private static SQLiteDatabase db;
@@ -244,21 +260,46 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_CREDENTIALS_TABLE);
 
         String CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PREFERENCES + "("
-        		+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_FIRST_LOGIN + " BOOLEAN, "
-        		+ KEY_CAM_SYNC_ENABLED + " BOOLEAN, " + KEY_CAM_SYNC_HANDLE + " TEXT, "
-        		+ KEY_CAM_SYNC_LOCAL_PATH + " TEXT, " + KEY_CAM_SYNC_WIFI + " BOOLEAN, "
-        		+ KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, " + KEY_PIN_LOCK_ENABLED + " TEXT, " +
-        		KEY_PIN_LOCK_CODE + " TEXT, " + KEY_STORAGE_ASK_ALWAYS + " TEXT, " +
-        		KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, " + KEY_CAM_SYNC_TIMESTAMP + " TEXT, " +
-        		KEY_CAM_SYNC_CHARGING + " BOOLEAN, " + KEY_LAST_UPLOAD_FOLDER + " TEXT, "+
-        		KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, " + KEY_SEC_FOLDER_ENABLED + " TEXT, " + KEY_SEC_FOLDER_LOCAL_PATH +
-        		" TEXT, "+ KEY_SEC_FOLDER_HANDLE + " TEXT, " + KEY_SEC_SYNC_TIMESTAMP+" TEXT, "+KEY_KEEP_FILE_NAMES + " BOOLEAN, "+
-        		KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN, "+ KEY_PREFERRED_VIEW_LIST+ "	BOOLEAN, "+KEY_PREFERRED_VIEW_LIST_CAMERA+ " BOOLEAN, " +
-        		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " + KEY_PIN_LOCK_TYPE + " TEXT, " +
-				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT," +
-				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN," + KEY_AUTO_PLAY + " BOOLEAN," + KEY_UPLOAD_VIDEO_QUALITY + " TEXT," +
-                KEY_CONVERSION_ON_CHARGING + " BOOLEAN," + KEY_CHARGING_ON_SIZE + " TEXT," + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT," +  KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT," +
-                KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT," + KEY_REMOVE_GPS + " TEXT" + ")";
+                + KEY_ID + " INTEGER PRIMARY KEY,"                  //0
+                + KEY_FIRST_LOGIN + " BOOLEAN, "                    //1
+                + KEY_CAM_SYNC_ENABLED + " BOOLEAN, "               //2
+                + KEY_CAM_SYNC_HANDLE + " TEXT, "                   //3
+                + KEY_CAM_SYNC_LOCAL_PATH + " TEXT, "               //4
+                + KEY_CAM_SYNC_WIFI + " BOOLEAN, "                  //5
+                + KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, "              //6
+                + KEY_PIN_LOCK_ENABLED + " TEXT, "                  //7
+                + KEY_PIN_LOCK_CODE + " TEXT, "                     //8
+                + KEY_STORAGE_ASK_ALWAYS + " TEXT, "                //9
+                + KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, "         //10
+                + KEY_CAM_SYNC_TIMESTAMP + " TEXT, "                //11
+                + KEY_CAM_SYNC_CHARGING + " BOOLEAN, "              //12
+                + KEY_LAST_UPLOAD_FOLDER + " TEXT, "                //13
+                + KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, "          //14
+                + KEY_SEC_FOLDER_ENABLED + " TEXT, "                //15
+                + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT, "             //16
+                + KEY_SEC_FOLDER_HANDLE + " TEXT, "                 //17
+                + KEY_SEC_SYNC_TIMESTAMP + " TEXT, "                //18
+                + KEY_KEEP_FILE_NAMES + " BOOLEAN, "                //19
+                + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN, "       //20
+                + KEY_PREFERRED_VIEW_LIST + " BOOLEAN, "            //21
+                + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN, "     //22
+                + KEY_URI_EXTERNAL_SD_CARD + " TEXT, "              //23
+                + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " //24
+                + KEY_PIN_LOCK_TYPE + " TEXT, "                     //25
+                + KEY_PREFERRED_SORT_CLOUD + " TEXT, "              //26
+                + KEY_PREFERRED_SORT_CONTACTS + " TEXT, "           //27
+                + KEY_PREFERRED_SORT_OTHERS + " TEXT,"              //28
+                + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               //29
+                + KEY_SMALL_GRID_CAMERA + " BOOLEAN,"               //30
+                + KEY_AUTO_PLAY + " BOOLEAN,"                       //31
+                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT,"               //32
+                + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          //33
+                + KEY_CHARGING_ON_SIZE + " TEXT,"                   //34
+                + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       //35
+                + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //36
+                + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //37
+                + KEY_REMOVE_GPS + " TEXT,"                         //38
+                + KEY_SHOW_INVITE_BANNER + " TEXT" + ")";           //39
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -318,6 +359,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_NEW_PENDING_MSG_TABLE);
 
         db.execSQL(CREATE_SYNC_RECORDS_TABLE);
+
+        db.execSQL(CREATE_MEGA_CONTACTS_TABLE);
 	}
 
 	@Override
@@ -676,6 +719,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_STORAGE_STATE + " INTEGER;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_STORAGE_STATE + " = '" + encrypt(String.valueOf(MegaApiJava.STORAGE_STATE_UNKNOWN)) + "';");
 		}
+
+        if(oldVersion <= 47) {
+            db.execSQL(CREATE_MEGA_CONTACTS_TABLE);
+
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SHOW_INVITE_BANNER + " TEXT;");
+            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SHOW_INVITE_BANNER + " = '" + encrypt("true") + "';");
+        }
 	}
 
 //	public MegaOffline encrypt(MegaOffline off){
@@ -1198,6 +1248,67 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return userCredentials;
 	}
 
+    public void batchInsertMegaContacts(List<MegaContactGetter.MegaContact> contacts) {
+        if (contacts == null || contacts.size() == 0) {
+            logWarning("Empty MEGA contacts list.");
+            return;
+        }
+        logDebug("Contacts size is: " + contacts.size());
+        db.beginTransaction();
+        try {
+            ContentValues values;
+            for (MegaContactGetter.MegaContact contact : contacts) {
+                values = new ContentValues();
+                values.put(KEY_MEGA_CONTACTS_ID, encrypt(contact.getId()));
+                values.put(KEY_MEGA_CONTACTS_HANDLE, encrypt(String.valueOf(contact.getHandle())));
+                values.put(KEY_MEGA_CONTACTS_LOCAL_NAME, encrypt(contact.getLocalName()));
+                values.put(KEY_MEGA_CONTACTS_EMAIL, encrypt(contact.getEmail()));
+                values.put(KEY_MEGA_CONTACTS_PHONE_NUMBER, encrypt(contact.getNormalizedPhoneNumber()));
+
+                db.insert(TABLE_MEGA_CONTACTS, null, values);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public ArrayList<MegaContactGetter.MegaContact> getMegaContacts() {
+        String sql = "SELECT * FROM " + TABLE_MEGA_CONTACTS;
+        Cursor cursor = db.rawQuery(sql, null);
+        if (cursor != null) {
+            ArrayList<MegaContactGetter.MegaContact> contacts = new ArrayList<>();
+            try {
+                MegaContactGetter.MegaContact contact;
+                while(cursor.moveToNext()) {
+                    contact = new MegaContactGetter.MegaContact();
+
+                    String id = cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_ID));
+                    contact.setId(decrypt(id));
+                    String handle = cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_HANDLE));
+                    contact.setHandle(Long.valueOf(decrypt(handle)));
+                    String localName = cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_LOCAL_NAME));
+                    contact.setLocalName(decrypt(localName));
+                    String email = cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_EMAIL));
+                    contact.setEmail(decrypt(email));
+                    String phoneNumber = cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_PHONE_NUMBER));
+                    contact.setNormalizedPhoneNumber(decrypt(phoneNumber));
+
+                    contacts.add(contact);
+                }
+                return contacts;
+            } finally {
+                cursor.close();
+            }
+        }
+        return null;
+    }
+
+    public void clearMegaContacts() {
+        logDebug("delete table " + TABLE_MEGA_CONTACTS);
+        db.execSQL("DELETE FROM " + TABLE_MEGA_CONTACTS);
+    }
+
     public EphemeralCredentials getEphemeral(){
         EphemeralCredentials ephemeralCredentials = null;
 
@@ -1306,12 +1417,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String camVideoSyncTimeStamp = decrypt(cursor.getString(36));
 			String secVideoSyncTimeStamp = decrypt(cursor.getString(37));
 			String removeGPS = decrypt(cursor.getString(38));
+			String closeInviteBanner = decrypt(cursor.getString(39));
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
 					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize,shouldClearCameraSyncRecords,camVideoSyncTimeStamp,
-                    secVideoSyncTimeStamp,isAutoPlayEnabled,removeGPS);
+                    secVideoSyncTimeStamp,isAutoPlayEnabled,removeGPS,closeInviteBanner);
 		}
 		cursor.close();
 
@@ -3670,6 +3782,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         else{
             values.put(KEY_AUTO_PLAY, encrypt(enabled + ""));
+            db.insert(TABLE_PREFERENCES, null, values);
+        }
+        cursor.close();
+    }
+
+    public void setShowInviteBanner(String show){
+        logDebug("setCloseInviteBanner");
+
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SHOW_INVITE_BANNER + "='" + encrypt(show + "") + "' WHERE " + KEY_ID + " ='1'";
+            db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+        }
+        else{
+            values.put(KEY_SHOW_INVITE_BANNER, encrypt(show + ""));
             db.insert(TABLE_PREFERENCES, null, values);
         }
         cursor.close();
