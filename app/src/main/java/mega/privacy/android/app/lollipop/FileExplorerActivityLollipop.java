@@ -250,6 +250,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private int totalErrors;
 
 	private boolean shouldRestartSearch;
+	private String queryAfterSearch;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -991,12 +992,17 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	public void isPendingToOpenSearchView () {
 		if (pendingToOpenSearchView && searchMenuItem != null) {
-			String query = querySearch;
-			searchMenuItem.expandActionView();
-			searchView.setQuery(query, false);
+			openSearchView(querySearch);
 			pendingToOpenSearchView = false;
 		}
 	}
+
+	private void openSearchView(String search) {
+	    if (searchMenuItem == null) return;
+
+        searchMenuItem.expandActionView();
+        searchView.setQuery(search, false);
+    }
 
 	private void setCreateFolderVisibility() {
 		if (intent == null) {
@@ -3488,4 +3494,16 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public void clearQuerySearch() {
 		querySearch = null;
 	}
+
+    public void setQueryAfterSearch() {
+	    this.queryAfterSearch = querySearch;
+    }
+
+    public boolean shouldReopenSearch() {
+	    if (queryAfterSearch == null) return false;
+
+        openSearchView(queryAfterSearch);
+	    queryAfterSearch = null;
+	    return true;
+    }
 }

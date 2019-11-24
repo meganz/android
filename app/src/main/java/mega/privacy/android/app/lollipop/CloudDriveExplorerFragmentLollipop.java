@@ -161,9 +161,11 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			((FileExplorerActivityLollipop) context).clearQuerySearch();
-			getNodes();
-			setNodes(nodes);
+			if (!((FileExplorerActivityLollipop) context).shouldReopenSearch()) {
+				((FileExplorerActivityLollipop) context).clearQuerySearch();
+				getNodes();
+				setNodes(nodes);
+			}
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
@@ -556,6 +558,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		if (searchNodes != null) {
 			clickNodes = searchNodes;
 			shouldResetNodes = false;
+			((FileExplorerActivityLollipop) context).setQueryAfterSearch();
 			((FileExplorerActivityLollipop) context).collapseSearchView();
 		}
 		else {
