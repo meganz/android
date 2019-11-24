@@ -633,23 +633,13 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 		}
 		else if(selectFile) {
 			if(((FileExplorerActivityLollipop)context).isMultiselect()){
-				int togglePosition = position;
-				if (!clickNodes.equals(nodes)) {
-					MegaNode node;
-					for (int i=0; i<nodes.size(); i++) {
-						node = nodes.get(i);
-						if (node != null && node.getHandle() == n.getHandle()) {
-							togglePosition = i;
-						}
-					}
-				}
 				if (adapter.getSelectedItemCount() == 0) {
 					activateActionMode();
-					adapter.toggleSelection(togglePosition);
+					adapter.toggleSelection(position);
 					updateActionModeTitle();
 				}
 				else {
-					adapter.toggleSelection(togglePosition);
+					adapter.toggleSelection(position);
 
 					List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 					if (selectedNodes.size() > 0){

@@ -765,14 +765,17 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 					public void onPageSelected(int position) {
 						logDebug("Position:"+ position);
-						clearQuerySearch();
 						supportInvalidateOptionsMenu();
 						changeTitle();
 
 						if (!multiselect) {
 							return;
 						}
-						collapseSearchView();
+						
+						if (isSearchExpanded && !pendingToOpenSearchView) {
+							clearQuerySearch();
+							collapseSearchView();
+						}
 						cDriveExplorer = getCloudExplorerFragment();
 						iSharesExplorer = getIncomingExplorerFragment();
 						if (position == 0) {

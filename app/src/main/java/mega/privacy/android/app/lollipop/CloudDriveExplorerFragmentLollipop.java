@@ -623,27 +623,12 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		}
 		else if(selectFile) {
 			if(((FileExplorerActivityLollipop)context).isMultiselect()){
-				logDebug("select file and allow multiselection");
-				int togglePosition = position;
-				if (!clickNodes.equals(nodes)) {
-					MegaNode node;
-					for (int i=0; i<nodes.size(); i++) {
-						node = nodes.get(i);
-						if (node != null && node.getHandle() == n.getHandle()) {
-							togglePosition = i;
-						}
-					}
-				}
-
 				if (adapter.getSelectedItemCount() == 0) {
-					logDebug("Activate the actionMode");
 					activateActionMode();
-					adapter.toggleSelection(togglePosition);
+					adapter.toggleSelection(position);
 					updateActionModeTitle();
-				}
-				else {
-					logDebug("add to selectedNodes");
-					adapter.toggleSelection(togglePosition);
+				} else {
+					adapter.toggleSelection(position);
 
 					List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 					if (selectedNodes.size() > 0){
