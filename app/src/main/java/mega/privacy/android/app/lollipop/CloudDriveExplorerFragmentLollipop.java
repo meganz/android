@@ -635,7 +635,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 						updateActionModeTitle();
 					}
 				}
-
 			}
 			else{
 				//Send file

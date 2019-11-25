@@ -49,13 +49,13 @@ public abstract class RotatableFragment extends Fragment {
                         logDebug("selectedItem:" + selectedItem);
                         multipleItemClick(selectedItem);
                     } else {
-                        if (selectedItem < folderCount) {
-                            logDebug("List folder, selectedItem: " + selectedItem);
-                            multipleItemClick(selectedItem);
-                        } else {
+//                        if (selectedItem < folderCount) {
+//                            logDebug("List folder, selectedItem: " + selectedItem);
+//                            multipleItemClick(selectedItem);
+//                        } else {
                             logDebug("File selection, selectedItem: " + selectedItem + "lastPlaceHolderCount:" + lastPlaceHolderCount + ". currentPlaceHolderCount: " + currentPlaceHolderCount);
                             multipleItemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount));
-                        }
+//                        }
                     }
                 }
             }
