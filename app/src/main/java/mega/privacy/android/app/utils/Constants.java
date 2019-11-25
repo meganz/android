@@ -169,6 +169,7 @@ public class Constants {
     public static final int COLOR_STATUS_BAR_SEARCH_DELAY = 4;
     public static final int COLOR_STATUS_BAR_SMS_VERIFICATION = 5;
 
+    public static final String CONTACT_LINK_BASE_URL = "https://mega.nz/C!";
     public static final String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
     public static final String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";

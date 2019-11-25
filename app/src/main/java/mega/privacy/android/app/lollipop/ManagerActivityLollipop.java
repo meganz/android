@@ -209,6 +209,7 @@ import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
 import mega.privacy.android.app.utils.billing.Purchase;
+import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -667,8 +668,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private MenuItem pauseTransfersMenuIcon;
 	private MenuItem logoutMenuItem;
 	private MenuItem forgotPassMenuItem;
-	private MenuItem newChatMenuItem;
-	private MenuItem setStatusMenuItem;
+	private MenuItem inviteMenuItem;
 	private MenuItem clearCompletedTransfers;
 	private MenuItem scanQRcodeMenuItem;
 	private MenuItem rubbishBinMenuItem;
@@ -2093,6 +2093,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		transfersInProgress = new ArrayList<Integer>();
+
+		//sync local contacts to see who's on mega.
+		if (hasPermissions(this, Manifest.permission.READ_CONTACTS)) {
+		    logDebug("sync mega contacts");
+			MegaContactGetter getter = new MegaContactGetter(this);
+			getter.getMegaContacts(megaApi, MegaContactGetter.WEEK);
+		}
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -4574,6 +4581,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.replace(R.id.fragment_container, f, fTag);
 		ft.commitNowAllowingStateLoss();
+		// refresh manually
+		if (f instanceof RecentChatsFragmentLollipop) {
+			RecentChatsFragmentLollipop rcf = (RecentChatsFragmentLollipop) f;
+			if (rcf.isResumed()) {
+				rcf.refreshMegaContactsList();
+				rcf.setCustomisedActionBar();
+			}
+		}
 	}
 
 	void refreshFragment (String fTag) {
@@ -5703,6 +5718,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     	drawerItem = item;
 		((MegaApplication)getApplication()).setRecentChatVisible(false);
+		resetActionBar(aB);
 		setTransfersWidget();
 		setCallWidget();
 
@@ -6496,8 +6512,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		forgotPassMenuItem = menu.findItem(R.id.action_menu_forgot_pass);
 		forgotPassMenuItem.setVisible(false);
 
-		newChatMenuItem = menu.findItem(R.id.action_menu_new_chat);
-		setStatusMenuItem = menu.findItem(R.id.action_menu_set_status);
+		inviteMenuItem = menu.findItem(R.id.action_menu_invite);
 
 	    if (drawerItem == null){
 	    	if (bNV != null){
@@ -6547,8 +6562,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 
 //				Show
 				rubbishBinMenuItem.setVisible(true);
@@ -6592,6 +6605,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					selectMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
 				}
+                inviteMenuItem.setVisible(false);
 			}
 			else if(drawerItem == DrawerItem.RUBBISH_BIN){
 				logDebug("In Rubbish");
@@ -6640,8 +6654,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				rubbishBinMenuItem.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
+                inviteMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 				logDebug("In Offline");
@@ -6706,8 +6719,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				setGridListIcon();
 
 				gridSmallLargeMenuItem.setVisible(false);
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
+                inviteMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 				logDebug("In Camera Uploads");
@@ -6785,8 +6797,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						selectMenuItem.setVisible(false);
 					}
 				}
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
+                inviteMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 				logDebug("In Media Uploads");
@@ -6866,8 +6877,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						selectMenuItem.setVisible(false);
 					}
 				}
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
+                inviteMenuItem.setVisible(false);
 			}
 
 			else if (drawerItem == DrawerItem.INBOX){
@@ -6913,8 +6923,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				gridSmallLargeMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
+                inviteMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.SHARED_ITEMS){
 				//Lollipop
@@ -7040,15 +7049,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 				}
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
+
+                inviteMenuItem.setVisible(false);
 				setGridListIcon();
 			}
 			else if (drawerItem == DrawerItem.CONTACTS){
 				logDebug("createOptions CONTACTS");
 				int index = getTabItemContacts();
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
+                inviteMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);
 
 				if (index == CONTACTS_TAB){
@@ -7204,9 +7212,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				gridSmallLargeMenuItem.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
-				if (searchExpand) {
+                inviteMenuItem.setVisible(false);
+                if (searchExpand) {
 					openSearchView();
 					upgradeAccountMenuItem.setVisible(false);
 					rubbishBinMenuItem.setVisible(false);
@@ -7260,8 +7267,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				cancelAllTransfersMenuItem.setVisible(false);
 				clearCompletedTransfers.setVisible(false);
 				gridSmallLargeMenuItem.setVisible(false);
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
+                inviteMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);
 				if(accountFragment==MY_ACCOUNT_FRAGMENT){
 					//Show
@@ -7323,8 +7329,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				killAllSessions.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
+                inviteMenuItem.setVisible(false);
 
 				cancelAllTransfersMenuItem.setVisible(true);
 
@@ -7393,8 +7398,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				forgotPassMenuItem.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
+				inviteMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.CHAT){
 				logDebug("In Chat Section");
@@ -7404,24 +7408,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 					if (searchExpand) {
 						openSearchView();
-						newChatMenuItem.setVisible(false);
+						inviteMenuItem.setVisible(false);
 						selectMenuItem.setVisible(false);
-						setStatusMenuItem.setVisible(false);
 						importLinkMenuItem.setVisible(false);
 					}
 					else {
 						if (isOnline(this)) {
-							newChatMenuItem.setVisible(true);
+							inviteMenuItem.setVisible(true);
 							if (rChatFL != null && rChatFL.getItemCount() > 0) {
 								selectMenuItem.setVisible(true);
 							} else {
 								selectMenuItem.setVisible(false);
 							}
-							setStatusMenuItem.setVisible(true);
 						} else {
-							newChatMenuItem.setVisible(false);
+							inviteMenuItem.setVisible(false);
 							selectMenuItem.setVisible(false);
-							setStatusMenuItem.setVisible(false);
 						}
 						importLinkMenuItem.setVisible(true);
 					}
@@ -7467,8 +7468,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				else{
 					//Hide ALL
 					searchByDate.setVisible(false);
-					newChatMenuItem.setVisible(false);
-					setStatusMenuItem.setVisible(false);
+					inviteMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
@@ -7498,11 +7498,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			else if(drawerItem == DrawerItem.NOTIFICATIONS){
 				//Hide all
-				newChatMenuItem.setVisible(false);
+				inviteMenuItem.setVisible(false);
 				selectMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
-				selectMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
 				searchByDate.setVisible(false);
 				addContactMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);
@@ -7541,15 +7538,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					if (rChatFL != null) {
 						if (isOnline(this)) {
 							selectMenuItem.setVisible(true);
-							setStatusMenuItem.setVisible(true);
 						} else {
 							selectMenuItem.setVisible(false);
-							setStatusMenuItem.setVisible(false);
 						}
 					}
 
 					//Hide
-					newChatMenuItem.setVisible(false);
+					inviteMenuItem.setVisible(false);
 					searchByDate.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
@@ -7580,8 +7575,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					logDebug("HIDE ALL options chat disabled");
 					//Hide ALL
 					searchByDate.setVisible(false);
-					newChatMenuItem.setVisible(false);
-					setStatusMenuItem.setVisible(false);
+					inviteMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
@@ -7613,8 +7607,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("HIDE ALL options without NET");
 				//Hide ALL
 				searchByDate.setVisible(false);
-				newChatMenuItem.setVisible(false);
-				setStatusMenuItem.setVisible(false);
+				inviteMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
 				selectMenuItem.setVisible(false);
 				searchMenuItem.setVisible(false);
@@ -7848,8 +7841,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
-					newChatMenuItem.setVisible(false);
-					setStatusMenuItem.setVisible(false);
+					inviteMenuItem.setVisible(false);
 					selectMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
@@ -7919,18 +7911,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        	}
 	        	return true;
 	        }
-			case R.id.action_menu_new_chat:{
+			case R.id.action_menu_invite:{
 				if (drawerItem == DrawerItem.CHAT){
-					logDebug("Create new chat");
-					chooseAddContactDialog(true);
-				}
-
-				return true;
-			}
-			case R.id.action_menu_set_status:{
-				if (drawerItem == DrawerItem.CHAT){
-					logDebug("Action set status");
-					showPresenceStatusDialog();
+                    logDebug("to InviteContactActivity");
+                    startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
 				}
 
 				return true;
@@ -11209,8 +11193,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	public void addContactFromPhone(){
-		Intent in = new Intent(this, AddContactActivityLollipop.class);
+	public void addContactFromPhone() {
+		Intent in = new Intent(this, InviteContactActivity.class);
 		in.putExtra("contactType", CONTACT_TYPE_DEVICE);
 		startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
 	}
