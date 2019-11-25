@@ -14,6 +14,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -47,6 +48,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -68,7 +70,6 @@ import nz.mega.sdk.MegaUser;
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -96,6 +97,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	TextView usedSpace;
 	TextView lastSession;
 	TextView connections;
+	TextView addPhoneNumber;
 
 	ImageView editImageView;
 
@@ -226,7 +228,20 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		infoEmail.setText(megaApi.getMyEmail());
 		infoEmail.setOnClickListener(this);
-		
+
+        String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
+		addPhoneNumber = v.findViewById(R.id.add_phone_number);
+		if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
+            addPhoneNumber.setText(registeredPhoneNumber);
+        } else {
+		    if(Util.canVoluntaryVerifyPhoneNumber()) {
+                addPhoneNumber.setText(R.string.add_phone_number_label);
+                addPhoneNumber.setOnClickListener(this);
+            } else {
+		        addPhoneNumber.setVisibility(View.GONE);
+            }
+        }
+
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
 
 		mkButton = (Button) v.findViewById(R.id.MK_button);
@@ -336,8 +351,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         super.onResume();
         //Refresh
 		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
-		refreshAccountInfo();
-        updateView();
+		updateView();
 		checkLogoutWarnings();
     }
     /**
@@ -404,27 +418,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		logDebug("newInstance");
 		MyAccountFragmentLollipop fragment = new MyAccountFragmentLollipop();
 		return fragment;
-	}
-
-	public void refreshAccountInfo(){
-		logDebug("refreshAccountInfo");
-
-		//Check if the call is recently
-		logDebug("Check the last call to getAccountDetails");
-		if(callToAccountDetails(context)){
-			logDebug("megaApi.getAccountDetails SEND");
-			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
-		}
-		logDebug("Check the last call to getExtendedAccountDetails");
-		if(callToExtendedAccountDetails(context)){
-			logDebug("megaApi.getExtendedAccountDetails SEND");
-			((MegaApplication) ((Activity)context).getApplication()).askForExtendedAccountDetails();
-		}
-		logDebug("Check the last call to getPaymentMethods");
-		if(callToPaymentMethods(context)){
-			logDebug("megaApi.getPaymentMethods SEND");
-			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
-		}
 	}
 
 	public void setAccountDetails(){
@@ -656,7 +649,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					}
 					else{
 						staging = false;
-						megaApi.changeApiUrl("https://g.api.mega.co.nz/");
+                        megaApi.changeApiUrl("https://g.api.mega.co.nz/");
 						if (dbH != null){
 							dbH.setStaging(false);
 						}
@@ -669,6 +662,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				}
 				break;
 			}
+            case R.id.add_phone_number:{
+                Intent intent = new Intent(context,SMSVerificationActivity.class) ;
+                startActivity(intent);
+                break;
+            }
+
 		}
 	}
 
@@ -939,6 +938,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
      * If not, hide the text.
      */
 	public void checkLogoutWarnings() {
+		if (logoutWarning == null) return;
+
 		boolean existOfflineFiles = existsOffline(context);
 		boolean existOutgoingTransfers = existOngoingTransfers(megaApi);
 		int oldVisibility = logoutWarning.getVisibility();
@@ -966,4 +967,26 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			logoutWarning.setText(newText);
 		}
 	}
+
+	public void updateAddPhoneNumberLabel(){
+        logDebug("updateAddPhoneNumberLabel");
+        addPhoneNumber.setVisibility(View.GONE);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                //work around - it takes time for megaApi.smsVerifiedPhoneNumber() to return value
+                String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
+                logDebug("updateAddPhoneNumberLabel " + registeredPhoneNumber);
+
+                if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
+                    addPhoneNumber.setText(registeredPhoneNumber);
+                    addPhoneNumber.setOnClickListener(null);
+                    addPhoneNumber.setVisibility(View.VISIBLE);
+                }
+            }
+        }, 3000);
+
+    }
 }

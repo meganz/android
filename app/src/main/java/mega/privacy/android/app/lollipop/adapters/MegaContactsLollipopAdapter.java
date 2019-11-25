@@ -170,7 +170,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
-
 		    holderList.itemLayout.setTag(holderList);
 		    holderList.itemLayout.setOnClickListener(this);
 			holderList.itemLayout.setOnLongClickListener(this);
@@ -237,7 +236,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 			holderList.itemLayout.setTag(holderList);
 			holderList.itemLayout.setOnClickListener(this);
-
 			holderList.threeDotsLayout.setVisibility(View.GONE);
 
 			v.setTag(holderList);
@@ -266,7 +264,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			}
 
 			holderList.threeDotsLayout = v.findViewById(R.id.contact_list_three_dots_layout);
-
 			holderList.declineLayout.setTag(holderList);
 			holderList.declineLayout.setOnClickListener(this);
 

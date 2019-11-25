@@ -29,7 +29,6 @@
 			android:layout_alignParentTop="true"
 			android:layout_marginLeft="7dp"
 			android:layout_marginTop="7dp"/>
-
 	</RelativeLayout>
 
 	<View

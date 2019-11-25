@@ -630,16 +630,13 @@
 
             <Button
                 android:id="@+id/file_properties_link_button"
-                android:layout_width="wrap_content"
+                style="@style/AccentBorderBackgroundButton"
                 android:layout_height="wrap_content"
-                android:background="@drawable/background_button_border_accent"
-                android:textSize="14sp"
-                android:textColor="@color/accentColor"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
                 android:paddingLeft="16dp"
+                android:paddingTop="10dp"
                 android:paddingRight="16dp"
-                style="@style/ButtonStyle"/>
+                android:paddingBottom="10dp"
+                android:textSize="14sp" />
         </RelativeLayout>
 
     </LinearLayout>

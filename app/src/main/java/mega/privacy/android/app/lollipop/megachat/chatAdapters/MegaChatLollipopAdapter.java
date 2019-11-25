@@ -356,17 +356,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private class ChatUploadingPreviewAsyncTask extends AsyncTask<String, Void, Bitmap> {
-
-        MegaChatLollipopAdapter.ViewHolderMessageChat holder;
+    private class ChatUploadingPreviewAsyncTask extends AsyncTask<String, Void, Boolean> {
         String filePath;
+        MegaChatLollipopAdapter adapter;
+        int position;
 
-        public ChatUploadingPreviewAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder) {
-            this.holder = holder;
+        public ChatUploadingPreviewAsyncTask(MegaChatLollipopAdapter adapter, int position) {
+            this.adapter = adapter;
+            this.position = position;
         }
 
         @Override
-        protected Bitmap doInBackground(String... params) {
+        protected Boolean doInBackground(String... params) {
 
             filePath = params[0];
             File currentFile = new File(filePath);
@@ -375,6 +376,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
+                //ARGB_8888 would create huge memory pressure to app, since we are creating preview, we don't need to have ARGB_8888 as the standard
+                options.inPreferredConfig = Bitmap.Config.RGB_565;
                 Bitmap preview;
 
                 ExifInterface exif;
@@ -383,6 +386,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     exif = new ExifInterface(currentFile.getAbsolutePath());
                     orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
                 } catch (IOException e) {
+                    logWarning("EXCEPTION", e);
                 }
 
                 // Calculate inSampleSize
@@ -396,8 +400,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     preview = rotateBitmap(preview, orientation);
 
                     long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(filePath));
-                    setPreviewCache(fingerprintCache, preview);
-                    return preview;
+                    if (preview != null) {
+                        //put preview bitmap to memory cache
+                        setPreviewCache(fingerprintCache, preview);
+                        return true;
+                    }
+                    return false;
                 }
             } else if (MimeTypeList.typeForName(filePath).isPdf()) {
                 logDebug("Is pdf");
@@ -424,18 +432,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (preview != null && result) {
                         logDebug("Compress OK");
                         long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
+                        //put preview bitmap to memory cache
                         setPreviewCache(fingerprintCache, preview);
-                        return preview;
+                        return true;
                     } else if (!result) {
                         logWarning("Not Compress");
+                        return false;
                     }
                 } catch (Exception e) {
                     logError("Pdf thumbnail could not be created", e);
                 } finally {
                     try {
-                        if (out != null)
+                        if (out != null) {
                             out.close();
+                        }
                     } catch (Exception e) {
+                        logWarning("Error closing FileOutputStream", e);
                     }
                 }
             } else if (MimeTypeList.typeForName(filePath).isVideo()) {
@@ -462,8 +474,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             if (result) {
                                 logDebug("Compress OK");
                                 long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
+                                //put preview bitmap to memory cache
                                 setPreviewCache(fingerprintCache, bmPreview);
-                                return bmPreview;
+                                return true;
+                            } else {
+                                return false;
                             }
                         } catch (Exception e) {
                             logError("Error with FileOutputStream", e);
@@ -473,7 +488,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     out.close();
                                 }
                             } catch (IOException e) {
-                                logError("Error", e);
+                                logError("Error closing FileOutputStream", e);
                             }
                         }
 
@@ -485,18 +500,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-            return null;
+            return false;
         }
 
         @Override
-        protected void onPostExecute(Bitmap preview) {
+        protected void onPostExecute(Boolean isContinue) {
             logDebug("ChatUploadingPreviewAsyncTask-onPostExecute");
-            if (preview != null) {
-                if (holder.filePathUploading.equals(filePath)) {
-                    setUploadingPreview(holder, preview);
-                } else {
-                    logWarning("The filePaths are not equal!");
-                }
+            if (isContinue) {
+                //notify adapter to update view
+                adapter.notifyItemChanged(position);
             } else {
                 logWarning("The preview is NULL!");
             }
@@ -1386,18 +1398,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     Bitmap preview = null;
                     ((ViewHolderMessageChat) holder).filePathUploading = path;
                     logDebug("Path of the file: " + path);
-                    long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(path));
 
                     if (MimeTypeList.typeForName(path).isImage() || MimeTypeList.typeForName(path).isPdf() || MimeTypeList.typeForName(path).isVideo()) {
                         logDebug("isImage, isPdf or isVideo");
 
                         ((ViewHolderMessageChat) holder).errorUploadingFile.setVisibility(View.GONE);
 
-                        preview = getPreviewFromCache(fingerprintCache);
+                        preview = getPreview(path, context);
+
                         if (preview != null) {
                             setUploadingPreview((ViewHolderMessageChat) holder, preview);
                             logDebug("preview!");
-
                         } else {
                             logWarning("No preview!");
                             if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
@@ -1405,10 +1416,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
                             }
                             try {
-                                new ChatUploadingPreviewAsyncTask(((ViewHolderMessageChat) holder)).execute(path);
-
+                                new ChatUploadingPreviewAsyncTask(this, position).execute(path);
                             } catch (Exception e) {
-                                //Too many AsyncTasks
+                                logWarning("Error creating preview (Too many AsyncTasks)", e);
                             }
                         }
                     } else {
@@ -6209,7 +6219,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
             String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(megaChatApi.getMyFullname()));
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
