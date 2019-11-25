@@ -119,7 +119,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
-
 import mega.privacy.android.app.BucketSaved;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -248,6 +247,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -256,7 +256,6 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.Constants.*;
 
 public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -6339,6 +6338,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setSearchDrawerItem();
 					selectDrawerItemLollipop(drawerItem);
 				}
+				hideCallMenuItem();
+				hideCallWidget();
 				return true;
 			}
 
@@ -6346,6 +6347,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			public boolean onMenuItemActionCollapse(MenuItem item) {
 				logDebug("onMenuItemActionCollapse()");
 				searchExpand = false;
+				setCallWidget();
+				setCallMenuItem();
 				if (drawerItem == DrawerItem.CHAT) {
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if (rChatFL != null) {
@@ -6523,21 +6526,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	    	}
 	    }
 
-        if(((drawerItem == DrawerItem.CHAT) || (isOnline(this) && (drawerItem == DrawerItem.CLOUD_DRIVE || drawerItem == DrawerItem.SHARED_ITEMS)))
-				&& !isScreenInPortrait(this) && isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1){
-            returnCallMenuItem.setVisible(true);
-            if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                chronometerMenuItem.setVisibility(View.VISIBLE);
-                chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
-                chronometerMenuItem.start();
-                chronometerMenuItem.setFormat(" %s");
-            }else if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
-                chronometerMenuItem.setVisibility(View.GONE);
-            }
-        }else {
-            chronometerMenuItem.stop();
-            returnCallMenuItem.setVisible(false);
-        }
+		setCallMenuItem();
 
 	    if(isOnline(this)){
 
@@ -18151,25 +18140,57 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * This method sets "Tap to return to call" banner when there is a call in progress
 	 * and it is in Cloud Drive section, Recents section, Incoming section, Outgoing section or in the chats list.
 	 */
-	public void setCallWidget() {
+	private void setCallWidget() {
 		setCallBadge();
 
-		if(drawerItem != DrawerItem.CLOUD_DRIVE && drawerItem != DrawerItem.SHARED_ITEMS && drawerItem != DrawerItem.CHAT  || !isScreenInPortrait(this)){
-
-			if (callInProgressChrono != null) {
-				activateChrono(false, callInProgressChrono, null);
-			}
-			callInProgressLayout.setVisibility(View.GONE);
-
+		if (drawerItem != DrawerItem.CLOUD_DRIVE && drawerItem != DrawerItem.SHARED_ITEMS && drawerItem != DrawerItem.CHAT || !isScreenInPortrait(this)) {
+			hideCallWidget();
 			return;
 		}
-
 
 		if (!isOnline(this)) return;
 
 		showCallLayout(megaChatApi, callInProgressLayout, callInProgressChrono);
 	}
 
+	private void hideCallWidget() {
+		if (callInProgressChrono != null) {
+			activateChrono(false, callInProgressChrono, null);
+		}
+		if (callInProgressLayout != null && callInProgressLayout.getVisibility() == View.VISIBLE) {
+			callInProgressLayout.setVisibility(View.GONE);
+		}
+	}
+
+	/**
+	 * This method shows or hides the toolbar icon to return a call when a call is in progress
+	 * and it is in Cloud Drive section, Recents section, Incoming section, Outgoing section or in the chats list.
+	 */
+	private void setCallMenuItem(){
+		if(((drawerItem == DrawerItem.CHAT) || (isOnline(this) && (drawerItem == DrawerItem.CLOUD_DRIVE || drawerItem == DrawerItem.SHARED_ITEMS)))
+				&& !isScreenInPortrait(this) && isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1){
+			returnCallMenuItem.setVisible(true);
+			if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+				chronometerMenuItem.setVisibility(View.VISIBLE);
+				chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getDuration() * 1000));
+				chronometerMenuItem.start();
+				chronometerMenuItem.setFormat(" %s");
+			}else if(megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)).getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+				chronometerMenuItem.setVisibility(View.GONE);
+			}
+		}else {
+			hideCallMenuItem();
+		}
+	}
+
+	private void hideCallMenuItem() {
+		if (chronometerMenuItem != null) {
+			chronometerMenuItem.stop();
+		}
+		if (returnCallMenuItem != null) {
+			returnCallMenuItem.setVisible(false);
+		}
+	}
 
 	/**
 	 * This method updates the action button, play or pause, of the
