@@ -49,6 +49,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 
+import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -128,7 +129,7 @@ public class AccountController implements View.OnClickListener{
     public void removeAvatar() {
         logDebug("removeAvatar");
         File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
-        File qrFile = buildQrFile(context,megaApi.getMyEmail() + "QRcode.jpg");
+        File qrFile = buildQrFile(context,megaApi.getMyEmail() + QR_IMAGE_FILE_NAME);
 
         if (isFileAvailable(avatar)) {
             logDebug("Avatar to delete: " + avatar.getAbsolutePath());
