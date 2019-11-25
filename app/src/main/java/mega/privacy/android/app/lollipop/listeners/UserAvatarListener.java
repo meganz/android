@@ -63,9 +63,6 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
                                 ((ContactsHorizontalAdapter.ContactViewHolder) holder).avatar.setImageBitmap(bitmap);
                                 ((ContactsHorizontalAdapter.ContactViewHolder) holder).textViewInitialLetter.setVisibility(View.INVISIBLE);
                             }
-                            if(holder.contactInitialLetter != null) {
-                                holder.contactInitialLetter.setVisibility(View.GONE);
-                            }
                         }
                     }
                 }

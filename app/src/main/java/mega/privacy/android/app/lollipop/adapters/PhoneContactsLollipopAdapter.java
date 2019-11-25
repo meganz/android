@@ -173,7 +173,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 	public class ViewHolderPhoneContactsLollipop extends RecyclerView.ViewHolder implements OnClickListener{
 		RelativeLayout contactLayout;
-		EmojiTextView contactNameTextView;
+		TextView contactNameTextView;
 		TextView phoneEmailTextView;
 		RoundedImageView imageView;
 		RelativeLayout contactImageLayout;
@@ -216,13 +216,11 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 		holder.contactLayout = rowView.findViewById(R.id.contact_list_item_layout);
 		holder.contactNameTextView = rowView.findViewById(R.id.contact_explorer_name);
-		holder.contactNameTextView.setTypeEllipsize(TextUtils.TruncateAt.MIDDLE);
-
 		if(!isScreenInPortrait(mContext)){
-			holder.contactNameTextView.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, mContext.getResources().getDisplayMetrics()));
+			holder.contactNameTextView.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, mContext.getResources().getDisplayMetrics()));
 		}
 		else{
-			holder.contactNameTextView.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics()));
+			holder.contactNameTextView.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics()));
 		}
 
 		holder.phoneEmailTextView = rowView.findViewById(R.id.contact_explorer_phone_mail);

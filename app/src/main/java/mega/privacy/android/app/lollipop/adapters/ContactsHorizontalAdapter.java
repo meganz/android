@@ -35,6 +35,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 
 public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHorizontalAdapter.ContactViewHolder> implements View.OnClickListener {
 
@@ -147,19 +149,9 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
     }
 
     public void setDefaultAvatar(MegaContactGetter.MegaContact contact, ContactViewHolder holder) {
-        String color = megaApi.getUserAvatarColor(contact.getId());
-        Bitmap background = Util.createAvatarBackground(color);
+        int color = colorAvatar(context, megaApi, contact.getId());
+        Bitmap background = getDefaultAvatar(context, color, contact.getLocalName(), AVATAR_SIZE, true);
         holder.avatar.setImageBitmap(background);
-
-        String firstLetter = ChatUtil.getFirstLetter(contact.getLocalName());
-        if (firstLetter.trim().isEmpty() || firstLetter.equals("(")) {
-            holder.textViewInitialLetter.setVisibility(View.INVISIBLE);
-        } else {
-            holder.textViewInitialLetter.setText(firstLetter);
-            holder.textViewInitialLetter.setTextColor(Color.WHITE);
-            holder.textViewInitialLetter.setVisibility(View.VISIBLE);
-            holder.textViewInitialLetter.setTextSize(24);
-        }
     }
 
     @Override

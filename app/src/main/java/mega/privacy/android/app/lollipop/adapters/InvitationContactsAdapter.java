@@ -13,27 +13,25 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.InvitationContactInfo;
-import mega.privacy.android.app.utils.FileUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 
 public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationContactsAdapter.ViewHolderPhoneContactsLollipop> implements MegaRequestListenerInterface {
 
@@ -77,7 +75,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
     public class ViewHolderPhoneContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener {
         private RelativeLayout contactLayout;
-        private TextView contactNameTextView, displayLabelTextView, headerTextView, initialLetter;
+        private TextView contactNameTextView, displayLabelTextView, headerTextView;
         private RoundedImageView imageView;
         private long contactId;
         private String contactName, displayLabel;
@@ -193,7 +191,6 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         holder.contactNameTextView = rowView.findViewById(R.id.contact_explorer_name);
         holder.displayLabelTextView = rowView.findViewById(R.id.contact_explorer_phone_mail);
         holder.imageView = rowView.findViewById(R.id.contact_explorer_thumbnail);
-        holder.initialLetter = rowView.findViewById(R.id.contact_explorer_initial_letter);
         rowView.setTag(holder);
         return holder;
     }
@@ -214,7 +211,6 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
         if (contact.isHighlighted()) {
             setItemHighlighted(holder.contactLayout);
-            holder.initialLetter.setVisibility(View.GONE);
         } else {
             Bitmap bitmap;
             if (isMegaContact) {
@@ -226,14 +222,9 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
             // create default one if unable to get user pre-set avatar
             if (bitmap == null) {
                 logDebug("create default avatar as unable to get user pre-set one");
-                String color = contact.getAvatarColor();
-                bitmap = Util.createAvatarBackground(color);
-                holder.initialLetter.setText(contact.getInitial());
-                holder.initialLetter.setVisibility(View.VISIBLE);
-            } else {
-                holder.initialLetter.setVisibility(View.GONE);
+                int color = contact.getAvatarColor();
+                bitmap = getDefaultAvatarNoMegaEmoji(context, color, contact.getName(), AVATAR_SIZE, true);
             }
-
             contact.setBitmap(bitmap);
             holder.imageView.setImageBitmap(bitmap);
         }
@@ -280,7 +271,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         String email = contact.getDisplayInfo();
         File avatar = buildAvatarFile(context, email + IMAGE_EXTENSION);
         String path = avatar.getAbsolutePath();
-        if (FileUtils.isFileAvailable(avatar)) {
+        if (isFileAvailable(avatar)) {
             BitmapFactory.Options bOpts = new BitmapFactory.Options();
             Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
             if (bitmap == null) {

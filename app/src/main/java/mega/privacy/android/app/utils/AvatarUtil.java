@@ -75,6 +75,57 @@ public class AvatarUtil {
     }
 
     /*Method to get the default avatar bitmap*/
+    public static Bitmap getDefaultAvatarNoMegaEmoji(Context context, int colorAvatar, String textAvatar, int textSize, boolean isList) {
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(defaultAvatar);
+
+        /*Background*/
+        Paint paintCircle = new Paint();
+        paintCircle.setColor(colorAvatar);
+        paintCircle.setAntiAlias(true);
+
+        if(isList){
+            /*Shape list*/
+            int radius;
+            if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
+                radius = defaultAvatar.getWidth() / 2;
+            }else {
+                radius = defaultAvatar.getHeight() / 2;
+            }
+            c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, paintCircle);
+        }else{
+            /*Shape grid*/
+            Path path = getRoundedRect(0, 0, DEFAULT_AVATAR_WIDTH_HEIGHT , DEFAULT_AVATAR_WIDTH_HEIGHT, 10, 10,true, true, false, false);
+            c.drawPath(path, paintCircle);
+        }
+
+        /*Text*/
+        Typeface face = Typeface.SANS_SERIF;
+        Paint paintText = new Paint();
+        paintText.setColor(Color.WHITE);
+        paintText.setTextSize(textSize);
+        paintText.setAntiAlias(true);
+        paintText.setTextAlign(Paint.Align.CENTER);
+        paintText.setTypeface(face);
+        paintText.setAntiAlias(true);
+        paintText.setSubpixelText(true);
+        paintText.setStyle(Paint.Style.FILL);
+
+        /*First Letter*/
+        if(textAvatar == null || textAvatar.trim().length() <= 0){
+            textAvatar = UNKNOWN_USER_NAME_AVATAR;
+        }
+        String firstLetter = getFirstLetter(textAvatar);
+        Rect bounds = new Rect();
+        paintText.getTextBounds(firstLetter, 0, firstLetter.length(), bounds);
+        int xPos = (c.getWidth() / 2);
+        int yPos = (int) ((c.getHeight() / 2) - ((paintText.descent() + paintText.ascent() / 2)) + 20);
+        c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
+        return defaultAvatar;
+    }
+
+
+    /*Method to get the default avatar bitmap*/
     public static Bitmap getDefaultAvatar(Context context, int colorAvatar, String textAvatar, int textSize, boolean isList) {
         Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);

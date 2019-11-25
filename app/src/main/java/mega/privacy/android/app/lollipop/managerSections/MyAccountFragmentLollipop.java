@@ -234,7 +234,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
             addPhoneNumber.setText(registeredPhoneNumber);
         } else {
-		    if(Util.canVoluntaryVerifyPhoneNumber()) {
+		    if(canVoluntaryVerifyPhoneNumber()) {
                 addPhoneNumber.setText(R.string.add_phone_number_label);
                 addPhoneNumber.setOnClickListener(this);
             } else {
