@@ -12347,7 +12347,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			case R.id.call_in_progress_layout:{
 				if(checkPermissionsCall()){
-					returnCall(context, megaChatApi);
+					returnCall(this, megaChatApi);
 				}
 				break;
 			}
