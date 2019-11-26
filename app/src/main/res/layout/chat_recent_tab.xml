@@ -206,17 +206,12 @@
                     android:textSize="16sp" />
             </RelativeLayout>
         </ScrollView>
-        <include layout="@layout/item_call_in_progress_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/linear_layout_add"/>
 
         <LinearLayout
             android:id="@+id/linear_layout_recycler"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_below="@id/call_in_progress_layout"
-            android:elevation="-1dp">
+            android:layout_below="@id/linear_layout_add">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
