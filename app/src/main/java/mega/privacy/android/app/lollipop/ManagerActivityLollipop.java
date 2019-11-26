@@ -245,6 +245,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -13146,7 +13147,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					return;
 				}
 
-                File qrFile = buildQrFile(this,myEmail + "QRcode.jpg");
+				File qrFile = buildQrFile(this, myEmail + QR_IMAGE_FILE_NAME);
                 File newFile = buildAvatarFile(this,myEmail + "Temp.jpg");
 				if (isFileAvailable(qrFile)) {
 					qrFile.delete();
@@ -14250,9 +14251,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					if(avatarPath!=null){
 						logDebug("Chosen picture to change the avatar");
 						File imgFile = new File(avatarPath);
-//						String name = getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-                        File qrFile = buildQrFile(this,megaApi.getMyUser().getEmail() + "QRcode.jpg");
-                        File newFile = buildAvatarFile(this, megaApi.getMyUser().getEmail() + "Temp.jpg");
+						File qrFile = buildQrFile(this, megaApi.getMyUser().getEmail() + QR_IMAGE_FILE_NAME);
+						File newFile = buildAvatarFile(this, megaApi.getMyUser().getEmail() + "Temp.jpg");
 
 
 						if (isFileAvailable(qrFile)) {
