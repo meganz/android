@@ -74,6 +74,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
 import static android.app.Activity.RESULT_OK;
+import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_RECENT;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -336,7 +337,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             adjustLandscape();
-            emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
+            emptyImageView.setVisibility(View.GONE);
         } else {
             addMarginTop();
             emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
@@ -761,7 +762,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         if(context instanceof ManagerActivityLollipop) {
                             Intent in = new Intent(context, AddContactActivityLollipop.class);
                             in.putExtra("contactType", CONTACT_TYPE_MEGA);
-                            in.putExtra("comesFromRecent", true);
+                            in.putExtra(FROM_RECENT, true);
                             ((ManagerActivityLollipop)context).startActivityForResult(in, REQUEST_CREATE_CHAT);
                         }
                         if (megaChatApi.isSignalActivityRequired()) {
