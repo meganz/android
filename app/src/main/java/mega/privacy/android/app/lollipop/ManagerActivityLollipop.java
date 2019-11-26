@@ -991,8 +991,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 					else if (adapterType == SEARCH_ADAPTER){
 						Long handle = intent.getLongExtra("handle", -1);
-						sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-						if (sFLol != null){
+						if (getSearchFragment() != null){
 							ArrayList<MegaNode> listNodes = sFLol.getNodes();
 							for (int i=0; i<listNodes.size(); i++){
 								if (listNodes.get(i).getHandle() == handle){
@@ -3524,6 +3523,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
 	protected void onResume(){
 		logDebug("onResume");
+
+		if (drawerItem == DrawerItem.SEARCH && getSearchFragment() != null) {
+			sFLol.setWaitingForSearchedNodes(true);
+		}
+
 		super.onResume();
 
 //		dbH.setShowNotifOff(true);
@@ -4571,8 +4575,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void cancelSearch() {
-		sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-		if (sFLol != null) {
+		if (getSearchFragment() != null) {
 			sFLol.cancelPreviousAsyncTask();
 		}
 	}
@@ -4885,8 +4888,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			case SEARCH:{
 				aB.setSubtitle(null);
 				if(textsearchQuery){
-					sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-					if (sFLol != null) {
+					if (getSearchFragment() != null) {
 						sFLol.setAllowedMultiselect(true);
 					}
 				}
@@ -5924,8 +5926,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 
     			drawerItem = DrawerItem.SEARCH;
-				sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-				if (sFLol == null) {
+				if (getSearchFragment() == null) {
 					sFLol = SearchFragmentLollipop.newInstance();
 				}
 
@@ -6108,8 +6109,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 break;
             }
             case SEARCH: {
-				sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-                if (sFLol != null) {
+				if (getSearchFragment() != null) {
                     sFLol.checkScroll();
                 }
                 break;
@@ -6434,7 +6434,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					searchQuery = newText;
 					offlineSearch();
 				} else {
-					sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
+					getSearchFragment();
+
 					if (textSubmitted) {
 						if (sFLol != null) {
 							sFLol.setAllowedMultiselect(true);
@@ -7223,8 +7224,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				else {
 					upgradeAccountMenuItem.setVisible(true);
 					//Show
-					sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-					if(sFLol != null && sFLol.getNodes()!=null){
+					if(getSearchFragment() != null && sFLol.getNodes()!=null){
 						if(sFLol.getNodes().size()!=0){
 							selectMenuItem.setVisible(true);
 							if(!firstLogin){
@@ -7755,9 +7755,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						}
 					}
 		    		else if (drawerItem == DrawerItem.SEARCH){
-
-						sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-		    			if (sFLol != null){
+		    			if (getSearchFragment() != null){
 //		    				sFLol.onBackPressed();
 		    				onBackPressed();
 		    				return true;
@@ -8140,8 +8138,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	        		}
     			}
 	        	if (drawerItem == DrawerItem.SEARCH){
-					sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-	        		if (sFLol != null){
+					if (getSearchFragment() != null){
 	        			sFLol.selectAll();
 	    				if (sFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
@@ -8530,8 +8527,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void refreshSearch() {
-		sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-		if (sFLol != null){
+		if (getSearchFragment() != null){
 			sFLol.hideMultipleSelect();
 			sFLol.refresh();
 		}
@@ -8798,8 +8794,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     		}
     	}
 		else if (drawerItem == DrawerItem.SEARCH){
-			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-    		if (sFLol != null && sFLol.onBackPressed() == 0){
+			if (getSearchFragment() != null && sFLol.onBackPressed() == 0){
     			closeSearchSection();
 				return;
     		}
@@ -12632,7 +12627,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
 			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+			long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 			long[] userHandles = intent.getLongArrayExtra("USER_HANDLES");
 
 			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
@@ -12685,8 +12680,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 					if(nodeHandles!=null){
 						logDebug("Send " + nodeHandles.length + " nodes");
-
-						sendFilesToChats(null, chatHandles, nodeHandles);
+						checkIfNodesAreMineBeforeAttach(null, chatHandles, nodeHandles);
 					}
 					else if(userHandles!=null){
 						logDebug("Send " + userHandles.length + " contacts");
@@ -12745,8 +12739,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				cFLol.clearSelectionsNoAnimations();
 			}
 
-			ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
-			long fileHandle = intent.getLongExtra("SELECT", 0);
+			ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
+			long fileHandles[] = intent.getLongArrayExtra(NODE_HANDLES);
 
 			//Send file to contacts
 			//Check if all contacts have a chat created
@@ -12775,12 +12769,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			if(usersNoChat==null || usersNoChat.isEmpty()){
-				sendFileToChatsFromContacts(this, chats, fileHandle);
-
+				checkIfNodesAreMineBeforeAttach(chats, null, fileHandles);
 			}
 			else{
 				//Create first the chats
-				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandle, this, CreateChatToPerformActionListener.SEND_FILE);
+				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandles, this, CreateChatToPerformActionListener.SEND_FILES, -1);
 
 				for(int i=0; i<usersNoChat.size(); i++){
 					MegaChatPeerList peers = MegaChatPeerList.createInstance();
@@ -12842,7 +12835,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				return;
 			}
 
-			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
 			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
@@ -12988,8 +12981,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 			}
 			else if (drawerItem == DrawerItem.SEARCH){
-				sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-				if(sFLol!=null)				{
+				if(getSearchFragment() != null)				{
 					parentHandleUpload = sFLol.getParentHandle();
 				}
 			}
@@ -13320,46 +13312,42 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	public void sendFilesToChats (ArrayList<MegaChatRoom> chats, long[] chatHandles, long[] nodeHandles) {
-
-		MultipleAttachChatListener listener = null;
-
-		if (chatHandles == null && chats != null) {
-			chatHandles = new long[chats.size()];
-			for (int i=0; i<chats.size(); i++) {
-				chatHandles[i] = chats.get(i).getChatId();
-			}
+	private long[] getChatHandles(ArrayList<MegaChatRoom> chats, long[] _chatHandles) {
+		if (_chatHandles != null && chats == null) {
+			return _chatHandles;
 		}
+
+		long[] chatHandles = new long[chats.size()];
+
+		for (int i = 0; i < chats.size(); i++) {
+			chatHandles[i] = chats.get(i).getChatId();
+		}
+
+		return chatHandles;
+	}
+
+	public void checkIfNodesAreMineBeforeAttach(ArrayList<MegaChatRoom> chats, long[] chatHandles, long[] nodeHandles) {
+
+
+		new ChatController(this).checkIfNodesAreMineAndAttachNodes(nodeHandles, getChatHandles(chats, chatHandles));
+	}
+
+	public void sendFilesToChats(ArrayList<MegaChatRoom> chats, long[] _chatHandles, long[] nodeHandles) {
+		long[] chatHandles = getChatHandles(chats, _chatHandles);
 
 		int countChat = chatHandles.length;
-        int counter = chatHandles.length*nodeHandles.length;
+		int counter = chatHandles.length * nodeHandles.length;
+		long chatId = -1;
 
-		if(countChat==1){
-			if(nodeHandles.length==1){
-				listener = new MultipleAttachChatListener(this, chatHandles[0], false, counter);
-				megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
-			}
-			else{
-				listener = new MultipleAttachChatListener(this, chatHandles[0], true, counter);
-				for(int i=0;i<nodeHandles.length;i++){
-					megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
-				}
-			}
+		if (countChat == 1) {
+			chatId = chatHandles[0];
 		}
-		else{
-			if(nodeHandles.length==1){
-				listener = new MultipleAttachChatListener(this, -1, false, counter);
-				for(int i=0;i<chatHandles.length;i++){
-					megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
-				}
-			}
-			else{
-				listener = new MultipleAttachChatListener(this, -1, true, counter);
-				for(int i=0;i<chatHandles.length;i++){
-					for(int j=0;j<nodeHandles.length;j++){
-						megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
-					}
-				}
+
+		MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatId, counter);
+
+		for (int i = 0; i < chatHandles.length; i++) {
+			for (int j = 0; j < nodeHandles.length; j++) {
+				megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
 			}
 		}
 	}
@@ -16013,9 +16001,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void onNodesSearchUpdate() {
-		logDebug("onNodesSearchUpdate");
-		sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-		if (sFLol != null){
+		if (getSearchFragment() != null){
 			//stop from query for empty string.
 			textSubmitted = true;
 			sFLol.refresh();
@@ -17871,8 +17857,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		} else {
 			switch (drawerItem) {
 				case CLOUD_DRIVE: {
-					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-					if (fbFLol != null) {
+					if (isCloudAdded()) {
 						fbFLol.openFile(node, position, screenPosition, imageView);
 					}
 					break;
@@ -18240,5 +18225,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public long getParentHandleSearch() {
 		return parentHandleSearch;
+	}
+
+	private SearchFragmentLollipop getSearchFragment() {
+		return sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
 	}
 }
