@@ -48,7 +48,7 @@
                 android:maxLines="1"
                 android:textColor="@color/name_my_account"
                 android:textSize="16sp"
-                rounded:emojiSize="14dp"/>
+                rounded:emojiSize="14sp"/>
 
             <TextView
                 android:id="@+id/file_contact_list_contact_mail_text"

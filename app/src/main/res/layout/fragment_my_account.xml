@@ -55,7 +55,7 @@
 							android:singleLine="true"
 							android:textColor="@color/name_my_account"
 							android:textSize="16sp"
-							rounded:emojiSize="14dp"/>
+							rounded:emojiSize="14sp"/>
 
 						<ImageView
 							android:id="@+id/my_account_edit_icon"

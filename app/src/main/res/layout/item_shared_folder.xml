@@ -55,7 +55,7 @@
             android:layout_marginLeft="13dp"
             android:textColor="@color/file_list_first_row"
             android:textSize="16sp"
-            rounded:emojiSize="14dp"
+            rounded:emojiSize="14sp"
             android:singleLine="true"
             android:maxLines="1"/>
 

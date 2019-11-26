@@ -1201,7 +1201,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
             RelativeLayout.LayoutParams paramsContactAttach = (RelativeLayout.LayoutParams) holder.contentContactMessageAttachLayout.getLayoutParams();
             RelativeLayout.LayoutParams paramsContactRichLink = (RelativeLayout.LayoutParams) holder.urlContactMessageLayout.getLayoutParams();
-            RelativeLayout.LayoutParams paramsContactMessage = (RelativeLayout.LayoutParams) holder.contentContactMessageText.getLayoutParams();
+
             RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
 
             if (!isScreenInPortrait(context)) {
@@ -1210,12 +1210,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 paramsContactManagement.rightMargin = scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
                 paramsContactAttach.leftMargin = scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
                 paramsContactRichLink.leftMargin = scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
-                paramsContactMessage.leftMargin = scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
+
                 paramsOwnManagement.leftMargin = scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
                 paramsOwnManagement.rightMargin = scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
-                holder.contentContactMessageText.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_MESSAGE_LAND, outMetrics));
                 holder.nameContactText.setMaxWidthEmojis(px2dp(MAX_WIDTH_NAME_LAND, outMetrics));
-                holder.contentOwnMessageText.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_MESSAGE_LAND, outMetrics));
                 holder.titleContactMessage.setPadding(scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics), 0, 0, 0);
                 holder.titleOwnMessage.setPadding(0, 0, scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics), 0);
             } else {
@@ -1224,14 +1222,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 paramsContactManagement.rightMargin = scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
                 paramsContactAttach.leftMargin = scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
                 paramsContactRichLink.leftMargin = scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
-                paramsContactMessage.leftMargin = scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
                 paramsOwnManagement.leftMargin = scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
                 paramsOwnManagement.rightMargin = scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
 
-                holder.contentContactMessageText.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_MESSAGE_PORT, outMetrics));
                 holder.nameContactText.setMaxWidthEmojis(px2dp(MAX_WIDTH_NAME_PORT, outMetrics));
-                holder.contentContactMessageText.setLayoutParams(paramsContactMessage);
-                holder.contentOwnMessageText.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_MESSAGE_PORT, outMetrics));
                 holder.titleContactMessage.setPadding(px2dp(CONTACT_MESSAGE_PORT, outMetrics), 0, 0, 0);
                 holder.titleOwnMessage.setPadding(0, 0, scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics), 0);
             }

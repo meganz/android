@@ -69,7 +69,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    rounded:emojiSize="14dp"
+                    rounded:emojiSize="14sp"
                     android:singleLine="true"
                     android:textColor="@color/file_list_first_row" />
 

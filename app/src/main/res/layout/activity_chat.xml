@@ -52,7 +52,7 @@
                             android:fontFamily="sans-serif-light"
                             android:gravity="center_vertical|left"
                             android:textSize="20sp"
-                            app:emojiSize="18dp"
+                            app:emojiSize="18sp"
                             android:textColor="@color/white"
                             android:textStyle="bold"
                             android:singleLine="true"
@@ -108,7 +108,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="0dp"
-                        android:ellipsize="marquee"
                         android:focusable="true"
                         android:focusableInTouchMode="true"
                         android:marqueeRepeatLimit="marquee_forever"
@@ -116,7 +115,7 @@
                         android:singleLine="true"
                         android:textColor="@color/white"
                         android:textSize="12sp"
-                        app:emojiSize="10dp"
+                        app:emojiSize="10sp"
                         android:visibility="gone" />
 
                     <LinearLayout
@@ -224,7 +223,7 @@
                                 android:maxLines="1"
                                 android:textColor="@color/black"
                                 android:textSize="14sp"
-                                app:emojiSize="12dp"/>
+                                app:emojiSize="14sp"/>
 
                         </RelativeLayout>
                     </RelativeLayout>

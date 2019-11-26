@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:textSize="12sp"
-        app:emojiSize="10dp"
+        app:emojiSize="10sp"
         android:singleLine="true"
         android:maxLines="1"
         android:maxWidth="60dp"

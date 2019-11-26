@@ -25,11 +25,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
-import mega.privacy.android.app.utils.CacheFolderManager;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.FileUtils;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
@@ -37,6 +32,9 @@ import nz.mega.sdk.MegaContactRequest;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
 public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHorizontalAdapter.ContactViewHolder> implements View.OnClickListener {
 
@@ -71,7 +69,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         holder.itemLayout = v.findViewById(R.id.chip_layout);
         holder.textViewInitialLetter = v.findViewById(R.id.contact_list_initial_letter);
         holder.textViewName = v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
+        holder.textViewName.setMaxWidth(px2dp(60, outMetrics));
         holder.avatar = v.findViewById(R.id.add_rounded_avatar);
         holder.addIcon = v.findViewById(R.id.add_icon_chip);
         holder.clickableArea.setOnClickListener(this);
@@ -103,7 +101,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
                         logDebug("Sent invite to: " + email);
                         // for UI smoothness, ignore the callback
                         megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
-                        Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
+                        showSnackBar(context, SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         dialog.dismiss();
@@ -131,9 +129,9 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         holder.textViewName.setText(megaContact.getLocalName());
         UserAvatarListener listener = new UserAvatarListener(context, holder);
         setDefaultAvatar(megaContact, holder);
-        File avatar = CacheFolderManager.buildAvatarFile(context, email + ".jpg");
+        File avatar = buildAvatarFile(context, email + ".jpg");
         Bitmap bitmap;
-        if (FileUtils.isFileAvailable(avatar) && avatar.length() > 0) {
+        if (isFileAvailable(avatar) && avatar.length() > 0) {
             BitmapFactory.Options bOpts = new BitmapFactory.Options();
             bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
             if (bitmap == null) {

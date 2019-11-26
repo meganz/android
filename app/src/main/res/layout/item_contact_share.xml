@@ -33,7 +33,7 @@
             android:maxLines="1"
             android:singleLine="true"
             android:textSize="16sp"
-            rounded:emojiSize="14dp"/>
+            rounded:emojiSize="14sp"/>
 
         <ImageView
             android:id="@+id/contact_state"

@@ -84,7 +84,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="72dp"
                         android:textSize="20sp"
-                        app:emojiSize="18dp"
+                        app:emojiSize="18sp"
                         android:paddingTop="6dp"
                         android:textColor="@color/white"
                         android:maxLines="1"

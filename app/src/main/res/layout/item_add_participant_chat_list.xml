@@ -32,7 +32,7 @@
         android:textColor="@color/accentColor"
         android:fontFamily="sans-serif-medium"
         android:textSize="14sp"
-        app:emojiSize="12dp"
+        app:emojiSize="12sp"
         android:maxLines="1"/>
 
 </RelativeLayout>

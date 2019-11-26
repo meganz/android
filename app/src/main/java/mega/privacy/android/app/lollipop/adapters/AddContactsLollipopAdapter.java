@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -73,6 +74,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
 
         holder.textViewName = v.findViewById(R.id.name_chip);
         holder.textViewName.setMaxWidthEmojis(px2dp(MAX_WIDTH_ADD_CONTACTS, outMetrics));
+        holder.textViewName.setTypeEllipsize(TextUtils.TruncateAt.MIDDLE);
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
         holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
 

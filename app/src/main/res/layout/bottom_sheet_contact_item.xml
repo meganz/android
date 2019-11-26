@@ -49,7 +49,7 @@
                 android:maxLines="1"
                 android:textColor="@color/name_my_account"
                 android:textSize="16sp"
-                rounded:emojiSize="14dp"/>
+                rounded:emojiSize="14sp"/>
 
             <ImageView
                 android:id="@+id/contact_list_drawable_state"

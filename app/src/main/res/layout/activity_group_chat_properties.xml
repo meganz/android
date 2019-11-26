@@ -86,7 +86,7 @@
                             android:singleLine="true"
                             android:maxLines="1"
                             android:textSize="15sp"
-                            app:emojiSize="13dp"/>
+                            app:emojiSize="13sp"/>
 
                         <ImageView
                             android:id="@+id/chat_group_contact_properties_edit_icon"

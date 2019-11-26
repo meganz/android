@@ -36,6 +36,7 @@ import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -50,7 +51,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -90,7 +90,9 @@ import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
@@ -184,7 +186,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private final static int ROTATION_REVERSE_LANDSCAPE = 3;
     private final static int TITLE_TOOLBAR_PORT = 180;
     private final static int TITLE_TOOLBAR_LAND = 400;
-    private final static int TITLE_TOOLBAR_IND_PORT = 120;
+    private final static int TITLE_TOOLBAR_IND_PORT = 180;
 
     public static int MEGA_FILE_LINK = 1;
     public static int MEGA_FOLDER_LINK = 2;
@@ -1113,6 +1115,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         refreshTextInput();
     }
 
+    private SpannableStringBuilder transformEmojis(String textToTransform, float sizeText){
+        CharSequence text = textToTransform == null ? "" : textToTransform;
+        String resultText = EmojiUtilsShortcodes.emojify(text.toString());
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(resultText);
+        EmojiManager.getInstance().replaceWithImages(this, spannableStringBuilder, sizeText, sizeText);
+        return spannableStringBuilder;
+    }
+
     private void refreshTextInput() {
         recordButtonStates(RECORD_BUTTON_DEACTIVATED);
         sendIcon.setVisibility(View.GONE);
@@ -1120,12 +1130,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
         if (chatRoom != null) {
             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
-
+            String title;
             if (chatRoom.hasCustomTitle()) {
-                textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
+                title = getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle());
             } else {
-                textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
+                title = getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle());
             }
+            textChat.setHint(transformEmojis(title, textChat.getTextSize()));
         }
 
         textChat.setMinLines(1);
@@ -1348,14 +1359,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         int width;
         if(isScreenInPortrait(this)){
             if(isGroup()) {
-                width = px2dp(TITLE_TOOLBAR_PORT, outMetrics);
+                width = scaleWidthPx(TITLE_TOOLBAR_PORT, outMetrics);
             }else {
-                width = px2dp(TITLE_TOOLBAR_IND_PORT, outMetrics);
+                width = scaleWidthPx(TITLE_TOOLBAR_IND_PORT, outMetrics);
             }
         }else{
-            width = px2dp(TITLE_TOOLBAR_LAND, outMetrics);
+            width = scaleWidthPx(TITLE_TOOLBAR_LAND, outMetrics);
         }
-        groupalSubtitleToolbar.setMaxWidthEmojis(width);
         titleToolbar.setMaxWidthEmojis(width);
 
         setSubtitleVisibility();

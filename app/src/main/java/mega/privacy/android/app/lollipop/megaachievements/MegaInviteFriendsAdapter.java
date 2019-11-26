@@ -56,11 +56,9 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 			super(v);
 		}
 
-
-        EmojiTextView textViewName;
+        TextView textViewName;
 		ImageView deleteIcon;
         RelativeLayout itemLayout;
-
     }
 
 	ViewHolderChips holderList = null;
@@ -81,10 +79,10 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 		holderList.textViewName = v.findViewById(R.id.name_chip);
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			logDebug("Landscape");
-			holderList.textViewName.setMaxWidthEmojis(scaleWidthPx(260, outMetrics));
+			holderList.textViewName.setMaxWidth(scaleWidthPx(260, outMetrics));
 		}else{
 			logDebug("Portrait");
-			holderList.textViewName.setMaxWidthEmojis(scaleWidthPx(230, outMetrics));
+			holderList.textViewName.setMaxWidth(scaleWidthPx(230, outMetrics));
 		}
 
 		holderList.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
