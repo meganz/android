@@ -415,6 +415,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
         setNodes(nodes);
 
         if (((FileExplorerActivityLollipop) context).shouldRestartSearch()) {
+        	setWaitingForSearchedNodes(true);
             search(((FileExplorerActivityLollipop) context).getQuerySearch());
         }
 		return v;
@@ -904,15 +905,17 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	public void setProgressView(boolean inProgress) {
 		setSearchProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
 	}
-
 	public void setSearchNodes(ArrayList<MegaNode> nodes) {
 		if (adapter == null) return;
-
 		searchNodes = nodes;
 		((FileExplorerActivityLollipop) context).setShouldRestartSearch(true);
 		addSectionTitle(searchNodes, ((FileExplorerActivityLollipop) context).getItemType());
 		adapter.setNodes(searchNodes);
 		showEmptyScreen();
+
+		if (isWaitingForSearchedNodes()) {
+			reDoTheSelectionAfterRotation();
+		}
 	}
 
 	public void closeSearch(boolean collapsedByClick) {

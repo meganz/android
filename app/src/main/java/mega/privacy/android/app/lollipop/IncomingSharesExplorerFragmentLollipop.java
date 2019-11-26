@@ -372,6 +372,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 		setOptionsBarVisibility();
 
         if (((FileExplorerActivityLollipop) context).shouldRestartSearch()) {
+        	setWaitingForSearchedNodes(true);
             search(((FileExplorerActivityLollipop) context).getQuerySearch());
         }
 		return v;
@@ -915,6 +916,10 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 		addSectionTitle(searchNodes, ((FileExplorerActivityLollipop) context).getItemType());
 		adapter.setNodes(searchNodes);
 		showEmptyScreen();
+
+		if (isWaitingForSearchedNodes()) {
+			reDoTheSelectionAfterRotation();
+		}
 	}
 
 	public void closeSearch(boolean collapsedByClick) {

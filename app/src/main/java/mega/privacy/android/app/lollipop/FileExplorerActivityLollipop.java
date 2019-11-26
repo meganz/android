@@ -109,6 +109,7 @@ import static mega.privacy.android.app.utils.Util.*;
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
 	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
+	private final static String QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH";
 
 	public final static int CLOUD_FRAGMENT = 0;
 	public final static int INCOMING_FRAGMENT = 1;
@@ -387,6 +388,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			totalAttached = savedInstanceState.getInt("totalAttached", 0);
 			totalErrors = savedInstanceState.getInt("totalErrors", 0);
 			shouldRestartSearch = savedInstanceState.getBoolean(SHOULD_RESTART_SEARCH, false);
+			queryAfterSearch = savedInstanceState.getString(QUERY_AFTER_SEARCH, null);
 
 			if (isSearchExpanded) {
 				pendingToOpenSearchView = true;
@@ -1426,6 +1428,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		bundle.putInt("totalAttached", totalAttached);
 		bundle.putInt("totalErrors", totalErrors);
 		bundle.putBoolean(SHOULD_RESTART_SEARCH, shouldRestartSearch);
+		bundle.putString(QUERY_AFTER_SEARCH, queryAfterSearch);
 	}
 	
 	@Override
