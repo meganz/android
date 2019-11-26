@@ -1232,17 +1232,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_send_message_layout:{
 				logDebug("Send message option");
-				if(!isOnline(this)){
-
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-					return;
-				}
+				if(!checkConnection()) return;
 
 				sendMessageToChat();
 				break;
 			}
 			case R.id.chat_contact_properties_chat_call_layout:{
 				logDebug("Start audio call option");
+				if(!checkConnection()) return;
+
 				if(megaChatApi!=null){
 					if(!participatingInACall(megaChatApi)){
 						logDebug("I'm not in a call");
@@ -1256,6 +1254,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_video_layout:{
 				logDebug("Star video call option");
+				if(!checkConnection()) return;
+
 				if(megaChatApi!=null) {
 					if (!participatingInACall(megaChatApi)) {
 						logDebug("I'm not in a call");
@@ -1326,6 +1326,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				break;
 			}
 		}
+	}
+
+	private boolean checkConnection() {
+		if (!isOnline(this)) {
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			return false;
+		}
+		return true;
 	}
 
 	@Override
