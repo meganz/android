@@ -184,7 +184,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private final static int ROTATION_LANDSCAPE = 1;
     private final static int ROTATION_REVERSE_PORTRAIT = 2;
     private final static int ROTATION_REVERSE_LANDSCAPE = 3;
-    private final static int TITLE_TOOLBAR_PORT = 180;
+    private final static int TITLE_TOOLBAR_PORT = 150;
     private final static int TITLE_TOOLBAR_LAND = 400;
     private final static int TITLE_TOOLBAR_IND_PORT = 180;
 
@@ -275,7 +275,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     ActionBar aB;
     Toolbar tB;
-    RelativeLayout toolbarElementsInside;
+    LinearLayout toolbarElementsInside;
 
     private EmojiTextView titleToolbar;
     MarqueeTextView individualSubtitleToobar;
@@ -1367,6 +1367,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             width = scaleWidthPx(TITLE_TOOLBAR_LAND, outMetrics);
         }
         titleToolbar.setMaxWidthEmojis(width);
+        titleToolbar.setTypeEllipsize(TextUtils.TruncateAt.END);
 
         setSubtitleVisibility();
 
