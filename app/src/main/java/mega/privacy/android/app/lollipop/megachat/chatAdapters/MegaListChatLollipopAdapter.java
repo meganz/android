@@ -2413,7 +2413,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			} else if (messageType == MegaChatMessage.TYPE_CONTACT_ATTACHMENT && lastMessage != null && lastMessage.getUsersCount() > 1) {
 				long contactsCount = lastMessage.getUsersCount();
-				String contactAttachmentMessage = context.getString(R.string.contacts_sent, contactsCount);
+				String contactAttachmentMessage = context.getString(R.string.contacts_sent, String.valueOf(contactsCount));
 				Spannable myMessage = new SpannableString(contactAttachmentMessage);
 
 				if (chat.getLastMessageSender() == megaChatApi.getMyUserHandle()) {
