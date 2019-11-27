@@ -115,14 +115,16 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         ShareContactInfo contact = getItem(position);
         if (contact.isHeader()){
             return HEADER_VIEW_TYPE;
-        }
-        else{
+        } else if (contact.isProgress()) {
+            return ITEM_PROGRESS;
+        } else{
             return ITEM_VIEW_TYPE;
         }
     }
 
     public class ViewHolderShareContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener{
 
+        RelativeLayout itemProgress;
         RelativeLayout itemHeader;
         TextView textHeader;
         RelativeLayout itemLayout;
@@ -158,10 +160,12 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         View rowView = inflater.inflate(R.layout.item_contact_share, parent, false);
         ViewHolderShareContactsLollipop holder = new ViewHolderShareContactsLollipop(rowView);
 
-        holder.itemHeader = (RelativeLayout) rowView.findViewById(R.id.header);
-        holder.textHeader = (TextView) rowView.findViewById(R.id.text_header);
+        holder.itemProgress = rowView.findViewById(R.id.item_progress);
 
-        holder.itemLayout = (RelativeLayout) rowView.findViewById(R.id.item_content);
+        holder.itemHeader = rowView.findViewById(R.id.header);
+        holder.textHeader = rowView.findViewById(R.id.text_header);
+
+        holder.itemLayout = rowView.findViewById(R.id.item_content);
         holder.contactNameTextView = rowView.findViewById(R.id.contact_name);
 
         if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -174,9 +178,9 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         }
         holder.contactNameTextView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
 
-        holder.emailTextView = (TextView) rowView.findViewById(R.id.contact_mail);
-        holder.avatar = (RoundedImageView) rowView.findViewById(R.id.contact_avatar);
-        holder.contactStateIcon = (ImageView) rowView.findViewById(R.id.contact_state);
+        holder.emailTextView = rowView.findViewById(R.id.contact_mail);
+        holder.avatar = rowView.findViewById(R.id.contact_avatar);
+        holder.contactStateIcon = rowView.findViewById(R.id.contact_state);
 
         return holder;
     }
@@ -187,6 +191,8 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         ShareContactInfo contact = getItem(position);
 
         holder.currentPosition = position;
+
+        holder.itemProgress.setVisibility(View.GONE);
 
         if (contact.isMegaContact()){
             if (contact.isHeader()){
@@ -294,6 +300,10 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
                 holder.avatar.setImageBitmap(createDefaultAvatar(holder.emailTextView.getText().toString(), contact));
             }
+        } else if (contact.isProgress()) {
+            holder.itemLayout.setVisibility(View.GONE);
+            holder.itemHeader.setVisibility(View.GONE);
+            holder.itemProgress.setVisibility(View.VISIBLE);
         }
     }
 

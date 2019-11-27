@@ -14,6 +14,7 @@ public class ShareContactInfo{
     boolean isPhoneContact;
     boolean isMegaContact;
     boolean isHeader;
+    boolean isProgress;
 
     public ShareContactInfo(PhoneContactInfo phoneContactInfo, MegaContactAdapter megaContactAdapter, String mail) {
         this.phoneContactInfo = phoneContactInfo;
@@ -34,12 +35,21 @@ public class ShareContactInfo{
 
         this.mail = mail;
         isHeader = false;
+        isProgress = false;
     }
 
     public ShareContactInfo(boolean isHeader, boolean isMegaContact, boolean isPhoneContact){
         this.isHeader = isHeader;
         this.isMegaContact = isMegaContact;
         this.isPhoneContact = isPhoneContact;
+        isProgress = false;
+    }
+
+    public ShareContactInfo() {
+        isPhoneContact = false;
+        isMegaContact = false;
+        isHeader = false;
+        isProgress = true;
     }
 
     public PhoneContactInfo getPhoneContactInfo() {
@@ -72,5 +82,9 @@ public class ShareContactInfo{
 
     public boolean isMegaContact () {
         return isMegaContact;
+    }
+
+    public boolean isProgress() {
+        return isProgress;
     }
 }

@@ -276,6 +276,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             boolean found;
             shareContacts.clear();
 
+            ShareContactInfo lastItem = filteredContactsShare.get(filteredContactsShare.size() - 1);
+            if (lastItem.isProgress()) {
+               filteredContactsShare.remove(lastItem);
+            }
+
             if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
                 shareContacts.add(new ShareContactInfoHeader(true, false, true));
                 for (int i=0; i<filteredContactsPhone.size(); i++) {
@@ -309,7 +314,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         protected void onPostExecute(Void aVoid) {
             waitingForPhoneContacts = false;
             setShareAdapterContacts(filteredContactsShare);
-//            Remove progress in filteredContactsShare
         }
     }
 
@@ -415,9 +419,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     setShareAdapterContacts(filteredContactsShare);
                     if (queryPermissions) {
                         waitingForPhoneContacts = true;
-//                        Add item in filteredContactsShare
-//                        getPhoneContactsTask = new GetPhoneContactsTask();
-//                        getPhoneContactsTask.execute();
+                        filteredContactsShare.add(new ShareContactInfo());
+                        getPhoneContactsTask = new GetPhoneContactsTask();
+                        getPhoneContactsTask.execute();
                     }
                 }
                 setTitleAB();
@@ -1447,24 +1451,24 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 outState.putParcelableArrayList("addedContactsPhone", null);
                 outState.putParcelableArrayList("filteredContactsPhone", null);
                 outState.putParcelableArrayList("phoneContacts", null);
-            }
-            else {
+            } else {
                 outState.putStringArrayList("savedaddedContacts", null);
             }
-        }
-        else if (isAsyncTaskRunning(filterContactsTask)){
+        } else if (isAsyncTaskRunning(getPhoneContactsTask)) {
+            getPhoneContactsTask.cancel(true);
+            finished = false;
+            outState.putStringArrayList("savedaddedContacts", null);
+        } else if (isAsyncTaskRunning(filterContactsTask)) {
             filterContactsTask.cancel(true);
             finished = true;
-        }
-        else if (isAsyncTaskRunning(recoverContactsTask)) {
+        } else if (isAsyncTaskRunning(recoverContactsTask)) {
             recoverContactsTask.cancel(true);
             finished = false;
             if (contactType == CONTACT_TYPE_DEVICE) {
                 outState.putParcelableArrayList("addedContactsPhone", addedContactsPhone);
                 outState.putParcelableArrayList("filteredContactsPhone", filteredContactsPhone);
                 outState.putParcelableArrayList("phoneContacts", phoneContacts);
-            }
-            else {
+            } else {
                 outState.putStringArrayList("savedaddedContacts", savedaddedContacts);
             }
         }
@@ -1930,7 +1934,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
 
         if (waitingForPhoneContacts) {
-//            Add progress in filteredContactsShare
+            filteredContactsShare.add(new ShareContactInfo());
             getPhoneContactsTask = new GetPhoneContactsTask();
             getPhoneContactsTask.execute();
             return;
@@ -2910,7 +2914,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
 
             final ShareContactInfo contact = adapterShareHeader.getItem(position);
-            if(contact == null || contact.isHeader()) {
+            if(contact == null || contact.isHeader() || contact.isProgress()) {
                 return;
             }
 

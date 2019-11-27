@@ -385,6 +385,7 @@ public class Constants {
 
     public static final int HEADER_VIEW_TYPE = 0;
     public static final int ITEM_VIEW_TYPE = 1;
+    public static final int ITEM_PROGRESS = 2;
 
     public static final int FILE_LINK = 200;
     public static final int FOLDER_LINK = 201;
