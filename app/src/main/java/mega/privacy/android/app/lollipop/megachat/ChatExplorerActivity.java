@@ -151,7 +151,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 }
             }
             else{
-                nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+                nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
                 if(nodeHandles!=null){
                     logDebug("Node handle is: " + nodeHandles[0]);
                 }
@@ -387,7 +387,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         Intent intent = new Intent();
 
         if(nodeHandles!=null){
-            intent.putExtra("NODE_HANDLES", nodeHandles);
+            intent.putExtra(NODE_HANDLES, nodeHandles);
         }
 
         if(userHandles!=null){
