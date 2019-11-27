@@ -74,6 +74,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
 import static android.app.Activity.RESULT_OK;
+import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_RECENT;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -140,10 +141,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private RelativeLayout emptyLayout;
     private TextView emptyTextViewInvite;
     private ImageView emptyImageView;
-
-    //Call
-    RelativeLayout callInProgressLayout;
-    Chronometer callInProgressChrono;
 
     Button inviteButton;
     int chatStatus;
@@ -340,7 +337,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             adjustLandscape();
-            emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
+            emptyImageView.setVisibility(View.GONE);
         } else {
             addMarginTop();
             emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
@@ -348,12 +345,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         inviteButton = (Button) v.findViewById(R.id.invite_button);
         inviteButton.setOnClickListener(this);
-
-        callInProgressLayout = (RelativeLayout) v.findViewById(R.id.call_in_progress_layout);
-        callInProgressLayout.setOnClickListener(this);
-        callInProgressChrono = (Chronometer) v.findViewById(R.id.call_in_progress_chrono);
-        callInProgressLayout.setVisibility(View.GONE);
-        callInProgressChrono.setVisibility(View.GONE);
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
         //auto scroll to bottom to show invite button.
@@ -590,6 +581,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
     }
 
+
     private void sortChats(ArrayList<MegaChatListItem> chatsToSort) {
         Collections.sort(chatsToSort, new Comparator<MegaChatListItem>() {
 
@@ -601,37 +593,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 return (int) result;
             }
         });
-    }
-
-    public void showCallLayout() {
-        if (isChatEnabled() && context instanceof ManagerActivityLollipop && megaChatApi != null && participatingInACall(megaChatApi)) {
-            logDebug("showCallLayout");
-
-            if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
-                callInProgressLayout.setVisibility(View.VISIBLE);
-            }
-            if (callInProgressChrono != null && callInProgressChrono.getVisibility() != View.VISIBLE) {
-                long chatId = getChatCallInProgress(megaChatApi);
-                if ((megaChatApi != null) && chatId != -1) {
-                    MegaChatCall call = megaChatApi.getChatCall(chatId);
-                    if (call != null) {
-                        callInProgressChrono.setVisibility(View.VISIBLE);
-                        callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration() * 1000));
-                        callInProgressChrono.start();
-                        callInProgressChrono.setFormat("%s");
-                    }
-                }
-            }
-        } else {
-
-            if (callInProgressChrono != null) {
-                callInProgressChrono.stop();
-                callInProgressChrono.setVisibility(View.GONE);
-            }
-            if (callInProgressLayout != null) {
-                callInProgressLayout.setVisibility(View.GONE);
-            }
-        }
     }
 
     public void showEmptyChatScreen() {
@@ -801,7 +762,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         if(context instanceof ManagerActivityLollipop) {
                             Intent in = new Intent(context, AddContactActivityLollipop.class);
                             in.putExtra("contactType", CONTACT_TYPE_MEGA);
-                            in.putExtra("comesFromRecent", true);
+                            in.putExtra(FROM_RECENT, true);
                             ((ManagerActivityLollipop)context).startActivityForResult(in, REQUEST_CREATE_CHAT);
                         }
                         if (megaChatApi.isSignalActivityRequired()) {
@@ -1543,7 +1504,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     public void refreshNode(MegaChatListItem item) {
         logDebug("Chat ID: " + item.getChatId());
-        ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
 
         //elements of adapter
         long chatHandleToUpdate = item.getChatId();
@@ -1654,7 +1614,13 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             (listView.getLayoutManager()).scrollToPosition(0);
         }
         lastFirstVisiblePosition = 0;
-        ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
+        if(aB == null) {
+            aB = ((AppCompatActivity) context).getSupportActionBar();
+
+        }
+        if (aB != null && aB.getTitle() != null) {
+            aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
+        }
 
         if (context instanceof ManagerActivityLollipop) {
             if (((ManagerActivityLollipop) context).isSearchOpen()) {

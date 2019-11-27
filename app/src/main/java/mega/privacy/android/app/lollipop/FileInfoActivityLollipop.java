@@ -1793,7 +1793,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 						if (isFileAvailable(destination) && destination.isDirectory()){
 							File offlineFile = new File(destination, node.getName());
-							if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+							if (isFileAvailable(offlineFile) && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
 								return;
 							}
 						}
@@ -1825,14 +1825,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 						//check the parent
 						long result = -1;
-						result= findIncomingParentHandle(node, megaApi);
+						result = findIncomingParentHandle(node, megaApi);
                         logDebug("IncomingParentHandle: " + result);
 						if(result!=-1){
-							File destination = getOfflineParentFile(this, INCOMING_REQUEST_ADAPTER, node, megaApi);
+							File destination = getOfflineParentFile(this, FROM_INCOMING_SHARES, node, megaApi);
 
 							if (isFileAvailable(destination) && destination.isDirectory()){
 								File offlineFile = new File(destination, node.getName());
-								if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+								if (isFileAvailable(offlineFile) && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
 									return;
 								}
 							}
@@ -2660,7 +2660,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
             long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-            long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+            long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 
             if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
                 if (contactHandles != null && contactHandles.length > 0) {
