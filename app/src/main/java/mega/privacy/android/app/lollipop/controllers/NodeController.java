@@ -46,7 +46,6 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
-import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import nz.mega.sdk.MegaApiAndroid;
@@ -54,6 +53,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -210,6 +210,20 @@ public class NodeController {
             return;
         }
 
+        checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes);
+
+        if (notOwnerNodes.size() == 0) {
+            selectChatsToSendNodes(ownerNodes);
+            return;
+        }
+
+        CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
+        copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
+    }
+
+    public void checkIfNodesAreMine(ArrayList<MegaNode> nodes, ArrayList<MegaNode> ownerNodes, ArrayList<MegaNode> notOwnerNodes) {
+        MegaNode currentNode;
+
         for (int i=0; i<nodes.size(); i++) {
             currentNode = nodes.get(i);
             if (currentNode != null) {
@@ -236,14 +250,6 @@ public class NodeController {
                     }
                 }
             }
-        }
-
-        if (notOwnerNodes.size() == 0) {
-            selectChatsToSendNodes(ownerNodes);
-        }
-        else {
-            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
-            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
         }
     }
 
@@ -877,7 +883,7 @@ public class NodeController {
                                     internalIntent = true;
                                     mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                                 }
-                                mediaIntent.putExtra("isPlayList", false);
+                                mediaIntent.putExtra(IS_PLAYLIST, false);
                                 mediaIntent.putExtra("HANDLE", tempNode.getHandle());
                                 mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1600,88 +1606,33 @@ public class NodeController {
         megaApi.removeVersions((ManagerActivityLollipop) context);
     }
 
-    private void removeNotOfflineElements(String pathNavigation) {
-        ArrayList<MegaOffline> mOffList = dbH.findByPath(pathNavigation);
+    public void deleteOffline(MegaOffline selectedNode){
+        logDebug("deleteOffline");
+        dbH = DatabaseHandler.getDbHandler(context);
 
-        logDebug("Number of elements: " + mOffList.size());
+        //Delete children
+        ArrayList<MegaOffline> mOffListChildren = dbH.findByParentId(selectedNode.getId());
+        if (mOffListChildren.size() > 0) {
+            //The node have childrens, delete
+            deleteChildrenDB(mOffListChildren);
+        }
 
-        for (int i = 0; i < mOffList.size(); i++) {
-            MegaOffline checkOffline = mOffList.get(i);
-            File offlineFile = getOfflineFile(context, checkOffline);
+        removeNodePhysically(selectedNode);
 
-            if (!isFileAvailable(offlineFile)) {
-                logDebug("Path to remove: " + (mOffList.get(i).getPath() + mOffList.get(i).getName()));
-                mOffList.remove(i);
-                i--;
-            }
+        dbH.removeById(selectedNode.getId());
 
+        //Check if the parent has to be deleted
+
+        int parentId = selectedNode.getParentId();
+        MegaOffline parentNode = dbH.findById(parentId);
+
+        if (parentNode != null) {
+            logDebug("Parent to check: " + parentNode.getName());
+            checkParentDeletion(parentNode);
         }
 
         if (context instanceof ManagerActivityLollipop) {
             ((ManagerActivityLollipop) context).updateOfflineView(null);
-        }
-    }
-
-    public void deleteOffline(MegaOffline selectedNode, String pathNavigation){
-        logDebug("deleteOffline");
-        if (selectedNode == null){
-            logDebug("Delete RK");
-            File file= buildExternalStorageFile(RK_FILE);
-            if(isFileAvailable(file)){
-                file.delete();
-                removeNotOfflineElements(pathNavigation);
-            }
-        }
-        else {
-            if (selectedNode.getHandle().equals("0")) {
-                logDebug("Delete RK");
-                File file = buildExternalStorageFile(RK_FILE);
-                if (isFileAvailable(file)) {
-                    file.delete();
-
-                    if(context instanceof ManagerActivityLollipop){
-                        ((ManagerActivityLollipop) context).invalidateOptionsMenu();
-                        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                        if(mAF!=null && mAF.isAdded()){
-                            mAF.setMkButtonText();
-                        }
-                    }
-
-                    removeNotOfflineElements(pathNavigation);
-                }
-            } else {
-                logDebug("Delete node");
-                dbH = DatabaseHandler.getDbHandler(context);
-
-                ArrayList<MegaOffline> mOffListParent = new ArrayList<MegaOffline>();
-                ArrayList<MegaOffline> mOffListChildren = new ArrayList<MegaOffline>();
-                MegaOffline parentNode = null;
-
-                //Delete children
-                mOffListChildren = dbH.findByParentId(selectedNode.getId());
-                if (mOffListChildren.size() > 0) {
-                    //The node have childrens, delete
-                    deleteChildrenDB(mOffListChildren);
-                }
-
-                removeNodePhysically(selectedNode);
-
-                dbH.removeById(selectedNode.getId());
-
-                //Check if the parent has to be deleted
-
-                int parentId = selectedNode.getParentId();
-                parentNode = dbH.findById(parentId);
-
-                if (parentNode != null) {
-                    logDebug("Parent to check: " + parentNode.getHandle());
-                    checkParentDeletion(parentNode);
-                }
-
-                if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).updateOfflineView(null);
-                }
-            }
         }
     }
 

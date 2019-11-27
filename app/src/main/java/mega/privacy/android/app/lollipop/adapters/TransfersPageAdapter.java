@@ -40,10 +40,10 @@ public class TransfersPageAdapter extends FragmentPagerAdapter {
         // Generate title based on item position
         switch (position){
             case 0: {
-                return context.getString(R.string.title_tab_in_progress_transfers).toLowerCase();
+                return context.getString(R.string.title_tab_in_progress_transfers);
             }
             case 1:{
-                return context.getString(R.string.title_tab_completed_transfers).toLowerCase();
+                return context.getString(R.string.title_tab_completed_transfers);
             }
         }
         return null;

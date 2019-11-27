@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -13,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.Html;
+import android.text.InputFilter;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -55,6 +55,9 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -81,6 +84,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public static final int ADAPTER_RECENT_CHATS = 0;
 	public static final int ADAPTER_ARCHIVED_CHATS = 1;
+
+	private static final String SPACE = " ";
 
 	Context context;
 	int positionClicked;
@@ -140,7 +145,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			super(arg0);
 		}
 		RoundedImageView imageView;
-		TextView contactInitialLetter;
+		EmojiTextView contactInitialLetter;
 		EmojiTextView textViewContactName;
 		EmojiTextView textViewContent;
 		LinearLayout voiceClipOrLocationLayout;
@@ -193,7 +198,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(itemType == ITEM_VIEW_TYPE_NORMAL) {
 			((ViewHolderNormalChatList)holder).imageView.setImageBitmap(null);
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setText("");
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(SPACE);
 
 			MegaChatListItem chat = (MegaChatListItem) getItem(position);
 
@@ -258,20 +263,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if (!multipleSelect) {
 					//Multiselect OFF
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-
-					if (chat.getTitle().length() > 0){
-						String chatTitle = chat.getTitle().trim();
-
-						String firstLetter = "";
-						if(!chatTitle.isEmpty()){
-							firstLetter = chatTitle.charAt(0) + "";
-							firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-						}
-
-						((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-					}
-
-					createGroupChatAvatar(holder);
+					createGroupChatAvatar(holder, chat.getTitle());
 				} else {
 					logDebug("Multiselect ON");
 
@@ -285,15 +277,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					else{
 						logDebug("NOT selected");
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-
-						if (chat.getTitle().length() > 0){
-							String chatTitle = chat.getTitle().trim();
-							String firstLetter = chatTitle.charAt(0) + "";
-							firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-							((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-						}
-
-						createGroupChatAvatar(holder);
+						createGroupChatAvatar(holder, chat.getTitle());
 					}
 				}
 			}
@@ -508,48 +492,34 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if(viewType == ITEM_VIEW_TYPE_NORMAL) {
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
 			holder = new ViewHolderNormalChatList(v);
-			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.recent_chat_list_item_layout);
-			((ViewHolderNormalChatList)holder).muteIcon = (ImageView) v.findViewById(R.id.recent_chat_list_mute_icon);
+			holder.itemLayout = v.findViewById(R.id.recent_chat_list_item_layout);
+			((ViewHolderNormalChatList) holder).muteIcon = v.findViewById(R.id.recent_chat_list_mute_icon);
 
-			((ViewHolderNormalChatList)holder).imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
-			((ViewHolderNormalChatList)holder).contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
-			((ViewHolderNormalChatList)holder).textViewContactName = (EmojiTextView) v.findViewById(R.id.recent_chat_list_name);
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(scaleWidthPx(10, outMetrics));
-			}else{
-				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(scaleWidthPx(20, outMetrics));
-			}
+			((ViewHolderNormalChatList) holder).imageView = v.findViewById(R.id.recent_chat_list_thumbnail);
+			((ViewHolderNormalChatList) holder).contactInitialLetter = v.findViewById(R.id.recent_chat_list_initial_letter);
+			((ViewHolderNormalChatList) holder).textViewContactName = v.findViewById(R.id.recent_chat_list_name);
+			((ViewHolderNormalChatList) holder).textViewContent = v.findViewById(R.id.recent_chat_list_content);
 
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				logDebug("Landscape");
-				((ViewHolderNormalChatList)holder).textViewContactName.setMaxWidth(scaleWidthPx(260, outMetrics));
-			}else{
-				logDebug("Portrait");
-				((ViewHolderNormalChatList)holder).textViewContactName.setMaxWidth(scaleWidthPx(190, outMetrics));
-			}
+			((ViewHolderNormalChatList) holder).textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+			((ViewHolderNormalChatList) holder).contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+			((ViewHolderNormalChatList) holder).textViewContent.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
+			((ViewHolderNormalChatList) holder).textViewContent.setMaxWidth(Util.px2dp(260, outMetrics));
 
-			((ViewHolderNormalChatList)holder).textViewContent = (EmojiTextView) v.findViewById(R.id.recent_chat_list_content);
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(scaleWidthPx(10, outMetrics));
-				((ViewHolderNormalChatList)holder).textViewContent.setMaxWidth(scaleWidthPx(260, outMetrics));
-			}else{
-				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(scaleWidthPx(15, outMetrics));
-				((ViewHolderNormalChatList)holder).textViewContent.setMaxWidth(scaleWidthPx(190, outMetrics));
-			}
-            ((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout = (LinearLayout) v.findViewById(R.id.last_message_voice_clip_or_location);
-            ((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
-			((ViewHolderNormalChatList)holder).voiceClipOrLocationText = (TextView) v.findViewById(R.id.last_message_voice_clip_or_location_text);
-			((ViewHolderNormalChatList)holder).voiceClipOrLocationIc = (ImageView) v.findViewById(R.id.last_message_voice_clip_or_location_ic);
+			((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout = v.findViewById(R.id.last_message_voice_clip_or_location);
+			((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
+			((ViewHolderNormalChatList) holder).voiceClipOrLocationText = v.findViewById(R.id.last_message_voice_clip_or_location_text);
+			((ViewHolderNormalChatList) holder).voiceClipOrLocationIc = v.findViewById(R.id.last_message_voice_clip_or_location_ic);
 
-			((ViewHolderNormalChatList)holder).textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
-			((ViewHolderNormalChatList)holder).iconMyAudioOff = (ImageView) v.findViewById(R.id.recent_chat_list_micro_off);
+			((ViewHolderNormalChatList)holder).textViewDate = v.findViewById(R.id.recent_chat_list_date);
+			((ViewHolderNormalChatList)holder).iconMyAudioOff = v.findViewById(R.id.recent_chat_list_micro_off);
+
 			((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.GONE);
 
-			((ViewHolderNormalChatList)holder).iconMyVideoOn = (ImageView) v.findViewById(R.id.recent_chat_list_video_on);
+			((ViewHolderNormalChatList)holder).iconMyVideoOn = v.findViewById(R.id.recent_chat_list_video_on);
 			((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.GONE);
 
 
-			((ViewHolderNormalChatList)holder).imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
+			((ViewHolderNormalChatList)holder).imageButtonThreeDots = v.findViewById(R.id.recent_chat_list_three_dots);
 
 			if((context instanceof ManagerActivityLollipop) || (context instanceof ArchivedChatsActivity)){
 				((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
@@ -625,12 +595,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				break;
 			}
 		}
-
 		((ViewHolderNormalChatList)holder).numberPendingMessages.setText(numberString);
-
 	}
 
-	public void createGroupChatAvatar(ViewHolderChatList holder){
+	public void createGroupChatAvatar(ViewHolderChatList holder, String chatTitle){
 		logDebug("createGroupChatAvatar()");
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -651,23 +619,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
-		float density  = context.getResources().getDisplayMetrics().density;
 
-		String firstLetter = ((ViewHolderNormalChatList)holder).contactInitialLetter.getText().toString();
-
-		if(firstLetter.trim().isEmpty()){
+		String firstLetter = ChatUtil.getFirstLetter(chatTitle);
+		if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
 			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.INVISIBLE);
-		}
-		else{
-			if(firstLetter.equals("(")){
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.INVISIBLE);
-			}
-			else{
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setTextSize(24);
-			}
+		}else {
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -704,16 +663,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		boolean setInitialByMail = false;
 
-		if (((ViewHolderNormalChatList)holder).fullName != null){
-			if (((ViewHolderNormalChatList)holder).fullName.trim().length() > 0){
-				String firstLetter = ((ViewHolderNormalChatList)holder).fullName.charAt(0) + "";
-				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
-				((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
-			}else{
-				setInitialByMail=true;
-			}
+		if (((ViewHolderNormalChatList)holder).fullName != null && ((ViewHolderNormalChatList)holder).fullName.trim().length() > 0){
+			String firstLetter = ChatUtil.getFirstLetter(((ViewHolderNormalChatList)holder).fullName);
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setTextColor(Color.WHITE);
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.VISIBLE);
+
 		}
 		else{
 			setInitialByMail=true;
@@ -729,6 +684,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			}
 		}
+
 		((ViewHolderNormalChatList)holder).contactInitialLetter.setTextSize(24);
 	}
 
@@ -1156,29 +1112,19 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			String title = chat.getTitle();
 
 			if(title!=null){
-				logDebug("ChatRoom ID: " + chat.getChatId());
-				logDebug("Chat timestamp: " + chat.getLastTimestamp());
+				logDebug("ChatRoom id: "+chat.getChatId());
+				logDebug("chat timestamp: "+chat.getLastTimestamp());
 				String date = formatDateAndTime(context,chat.getLastTimestamp(), DATE_LONG_FORMAT);
-				logDebug("Date timestamp: " + date);
+				logDebug("date timestamp: "+date);
+				int maxAllowed = ChatUtil.getMaxAllowed(title);
+				((ViewHolderNormalChatList)holder).textViewContactName.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
 				((ViewHolderNormalChatList)holder).textViewContactName.setText(title);
 
 				if(!chat.isGroup()){
 					((ViewHolderNormalChatList)holder).fullName = title;
 				}
 				else{
-					if (title.length() > 0){
-						String chatTitle = title.trim();
-
-						String firstLetter = "";
-						if(!chatTitle.isEmpty()){
-							firstLetter = chatTitle.charAt(0) + "";
-							firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-						}
-
-						((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
-					}
-
-					createGroupChatAvatar(holder);
+					createGroupChatAvatar(holder,title);
 				}
 			}
 		}
@@ -1287,14 +1233,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
-
-			if(isChatEnabled() && chat != null && chat.isCallInProgress() && (megaChatApi != null) && (megaChatApi.getNumCalls() != 0)){
-				MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
-				if(call!=null){
-					return;
-				}
-			}
-
 			int messageType = chat.getLastMessageType();
 			MegaChatMessage lastMessage = megaChatApi.getMessage(chat.getChatId(), chat.getLastMessageId());
 			logDebug("MessageType: " + messageType);
@@ -1340,7 +1278,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						if(fullNameAction.isEmpty()){
 							if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 								logDebug("Call for nonContactHandle: "+ chat.getLastMessageSender());
-								fullNameAction = "Unknown name";
+								fullNameAction = context.getString(R.string.unknown_name_label);
 								((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 								((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -1448,7 +1386,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					if(fullNameTitle.trim().length()<=0){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 							logDebug("Call for nonContactHandle: " + chat.getLastMessageHandle());
-							fullNameTitle = "Unknown name";
+							fullNameTitle = context.getString(R.string.unknown_name_label);
 							((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 							((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageHandle();
 
@@ -1510,7 +1448,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								if(fullNameAction.isEmpty()){
 									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 										logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-										fullNameAction = "Unknown name";
+										fullNameAction = context.getString(R.string.unknown_name_label);
 										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 										((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -1597,7 +1535,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 									if(fullNameAction.isEmpty()){
 										if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 											logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-											fullNameAction = "Unknown name";
+											fullNameAction = context.getString(R.string.unknown_name_label);
 											((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 											((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -1707,7 +1645,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(fullNameAction.isEmpty()){
 								if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 									logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-									fullNameAction = "Unknown name";
+									fullNameAction = context.getString(R.string.unknown_name_label);
 									((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 									((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -1761,7 +1699,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					if(fullNameTitle.trim().length()<=0){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 							logDebug("Call for nonContactHandle: " + chat.getLastMessageHandle());
-							fullNameTitle = "Unknown name";
+							fullNameTitle = context.getString(R.string.unknown_name_label);
 							((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 							((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageHandle();
 
@@ -1818,7 +1756,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(fullNameAction.isEmpty()){
 								if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 									logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-									fullNameAction = "Unknown name";
+									fullNameAction = context.getString(R.string.unknown_name_label);
 									((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 									((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -1894,7 +1832,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						if(fullNameAction.isEmpty()){
 							if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 								logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-								fullNameAction = "Unknown name";
+								fullNameAction = context.getString(R.string.unknown_name_label);
 								((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 								((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 
@@ -2237,7 +2175,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								if(fullNameAction.isEmpty()){
 									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 										logDebug("Call for nonContactName: " + lastMsgSender);
-										fullNameAction = "Unknown name";
+										fullNameAction = context.getString(R.string.unknown_name_label);
 										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
@@ -2328,7 +2266,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								if(fullNameAction.isEmpty()){
 									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 										logDebug("Call for nonContactName: " + lastMsgSender);
-										fullNameAction = "Unknown name";
+										fullNameAction = context.getString(R.string.unknown_name_label);
 										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
@@ -2420,7 +2358,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								if(fullNameAction.isEmpty()){
 									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 										logDebug("Call for nonContactName: " + lastMsgSender);
-										fullNameAction = "Unknown name";
+										fullNameAction = context.getString(R.string.unknown_name_label);
 										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
@@ -2499,7 +2437,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					}
 
 					if (fullNameAction.trim().length() <= 0 && fullNameAction.isEmpty() && !(((ViewHolderNormalChatList) holder).nameRequestedAction)) {
-						fullNameAction = "Unknown name";
+						fullNameAction = context.getString(R.string.unknown_name_label);
 						((ViewHolderNormalChatList) holder).nameRequestedAction = true;
 						((ViewHolderNormalChatList) holder).userHandle = lastMsgSender;
 
@@ -2594,7 +2532,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(fullNameAction.isEmpty()){
 								if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 									logDebug("Call for nonContactHandle: " + lastMsgSender);
-									fullNameAction = "Unknown name";
+									fullNameAction = context.getString(R.string.unknown_name_label);
 									((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 									((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
@@ -2618,6 +2556,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							CharSequence indexedText = TextUtils.concat(name, myMessage);
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, true);
 						}
@@ -2626,6 +2565,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							CharSequence indexedText = TextUtils.concat(name, myMessage);
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, false);
 						}
@@ -2693,7 +2633,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(fullNameAction.isEmpty()){
 					if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
 						logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
-						fullNameAction = "Unknown name";
+						fullNameAction = context.getString(R.string.unknown_name_label);
 						((ViewHolderNormalChatList)holder).nameRequestedAction=true;
 						((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
 						ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());

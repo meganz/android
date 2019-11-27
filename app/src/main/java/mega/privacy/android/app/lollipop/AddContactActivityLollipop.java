@@ -34,6 +34,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
+import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -74,6 +75,7 @@ import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.lollipop.adapters.AddContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaAddContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
@@ -107,6 +109,7 @@ import static mega.privacy.android.app.utils.Util.*;
 public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface {
 
     public static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
+    private static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
     public static final String BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT = "INTENT_FILTER_INVITE_CONTACT";
 
     DisplayMetrics outMetrics;
@@ -210,7 +213,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     private FloatingActionButton fabImageGroup;
     private FloatingActionButton fabButton;
-    private EditText nameGroup;
+    private EmojiEditText nameGroup;
     private boolean onNewGroup = false;
     private boolean isConfirmDeleteShown = false;
     private String confirmDeleteMail;
@@ -1603,7 +1606,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         containerAddedContactsRecyclerView = (RelativeLayout) findViewById(R.id.contacts_adds_container);
         containerAddedContactsRecyclerView.setVisibility(View.GONE);
         fabImageGroup = (FloatingActionButton) findViewById(R.id.image_group_floating_button);
-        nameGroup = (EditText) findViewById(R.id.name_group_edittext);
+        nameGroup = findViewById(R.id.name_group_edittext);
+        nameGroup.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+        nameGroup.setFilters(new InputFilter[]{new InputFilter.LengthFilter(MAX_ALLOWED_CHARACTERS_AND_EMOJIS)});
 
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         addedContactsRecyclerView.setLayoutManager(mLayoutManager);
@@ -3046,11 +3051,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         else if (onNewGroup) {
             String chatTitle = "";
-            if(nameGroup!=null && (nameGroup.getText()).length()>0){
+            if (nameGroup != null && nameGroup.getText().length() > 0) {
                 chatTitle = nameGroup.getText().toString();
                 startConversation(contactsSelected, megaContacts, chatTitle);
             }
-            else{
+            else {
                 startConversation(contactsSelected, megaContacts, null);
             }
         }

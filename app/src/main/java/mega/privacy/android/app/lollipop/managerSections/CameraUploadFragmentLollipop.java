@@ -119,10 +119,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-//	private RelativeLayout contentTextLayout;
-//	Button turnOnOff;
-	private RelativeLayout transfersOverViewLayout;
-
 	private SwitchCompat switchCellularConnection;
 	private SwitchCompat switchUploadVideos;
 
@@ -753,45 +749,43 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
 
-		if (type == TYPE_CAMERA) {
-			if (((ManagerActivityLollipop) context).getFirstLogin()) {
-				((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-				setInitialPreferences();
-				View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
-				scrollView = (ScrollView) v.findViewById(R.id.cam_sync_scroll_view);
-				new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
-					@Override
-					public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-						if (scrollView.canScrollVertically(-1)){
-							((ManagerActivityLollipop) context).changeActionBarElevation(true);
-						}
-						else {
-							((ManagerActivityLollipop) context).changeActionBarElevation(false);
-						}
+		if (type == TYPE_CAMERA && ((ManagerActivityLollipop) context).getFirstLogin()) {
+			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
+			setInitialPreferences();
+			View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
+			scrollView = (ScrollView) v.findViewById(R.id.cam_sync_scroll_view);
+			new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
+				@Override
+				public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+					if (scrollView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
 					}
-				});
-
-				initialImageView = (ImageView) v.findViewById(R.id.cam_sync_image_view);
-
-				bOK = (TextView) v.findViewById(R.id.cam_sync_button_ok);
-				bSkip = (TextView) v.findViewById(R.id.cam_sync_button_skip);
-				switchCellularConnection = (SwitchCompat) v.findViewById(R.id.cellular_connection_switch);
-				switchUploadVideos = (SwitchCompat) v.findViewById(R.id.upload_videos_switch);
-
-				bSkip.setText(getString(R.string.cam_sync_skip));
-				bOK.setText(getString(R.string.cam_sync_ok));
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					bSkip.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
-					bOK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-				} else {
-					bSkip.setBackgroundResource(R.drawable.black_button_border);
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
 				}
+			});
 
-				bOK.setOnClickListener(this);
-				bSkip.setOnClickListener(this);
+			initialImageView = (ImageView) v.findViewById(R.id.cam_sync_image_view);
 
-				return v;
+			bOK = (TextView) v.findViewById(R.id.cam_sync_button_ok);
+			bSkip = (TextView) v.findViewById(R.id.cam_sync_button_skip);
+			switchCellularConnection = (SwitchCompat) v.findViewById(R.id.cellular_connection_switch);
+			switchUploadVideos = (SwitchCompat) v.findViewById(R.id.upload_videos_switch);
+
+			bSkip.setText(getString(R.string.cam_sync_skip));
+			bOK.setText(getString(R.string.cam_sync_ok));
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				bSkip.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
+				bOK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+			} else {
+				bSkip.setBackgroundResource(R.drawable.black_button_border);
 			}
+
+			bOK.setOnClickListener(this);
+			bSkip.setOnClickListener(this);
+
+			return v;
 		}
 
 		if (((ManagerActivityLollipop) context).isListCameraUploads()) {
@@ -826,9 +820,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			} else {
 				turnOnOff.setText(getString(R.string.settings_set_up_automatic_uploads).toUpperCase(Locale.getDefault()));
 			}
-
-			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
-			transfersOverViewLayout.setVisibility(View.GONE);
 
 			boolean camEnabled = false;
 			prefs = dbH.getPreferences();
