@@ -36,8 +36,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical|left"
                     android:orientation="vertical">
-
-                    <LinearLayout
+                    <RelativeLayout
                         android:id="@+id/toolbar_elements_inside"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -52,8 +51,8 @@
                             android:layout_gravity="left"
                             android:fontFamily="sans-serif-light"
                             android:gravity="center_vertical|left"
-                            android:textSize="18sp"
-                            app:emojiSize="16sp"
+                            android:textSize="17sp"
+                            app:emojiSize="17sp"
                             android:textColor="@color/white"
                             android:textStyle="bold"
                             android:singleLine="true"
@@ -64,6 +63,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentTop="true"
+                            android:layout_toRightOf="@id/title_toolbar"
                             android:orientation="horizontal"
                             android:layout_marginLeft="8dp"
                             android:layout_marginRight="8dp">
@@ -85,8 +85,7 @@
                                 android:tint="@color/white"
                                 android:visibility="gone" />
                         </LinearLayout>
-
-                    </LinearLayout>
+                    </RelativeLayout>
 
                     <mega.privacy.android.app.components.MarqueeTextView
                         android:id="@+id/individual_subtitle_toolbar"
@@ -100,8 +99,9 @@
 
                     <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/groupal_subtitle_toolbar"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:ellipsize="marquee"
                         android:focusable="true"
                         android:focusableInTouchMode="true"
                         android:marqueeRepeatLimit="marquee_forever"

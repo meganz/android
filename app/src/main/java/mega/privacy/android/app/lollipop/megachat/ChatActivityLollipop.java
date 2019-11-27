@@ -184,9 +184,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private final static int ROTATION_LANDSCAPE = 1;
     private final static int ROTATION_REVERSE_PORTRAIT = 2;
     private final static int ROTATION_REVERSE_LANDSCAPE = 3;
-    private final static int TITLE_TOOLBAR_PORT = 150;
-    private final static int TITLE_TOOLBAR_LAND = 400;
-    private final static int TITLE_TOOLBAR_IND_PORT = 180;
+    private final static int TITLE_TOOLBAR_PORT = 140;
+    private final static int TITLE_TOOLBAR_LAND = 250;
+    private final static int TITLE_TOOLBAR_IND_PORT = 100;
 
     public static int MEGA_FILE_LINK = 1;
     public static int MEGA_FOLDER_LINK = 2;
@@ -275,10 +275,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     ActionBar aB;
     Toolbar tB;
-    LinearLayout toolbarElementsInside;
+    RelativeLayout toolbarElementsInside;
 
     private EmojiTextView titleToolbar;
-    MarqueeTextView individualSubtitleToobar;
+    private MarqueeTextView individualSubtitleToobar;
     private EmojiTextView groupalSubtitleToolbar;
     LinearLayout subtitleCall;
     Chronometer subtitleChronoCall;
