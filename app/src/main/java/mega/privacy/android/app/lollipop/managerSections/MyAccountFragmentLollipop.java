@@ -61,9 +61,6 @@ import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import nz.mega.sdk.MegaAccountDetails;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -73,6 +70,7 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -230,7 +228,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 
 		nameView = v.findViewById(R.id.my_account_name);
-		nameView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
+		nameView.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 		nameView.setOnClickListener(this);
 
 
@@ -245,14 +243,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		addPhoneNumber = v.findViewById(R.id.add_phone_number);
 		if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
             addPhoneNumber.setText(registeredPhoneNumber);
-        } else {
-		    if(canVoluntaryVerifyPhoneNumber()) {
-                addPhoneNumber.setText(R.string.add_phone_number_label);
-                addPhoneNumber.setOnClickListener(this);
-            } else {
-		        addPhoneNumber.setVisibility(View.GONE);
-            }
-        }
+        } else if(canVoluntaryVerifyPhoneNumber()) {
+			addPhoneNumber.setText(R.string.add_phone_number_label);
+			addPhoneNumber.setOnClickListener(this);
+		} else {
+			addPhoneNumber.setVisibility(View.GONE);
+		}
 
 		mkButton = v.findViewById(R.id.MK_button);
 		mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
@@ -854,11 +850,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void setDefaultAvatar(){
 		logDebug("setDefaultAvatar");
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		String firstLetter = ChatUtil.getFirstLetter(myAccountInfo.getFullName());
+		String firstLetter = getFirstLetter(myAccountInfo.getFullName());
 		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
 			firstLetter = " ";
 		}
-		myAccountImage.setImageBitmap(Util.createDefaultAvatar(color, firstLetter));
+		myAccountImage.setImageBitmap(createDefaultAvatar(color, firstLetter));
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){
