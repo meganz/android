@@ -1415,6 +1415,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         outState.putBoolean("onNewGroup", onNewGroup);
         outState.putBoolean("isConfirmDeleteShown", isConfirmDeleteShown);
         outState.putString("confirmDeleteMail", confirmDeleteMail);
+        outState.putBoolean(FROM_RECENT, comesFromRecent);
         if (isAsyncTaskRunning(queryIfContactSouldBeAddedTask)){
             isConfirmAddShown = true;
             queryIfContactSouldBeAddedTask.cancel(true);
@@ -1777,6 +1778,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             onNewGroup = savedInstanceState.getBoolean("onNewGroup", onNewGroup);
             isConfirmDeleteShown = savedInstanceState.getBoolean("isConfirmDeleteShown", false);
             confirmDeleteMail = savedInstanceState.getString("confirmDeleteMail");
+            comesFromRecent = savedInstanceState.getBoolean(FROM_RECENT, false);
             searchExpand = savedInstanceState.getBoolean("searchExpand", false);
             savedInputString = savedInstanceState.getString("inputString");
             isConfirmAddShown = savedInstanceState.getBoolean("isConfirmAddShown", false);
@@ -1874,8 +1876,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
 
         setGetChatLinkVisibility();
-        if(comesFromRecent) {
-            if(isAsyncTaskRunning(getContactsTask)) {
+
+        if (comesFromRecent && !onNewGroup) {
+            if (isAsyncTaskRunning(getContactsTask)) {
                 getContactsTask.cancel(true);
             }
             createNewChatLink = true;

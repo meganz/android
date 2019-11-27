@@ -55,6 +55,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -1752,6 +1753,42 @@ public class Util {
 		}
 		return false;
 
+	}
+
+	/**
+	 * This method decodes a url and formats it before its treatment
+	 *
+	 * @param url the passed url to be decoded
+	 */
+	public static void decodeURL(String url) {
+		try {
+			url = URLDecoder.decode(url, "UTF-8");
+		} catch (Exception e) {
+			logDebug("Exception decoding url: "+url);
+			e.printStackTrace();
+		}
+
+		url.replace(' ', '+');
+
+		if (url.startsWith("mega://")) {
+			url = url.replaceFirst("mega://", "https://mega.nz/");
+		} else if (url.startsWith("mega.")) {
+			url = url.replaceFirst("mega.", "https://mega.");
+		}
+
+		if (url.startsWith("https://www.mega.co.nz")) {
+			url = url.replaceFirst("https://www.mega.co.nz", "https://mega.co.nz");
+		}
+
+		if (url.startsWith("https://www.mega.nz")) {
+			url = url.replaceFirst("https://www.mega.nz", "https://mega.nz");
+		}
+
+		if (url.endsWith("/")) {
+			url = url.substring(0, url.length() - 1);
+		}
+
+		logDebug("URL decoded: " + url);
 	}
 
     public static boolean hasPermissions(Context context, String... permissions) {

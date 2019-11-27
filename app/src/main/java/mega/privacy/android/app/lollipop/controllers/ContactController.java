@@ -61,7 +61,7 @@ public class ContactController {
         for (int i=0; i<users.size(); i++){
             longArray.add(users.get(i).getEmail());
         }
-        intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
+        intent.putStringArrayListExtra(SELECTED_CONTACTS, longArray);
         ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
     }
 
@@ -69,12 +69,12 @@ public class ContactController {
         logDebug("pickFileToSend");
 
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
-        intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FILE);
+        intent.setAction(FileExplorerActivityLollipop.ACTION_MULTISELECT_FILE);
         ArrayList<String> longArray = new ArrayList<String>();
         for (int i=0; i<users.size(); i++){
             longArray.add(users.get(i).getEmail());
         }
-        intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
+        intent.putStringArrayListExtra(SELECTED_CONTACTS, longArray);
 
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
