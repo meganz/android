@@ -74,7 +74,7 @@
     <color name="transparent_mega">#80db0605</color>
     
     <color name="delimiterColor">#e6e6e6</color>
-
+    <color name="contactSelected">#1A00BFA5</color>
     <color name="accentColor">#FF00BFA5</color>
     <color name="accentColorTransparent">#5900BFA5</color>
     <color name="accentColorLight">#9900BFA5</color>
@@ -138,6 +138,8 @@
     <color name="background_chat">#FFFFFFFF</color>
     <!--<color name="disable_fab_chat_call">#CC444444</color>-->
     <color name="disable_fab_chat_call">#FF6E6E6E</color>
+    <color name="disable_fab_invite_contact">#A9E3D8</color>
+
 	<color name="disabled_radio_button_label">#FF8C8F90</color>
     <color name="pass_weak">#FFFFD300</color>
     <color name="pass_good">#FF13E03C</color>
@@ -171,6 +173,7 @@
     <color name="dark_primary_color">#FFF30C14</color>
     <color name="dark_primary_color_secondary">#FFD50004</color>
     <color name="status_bar_search">#FFCCCCCC</color>
+    <color name="status_bar_sms_verification">#40B0D7</color>
     <color name="status_bar_navigation_view">#FF33CCB7</color>
     <color name="white_50_opacity">#80FFFFFF</color>
     <color name="white_15_opacity">#26FFFFFF</color>
@@ -199,4 +202,7 @@
     <color name="expired_business_admin">#FF79556C</color>
     <color name="expired_business_user">#379ABB</color>
     <color name="business_color">#2BA6DE</color>
+
+    <color name="black_40_alpha">#66000000</color>
+
 </resources>

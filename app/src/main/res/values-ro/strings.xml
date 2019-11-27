@@ -46,7 +46,7 @@
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importă</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Spațiu de stocare</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Cotă de transfer</string>
-    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Abonare</string>
+    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Abonează-te</string>
     <!--
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>
     -->
@@ -63,6 +63,8 @@
     <string name="general_show_info" context="Label of a button/notification to show info about something">Afișează informații</string>
 
     <string name="error_general_nodes" context="Error getting the root node">Eroate. Te rugăm să încerci din nou.</string>
+
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">CHEIEDERECUPERARE-MEGA</string>
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">Folderul media secundar nu există, te rugăm să alegi un folder nou</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Nicio stocare externă detectată</string>
@@ -91,7 +93,7 @@
 
     <string name="action_logout" context="Button where the user can sign off or logout">Deconectează-te</string>
     <string name="action_add" context="Menu item">Încărcare</string>
-    <string name="action_create_folder" context="Menu item">Creează folder nou</string>
+    <string name="action_create_folder" context="Menu item">Creează un folder nou</string>
     <string name="action_open_link" context="Menu item">Deschide linkul</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Vizualizare tip miniatură</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Vizualizare tip listă</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Fă backup cheii recup</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Elimină cheia de recuperare</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Anulează abonamentul</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">Fișierul cheii de recuperare a fost eliminat</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Abonamentul a fost anulat</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Nu am putut anula abonamentul tău. Te rugăm să contactezi support&#64;mega.nz pentru asistență</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Închide alte sesiuni</string>
@@ -202,7 +202,7 @@
     <string name="tour_access_title">MEGA Acces</string>
     <string name="tour_space_text">Înregistrează-te acum și obține 50 GB* spațiu gratuit.</string>
     <string name="tour_speed_text">Încărcările sunt rapide. Partajează rapid fișiere cu toți.</string>
-    <string name="tour_privacy_text">Păstrează toate fișierele în siguranță cu criptarea capăt-la-capăt a MEGA</string>
+    <string name="tour_privacy_text">Păstrează toate fișierele în siguranță cu criptarea capăt-la-capăt MEGA</string>
     <string name="tour_access_text">Obține acces complet criptat oriunde, oricând</string>
 
     <string name="create_account_text" context="button that allows the user to create an account">Creează un cont</string>
@@ -232,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">Ștergi toate transferurile?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Unitate cloud</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Recente</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Încărcări media</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Conținut media primit</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Salvate pentru offline</string>
@@ -612,7 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Previzualizarea nu a fost descărcată încă. Te rugăm să aștepți</string>
-    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Previzualizarea nu se poate încărca din cauza memoriei insuficiente disponibile. Te rugăm să încerci din nou mai târziu.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Te rugăm să te deconectezi înainte de a crea contul</string>
 
@@ -933,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Eroare. Această adresă de e-mail este folosită deja.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">Ai solicitat deja un link de confirmare pentru acea adresă de e-mail.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">E-mailul nou și cel vechi nu trebuie să coincidă</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Acesta este ultimul pas pentru a-ți modifica e-mailul. Te rugăm să introduci parola mai jos.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Modifică e-mailul</string>
 
@@ -1546,7 +1550,7 @@
     <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Golește istoricul chatului</string>
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Elimină contactul</string>
 
-    <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Notificări pentru chat</string>
+    <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Notificări de chat</string>
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone">[A]%1$s[/A][B] a golit istoricul chatului[/B]</string>
 
     <string name="number_messages_chat_notification" formatted="false" context="messages string in chat notification">%1$d chaturi necitite</string>
@@ -1560,7 +1564,7 @@
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Dacă părăsești folderul, nu vei mai putea să îl vezi din nou</string>
     <string name="attachment_uploading_state" context="label to indicate the state of an upload in chat">Se încarcă&#8230;</string>
 
-    <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Notificări pentru chat</string>
+    <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Notificări de chat</string>
 
     <string name="achievements_title" context="title of the section for achievements">Realizări</string>
     <string name="achievements_subtitle" context="subtitle of the section for achievements">Invită prieteni și obține recompense</string>
@@ -1940,7 +1944,7 @@
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrie un mesaj către „%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Scrie un mesaj către %s&#8230;</string>
 
-    <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Autentificarea cu doi factori</string>
+    <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Autentificare cu doi factori</string>
     <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">Autentificarea cu doi factori reprezintă un al doilea strat de securitate pentru contul tău.</string>
     <string name="title_2fa" context="Title of the screen Two-Factor Authentication">De ce ai nevoie de autentificarea cu doi factori?</string>
     <string name="two_factor_authentication_explain">Autentificarea cu doi factori reprezintă un al doilea strat de securitate pentru contul tău. Ceea ce înseamnă că, chiar dacă cineva îți cunoaște parola, nu îți poate accesa contul fără să aibă acces la codul din șase cifre la care doar tu ai acces.</string>
@@ -2138,7 +2142,7 @@
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">S-ar putea să ai mesaje noi</string>
     <string name="retrieving_message_title" context="When app is retrieving push message">Se preluează mesajul</string>
 
-    <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Planificatorul de golire a coșului de gunoi</string>
+    <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Planificator de golire a coșului de gunoi</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">Coșul de gunoi este golit automat pentru tine.</string>
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Perioada minimă este de 7 zile.</string>
@@ -2519,6 +2523,21 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d fișiere în așteptare.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Recente</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 imagine și 1 videoclip</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Eu</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Nu este posibilă înregistrarea mesajelor vocale în timp ce există un apel în desfășurare.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">A apărut o eroare la încercarea de încărcare a mesajului vocal.</string>
 
@@ -2527,5 +2546,6 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Se încarcă</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Te rugăm să astepți&#8230;</string>
 
-    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s contacte trimise.</string>
 </resources>

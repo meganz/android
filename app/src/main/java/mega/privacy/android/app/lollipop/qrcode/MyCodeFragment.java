@@ -15,7 +15,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -63,16 +62,17 @@ import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 
 public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
     final int RELATIVE_WIDTH = 280;
     final int WIDTH = 500;
-    final int AVATAR_LEFT = 177;
-    final int AVATAR_RIGTH = 312;
+    final int AVATAR_LEFT = 182;
+    final int AVATAR_RIGHT = 317;
     final int AVATAR_WIDTH = 135;
+    public final static String QR_IMAGE_FILE_NAME_OLD = "QRcode.jpg";
+    public final static String QR_IMAGE_FILE_NAME = "QR_code_image.jpg";
 
     MegaUser myUser;
     String myEmail;
@@ -129,11 +129,16 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             contactLink = savedInstanceState.getString("contactLink");
         }
 
+        //remove QR image in old format
+        File oldImage = buildQrFile(context, myEmail + QR_IMAGE_FILE_NAME_OLD);
+        if (oldImage != null) {
+            oldImage.delete();
+        }
     }
 
     public File queryIfQRExists() {
         logDebug("queryIfQRExists");
-        qrFile = buildQrFile(context,myEmail + "QRcode.jpg");
+        qrFile = buildQrFile(context,myEmail + QR_IMAGE_FILE_NAME);
         if (isFileAvailable(qrFile)) {
             return qrFile;
         }
@@ -226,38 +231,30 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         logDebug("createQRCode");
 
         Bitmap qrCode = Bitmap.createBitmap(WIDTH,WIDTH, Bitmap.Config.ARGB_8888);
-//        int width = (int)getResources().getDimension(R.dimen.width_qr);
         int width = AVATAR_WIDTH;
         Canvas c = new Canvas(qrCode);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setColor(WHITE);
-//        int pos = (c.getWidth()/2) - (width/2);
-//        int border = getDP(4);
-//        float radius = getDP(40);
 
         avatar = Bitmap.createScaledBitmap(avatar, width, width, false);
         c.drawBitmap(qr, 0f, 0f, null);
         c.drawRect(AVATAR_LEFT,
                 AVATAR_LEFT,
-                AVATAR_RIGTH,
-                AVATAR_RIGTH, paint);
-//        c.drawCircle(pos+radius-border, pos+radius-border, radius, paint);
+                AVATAR_RIGHT,
+                AVATAR_RIGHT, paint);
         c.drawBitmap(avatar, AVATAR_LEFT, AVATAR_LEFT, null);
 
         return qrCode;
     }
 
     public Bitmap queryQR () {
-        logDebug("queryQR");
-
         Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-
-        BitMatrix bitMatrix = null;
+        BitMatrix bitMatrix;
 
         try {
-            bitMatrix = new MultiFormatWriter().encode(contactLink, BarcodeFormat.QR_CODE, 40, 40, hints);
+            bitMatrix = new MultiFormatWriter().encode(contactLink, BarcodeFormat.QR_CODE, WIDTH, WIDTH, hints);
         } catch (WriterException e) {
             e.printStackTrace();
             return null;
@@ -266,7 +263,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         int h = bitMatrix.getHeight();
         int[] pixels = new int[w * h];
         int color = ContextCompat.getColor(context, R.color.lollipop_primary_color);
-        float resize = 12.2f;
 
         Bitmap bitmap = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bitmap);
@@ -280,48 +276,12 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             int offset = y * w;
             for (int x = 0; x < w; x++) {
                 pixels[offset + x] = bitMatrix.get(x, y) ? color : WHITE;
-                if (pixels[offset + x] == color){
-                    c.drawCircle(x*resize, y*resize, 5, paint);
-                }
-                logDebug("pixels[offset + x]: "+ pixels[offset + x] + " offset+x: " + (offset+x));
             }
         }
-        paint.setColor(WHITE);
-        c.drawRect(3*resize, 3*resize, 11.5f*resize, 11.5f*resize, paint);
-        c.drawRect(28.5f*resize, 3*resize, 37*resize, 11.5f*resize, paint);
-        c.drawRect(3*resize, 28.5f*resize, 11.5f*resize, 37*resize, paint);
 
-        paint.setColor(color);
-
-        if (Build.VERSION.SDK_INT >= 21) {
-            c.drawRoundRect(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize, 30, 30, paint);
-            c.drawRoundRect(29.25f * resize, 3.75f * resize, 36.25f * resize, 10.75f * resize, 30, 30, paint);
-            c.drawRoundRect(3.75f * resize, 29.25f * resize, 10.75f * resize, 36.25f * resize, 30, 30, paint);
-
-            paint.setColor(WHITE);
-            c.drawRoundRect(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize, 25, 25, paint);
-            c.drawRoundRect(30.25f * resize, 4.75f * resize, 35.25f * resize, 9.75f * resize, 25, 25, paint);
-            c.drawRoundRect(4.75f * resize, 30.25f * resize, 9.75f * resize, 35.25f * resize, 25, 25, paint);
-        }
-        else {
-            c.drawRoundRect(new RectF(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize), 30, 30, paint);
-            c.drawRoundRect(new RectF(29.25f * resize, 3.75f * resize, 36.25f * resize, 10.75f * resize), 30, 30, paint);
-            c.drawRoundRect(new RectF(3.75f * resize, 29.25f * resize, 10.75f * resize, 36.25f * resize), 30, 30, paint);
-
-            paint.setColor(WHITE);
-            c.drawRoundRect(new RectF(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize), 25, 25, paint);
-            c.drawRoundRect(new RectF(30.25f * resize, 4.75f * resize, 35.25f * resize, 9.75f * resize), 25, 25, paint);
-            c.drawRoundRect(new RectF(4.75f * resize, 30.25f * resize, 9.75f * resize, 35.25f * resize), 25, 25, paint);
-        }
-
-        paint.setColor(color);
-        c.drawCircle(7.25f*resize, 7.25f*resize, 17.5f, paint);
-        c.drawCircle(32.75f*resize, 7.25f*resize, 17.5f, paint);
-        c.drawCircle(7.25f*resize, 32.75f*resize, 17.5f, paint);
-
-//        bitmap.setPixels(pixels, 0, w, 0, 0, w,  h);
-
+        bitmap.setPixels(pixels, 0, w, 0, 0, w,  h);
         return bitmap;
+
     }
 
     public Bitmap setUserAvatar(){
@@ -497,7 +457,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
             qrcode_link.setText(contactLink);
             qrCodeBitmap = createQRCode(queryQR(), setUserAvatar());
-            File qrCodeFile = buildQrFile(context, myEmail + "QRcode.jpg");
+            File qrCodeFile = buildQrFile(context, myEmail + QR_IMAGE_FILE_NAME);
 
             if (qrCodeFile != null) {
                 try {
@@ -533,7 +493,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     public void initDeleteQR(MegaRequest request, MegaError e){
         if (e.getErrorCode() == MegaError.API_OK){
             logDebug("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
-            File qrCodeFile = buildQrFile(context, myEmail + "QRcode.jpg");
+            File qrCodeFile = buildQrFile(context, myEmail + QR_IMAGE_FILE_NAME);
             if (isFileAvailable(qrCodeFile)){
                 qrCodeFile.delete();
             }

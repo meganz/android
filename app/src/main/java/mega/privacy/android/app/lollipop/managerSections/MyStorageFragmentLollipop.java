@@ -24,7 +24,6 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -70,8 +69,6 @@ public class MyStorageFragmentLollipop extends Fragment {
 	@Override
 	public void onResume () {
 		super.onResume();
-
-		refreshAccountInfo();
 	}
 
 	public void checkScroll () {
@@ -151,17 +148,6 @@ public class MyStorageFragmentLollipop extends Fragment {
 		logDebug("newInstance");
 		MyStorageFragmentLollipop fragment = new MyStorageFragmentLollipop();
 		return fragment;
-	}
-
-	public void refreshAccountInfo(){
-		logDebug("refreshAccountInfo");
-
-		//Check if the call is recently
-		logDebug("Check the last call to getAccountDetails");
-		if(callToAccountDetails(context)){
-			logDebug("megaApi.getAccountDetails SEND");
-			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
-		}
 	}
 
 	public void setAccountDetails(){

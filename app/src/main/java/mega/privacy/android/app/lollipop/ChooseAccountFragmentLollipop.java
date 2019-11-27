@@ -248,6 +248,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent.putExtra("firstLogin", true);
         intent.putExtra("upgradeAccount", false);
         intent.putExtra("newAccount", true);
+        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }
@@ -261,6 +262,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", PRO_I);
         intent.putExtra("newAccount", true);
+        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }
@@ -274,6 +276,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", PRO_II);
         intent.putExtra("newAccount", true);
+        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }
@@ -287,6 +290,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", PRO_III);
         intent.putExtra("newAccount", true);
+        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }
@@ -300,6 +304,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", PRO_LITE);
         intent.putExtra("newAccount", true);
+        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }

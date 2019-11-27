@@ -1,79 +1,87 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="72dp"
     android:descendantFocusability="blocksDescendants"
     android:background="@drawable/statelist_item_layout"
     android:id="@+id/transfers_overview_item_layout"
+	android:paddingBottom="3dp"
+	android:paddingLeft="16dp"
 	android:visibility="gone">
 
-	<RelativeLayout
-		android:id="@+id/transfers_overview_three_dots_layout"
+	<LinearLayout
+		android:id="@+id/transfers_text_layout"
 		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:layout_alignParentRight="true">
-
-		<ImageView
-			android:id="@+id/transfers_overview_three_dots"
+		android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentTop="true"
+		android:layout_marginTop="14dp">
+		<TextView
+			android:id="@+id/transfers_overview_title"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:src="@drawable/ic_dots_vertical_grey"
-			android:background="@null"
-			android:layout_marginRight="10dp"
-			android:layout_centerVertical="true" />
-	</RelativeLayout>
+			android:layout_marginRight="20dp"
+			android:textColor="@color/name_my_account"
+			android:fontFamily="sans-serif-light"
+			android:textStyle="bold"
+			android:textAllCaps="true"
+			android:singleLine="true"
+			android:ellipsize="middle"
+			android:textSize="16sp"/>
+		<TextView
+			android:id="@+id/transfers_overview_number"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textColor="@color/mail_my_account"
+			android:textSize="14sp"
+			android:ellipsize="end"
+			android:maxLines="1"/>
+	</LinearLayout>
 
-	<RelativeLayout
-		android:id="@+id/transfers_overview_action_layout"
+	<LinearLayout
 		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
+		android:layout_height="wrap_content"
 		android:layout_centerVertical="true"
-		android:gravity="center_vertical"
-		android:layout_toLeftOf="@id/transfers_overview_three_dots_layout">
-		<ImageView
-			android:id="@+id/transfers_overview_button"
+		android:layout_alignParentRight="true"
+		android:orientation="horizontal">
+		<RelativeLayout
+			android:id="@+id/transfers_overview_action_layout"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:background="@null"
-			android:layout_marginRight="12dp"
-			android:layout_marginLeft="12dp"
-			android:src="@drawable/ic_pause"/>
-	</RelativeLayout>
-        
-	<TextView
-		android:id="@+id/transfers_overview_title"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="13dp"
-		android:layout_marginLeft="16dp"
-		android:textColor="@color/name_my_account"
-		android:fontFamily="sans-serif-light"
-		android:textStyle="bold"
-		android:textAllCaps="true"
-		android:singleLine="true"
-		android:ellipsize="middle"
-		android:textSize="16sp"/>
+			android:layout_centerVertical="true"
+			android:gravity="center_vertical">
+			<ImageView
+				android:id="@+id/transfers_overview_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:background="@null"
+				android:layout_marginRight="12dp"
+				android:layout_marginLeft="12dp"
+				android:src="@drawable/ic_pause"/>
+		</RelativeLayout>
+		<RelativeLayout
+			android:id="@+id/transfers_overview_three_dots_layout"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:gravity="center_vertical"
+			android:paddingRight="10dp">
+			<ImageView
+				android:id="@+id/transfers_overview_three_dots"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/ic_dots_vertical_grey"
+				android:background="@null"
+				android:layout_centerVertical="true" />
+		</RelativeLayout>
+	</LinearLayout>
 
-	<TextView
-		android:id="@+id/transfers_overview_number"
-		android:layout_width="wrap_content"
+	<ProgressBar
+		android:id="@+id/transfers_overview_progress_bar"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_below="@+id/transfers_overview_title"
-		android:textColor="@color/mail_my_account"
-		android:layout_marginLeft="16dp"
-		android:textSize="14sp"
-		android:ellipsize="end"
-		android:maxLines="1"/>
-    
-     <ProgressBar
-	    android:id="@+id/transfers_overview_progress_bar"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"  
-        android:layout_marginTop="6dp"
-		 android:layout_marginLeft="16dp"
-		 android:layout_marginRight="16dp"
-		 android:paddingBottom="2dp"
-        style="@style/TransferProgressBar"
-		android:layout_alignParentBottom="true" />
-    
+		android:layout_alignParentBottom="true"
+		android:layout_marginRight="16dp"
+		style="@style/TransferProgressBar" />
+
 </RelativeLayout>
 

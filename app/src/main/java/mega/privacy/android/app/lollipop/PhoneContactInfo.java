@@ -2,13 +2,12 @@ package mega.privacy.android.app.lollipop;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
-public class PhoneContactInfo implements  Comparable<PhoneContactInfo>, Parcelable{
-    long id;
-    String name;
-    String email;
-    String phoneNumber;
+public class PhoneContactInfo implements Comparable<PhoneContactInfo>, Parcelable {
+    private long id;
+    private String name;
+    private String email;
+    private String phoneNumber;
 
     public PhoneContactInfo(long id, String name, String email, String phoneNumber) {
         this.id = id;
@@ -17,28 +16,26 @@ public class PhoneContactInfo implements  Comparable<PhoneContactInfo>, Parcelab
         this.phoneNumber = phoneNumber;
     }
 
-    public long getId(){
+    public long getId() {
         return id;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public String getEmail(){
+    public String getEmail() {
         return email;
     }
 
-    public String getPhoneNumber(){
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
     @Override
     public int compareTo(PhoneContactInfo contactInfo) {
-
-        String a = new String(String.valueOf(this.getName()));
-        String b = new String (String.valueOf(contactInfo.getName()));
-
+        String a = String.valueOf(this.getName());
+        String b = String.valueOf(contactInfo.getName());
         return a.compareTo(b);
     }
 

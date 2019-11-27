@@ -1,3 +1,4 @@
+
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:rounded="http://schemas.android.com/apk/res-auto"
@@ -48,7 +49,7 @@
 				<LinearLayout
 					android:id="@+id/my_account_email_layout"
 					android:layout_width="match_parent"
-					android:layout_height="90dp"
+					android:layout_height="wrap_content"
 					android:layout_marginBottom="8dp"
 					android:layout_marginTop="16dp"
 					android:background="@color/white"
@@ -101,6 +102,17 @@
 							android:textColor="@color/mail_my_account"
 							android:textSize="14sp"/>
 
+						<TextView
+							android:id="@+id/add_phone_number"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_marginTop="7dp"
+							android:ellipsize="end"
+							android:maxLines="1"
+							android:singleLine="true"
+							android:textColor="@color/accentColor"
+							android:textSize="14sp"/>
+
 					</LinearLayout>
 
 					<LinearLayout
@@ -133,6 +145,7 @@
 									rounded:border_color="@color/border_file_properties"
 									rounded:border_width="0dp"
 									rounded:corner_radius="30dp" />
+
 							</RelativeLayout>
 
 						</RelativeLayout>
@@ -598,6 +611,14 @@
 					</RelativeLayout>
 
 				</LinearLayout>
+
+
+				<TextView
+					android:id="@+id/logout_warning_text"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:textSize="12sp"
+					android:textColor="@color/black_40_alpha"/>
 
 			</LinearLayout>
 
