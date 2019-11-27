@@ -39,6 +39,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SMSVerificationActivity;
+import mega.privacy.android.app.UserCredentials;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -54,9 +56,11 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.*;
+
 
 public class LoginActivityLollipop extends BaseActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
 
@@ -584,7 +588,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                     String title = getString(R.string.cam_sync_syncing);
                     String text = getString(R.string.cam_sync_cancel_sync);
                     AlertDialog.Builder builder = getCustomAlertBuilder(this, title, text, null);
-                    builder.setPositiveButton(getString(R.string.cam_sync_stop),
+                    builder.setPositiveButton(getString(R.string.general_yes),
                             new DialogInterface.OnClickListener() {
 
                                 @Override
@@ -593,7 +597,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                                     dbH.setCamSyncEnabled(false);
                                 }
                             });
-                    builder.setNegativeButton(getString(R.string.general_cancel), null);
+                    builder.setNegativeButton(getString(R.string.general_no), null);
                     final AlertDialog dialog = builder.create();
                     try {
                         dialog.show();
@@ -847,11 +851,19 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         logDebug("onEvent");
         if(event.getType()==MegaEvent.EVENT_ACCOUNT_BLOCKED){
             logDebug("Event received: " + event.getText() + "_" + event.getNumber());
-            if(event.getNumber()==200){
+            int whyAmIBlocked = (int) event.getNumber();
+            if(whyAmIBlocked == 200){
                 accountBlocked = getString(R.string.account_suspended_multiple_breaches_ToS);
-            }
-            else if(event.getNumber()==300){
+                megaChatApi.logout(loginFragment);
+            } else if(whyAmIBlocked == 300){
                 accountBlocked = getString(R.string.account_suspended_breache_ToS);
+                megaChatApi.logout(loginFragment);
+            } else if(whyAmIBlocked == 500) {
+                //CODE REFACTOR PENDING TO UNIFY CODE
+                //Processed in the `onEvent` callback of `MegaApplication`
+            } else {
+                //Default account blocked error
+                accountBlocked = getString(R.string.error_account_suspended);
             }
         }
     }
