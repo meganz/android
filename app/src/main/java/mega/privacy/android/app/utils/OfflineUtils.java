@@ -45,7 +45,6 @@ public class OfflineUtils {
     private static final String DB_FOLDER = "1";
 
     public static void saveOffline (File destination, MegaNode node, Context context, Activity activity, MegaApiAndroid megaApi){
-        logDebug("saveOffline");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -57,8 +56,6 @@ public class OfflineUtils {
         }
 
         destination.mkdirs();
-
-        logDebug("DESTINATION: " + destination.getAbsolutePath());
 
         double availableFreeSpace = Double.MAX_VALUE;
         try{

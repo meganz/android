@@ -651,7 +651,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		super.onViewCreated(view, savedInstanceState);
 
 		String query = ((ManagerActivityLollipop) context).getSearchQuery();
-		if (isAdded() && query != null && query.isEmpty()) {
+		if (isAdded() && query != null) {
 			newSearchNodesTask();
 			((ManagerActivityLollipop) context).showFabButton();
 		}
@@ -689,7 +689,9 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	private void serializeNodes(Intent intent) {
 		ArrayList<String> serialized = new ArrayList<>();
 		for (MegaNode node : nodes) {
-			serialized.add(node.serialize());
+			if (node != null) {
+				serialized.add(node.serialize());
+			}
 		}
 		intent.putExtra(ARRAY_SEARCH, serialized);
 	}
@@ -755,8 +757,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
 					serializeNodes(intent);
-					context.startActivity(intent);
-					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					startActivity(intent);
+					getActivity().overridePendingTransition(0,0);
 					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
@@ -1267,6 +1269,10 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
+		}
+
+		if (isWaitingForSearchedNodes()) {
+			reDoTheSelectionAfterRotation();
 		}
 	}
 

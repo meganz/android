@@ -90,6 +90,7 @@
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
+    <string name="confirm_to_send" context="Button label, confirm to send invitation to contact">Send</string>
 
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Menu item">Upload</string>
@@ -129,6 +130,11 @@
     <plurals name="general_num_contacts">
         <item context="referring to a contact in the contact list of the user" quantity="one">contact</item>
         <item context="Title of the contact list" quantity="other">contacts</item>
+    </plurals>
+
+    <plurals name="num_contacts_selected">
+        <item context="chat invitation - tool bar subtitle, when users selected single contact. Placeholder - number of contacts selected " quantity="one">%d contact</item>
+        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d contacts</item>
     </plurals>
 
     <plurals name="general_num_folders">
@@ -183,6 +189,7 @@
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Invalid email address</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Please enter your password</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">No network connection</string>
+    <string name="error_unable_to_change_status" context="Error message for unknown host error when user is trying to change online status">Unable to change the status.</string>
     <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">You have been logged out on this device from another location</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calculating encryption keys</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Connecting to the server</string>
@@ -659,7 +666,7 @@
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
-	<string name="settings_camera_upload_remove_gps_helper_label" context="Helper text to explain the things to note if turn off the feature of removing GPS info">If turn off, your uploaded pictures via Camera Uploads will contain information about where they were taken, so be careful when sharing them.</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures and videos were taken, so be careful when sharing them.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
@@ -733,7 +740,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Only when charging</string>
-    <string name="settings_camera_upload_remove_gps" context="Title of 'Remove location tags' setting option. Once enabled, Camera Uploads will remove the location info from pictures those are being uploaded">Remove location tags</string>
+    <string name="settings_camera_upload_include_gps" context="Title of 'Include location tags' setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded">Include location tags</string>
     <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to actively charge my device</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Keep file names as in the device</string>
 
@@ -1313,6 +1320,7 @@
         <item context="Plural" quantity="other">%1$s [A]are typing&#8230;[/A]</item>
     </plurals>
 
+
     <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]and more are typing&#8230;[/A]</string>
     <string name="label_more" context="button label more">More</string>
     <string name="label_close" context="button label Close">Close</string>
@@ -1338,7 +1346,6 @@
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without a connection.</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
-
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
 
     <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">Invitation accepted</string>
@@ -1372,6 +1379,7 @@
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">No files Saved for Offline</string>
 
     <string name="general_enable" context="Positive confirmation to enable logs">Enable</string>
+    <string name="general_allow" context="Positive confirmation to allow MEGA to read contacts book.">Allow</string>
     <string name="enable_log_text_dialog" context="Dialog to confirm the action of enabling logs">Logs can contain information related to your account</string>
 
     <string name="confirmation_to_reconnect" context="Dialog to confirm the reconnect action">Network connection recovered. Connect to MEGA?</string>
@@ -1799,7 +1807,7 @@
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Click to go back to the call</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Return to the call</string>
 
-    <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list's header">On MEGA</string>
+    <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list's header">Contacts on MEGA</string>
     <string name="contacts_phone" context="When it lists contacts of phone, the title of list's header">Phone contacts</string>
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Your account has been suspended due to multiple breaches of MEGA’s Terms of Service. Please check your email inbox.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Your account was terminated due to a breach of MEGA’s Terms of Service, such as abuse of rights of others; sharing and/or importing illegal data; or system abuse.</string>
@@ -2111,7 +2119,7 @@
     <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
     <string name="choose_chat" context="section title to select a chat to send a file">Choose chat</string>
 
-    <string name="type_mail" context="Hint shown to guide user on activity add contacts">Tap, enter name or email</string>
+    <string name="type_mail" context="Hint shown to guide user on activity add contacts">Enter contact detail to search or add</string>
 
     <string name="confirmation_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Add %s to your contacts?</string>
     <string name="confirmation_not_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and the contact is already a contact">You have already added the contact %s.</string>
@@ -2156,6 +2164,8 @@
         <item context="one file" quantity="one">Choose File</item>
         <item context="more files" quantity="other">Choose Files</item>
     </plurals>
+
+    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">Invite %1$s?</string>
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Choose folder</string>
 
@@ -2369,6 +2379,9 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Allow access to your camera to scan documents, take pictures and make video calls.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
+    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Enable access to contacts</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA needs access to your contacts to help you connect with other people on MEGA.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Allow access to your microphone to make encrypted calls.</string>
     <string name="general_enable_access" context="General enable access">Enable access</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>
@@ -2445,6 +2458,15 @@
         <item context="Plural of file. 2 files" quantity="other">%d messages were not sent to %d chats</item>
     </plurals>
 
+    <plurals name="quantity_of_local_contact" context="How many local contacts have been on MEGA">
+        <item context="Singular of local contact. 1 contact" quantity="one">%d Contact found on MEGA</item>
+        <item context="Plural of local contact. 2 contacts" quantity="other">%d Contacts found on MEGA</item>
+    </plurals>
+    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Invite contact now?</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
+    <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
+
+
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
 
     <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created successfully</string>
@@ -2470,6 +2492,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
+    <string name="invite_more" context="Invite button for chat top cell">Invite more...</string>
 
     <string name="title_tour_one" context="Title of first tour screen">You hold the keys</string>
     <string name="content_tour_one" cotext="Content of first tour screen">Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access your files.</string>
@@ -2530,6 +2553,9 @@
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">Enter group name</string>
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">To create a chat link you must name the group.</string>
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
+    <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">Start chatting securely with your contacts using end-to-end encryption</string>
+
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hi! Have secure conversations on MEGA with me and get up to 50GB free storage. %1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">No chat link available.</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chat link deleted successfully.</string>
@@ -2547,6 +2573,8 @@
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
 
+    <string name="invite_contact_chooser_title" context="Title of popup when user click 'Share' button on invite contact page">Invite a friend via</string>
+    <string name="invite_contact_action_button" context="Action button label">Invite a friend via...</string>
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>

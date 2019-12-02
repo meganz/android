@@ -1040,10 +1040,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setTitle(" ");
 
-		Window window = this.getWindow();
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		imageHandles = new ArrayList<>();
 		paths = new ArrayList<>();
@@ -1441,7 +1438,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 							}
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(0).start();
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -2390,7 +2386,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
 			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+			long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 
 			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
 				if (contactHandles != null && contactHandles.length > 0) {
@@ -2561,7 +2557,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 							}
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(400L).start();
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -2575,7 +2570,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(400L).start();
 				bottomLayout.animate().translationY(0).setDuration(400L).start();
-				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.black));
 			}
 		}
 	}
@@ -2756,7 +2751,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 								}
 							}).start();
 					bottomLayout.animate().translationY(220).setDuration(0).start();
-					getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				} else {
 					aB.hide();
 				}

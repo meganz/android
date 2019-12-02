@@ -22,6 +22,7 @@ import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -76,7 +77,7 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
         }
         MegaNode parentNode = megaApi.getRootNode();
         String myEmail = megaApi.getMyUser().getEmail();
-        File qrFile = buildQrFile(getActivity(),myEmail + "QRcode.jpg");
+        File qrFile = buildQrFile(getActivity(),myEmail + QR_IMAGE_FILE_NAME);
 
         if (isFileAvailable(qrFile)){
             ShareInfo info = ShareInfo.infoFromFile(qrFile);

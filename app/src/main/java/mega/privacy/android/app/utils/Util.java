@@ -31,14 +31,14 @@ import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
-
 import android.support.v4.app.ActivityCompat;
-
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.telephony.PhoneNumberUtils;
+import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.format.Formatter;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -55,6 +55,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -185,6 +186,25 @@ public class Util {
 	
 	public static void showErrorAlertDialog(int errorCode, Activity activity) {
 		showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
+	}
+
+	public static String getCountryCodeByNetwork(Context context) {
+		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		if (tm != null) {
+			return tm.getNetworkCountryIso();
+		}
+		return null;
+	}
+
+	public static boolean isRoaming(Context context) {
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (cm != null) {
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			if(ni != null) {
+                return ni.isRoaming();
+            }
+		}
+		return true;
 	}
 
 	public static int countMatches(Pattern pattern, String string)
@@ -1470,6 +1490,20 @@ public class Util {
 		}
 	}
 
+    public static Bitmap createAvatarBackground(String colorString) {
+        Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(circle);
+        Paint paintCircle = new Paint();
+        paintCircle.setAntiAlias(true);
+        int color = (colorString == null) ?
+                ContextCompat.getColor(context, R.color.lollipop_primary_color) :
+                Color.parseColor(colorString);
+        paintCircle.setColor(color);
+        int radius = circle.getWidth() / 2;
+        c.drawCircle(radius, radius, radius, paintCircle);
+        return circle;
+    }
+
 	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
 		logDebug("color: '" + color + "' firstLetter: '" + firstLetter + "'");
 
@@ -1592,6 +1626,18 @@ public class Util {
         return rootView;
     }
 
+    public static String normalizePhoneNumber(String phoneNumber,String countryCode) {
+        return PhoneNumberUtils.formatNumberToE164(phoneNumber, countryCode);
+    }
+
+    public static String normalizePhoneNumberByNetwork(Context context,String phoneNumber) {
+        String countryCode = getCountryCodeByNetwork(context);
+        if(countryCode == null) {
+            return null;
+        }
+        return normalizePhoneNumber(phoneNumber, countryCode.toUpperCase());
+    }
+
 	/**
 	 * This method formats the coordinates of a location in degrees, minutes and seconds
 	 * and returns a string with it
@@ -1704,6 +1750,42 @@ public class Util {
 
 	}
 
+	/**
+	 * This method decodes a url and formats it before its treatment
+	 *
+	 * @param url the passed url to be decoded
+	 */
+	public static void decodeURL(String url) {
+		try {
+			url = URLDecoder.decode(url, "UTF-8");
+		} catch (Exception e) {
+			logDebug("Exception decoding url: "+url);
+			e.printStackTrace();
+		}
+
+		url.replace(' ', '+');
+
+		if (url.startsWith("mega://")) {
+			url = url.replaceFirst("mega://", "https://mega.nz/");
+		} else if (url.startsWith("mega.")) {
+			url = url.replaceFirst("mega.", "https://mega.");
+		}
+
+		if (url.startsWith("https://www.mega.co.nz")) {
+			url = url.replaceFirst("https://www.mega.co.nz", "https://mega.co.nz");
+		}
+
+		if (url.startsWith("https://www.mega.nz")) {
+			url = url.replaceFirst("https://www.mega.nz", "https://mega.nz");
+		}
+
+		if (url.endsWith("/")) {
+			url = url.substring(0, url.length() - 1);
+		}
+
+		logDebug("URL decoded: " + url);
+	}
+
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
@@ -1768,4 +1850,11 @@ public class Util {
             }
         }, 50);
     }
+
+	public static void resetActionBar(ActionBar aB) {
+		if (aB != null) {
+			aB.setDisplayShowCustomEnabled(false);
+			aB.setDisplayShowTitleEnabled(true);
+		}
+	}
 }
