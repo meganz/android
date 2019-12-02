@@ -5,36 +5,11 @@
     android:background="@color/white"
     tools:context=".OfflineFragmentLollipop" >
 
-    <RelativeLayout
-        android:id="@+id/offline_content_text_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="36dp"
-        android:background="@color/white">
-
-        <TextView
-            android:id="@+id/offline_content_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/mail_my_account"
-            android:layout_marginLeft="72dp"
-            android:layout_centerVertical="true"
-            android:textSize="14sp" />
-    </RelativeLayout>
-
-    <!--<View-->
-        <!--android:id="@+id/separator"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="1dip"-->
-        <!--android:layout_below="@id/offline_content_text_layout"-->
-        <!--android:background="@color/delimiterColor" />-->
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/offline_view_browser"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/offline_content_text_layout"
         android:choiceMode="multipleChoice"/>
-
 
     <RelativeLayout
         android:layout_width="wrap_content"

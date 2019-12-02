@@ -1,23 +1,25 @@
 package mega.privacy.android.app;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import android.content.Context;
 
 import java.io.File;
 
 import static mega.privacy.android.app.utils.FileUtils.getDirSize;
 import static mega.privacy.android.app.utils.LogUtil.*;
-
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 
-public class MegaOffline {
-	
+public class MegaOffline implements Parcelable {
+
 	public static final String FOLDER = "1";
 	public static final String FILE = "0";
 
 	public static final int INCOMING = 1;
 	public static final int INBOX = 2;
 	public static final int OTHER = 0;
-	
+
 	private int id = -1;
 	private String handle = "";
 	private String path = "";
@@ -26,7 +28,7 @@ public class MegaOffline {
 	private String type = "";
 	private int origin = OTHER;
 	private String handleIncoming = "";
-	
+
 	public MegaOffline(String handle, String path, String name, int parentId, String type, int origin, String handleIncoming) {
 		this.handle = handle;
 		this.path = path;
@@ -36,7 +38,7 @@ public class MegaOffline {
 		this.origin = origin;
 		this.handleIncoming = handleIncoming;
 	}
-	
+
 	public MegaOffline(int id, String handle, String path, String name, int parentId, String type, int origin, String handleIncoming) {
 		this.id=id;
 		this.handle = handle;
@@ -47,7 +49,18 @@ public class MegaOffline {
 		this.origin = origin;
 		this.handleIncoming = handleIncoming;
 	}
-	
+
+	protected MegaOffline(Parcel in) {
+		id = in.readInt();
+		handle = in.readString();
+		path = in.readString();
+		name = in.readString();
+		parentId = in.readInt();
+		type = in.readString();
+		origin = in.readInt();
+		handleIncoming = in.readString();
+	}
+
 	public String getHandle() {
 		return handle;
 	}
@@ -79,7 +92,7 @@ public class MegaOffline {
 	public void setType(String type) {
 		this.type = type;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -103,7 +116,7 @@ public class MegaOffline {
 	public void setHandleIncoming(String handleIncoming) {
 		this.handleIncoming = handleIncoming;
 	}
-	
+
 	public boolean isFolder(){
 		if (type != null){
 			if(type.equals(FOLDER)){
@@ -122,6 +135,35 @@ public class MegaOffline {
 
 	public void setOrigin(int origin) {
 		this.origin = origin;
+	}
+
+	public static final Creator<MegaOffline> CREATOR = new Creator<MegaOffline>() {
+		@Override
+		public MegaOffline createFromParcel(Parcel in) {
+			return new MegaOffline(in);
+		}
+
+		@Override
+		public MegaOffline[] newArray(int size) {
+			return new MegaOffline[size];
+		}
+	};
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(id);
+		dest.writeString(handle);
+		dest.writeString(path);
+		dest.writeString(name);
+		dest.writeInt(parentId);
+		dest.writeString(type);
+		dest.writeInt(origin);
+		dest.writeString(handleIncoming);
 	}
 
 	public long getModificationDate(Context context) {

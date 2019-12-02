@@ -155,16 +155,19 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
+import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, MyChatFilesExisitListener<ArrayList<AndroidMegaChatMessage>> {
 
@@ -2625,7 +2628,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 return;
             }
 
-            long handles[] = intent.getLongArrayExtra("NODE_HANDLES");
+            long handles[] = intent.getLongArrayExtra(NODE_HANDLES);
             logDebug("Number of files to send: " + handles.length);
 
             chatC.checkIfNodesAreMineAndAttachNodes(handles, idChat);
@@ -3100,8 +3103,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         logDebug("onBackPressed");
         retryConnectionsAndSignalPresence();
 
-        closeChat(true);
-
         if(emojiKeyboard!=null && (emojiKeyboard.getLetterKeyboardShown() || emojiKeyboard.getEmojiKeyboardShown())){
             emojiKeyboard.hideBothKeyboard(this);
         }else{
@@ -3114,6 +3115,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if (handlerKeyboard != null){
                     handlerKeyboard.removeCallbacksAndMessages(null);
                 }
+                closeChat(true);
                 ifAnonymousModeLogin(false);
             }
         }
@@ -3476,6 +3478,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             logError("Error sending message!");
+        }
+    }
+
+    public void sendMessagesToUI(ArrayList<AndroidMegaChatMessage> messages) {
+        for (AndroidMegaChatMessage message : messages) {
+            sendMessageToUI(message);
         }
     }
 
@@ -4927,47 +4935,38 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public int checkMegaLink(MegaChatMessage msg){
         logDebug("checkMegaLink");
+
         //Check if it is a MEGA link
-        if(msg.getType()==MegaChatMessage.TYPE_NORMAL){
-            if(msg.getContent()!=null){
-                String link = AndroidMegaRichLinkMessage.extractMegaLink(msg.getContent());
+        if (msg.getType() != MegaChatMessage.TYPE_NORMAL || msg.getContent() == null) return -1;
 
-                if(AndroidMegaRichLinkMessage.isChatLink(link)){
+        String link = extractMegaLink(msg.getContent());
 
-                    logDebug("isChatLink");
-                    ChatLinkInfoListener listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
-                    megaChatApi.checkChatLink(link, listener);
+        if (isChatLink(link)) {
+            logDebug("isChatLink");
+            ChatLinkInfoListener listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
+            megaChatApi.checkChatLink(link, listener);
 
-                    return MEGA_CHAT_LINK;
-                }
-                else{
-                    boolean isFile = AndroidMegaRichLinkMessage.isFileLink(link);
-
-                    if(link!=null){
-                        logDebug("The link was found");
-                        if(megaApi!=null && megaApi.getRootNode()!=null){
-                            ChatLinkInfoListener listener = null;
-                            if(isFile){
-                                logDebug("isFileLink");
-                                listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
-                                megaApi.getPublicNode(link, listener);
-                                return MEGA_FILE_LINK;
-                            }
-                            else{
-                                logDebug("isFolderLink");
-
-                                MegaApiAndroid megaApiFolder = getLocalMegaApiFolder();
-                                listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi, megaApiFolder);
-                                megaApiFolder.loginToFolder(link, listener);
-                                return MEGA_FOLDER_LINK;
-                            }
-
-                        }
-                    }
-                }
-            }
+            return MEGA_CHAT_LINK;
         }
-        return -1;
+
+        if (link == null || megaApi == null || megaApi.getRootNode() == null) return -1;
+
+        logDebug("The link was found");
+
+        ChatLinkInfoListener listener = null;
+        if (isFileLink(link)) {
+            logDebug("isFileLink");
+            listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
+            megaApi.getPublicNode(link, listener);
+            return MEGA_FILE_LINK;
+        } else {
+            logDebug("isFolderLink");
+
+            MegaApiAndroid megaApiFolder = getLocalMegaApiFolder();
+            listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi, megaApiFolder);
+            megaApiFolder.loginToFolder(link, listener);
+            return MEGA_FOLDER_LINK;
+        }
     }
 
     @Override
@@ -6863,6 +6862,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 idChat = request.getChatHandle();
                 MegaApplication.setOpenChatId(idChat);
                 showChat(null);
+
+                supportInvalidateOptionsMenu();
                 if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
                     if (megaChatApi.getChatRoom(idChat).isActive()) {
                         logWarning("ERROR: You are already a participant of the chat link or are trying to open it again");
@@ -7489,7 +7490,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             MegaApplication.setShowPinScreen(true);
             MegaApplication.setOpenChatId(idChat);
-
             supportInvalidateOptionsMenu();
 
             int chatConnection = megaChatApi.getChatConnectionState(idChat);
@@ -7721,7 +7721,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
         logDebug("Chat ID: "+ chatid + ". New State: " + newState);
-
         supportInvalidateOptionsMenu();
 
         if (idChat == chatid) {

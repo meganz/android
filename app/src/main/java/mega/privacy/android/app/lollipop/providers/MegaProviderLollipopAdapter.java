@@ -137,15 +137,16 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		holder.itemLayout.setOnLongClickListener(this);
 		holder.imageView = (ImageView) v.findViewById(R.id.file_explorer_thumbnail);
 		holder.textViewFileName = (TextView) v.findViewById(R.id.file_explorer_filename);
+		holder.textViewFileName.setOnClickListener(this);
+		holder.textViewFileName.setOnLongClickListener(this);
+		holder.textViewFileName.setTag(holder);
 
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
 		holder.permissionsIcon = (ImageView) v.findViewById(R.id.file_explorer_permissions);
 
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			holder.textViewFileName.setMaxWidth(scaleWidthPx(260, outMetrics));
 			holder.textViewFileSize.setMaxWidth(scaleWidthPx(260, outMetrics));
 		}else{
-			holder.textViewFileName.setMaxWidth(scaleWidthPx(200, outMetrics));
 			holder.textViewFileSize.setMaxWidth(scaleWidthPx(200, outMetrics));
 		}
 			
@@ -448,7 +449,8 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		int currentPosition = holder.currentPosition;
 		
 		switch (v.getId()){
-			case R.id.file_explorer_item_layout:{	
+			case R.id.file_explorer_filename:
+			case R.id.file_explorer_item_layout:{
 				if(fragment instanceof CloudDriveProviderFragmentLollipop){
 					((CloudDriveProviderFragmentLollipop)fragment).itemClick(currentPosition);	
 				}
@@ -459,7 +461,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			}
 		}		
 	}
-	
+
 	public int getPositionClicked (){
     	return positionClicked;
     }
