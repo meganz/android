@@ -32,7 +32,7 @@
             android:src="@drawable/ic_b_remove_avatar" />
     </RelativeLayout>
 
-    <TextView
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/name_chip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,7 +40,6 @@
         android:textSize="12sp"
         android:singleLine="true"
         android:maxLines="1"
-        android:ellipsize="middle"
         android:maxWidth="60dp"
         android:gravity="center"
         android:textColor="@color/mail_my_account"

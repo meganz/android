@@ -37,13 +37,14 @@ import android.os.Handler;
 
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.telephony.PhoneNumberUtils;
+import android.telephony.TelephonyManager;
 import android.support.v4.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.format.Formatter;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -61,6 +62,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -84,10 +86,10 @@ import javax.crypto.spec.SecretKeySpec;
 import mega.privacy.android.app.AndroidLogger;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -101,6 +103,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
+import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
 
@@ -198,6 +202,25 @@ public class Util {
 	
 	public static void showErrorAlertDialog(int errorCode, Activity activity) {
 		showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
+	}
+
+	public static String getCountryCodeByNetwork(Context context) {
+		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		if (tm != null) {
+			return tm.getNetworkCountryIso();
+		}
+		return null;
+	}
+
+	public static boolean isRoaming(Context context) {
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (cm != null) {
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			if(ni != null) {
+                return ni.isRoaming();
+            }
+		}
+		return true;
 	}
 
 	public static int countMatches(Pattern pattern, String string)
@@ -310,19 +333,20 @@ public class Util {
            default:
                return bitmap;
         }
-	     
-        try {
-            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            if (bitmap != null && !bitmap.isRecycled()) {
-                bitmap.recycle();
-                bitmap = null; 
-            }
-            return bmRotated;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+
+		try {
+			Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+			if (bitmap != null && !bitmap.isRecycled()) {
+				bitmap.recycle();
+				bitmap = null;
+				System.gc();
+			}
+			return bmRotated;
+		} catch (Exception e) {
+			logError("Exception creating rotated bitmap", e);
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -568,8 +592,8 @@ public class Util {
 	public static String getProgressSize(Context context, long progress,
 			long size) {
 		return String.format("%s/%s",
-				Formatter.formatFileSize(context, progress),
-				Formatter.formatFileSize(context, size));
+				getSizeString(progress),
+				getSizeString(size));
 	}
 	
 	/*
@@ -1192,6 +1216,16 @@ public class Util {
 		return null;
 	}
 
+	/*
+	 * compare the current mail to newly changed email
+	 */
+	public static String comparedToCurrentEmail(String value, Context context) {
+		if (value.equals(dbH.getCredentials().getEmail())) {
+			return context.getString(R.string.mail_same_as_old);
+		}
+		return null;
+	}
+
 	public static int getAvatarTextSize (float density){
 		float textSize = 0.0f;
 
@@ -1304,6 +1338,13 @@ public class Util {
 			return chatEnabled;
 		}
 	}
+
+	public static boolean canVoluntaryVerifyPhoneNumber() {
+        MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
+	    boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;
+	    boolean allowVerify = api.smsAllowedState() == 2;
+	    return hasNotVerified && allowVerify;
+    }
 
 	public static void resetAndroidLogger(){
 
@@ -1420,42 +1461,14 @@ public class Util {
 		return icon;
 	}
 
-	//Notice user that any transfer prior to login will be destroyed
-	public static void checkPendingTransfer(MegaApiAndroid megaApi, Context context, final AbortPendingTransferCallback callback){
-		if(megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0){
-			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-			if(context instanceof ManagerActivityLollipop){
-				logDebug("Show dialog to cancel transfers before logging OUT");
-				builder.setMessage(R.string.logout_warning_abort_transfers);
-				builder.setPositiveButton(R.string.action_logout, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						callback.onAbortConfirm();
-					}
-				});
-			}
-			else{
-				logDebug("Show dialog to cancel transfers before logging IN");
-				builder.setMessage(R.string.login_warning_abort_transfers);
-				builder.setPositiveButton(R.string.login_text, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						callback.onAbortConfirm();
-					}
-				});
-			}
-
-			builder.setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					callback.onAbortCancel();
-				}
-			});
-			builder.show();
-		}else{
-			callback.onAbortConfirm();
-		}
+	/**
+	 *Check if exist ongoing transfers
+	 *
+	 * @param megaApi
+	 * @return true if exist ongoing transfers, false otherwise
+	 */
+	public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {
+		return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
 	}
 
 	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
@@ -1492,6 +1505,20 @@ public class Util {
 			}
 		}
 	}
+
+    public static Bitmap createAvatarBackground(String colorString) {
+        Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(circle);
+        Paint paintCircle = new Paint();
+        paintCircle.setAntiAlias(true);
+        int color = (colorString == null) ?
+                ContextCompat.getColor(context, R.color.lollipop_primary_color) :
+                Color.parseColor(colorString);
+        paintCircle.setColor(color);
+        int radius = circle.getWidth() / 2;
+        c.drawCircle(radius, radius, radius, paintCircle);
+        return circle;
+    }
 
 	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
 		logDebug("color: '" + color + "' firstLetter: '" + firstLetter + "'");
@@ -1542,6 +1569,10 @@ public class Util {
 		return defaultAvatar;
 	}
 
+	public static MegaPreferences getPreferences (Context context) {
+		return DatabaseHandler.getDbHandler(context).getPreferences();
+	}
+
     public static boolean askMe (Context context) {
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		MegaPreferences prefs = dbH.getPreferences();
@@ -1559,7 +1590,18 @@ public class Util {
 		}
 		return true;
 	}
-    
+
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
     public static void showSnackBar(Context context,int snackbarType,String message,int idChat) {
         if (context instanceof ChatFullScreenImageViewer) {
             ((ChatFullScreenImageViewer)context).showSnackbar(snackbarType,message,idChat);
@@ -1582,7 +1624,7 @@ public class Util {
             }
         }
     }
-    
+
     private static View getRootViewFromContext(Context context) {
         BaseActivity activity = (BaseActivity)context;
         View rootView = null;
@@ -1598,6 +1640,18 @@ public class Util {
 			logError("ERROR", e);
         }
         return rootView;
+    }
+
+    public static String normalizePhoneNumber(String phoneNumber,String countryCode) {
+        return PhoneNumberUtils.formatNumberToE164(phoneNumber, countryCode);
+    }
+
+    public static String normalizePhoneNumberByNetwork(Context context,String phoneNumber) {
+        String countryCode = getCountryCodeByNetwork(context);
+        if(countryCode == null) {
+            return null;
+        }
+        return normalizePhoneNumber(phoneNumber, countryCode.toUpperCase());
     }
 
 	/**
@@ -1674,6 +1728,14 @@ public class Util {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
+	public static boolean isScreenInPortrait(Context context) {
+		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	/**
 	 * This method detects whether the android device is tablet
 	 *
@@ -1701,6 +1763,43 @@ public class Util {
 			}
 		}
 		return false;
+
+	}
+
+	/**
+	 * This method decodes a url and formats it before its treatment
+	 *
+	 * @param url the passed url to be decoded
+	 */
+	public static void decodeURL(String url) {
+		try {
+			url = URLDecoder.decode(url, "UTF-8");
+		} catch (Exception e) {
+			logDebug("Exception decoding url: "+url);
+			e.printStackTrace();
+		}
+
+		url.replace(' ', '+');
+
+		if (url.startsWith("mega://")) {
+			url = url.replaceFirst("mega://", "https://mega.nz/");
+		} else if (url.startsWith("mega.")) {
+			url = url.replaceFirst("mega.", "https://mega.");
+		}
+
+		if (url.startsWith("https://www.mega.co.nz")) {
+			url = url.replaceFirst("https://www.mega.co.nz", "https://mega.co.nz");
+		}
+
+		if (url.startsWith("https://www.mega.nz")) {
+			url = url.replaceFirst("https://www.mega.nz", "https://mega.nz");
+		}
+
+		if (url.endsWith("/")) {
+			url = url.substring(0, url.length() - 1);
+		}
+
+		logDebug("URL decoded: " + url);
 	}
 
     public static boolean hasPermissions(Context context, String... permissions) {
@@ -1747,22 +1846,21 @@ public class Util {
 		File newFile = buildTempFile(activity, "picture.jpg");
 		try {
 			newFile.createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-			logError("IOException happens" + e.toString());
-		}
+		} catch (IOException e) {}
 
-		Uri outputFileUri;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			outputFileUri = FileProvider.getUriForFile(activity, "mega.privacy.android.app.providers.fileprovider", newFile);
-		}
-		else{
-			outputFileUri = Uri.fromFile(newFile);
-		}
+		//This method is in the v4 support library, so can be applied to all devices
+		Uri outputFileUri = FileProvider.getUriForFile(activity, AUTHORITY_STRING_FILE_PROVIDER, newFile);
 
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 		cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		activity.startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
+		activity.startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+	}
+
+	public static void resetActionBar(ActionBar aB) {
+		if (aB != null) {
+			aB.setDisplayShowCustomEnabled(false);
+			aB.setDisplayShowTitleEnabled(true);
+		}
 	}
 }

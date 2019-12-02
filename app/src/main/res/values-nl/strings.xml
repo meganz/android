@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">Fout. Probeer alstublieft opnieuw.</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-HERSTELSLEUTEL</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">De tweede media map bestaat niet, kies een nieuwe map</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Geen externe opslag gedetecteerd</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Deze map is alleen lezen. U heeft geen toestemming om te uploaden</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Miniatuurweergave</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Lijstweergave</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Reservekopie Herstelsleutel</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Verwijder Herstelsleutel</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Abonnement opzeggen</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">De Herstelsleutel werd verwijderd</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Het abonnement is geannuleerd</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">We konden uw abonnement niet annuleren. Neem a.u.b. contact op met support&#64;mega.nz voor assistentie</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Sluit andere sessie</string>
@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Account activeren</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Bestandslijst voorbereiden</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Log in om te delen met MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Uw bevestigingskoppeling is niet langer geldig. Uw account kan al geactiveerd zijn of u kunt uw registratie geannuleerd hebben.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -231,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">Alle overdrachten verwijderen?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Schijf</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Recent</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media uploads</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Opgeslagen voor Offline gebruik</string>
@@ -611,6 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">De weergave was nog niet gedownload. Wacht a.u.b.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">De weergave kan niet worden geladen door dat er onvoldoende geheugen beschikbaar is. Probeer later nogmaals.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Log uit voordat u de account creëert</string>
 
@@ -630,12 +633,12 @@
 
     <string name="menu_take_picture" context="menu item">Maak een foto</string>
 
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Alleen via Wi-Fi</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi of mobiele data</string>
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Alleen Wi-Fi</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele data</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Overslaan</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload is bezig</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera uploads in behandeling</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Wilt u Camera Uploads stoppen?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -687,8 +690,8 @@
     <string name="settings_empty_folder" context="settings option">Kies een map</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi of mobiele data</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">Alleen via Wi-Fi</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele data</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Alleen Wi-Fi</item>
     </string-array>
 
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Upload Bestand</string>
@@ -931,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Fout. Dit e-mailadres is al in gebruik.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">U heeft al een bevestigingskoppeling voor dat e-mailadres gevraagd.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">Het nieuwe en het oude e-mailadres mogen niet hetzelfde zijn.</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Dit is de laatste stap om uw e-mail te wijzigen. Vul alstublieft hieronder uw wachtwoord in.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">E-mailadres wijzigen</string>
 
@@ -1796,7 +1802,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Uploaden gesprek</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media kwaliteit</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Gesprek video kwaliteit</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Kwaliteit</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads heeft toegang nodig tot uw foto\'s en andere media op uw apparaat. Gaar naar de instellingen pagina en geef toestemming.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
@@ -2320,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Oproep Gestart</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL sleutel fout</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is niet in staat om veilig te verbinden via SSL. U kunt op het publiekelijke wifi zitten met extra benodigdheden.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA kan geen veilige verbinding maken via SSL. Mogelijk gebruikt u openbare wifi met aanvullende vereisten.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Geen [/B][A]Notificaties[/A][B].[/B]</string>
 
@@ -2517,6 +2523,21 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d bestanden in afwachting.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Recent</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 Afbeelding en 1 Video</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Mij</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Het is niet mogelijk om spraakberichten op te nemen tijdens een oproep die gaande is.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Er is een fout opgetreden bij het uploaden van het spraakbericht.</string>
 
@@ -2524,4 +2545,7 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Laden</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Een ogenblik geduld a.u.b&#8230;</string>
+
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s Contactpersonen verstuurd.</string>
 </resources>

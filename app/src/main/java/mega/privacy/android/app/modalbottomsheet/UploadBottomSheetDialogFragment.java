@@ -9,10 +9,12 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
@@ -43,6 +45,16 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         LinearLayout optionTakePicture = contentView.findViewById(R.id.take_picture_layout);
         LinearLayout optionCreateFolder = contentView.findViewById(R.id.new_folder_layout);
 
+        LinearLayout createFolderSeparator = contentView.findViewById(R.id.create_folder_separator);
+        if (((ManagerActivityLollipop)context).isOnRecents()) {
+            optionCreateFolder.setVisibility(View.GONE);
+            createFolderSeparator.setVisibility(View.GONE);
+        }
+        else {
+            optionCreateFolder.setVisibility(View.VISIBLE);
+            createFolderSeparator.setVisibility(View.VISIBLE);
+        }
+
         optionFromDevice.setOnClickListener(this);
         optionFromSystem.setOnClickListener(this);
         optionTakePicture.setOnClickListener(this);
@@ -69,6 +81,9 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
             case R.id.upload_from_system_layout: {
                 logDebug("click upload from_system");
                 listener.uploadFromSystem();
+                break;
+            }
+            case R.id.scan_document_layout:{
                 break;
             }
 

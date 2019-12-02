@@ -151,7 +151,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 }
             }
             else{
-                nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+                nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
                 if(nodeHandles!=null){
                     logDebug("Node handle is: " + nodeHandles[0]);
                 }
@@ -200,6 +200,8 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.file_explorer_action, menu);
+        menu.findItem(R.id.cab_menu_sort).setVisible(false);
+        menu.findItem(R.id.cab_menu_grid_list).setVisible(false);
         searchMenuItem = menu.findItem(R.id.cab_menu_search);
         searchMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
         createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
@@ -258,7 +260,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     }
 
     public void isPendingToOpenSearchView () {
-        if (pendingToOpenSearchView) {
+        if (pendingToOpenSearchView && searchMenuItem != null && searchView != null) {
             String query = querySearch;
             searchMenuItem.expandActionView();
             searchView.setQuery(query, false);
@@ -385,7 +387,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         Intent intent = new Intent();
 
         if(nodeHandles!=null){
-            intent.putExtra("NODE_HANDLES", nodeHandles);
+            intent.putExtra(NODE_HANDLES, nodeHandles);
         }
 
         if(userHandles!=null){
@@ -416,7 +418,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             intent.putExtra("SELECTED_CHATS", chatHandles);
         }
 
-        if (users != null && !chats.isEmpty()) {
+        if (users != null && !users.isEmpty()) {
             long[] userHandles = new long[users.size()];
             for (int i=0; i<users.size(); i++) {
                 userHandles[i] = users.get(i).getHandle();
@@ -440,9 +442,11 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     }
 
     public void collapseSearchView () {
-        if (searchMenuItem != null) {
-            searchMenuItem.collapseActionView();
+        if (searchMenuItem == null) {
+            return;
         }
+
+        searchMenuItem.collapseActionView();
     }
 
     @Override
@@ -459,24 +463,18 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 break;
             }
             case R.id.new_group_button: {
-                if(megaApi!=null && megaApi.getRootNode()!=null){
+                if (megaApi != null && megaApi.getRootNode() != null) {
                     ArrayList<MegaUser> contacts = megaApi.getContacts();
-                    if(contacts==null){
+                    if (contacts == null || contacts.isEmpty()) {
                         showSnackbar(getString(R.string.no_contacts_invite));
+                        break;
                     }
-                    else {
-                        if(contacts.isEmpty()){
-                            showSnackbar(getString(R.string.no_contacts_invite));
-                        }
-                        else{
-                            Intent intent = new Intent(this, AddContactActivityLollipop.class);
-                            intent.putExtra("contactType", CONTACT_TYPE_MEGA);
-                            intent.putExtra("onlyCreateGroup", true);
-                            startActivityForResult(intent, REQUEST_CREATE_CHAT);
-                        }
-                    }
-                }
-                else{
+
+                    Intent intent = new Intent(this, AddContactActivityLollipop.class);
+                    intent.putExtra("contactType", CONTACT_TYPE_MEGA);
+                    intent.putExtra("onlyCreateGroup", true);
+                    startActivityForResult(intent, REQUEST_CREATE_CHAT);
+                } else {
                     logWarning("Online but not megaApi");
                     showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 }

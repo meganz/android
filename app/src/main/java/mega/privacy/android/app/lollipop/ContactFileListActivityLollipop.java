@@ -83,6 +83,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -113,13 +114,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	boolean moveToRubbish = false;
 
-	public static int REQUEST_CODE_GET = 1000;
-	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
-	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
-	public static int REQUEST_CODE_GET_LOCAL = 1003;
-	public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
-	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
-
 	private final static String PARENT_HANDLE = "parentHandle";
 	static ContactFileListActivityLollipop contactPropertiesMainActivity;
 
@@ -143,6 +137,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	Toolbar tB;
 	ActionBar aB;
 
+	private BottomSheetDialogFragment bottomSheetDialogFragment;
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		logDebug("onSaveInstanceState");
@@ -158,6 +154,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.file_explorer_action, menu);
 
+		menu.findItem(R.id.cab_menu_sort).setVisible(false);
+		menu.findItem(R.id.cab_menu_grid_list).setVisible(false);
 		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 		startConversation = menu.findItem(R.id.cab_menu_new_chat);
 		startConversation.setVisible(false);
@@ -606,6 +604,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	private void onGetReadWritePermission() {
+        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
@@ -1148,7 +1147,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				return;
 			}
 
-			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
@@ -1551,11 +1550,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	public void showOptionsPanel(MegaNode node) {
 		logDebug("showOptionsPanel");
-		if (node != null) {
-			this.selectedNode = node;
-			ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment = new ContactFileListBottomSheetDialogFragment();
-			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-		}
+		if (node == null|| isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedNode = node;
+        bottomSheetDialogFragment = new ContactFileListBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showSnackbar(int type, String s) {

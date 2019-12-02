@@ -108,6 +108,37 @@
                 android:background="@color/divider_upgrade_account"/>
 
             <LinearLayout
+                android:id="@+id/scan_document_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/scan_document"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:alpha="0.54"
+                    android:src="@drawable/ic_b_scan_document"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/scan_document_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/take_picture_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -138,10 +169,12 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/create_folder_separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/divider_upgrade_account"
+                android:orientation="vertical"/>
 
             <LinearLayout
                 android:id="@+id/new_folder_layout"
