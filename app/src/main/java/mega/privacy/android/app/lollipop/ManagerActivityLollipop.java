@@ -1199,7 +1199,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
 		Purchase purchase = app.getMyAccountInfo().getActiveGooglePlaySubscription();
 		String oldSku = purchase == null ? null : purchase.getSku();
-		mBillingManager.initiatePurchaseFlow(oldSku, skuDetails);
+		if (mBillingManager != null) {
+			mBillingManager.initiatePurchaseFlow(oldSku, skuDetails);
+		}
 	}
 
 	private SkuDetails getSkuDetails(List<SkuDetails> list, String key) {
@@ -17180,11 +17182,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void onActionModeStarted(ActionMode mode) {
 		super.onActionModeStarted(mode);
 		getTheme().applyStyle(R.style.ActionOverflowButtonStyle, true);
-	}
-
-	@Override
-	public void onPointerCaptureChanged(boolean hasCapture) {
-
 	}
 
 	public void setChatBadge() {

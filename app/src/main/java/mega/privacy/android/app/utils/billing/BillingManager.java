@@ -223,7 +223,7 @@ public class BillingManager implements PurchasesUpdatedListener {
 
     public boolean isPayloadValid(String pl) {
         //backward compatibility - old version does not have payload so just let it go
-        return payload == null || TextUtil.isTextEmpty(pl) || payload.equals(pl);
+        return TextUtil.isTextEmpty(pl) || payload.equals(pl);
     }
 
     /**
