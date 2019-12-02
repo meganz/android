@@ -32,9 +32,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatFileStorageAdapter;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
+
+import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
@@ -58,7 +61,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     public ActionMode actionMode;
     RelativeLayout rlfragment;
     ArrayList<Integer> posSelected = new ArrayList<>();
-    String downloadLocationDefaultPath = Util.downloadDIR;
+    String downloadLocationDefaultPath;
     FloatingActionButton sendIcon;
 
     @Override
@@ -77,21 +80,11 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
         prefs = dbH.getPreferences();
-        if (prefs != null){
-            log("prefs != null");
-            if (prefs.getStorageAskAlways() != null){
-                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-                    log("askMe==false");
-                    if (prefs.getStorageDownloadLocation() != null){
-                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-                        }
-                    }
-                }
-            }
-        }
+
+        downloadLocationDefaultPath = getDownloadLocation(context);
+
         super.onCreate(savedInstanceState);
-        log("after onCreate called super");
+        logDebug("After onCreate called super");
     }
 
     @Override
@@ -101,7 +94,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             return null;
         }
 
-        log("fragment ADDED");
+        logDebug("Fragment ADDED");
 
         if (aB == null){
             aB = ((AppCompatActivity)context).getSupportActionBar();
@@ -113,12 +106,12 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
-        scaleW = Util.getScaleW(outMetrics, density);
-        scaleH = Util.getScaleH(outMetrics, density);
+        scaleW = getScaleW(outMetrics, density);
+        scaleH = getScaleH(outMetrics, density);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int heightFrag = displayMetrics.heightPixels / 2 - ChatUtil.getActionBarHeight(((Activity)context), getResources());
+        int heightFrag = displayMetrics.heightPixels / 2 - getActionBarHeight(((Activity)context), getResources());
 
         View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
         rlfragment = (RelativeLayout) v.findViewById(R.id.relative_layout_frag);
@@ -206,7 +199,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void updateIconSend(boolean isVisible) {
-        log("updateIconSend() - " + isVisible);
+        logDebug("isVisible: " + isVisible);
         if (isVisible) {
             sendIcon.setVisibility(View.VISIBLE);
         } else {
@@ -215,14 +208,10 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void itemClick(int position) {
-        log("itemClick()");
+        logDebug("Position: " + position);
         if (adapter.isMultipleSelect()){
             adapter.toggleSelection(position);
         }
-    }
-
-    private static void log(String log) {
-        Util.log("ChatFileStorageFragment", log);
     }
 
     public RecyclerView getRecyclerView(){
@@ -262,7 +251,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void hideMultipleSelect() {
-        log("hideMultipleSelect");
+        logDebug("hideMultipleSelect");
         adapter.setMultipleSelect(false);
 
     }
@@ -323,20 +312,27 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
                 Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
                 String orderBy = MediaStore.Images.Media._ID + " DESC";
+                Cursor cursor = null;
+                try {
+                    cursor = context.getActivity().getContentResolver().query(uri, projection, "", null, orderBy);
 
-                Cursor cursor = context.getActivity().getContentResolver().query(uri, projection, "", null, orderBy);
+                    if (cursor != null) {
+                        int dataColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
 
-                if (cursor != null) {
-                    int dataColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+                        List<String> photoUris = new ArrayList<>(cursor.getCount());
+                        while (cursor.moveToNext()) {
+                            photoUris.add("file://" + cursor.getString(dataColumn));
+                            context.createImagesPath(cursor.getString(dataColumn));
+                        }
 
-                    List<String> photoUris = new ArrayList<>(cursor.getCount());
-                    while (cursor.moveToNext()) {
-                        photoUris.add("file://" + cursor.getString(dataColumn));
-                        context.createImagesPath(cursor.getString(dataColumn));
+                        return photoUris;
                     }
-                    cursor.close();
-
-                    return photoUris;
+                } catch (Exception ex) {
+                    logError("Exception is thrown", ex);
+                } finally {
+                    if (cursor != null) {
+                        cursor.close();
+                    }
                 }
             }
             return null;

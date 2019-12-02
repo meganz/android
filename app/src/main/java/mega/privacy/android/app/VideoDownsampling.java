@@ -18,7 +18,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class VideoDownsampling {
 
@@ -43,7 +45,9 @@ public class VideoDownsampling {
 
     static ConcurrentLinkedQueue<VideoUpload> queue;
 
-    private class VideoUpload{
+    private boolean isRunning = true;
+
+    protected class VideoUpload{
         String original;
         String outFile;
         long idPendingMessage;
@@ -64,8 +68,16 @@ public class VideoDownsampling {
         queue = new ConcurrentLinkedQueue<VideoUpload>();
     }
 
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public void setRunning(boolean running) {
+        isRunning = running;
+    }
+
     public void changeResolution(File f, String inputFile, long idMessage) throws Throwable {
-        log("changeResolution");
+        logDebug("changeResolution");
 
         queue.add(new VideoUpload(f.getAbsolutePath(), inputFile, f.length(), idMessage));
 
@@ -89,18 +101,21 @@ public class VideoDownsampling {
 
             try {
                 while(!queue.isEmpty()){
-                    mChanger.prepareAndChangeResolution();
+                    VideoUpload toProcess = queue.poll();
+                    mChanger.prepareAndChangeResolution(toProcess);
                 }
             } catch (Throwable th) {
                 mThrowable = th;
                 if(out!=null){
-                    ((ChatUploadService)context).finishDownsampling(out, false, video.idPendingMessage);
+                    if(context instanceof ChatUploadService) {
+                        ((ChatUploadService)context).finishDownsampling(out, false, video.idPendingMessage);
+                    }
                 }
             }
         }
 
         public static void changeResolutionInSeparatedThread(VideoDownsampling changer) throws Throwable {
-            log("changeResolutionInSeparatedThread");
+            logDebug("changeResolutionInSeparatedThread");
             ChangerWrapper wrapper = new ChangerWrapper(changer);
             Thread th = new Thread(wrapper, ChangerWrapper.class.getSimpleName());
             th.start();
@@ -110,12 +125,9 @@ public class VideoDownsampling {
         }
     }
 
-    private void prepareAndChangeResolution() throws Exception {
-        log("prepareAndChangeResolution");
+    protected void prepareAndChangeResolution(VideoUpload video) throws Exception {
+        logDebug("prepareAndChangeResolution");
         Exception exception = null;
-
-        VideoUpload video = queue.poll();
-
         String mInputFile = video.original;
 
         String mOutputFile = video.outFile;
@@ -141,25 +153,7 @@ public class VideoDownsampling {
             int videoInputTrack = getAndSelectVideoTrackIndex(videoExtractor);
             MediaFormat inputFormat = videoExtractor.getTrackFormat(videoInputTrack);
 
-            MediaMetadataRetriever m = new MediaMetadataRetriever();
-            m.setDataSource(mInputFile);
-            Bitmap thumbnail = m.getFrameAtTime();
-            int inputWidth = thumbnail.getWidth(), inputHeight = thumbnail.getHeight();
-
-            if(inputWidth>inputHeight){
-                if(mWidth<mHeight){
-                    int w = mWidth;
-                    mWidth=mHeight;
-                    mHeight=w;
-                }
-            }
-            else{
-                if(mWidth>mHeight){
-                    int w = mWidth;
-                    mWidth=mHeight;
-                    mHeight=w;
-                }
-            }
+            resetWidthAndHeight(mInputFile);
 
             MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE, mWidth, mHeight);
             outputVideoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, OUTPUT_VIDEO_COLOR_FORMAT);
@@ -179,8 +173,8 @@ public class VideoDownsampling {
             int audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor);
             MediaFormat inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack);
             MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(MediaFormat.KEY_MIME),
-                            inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
-                            inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
+                    inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
+                    inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
             outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_AUDIO_BIT_RATE);
             outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE);
 
@@ -267,11 +261,33 @@ public class VideoDownsampling {
             }
         }
         if (exception != null){
-            log("VideoDownsampling Exception: "+exception.toString());
+            logError("Exception", exception);
             throw exception;
         }
         else{
-            ((ChatUploadService)context).finishDownsampling(mOutputFile, true, video.idPendingMessage);
+            if(context instanceof ChatUploadService) {
+                ((ChatUploadService)context).finishDownsampling(mOutputFile, true, video.idPendingMessage);
+            }
+        }
+    }
+
+    private void resetWidthAndHeight(String mInputFile) {
+        MediaMetadataRetriever m = new MediaMetadataRetriever();
+        m.setDataSource(mInputFile);
+        Bitmap thumbnail = m.getFrameAtTime();
+        int inputWidth = thumbnail.getWidth(), inputHeight = thumbnail.getHeight();
+        if (inputWidth > inputHeight) {
+            if (mWidth < mHeight) {
+                int w = mWidth;
+                mWidth = mHeight;
+                mHeight = w;
+            }
+        } else {
+            if (mWidth > mHeight) {
+                int w = mWidth;
+                mWidth = mHeight;
+                mHeight = w;
+            }
         }
     }
 
@@ -335,7 +351,7 @@ public class VideoDownsampling {
                                   MediaCodec audioDecoder, MediaCodec audioEncoder,
                                   MediaMuxer muxer,
                                   InputSurface inputSurface, OutputSurface outputSurface, VideoUpload video) {
-        log("changeResolution");
+        logDebug("changeResolution");
         String mOutputFile = video.outFile;
 
         ByteBuffer[] videoDecoderInputBuffers = null;
@@ -381,7 +397,7 @@ public class VideoDownsampling {
 
         int pendingAudioDecoderOutputBufferIndex = -1;
         boolean muxing = false;
-        while ((!videoEncoderDone) || (!audioEncoderDone)) {
+        while ((!videoEncoderDone || !audioEncoderDone) && isRunning) {
             while (!videoExtractorDone && (encoderOutputVideoFormat == null || muxing)) {
                 int decoderInputBufferIndex = videoDecoder.dequeueInputBuffer(TIMEOUT_USEC);
                 if (decoderInputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
@@ -566,7 +582,12 @@ public class VideoDownsampling {
 //            log("The percentage complete is: " + video.percentage + " (" + video.sizeRead + "/" + video.sizeInputFile +")");
             if(video.percentage%5==0){
 //                log("Percentage: "+mOutputFile + "  " + video.percentage + " (" + video.sizeInputFile + "/" + video.sizeInputFile +")");
-                ((ChatUploadService)context).updateProgressDownsampling(video.percentage, mOutputFile);
+                if(context instanceof  ChatUploadService) {
+                    ((ChatUploadService)context).updateProgressDownsampling(video.percentage, mOutputFile);
+                }
+            }
+            if(context instanceof VideoCompressionCallback) {
+                ((VideoCompressionCallback) context).onCompressUpdateProgress(video.percentage);
             }
         }
         video.percentage = 100;
@@ -597,9 +618,5 @@ public class VideoDownsampling {
             }
         }
         return null;
-    }
-
-    private static void log(String log) {
-        Util.log("VideoDownsampling", log);
     }
 }

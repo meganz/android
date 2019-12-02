@@ -26,8 +26,6 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.utils.DBUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -39,6 +37,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
+
+import static mega.privacy.android.app.utils.DBUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class FortumoFragmentLollipop extends Fragment implements MegaRequestListenerInterface, MegaGlobalListenerInterface {
 	
@@ -72,7 +74,7 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 		dbH = DatabaseHandler.getDbHandler(context);
 
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		logDebug("onCreate");
 	}
 	
 	
@@ -94,8 +96,8 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 		display.getMetrics(outMetrics);
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
+		float scaleW = getScaleW(outMetrics, density);
+		float scaleH = getScaleH(outMetrics, density);
 
 		View v = null;
 		v = inflater.inflate(R.layout.activity_fortumo_payment, container, false);
@@ -105,8 +107,8 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 //        WebSettings webSettings = myWebView.getSettings();
 //        webSettings.setJavaScriptEnabled(true);
 
-		if(DBUtil.callToPricing(context)){
-			log("megaApi.getPricing SEND");
+		if(callToPricing(context)){
+			logDebug("megaApi.getPricing SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}else{
 			getPaymentId();
@@ -116,7 +118,7 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 	}
 
 	public void getPaymentId(){
-		log("getPaymentId");
+		logDebug("getPaymentId");
 		if(myAccountInfo==null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
@@ -132,14 +134,14 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 			Product account = p.get(i);
 			if ((account.getLevel()==4) && (account.getMonths()==1)){
 				long planHandle = account.getHandle();
-				long lastPublicHandle = Util.getLastPublicHandle(attributes);
+				long lastPublicHandle = getLastPublicHandle(attributes);
 				if (lastPublicHandle == -1){
 					megaApi.getPaymentId(planHandle, this);
 				}
 				else{
 					megaApi.getPaymentId(planHandle, lastPublicHandle, this);
 				}
-				log("megaApi.getPaymentId(" + planHandle + ", " + lastPublicHandle + ")");
+				logDebug("megaApi.getPaymentId(" + planHandle + ", " + lastPublicHandle + ")");
 			}
 		}
 	}
@@ -158,10 +160,10 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		
-		log("REQUEST: " + request.getName() + "__" + request.getRequestString());
+
+		logDebug("REQUEST: " + request.getName() + "__" + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
-			log("PAYMENT ID: " + request.getLink());
+			logDebug("PAYMENT ID: " + request.getLink());
 //			Toast.makeText(context, "PAYMENTID: " + request.getLink(), Toast.LENGTH_LONG).show();
 			
 			String urlFortumo = "http://fortumo.com/mobile_payments/f250460ec5d97fd27e361afaa366db0f?cuid=" + request.getLink();
@@ -199,10 +201,6 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 		context = activity;
 		aB = ((AppCompatActivity)activity).getSupportActionBar();
 	}
-	
-	public static void log(String message) {
-		Util.log("FortumoFragment", message);
-	}
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
@@ -211,7 +209,7 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-		log("onUserAlertsUpdate");
+		logDebug("onUserAlertsUpdate");
 	}
 
 	@Override

@@ -25,7 +25,7 @@
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Download</string>
     <string name="general_add" context="button">Hinzufügen</string>
     <string name="general_move" context="button">Verschieben</string>
-    <string name="general_remove" context="button">Löschen</string>
+    <string name="general_remove" context="button">Entfernen</string>
     <string name="general_share" context="button">Freigeben</string>
     <!--
     <string name="general_confirm" context="button">Confirm</string>
@@ -43,8 +43,8 @@
     <string name="general_loading" context="state previous to import a file">Lade</string>
     <string name="general_importing" context="state while importing the file">Import läuft&#8230;</string>
     <string name="general_forwarding" context="state while importing the file">Wird weitergeleitet</string>
-    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importieren</string>
-    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Speicherplatz</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Import</string>
+    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Speicher</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Übertragungsvolumen</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Kaufen</string>
     <!--
@@ -63,6 +63,8 @@
     <string name="general_show_info" context="Label of a button/notification to show info about something">Infos anzeigen</string>
 
     <string name="error_general_nodes" context="Error getting the root node">Fehler! Bitte versuchen Sie es später erneut.</string>
+
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">Der Zweitmedienordner existiert nicht. Bitte wählen Sie einen anderen Ordner.</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Kein externes Speichermedium gefunden</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail-Ansicht</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Listenansicht</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Rettungsschlüssel sichern</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Rettungsschlüssel löschen</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Abonnement stornieren</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">Der Rettungsschlüssel wurde gelöscht.</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Das Abonnement wurde storniert.</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Wir konnten Ihr Abonnement nicht stornieren. Bitte setzen Sie sich mit support&#64;mega.nz in Verbindung.</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Alle anderen Sitzungen beenden</string>
@@ -164,11 +164,11 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s wird heruntergeladen.</string>
     <string name="alert_no_app" context="Alert text before download">Keine installierte App kennt den Dateityp von %s. Download trotzdem fortsetzen?</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">Nicht noch mal anzeigen</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Nicht nochmal anzeigen</string>
 
-    <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Are you sure that you want to cancel the current login process?</string>
+    <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Wollen Sie den Loginvorgang abbrechen?</string>
 
-    <string name="login_text" context="Login button">Anmelden</string>
+    <string name="login_text" context="Login button">Login</string>
     <string name="email_text" context="email label">E-Mail</string>
     <string name="password_text" context="password label">Passwort</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Passwort bestätigen</string>
@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Aktiviere Account</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Dateiliste wird erstellt</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Bitte loggen Sie sich ein, um Freigaben zu erstellen</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Der Bestätigungslink ist nicht mehr gültig. Entweder haben Sie Ihren Account bereits aktiviert, oder die Registrierung wurde abgebrochen.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -215,7 +216,7 @@
     <string name="error_enter_userlastname" context="Warning dialog">Bitte geben Sie Ihren Nachnamen ein.</string>
     <string name="error_short_password" context="when creating the account">Das Passwort ist zu kurz</string>
     <string name="error_passwords_dont_match" context="when creating the account">Passwörter stimmen nicht überein</string>
-    <string name="error_email_registered" contect="when creating the account">Diese E-Mail Adresse ist bereits von einem registrierten Mitglied in Verwendung.</string>
+    <string name="error_email_registered" contect="when creating the account">Unter dieser E-Mail-Adresse ist bereits ein MEGA-Account registriert.</string>
 
     <!--
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Confirmation required</string>
@@ -230,9 +231,10 @@
     <string name="cancel_transfer_confirmation">Diesen Transfer löschen?</string>
     <string name="cancel_all_transfer_confirmation">Alle Transfers löschen?</string>
 
-    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud-Drive</string>
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Neue/Geänderte Dateien</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Medienuploads</string>
-    <string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
+    <string name="section_inbox" context="title of the screen that show the inbox">Posteingang</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Für Offline-Zugriff gespeichert</string>
     <string name="section_saved_for_offline_new" context="title of the screen that shows the files saved for offline in the device">Offline</string>
     <!--
@@ -247,7 +249,7 @@
     <string name="received_requests_empty" context="the user has not received any contact request from other users">[B]Keine [/B][A]Kontaktanfragen empfangen[/A][B].[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transfers</string>
 
-    <string name="section_account" context="button to the settings of the user\'s account">Mein Benutzerkonto</string>
+    <string name="section_account" context="button to the settings of the user\'s account">Mein Account</string>
     <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Kamerauploads</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
@@ -261,11 +263,11 @@
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
     -->
 
-    <string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud drive">Keine Dateien in Ihrem CloudDrive</string>
+    <string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud drive">Keine Dateien vorhanden</string>
     <!--
     <string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
     -->
-    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Leerer Ordner</string>
+    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Keine Dateien im Ordner</string>
 
     <string name="choose_account_fragment" context="Title of the fragment Choose Account">ACCOUNT WÄHLEN</string>
 
@@ -280,15 +282,14 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Größe</string>
-    <string name="file_properties_info_modified" context="when was the file modified">Geändert</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">Zuletzt bearbeitet am</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Erstellt</string>
-    <string name="file_properties_info_created" context="when the file was created">Erstellt am</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
     <string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Öffentlicher Link</string>
 
-    <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Berechtigungen</string>
+    <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Zugriffsrechte</string>
     <string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Zugriffsrechte</string>
     <string name="file_properties_shared_folder_change_permissions" context="menu item">Zugriff ändern</string>
     <string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">Freigegeben an</string>
@@ -376,7 +377,7 @@
     -->
     <string name="context_move_to_trash" context="menu item">In den Papierkorb verschieben</string>
     <string name="context_delete_from_mega" context="menu item">Von MEGA entfernen</string>
-    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Name des Ordners</string>
+    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Ordnername</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Kontakt E-Mail</string>
     <string name="context_creating_folder" context="status dialog when performing the action">Ordner wird erstellt</string>
     <!--
@@ -393,13 +394,13 @@
     <!--
     <string name="context_copy_link" context="get the link and copy it">Copy link</string>
     -->
-    <string name="context_remove" context="Menu option to delete one or multiple selected items.">Löschen</string>
+    <string name="context_remove" context="Menu option to delete one or multiple selected items.">Entfernen</string>
     <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Aus Offline-Daten entfernen</string>
     <string name="context_share_folder" context="menu item">Ordner freigeben</string>
     <string name="context_send_file" context="menu item">Datei an Chat senden</string>
     <string name="context_send_contact" context="menu item">Kontakt an Chat senden</string>
     <string name="context_view_shared_folders" context="open a shared folder">Freigaben</string>
-    <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Freigeben</string>
+    <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Freigabe</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -498,9 +499,9 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Ihr Abonnement wurde noch nicht storniert. Bitte geben Sie einen Grund an.</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">Ordnerlink deaktiviert</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Ordnerfreigabe deaktiviert</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Neuer Ordner</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Kontakt hinzufügen</string>
@@ -519,7 +520,7 @@
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
     <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Aus Dateisystem wählen</string>
-    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Pick from</string>
+    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Von</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -539,7 +540,7 @@
     <string name="upload_prepare" context="Status text at the beginning of an upload">Datei wird bearbeitet</string>
     <plurals name="upload_prepare" context="Status text at the beginning of an upload">
         <item context="Status text at the beginning of an upload for 1 file" quantity="one">Datei wird bearbeitet</item>
-        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Dateien werden verarbeitet</item>
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">Quelldatei momentan nicht verfügbar, bitte versuchen Sie es später noch einmal</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Die ausgewählte Datei kann nicht geöffnet werden</string>
@@ -564,7 +565,7 @@
     <!--
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Free Space</string>
     -->
-    <string name="my_account_used_space" context="Headline for the amount of storage space is used">Benutzter Speicherplatz</string>
+    <string name="my_account_used_space" context="Headline for the amount of storage space is used">Belegter Platz</string>
     <string name="my_account_change_password" context="menu item">Passwort ändern</string>
     <!--
     <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
@@ -612,6 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Die Voransicht wird geladen. Bitte warten Sie.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">The preview is not able to load due to insufficient memory available. Please try again later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Bitte loggen Sie sich aus, bevor Sie einen Account erstellen</string>
 
@@ -632,29 +634,32 @@
     <string name="menu_take_picture" context="menu item">Foto machen</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Nur via WLAN</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WLAN oder mobile Datenverbindung</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WLAN oder Mobildaten</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Überspringen</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Anhalten</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Kamera Upload in Arbeit</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Kameraupload aktiv</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Kamera-Uploads anhalten?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Hochladen von Dateien aus Medienordnern</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Dateien werden für den Upload geprüft</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Kamera-Uploads werden initialisiert</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Kamera-Uploads beendet</string>
 
-    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Speicherplatz</string>
+    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Speicher</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN-Lock</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Die Videokompression verbraucht viel Leistung. MEGA wird Sie darum bitten, Ihr Gerät zu laden, wenn die zu komprimierenden Videos größer sind als %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Erweitert</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Zwischenspeicher leeren</string>
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Löschung der Offline-Daten</string>
 
-    <string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
+    <string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Datei nach Herunterladen öffnen</string>
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Account stornieren</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">%s belegt</string>
@@ -685,7 +690,7 @@
     <string name="settings_empty_folder" context="settings option">Ordner auswählen</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WLAN oder mobile Datenverbindung</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WLAN oder Mobildaten</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Nur via WLAN</item>
     </string-array>
 
@@ -698,6 +703,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Nur am Ladegerät</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to actively charge my device</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Original-Dateinamen beibehalten</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Lokaler Kameraordner</string>
@@ -727,7 +733,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Nach zehn Fehlversuchen werden Ihre lokalen Dateien gelöscht und Ihre Sitzung beendet.</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Falscher PIN</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">PIN inkorrekt. Sie haben noch einen Versuch.</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Falsche PIN, bitte versuchen Sie es erneut. Sie haben noch %2d Versuche.</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN-Codes stimmen nicht überein</string>
@@ -739,7 +745,7 @@
 
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Version</string>
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Datenschutzerklärung</string>
-    <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Allgemeine Geschäftsbedingungen</string>
+    <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Allgemeinen Geschäftsbedingungen zu</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Datenschutz-Grundverordnung</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">App Version</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK Version</string>
@@ -768,7 +774,7 @@
     <string name="my_account_title" context="title of the My Account screen">Accountart</string>
     <string name="renews_on" context="title of the Expiration Date">Erneuert sich am&#160;</string>
     <string name="expires_on" context="title of the Expiration Date">Gültig bis&#160;</string>
-    <string name="free_account">KOSTENLOS</string>
+    <string name="free_account">GRATIS</string>
 
     <!--
     <string name="free_storage" context="Not translate">50 GB</string>
@@ -857,7 +863,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Kopieren Sie den Rettungsschlüssel in Ihre Zwischenablage oder speichern Sie ihn als Textdatei.</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Speichern</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Ihr Rettungsschlüssel wurde erfolgreich in die Zwischenablage kopiert</string>
 
     <string name="change_pass" context="Button to change the password">Ändern</string>
 
@@ -917,7 +923,7 @@
     <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Sie können Ihr Passwort nun dank Ihres Rettungsschlüssels ändern. Geben Sie bitte Ihr neues Passwort ein.</string>
     <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Sie erhalten einen Link, mit dem Sie Ihr Passwort zurücksetzen können.</string>
 
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Upgraden</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Account erweitern</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Jetzt erweitern</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Erhöhen Sie Ihre Cloudkapazität![A]Mehr Speicherplatz &amp; Transfervolumen mit einem PRO-Account</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Der Rettungsschlüssel wurde als %1s gespeichert. [A]Solange die Datei sich an dieser Stelle befindet, können Sie sie im Offline-Bereich finden.[A]Achtung: Sie wird beim nächsten Logout gelöscht. Bitte speichern Sie sie jetzt an einem sicheren Ort.</string>
@@ -928,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Diese E-Mail-Adresse ist bereits belegt.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">Sie haben einen Bestätigungslink für diese E-Mail-Adresse angefordert.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">Die neue E-Mail-Adresse muss sich von der jetzigen unterscheiden</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Um Ihre E-Mail-Adresse jetzt zu ändern, geben Sie bitte Ihr Passwort ein.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">E-Mail-Adresse ändern</string>
 
@@ -965,7 +974,7 @@
 
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Link bearbeiten</string>
 
-    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">Das aktuelle Passwort, welches Sie angegeben haben, ist inkorrekt.</string>
+    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">Das aktuelle Passwort, das Sie eingegeben haben, ist nicht korrekt.</string>
 
     <string name="number_correctly_reinvite_contact_request" context="success message when reinviting multiple contacts">%d Einladungen wurden wiederholt.</string>
 
@@ -999,8 +1008,10 @@
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Datei-Link nicht verfügbar</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">Dieser Dateilink wurde wegen Verletzung unserer Benutzungsbedingungen entfernt.</string>
 
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">Ungültiges URL-Format. Der eingegebene Link existiert nicht.</string>
+
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Warte auf E-Mail-Bestätigung</string>
-    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Bitte checken Sie Ihre E-Mails und klicken Sie den enthaltenen Link, um Ihren Account zu bestätigen.</string>
+    <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Bitte öffnen Sie Ihre E-Mail und bestätigen Sie Ihren Account, indem Sie den entsprechenden Link anklicken.</string>
 
     <plurals name="general_num_items">
         <item context="Singular of items which contains a folder. 1 item" quantity="one">Element</item>
@@ -1076,6 +1087,9 @@
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d Teilnehmer der Ordnerfreigabe entfernt</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;und die Entfernung von %d Kontakten ist fehlgeschlagen</string>
 
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Aktualisierung der Zugriffsrechte für %d Kontakte erfolgreich</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Aktualisierung der Zugriffsrechte für %d Kontakte fehlgeschlagen</string>
+
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Telefonkontakte werden geladen&#8230;</string>
 
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d Einladungen versandt.</string>
@@ -1146,7 +1160,7 @@
 
     <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">%s aus diesem Chat entfernen?</string>
 
-    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Schreibgeschützt</string>
+    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Nur lesen</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1271,8 +1285,8 @@
     <string name="label_more" context="button label more">Weitere</string>
     <string name="label_close" context="button label Close">Schließen</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">Allgemein</string>
-    <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Speicherplatz</string>
-    <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Speicherplatz</string>
+    <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Speicher</string>
+    <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Speicher</string>
     <string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">Übertragungsvolumen</string>
     <string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">Übertragungsvolumen</string>
 
@@ -1283,7 +1297,7 @@
     <string name="available_space" context="Label in section the storage tab in My Account Section">Verfügbar</string>
     <string name="not_available" context="Label in section the storage tab in My Account Section when no info info is received">nicht verfügbar</string>
 
-    <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">Kein Abrechnungszeitraum</string>
+    <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">Keine anstehende Zahlung</string>
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]von %2$s[/A]</string>
 
@@ -1338,6 +1352,7 @@
         <item context="Plural" quantity="other">%1$d von %2$d Dateien</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Vorgang wird abgeschlossen&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Ansehen</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Alle Transfers vorübergehend anhalten</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Alle Transfers fortsetzen</string>
@@ -1372,8 +1387,8 @@
     </plurals>
 
 	<plurals name="folder_upload_service_notification" context="Text of the notification shown when the folder upload service is running">
-		<item context="Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder</item>
-		<item context="Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders</item>
+		<item context="Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">%1$d von %2$d Ordner wird hochgeladen</item>
+		<item context="Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">%1$d von %2$d Ordnern wird hochgeladen</item>
 	</plurals>
 
     <plurals name="upload_service_final_notification" context="Text of the notification shown when the upload service has finished">
@@ -1382,8 +1397,8 @@
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification" context="Text of the notification shown when the folder upload service has finished">
-		<item context="Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">Uploaded %1$d folder</item>
-		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">Uploaded %1$d folders</item>
+		<item context="Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">%1$d Ordner hochgeladen</item>
+		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">%1$d Ordner hochgeladen</item>
 	</plurals>
 
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">Gesamtgröße: %1$s</string>
@@ -1434,7 +1449,7 @@
     </plurals>
 
     <string name="general_view" context="Menu option">Dateien anzeigen</string>
-    <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importieren</string>
+    <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Import</string>
     <string name="save_for_offline" context="Menu option">Für Offline-Nutzung speichern</string>
 
     <string name="general_view_contacts" context="Menu option">Kontakte anzeigen</string>
@@ -1502,7 +1517,7 @@
     <string name="file_properties_shared_folder_public_link_name">Verlinken</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Vollzugriff</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Schreibgeschützt</string>
+    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Nur lesen</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Lese- und Schreibzugriff</string>
 
     <string name="attachment_uploading_state_uploading">Upload&#8230;</string>
@@ -1788,10 +1803,11 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Chat-Upload</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualitätsreduktion bei Versand via Chat</string>
-
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Videoqualität</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Kamera-Uploads benötigt Zugriff auf Ihre Fotos und Mediendateien. Bitte gewähren Sie der App dieses Zugriffsrecht in den Einstellungen.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of origin quality multimedia file to upload.">Original quality</item>
-        <item context="the options of medium quality multimedia file to  upload.">Medium quality</item>
+        <item context="the options of origin quality multimedia file to upload.">Höchste Qualitätsstufe</item>
+        <item context="the options of medium quality multimedia file to  upload.">Mittlere Qualitätsstufe</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Verpasster Anruf</string>
@@ -1839,7 +1855,7 @@
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">Passswort testen</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Passwort-Test</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Passwort akzeptiert</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Passwort nicht korrekt.\nErstellen Sie baldmöglichst eine Sicherheitskopie Ihres Rettungsschlüssels!</string>
     <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">Rettungsschlüssel exportiert</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">Ihr Rettungsschlüssel wurde in den Offline-Bereich als MEGARecoverKey.txt exportiert.\nAchtung: Sobald Sie sich ausloggen, wird er gelöscht - bewahren Sie ihn an einem sicheren Ort auf!</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Sie loggen sich aus. Bitte prüfen Sie, ob Sie sich noch an Ihr Passwort erinnern können.\nPasswortverlust bedeutet Datenverlust!</string>
@@ -1848,7 +1864,7 @@
     <string name="proceed_to_logout" context="Option that permits user logout">Mit dem Logout fortfahren</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Rettungsschlüssel</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Lokal abspeichern</string>
-    <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">Kopiert</string>
+    <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">In die Zwischenablage kopiert</string>
 
     <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">Zur neuesten</string>
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">Neue Nachrichten</string>
@@ -1881,7 +1897,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Unsere Server sind leider überlastet - es geht gleich weiter&#8230;</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Der Vorgang dauert länger als erwartet. Bitte warten Sie.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit ">Zuviele Anfragen - bitte warten.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">Canceling login process. Please wait&#8230;</string>
+    <string name="login_in_progress" context="message when previous login is being canceled">Login wird abgebrochen. Bitte warten&#8230;</string>
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Fehler: Die Datei ist beschädigt oder existiert nicht</string>
 
@@ -2034,7 +2050,7 @@
     <string name="number_incorrectly_restored_from_rubbish" context="error message when restoring several nodes from rubbish">%d Elemente konnten nicht wiederhergestellt werden</string>
     <string name="number_correctly_restored_from_rubbish" context="success message when restoring several nodes from rubbish">%d Elemente wiederhergestellt</string>
 
-    <string name="join_call_layout" context="Title of the layout to join a group call from the chat screen">Tap to join the call</string>
+    <string name="join_call_layout" context="Title of the layout to join a group call from the chat screen">Konferenz beitreten</string>
 
     <string name="invite_contacts" context="Label shown when the user wants to add contacts into his MEGA account">Kontaktanfragen verschicken</string>
     <string name="share_with" cotext="Label shown when the user wants to share something with other contacts">Freigeben an</string>
@@ -2124,22 +2140,26 @@
 
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">Chataktivität</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">Sie haben neue Nachrichten</string>
-    <string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
+    <string name="retrieving_message_title" context="When app is retrieving push message">Nachricht wird empfangen</string>
 
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Automatische Leerung des Papierkorbs</string>
-    <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">Der Papierkorb wird automatisch für Sie geleert.</string>
+    <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">Die Leerung des Papierkorbs erfolgt automatisch.</string>
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Minimum: 7 Tage</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Der erlaubte Zeitraum liegt zwischen sieben und 30 Tagen.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">Die erlaubte Größe liegt zwischen %1$s und %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Automatische Löschung nach</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d Tage</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Benachrichtigung wenn Größe über</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Falls die zu komprimiertenden Videos größer sind als</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Eine automatische Leerung nach mehr als 30 Tagen (oder das Abschalten derselben) erfordert PRO-Status.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">Tag(en)</string>
-    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get chat link</string>
-    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage chat link</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Chatlink erstellen</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Chatlink verwalten</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Schlüsselrotation aktivieren</string>
     <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chatlinks exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
@@ -2149,7 +2169,7 @@
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">Chatlink löschen</string>
 
-    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat link</string>
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chatlink</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">Sie loggen alle Sitzungen außer dieser aus.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Alle anderen Sitzungen ausloggen?</string>
 
@@ -2159,25 +2179,25 @@
 
     <string name="observers_chat_label" context="Label for observers of a group chat">Beobachter</string>
 
-    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the chat link.</string>
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Chatlink konnte nicht geladen werden.</string>
 
-    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the chat link.</string>
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Fehler bei der Initialisierung des Chats beim Laden des Chatlinks.</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">You are trying to preview a chat that you were previously a member of. Do you want to join the chat again?</string>
-    <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">You are already participating in this chat.</string>
+    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Sie waren früher bereits in diesem Chat. Erneut teilnehmen?</string>
+    <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Sie sind bereits in diesem Chat</string>
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is no longer available. If you leave the preview, you won’t be able to reopen it.</string>
 
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] enabled encrypted key rotation.[/B]</string>
 
-    <string name="invalid_chat_link" context="error message shown when a chat link is invalid">This conversation is no longer available</string>
-    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid chat link</string>
+    <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Diese Unterhaltung ist nicht mehr verfügbar</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Chatlink ungültig</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Schlüsselrotation</string>
     <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chatlinks exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
 
     <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chatlinks exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
-    <string name="action_open_chat_link" context="Menu item">Open chat link</string>
+    <string name="action_open_chat_link" context="Menu item">Chatlink öffnen.</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">Die Einladung an %s wurde bereits verschickt und kann unter "Gesendete Anfragen" verwaltet werden.</string>
 
@@ -2240,7 +2260,7 @@
     <string name="billed_monthly_text" context="option of billing period, monthly">[A]Monatliche Zahlung[/A] %s pro Monat</string>
     <string name="billed_yearly_text" context="option of billing period, yearly">[A]Jährliche Zahlung[/A] %s pro Jahr</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">Abbrechen</string>
-    <string name="button_continue" context="dialog option continue in alert dialog">Fortsetzen</string>
+    <string name="button_continue" context="dialog option continue in alert dialog">Fortfahren</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (monatliche/jährliche Zahlung)</string>
     <string name="payment_method_credit_card" context="one of the payment methods">[A]Kreditkarte[/A] (monatliche/jährliche Zahlung)</string>
@@ -2255,6 +2275,15 @@
 
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Letzte Online-Zeit verfügbar machen</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Erlauben Sie Ihren Kontakten, den Zeitpunkt zu sehen, an dem Sie zuletzt online waren</string>
+
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Nicht genügend freier Speicherplatz.</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Nicht genügend freier Speicherplatz für die Videokomprimierung.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Komprimiertes Video zu groß</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">Die Größe der zu komprimierenden Videos übersteigt %s - bitte laden Sie Ihr Gerät.</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Diese Einstellung wird bei dem nächsten Kamera-Upload wirksam</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s komprimiert</string>
+	<string name="title_compress_video" context="notification title when compressing video">Videokomprimierung %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Der gewählte Ordner ist ungültig</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d Datei</item>
@@ -2290,27 +2319,26 @@
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Geben Sie vor der Erstellung des Chatlinks zunächst eine Beschreibung des Chats ein:</string>
 
-    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat link copied to the clipboard</string>
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chatlink in die Zwischenablage kopiert.</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Ab[/A] %s pro [A]Monat[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Abonnements können vor der nächsten Fälligkeit jederzeit storniert werden</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Gespräch aktiv</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL-Schlüssel ungültig</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA kann keine gesicherte SSL-Verbindung aufbauen. Möglicherweise müssen Sie sich zunächst in den WLAN-Hotspot einloggen.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">Ihre SSL-Verbindung zu den MEGA-Servern wurde manipuliert. Bitte prüfen Sie, ob Ihr WLAN-Hotspot einen Login erfordert.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Keine [/B][A]Benachrichtigungen[/A][B].[/B]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">MEGA konfigurieren</string>
-    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA needs access to your photos, media and files so you are able to share them with friends, exchange encrypted messages and make secure calls.</string>
-    <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Allow access to photos, media and files.</string>
-    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">To share photos, media and files MEGA needs your permission.</string>
-    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Allow access to your camera to scan documents, take pictures and make video calls.</string>
-    <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Allow access to your microphone to make encrypted calls.</string>
-    <string name="general_enable_access" context="General enable access">Enable access</string>
+    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA benötigt Zugriff auf Ihre Fotos und (Medien-)dateien, damit Sie diese hochladen und versenden können.</string>
+    <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Zugriff auf Fotos und (Medien-)dateien erlauben.</string>
+    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">Für das Versenden von Fotos und (Medien-)dateien benötigt MEGA Ihre Erlaubnis.</string>
+    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Kamera aktivieren</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Kamerazugriff für Dokumentenscanning, Fotos und Videoanrufe freigeben.</string>
+    <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Anrufe aktivieren</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Zugriff auf das Mikrofon für verschlüsselte Anrufe freigeben.</string>
+    <string name="general_enable_access" context="General enable access">Zugriff freigeben</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Freigegebene Dateien</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Anhang schon versandt</string>
@@ -2329,36 +2357,36 @@
         <item context="more seconds" quantity="other">[B]%1$d Sekunden[/B]</item>
     </plurals>
 
-    <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">Zuletzt online: Heute %1$s</string>
-    <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it's been a long time ago that we don't see any activity from that user">[A]Last seen [/A]a long time ago</string>
-    <string name="last_seen_general" context="String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. ">Zuletzt online: %1$s %2$s</string>
+    <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]Zuletzt online:[/A]heute %1$s</string>
+    <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it's been a long time ago that we don't see any activity from that user">[A]Zuletzt online [/A]vor sehr langer Zeit</string>
+    <string name="last_seen_general" context="String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. ">[A]Zuletzt online: [/A]%1$s %2$s</string>
 
     <string name="label_today" context="label today">Heute</string>
     <string name="label_yesterday" context="label yesterday">Gestern</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Keine [/B][A]Dateien[/A][B] empfangen.[/B]</string>
 
-    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s joined the call</string>
-    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s left the call</string>
+    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s ist der Konferenz beigetreten</string>
+    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s hat die Konferenz verlassen</string>
 
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Diese Konferenz hat die maximale Teilnehmerzahl erreicht. Sie können derzeit nicht teilnehmen.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Die maximale Anzahl von Video-Teilnehmern ist erreicht, bitte beschränken Sie sich auf Audio.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Fehler: Die Datei konnte nicht geöffnet werden.</string>
-    <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Incoming call&#8230;</string>
+    <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Eingehener Anruf&#8230;</string>
     <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">Es wird angerufen:</string>
 
-    <string name="error_meta_message_invalid" context="Content of a invalid meta message">Message contains invalid metadata</string>
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message">Nachricht enthält ungültige Metadaten</string>
 
-    <string name="title_activity_maps" context="Title of the activity that sends a location">Send Location</string>
-    <string name="current_location_label" context="Label layout on maps activity that permits send current location">Send your current location</string>
-    <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">Send your current location: [A]%1$s[/A]</string>
-    <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">Nearby places</string>
-    <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">This location will be opened using a third party maps provider outside the end-to-end encrypted MEGA platform.</string>
-    <string name="title_marker_maps" context="Title of the location marker set by the user">Send This Location</string>
-    <string name="no_places_found" context="Label shown when after a maps search and no places were found">No places were found</string>
-    <string name="gps_disabled" context="Title of the dialog shown when the location is disabled">The GPS is disabled</string>
-    <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">Would you like to open the location settings?</string>
+    <string name="title_activity_maps" context="Title of the activity that sends a location">Standort senden</string>
+    <string name="current_location_label" context="Label layout on maps activity that permits send current location">Standort versenden</string>
+    <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">Standort versenden: [A]%1$s[/A]</string>
+    <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">Orte in der Nähe</string>
+    <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">Der Standort wird mit einer Dritt-App außerhalb der sicheren MEGA-Umgebung angezeigt. Bitte beachten Sie mögliche Konsequenzen für die Privatsphäre der betroffenen Personen.</string>
+    <string name="title_marker_maps" context="Title of the location marker set by the user">Diesen Ort senden</string>
+    <string name="no_places_found" context="Label shown when after a maps search and no places were found">Keine Orte gefunden</string>
+    <string name="gps_disabled" context="Title of the dialog shown when the location is disabled">GPS deaktiviert</string>
+    <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">Ortseinstellungen öffnen?</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
@@ -2367,49 +2395,49 @@
         <item context="version items" quantity="other">Nachrichten weitergeleitet</item>
     </plurals>
 
-    <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Pinned Location</string>
-    <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">From File System</string>
+    <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Standort</string>
+    <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">Aus dem Dateisystem</string>
 
     <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
-        <item context="Singular of file. 1 file" quantity="one">%d file was not sent to %d chats</item>
-        <item context="Plural of file. 2 files" quantity="other">%d files were not sent to %d chats</item>
+        <item context="Singular of file. 1 file" quantity="one">%d Datei wurde an %d Chats nicht verschickt</item>
+        <item context="Plural of file. 2 files" quantity="other">%d Dateien wurden an %d Chats nicht verschickt</item>
     </plurals>
 
     <plurals name="num_contacts_not_send" context="Alert shown when a num of contacts have not been sent because of any error occurs">
-        <item context="Singular of file. 1 file" quantity="one">%d contact was not sent to %d chats</item>
-        <item context="Plural of file. 2 files" quantity="other">%d contacts were not sent to %d chats</item>
+        <item context="Singular of file. 1 file" quantity="one">%d Kontakt wurde an %d Chats nicht verschickt</item>
+        <item context="Plural of file. 2 files" quantity="other">%d Kontakte wurden an %d Chats nicht verschickt</item>
     </plurals>
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
-        <item context="Singular of file. 1 file" quantity="one">%d message was not sent to %d chats</item>
-        <item context="Plural of file. 2 files" quantity="other">%d messages were not sent to %d chats</item>
+        <item context="Singular of file. 1 file" quantity="one">%d Nachricht wurde an %d Chats nicht verschickt</item>
+        <item context="Plural of file. 2 files" quantity="other">%d Nachrichten konnten nicht an %d Chats versandt werden</item>
     </plurals>
 
-    <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
+    <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">Der Inhalt wurde an %d Chats nicht verschickt</string>
 
-    <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created successfully</string>
+    <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">Neuer Gruppenchat erstellt</string>
     <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">Dateien werden vorbereitet</string>
-    <string name="sent_as_message" context="Label indicating some content has been sent as message">Sent as a message.</string>
+    <string name="sent_as_message" context="Label indicating some content has been sent as message">Als Nachricht verschickt.</string>
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Die Datei konnte nicht versandt werden</string>
-    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]No[/A] [B]Items[/B]</string>
+    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]Keine[/A] [B]Einträge[/B]</string>
 
     <string name="delete_versions" context="Action delete all file versions">Delete previous versions</string>
-    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete previous versions?</string>
-    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Please note that the current file will not be deleted.</string>
-    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Previous versions deleted.</string>
-    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Previous versions not deleted.</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Ältere Versionen löschen?</string>
+    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Die aktuelle Version jeder Datei bleibt erhalten.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Ältere Versionen gelöscht</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Ältere Versionen nicht gelöscht</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
-        <item context="version item" quantity="one">%d version deleted successfully</item>
-        <item context="version items" quantity="other">%d versions deleted successfully</item>
+        <item context="version item" quantity="one">%d Version gelöscht</item>
+        <item context="version items" quantity="other">%d Versionen gelöscht</item>
     </plurals>
 
     <plurals name="versions_not_deleted" formatted="false" context="Alert shown when some versions are not deleted successfully">
         <item context="version item" quantity="one">%d version not deleted</item>
-        <item context="version items" quantity="other">%d versions not deleted</item>
+        <item context="version items" quantity="other">%d Versionen nicht gelöscht</item>
     </plurals>
 
-    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
+    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Sie haben noch keine Kontakte. Bitte laden Sie Freunde, Bekannte oder Kollegen über über den Bereich Kontakte ein.</string>
 
     <string name="title_tour_one" context="Title of first tour screen">Sie sind der alleinige Inhaber Ihrer Schlüsel</string>
     <string name="content_tour_one" cotext="Content of first tour screen">Die Sicherheit Ihrer Daten ist unsere Existenzgrundlage. Dank Ende-zu-Ende-Verschlüsselung kontrollieren Sie alleine, wer Zugang zu ihnen erhält.</string>
@@ -2425,78 +2453,99 @@
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Passwort nicht korrekt, bitte versuchen Sie es noch einmal.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">Ungültiges Passwort.</string>
 
-    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">It is not possible to open the file. It is an unknown file type or it has not been possible to unzip the file successfully.</string>
+    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">Die Datei konnte nicht geöffnet weden. Der Dateityp wird nicht unterstützt, oder die Dekomprimierung ist fehlgeschlagen.</string>
 
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">Sie können während eines laufenden Anrufs keine Mediendateien abspielen</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Laufendes Gespräch</string>
-    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s started a group call. Tap to join.</string>
-    <string name="call_in_progress_layout" context="Title of the layout to return to a call">Tap to return to call</string>
+    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s hat eine Konferenz begonnen. Zur Teilnahme tippen.</string>
+    <string name="call_in_progress_layout" context="Title of the layout to return to a call">Zum Gespräch zurückkehren</string>
 
-    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] joined the group chat.[/B]</string>
+    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] ist dem Gruppenchat beigetreten.[/B]</string>
 
     <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the chat link once it has been removed.</string>
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a chat link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a chat link?</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Neuen Gruppenchat erstellen und Chatlink exportieren?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chatlinks exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
 
-    <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">You have joined the chat successfully.</string>
+    <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">Sie sind dem Chat erfolgreich beigetreten</string>
 
-    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d of %2$d</string>
+    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d von %2$d</string>
 
-    <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
+    <string name="hint_action_search" context="Hint of the Search view">Suche&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Annehmen</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignorieren</string>
-    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Starting audio call&#8230;</string>
-    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Starting video call&#8230;</string>
-    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s muted this call</string>
-    <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
+    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s hat diesen Anruf stummgeschaltet</string>
+    <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Stummgeschaltet</string>
 
     <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File already downloaded. Copied to the selected path.</string>
 
-    <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Join call</string>
-    <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">To join this call you have to end your current call.</string>
+    <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">An Konferenz teilnehmen</string>
+    <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">Um an dieser Konferenz teilnehmen zu können, müssen Sie zunächst auflegen.</string>
 
-    <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Enter chat link</string>
+    <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Chatlink eingeben</string>
 
-    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
-    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
-    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
-    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
-    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Link einfügen</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Ungültiger Datei- oder Ordnerlink</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Bitte geben Sie einen gültigen Datei- oder Ordnerlink ein</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Bitte geben Sie einen gültigen Chatlink ein</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">Sie haben einen Chatlink eingefügt</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">Sie haben einen Kontaktlink eingefügt</string>
+    <string name="action_open_contact_link" context="Menu item">Kontaktlink öffnen</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">Über diesen Link können Dritte der Unterhaltung beitreten</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">Neuer Chatlink</string>
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">Benennen Sie den Gruppenchat</string>
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">Link-Export ist nur für Chats mit gesetztem Titel erlaubt.</string>
-    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
+    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Laden Sie Kontakte ein und kommunizieren Sie sicher mit MEGAs Ende-zu-Ende-Verschlüsselung.</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">Kein Chatlink verfügbar.</string>
-    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chat link deleted successfully.</string>
+    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chatlink erfolgreich gelöscht</string>
 
-    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (ACCEPTED)</string>
-    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (DELETED)</string>
-    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (DENIED)</string>
-    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (IGNORED)</string>
-    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REMINDED)</string>
-    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
+    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (akzeptiert)</string>
+    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (gelöscht)</string>
+    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (verweigert)</string>
+    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (ignoriert)</string>
+    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (erneut angefragt)</string>
+    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (noch unbeantwortet)</string>
 
-    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">This voice clip is not available</string>
+    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Gedrückt halten zur Aufnahme, loslassen zum Versenden</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Abbrechen</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">Die Sprachnachricht ist nicht verfügbar</string>
 
 	<plurals name="file_already_downloaded">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d Datei bereits heruntergeladen.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d Dateien bereits heruntergeladen.&#160;</item>
 	</plurals>
 
 	<plurals name="file_pending_download">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">Noch %d Datei.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d Dateien in der Warteschlange</item>
 	</plurals>
 
-    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
-    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
+    <string name="recents_label" context="Label to reference a recents section">Neue/Geänderte Dateien</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 Bild und 1 Video</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Ich</string>
+
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Sie können während eines laufenden Gesprächs keine Sprachnachricht aufzeichnen</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Fehler beim Versenden der Sprachnachricht</string>
+
+    <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Eingehender Anruf</string>
+
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Lade</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Bitte warten&#8230;</string>
+
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s Kontakte versandt.</string>
 </resources>

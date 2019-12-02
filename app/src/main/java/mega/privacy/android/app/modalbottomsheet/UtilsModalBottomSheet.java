@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.FileProvider;
 import android.util.TypedValue;
 import android.view.View;
@@ -15,15 +16,13 @@ import java.io.File;
 
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-/**
- * Created by mega on 22/06/18.
- */
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
 
 public class UtilsModalBottomSheet {
 
@@ -46,7 +45,7 @@ public class UtilsModalBottomSheet {
         else {
             for (int i = 0; i < numOptions; i++) {
                 if (items_layout.getChildAt(i).getVisibility() == View.VISIBLE && peekHeight < heightScreen) {
-                    log("Child i: " + i + " is visible; peekHeight: " + peekHeight + " heightScreen: " + heightScreen + " heightChild: " + heightChild);
+                    logDebug("Child i: " + i + " is visible; peekHeight: " + peekHeight + " heightScreen: " + heightScreen + " heightChild: " + heightChild);
                     peekHeight += heightChild;
                     if (peekHeight >= heightScreen) {
                         if (items_layout.getChildAt(i + 2) != null) {
@@ -84,20 +83,20 @@ public class UtilsModalBottomSheet {
     }
 
     public static void openWith (MegaApiAndroid megaApi, Context context, MegaNode node) {
-        log("openWith");
+        logDebug("openWith");
 
         boolean isError = false;
 
         String mimeType = MimeTypeList.typeForName(node.getName()).getType();
-        log("FILENAME: " + node.getName());
+        logDebug("FILENAME: " + node.getName());
 
         Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
         mediaIntent.putExtra("HANDLE", node.getHandle());
         mediaIntent.putExtra("FILENAME", node.getName());
 
-        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation(context);
         boolean isOnMegaDownloads = false;
-        String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
+        String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
         File f = new File(downloadLocationDefaultPath, node.getName());
         if(f.exists() && (f.length() == node.getSize())){
             isOnMegaDownloads = true;
@@ -121,13 +120,13 @@ public class UtilsModalBottomSheet {
             ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             activityManager.getMemoryInfo(mi);
 
-            if(mi.totalMem> Constants.BUFFER_COMP){
-                log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+            if(mi.totalMem> BUFFER_COMP){
+                logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+                megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
             }
             else{
-                log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+                megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
             }
 
             String url = megaApi.httpServerGetLocalLink(node);
@@ -144,7 +143,7 @@ public class UtilsModalBottomSheet {
             Toast.makeText(context, context.getResources().getString(R.string.error_open_file_with), Toast.LENGTH_LONG).show();
         }
         else{
-            if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+            if (isIntentAvailable(context, mediaIntent)){
                 context.startActivity(mediaIntent);
             }
             else{
@@ -153,7 +152,11 @@ public class UtilsModalBottomSheet {
         }
     }
 
-    private static void log(String log) {
-        Util.log("UtilsModalBottomSheet", log);
+    public static boolean isBottomSheetDialogShown(BottomSheetDialogFragment bottomSheetDialogFragment) {
+        if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded()) {
+            return true;
+        }
+
+        return false;
     }
 }

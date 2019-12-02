@@ -8,7 +8,7 @@
 
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">จาก</string>
     <string name="general_yes" context="Answer for confirmation dialog.">ใช่</string>
-    <string name="general_no" context="Answer for confirmation dialog.">ไม่</string>
+    <string name="general_no" context="Answer for confirmation dialog.">ไม่ใช่</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">ยกเลิก</string>
     <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">ย้ายไปยัง</string>
     <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">คัดลอกไปยัง</string>
@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">ผิดพลาด กรุณาลองใหม่อีกครั้ง</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">ไม่มีโฟลเดอร์มีเดียสำรองอยู่ กรุณาเลือกโฟลเดอร์ใหม่</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">ไม่พบที่เก็บข้อมูลภายนอก</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">โฟลเดอร์นี้อ่านอย่างเดียว คุณไม่มีสิทธิ์อัปโหลด</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">มุมมองภาพตัวอย่าง</string>
     <string name="action_list" context="Menu item to change from grid view to list view">มุมมองรายการ</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">สำรองคีย์การกู้คืน</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">ลบคีย์การกู้คืน</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">ยกเลิกการสมัครใช้งาน</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">ไฟล์คีย์การกู้คืนถูกนำออกแล้ว</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">การสมัครใช้งานได้ถูกยกเลิกแล้ว</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">เราไม่สามารถยกเลิกการสมัครรับข้อมูลของคุณได้ กรุณาติดต่อ support&#64;mega.nz เพื่อขอความช่วยเหลือ</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">ปิดเซสชั่นอื่นๆ</string>
@@ -169,7 +169,7 @@
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Are you sure that you want to cancel the current login process?</string>
 
     <string name="login_text" context="Login button">เข้าสู่ระบบ</string>
-    <string name="email_text" context="email label">อีเมล์</string>
+    <string name="email_text" context="email label">อีเมล</string>
     <string name="password_text" context="password label">รหัสผ่าน</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">ยืนยันรหัสผ่าน</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">เปิดใช้งานบัญชี</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">กำลังเตรียมการรายการไฟล์</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">กรุณาลงชื่อเข้าใช้เพื่อแชร์กับ MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">ลิงก์ยืนยันของคุณใช้ไม่ได้อีกต่อไป บัญชีของคุณอาจถูกเปิดใช้งานหรือคุณอาจยกเลิกการลงทะเบียนแล้ว</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -230,7 +231,8 @@
     <string name="cancel_transfer_confirmation">ลบการถ่ายโอนนี้หรือไม่</string>
     <string name="cancel_all_transfer_confirmation">ลบการถ่ายโอนทั้งหมดหรือไม่</string>
 
-    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">คลาวด์ไดร์ฟ</string>
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">คลาวด์ไดรฟ์</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">เมื่อเร็ว ๆ นี้</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">การอัปโหลดมีเดีย</string>
     <string name="section_inbox" context="title of the screen that show the inbox">กล่องขาเข้า</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">บันทึกออฟไลน์</string>
@@ -265,7 +267,7 @@
     <!--
     <string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
     -->
-    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">โฟล์เดอร์ว่าง</string>
+    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">โฟลเดอร์ว่างเปล่า</string>
 
     <string name="choose_account_fragment" context="Title of the fragment Choose Account">เลือกบัญชี</string>
 
@@ -280,9 +282,8 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">ขนาด</string>
-    <string name="file_properties_info_modified" context="when was the file modified">วันที่แก้ไข</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">แก้ไขล่าสุด</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">วันที่เพิ่ม</string>
-    <string name="file_properties_info_created" context="when the file was created">วันที่สร้าง</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -376,7 +377,7 @@
     -->
     <string name="context_move_to_trash" context="menu item">ย้ายไปที่ถังขยะ</string>
     <string name="context_delete_from_mega" context="menu item">นำออกจาก MEGA</string>
-    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">ชื่อโฟลเดอร์</string>
+    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">ชื่อโฟล์เดอร์</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">อีเมลรายการติดต่อ</string>
     <string name="context_creating_folder" context="status dialog when performing the action">กำลังสร้างโฟลเดอร์</string>
     <!--
@@ -498,12 +499,12 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">การสมัครสมาชิกของคุณยังไม่ถูกยกเลิก กรุณาระบุเหตุผลในการยกเลิกของคุณ</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">โฟลเดอร์นี้เป็นส่วนตัว</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">แชร์ได้ถูกลบออกอย่างถูกต้องแล้ว</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">โฟลเดอร์ใหม่</string>
-    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">เพิ่มรายการติดต่อ</string>
+    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">เพิ่มผู้ติดต่อ</string>
     <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">เพิ่มรายชื่อผู้ติดต่อและแชร์</string>
     <!--
     <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download from MEGA link</string>
@@ -612,6 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">ยังไม่ได้ดาวน์โหลดตัวอย่าง กรุณารอสักครู่</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">The preview is not able to load due to insufficient memory available. Please try again later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">กรุณาออกจากระบบก่อนที่จะสร้างบัญชี</string>
 
@@ -632,7 +634,7 @@
     <string name="menu_take_picture" context="menu item">ถ่ายภาพ</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi เท่านั้น</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลเครือข่ายโทรศัพท์</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลมือถือ</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">ตกลง</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">ข้าม</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">หยุด</string>
@@ -642,6 +644,8 @@
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">อัปโหลดไฟล์ในโฟลเดอร์ของสื่อ</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Uploads</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -649,6 +653,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">ที่เก็บข้อมูล</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">ล็อก PIN</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">ขั้นสูง</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">เคลียร์แคช</string>
@@ -685,7 +690,7 @@
     <string name="settings_empty_folder" context="settings option">เลือกโฟลเดอร์</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลเครือข่ายโทรศัพท์</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลมือถือ</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi เท่านั้น</item>
     </string-array>
 
@@ -698,6 +703,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">เมื่อชาร์จเท่านั้น</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to actively charge my device</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">เก็บชื่อไฟล์เป็นชื่อตามการตั้งค่าของเครื่อง</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">ตำแหน่งที่ตั้งของโฟลเดอร์กล้องถ่ายรูป</string>
@@ -752,7 +758,7 @@
     <string name="april">เมษายน</string>
     <string name="may">พฤษภาคม</string>
     <string name="june">มิถุนายน</string>
-    <string name="july">กรกฎาคม</string>
+    <string name="july">กรกฏาคม</string>
     <string name="august">สิงหาคม</string>
     <string name="september">กันยายน</string>
     <string name="october">ตุลาคม</string>
@@ -928,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">ผิดพลาด ชื่อบัญชีนี้ได้ถูกใช้งานไปแล้ว</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">คุณมีการยืนยันลิงก์คำขอสำหรับอีเมลแล้ว</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">อีเมลใหม่และอีเมลเก่าต้องไม่ตรงกัน</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">นี่เป็นขั้นตอนสุดท้ายในการเปลี่ยนอีเมลของคุณ กรุณากรอกรหัสผ่านของคุณด้านล่าง</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">เปลี่ยนอีเมล</string>
 
@@ -965,7 +974,7 @@
 
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">จัดการลิงก์</string>
 
-    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">รหัสผ่านปัจจุบันของคุณไม่ถูกต้อง</string>
+    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">รหัสผ่านปัจจุบันที่คุณกรอกไม่ถูกต้อง.</string>
 
     <string name="number_correctly_reinvite_contact_request" context="success message when reinviting multiple contacts">%d ส่งคำขอใหม่เรียบร้อยแล้ว</string>
 
@@ -998,6 +1007,8 @@
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">ลิงก์ไฟล์ไม่พร้อมใช้งาน</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">ลิงก์ไฟล์ถูกลบ เนื่องจากมีการละเมิด ToS/AUP</string>
+
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">URL นี้เสียหายหรือผิดรูปแบบ ไม่มีลิงก์ที่คุณพยายามเข้าถึง</string>
 
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">กำลังรอการยืนยันทางอีเมล</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">กรุณาตรวจสอบอีเมลของคุณและคลิกที่ลิงก์เพื่อยืนยันการเปิดบัญชีของคุณ</string>
@@ -1076,6 +1087,9 @@
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">ลบรายชื่อติดต่อออกจากโฟลเดอร์ที่แชร์แล้วอย่างถูกต้อง %d ราย</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;และไม่สามารถลบรายชื่อติดต่อทั้งหมด %d รายได้</string>
 
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Successfully updated permissions for %d contacts</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Failed to update permissions for %d contacts</string>
+
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">กำลังโหลดรายชื่อจากโทรศัพท์&#8230;</string>
 
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">ส่งคำขอเชิญ %d คำขอเรียบร้อยแล้ว</string>
@@ -1146,7 +1160,7 @@
 
     <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">ลบ %s ออกจากการสนทนานี้หรือไม่</string>
 
-    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">อ่านเท่านั้น</string>
+    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">อ่านอย่างเดียว</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1283,7 +1297,7 @@
     <string name="available_space" context="Label in section the storage tab in My Account Section">ใช้ได้</string>
     <string name="not_available" context="Label in section the storage tab in My Account Section when no info info is received">ไม่สามารถใช้ได้</string>
 
-    <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">ยังไม่มีรอบบิล</string>
+    <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">ไม่มีรอบบิล</string>
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]จาก %2$s[/A]</string>
 
@@ -1338,6 +1352,7 @@
         <item context="Plural" quantity="other">ไฟล์ %1$d จาก %2$d ไฟล์</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Process is finishing&#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">ดู</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">หยุดการถ่ายโอนทั้งหมดชั่วคราว</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">ดำเนินการถ่ายโอนต่อทั้งหมด</string>
@@ -1489,7 +1504,7 @@
     <string name="no_files_selected_warning">ไม่มีไฟล์ที่เลือก</string>
 
     <string name="attachment_upload_panel_from_cloud">จากคลาวด์ไดรฟ์</string>
-    <string name="attachment_upload_panel_contact">รายการติดต่อ</string>
+    <string name="attachment_upload_panel_contact">ผู้ติดต่อ</string>
     <string name="attachment_upload_panel_photo">จากอุปกรณ์</string>
 
     <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">ยกเลิกบัญชี</string>
@@ -1502,7 +1517,7 @@
     <string name="file_properties_shared_folder_public_link_name">ลิงก์</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">เข้าถึงแบบเต็มที่</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">อ่านเท่านั้น</string>
+    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">อ่านอย่างเดียว</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">อ่านและเขียน</string>
 
     <string name="attachment_uploading_state_uploading">กำลังอัปโหลด&#8230;</string>
@@ -1788,7 +1803,8 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">อัปโหลดไฟล์ไปยังแชท</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">คุณภาพไฟล์มีเดีย</string>
-
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Quality</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Original quality</item>
         <item context="the options of medium quality multimedia file to  upload.">Medium quality</item>
@@ -1848,7 +1864,7 @@
     <string name="proceed_to_logout" context="Option that permits user logout">ดำเนินการเพื่อออกจากระบบ</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">คีย์สำหรับกู้คืน</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">บันทึกในระบบไฟล์</string>
-    <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">คัดลอกไปยังคลิปบอร์ดเรียบร้อยแล้ว</string>
+    <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">คัดลอกไปยังคลิปบอร์ดแล้ว</string>
 
     <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">ข้ามไปที่ล่าสุด</string>
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">ข้อความใหม่</string>
@@ -1937,7 +1953,7 @@
     <string name="explain_qr_seed_2fa_2" context="Text that explain how to do with Two-Factor Authentication seed">อย่าลืมสำรองรหัสนี้ไว้ในที่ปลอดภัย ในกรณีที่คุณทำอุปกรณ์ของคุณหาย</string>
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">กรุณากรอกรหัส 6 หลักที่สร้างโดยแอปตัวรับรองความถูกต้องของคุณ</string>
     <string name="general_verify" context="Text button">ตรวจสอบ</string>
-    <string name="general_next" context="Text button">ถัดไป</string>
+    <string name="general_next" context="Text button">ต่อไป</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">เกิดข้อผิดพลาดในการสร้างรหัสหรือคิวอาร์โค้ด กรุณาลองอีกครั้ง</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">เปิดใช้งานการรับรองความถูกต้องด้วยสองปัจจัยแล้ว</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">ครั้งต่อไปที่คุณลงชื่อเข้าใช้บัญชีของคุณ ระบบจะขอให้คุณกรอกรหัส 6 หลักที่ได้รับจากแอปตัวรับรองความถูกต้องของคุณ</string>
@@ -2131,9 +2147,13 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">ระยะเวลาขั้นต่ำ 7 วัน</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">ระยะเวลาขั้นต่ำคือ 7 วันและระยะเวลาสูงสุดของคุณคือ 30 วัน</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">ลบไฟล์ที่เก่ากว่า</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d วัน</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notify me when size is larger than</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to compress are larger than</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">หากต้องการปิดใช้งานตัวกำหนดเวลาทำความสะอาดถังขยะหรือตั้งระยะเวลาเก็บรักษาที่นานขึ้น คุณต้องสมัครแผน PRO</string>
 
@@ -2256,6 +2276,15 @@
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">แสดงดูครั้งล่าสุด&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">อนุญาตให้ผู้ติดต่อของคุณเห็นว่า เป็นครั้งสุดท้ายที่คุณใช้งาน MEGA</string>
 
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Not enough storage space</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video compression.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">The total size of the videos to compress exceeds %s, please put your device on charge to continue.</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">This setting will take effect the next time Camera Uploads runs</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
+	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
+
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d ไฟล์</item>
         <item context="Plural of file. 2 files" quantity="other">%d ไฟล์</item>
@@ -2297,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">เริ่มการโทร</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">ข้อผิดพลาดคีย์ SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA ไม่สามารถเชื่อมต่ออย่างปลอดภัยผ่าน SSL คุณอาจใช้ WiFi สาธารณะร่วมกับข้อกำหนดเพิ่มเติมอย่างอื่น</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public Wi-Fi with additional requirements.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]ไม่มี [/B][A]แจ้งเตือน[/A][B][/B]</string>
 
@@ -2308,7 +2337,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">เปิดใช้งานกล้อง</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">อนุญาตให้เข้าถึงกล้องของคุณเพื่อสแกนเอกสาร ถ่ายภาพและสนทนาทางวิดีโอ</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">เปิดใช้งานการโทร</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">อนุญาตให้เข้าถึงไมโครโฟนของคุณ เพื่อให้โทรแบบเข้ารหัสได้</string>
     <string name="general_enable_access" context="General enable access">เปิดใช้งานการเข้าถึง</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">ไฟล์ที่ใช้ร่วมกัน</string>
@@ -2447,8 +2475,6 @@
     <string name="hint_action_search" context="Hint of the Search view">ค้นหา&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">ตอบกลับ</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">ละเว้น</string>
-    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">กำลังเริ่มต้นการโทรด้วยเสียง&#8230;</string>
-    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">กำลังเริ่มสนทนาทางวิดีโอ&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s ปิดเสียงการโทรนี้</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">ปิดเสียง</string>
 
@@ -2461,8 +2487,8 @@
 
     <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
     <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please enter a valid file or folder link</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please enter a valid chat link</string>
     <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
     <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
     <string name="action_open_contact_link" context="Menu item">Open contact link</string>
@@ -2485,7 +2511,7 @@
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">This voice clip is not available</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">ดาวน์โหลดไฟล์แล้ว %d ไฟล์ &#160;</item>
@@ -2497,6 +2523,29 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">รอไฟล์ %d ไฟล์</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">เมื่อเร็ว ๆ นี้</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">รูปภาพ 1 ภาพและวิดีโอ 1 รายการ</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">ฉัน</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
+
+    <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">สายเรียกเข้า</string>
+
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">กำลังโหลด</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">กรุณารอสักครู่&#8230;</string>
+
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">ส่งแล้ว %s ผู้ติดต่อ</string>
 </resources>

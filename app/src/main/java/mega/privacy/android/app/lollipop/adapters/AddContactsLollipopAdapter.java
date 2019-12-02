@@ -2,9 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -21,21 +19,23 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.PhoneContactInfo;
-import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
-import static mega.privacy.android.app.utils.Util.getAvatarTextSize;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContactsLollipopAdapter.ViewHolderChips> implements View.OnClickListener{
 
@@ -59,7 +59,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
             super(itemView);
         }
 
-        TextView textViewName;
+        EmojiTextView textViewName;
         ImageView deleteIcon;
         RoundedImageView avatar;
         RelativeLayout itemLayout;
@@ -69,7 +69,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
 
     @Override
     public AddContactsLollipopAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder");
+        logDebug("onCreateViewHolder");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -81,8 +81,9 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
         holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
         holder.itemLayout.setOnClickListener(this);
 
-        holder.textViewName = (TextView) v.findViewById(R.id.name_chip);
+        holder.textViewName = v.findViewById(R.id.name_chip);
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
+        holder.textViewName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
 
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
         holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
@@ -96,7 +97,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
 
     @Override
     public void onBindViewHolder(AddContactsLollipopAdapter.ViewHolderChips holder, int position) {
-        log("onBindViewHolderList");
+        logDebug("onBindViewHolderList");
 
         PhoneContactInfo contact = (PhoneContactInfo) getItem(position);
         String[] s;
@@ -129,15 +130,15 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
 
     @Override
     public void onClick(View view) {
-        log("onClick");
+        logDebug("onClick");
 
         AddContactsLollipopAdapter.ViewHolderChips holder = (AddContactsLollipopAdapter.ViewHolderChips) view.getTag();
         if(holder!=null){
             int currentPosition = holder.getLayoutPosition();
-            log("onClick -> Current position: "+currentPosition);
+            logDebug("onClick -> Current position: " + currentPosition);
 
             if(currentPosition<0){
-                log("Current position error - not valid value");
+                logError("Current position error - not valid value");
                 return;
             }
             switch (view.getId()) {
@@ -148,7 +149,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
             }
         }
         else{
-            log("Error. Holder is Null");
+            logError("Error. Holder is Null");
         }
     }
 
@@ -163,27 +164,27 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
     }
 
     public void setPositionClicked(int p) {
-        log("setPositionClicked: "+p);
+        logDebug("Position clicked: " + p);
         positionClicked = p;
         notifyDataSetChanged();
     }
 
     public void setContacts (ArrayList<PhoneContactInfo> contacts){
-        log("setContacts");
+        logDebug("setContacts");
         this.contacts = contacts;
 
         notifyDataSetChanged();
     }
 
     public Object getItem(int position) {
-        log("getItem");
+        logDebug("Position: " + position);
         return contacts.get(position);
     }
 
     public Bitmap createDefaultAvatar(String fullName){
-        log("createDefaultAvatar()");
+        logDebug("createDefaultAvatar()");
 
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint paintText = new Paint();
         Paint paintCircle = new Paint();
@@ -210,8 +211,10 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
         }
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-        String firstLetter = fullName.charAt(0) + "";
-        log("Draw letter: "+firstLetter);
+        String firstLetter = ChatUtil.getFirstLetter(fullName);
+        if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+            firstLetter = " ";
+        }
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
@@ -221,9 +224,4 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
 
         return defaultAvatar;
     }
-
-    private static void log(String log) {
-        Util.log("AddContactsLollipopAdapter", log);
-    }
-
 }

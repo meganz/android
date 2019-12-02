@@ -1,6 +1,6 @@
 package mega.privacy.android.app;
 
-import mega.privacy.android.app.utils.Util;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MegaPreferences{
 	
@@ -12,6 +12,7 @@ public class MegaPreferences{
 	String camSyncLocalPath = "";
 	String camSyncFileUpload = "";
 	String camSyncTimeStamp = "";
+	String camVideoSyncTimeStamp = "";
 	String pinLockEnabled = "";
 	String pinLockCode = "";
 	String storageAskAlways = "";
@@ -22,6 +23,7 @@ public class MegaPreferences{
 	String localPathSecondaryFolder = "";
 	String megaHandleSecondaryFolder = "";
 	String secSyncTimeStamp = "";
+	String secVideoSyncTimeStamp = "";
 	String keepFileNames = "";
 	String storageAdvancedDevices = "";
 	String preferredViewList = "";
@@ -34,16 +36,28 @@ public class MegaPreferences{
 	String preferredSortOthers = "";
 	String firstTimeChat = "";
 	String smallGridCamera = "";
+	String uploadVideoQuality = "";
+	String conversionOnCharging = "";
+	private String removeGPS;
+	String chargingOnSize = "";
+	String shouldClearCameraSyncRecords;
+
 	String isAutoPlayEnabled = "";
-		
+	private String showInviteBanner = "";
+
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
 	public final static int PHOTOS_AND_VIDEOS = 1003;
-	
+	public final static int ORIGINAL = 0;
+	public final static int MEDIUM = 1;
+	public final static int CHARGING_ON_SIZE_DEFAULT = 200;
+
+
+
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
 			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String pinLockType, String preferredSortCloud, String preferredSortContacts,
-			String preferredSortOthers, String firstTimeChat, String smallGridCamera, String isAutoPlayEnabled){
+			String preferredSortOthers, String firstTimeChat, String smallGridCamera,String uploadVideoQuality,String conversionOnCharging,String chargingOnSize,String shouldClearCameraSyncRecords,String camVideoSyncTimeStamp,String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,String showInviteBanner){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -74,7 +88,15 @@ public class MegaPreferences{
 		this.preferredSortOthers = preferredSortOthers;
 		this.firstTimeChat = firstTimeChat;
 		this.smallGridCamera = smallGridCamera;
+		this.uploadVideoQuality = uploadVideoQuality;
+		this.conversionOnCharging = conversionOnCharging;
+		this.chargingOnSize = chargingOnSize;
+		this.shouldClearCameraSyncRecords = shouldClearCameraSyncRecords;
+		this.camVideoSyncTimeStamp = camVideoSyncTimeStamp;
+		this.secVideoSyncTimeStamp = secVideoSyncTimeStamp;
 		this.isAutoPlayEnabled = isAutoPlayEnabled;
+		this.removeGPS = removeGPS;
+		this.showInviteBanner = showInviteBanner;
 	}
 
 	public String getFirstTime (){
@@ -116,14 +138,21 @@ public class MegaPreferences{
 	public void setCamSyncWifi(String camSyncWifi){
 		this.camSyncWifi = camSyncWifi;
 	}
-	
-	public String getCamSyncCharging (){
-		return camSyncCharging;
-	}
-	
-	public void setCamSyncCharging(String camSyncCharging){
-		this.camSyncCharging = camSyncCharging;
-	}
+
+    public String getShouldClearCameraSyncRecords() {
+        return shouldClearCameraSyncRecords;
+    }
+
+    public void setShouldClearCameraSyncRecords(String shouldClearCameraSyncRecords) {
+        this.shouldClearCameraSyncRecords = shouldClearCameraSyncRecords;
+    }
+    //	public String getCamSyncCharging (){
+//		return camSyncCharging;
+//	}
+//
+//	public void setCamSyncCharging(String camSyncCharging){
+//		this.camSyncCharging = camSyncCharging;
+//	}
 	
 	public String getCamSyncFileUpload(){
 		return camSyncFileUpload;
@@ -183,7 +212,11 @@ public class MegaPreferences{
 		this.lastFolderUpload = lastFolderUpload;
 	}
 
-	public String getLastFolderCloud() {
+    public String getShowInviteBanner() {
+        return showInviteBanner;
+    }
+
+    public String getLastFolderCloud() {
 		if(lastFolderCloud == null || lastFolderCloud.length() == 0)
 			return null;
 		
@@ -211,15 +244,12 @@ public class MegaPreferences{
 	}
 
 	public String getMegaHandleSecondaryFolder() {
-		log("getMegaHandleSecondaryFolder "+megaHandleSecondaryFolder);
+		logDebug("getMegaHandleSecondaryFolder " + megaHandleSecondaryFolder);
 		return megaHandleSecondaryFolder;
 	}
 
 	public void setMegaHandleSecondaryFolder(String megaHandleSecondaryFolder) {
 		this.megaHandleSecondaryFolder = megaHandleSecondaryFolder;
-	}
-	private static void log(String log) {
-		Util.log("Preferences", log);
 	}
 
 	public String getSecSyncTimeStamp() {
@@ -327,7 +357,65 @@ public class MegaPreferences{
 	public void setSmallGridCamera(String smallGridCamera) {
 		this.smallGridCamera = smallGridCamera;
 	}
-    
+
+    public String getUploadVideoQuality() {
+        return uploadVideoQuality;
+    }
+
+    public void setUploadVideoQuality(String uploadVideoQuality) {
+        this.uploadVideoQuality = uploadVideoQuality;
+    }
+
+    public String getConversionOnCharging() {
+        return conversionOnCharging;
+    }
+
+    public void setConversionOnCharging(String conversionOnCharging) {
+        this.conversionOnCharging = conversionOnCharging;
+    }
+
+    public String getChargingOnSize() {
+        return chargingOnSize;
+    }
+
+    public void setChargingOnSize(String chargingOnSize) {
+        this.chargingOnSize = chargingOnSize;
+    }
+
+    public String getCamVideoSyncTimeStamp() {
+        return camVideoSyncTimeStamp;
+    }
+
+    public void setCamVideoSyncTimeStamp(String camVideoSyncTimeStamp) {
+        this.camVideoSyncTimeStamp = camVideoSyncTimeStamp;
+    }
+
+    public String getSecVideoSyncTimeStamp() {
+        return secVideoSyncTimeStamp;
+    }
+
+    public void setSecVideoSyncTimeStamp(String secVideoSyncTimeStamp) {
+        this.secVideoSyncTimeStamp = secVideoSyncTimeStamp;
+    }
+
+    public String getRemoveGPS() {
+        return removeGPS;
+    }
+
+    public void setRemoveGPS(String removeGPS) {
+        this.removeGPS = removeGPS;
+    }
+
+    @Override
+    public String toString() {
+        return "MegaPreferences{" +
+                "camSyncTimeStamp='" + camSyncTimeStamp + '\'' +
+                ", camVideoSyncTimeStamp='" + camVideoSyncTimeStamp + '\'' +
+                ", secSyncTimeStamp='" + secSyncTimeStamp + '\'' +
+                ", secVideoSyncTimeStamp='" + secVideoSyncTimeStamp + '\'' +
+                '}';
+    }
+
     public boolean isAutoPlayEnabled(){
         return Boolean.parseBoolean(isAutoPlayEnabled);
     }

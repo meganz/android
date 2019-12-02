@@ -1,14 +1,13 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/file_info_fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/file_info_fragment_container"
+    android:background="@color/black"
     android:fitsSystemWindows="true"
     android:keepScreenOn="true"
-    android:background="@color/black"
     tools:context=".lollipop.megachat.calls.ChatCallActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -21,126 +20,127 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-                <!-- Layout for group call -->
+            <!-- Layout for group call -->
+            <RelativeLayout
+                android:id="@+id/big_elements_group_call"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/black">
+
+                <!--Layout Cameras in Group call (1 - 6)-->
                 <RelativeLayout
-                    android:id="@+id/big_elements_group_call"
+                    android:id="@+id/rl_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/black">
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-                    <!--Layout Cameras in Group call (1 - 6)-->
-                    <RelativeLayout
-                        android:id="@+id/rl_recycler_view"
+                    <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
+                        android:id="@+id/recycler_view_cameras"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:layout_centerInParent="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center_vertical|center|center_horizontal"
+                        android:background="@android:color/transparent"
+                        android:horizontalSpacing="0dp"
+                        android:nestedScrollingEnabled="false"
+                        android:numColumns="auto_fit"
+                        android:scrollbars="horizontal"
+                        android:stretchMode="columnWidth"
+                        android:verticalSpacing="0dp" />
+                </RelativeLayout>
 
-                        <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
-                            android:id="@+id/recycler_view_cameras"
+                <!--Layout big Camera in Group call (7 + users)-->
+                <RelativeLayout
+                    android:id="@+id/parent_layout_big_camera_group_call"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="96dp"
+                    android:background="@android:color/transparent"
+                    android:visibility="gone">
+
+                    <!--Remote camera in Group call-->
+                    <FrameLayout
+                        android:id="@+id/fragment_big_camera_group_call"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+                    <!--Micro Video-->
+                    <ImageView
+                        android:id="@+id/micro_fragment_big_camera_group_call"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginRight="8dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_mic_off_contact"
+                        android:visibility="gone" />
+
+                    <!--Big Avatar in Group call-->
+                    <RelativeLayout
+                        android:id="@+id/rl_avatar_big_camera_group_call"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_centerInParent="true"
+                        android:background="@android:color/transparent"
+                        android:gravity="center_horizontal|center_vertical">
+
+                        <mega.privacy.android.app.components.RoundedImageView
+                            android:id="@+id/image_big_camera_group_call"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:scrollbars="horizontal"
-                            android:layout_gravity="center_vertical|center|center_horizontal"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
                             android:layout_centerInParent="true"
-                            android:background="@android:color/transparent"
-                            android:nestedScrollingEnabled="false"
-                            android:horizontalSpacing="0dp"
-                            android:verticalSpacing="0dp"
-                            android:numColumns="auto_fit"
-                            android:stretchMode="columnWidth"/>
-                    </RelativeLayout>
+                            android:scaleType="fitCenter"
+                            rounded:border_color="#4DFFFFFF"
+                            rounded:border_width="3dp"
+                            rounded:corner_radius="60dp" />
 
-                    <!--Layout big Camera in Group call (7 + users)-->
-                    <RelativeLayout
-                        android:id="@+id/parent_layout_big_camera_group_call"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="96dp"
-                        android:layout_centerHorizontal="true"
-                        android:background="@android:color/transparent"
-                        android:visibility="gone">
-
-                        <!--Remote camera in Group call-->
-                        <FrameLayout
-                            android:id="@+id/fragment_big_camera_group_call"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                            android:background="@android:color/transparent"/>
-
-                        <!--Micro Video-->
-                        <ImageView
-                            android:id="@+id/micro_fragment_big_camera_group_call"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentTop="true"
-                            android:layout_marginRight="8dp"
-                            android:layout_marginTop="8dp"
-                            android:background="@android:color/transparent"
-                            android:visibility="gone"
-                            android:src="@drawable/ic_mic_off_contact"/>
-
-                        <!--Big Avatar in Group call-->
-                        <RelativeLayout
-                            android:id="@+id/rl_avatar_big_camera_group_call"
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
+                            android:id="@+id/initial_letter_big_camera_group_call"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_centerInParent="true"
-                            android:layout_width="120dp"
-                            android:layout_height="120dp"
                             android:gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent">
-
-                            <mega.privacy.android.app.components.RoundedImageView
-                                android:id="@+id/image_big_camera_group_call"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="fitCenter"
-                                android:layout_centerInParent="true"
-                                rounded:border_color="#4DFFFFFF"
-                                rounded:border_width="3dp"
-                                rounded:corner_radius="60dp" />
-                            <TextView
-                                android:id="@+id/initial_letter_big_camera_group_call"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_centerInParent="true"
-                                android:textSize="50dp"
-                                android:textColor="@color/white"
-                                android:gravity="center_horizontal|center_vertical"
-                                android:paddingBottom="3dp"
-                                android:visibility="gone"/>
-                        </RelativeLayout>
-                        <!--Micro Avatar-->
-                        <ImageView
-                            android:id="@+id/micro_avatar_big_camera_group_call"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_toRightOf="@+id/rl_avatar_big_camera_group_call"
-                            android:layout_alignTop="@+id/rl_avatar_big_camera_group_call"
-                            android:background="@android:color/transparent"
-                            android:visibility="gone"
-                            android:src="@drawable/ic_mic_off_contact"/>
+                            android:textColor="@color/white"
+                            android:textSize="50dp"
+                            android:visibility="gone" />
                     </RelativeLayout>
-                    <!--RecyclerView (7 + users)-->
+                    <!--Micro Avatar-->
+                    <ImageView
+                        android:id="@+id/micro_avatar_big_camera_group_call"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignTop="@+id/rl_avatar_big_camera_group_call"
+                        android:layout_toRightOf="@+id/rl_avatar_big_camera_group_call"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_mic_off_contact"
+                        android:visibility="gone" />
+                </RelativeLayout>
+                <!--RecyclerView (7 + users)-->
 
-                    <RelativeLayout
-                        android:id="@+id/rl_big_recycler_view"
+                <RelativeLayout
+                    android:id="@+id/rl_big_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:background="@android:color/transparent"
+                    android:visibility="gone">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/big_recycler_view_cameras"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:background="@android:color/transparent"
-                        android:visibility="gone">
-                        <android.support.v7.widget.RecyclerView
-                            android:id="@+id/big_recycler_view_cameras"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"/>
+                        android:visibility="gone" />
 
-                    </RelativeLayout>
                 </RelativeLayout>
+            </RelativeLayout>
             <!--End layout for group calls-->
 
             <!-- Background -->
@@ -156,14 +156,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
                     android:background="@android:color/transparent">
+
                     <FrameLayout
                         android:id="@+id/fragment_container_local_cameraFS"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@android:color/transparent"/>
+                        android:background="@android:color/transparent" />
                 </RelativeLayout>
 
                 <!--Remote camera FS-->
@@ -172,41 +173,44 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
                     android:background="@android:color/transparent">
+
                     <FrameLayout
                         android:id="@+id/fragment_container_remote_cameraFS"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@android:color/transparent"/>
+                        android:background="@android:color/transparent" />
                 </RelativeLayout>
 
                 <!--Big Avatar-->
                 <RelativeLayout
                     android:id="@+id/call_chat_contact_image_rl"
-                    android:layout_centerInParent="true"
                     android:layout_width="120dp"
                     android:layout_height="120dp"
-                    android:gravity="center_horizontal|center_vertical"
-                    android:background="@android:color/transparent">
+                    android:layout_centerInParent="true"
+                    android:background="@android:color/transparent"
+                    android:gravity="center_horizontal|center_vertical">
+
                     <mega.privacy.android.app.components.RoundedImageView
                         android:id="@+id/call_chat_contact_image"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
                         android:layout_centerInParent="true"
+                        android:scaleType="fitCenter"
                         rounded:border_color="#4DFFFFFF"
                         rounded:border_width="3dp"
                         rounded:corner_radius="60dp" />
-                    <TextView
+
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/call_chat_contact_image_initial_letter"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
                         android:gravity="center_horizontal|center_vertical"
-                        android:paddingBottom="3dp"
-                        android:visibility="gone"/>
+                        android:textSize="15sp"
+                        android:visibility="gone" />
                 </RelativeLayout>
 
 
@@ -218,43 +222,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/gradient_shape_callschat"
+                android:fitsSystemWindows="true"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                android:fitsSystemWindows="true">
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
                 <LinearLayout
                     android:id="@+id/toolbar_elements"
                     android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:orientation="vertical">
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/title_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
+                        android:fontFamily="sans-serif-light"
+                        android:textStyle="bold"
                         android:textSize="20sp"
                         android:maxLines="1"
-                        android:layout_marginRight="20dp"
+                        android:singleLine="true"
                         android:ellipsize="end"/>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
+
                         <TextView
                             android:id="@+id/subtitle_toolbar"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginRight="8dp"
                             android:textColor="@color/white"
-                            android:textSize="14sp"
-                            android:layout_marginRight="8dp"/>
+                            android:textSize="14sp" />
+
                         <Chronometer
                             android:id="@+id/simple_chronometer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="gone"
+                            android:layout_marginRight="8dp"
                             android:textColor="@color/white"
                             android:textSize="14sp"
-                            android:layout_marginRight="8dp"/>
+                            android:visibility="gone" />
 
                         <LinearLayout
                             android:id="@+id/ll_participants"
@@ -267,15 +276,15 @@
                                 android:id="@+id/participants_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginRight="4dp"
                                 android:textColor="@color/white"
-                                android:textSize="14sp"
-                                android:layout_marginRight="4dp"/>
+                                android:textSize="14sp" />
 
                             <ImageView
                                 android:id="@+id/participants_image"
-                                android:layout_height="18dp"
                                 android:layout_width="18dp"
-                                android:src="@drawable/ic_videocam_white"/>
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_videocam_white" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -285,33 +294,40 @@
             <RelativeLayout
                 android:id="@+id/mutate_own_call"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/call_toolbar"
-                android:gravity="center_horizontal"
+                android:layout_gravity="center_horizontal|center_vertical"
                 android:background="@drawable/gradient_shape_callschat"
+                android:gravity="center_vertical|center_horizontal"
+                android:minHeight="36dp"
                 android:visibility="gone">
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_centerInParent="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true">
+                    android:orientation="horizontal">
+
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_mutate_layout"
                         android:layout_marginRight="8dp"
-                        android:background="@null" />
+                        android:background="@null"
+                        android:gravity="center"
+                        android:src="@drawable/ic_mutate_layout" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@null"
-                        android:textColor="@color/white"
+                        android:ellipsize="end"
+                        android:fontFamily="roboto"
+                        android:gravity="center"
+                        android:maxLines="1"
                         android:text="@string/muted_own_micro"
+                        android:textAlignment="gravity"
+                        android:textColor="@color/white"
                         android:textSize="14sp"
-                        android:textStyle="normal"
-                        android:fontFamily="roboto"/>
+                        android:textStyle="normal" />
 
                 </LinearLayout>
             </RelativeLayout>
@@ -319,33 +335,46 @@
             <RelativeLayout
                 android:id="@+id/mutate_contact_call"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/call_toolbar"
-                android:gravity="center_horizontal"
+                android:layout_gravity="center_horizontal|center_vertical"
                 android:background="@drawable/gradient_shape_callschat"
-                android:visibility="gone">
+                android:gravity="center_vertical|center_horizontal"
+                android:minHeight="36dp"
+                android:paddingLeft="16dp"
+                android:paddingTop="10dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="10dp"
+                android:visibility="visible">
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_centerInParent="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true">
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_mutate_layout"
                         android:layout_marginRight="8dp"
-                        android:background="@null" />
+                        android:background="@null"
+                        android:gravity="center"
+                        android:src="@drawable/ic_mutate_layout" />
+
                     <TextView
                         android:id="@+id/text_mutate_contact_call"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@null"
+                        android:ellipsize="end"
+                        android:fontFamily="roboto"
+                        android:gravity="left"
+                        android:maxWidth="250dp"
+                        android:maxLines="3"
+                        android:singleLine="false"
+                        android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="14sp"
-                        android:textStyle="normal"
-                        android:fontFamily="roboto"/>
+                        android:textStyle="normal" />
 
                 </LinearLayout>
             </RelativeLayout>
@@ -354,15 +383,14 @@
                 android:id="@+id/info_users_bar"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
-                android:textAlignment="center"
                 android:layout_alignParentTop="true"
+                android:background="@color/accentColor"
                 android:gravity="center"
+                android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 android:textStyle="normal"
-                android:background="@color/accentColor"
-                android:visibility="gone">
-            </TextView>
+                android:visibility="gone" />
 
             <RelativeLayout
                 android:id="@+id/small_elements_individual_call"
@@ -375,18 +403,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="5dp"
+                    android:layout_marginTop="60dp"
                     android:layout_marginRight="5dp"
                     android:layout_marginBottom="110dp"
-                    android:layout_marginTop="60dp"
                     android:background="@android:color/transparent">
+
                     <FrameLayout
                         android:id="@+id/fragment_container_local_camera"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
                         android:layout_marginRight="20dp"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                        android:background="@android:color/transparent"/>
+                        android:layout_marginBottom="10dp"
+                        android:background="@android:color/transparent"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
                 </RelativeLayout>
 
                 <!--Small avatar-->
@@ -394,8 +423,8 @@
                     android:id="@+id/call_chat_my_image_rl"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="110dp"
                     android:background="@drawable/shape_call_chat">
@@ -404,257 +433,263 @@
                         android:id="@+id/call_chat_my_image"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
                         android:layout_centerInParent="true"
+                        android:scaleType="fitCenter"
                         rounded:border_color="#4DFFFFFF"
                         rounded:border_width="3dp"
                         rounded:corner_radius="40dp" />
 
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/call_chat_my_image_initial_letter"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
                         android:gravity="center_horizontal|center_vertical"
-                        android:paddingBottom="3dp" />
+                        android:textSize="15sp" />
                 </RelativeLayout>
             </RelativeLayout>
 
 
+            <!-- Buttons -->
+            <LinearLayout
+                android:id="@+id/linear_buttons_hang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/linear_buttons"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_horizontal"
+                android:background="@null"
+                android:gravity="center_horizontal">
 
-                <!-- Buttons -->
-                <LinearLayout
-                    android:id="@+id/linear_buttons_hang"
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/hang_fab"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="24dp"
+                    android:background="@null"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_w_end_call"
+                    android:visibility="gone"
+                    app:backgroundTint="@color/delete_account"
+                    app:borderWidth="0dp"
+                    app:elevation="6dp"
+                    app:fabSize="normal"
+                    app:pressedTranslationZ="12dp" />
+
+            </LinearLayout>
+
+            <!-- Buttons -->
+            <LinearLayout
+                android:id="@+id/linear_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="@null"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <FrameLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@id/linear_buttons"
-                    android:layout_centerHorizontal="true"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center_horizontal"
-                    android:background="@null">
+                    android:layout_height="match_parent"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginRight="36dp">
 
                     <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/hang_fab"
+                        android:id="@+id/speaker_fab"
                         android:layout_width="54dp"
                         android:layout_height="54dp"
-                        android:layout_gravity="bottom"
                         android:layout_marginBottom="24dp"
-                        android:scaleType="center"
-                        android:src="@drawable/ic_w_end_call"
                         android:background="@null"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_speaker_on"
                         android:visibility="gone"
-                        app:backgroundTint="@color/delete_account"
+                        app:backgroundTint="@color/accentColor"
                         app:borderWidth="0dp"
                         app:elevation="6dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
-                </LinearLayout>
-
-                <!-- Buttons -->
-                <LinearLayout
-                    android:id="@+id/linear_buttons"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:gravity="center_horizontal"
-                    android:orientation="horizontal"
-                    android:background="@null">
-
-                    <FrameLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginRight="36dp"
-                        android:layout_gravity="bottom|center_horizontal">
-
-                        <android.support.design.widget.FloatingActionButton
-                            android:id="@+id/speaker_fab"
-                            android:layout_width="54dp"
-                            android:layout_height="54dp"
-                            android:scaleType="center"
-                            android:visibility="gone"
-                            android:layout_marginBottom="24dp"
-                            android:src="@drawable/ic_speaker_on"
-                            android:background="@null"
-                            app:backgroundTint="@color/accentColor"
-                            app:borderWidth="0dp"
-                            app:elevation="6dp"
-                            app:fabSize="normal"
-                            app:pressedTranslationZ="12dp"/>
-
-                        <RelativeLayout
-                            android:id="@+id/relative_answer_call_fab"
-                            android:layout_width="54dp"
-                            android:layout_height="match_parent"
-                            android:gravity="bottom|center_horizontal"
-                            android:background="@android:color/transparent">
-
-                            <android.support.design.widget.FloatingActionButton
-                                android:id="@+id/answer_call_fab"
-                                android:layout_width="54dp"
-                                android:layout_height="54dp"
-                                android:layout_gravity="bottom"
-                                android:layout_marginBottom="24dp"
-                                android:layout_below="@+id/linear_arrow_call"
-                                android:scaleType="center"
-                                android:src="@drawable/ic_phone_white"
-                                app:backgroundTint="@color/accentColor"
-                                app:borderWidth="0dp"
-                                app:elevation="6dp"
-                                app:fabSize="normal"
-                                app:pressedTranslationZ="12dp" />
-
-                            <LinearLayout
-                                android:id="@+id/linear_arrow_call"
-                                android:layout_width="54dp"
-                                android:layout_height="wrap_content"
-                                android:layout_centerHorizontal="true"
-                                android:orientation="vertical"
-                                android:gravity="bottom|center_horizontal"
-                                android:visibility="gone"
-                                android:background="@android:color/transparent">
-                                <ImageView
-                                    android:id="@+id/first_arrow_call"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/ic_expand"
-                                    android:layout_centerInParent="true"
-                                    android:layout_marginTop="10dp"/>
-                                <ImageView
-                                    android:id="@+id/second_arrow_call"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/ic_expand"
-                                    android:layout_centerInParent="true"
-                                    android:layout_marginTop="10dp"/>
-                                <ImageView
-                                    android:id="@+id/third_arrow_call"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/ic_expand"
-                                    android:layout_centerInParent="true"
-                                    android:layout_marginTop="10dp"/>
-                                <ImageView
-                                    android:id="@+id/four_arrow_call"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/ic_expand"
-                                    android:layout_centerInParent="true"
-                                    android:layout_marginTop="10dp"/>
-                            </LinearLayout>
-
-                        </RelativeLayout>
-
-                    </FrameLayout>
-
-
                     <RelativeLayout
-                        android:id="@+id/relative_video_fab"
+                        android:id="@+id/relative_answer_call_fab"
                         android:layout_width="54dp"
                         android:layout_height="match_parent"
-                        android:layout_gravity="bottom|center_horizontal"
-                        android:layout_marginRight="36dp"
-                        android:gravity="bottom|center_horizontal"
-                        android:background="@android:color/transparent">
+                        android:background="@android:color/transparent"
+                        android:gravity="bottom|center_horizontal">
 
                         <android.support.design.widget.FloatingActionButton
-                            android:id="@+id/video_fab"
+                            android:id="@+id/answer_call_fab"
                             android:layout_width="54dp"
                             android:layout_height="54dp"
+                            android:layout_below="@+id/linear_arrow_call"
                             android:layout_gravity="bottom"
                             android:layout_marginBottom="24dp"
-                            android:layout_below="@+id/linear_arrow_video"
                             android:scaleType="center"
-                            android:src="@drawable/ic_videocam_white"
-                            android:background="@null"
+                            android:src="@drawable/ic_phone_white"
                             app:backgroundTint="@color/accentColor"
                             app:borderWidth="0dp"
                             app:elevation="6dp"
                             app:fabSize="normal"
-                            app:pressedTranslationZ="12dp"/>
+                            app:pressedTranslationZ="12dp" />
 
                         <LinearLayout
-                            android:id="@+id/linear_arrow_video"
+                            android:id="@+id/linear_arrow_call"
                             android:layout_width="54dp"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
-                            android:orientation="vertical"
+                            android:background="@android:color/transparent"
                             android:gravity="bottom|center_horizontal"
-                            android:visibility="gone"
-                            android:background="@null">
+                            android:orientation="vertical"
+                            android:visibility="gone">
 
                             <ImageView
-                                android:id="@+id/first_arrow_video"
+                                android:id="@+id/first_arrow_call"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/ic_expand"
-                                android:background="@null"
                                 android:layout_centerInParent="true"
-                                android:layout_marginTop="10dp"/>
+                                android:layout_marginTop="10dp"
+                                android:src="@drawable/ic_expand" />
+
                             <ImageView
-                                android:id="@+id/second_arrow_video"
+                                android:id="@+id/second_arrow_call"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/ic_expand"
-                                android:background="@null"
                                 android:layout_centerInParent="true"
-                                android:layout_marginTop="10dp"/>
+                                android:layout_marginTop="10dp"
+                                android:src="@drawable/ic_expand" />
+
                             <ImageView
-                                android:id="@+id/third_arrow_video"
+                                android:id="@+id/third_arrow_call"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/ic_expand"
-                                android:background="@null"
                                 android:layout_centerInParent="true"
-                                android:layout_marginTop="10dp"/>
+                                android:layout_marginTop="10dp"
+                                android:src="@drawable/ic_expand" />
+
                             <ImageView
-                                android:id="@+id/four_arrow_video"
+                                android:id="@+id/four_arrow_call"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/ic_expand"
-                                android:background="@null"
                                 android:layout_centerInParent="true"
-                                android:layout_marginTop="10dp"/>
+                                android:layout_marginTop="10dp"
+                                android:src="@drawable/ic_expand" />
                         </LinearLayout>
+
                     </RelativeLayout>
 
-                    <FrameLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="24dp"
+                </FrameLayout>
+
+
+                <RelativeLayout
+                    android:id="@+id/relative_video_fab"
+                    android:layout_width="54dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginRight="36dp"
+                    android:background="@android:color/transparent"
+                    android:gravity="bottom|center_horizontal">
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/video_fab"
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:layout_below="@+id/linear_arrow_video"
                         android:layout_gravity="bottom"
-                        android:gravity="bottom">
+                        android:layout_marginBottom="24dp"
+                        android:background="@null"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_videocam_white"
+                        app:backgroundTint="@color/accentColor"
+                        app:borderWidth="0dp"
+                        app:elevation="6dp"
+                        app:fabSize="normal"
+                        app:pressedTranslationZ="12dp" />
 
-                        <android.support.design.widget.FloatingActionButton
-                            android:id="@+id/micro_fab"
-                            android:layout_width="54dp"
-                            android:layout_height="54dp"
-                            android:layout_gravity="bottom"
-                            android:scaleType="center"
-                            android:src="@drawable/ic_record_audio_w"
+                    <LinearLayout
+                        android:id="@+id/linear_arrow_video"
+                        android:layout_width="54dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:background="@null"
+                        android:gravity="bottom|center_horizontal"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/first_arrow_video"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_marginTop="10dp"
                             android:background="@null"
-                            app:backgroundTint="@color/accentColor"
-                            app:borderWidth="0dp"
-                            app:elevation="6dp"
-                            app:fabSize="normal"
-                            app:pressedTranslationZ="12dp" />
+                            android:src="@drawable/ic_expand" />
 
-                        <android.support.design.widget.FloatingActionButton
-                            android:id="@+id/reject_fab"
-                            android:layout_width="54dp"
-                            android:layout_height="54dp"
-                            android:layout_gravity="bottom"
-                            android:scaleType="center"
-                            android:src="@drawable/ic_w_end_call"
+                        <ImageView
+                            android:id="@+id/second_arrow_video"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_marginTop="10dp"
                             android:background="@null"
-                            app:backgroundTint="@color/delete_account"
-                            app:borderWidth="0dp"
-                            app:elevation="6dp"
-                            app:fabSize="normal"
-                            app:pressedTranslationZ="12dp" />
-                    </FrameLayout>
+                            android:src="@drawable/ic_expand" />
 
-                </LinearLayout>
+                        <ImageView
+                            android:id="@+id/third_arrow_video"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_marginTop="10dp"
+                            android:background="@null"
+                            android:src="@drawable/ic_expand" />
+
+                        <ImageView
+                            android:id="@+id/four_arrow_video"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_marginTop="10dp"
+                            android:background="@null"
+                            android:src="@drawable/ic_expand" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="24dp"
+                    android:gravity="bottom">
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/micro_fab"
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:layout_gravity="bottom"
+                        android:background="@null"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_record_audio_w"
+                        app:backgroundTint="@color/accentColor"
+                        app:borderWidth="0dp"
+                        app:elevation="6dp"
+                        app:fabSize="normal"
+                        app:pressedTranslationZ="12dp" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/reject_fab"
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:layout_gravity="bottom"
+                        android:background="@null"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_w_end_call"
+                        app:backgroundTint="@color/delete_account"
+                        app:borderWidth="0dp"
+                        app:elevation="6dp"
+                        app:fabSize="normal"
+                        app:pressedTranslationZ="12dp" />
+                </FrameLayout>
+
+            </LinearLayout>
 
 
         </RelativeLayout>

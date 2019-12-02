@@ -18,7 +18,7 @@
     <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Selecteer</string>
     <string name="general_select_to_upload" context="Selecting a specific location in MEGA. This is the text of the button">Selecteer bestanden</string>
     <string name="general_select_to_download" context="Selecting a specific location in MEGA. This is the text of the button">Selecteer map</string>
-    <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Maak</string>
+    <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Creëer</string>
     <!-- This string is commented in FileStorageActivityLollipop.java
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
     -->
@@ -43,8 +43,8 @@
     <string name="general_loading" context="state previous to import a file">Laden</string>
     <string name="general_importing" context="state while importing the file">Importeren</string>
     <string name="general_forwarding" context="state while importing the file">Doorsturen</string>
-    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importeer</string>
-    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Opslagruimte</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importeren</string>
+    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Opslag</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Overdracht Tegoed</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Inschrijven</string>
     <!--
@@ -63,6 +63,8 @@
     <string name="general_show_info" context="Label of a button/notification to show info about something">Informatie weergeven</string>
 
     <string name="error_general_nodes" context="Error getting the root node">Fout. Probeer alstublieft opnieuw.</string>
+
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-HERSTELSLEUTEL</string>
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">De tweede media map bestaat niet, kies een nieuwe map</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Geen externe opslag gedetecteerd</string>
@@ -110,10 +112,8 @@
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Wis selectie</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Miniatuurweergave</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Lijstweergave</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Reservekopie Herstel sleutel</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Verwijder Herstelsleutel</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Reservekopie Herstelsleutel</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Abonnement opzeggen</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">De Herstelsleutel werd verwijderd</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Het abonnement is geannuleerd</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">We konden uw abonnement niet annuleren. Neem a.u.b. contact op met support&#64;mega.nz voor assistentie</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Sluit andere sessie</string>
@@ -168,7 +168,7 @@
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Weet u zeker dat u het huidige aanmeldingsproces wilt annuleren?</string>
 
-    <string name="login_text" context="Login button">Inloggen</string>
+    <string name="login_text" context="Login button">Login</string>
     <string name="email_text" context="email label">E-mail</string>
     <string name="password_text" context="password label">Wachtwoord</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Wachtwoord bevestigen</string>
@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Account activeren</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Bestandslijst voorbereiden</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Log in om te delen met MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Uw bevestigingskoppeling is niet langer geldig. Uw account kan al geactiveerd zijn of u kunt uw registratie geannuleerd hebben.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -231,8 +232,9 @@
     <string name="cancel_all_transfer_confirmation">Alle overdrachten verwijderen?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Schijf</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Recent</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media uploads</string>
-    <string name="section_inbox" context="title of the screen that show the inbox">Postvak IN</string>
+    <string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Opgeslagen voor Offline gebruik</string>
     <string name="section_saved_for_offline_new" context="title of the screen that shows the files saved for offline in the device">Offline</string>
     <!--
@@ -247,7 +249,7 @@
     <string name="received_requests_empty" context="the user has not received any contact request from other users">[B]Geen [/B][A]ontvangen verzoeken[/A][B].[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Overdrachten</string>
 
-    <string name="section_account" context="button to the settings of the user\'s account">Mijn account</string>
+    <string name="section_account" context="button to the settings of the user\'s account">Mijn Account</string>
     <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera uploads</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
@@ -280,9 +282,8 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Grootte</string>
-    <string name="file_properties_info_modified" context="when was the file modified">Gewijzigd</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">Laatst aangepast</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Toegevoegd</string>
-    <string name="file_properties_info_created" context="when the file was created">Gecreëerd</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -498,9 +499,9 @@
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Uw abonnement was niet geannuleerd. Geef een reden voor uw annulering</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">De map is nu privé</string>
-    <!--
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share removed</string>
-    -->
+
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Gedeelde map correct verwijderd</string>
+
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Nieuwe map</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Voeg contact toe</string>
@@ -539,7 +540,7 @@
     <string name="upload_prepare" context="Status text at the beginning of an upload">Bestand verwerken</string>
     <plurals name="upload_prepare" context="Status text at the beginning of an upload">
         <item context="Status text at the beginning of an upload for 1 file" quantity="one">Bestand verwerken</item>
-        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Bestanden verwerken</item>
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">Hulpbron tijdelijk niet beschikbaar, probeer later opnieuw</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Kan geselecteerd bestand niet openen</string>
@@ -612,6 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">De weergave was nog niet gedownload. Wacht a.u.b.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">De weergave kan niet worden geladen door dat er onvoldoende geheugen beschikbaar is. Probeer later nogmaals.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Log uit voordat u de account creëert</string>
 
@@ -631,24 +633,27 @@
 
     <string name="menu_take_picture" context="menu item">Maak een foto</string>
 
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Alleen via Wi-Fi</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele dataverbinding</string>
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Alleen Wi-Fi</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele data</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Overslaan</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload is bezig</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera uploads in behandeling</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Wilt u Camera Uploads stoppen?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Bestanden uploaden van media mappen</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Bezig met zoeken naar te uploaden bestanden</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Camera-uploads initialiseren</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera uploads voltooid</string>
 
-    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Opslagruimte</string>
+    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Opslag</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Slot</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compressie verbruikt veel stroom; MEGA vereist dat u uw apparaat actief oplaadt als de te comprimeren video\'s groter zijn dan %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Geavanceerd</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Cache wissen</string>
@@ -674,9 +679,9 @@
         <item context="import from phone option">Importeren van apparaat</item>
     </string-array>
 
-    <string name="settings_camera_upload_on" context="settings option">Schakel Camera Uploads in</string>
-    <string name="settings_camera_upload_turn_on" context="settings option">Camera uploads inschakelen</string>
-    <string name="settings_camera_upload_off" context="settings option">Schakel Camera Uploads uit</string>
+    <string name="settings_camera_upload_on" context="settings option">Camera uploads inschakelen</string>
+    <string name="settings_camera_upload_turn_on" context="settings option">Camera uploads aanzetten</string>
+    <string name="settings_camera_upload_off" context="settings option">Camera Uploads uitzetten</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Uploaden met</string>
 
     <string name="settings_secondary_upload_on" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Secundaire Media uploads inschakelen</string>
@@ -685,8 +690,8 @@
     <string name="settings_empty_folder" context="settings option">Kies een map</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele dataverbinding</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">Alleen via Wi-Fi</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele data</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Alleen Wi-Fi</item>
     </string-array>
 
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Upload Bestand</string>
@@ -698,6 +703,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Alleen tijden het laden</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Vereist dat ik mijn apparaat actief oplaad</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Behoud bestandsnamen als in het apparaat</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Lokale Camera folder</string>
@@ -727,7 +733,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Uw lokale bestanden worden verwijderd en u wordt uitgelogd na 10 mislukte pogingen</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Foutieve code</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Verkeerde PIN code, probeer nogmaals. U heeft 1 poging over</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Foute PIN code, probeer nogmaals. U heeft %2d pogingen te gaan</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Pincodes komen niet overeen</string>
@@ -738,7 +744,7 @@
     <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">All uw lokale gegevens worden verwijderd en u wordt uitgelogd over %1d seconden</string>
 
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Over</string>
-    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Privacy Policy</string>
+    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Privacybeleid</string>
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Algemene Voorwaarden</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">Applicatie versie</string>
@@ -747,17 +753,17 @@
     <string name="settings_about_code_link_title" context="Link to the public code of the app">Bekijk broncode</string>
 
     <string name="january">januari</string>
-    <string name="february">februari</string>
-    <string name="march">maart</string>
-    <string name="april">april</string>
-    <string name="may">mei</string>
-    <string name="june">juni</string>
-    <string name="july">juli</string>
-    <string name="august">augustus</string>
-    <string name="september">september</string>
-    <string name="october">oktober</string>
-    <string name="november">november</string>
-    <string name="december">december</string>
+    <string name="february">Februari</string>
+    <string name="march">Maart</string>
+    <string name="april">April</string>
+    <string name="may">Mei</string>
+    <string name="june">Juni</string>
+    <string name="july">Juli</string>
+    <string name="august">Augustus</string>
+    <string name="september">September</string>
+    <string name="october">Oktober</string>
+    <string name="november">November</string>
+    <string name="december">December</string>
 
     <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">ZIP Bestanden</string>
 
@@ -830,8 +836,8 @@
     -->
 
     <string name="pin_lock_type" context="title to choose the type of PIN code">Soort PIN-Code</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">4-cijferige pincode</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">6-cijferige pincode</string>
+    <string name="four_pin_lock" context="PIN with 4 digits">4 cijferige PIN</string>
+    <string name="six_pin_lock" context="PIN with 6 digits">6 cijferige PIN</string>
     <string name="AN_pin_lock" context="PIN alphanumeric">Alfanumerieke PIN</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs zijn niet ingeschakeld</string>
@@ -848,13 +854,13 @@
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite Account</string>
 
-    <string name="backup_title" context="Title of the screen to backup the master key">Maak een reservekopie van uw herstel sleutel</string>
-    <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Uw wachtwoord ontsluit uw Herstel Sleutel</string>
+    <string name="backup_title" context="Title of the screen to backup the master key">Uw Herstelsleutel opslaan</string>
+    <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Uw wachtwoord decodeert uw Herstelsleutel</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Uw gegevens zijn alleen leesbaar via een ketting aan decoderingsoperaties die beginnen met uw master decoderingssleutel, die we gecodeerd opslaan met uw wachtwoord. Dit betekend dat als u uw wachtwoord verliest, uw master sleutel niet langer gedecodeerd kan worden, en u uw gegevens niet langer kan decoderen.</string>
     <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Het exporteren en bewaren van de Master Key op een veilige locatie stelt u in staat om een nieuw wachtwoord in te stellen zonder het verlies van gegevens.</string>
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Een externe aanvaller kan geen toegang krijgen tot uw account met alleen de master sleutel. Om het wachtwoord te wijzigen is toegang tot de master sleutel én uw e-mail vereist.</string>
-    <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Kopieer de Herstel Sleutel naar het klembord of sla het op als tekstbestand</string>
+    <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Kopieer de Herstelsleutel naar het klembord om het op te slaan als tekstbestand</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Opslaan</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">De Herstelsleutel was succesvol gekopieerd</string>
@@ -866,13 +872,13 @@
 
     <string name="forgot_pass_menu" context="Option of the overflow menu to show the screen info to reset the password">Wachtwoord vergeten?</string>
     <string name="forgot_pass" context="Button in the Login screen to reset the password">Wachtwoord vergeten?</string>
-    <string name="forgot_pass_first_paragraph" context="First paragraph of the screen when the password has been forgotten">Als u een reservekopie heeft van uw Herstel Sleutel, kunt u uw wachtwoord opnieuw instellen door het selecteren van JA. Er zullen geen gegevens verloren gaan.</string>
+    <string name="forgot_pass_first_paragraph" context="First paragraph of the screen when the password has been forgotten">Als u een reservekopie van uw Reservesleutel heeft, kunt u uw wachtwoord resetten door JA te selecteren. Geen gegevens gaan verloren.</string>
     <string name="forgot_pass_second_paragraph" context="Second paragraph of the screen when the password has been forgotten">U kunt nog steeds uw Herstelsleutel exporteren als u nu nog steeds een actieve MEGA sessie heeft in een andere browser op deze of een andere computer. Als u dat niet heeft, kunt u niet langer uw bestaande account decoderen, maar u kunt een nieuwe beginnen onder hetzelfde e-mailadres door NEE te selecteren.</string>
     <!--
     <string name="forgot_pass_second_paragraph_logged_in" context="Second paragraph of the screen when the password has been forgotten and the user is still logged in">If you don\&apos;t, you can still export your recovery key now in this MEGA session. Please, go back and backup your recovery key.</string>
     -->
 
-    <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">Heeft u een reservekopie van uw coderingssleutel?</string>
+    <string name="forgot_pass_action" context="Sentence to ask to the user if he has the master key in the screen when the password has been forgotten">Heeft u een reservekopie van uw Herstelsleutel?</string>
 
     <string name="title_alert_reset_with_MK" context="Title of the alert message to ask for the link to reset the pass with the MK">Geweldig!</string>
     <string name="edit_text_insert_mail" context="Hint of the text where the user can write his e-mail">e-mail vertrekt hier</string>
@@ -905,7 +911,7 @@
     <string name="park_account_dialog_title" context="Title of the dialog to park an account">Parkeer account</string>
     <string name="park_account_button" context="Button to park an account">Parkeren</string>
     <string name="park_account_title" context="Title of the screen to park an account">Oeps!</string>
-    <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">Door onze eind-tot-eind coderingsparadigma, zult u niet in staat zijn om toegang tot uw gegevens te verkrijgen zonder uw wachtwoord of een reservekopie van uw coderingssleutel.</string>
+    <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">Door onze eind-tot-eind encryptie paradigma, heeft u geen toegang tot uw gegevens zonder uw wachtwoord of een reservekopie van uw Herstelsleutel.</string>
     <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">U kunt uw bestaande account parkeren en een nieuwe starten onder hetzelfde e-mailadres. Uw gegevens zullen worden bewaard voor tenminste 60 dagen. Wanneer u het wachtwoord van uw geparkeerde account herinnert, neem dan alstublieft contact op met support&#64;mega.nz</string>
 
     <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">Vul alstublieft hieronder uw e-mail adres in. U ontvangt een herstel koppeling die u de mogelijkheid biedt om uw account te parkeren.</string>
@@ -928,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Fout. Dit e-mailadres is al in gebruik.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">U heeft al een bevestigingskoppeling voor dat e-mailadres gevraagd.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">Het nieuwe en het oude e-mailadres mogen niet hetzelfde zijn.</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Dit is de laatste stap om uw e-mail te wijzigen. Vul alstublieft hieronder uw wachtwoord in.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">E-mailadres wijzigen</string>
 
@@ -943,8 +952,8 @@
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Kies afbeelding</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Verwijder afbeelding</string>
 
-    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">De sleutel die u geeft, komt niet overeen met dit account. Zorg er alstublieft voor dat u de juiste coderingssleutel gebruikt en probeer het opnieuw.</string>
-    <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">Ongeldige herstel sleutel</string>
+    <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">De sleutel die gegeven werd komt niet overeen met dit account. Zorg ervoor dat u de juiste Herstelsleutel gebruikt en probeer nogmaals.</string>
+    <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">Ongeldige Herstelsleutel</string>
 
     <string name="option_full_link" context="Alert Dialog to get link">Koppeling met code</string>
 
@@ -998,6 +1007,8 @@
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Bestandskoppeling onbeschikbaar</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">De bestandskoppeling werd verwijderd vanwege een schending van onze Algemene Voorwaarden.</string>
+
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">Deze URL is corrupt of misvormd. De koppeling die u wilt bereiken bestaat niet.</string>
 
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">In afwachting op email bevestiging.</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Check uw email en klik op de koppeling in het bericht om uw account te bevestigen.</string>
@@ -1074,7 +1085,10 @@
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacten worden verwijderd van de gedeelde map</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacten correct verwijderd van de gedeelde map</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;en %d contacten waren niet succesvol verwijderd</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacten waren niet succesvol verwijderd</string>
+
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Machtigingen bijgewerkt voor %d contacten</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Bijwerken van %d contacten mislukt</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Contacten laden van de telefoon&#8230;</string>
 
@@ -1146,7 +1160,7 @@
 
     <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">Wilt u %s van deze chat verwijderen?</string>
 
-    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Alleen Lezen</string>
+    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Alleen lezen</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1271,8 +1285,8 @@
     <string name="label_more" context="button label more">Meer</string>
     <string name="label_close" context="button label Close">Sluit</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">Algemeen</string>
-    <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Opslagruimte</string>
-    <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Opslagruimte</string>
+    <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Opslag</string>
+    <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Opslag</string>
     <string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">Overdracht tegoed</string>
     <string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">Overdracht tegoed</string>
 
@@ -1338,6 +1352,7 @@
         <item context="Plural" quantity="other">%1$d of %2$d bestanden</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Het proces is afgelopen &#8230;</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Weergeven</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pauzeer alle transfers</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Alle overdrachten hervatten</string>
@@ -1434,7 +1449,7 @@
     </plurals>
 
     <string name="general_view" context="Menu option">Bestanden weergeven</string>
-    <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importeer</string>
+    <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Importeren</string>
     <string name="save_for_offline" context="Menu option">Opslaan voor offline</string>
 
     <string name="general_view_contacts" context="Menu option">Contacten weergeven</string>
@@ -1452,7 +1467,7 @@
 
     <string name="copyright_alert_title" context="text_copyright_alert_title">Waarschuwing over auteursrechten aan alle gebruikers</string>
     <string name="copyright_alert_first_paragraph" context="text_copyright_alert_first_paragraph">MEGA respecteert het auteursrecht van anderen en eist dat de gebruikers van de MEGA cloud service zich aan de auteurswetten houden.</string>
-    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">Het is strikt verboden om MEGA te gebruiken om het auteursrecht te schenden.U mag bestanden, data of andere content die enig auteursrecht of ander eigendomsrecht van een persoon of entiteit schenden niet uploaden, downloaden, opslaan, delen, weergeven, streamen, distribueren, emailen, linken naar, verzenden of op een andere manier beschikbaar maken.</string>
+    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">Het is strikt verboden om de MEGA cloud dienst te gebruiken om inbreuk te maken op auteursrecht.U mag niet uploaden, downloaden, opslaan, delen, weergeven, streamen, verdelen, mailen, linken naar, overdragen of anders beschikbaar maken van elk bestand, gegevens inhoud die inbreuk maken op auteursrecht of andere eigendom rechten of elk persoon of entiteit.</string>
     <string name="copyright_alert_agree_button" context="text of the Agree button">Instemmen</string>
     <string name="copyright_alert_disagree_button" context="text of the Disagree button">Oneens</string>
 
@@ -1502,7 +1517,7 @@
     <string name="file_properties_shared_folder_public_link_name">Koppeling</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Volledige toegang</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Alleen Lezen</string>
+    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Alleen lezen</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Lezen en schrijven</string>
 
     <string name="attachment_uploading_state_uploading">Uploaden&#8230;</string>
@@ -1787,8 +1802,9 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Uploaden gesprek</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media kwaliteit</string>
-
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Gesprek video kwaliteit</string>
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Kwaliteit</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads heeft toegang nodig tot uw foto\'s en andere media op uw apparaat. Gaar naar de instellingen pagina en geef toestemming.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Originele kwaliteit</item>
         <item context="the options of medium quality multimedia file to  upload.">Medium kwaliteit</item>
@@ -1844,7 +1860,7 @@
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">De Herstelsleutel was geëxporteerd naar de Offline sectie als MEGAHerstelSleutel.txt\nNoteer:Het wordt verwijderd als u uitlogt, sla het op op een veilige plek.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">U staat op het punt uit te loggen, test uw wachtwoord om er zeker van te zijn dat u deze onthoud. \nAls u uw wachtwoord verliest, verliest u toegang tot uw MEGA gegevens.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Kopieer naar klembord</string>
-    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Exporteer Herstel Sleutel</string>
+    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Herstelsleutel Exporteren</string>
     <string name="proceed_to_logout" context="Option that permits user logout">Doorgaan met uitloggen</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Herstel Sleutel</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Opslaan op Bestandssysteem</string>
@@ -1941,7 +1957,7 @@
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">Een fout heeft opgetreden bij het genereren van de seed of QR code, probeer nogmaals.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Twee-Stap Authenticatie Ingeschakeld</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw Authenticatie Applicatie.</string>
-    <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Maak een reservekopie van uw herstel sleutel</b></string>
+    <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Uw Herstelsleutel opslaan</b></string>
     <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Ongeldige code</string>
     <string name="lost_your_authenticator_device" context="When a user tries to login with Two-Factor Authentication and lost his device, button that permits get information about how login">Bent u uw Authenticatie apparaat verloren?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Login Verificatie</string>
@@ -2131,9 +2147,13 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">De minimale periode is 7 dagen.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">De minimale periode is 7 dagen en uw maximum is 30 dagen.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">De minimale grootte is %1$s en de maximale grootte is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Verwijder bestanden ouder dan</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d dagen</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Laat me weten wanneer de maat groter is dan</string>
+
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Als video\'s die gecomprimeerd moeten worden groter zijn dan</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Om het Wis Schema van de Prullenbak uit te schakelen of een langer bewaarperiode in te stellen, zal u een PRO abonnement nodig hebben.</string>
 
@@ -2240,7 +2260,7 @@
     <string name="billed_monthly_text" context="option of billing period, monthly">[A]Maandelijks betaald[/A] %s /maand</string>
     <string name="billed_yearly_text" context="option of billing period, yearly">[A]Jaarlijks betaald[/A] %s /jaar</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">Annuleer</string>
-    <string name="button_continue" context="dialog option continue in alert dialog">Ga verder</string>
+    <string name="button_continue" context="dialog option continue in alert dialog">Vervolgen</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (abonnement)</string>
     <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (abonnement)</string>
@@ -2255,6 +2275,15 @@
 
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Laatst Gezien weergeven&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Contacten toestaan om te zien wanneer u de laatste keer actief was op MEGA.</string>
+
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Niet genoeg opslagruimte</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Niet genoeg opslagruimte om videocompressie uit te voeren</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Videocompressie is te groot</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">De totale grootte van de te comprimeren video\'s zijn groter dan %s. Geef uw apparaat op om door te gaan.</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Deze instelling gaat van kracht wanneer Camera Uploads de volgende keer wordt uitgevoerd</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s is gecomprimeerd</string>
+	<string name="title_compress_video" context="notification title when compressing video">Video\'s comprimeren %1$d/%2$d</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Ongeldige map geselecteerd</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d bestand</item>
@@ -2297,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Oproep Gestart</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL sleutel fout</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is niet in staat om veilig te verbinden via SSL. U kunt op het publiekelijke wifi zitten met extra benodigdheden.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA kan geen veilige verbinding maken via SSL. Mogelijk gebruikt u openbare wifi met aanvullende vereisten.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Geen [/B][A]Notificaties[/A][B].[/B]</string>
 
@@ -2308,7 +2337,6 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Camera inschakelen</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Bied toegang tot uw camera om documenten te scannen, foto\'s te nemen en video-oproepen te maken.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Oproepen inschakelen</string>
-    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Bied toegang tot uw microfoon om gecodeerde oproepen te maken.</string>
     <string name="general_enable_access" context="General enable access">Toegang inschakelen</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Gedeelde Bestanden</string>
@@ -2447,8 +2475,6 @@
     <string name="hint_action_search" context="Hint of the Search view">Zoeken&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Antwoord</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Negeren</string>
-    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Audio oproep beginnen&#8230;</string>
-    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Video oproep beginnen&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s heeft deze oproep gedempt</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Gedempt</string>
 
@@ -2459,12 +2485,12 @@
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Voer gesprekslink in</string>
 
-    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
-    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
-    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
-    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Plak link</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Ongeldig bestand of map koppeling</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Voer een geldige bestand of map koppeling in</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Voer een geldige gesprek link in</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">U heeft een gesprek link gekplakt.</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">U heeft een contact link geplakt.</string>
     <string name="action_open_contact_link" context="Menu item">Open contact link</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">Personen kunnen aansluiten tot uw groep door deze koppeling te gebruiken.</string>
@@ -2485,7 +2511,7 @@
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tik en houd vast om op te nemen,dan loslaten om te verzenden.</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slepen om te annuleren</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice messages that it is not available">Deze spraakclip is niet beschikbaar</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">Dit spraakbericht is niet beschikbaar</string>
 
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d bestand al gedownload. &#160;</item>
@@ -2497,6 +2523,29 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d bestanden in afwachting.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Recent</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 Afbeelding en 1 Video</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Mij</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Het is niet mogelijk om spraakberichten op te nemen tijdens een oproep die gaande is.</string>
-    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Er is een fout opgetreden bij het uploaden van het spraakbericht.</string>
+
+    <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Inkomende oproep</string>
+
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Laden</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Een ogenblik geduld a.u.b&#8230;</string>
+
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s Contactpersonen verstuurd.</string>
 </resources>
