@@ -270,7 +270,7 @@ public class ChatExplorerFragment extends Fragment {
         }
 
         int connectionState = megaChatApi.getConnectionState();
-        log("connection state: " + connectionState);
+        logDebug("connection state: " + connectionState);
         //need to reconnect to load the chat rooms list room properly.
         if(connectionState == MegaChatApi.DISCONNECTED) {
             megaChatApi.connect(new MegaChatRequestListenerInterface() {
@@ -289,10 +289,10 @@ public class ChatExplorerFragment extends Fragment {
                 public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
                     if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                         emptyTextView.setVisibility(View.GONE);
-                        log("Connected to chat!");
+                        logDebug("Connected to chat!");
                         setChats();
                     } else {
-                        log("ERROR WHEN CONNECTING " + e.getErrorString());
+                        logWarning("ERROR WHEN CONNECTING " + e.getErrorString());
                     }
                 }
 
