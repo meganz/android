@@ -1760,7 +1760,7 @@ public class Util {
 	 *
 	 * @param url the passed url to be decoded
 	 */
-	public static void decodeURL(String url) {
+	public static String decodeURL(String url) {
 		try {
 			url = URLDecoder.decode(url, "UTF-8");
 		} catch (Exception e) {
@@ -1768,7 +1768,7 @@ public class Util {
 			e.printStackTrace();
 		}
 
-		url.replace(' ', '+');
+		url = url.replace(' ', '+');
 
 		if (url.startsWith("mega://")) {
 			url = url.replaceFirst("mega://", "https://mega.nz/");
@@ -1789,6 +1789,7 @@ public class Util {
 		}
 
 		logDebug("URL decoded: " + url);
+		return url;
 	}
 
     public static boolean hasPermissions(Context context, String... permissions) {
