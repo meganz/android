@@ -153,13 +153,7 @@ public class BillingManager implements PurchasesUpdatedListener {
                 // Query the purchase async
                 SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
                 params.setSkusList(skuList).setType(itemType);
-                mBillingClient.querySkuDetailsAsync(params.build(),
-                        new SkuDetailsResponseListener() {
-                            @Override
-                            public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
-                                listener.onSkuDetailsResponse(billingResult, skuDetailsList);
-                            }
-                        });
+                mBillingClient.querySkuDetailsAsync(params.build(), listener);
             }
         };
 
