@@ -9,13 +9,14 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ChatNonContactNameListener implements MegaChatRequestListenerInterface {
 
@@ -75,10 +76,6 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         }
     }
 
-    private static void log(String log) {
-        Util.log("ChatNonContactNameListener", log);
-    }
-
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -91,7 +88,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish()");
+        logDebug("onRequestFinish()");
 
         if (e.getErrorCode() == MegaError.API_OK){
             if (adapter == null) {
@@ -99,19 +96,19 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
             }
 
             if(adapter instanceof MegaChatLollipopAdapter && holder == null){
-                log("holder is NULL 1");
+                logWarning("holder is NULL");
                 holder = ((MegaChatLollipopAdapter)adapter).queryIfHolderNull(pos);
                 if (holder == null) {
-                    log("holder is NULL 2");
+                    logWarning("holder is NULL");
                     return;
                 }
             }
             else {
-                log("otro adapter holder is NULL");
+                logWarning("Other adapter holder is NULL");
             }
 
             if(request.getType()==MegaChatRequest.TYPE_GET_FIRSTNAME){
-                log("->First name received");
+                logDebug("First name received");
                 firstName = request.getText();
                 receivedFirstName = true;
                 if(firstName!=null&& !firstName.trim().isEmpty()){
@@ -120,7 +117,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                 }
             }
             else if(request.getType()==MegaChatRequest.TYPE_GET_LASTNAME){
-                log("->Last name received");
+                logDebug("Last name received");
                 lastName = request.getText();
                 receivedLastName = true;
                 if(lastName!=null && !lastName.trim().isEmpty()){
@@ -129,7 +126,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                 }
             }
             else if(request.getType()==MegaChatRequest.TYPE_GET_EMAIL){
-                log("->Email received");
+                logDebug("Email received");
                 mail = request.getText();
                 receivedEmail = true;
                 if(mail!=null && !mail.trim().isEmpty()){
@@ -139,15 +136,15 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
             }
         }
         else{
-            log("ERROR: requesting: "+request.getRequestString());
+            logError("ERROR: requesting: " + request.getRequestString());
         }
     }
 
     public void updateAdapter(int position) {
-        log("updateAdapter: "+position);
+        logDebug("position: " + position);
         if ((!isPreview && receivedFirstName && receivedLastName && receivedEmail)
             || (isPreview && receivedFirstName && receivedLastName)){
-            log("updateAdapter");
+            logDebug("updateAdapter");
             if(adapter instanceof MegaChatLollipopAdapter){
                 ((MegaChatLollipopAdapter)adapter).notifyItemChanged(position);
             }
@@ -160,7 +157,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
             receivedEmail = false;
         }
         else{
-            log("NOT updateAdapter:"+receivedFirstName+":"+receivedLastName+":"+receivedEmail);
+            logWarning("NOT updateAdapter: " + receivedFirstName + ":" + receivedLastName + ":" + receivedEmail);
         }
     }
 

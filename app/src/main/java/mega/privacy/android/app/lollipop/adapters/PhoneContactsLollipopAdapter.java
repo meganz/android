@@ -36,9 +36,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.PhoneContactInfo;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 /*
@@ -71,7 +73,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 		@Override
 		protected Long doInBackground(Void... args) {
-			log("doInBackGround");
+			logDebug("doInBackGround");
 
 			try {
 				InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),
@@ -276,9 +278,9 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	}
 	
 	public void createDefaultAvatar(ViewHolderPhoneContactsLollipop holder, boolean isMegaContact){
-		log("createDefaultAvatar()");
+		logDebug("isMegaContact: " + isMegaContact);
 		
-		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
@@ -304,8 +306,8 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	    display.getMetrics(outMetrics);
 	    float density  = mContext.getResources().getDisplayMetrics().density;
 	    
-	    int avatarTextSize = Util.getAvatarTextSize(density);
-	    log("DENSITY: " + density + ":::: " + avatarTextSize);
+	    int avatarTextSize = getAvatarTextSize(density);
+		logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
 	    if (isMegaContact){
 		    if (holder.contactMail != null){
 			    if (holder.contactMail.length() > 0){
@@ -334,10 +336,6 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	
 	@Override
 	public void onClick(View v) {
-		log("click!");
-	}	
-
-	private static void log(String message) {
-		Util.log("ContactsExplorerLollipopAdapter", message);
+		logDebug("click!");
 	}
 }

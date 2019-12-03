@@ -559,26 +559,28 @@
                                         android:layout_column="0"/>
 
                                 </RelativeLayout>
-
-
                             </LinearLayout>
 
+                            <RelativeLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:id="@+id/days_left_text_install_app"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentRight="true"
+                                    android:layout_marginRight="12dp"
+                                    android:layout_marginTop="5dp"
+                                    android:singleLine="true"
+                                    android:ellipsize="end"
+                                    android:textSize="14dp"
+                                    android:gravity="right"
+                                    android:textColor="@color/mail_my_account"
+                                    android:layout_column="0"/>
+                            </RelativeLayout>
+
                         </RelativeLayout>
 
-                        <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <TextView
-                                android:id="@+id/days_left_text_install_app"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:layout_marginRight="12dp"
-                                android:textSize="14dp"
-                                android:gravity="right"
-                                android:textColor="@color/mail_my_account"
-                                android:layout_column="0"/>
-                        </RelativeLayout>
 
                     </LinearLayout>
 
@@ -594,9 +596,128 @@
                     android:background="@color/separator_grey"/>
 
                 <RelativeLayout
+                    android:id="@+id/add_phone_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/separator_install_app">
+                    <LinearLayout
+                        android:id="@+id/add_phone_linear_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:id="@+id/add_phone_icon"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_marginLeft="20dp"
+                            android:src="@drawable/il_verify_phone_drawer"/>
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginBottom="16dp">
+                            <TextView
+                                android:id="@+id/title_add_phone"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:layout_marginBottom="14dp"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:singleLine="false"
+                                android:text="@string/title_add_phone"
+                                android:textColor="@color/name_my_account"
+                                android:textSize="16dp"/>
+                            <TextView
+                                android:id="@+id/zero_figures_add_phone_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/title_add_phone"
+                                android:layout_marginRight="24dp"
+                                android:textSize="12sp"/>
+                            <LinearLayout
+                                android:id="@+id/figures_add_phone_layout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/title_add_phone"
+                                android:orientation="horizontal">
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="24dp">
+                                    <TextView
+                                        android:id="@+id/figure_unlocked_storage_text_add_phone"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_column="0"
+                                        android:layout_gravity="left"
+                                        android:text="1 GB"
+                                        android:textColor="@color/blue_unlocked_rewards"
+                                        android:textSize="14dp"/>
+                                    <TextView
+                                        android:id="@+id/unlocked_storage_title_add_phone"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_column="0"
+                                        android:layout_below="@id/figure_unlocked_storage_text_add_phone"
+                                        android:text="@string/unlocked_storage_title"
+                                        android:textAllCaps="false"
+                                        android:textColor="@color/grey_achievements_title"
+                                        android:textSize="11dp"/>
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content">
+                                    <TextView
+                                        android:id="@+id/figure_unlocked_transfer_text_add_phone"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_column="0"
+                                        android:layout_gravity="left"
+                                        android:text="0 GB"
+                                        android:textColor="@color/green_unlocked_rewards"
+                                        android:textSize="14dp"/>
+                                    <TextView
+                                        android:id="@+id/unlocked_transfer_title_add_phone"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_column="0"
+                                        android:layout_below="@id/figure_unlocked_transfer_text_add_phone"
+                                        android:text="@string/transfer_quota"
+                                        android:textColor="@color/grey_achievements_title"
+                                        android:textSize="11dp"/>
+                                </RelativeLayout>
+                            </LinearLayout>
+                        </RelativeLayout>
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:id="@+id/days_left_text_add_phone"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_column="0"
+                                android:layout_alignParentRight="true"
+                                android:layout_marginRight="12dp"
+                                android:gravity="right"
+                                android:textColor="@color/mail_my_account"
+                                android:textSize="14dp"/>
+                        </RelativeLayout>
+                    </LinearLayout>
+                </RelativeLayout>
+                <LinearLayout
+                    android:id="@+id/separator_add_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@+id/add_phone_layout"
+                    android:background="@color/separator_grey"
+                    android:orientation="horizontal"/>
+                <RelativeLayout
                     android:id="@+id/registration_layout"
                     android:layout_width="match_parent"
-                    android:layout_below="@+id/separator_install_app"
+                    android:layout_below="@+id/separator_add_phone"
                     android:layout_height="wrap_content">
 
                     <LinearLayout
@@ -695,25 +816,28 @@
 
                                 </RelativeLayout>
 
-
                             </LinearLayout>
-
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <TextView
-                                android:id="@+id/days_left_text_registration"
+                            <RelativeLayout
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:layout_marginRight="12dp"
-                                android:textSize="14dp"
-                                android:gravity="right"
-                                android:textColor="@color/mail_my_account"
-                                android:layout_column="0"/>
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:id="@+id/days_left_text_registration"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentRight="true"
+                                    android:layout_marginRight="12dp"
+                                    android:layout_marginTop="5dp"
+                                    android:singleLine="true"
+                                    android:ellipsize="end"
+                                    android:textSize="14dp"
+                                    android:gravity="right"
+                                    android:textColor="@color/mail_my_account"
+                                    android:layout_column="0"/>
+                            </RelativeLayout>
+
                         </RelativeLayout>
+
+
 
                     </LinearLayout>
 
@@ -838,24 +962,25 @@
 
                                 </RelativeLayout>
 
-
                             </LinearLayout>
-
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <TextView
-                                android:id="@+id/days_left_text_install_desktop"
+                            <RelativeLayout
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:layout_marginRight="12dp"
-                                android:textSize="14dp"
-                                android:gravity="right"
-                                android:textColor="@color/mail_my_account"
-                                android:layout_column="0"/>
+                                android:layout_height="wrap_content">
+                                <TextView
+                                    android:id="@+id/days_left_text_install_desktop"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentRight="true"
+                                    android:layout_marginRight="12dp"
+                                    android:layout_marginTop="5dp"
+                                    android:singleLine="true"
+                                    android:ellipsize="end"
+                                    android:textSize="14dp"
+                                    android:gravity="right"
+                                    android:textColor="@color/mail_my_account"
+                                    android:layout_column="0"/>
+                            </RelativeLayout>
+
                         </RelativeLayout>
 
                     </LinearLayout>

@@ -2,13 +2,12 @@
 <resources>
     <string name="app_name" context="Name of the app" translatable="false">MEGA</string>
     <string name="pdf_app_name" context="PDF viewer app name" translatable="false">MEGA PDF Viewer</string>
-    <string name="app_version" context="Version number of the app" translatable="false">3.7.0 (250)</string>
-    <string name="sdk_version" context="SDK version" translatable="false">ff9b7eb</string>
-    <string name="karere_version" context="MEGAchat SDK version" translatable="false">fca7b4c</string>
+    <string name="app_version" context="Version number of the app" translatable="false">3.7.2 (270)</string>
+    <string name="sdk_version" context="SDK version" translatable="false">bfff951</string>
+    <string name="karere_version" context="MEGAchat SDK version" translatable="false">969d528</string>
     <string name="prolite_account" context="PRO Lite account" translatable="false">Lite</string>
     <string name="pro1_account" context="PRO I account" translatable="false">PRO I</string>
     <string name="pro2_account" context="PRO II account" translatable="false">PRO II</string>
     <string name="pro3_account" context="PRO III account" translatable="false">PRO III</string>
     <string name="url_qr_2fa" context="URL that is used to generate Two-Factor Authentication QR code" translatable="false">otpauth://totp/MEGA:%s?secret=%s&amp;issuer=MEGA</string>
-    <string name="general_rk" context="Text of the file name where the Recovery Key is saved" translatable="false">MEGARecoveryKey.txt</string>
 </resources>

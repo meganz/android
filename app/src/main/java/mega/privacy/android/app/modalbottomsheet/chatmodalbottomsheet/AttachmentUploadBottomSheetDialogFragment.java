@@ -17,8 +17,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class AttachmentUploadBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -97,20 +98,20 @@ public class AttachmentUploadBottomSheetDialogFragment extends BottomSheetDialog
         switch(v.getId()){
 
             case R.id.attachment_upload_cloud_layout:{
-                log("option attach from cloud");
+                logDebug("Option attach from cloud");
                 ((ChatActivityLollipop)context).attachFromCloud();
                 dismissAllowingStateLoss();
                 break;
             }
             case R.id.attachment_upload_contact_layout:{
-                log("option attach contact");
-                ((ChatActivityLollipop)context).attachContact();
+                logDebug("Option attach contact");
+                ((ChatActivityLollipop)context).chooseContactsDialog();
                 dismissAllowingStateLoss();
                 break;
             }
 
             case R.id.attachment_upload_photo_layout:{
-                log("option attach photo");
+                logDebug("Option attach photo");
                 ((ChatActivityLollipop)context).attachPhotoVideo();
                 dismissAllowingStateLoss();
                 break;
@@ -134,9 +135,5 @@ public class AttachmentUploadBottomSheetDialogFragment extends BottomSheetDialog
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-    }
-
-    private static void log(String log) {
-        Util.log("AttachmentUploadBottomSheetDialogFragment", log);
     }
 }

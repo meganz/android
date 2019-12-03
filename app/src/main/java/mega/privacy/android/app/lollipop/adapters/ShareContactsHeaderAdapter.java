@@ -12,7 +12,9 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +32,11 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListenerShare;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -40,16 +44,12 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-
-/**
- * Created by mega on 4/07/18.
- */
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop> implements View.OnClickListener, SectionTitleProvider {
-
-    public static final int ITEM_VIEW_TYPE_NODE= 0;
-    public static final int ITEM_VIEW_TYPE_HEADER = 1;
 
     DatabaseHandler dbH = null;
     public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
@@ -59,6 +59,8 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     private List<ShareContactInfo> shareContacts;
 
 
+
+
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
 
@@ -66,7 +68,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
-        if(Util.isChatEnabled()){
+        if(isChatEnabled()){
             if (megaChatApi == null){
                 megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
             }
@@ -112,10 +114,10 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     public int getItemViewType(int position) {
         ShareContactInfo contact = getItem(position);
         if (contact.isHeader()){
-            return ITEM_VIEW_TYPE_HEADER;
+            return HEADER_VIEW_TYPE;
         }
         else{
-            return ITEM_VIEW_TYPE_NODE;
+            return ITEM_VIEW_TYPE;
         }
     }
 
@@ -124,7 +126,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         RelativeLayout itemHeader;
         TextView textHeader;
         RelativeLayout itemLayout;
-        TextView contactNameTextView;
+        EmojiTextView contactNameTextView;
         TextView emailTextView;
         public String mail;
         public RoundedImageView avatar;
@@ -148,6 +150,10 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     @Override
     public ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        Display display = ((Activity)mContext).getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
 
         View rowView = inflater.inflate(R.layout.item_contact_share, parent, false);
         ViewHolderShareContactsLollipop holder = new ViewHolderShareContactsLollipop(rowView);
@@ -156,7 +162,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         holder.textHeader = (TextView) rowView.findViewById(R.id.text_header);
 
         holder.itemLayout = (RelativeLayout) rowView.findViewById(R.id.item_content);
-        holder.contactNameTextView = (TextView) rowView.findViewById(R.id.contact_name);
+        holder.contactNameTextView = rowView.findViewById(R.id.contact_name);
 
         if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, mContext.getResources().getDisplayMetrics());
@@ -166,6 +172,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
             float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics());
             holder.contactNameTextView.setMaxWidth((int) width);
         }
+        holder.contactNameTextView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
 
         holder.emailTextView = (TextView) rowView.findViewById(R.id.contact_mail);
         holder.avatar = (RoundedImageView) rowView.findViewById(R.id.contact_avatar);
@@ -204,36 +211,36 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                 holder.contactNameTextView.setText(name);
                 holder.emailTextView.setText(mail);
 
-                if(Util.isChatEnabled()){
+                if(isChatEnabled()){
                     holder.contactStateIcon.setVisibility(View.VISIBLE);
                     if (megaChatApi != null){
                         int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaContactAdapter().getMegaUser().getHandle());
                         if(userStatus == MegaChatApi.STATUS_ONLINE){
-                            log("This user is connected");
+                            logDebug("This user is connected");
                             holder.contactStateIcon.setVisibility(View.VISIBLE);
                             holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.circle_status_contact_online));
                         }
                         else if(userStatus == MegaChatApi.STATUS_AWAY){
-                            log("This user is away");
+                            logDebug("This user is away");
                             holder.contactStateIcon.setVisibility(View.VISIBLE);
                             holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.circle_status_contact_away));
                         }
                         else if(userStatus == MegaChatApi.STATUS_BUSY){
-                            log("This user is busy");
+                            logDebug("This user is busy");
                             holder.contactStateIcon.setVisibility(View.VISIBLE);
                             holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.circle_status_contact_busy));
                         }
                         else if(userStatus == MegaChatApi.STATUS_OFFLINE){
-                            log("This user is offline");
+                            logDebug("This user is offline");
                             holder.contactStateIcon.setVisibility(View.VISIBLE);
                             holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.circle_status_contact_offline));
                         }
                         else if(userStatus == MegaChatApi.STATUS_INVALID){
-                            log("INVALID status: "+userStatus);
+                            logWarning("INVALID status: " + userStatus);
                             holder.contactStateIcon.setVisibility(View.GONE);
                         }
                         else{
-                            log("This user status is: "+userStatus);
+                            logDebug("This user status is: " + userStatus);
                             holder.contactStateIcon.setVisibility(View.GONE);
                         }
                     }
@@ -291,7 +298,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     }
 
     public Bitmap setUserAvatar(ShareContactInfo contact){
-        log("setUserAvatar");
+        logDebug("setUserAvatar");
 
         String mail = null;
 
@@ -313,7 +320,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                     return createDefaultAvatar(mail, contact);
                 }
                 else{
-                    return Util.getCircleBitmap(bitmap);
+                    return getCircleBitmap(bitmap);
                 }
             }
             else{
@@ -326,9 +333,9 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     }
 
     public Bitmap createDefaultAvatar(String mail, ShareContactInfo contact){
-        log("createDefaultAvatar()");
+        logDebug("createDefaultAvatar()");
 
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint paintText = new Paint();
         Paint paintCircle = new Paint();
@@ -348,12 +355,12 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
             color = megaApi.getUserAvatarColor(contact.getMegaContactAdapter().getMegaUser());
         }
         if(color!=null){
-            log("The color to set the avatar is "+color);
+            logDebug("The color to set the avatar is " + color);
             paintCircle.setColor(Color.parseColor(color));
             paintCircle.setAntiAlias(true);
         }
         else{
-            log("Default color to the avatar");
+            logDebug("Default color to the avatar");
             if (contact.isPhoneContact()){
                 paintCircle.setColor(ContextCompat.getColor(mContext, R.color.color_default_avatar_phone));
             }
@@ -389,9 +396,12 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
             //No name, ask for it and later refresh!!
             fullName = mail;
         }
-        String firstLetter = fullName.charAt(0) + "";
+        String firstLetter = ChatUtil.getFirstLetter(fullName);
+        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+            firstLetter = " ";
+        }
 
-        log("Draw letter: "+firstLetter);
+        logDebug("Draw letter: " + firstLetter);
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
@@ -421,9 +431,5 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener){
         this.mItemClickListener = mItemClickListener;
-    }
-
-    private static void log(String log) {
-        Util.log("ShareContactsHeaderAdapter", log);
     }
 }

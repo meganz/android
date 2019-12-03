@@ -78,10 +78,8 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Ескізи</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Перегляд списком</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Експорт майстер-ключа</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Видалити майстер-ключ</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Скасувати підписку</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Майстер-ключ було експортовано до:</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">Майстер ключ було видалено.</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Підписку було скасовано коректно</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Підписку було скасовано невірно. Будь ласка, зв\'яжіться з support@mega.nz для скасування підписки</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Закрити усі сеанси</string>
@@ -226,7 +224,6 @@
 	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Розмір:</string>
 	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Вміст:</string>
 	<string name="file_properties_info_added" context="when was the file added in MEGA">Додано:</string>
-	<string name="file_properties_info_modified" context="when was the file modified">Змінено:</string>
 	<!--<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">Немає публічних ланок</string>-->
 	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Публічна ланка</string>
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Повний доступ</string>

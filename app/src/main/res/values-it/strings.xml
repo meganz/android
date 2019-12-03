@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">Errore. Per favore, riprova.</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">La cartella secondaria non esiste, per favore scegli una nuova cartella</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Nessuno spazio esterno rilevato</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Questa cartella è di sola lettura. Non hai il permesso di caricare</string>
@@ -104,16 +106,14 @@
     <string name="action_refresh" context="Menu item">Aggiorna</string>
     <string name="action_sort_by" context="Menu item">Ordina per</string>
     <string name="action_help" context="Menu item">Aiuto</string>
-    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Aumenta il piano PRO</string>
-    <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Passando a PRO</string>
+    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Fai l\'upgrade dell\'account</string>
+    <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Upgrade dell\'account in corso</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Seleziona tutto</string>
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Annulla selezione</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Vista thumbnail</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Modalità lista</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Copia la Chiave di Recupero</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Rimuovi la Chiave di Recupero</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Annulla iscrizione</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">La Chiave di Recupero è stata rimossa</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">La sottoscrizione è stata annullata</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Non ci è stato possibile annullare il tuo abbonamento. Per favore, contatta support&#64;mega.nz per assistenza</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Chiudi le altre sessioni</string>
@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Attivazione conto</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Aggiornamento file</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Per favore, effettua l\'accesso per condividere con MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Il tuo link di conferma non è più valido. Il tuo account potrebbe essere stato già attivato o potresti aver annullato la tua registrazione.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -231,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">Cancellare tutti i trasferimenti?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Recenti</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Caricamenti dei media</string>
     <string name="section_inbox" context="title of the screen that show the inbox">In arrivo</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Salvato in locale</string>
@@ -280,9 +282,8 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Dimensione</string>
-    <string name="file_properties_info_modified" context="when was the file modified">Modificato</string>
+    <string name="file_properties_info_last_modified" context="When the file was last modified">Ultima modifica</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Aggiunto</string>
-    <string name="file_properties_info_created" context="when the file was created">Creato</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -570,7 +571,7 @@
     <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     -->
     <!--<string name="overquota_alert_title" context="Title dialog overquota error">Storage over quota</string>-->
-    <string name="overquota_alert_text" context="Dialog text overquota error">Hai superato il limite del tuo spazio di archiviazione. Vuoi passare a PRO?</string>
+    <string name="overquota_alert_text" context="Dialog text overquota error">Hai superato il limite del tuo spazio di archiviazione. Vuoi fare l\'upgrade ad un account PRO?</string>
 
     <!--
     <string name="op_not_allowed" context="Dialod text overquota error">Operation not allowed</string>
@@ -612,6 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">L\'anteprima non è ancora stata scaricata. Per favore, attendi</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">L\'anteprima non riesce a caricarsi a causa di insufficienze spazio di memoria disponibile. Per favore, riprova più tardi.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Per favore, esci prima di creare l\'account</string>
 
@@ -632,18 +634,18 @@
     <string name="menu_take_picture" context="menu item">Scatta foto</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-Fi</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi o dati mobili</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi o connessione dati</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Salta</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload attivo</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Caricamenti da fotocamera attivi</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Vuoi fermare i caricamenti da fotocamera?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Caricamento di file di cartelle media</string>
-	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Checking for files to be uploaded</string>
-	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Initializing Camera Upload</string>
+	<string name="settings_camera_notif_checking_title" context="title of the notification when camera upload is checking files">Controllo di file da caricare in corso</string>
+	<string name="settings_camera_notif_initializing_title" context="title of the notification when camera upload is initializing">Inizializzazione dei Caricamenti da fotocamera in corso</string>
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
@@ -651,7 +653,7 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Archivio</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Codice d\'accesso</string>
-	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compressione dei video consuma molta energia, quindi MEGA ti ricorderà di caricare il tuo dispositivo se i video da convertire sono più grandi di %s.</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compressione dei video consuma molta energia; MEGA ti chiederà di caricare il tuo dispositivo se i video da convertire sono più grandi di %s.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Avanzato</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Svuota cache</string>
@@ -688,7 +690,7 @@
     <string name="settings_empty_folder" context="settings option">Scegli cartella</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi o dati mobili</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi o connessione dati</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-Fi</item>
     </string-array>
 
@@ -701,7 +703,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Solo mentre è in carica</string>
-    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
+    <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Rendimi necessario caricare il dispositivo</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Mantenere i nomi dei file, come nel dispositivo</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Cartella locale Camera</string>
@@ -826,8 +828,8 @@
 
     <string name="proceed_cc" context="Text of the button which proceeds the payment">Procedi</string>
 
-    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Account aggiornato con successo!</string>
-    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">L\'operazione è fallita. La tua carta di credito non è stata accettata</string>
+    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Upgrade dell\'account effettuato con successo!</string>
+    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">L\'operazione è fallita. Sulla tua carta di credito non è stata accreditata alcuna somma</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">Le informazioni della carta di credito non erano corrette. La tua carta di credito non è stata accettata</string>
     <!--
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
@@ -921,8 +923,8 @@
     <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">La tua Chiave di Recupero verrà usata per resettare la tua password. Per favore, inserisci la tua nuova password.</string>
     <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Riceverai un link di recupero che ti permetterà di resettare la tua password.</string>
 
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Passa a PRO</string>
-    <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Passa a PRO ora</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Fai l\'upgrade</string>
+    <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Fai l\'upgrade ora</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la tua capacità![A]Ottieni più spazio &amp; banda di trasferimento con un account PRO!</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">La Chiave di Recupero è stata copiata in: %1s.[A]Mentre il file rimane in questo percorso, lo troverai salvato nella sezione Offline.[A]Nota: Verrà cancellato se effettui il logout, quindi per favore archivialo in un luogo sicuro.</string>
 
@@ -932,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Errore. Questo indirizzo email è già in uso.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">Hai già richiesto un link di conferma per quell\'indirizzo email.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">La nuova e la vecchia email non devono combaciare</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Questo è l\'ultimo passaggio per cambiare la tua email. Per favore, inserisci la tua password qui sotto.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Cambia email</string>
 
@@ -1080,10 +1085,10 @@
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contatti verranno rimossi dalla cartella condivisa.</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contatti rimossi con successo dalla cartella condivisa</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;e %d contatti non sono stati rimossi con successo</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contatti non sono stati rimossi con successo</string>
 
-	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions changed successfully</string>
-	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">%d contacts permissions were not successfully changed</string>
+	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Aggiornati con successo i permessi per %d contatti</string>
+	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Aggiornamento fallito dei permessi per %d contatti</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Caricamento dei contatti&#8230;</string>
 
@@ -1797,9 +1802,9 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Caricamento della chat</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualità dei media della chat</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualità dei video della chat</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Qualità dei video</string>
-    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
+    <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">I Caricamenti da fotocamera hanno bisogno dell\'accesso alle tue foto e agli altri media sul tuo dispositivo. Per favore, vai nella pagina delle Impostazioni e garantisci questo permesso.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of origin quality multimedia file to upload.">Qualità originale</item>
         <item context="the options of medium quality multimedia file to  upload.">Qualità media</item>
@@ -2019,7 +2024,7 @@
 
     <string name="error_MEGAdrop_not_supported" context="Error message on opening a MEGAdrop folder link">Le cartelle MEGAdrop non sono ancora supportate</string>
 
-    <string name="pre_overquota_alert_text" context="Pre overquota error dialog when trying to copy or import a file">Questa azione non può essere completata in quanto ti porterebbe oltre il tuo limite corrente di spazio di archiviazione. Vuoi passare a PRO?</string>
+    <string name="pre_overquota_alert_text" context="Pre overquota error dialog when trying to copy or import a file">Questa azione non può essere completata in quanto ti porterebbe oltre il tuo limite corrente di spazio di archiviazione. Vuoi fare l\'upgrade a PRO?</string>
 
     <string name="archived_chats_title_section" context="Title of the section Archived chats">Chat archiviate</string>
 
@@ -2089,18 +2094,18 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">QR Code non valido</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Il Cloud Drive è quasi pieno. Passa a PRO ed ottieni fino a 8TB di spazio di archiviazione e 16TB di banda di trasferimento.</string>
-    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Il tuo Cloud Drive è quasi pieno. Aggiorna adesso ed ottieni fino a 8TB di spazio di archiviazione e 16TB di banda di trasferimento.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Il Cloud Drive è quasi pieno. Fai l\'upgrade a PRO ed ottieni fino a 8TB di spazio di archiviazione e 16TB di banda di trasferimento.</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Il tuo Cloud Drive è quasi pieno. Fai l\'upgrade adesso ed ottieni fino a 8TB di spazio di archiviazione e 16TB di banda di trasferimento.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Il tuo Cloud Drive è quasi pieno. Se hai bisogno di più spazio di archiviazione, per favore contatta il supporto di MEGA per ottenere un piano creato apposta per te e le tue esigenze.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Il tuo Cloud Drive è pieno. Aggiorna ad un account PEO ed ottieni fino a 8TB di spazio di archiviazione e 16TB di banda di trasferimento.</string>
-    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Il tuo Cloud Drive è pieno. Aggiorna adesso ed ottieni fino a 8TB di spazio di archiviazione e 16TB di banda di trasferimento.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Il tuo Cloud Drive è pieno. Fai l\'upgrade ad un account PRO ed ottieni fino a 8TB di spazio di archiviazione e 16TB di banda di trasferimento.</string>
+    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Il tuo Cloud Drive è pieno. Fai l\'upgrade adesso ed ottieni fino a 8TB di spazio di archiviazione e 16TB di banda di trasferimento.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Il tuo Cloud Drive è pieno. Se hai bisogno di più spazio di archiviazione, per favore contatta il supporto di MEGA per ottenere un piano creato apposta per te e le tue esigenze.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">Vedi i piani</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Piano personalizzato</string>
     <string name="button_bonus_almost_full_warning" context="Button of the dialog shown when the storage is almost full to get bonus">Ottieni il bonus</string>
 
-    <string name="title_mail_upgrade_plan" context="Mail title to upgrade to a custom plan">Passa ad un piano personalizzato</string>
-    <string name="subject_mail_upgrade_plan" context="Mail subject to upgrade to a custom plan">Chiedici come passare ad un piano personalizzato:</string>
+    <string name="title_mail_upgrade_plan" context="Mail title to upgrade to a custom plan">Fai l\'upgrade e passa ad un piano personalizzato</string>
+    <string name="subject_mail_upgrade_plan" context="Mail subject to upgrade to a custom plan">Chiedici come effettuare l\'upgrade ad un piano personalizzato:</string>
 
     <string name="word_me" context="Used in chat list screen to indicate in a chat list item that the message was sent by me, followed by the message">Io:</string>
 
@@ -2142,7 +2147,7 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Il periodo minimo è di 7 giorni.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">Il periodo minimo è di 7 giorni e il periodo massimo è di 30 giorni.</string>
-	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">La grandezza minima è %1$s e la grandezza massima è %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Rimuovi file più vecchi di</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d giorni</string>
@@ -2273,11 +2278,11 @@
 
 	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Non abbastanza spazio di archiviazione</string>
 	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Non abbastanza spazio di archiviazione per effettuare la compressione del video.</string>
-	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">La compressione del video è troppo grande</string>
 	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">La grandezza totale dei video da comprimere supera %s, per favore metti a caricare la tua batteria per continuare.</string>
-	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
-	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
-	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Questa impostazione farà effetto la prossima volta che i Caricamenti dalla fotocamera saranno attivi</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s è stato compresso</string>
+	<string name="title_compress_video" context="notification title when compressing video">Compressione di video %1$d su %2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Cartella non valida selezionata</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
@@ -2321,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Chiamata iniziata</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Errore della chiave SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA non riesce a connettersi in sicurezza attraverso SSL. Dovresti essere su un WiFi pubblico con requisiti addizionali.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA non riesce a connettersi in sicurezza tramite SSL. Potresti essere collegato ad un WiFi pubblico che richiede requisiti addizionali.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Nessuna[/B] [A]notifica[/A][B].[/B]</string>
 
@@ -2470,8 +2475,6 @@
     <string name="hint_action_search" context="Hint of the Search view">Cerca&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Rispondi</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignora</string>
-    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Iniziando una chiamata&#8230;</string>
-    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Iniziando una videochiamata&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s ha mutato questa chiamata</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Mutata</string>
 
@@ -2520,6 +2523,29 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d file in attesa.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Recenti</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 immagine e 1 video</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Io</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Non è possibile registrare messaggi vocali mentre c\'è una chiamata in corso.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Un errore è stato riscontrato durante l\'apload del messaggio vocale.</string>
+
+    <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Chiamata in arrivo</string>
+
+    <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Caricamento</string>
+    <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Attendere&#8230;</string>
+
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Invia %s contatti.</string>
 </resources>

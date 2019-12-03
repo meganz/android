@@ -1,71 +1,64 @@
 package mega.privacy.android.app;
 
-
-import android.util.Log;
-
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaLoggerInterface;
 
-
-public class AndroidLogger extends MegaLogger implements MegaLoggerInterface{
+public class AndroidLogger extends MegaLogger implements MegaLoggerInterface {
 
     public static final String LOG_FILE_NAME = "logSDK.txt";
-    private final String TAG =  "AndroidLogger";
 
     public AndroidLogger(String fileName, boolean fileLogger) {
         super(fileName, fileLogger);
     }
 
-    @Override
     public void log(String time, int logLevel, String source, String message) {
-        //display to console
-        if (Util.DEBUG) {
-			Log.d(TAG,createSourceMessage(message) + ": " + createMessage(message));
-        }
-
         //save to log file
         if (isReadyToWriteToFile(Util.getFileLoggerSDK())) {
-            fileLogQueue.add(createSourceMessage(message) + ": " + createMessage(message) + "\n");
+            fileLogQueue.add(createMessage(time, logLevel, source, message));
         }
     }
 
-    //create SDK specific log prefix
-    private String createSourceMessage(String source) {
+    //create SDK specific log message
+    private String createMessage(String time, int logLevel, String source, String message) {
+
+        String logLevelMessage = "";
+        switch (logLevel) {
+            case MegaApiAndroid.LOG_LEVEL_DEBUG:
+                logLevelMessage = "DEB";
+                break;
+            case MegaApiAndroid.LOG_LEVEL_ERROR:
+                logLevelMessage = "ERR";
+                break;
+            case MegaApiAndroid.LOG_LEVEL_FATAL:
+                logLevelMessage = "FAT";
+                break;
+            case MegaApiAndroid.LOG_LEVEL_INFO:
+                logLevelMessage = "INF";
+                break;
+            case MegaApiAndroid.LOG_LEVEL_MAX:
+                logLevelMessage = "MAX";
+                break;
+            case MegaApiAndroid.LOG_LEVEL_WARNING:
+                logLevelMessage = "WRN";
+                break;
+            default:
+                logLevelMessage = "NON";
+                break;
+        }
+
         String sourceMessage = "";
         if (source != null) {
             String[] s = source.split("jni/mega");
-            if (s != null) {
-                if (s.length > 1) {
-                    sourceMessage = s[1] + "";
-                } else {
-                    sourceMessage = source + "";
-                }
+            if (s.length > 1) {
+                sourceMessage = s[1];
+            } else {
+                sourceMessage = source;
             }
         }
 
-        return sourceMessage;
-    }
-
-    //save logs to file in new thread
-    @Override
-    protected void logToFile(){
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    String log = fileLogQueue.pollFirst();
-                    if (log != null) {
-                        writeToFile(log);
-                    } else {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        });
-        thread.start();
+        return (sourceMessage == null || sourceMessage.isEmpty()) ?
+                "[" + time + "][" + logLevelMessage + "] " + message + "\n" :
+                "[" + time + "][" + logLevelMessage + "] " + message + " (" + sourceMessage + ")\n";
     }
 }

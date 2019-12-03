@@ -37,12 +37,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -50,61 +50,68 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
+
 public class ChatExplorerFragment extends Fragment {
 
+    private static final int RECENTS_MAX_SIZE = 6;
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
-    ChatExplorerFragment chatExplorerFragment;
+    private ChatExplorerFragment chatExplorerFragment;
 
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
+    private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
 
-    DatabaseHandler dbH;
+    private DatabaseHandler dbH;
 
-    Context context;
-    ActionBar aB;
-    RecyclerView listView;
-    MegaListChatExplorerAdapter adapterList;
-    RelativeLayout mainRelativeLayout;
+    private Context context;
+    private ActionBar aB;
+    private RecyclerView listView;
+    private MegaListChatExplorerAdapter adapterList;
+    private RelativeLayout mainRelativeLayout;
 
-    LinearLayoutManager mLayoutManager;
+    private LinearLayoutManager mLayoutManager;
 
-    ArrayList<MegaChatListItem> chats;
-    ArrayList<MegaChatListItem> archievedChats;
-    ArrayList<MegaContactAdapter> contacts;
-    ArrayList<ChatExplorerListItem> items;
-    ArrayList<ChatExplorerListItem> addedItems;
-    ArrayList<String> addedItemsSaved;
+    private ArrayList<ChatExplorerListItem> recents;
+    private ArrayList<MegaChatListItem> chats;
+    private ArrayList<MegaChatListItem> archievedChats;
+    private ArrayList<MegaContactAdapter> contacts;
+    private ArrayList<ChatExplorerListItem> items;
+    private ArrayList<ChatExplorerListItem> addedItems;
+    private ArrayList<String> addedItemsSaved;
 
-    int lastFirstVisiblePosition;
+    private int lastFirstVisiblePosition;
 
     //Empty screen
-    TextView emptyTextView;
-    LinearLayout emptyLayout;
-    TextView emptyTextViewInvite;
-    ImageView emptyImageView;
-    int chatStatus;
-    Button inviteButton;
-    RelativeLayout contentLayout;
-    ProgressBar progressBar;
+    private TextView emptyTextView;
+    private LinearLayout emptyLayout;
+    private TextView emptyTextViewInvite;
+    private ImageView emptyImageView;
+    private Button inviteButton;
+    private RelativeLayout contentLayout;
+    private ProgressBar progressBar;
 
-    boolean chatEnabled = true;
-    float density;
-    DisplayMetrics outMetrics;
-    Display display;
+    private boolean chatEnabled = true;
+    private float density;
+    private DisplayMetrics outMetrics;
+    private Display display;
 
-    AppBarLayout addLayout;
-    Button newGroupButton;
-    RecyclerView addedList;
-    MegaChipChatExplorerAdapter adapterAdded;
-    LinearLayoutManager addedLayoutManager;
+    private AppBarLayout addLayout;
+    private Button newGroupButton;
+    private RecyclerView addedList;
+    private MegaChipChatExplorerAdapter adapterAdded;
+    private LinearLayoutManager addedLayoutManager;
 
-    SearchTask searchTask;
+    private SearchTask searchTask;
+
+    private PositionDividerItemDecoration positionDividerItemDecoration;
+    private SimpleDividerItemDecoration simpleDividerItemDecoration;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        log("onCreate");
+        logDebug("onCreate");
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -112,7 +119,7 @@ public class ChatExplorerFragment extends Fragment {
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
-        if(Util.isChatEnabled()){
+        if(isChatEnabled()){
             chatEnabled=true;
             if (megaChatApi == null){
                 megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
@@ -125,7 +132,7 @@ public class ChatExplorerFragment extends Fragment {
             }
         }
         else{
-            log("Chat not enabled!");
+            logWarning("Chat not enabled!");
             chatEnabled=false;
         }
 
@@ -134,28 +141,28 @@ public class ChatExplorerFragment extends Fragment {
 
 
     public static ChatExplorerFragment newInstance() {
-        log("newInstance");
+        logDebug("newInstance");
         ChatExplorerFragment fragment = new ChatExplorerFragment();
         return fragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        logDebug("onCreateView");
 
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         density = getResources().getDisplayMetrics().density;
 
-        View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
+        View v = inflater.inflate(R.layout.chat_recent_explore, container, false);
 
-        contentLayout = (RelativeLayout) v.findViewById(R.id.content_layout_chat_explorer);
-        progressBar = (ProgressBar) v.findViewById(R.id.progressbar_chat_explorer);
+        contentLayout = v.findViewById(R.id.content_layout_chat_explorer);
+        progressBar = v.findViewById(R.id.progressbar_chat_explorer);
 
-        addLayout = (AppBarLayout) v.findViewById(R.id.linear_layout_add);
-        addedList = (RecyclerView) v.findViewById(R.id.contact_adds_recycler_view);
-        newGroupButton = (Button) v.findViewById(R.id.new_group_button);
+        addLayout = v.findViewById(R.id.linear_layout_add);
+        addedList = v.findViewById(R.id.contact_adds_recycler_view);
+        newGroupButton = v.findViewById(R.id.new_group_button);
         if (context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop) {
             addLayout.setVisibility(View.VISIBLE);
             addedLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
@@ -176,15 +183,14 @@ public class ChatExplorerFragment extends Fragment {
             addLayout.setVisibility(View.GONE);
         }
 
-        listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
+        listView = v.findViewById(R.id.chat_recent_list_view);
 
-        listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
         listView.setItemAnimator(new DefaultItemAnimator());
         listView.setClipToPadding(false);
-        listView.setPadding(0,Util.scaleHeightPx(8, outMetrics),0, 0);
+        listView.setPadding(0,scaleHeightPx(8, outMetrics),0, 0);
         listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -193,7 +199,7 @@ public class ChatExplorerFragment extends Fragment {
                     if (listView.canScrollVertically(-1)) {
                         ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
                         if (addLayout.getVisibility() == View.VISIBLE) {
-                            addLayout.setElevation(Util.px2dp(4, outMetrics));
+                            addLayout.setElevation(px2dp(4, outMetrics));
                         }
                     } else {
                         ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
@@ -204,7 +210,7 @@ public class ChatExplorerFragment extends Fragment {
                 }
                 else if (context instanceof ChatExplorerActivity && addLayout != null && addLayout.getVisibility() == View.VISIBLE) {
                     if (listView.canScrollVertically(-1)) {
-                        addLayout.setElevation(Util.px2dp(4, outMetrics));
+                        addLayout.setElevation(px2dp(4, outMetrics));
                     } else {
                         addLayout.setElevation(0);
                     }
@@ -212,10 +218,10 @@ public class ChatExplorerFragment extends Fragment {
             }
         });
 
-        emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_chat_recent);
-        emptyTextViewInvite = (TextView) v.findViewById(R.id.empty_text_chat_recent_invite);
-        emptyTextViewInvite.setWidth(Util.scaleWidthPx(236, outMetrics));
-        emptyTextView = (TextView) v.findViewById(R.id.empty_text_chat_recent);
+        emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
+        emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
+        emptyTextViewInvite.setWidth(scaleWidthPx(236, outMetrics));
+        emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
 
         String textToShow = String.format(context.getString(R.string.chat_explorer_empty));
         try{
@@ -234,18 +240,18 @@ public class ChatExplorerFragment extends Fragment {
         emptyTextView.setText(resultB);
 
         LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyTextViewInvite.getLayoutParams();
-        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(50, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
+        emptyTextViewParams1.setMargins(0, scaleHeightPx(50, outMetrics), 0, scaleHeightPx(24, outMetrics));
         emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
 
         LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams)emptyTextView.getLayoutParams();
-        emptyTextViewParams2.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics));
+        emptyTextViewParams2.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics));
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
-        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_recent);
+        emptyImageView = v.findViewById(R.id.empty_image_view_recent);
         emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
 
-        mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
-        inviteButton = (Button) v.findViewById(R.id.invite_button);
+        mainRelativeLayout = v.findViewById(R.id.main_relative_layout);
+        inviteButton = v.findViewById(R.id.invite_button);
         inviteButton.setVisibility(View.GONE);
 
         if(megaChatApi.isSignalActivityRequired()){
@@ -264,7 +270,7 @@ public class ChatExplorerFragment extends Fragment {
         return v;
     }
 
-    void setFirstLayoutVisibility (int visibility) {
+    private void setFirstLayoutVisibility (int visibility) {
         newGroupButton.setVisibility(visibility);
         if (visibility == View.VISIBLE) {
             addedList.setVisibility(View.GONE);
@@ -274,14 +280,14 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    public MegaContactAdapter getContact(MegaChatListItem chat) {
+    private MegaContactAdapter getContact(MegaChatListItem chat) {
         long handle = chat.getPeerHandle();
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
         MegaUser user = megaApi.getContact(userHandleEncoded);
 
 //        Maybe the contact is not my contact already
         if (user == null) {
-            log("Chat ID " + chat.getChatId() + " with PeerHandle: " + handle + " is NULL");
+            logDebug("Chat ID " + chat.getChatId() + " with PeerHandle: " + handle + " is NULL");
             return null;
         }
 
@@ -298,7 +304,7 @@ public class ChatExplorerFragment extends Fragment {
         if (handle != -1) {
             int userStatus = megaChatApi.getUserOnlineStatus(handle);
             if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
-                log("Request last green for user");
+                logDebug("Request last green for user");
                 megaChatApi.requestLastGreen(handle, null);
             }
         }
@@ -320,7 +326,7 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    void sortByAlphabetical ( ) {
+    private void sortByAlphabetical ( ) {
         Collections.sort(items, new Comparator<ChatExplorerListItem> (){
 
             public int compare(ChatExplorerListItem c1, ChatExplorerListItem c2) {
@@ -337,17 +343,17 @@ public class ChatExplorerFragment extends Fragment {
     }
 
     public void setChats(){
-        log("setChats");
+        logDebug("setChats");
 
         contentLayout.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         new RecoverItemsTask().execute();
     }
 
-    void getVisibleMEGAContacts () {
+    private void getVisibleMEGAContacts () {
         ArrayList<MegaUser> contactsMEGA = megaApi.getContacts();
         for (int i=0;i<contactsMEGA.size();i++){
-            log("contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
+            logDebug("Contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
             if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 
                 MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
@@ -376,47 +382,51 @@ public class ChatExplorerFragment extends Fragment {
     }
 
     public void itemClick(int position) {
-        log("itemClick");
+        logDebug("Position: " + position);
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
 
-        if (adapterList != null && adapterList.getItemCount() > 0) {
-            ChatExplorerListItem item = adapterList.getItem(position);
+        if (adapterList == null || adapterList.getItemCount() <= 0) {
+            return;
+        }
 
-            if (adapterList.isSearchEnabled()) {
-                if (context instanceof ChatExplorerActivity) {
-                    ((ChatExplorerActivity) context).collapseSearchView();
-                }
-                else {
-                    ((FileExplorerActivityLollipop) context).collapseSearchView();
-                }
+        ChatExplorerListItem item = adapterList.getItem(position);
+
+        if (adapterList.isSearchEnabled()) {
+            if (context instanceof ChatExplorerActivity) {
+                ((ChatExplorerActivity) context).collapseSearchView();
+            }
+            else if (context instanceof FileExplorerActivityLollipop){
+                ((FileExplorerActivityLollipop) context).collapseSearchView();
+            }
+            if (!adapterList.getItems().equals(items)) {
                 adapterList.setItems(items);
-                int togglePossition = adapterList.getPosition(item);
-                adapterList.toggleSelection(togglePossition);
             }
-            else {
-                adapterList.toggleSelection(position);
-            }
+            int togglePossition = adapterList.getPosition(item);
+            adapterList.toggleSelection(togglePossition);
+        }
+        else {
+            adapterList.toggleSelection(position);
+        }
 
 
-            if (item != null && !addedItems.contains(item)) {
-                addedItems.add(item);
-                adapterAdded.setItems(addedItems);
-                setFirstLayoutVisibility(View.GONE);
+        if (item != null && !addedItems.contains(item)) {
+            addedItems.add(item);
+            adapterAdded.setItems(addedItems);
+            setFirstLayoutVisibility(View.GONE);
 
-                if(context instanceof  ChatExplorerActivity){
-                    ((ChatExplorerActivity)context).showFabButton(true);
-                    ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
-                }
-                else if (context instanceof FileExplorerActivityLollipop){
-                    ((FileExplorerActivityLollipop)context).showFabButton(true);
-                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
-                }
+            if(context instanceof  ChatExplorerActivity){
+                ((ChatExplorerActivity)context).showFabButton(true);
+                ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
-            else if (addedItems.contains(item)) {
-                deleteItem(item);
+            else if (context instanceof FileExplorerActivityLollipop){
+                ((FileExplorerActivityLollipop)context).showFabButton(true);
+                ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
+        }
+        else if (addedItems.contains(item)) {
+            deleteItem(item);
         }
     }
 
@@ -435,101 +445,10 @@ public class ChatExplorerFragment extends Fragment {
         aB = ((AppCompatActivity)context).getSupportActionBar();
     }
 
-    public String getParticipantFullName(MegaChatRoom chat, long i){
-        String participantFirstName = chat.getPeerFirstname(i);
-        String participantLastName = chat.getPeerLastname(i);
-
-        if(participantFirstName==null){
-            participantFirstName="";
-        }
-        if(participantLastName == null){
-            participantLastName="";
-        }
-
-        if (participantFirstName.trim().length() <= 0){
-            log("Participant1: "+participantFirstName);
-            return participantLastName;
-        }
-        else{
-            log("Participant2: "+participantLastName);
-            return participantFirstName + " " + participantLastName;
-        }
-    }
-
-//    @Override
-//    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom item) {
-//        log("onChatRoomUpdate");
-//
-////        MegaChatRoom chatUpdated = megaChatApi.getChatRoom(chat.getChatId());
-////        if(chatUpdated!=null){
-////            log("chat updated: "+chat.getTitle());
-////            log("unread count: "+chat.getUnreadCount());
-////            log("change type: "+chat.getChanges());
-////        }
-//
-//        if(item.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
-//            log("CHANGE_TYPE_UNREAD_COUNT for the chat: "+item.getChatId());
-//            if(item!=null){
-//
-//                if (adapterList == null || adapterList.getItemCount()==0){
-//                    setChats();
-//                }
-//                else{
-//                    long chatHandleToUpdate = item.getChatId();
-//                    int indexToReplace = -1;
-//                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-//                    while (itrReplace.hasNext()) {
-//                        MegaChatListItem chat = itrReplace.next();
-//                        if(chat!=null){
-//                            if(chat.getChatId()==chatHandleToUpdate){
-//                                indexToReplace = itrReplace.nextIndex()-1;
-//                                break;
-//                            }
-//                        }
-//                        else{
-//                            break;
-//                        }
-//                    }
-//                    if(indexToReplace!=-1){
-//                        log("Index to replace: "+indexToReplace);
-//                        MegaChatListItem chatToReplace = megaChatApi.getChatListItem(item.getChatId());
-//                        log("Unread count: "+chatToReplace.getUnreadCount());
-//                        chats.set(indexToReplace, chatToReplace);
-//
-//                        adapterList.modifyChat(chats, indexToReplace);
-//                        adapterList.setPositionClicked(-1);
-//
-//                        if (adapterList.getItemCount() == 0){
-//                            log("adapterList.getItemCount() == 0");
-//                            listView.setVisibility(View.GONE);
-//                            emptyLayout.setVisibility(View.VISIBLE);
-//                        }
-//                        else{
-//                            log("adapterList.getItemCount() NOT = 0");
-//                            listView.setVisibility(View.VISIBLE);
-//                            emptyLayout.setVisibility(View.GONE);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-//    @Override
-//    public void onViewStateRestored(Bundle savedInstanceState) {
-//        log("onViewStateRestored");
-//        super.onViewStateRestored(savedInstanceState);
-//
-//        if(savedInstanceState != null)
-//        {
-//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
-//            listView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-//        }
-//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        log("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         if(listView.getLayoutManager()!=null){
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
@@ -551,14 +470,14 @@ public class ChatExplorerFragment extends Fragment {
 
     @Override
     public void onPause() {
-        log("onPause");
+        logDebug("onPause");
         lastFirstVisiblePosition = ((LinearLayoutManager)listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
         super.onPause();
     }
 
     @Override
     public void onResume() {
-        log("onResume: lastFirstVisiblePosition " +lastFirstVisiblePosition);
+        logDebug("lastFirstVisiblePosition: " + lastFirstVisiblePosition);
         if(lastFirstVisiblePosition>0){
             (listView.getLayoutManager()).scrollToPosition(lastFirstVisiblePosition);
         }else{
@@ -568,16 +487,9 @@ public class ChatExplorerFragment extends Fragment {
         super.onResume();
     }
 
-    public int getItemCount(){
-        if(adapterList != null){
-            return adapterList.getItemCount();
-        }
-        return 0;
-    }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        log("onActivityCreated");
+        logDebug("onActivityCreated");
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
@@ -586,14 +498,7 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    public long getChatIdFrom(){
-        if(context instanceof  ChatExplorerActivity){
-            return ((ChatExplorerActivity)context).chatIdFrom;
-        }
-        return -1;
-    }
-
-    public long getMegaContactHandle (MegaContactAdapter contact) {
+    private long getMegaContactHandle (MegaContactAdapter contact) {
         long handle = -1;
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
@@ -663,7 +568,7 @@ public class ChatExplorerFragment extends Fragment {
         deleteItem(item);
     }
 
-    public void deleteItem(ChatExplorerListItem item) {
+    private void deleteItem(ChatExplorerListItem item) {
         if (item != null) {
             addedItems.remove(item);
             adapterAdded.setItems(addedItems);
@@ -693,7 +598,7 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    class RecoverItemsTask extends AsyncTask<Void, Void, Void> {
+    private class RecoverItemsTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -734,10 +639,52 @@ public class ChatExplorerFragment extends Fragment {
                 }
 
                 chats = megaChatApi.getActiveChatListItems();
+
+                if (!chats.isEmpty()) {
+                    Collections.sort(chats, new Comparator<MegaChatListItem>() {
+
+                        public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+                            long timestamp1 = c1.getLastTimestamp();
+                            long timestamp2 = c2.getLastTimestamp();
+
+                            long result = timestamp2 - timestamp1;
+                            return (int) result;
+                        }
+                    });
+
+                    recents = new ArrayList<>();
+                    recents.add(new ChatExplorerListItem(true, true));
+                    ArrayList<MegaChatListItem> removeChats = new ArrayList<>();
+                    for (MegaChatListItem chat : chats) {
+                        if (chat.getOwnPrivilege() < MegaChatRoom.PRIV_STANDARD) {
+                            continue;
+                        }
+                        ChatExplorerListItem item;
+                        if (chat.isGroup()) {
+                            item = new ChatExplorerListItem(chat);
+                        }
+                        else {
+                            item = new ChatExplorerListItem(chat, getContact(chat));
+                        }
+                        item.setRecent(true);
+                        recents.add(item);
+                        removeChats.add(chat);
+                        if (recents.size() == RECENTS_MAX_SIZE) {
+                            break;
+                        }
+                    }
+                    for (MegaChatListItem remove: removeChats) {
+                        chats.remove(remove);
+                    }
+                }
+
                 archievedChats = megaChatApi.getArchivedChatListItems();
                 getVisibleMEGAContacts();
 
                 for (MegaChatListItem chat : chats) {
+                    if (chat.getOwnPrivilege() < MegaChatRoom.PRIV_STANDARD) {
+                        continue;
+                    }
                     if (chat.isGroup()) {
                         items.add(new ChatExplorerListItem(chat));
                     }
@@ -747,6 +694,9 @@ public class ChatExplorerFragment extends Fragment {
                 }
 
                 for (MegaChatListItem archieved : archievedChats) {
+                    if (archieved.getOwnPrivilege() < MegaChatRoom.PRIV_STANDARD) {
+                        continue;
+                    }
                     if (archieved.isGroup()) {
                         items.add(new ChatExplorerListItem(archieved));
                     }
@@ -764,7 +714,7 @@ public class ChatExplorerFragment extends Fragment {
                                 if (handle != -1) {
                                     int userStatus = megaChatApi.getUserOnlineStatus(handle);
                                     if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
-                                        log("Request last green for user");
+                                        logDebug("Request last green for user");
                                         if (context instanceof ChatExplorerActivity) {
                                             megaChatApi.requestLastGreen(handle, (ChatExplorerActivity) context);
                                         }
@@ -779,39 +729,18 @@ public class ChatExplorerFragment extends Fragment {
                     }
                 }
 
-                log("items no: "+items.size());
+                logDebug("Items number: " + items.size());
 
                 //Order by title
                 sortByAlphabetical();
-
-                if (adapterList == null){
-                    log("adapterList is NULL");
-                    adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView);
-                }
-                else{
-                    adapterList.setItems(items);
+                if (!items.isEmpty()) {
+                    items.add(0, new ChatExplorerListItem(true, false));
                 }
 
-                if (addedItemsSaved != null && !addedItemsSaved.isEmpty()) {
-                    for (String id : addedItemsSaved) {
-                        for (ChatExplorerListItem item : items) {
-                            if (item.getId().equals(id)) {
-                                addedItems.add(item);
-                                int position = adapterList.getPosition(item);
-                                if (position != -1) {
-                                    adapterList.toggleSelection(position);
-                                }
-                                break;
-                            }
-                        }
+                if (recents != null) {
+                    for (int i = 0; i < recents.size(); i++) {
+                        items.add(i, recents.get(i));
                     }
-                }
-
-                if (adapterAdded == null) {
-                    adapterAdded = new MegaChipChatExplorerAdapter(context, chatExplorerFragment, addedItems);
-                }
-                else {
-                    adapterAdded.setItems(addedItems);
                 }
             }
 
@@ -820,55 +749,114 @@ public class ChatExplorerFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            if (adapterList == null){
+                logWarning("AdapterList is NULL");
+                adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView);
+            }
+            else{
+                adapterList.setItems(items);
+            }
+
+            if (adapterAdded == null) {
+                adapterAdded = new MegaChipChatExplorerAdapter(context, chatExplorerFragment, addedItems);
+            }
+            else {
+                adapterAdded.setItems(addedItems);
+            }
 
             addedList.setAdapter(adapterAdded);
 
-            listView.setAdapter(adapterList);
-
-            if (adapterAdded.getItemCount() == 0) {
-                setFirstLayoutVisibility(View.VISIBLE);
-
-                if(context instanceof  ChatExplorerActivity){
-                    ((ChatExplorerActivity)context).setToolbarSubtitle(null);
-                }
-                else if (context instanceof FileExplorerActivityLollipop){
-                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(null);
-                }
-            }
-            else {
-                setFirstLayoutVisibility(View.GONE);
-
-                if(context instanceof  ChatExplorerActivity){
-                    ((ChatExplorerActivity)context).showFabButton(true);
-                    ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
-                }
-                else if (context instanceof FileExplorerActivityLollipop){
-                    ((FileExplorerActivityLollipop) context).showFabButton(true);
-                    ((FileExplorerActivityLollipop) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
-                }
+            if (addedItemsSaved != null && !addedItemsSaved.isEmpty()) {
+                new RecoverSavedItemsTask().execute();
+                return;
             }
 
-            if (context instanceof ChatExplorerActivity) {
-                ((ChatExplorerActivity) context).isPendingToOpenSearchView();
-            }
-            else if (context instanceof FileExplorerActivityLollipop) {
-                ((FileExplorerActivityLollipop) context).isPendingToOpenSearchView();
-            }
-            contentLayout.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
-            setListVisibility();
+            setFinalViews();
         }
     }
 
-    void setListVisibility () {
+    private void setFinalViews() {
+        int position;
+        if (recents != null && !recents.isEmpty()) {
+            position = recents.size();
+        }
+        else {
+            position = -1;
+        }
+        positionDividerItemDecoration = new PositionDividerItemDecoration(context, outMetrics, position);
+        simpleDividerItemDecoration = new SimpleDividerItemDecoration(context, outMetrics);
+        listView.addItemDecoration(positionDividerItemDecoration);
+        listView.setAdapter(adapterList);
+
+        if (adapterAdded.getItemCount() == 0) {
+            setFirstLayoutVisibility(View.VISIBLE);
+
+            if(context instanceof  ChatExplorerActivity){
+                ((ChatExplorerActivity)context).setToolbarSubtitle(null);
+            }
+            else if (context instanceof FileExplorerActivityLollipop){
+                ((FileExplorerActivityLollipop)context).setToolbarSubtitle(null);
+            }
+        }
+        else {
+            setFirstLayoutVisibility(View.GONE);
+
+            if(context instanceof  ChatExplorerActivity){
+                ((ChatExplorerActivity)context).showFabButton(true);
+                ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+            }
+            else if (context instanceof FileExplorerActivityLollipop){
+                ((FileExplorerActivityLollipop) context).showFabButton(true);
+                ((FileExplorerActivityLollipop) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+            }
+        }
+
+        if (context instanceof ChatExplorerActivity) {
+            ((ChatExplorerActivity) context).isPendingToOpenSearchView();
+        }
+        else if (context instanceof FileExplorerActivityLollipop) {
+            ((FileExplorerActivityLollipop) context).isPendingToOpenSearchView();
+        }
+        contentLayout.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+        setListVisibility();
+    }
+
+    private class RecoverSavedItemsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            for (String id : addedItemsSaved) {
+                for (ChatExplorerListItem item : items) {
+                    if (!item.isHeader() && item.getId().equals(id)) {
+                        addedItems.add(item);
+                        int position = adapterList.getPosition(item);
+                        if (position != -1) {
+                            adapterList.toggleSelection(position);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            setFinalViews();
+        }
+    }
+
+    private void setListVisibility () {
         if (adapterList.getItemCount() == 0){
-            log("adapterList.getItemCount() == 0");
+            logDebug("adapterList.getItemCount() == 0");
             listView.setVisibility(View.GONE);
             addLayout.setVisibility(View.GONE);
             emptyLayout.setVisibility(View.VISIBLE);
         }
         else{
-            log("adapterList.getItemCount() NOT = 0");
+            logDebug("adapterList.getItemCount() NOT = 0");
             listView.setVisibility(View.VISIBLE);
             if (!adapterList.isSearchEnabled()) {
                 addLayout.setVisibility(View.VISIBLE);
@@ -877,7 +865,7 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    class SearchTask extends AsyncTask<String, Void, Void> {
+    private class SearchTask extends AsyncTask<String, Void, Void> {
 
         ArrayList<ChatExplorerListItem> searchItems = new ArrayList<>();
         SparseBooleanArray searchSelectedItems = new SparseBooleanArray();
@@ -890,9 +878,9 @@ public class ChatExplorerFragment extends Fragment {
             if (addedItems != null && !addedItems.isEmpty()) {
                 areAddedItems = true;
             }
-
-            for (ChatExplorerListItem item : items) {
-                if (item.getTitle().toLowerCase().contains(s.toLowerCase())) {
+            ArrayList<ChatExplorerListItem> copiedItems = items;
+            for (ChatExplorerListItem item : copiedItems) {
+                if (!item.isHeader() && item.getTitle().toLowerCase().contains(s.toLowerCase())) {
                     searchItems.add(item);
                     if (areAddedItems && addedItems.contains(item)) {
                         searchSelectedItems.put(searchItems.indexOf(item), true);
@@ -901,12 +889,14 @@ public class ChatExplorerFragment extends Fragment {
             }
 
             adapterList.setSearchSelectedItems(searchSelectedItems);
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            if (!adapterList.isSearchEnabled()) {
+                return;
+            }
             adapterList.setItems(searchItems);
             setListVisibility();
         }
@@ -922,6 +912,9 @@ public class ChatExplorerFragment extends Fragment {
 
     public void enableSearch(boolean enable) {
         if (enable) {
+            listView.removeItemDecoration(positionDividerItemDecoration);
+            listView.addItemDecoration(simpleDividerItemDecoration);
+            listView.invalidateItemDecorations();
             search("");
             if (addLayout.getVisibility() == View.VISIBLE) {
                 addLayout.setVisibility(View.GONE);
@@ -937,12 +930,19 @@ public class ChatExplorerFragment extends Fragment {
             }
         }
         else{
+            listView.removeItemDecoration(simpleDividerItemDecoration);
+            listView.addItemDecoration(positionDividerItemDecoration);
+            listView.invalidateItemDecorations();
+
             if (addLayout.getVisibility() == View.GONE) {
                 addLayout.setVisibility(View.VISIBLE);
             }
 
             if (adapterList != null && adapterList.isSearchEnabled()) {
                 adapterList.setSearchEnabled(enable);
+                if (!adapterList.getItems().equals(items)) {
+                    adapterList.setItems(items);
+                }
             }
 
             if (adapterAdded != null && adapterAdded.getItemCount() == 0) {
@@ -959,9 +959,6 @@ public class ChatExplorerFragment extends Fragment {
                 }
             }
         }
-    }
-
-    private static void log(String log) {
-        Util.log("ChatExplorerFragment", log);
+        setListVisibility();
     }
 }

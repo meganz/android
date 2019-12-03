@@ -46,20 +46,21 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
-import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class NodeController {
 
@@ -71,7 +72,7 @@ public class NodeController {
     boolean isFolderLink = false;
 
     public NodeController(Context context){
-        log("NodeController created");
+        logDebug("NodeController created");
         this.context = context;
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -82,7 +83,7 @@ public class NodeController {
     }
 
     public NodeController(Context context, boolean isFolderLink){
-        log("NodeController created");
+        logDebug("NodeController created");
         this.context = context;
         this.isFolderLink = isFolderLink;
         if (megaApi == null){
@@ -99,7 +100,7 @@ public class NodeController {
     }
 
     public void chooseLocationToCopyNodes(ArrayList<Long> handleList){
-        log("chooseLocationToCopyNodes");
+        logDebug("chooseLocationToCopyNodes");
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
         long[] longArray = new long[handleList.size()];
@@ -107,14 +108,14 @@ public class NodeController {
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_COPY_FOLDER);
+        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
     }
 
     public void copyNodes(long[] copyHandles, long toHandle) {
-        log("copyNodes");
+        logDebug("copyNodes");
 
-        if(!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+        if(!isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -122,27 +123,27 @@ public class NodeController {
         if(parent!=null) {
             MultipleRequestListener copyMultipleListener = null;
             if (copyHandles.length > 1) {
-                log("Copy multiple files");
-                copyMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_COPY, context);
+                logDebug("Copy multiple files");
+                copyMultipleListener = new MultipleRequestListener(MULTIPLE_COPY, context);
                 for (int i = 0; i < copyHandles.length; i++) {
                     MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
                     if (cN != null){
-                        log("cN != null, i = " + i + " of " + copyHandles.length);
+                        logDebug("cN != null, i = " + i + " of " + copyHandles.length);
                         megaApi.copyNode(cN, parent, copyMultipleListener);
                     }
                     else{
-                        log("cN == null, i = " + i + " of " + copyHandles.length);
+                        logWarning("cN == null, i = " + i + " of " + copyHandles.length);
                     }
                 }
             } else {
-                log("Copy one file");
+                logDebug("Copy one file");
                 MegaNode cN = megaApi.getNodeByHandle(copyHandles[0]);
                 if (cN != null){
-                    log("cN != null");
+                    logDebug("cN != null");
                     megaApi.copyNode(cN, parent, (ManagerActivityLollipop) context);
                 }
                 else{
-                    log("cN == null");
+                    logWarning("cN == null");
                     if(context instanceof ManagerActivityLollipop){
                         ((ManagerActivityLollipop)context).copyError();
                     }
@@ -153,7 +154,7 @@ public class NodeController {
     }
 
     public void chooseLocationToMoveNodes(ArrayList<Long> handleList){
-        log("chooseLocationToMoveNodes");
+        logDebug("chooseLocationToMoveNodes");
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
         long[] longArray = new long[handleList.size()];
@@ -161,30 +162,30 @@ public class NodeController {
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("MOVE_FROM", longArray);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_MOVE_FOLDER);
+        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
     }
 
     public void moveNodes(long[] moveHandles, long toHandle){
-        log("moveNodes");
+        logDebug("moveNodes");
 
-        if(!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+        if(!isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
         MegaNode parent = megaApi.getNodeByHandle(toHandle);
         if(parent!=null){
-            MultipleRequestListener moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_MOVE, context);
+            MultipleRequestListener moveMultipleListener = new MultipleRequestListener(MULTIPLE_MOVE, context);
 
             if(moveHandles.length>1){
-                log("MOVE multiple: "+moveHandles.length);
+                logDebug("MOVE multiple: " + moveHandles.length);
 
                 for(int i=0; i<moveHandles.length;i++){
                     megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, moveMultipleListener);
                 }
             }
             else{
-                log("MOVE single");
+                logDebug("MOVE single");
 
                 megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[0]), parent, (ManagerActivityLollipop) context);
             }
@@ -192,22 +193,35 @@ public class NodeController {
     }
 
     public void checkIfNodeIsMineAndSelectChatsToSendNode(MegaNode node) {
-        log("checkIfNodeIsMineAndSelectChatsToSendNode");
+        logDebug("checkIfNodeIsMineAndSelectChatsToSendNode");
         ArrayList<MegaNode> nodes = new ArrayList<>();
         nodes.add(node);
         checkIfNodesAreMineAndSelectChatsToSendNodes(nodes);
     }
 
     public void checkIfNodesAreMineAndSelectChatsToSendNodes(ArrayList<MegaNode> nodes) {
-        log("checkIfNodesAreMineAndSelectChatsToSendNodes");
+        logDebug("checkIfNodesAreMineAndSelectChatsToSendNodes");
 
-        MegaNode currentNode;
         ArrayList<MegaNode> ownerNodes = new ArrayList<>();
         ArrayList<MegaNode> notOwnerNodes = new ArrayList<>();
 
         if (nodes == null) {
             return;
         }
+
+        checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes);
+
+        if (notOwnerNodes.size() == 0) {
+            selectChatsToSendNodes(ownerNodes);
+            return;
+        }
+
+        CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
+        copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
+    }
+
+    public void checkIfNodesAreMine(ArrayList<MegaNode> nodes, ArrayList<MegaNode> ownerNodes, ArrayList<MegaNode> notOwnerNodes) {
+        MegaNode currentNode;
 
         for (int i=0; i<nodes.size(); i++) {
             currentNode = nodes.get(i);
@@ -236,18 +250,10 @@ public class NodeController {
                 }
             }
         }
-
-        if (notOwnerNodes.size() == 0) {
-            selectChatsToSendNodes(ownerNodes);
-        }
-        else {
-            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
-            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
-        }
     }
 
     public void selectChatsToSendNodes(ArrayList<MegaNode> nodes){
-        log("selectChatsToSendNodes");
+        logDebug("selectChatsToSendNodes");
 
         int size = nodes.size();
         long[] longArray = new long[size];
@@ -257,22 +263,22 @@ public class NodeController {
         }
 
         Intent i = new Intent(context, ChatExplorerActivity.class);
-        i.putExtra("NODE_HANDLES", longArray);
+        i.putExtra(NODE_HANDLES, longArray);
 
         if(context instanceof FullScreenImageViewerLollipop){
-            ((FullScreenImageViewerLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+            ((FullScreenImageViewerLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
         else if(context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+            ((ManagerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
         else if (context instanceof PdfViewerActivityLollipop){
-            ((PdfViewerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+            ((PdfViewerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
         else if (context instanceof AudioVideoPlayerLollipop){
-            ((AudioVideoPlayerLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+            ((AudioVideoPlayerLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
         else if (context instanceof FileInfoActivityLollipop) {
-            ((FileInfoActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+            ((FileInfoActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
     }
 
@@ -327,31 +333,31 @@ public class NodeController {
         intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
         intent.setClass(context, FileStorageActivityLollipop.class);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-        intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
+        intent.putExtra(HIGH_PRIORITY_TRANSFER, highPriority);
 
         if(context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
         else if(context instanceof FullScreenImageViewerLollipop){
-            ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
         else if(context instanceof FileInfoActivityLollipop){
-            ((FileInfoActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            ((FileInfoActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
         else if(context instanceof ContactFileListActivityLollipop){
-            ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            ((ContactFileListActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
         else if(context instanceof PdfViewerActivityLollipop){
-            ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            ((PdfViewerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
         else if(context instanceof AudioVideoPlayerLollipop){
-            ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
     }
 
     //Old onFileClick
     public void prepareForDownloadLollipop(ArrayList<Long> handleList, final boolean highPriority){
-        log("prepareForDownload: "+handleList.size()+" files to download");
+        logDebug("prepareForDownload: " + handleList.size() + " files to download");
         long size = 0;
         long[] hashes = new long[handleList.size()];
         for (int i=0;i<handleList.size();i++){
@@ -363,21 +369,21 @@ public class NodeController {
                 }
             }
             else{
-                log("Error - nodeTemp is NULL");
+                logWarning("Error - nodeTemp is NULL");
             }
 
         }
-        log("Number of files: "+hashes.length);
+        logDebug("Number of files: " + hashes.length);
 
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        boolean askMe = Util.askMe(context);
+        boolean askMe = askMe(context);
         String downloadLocationDefaultPath = getDownloadLocation(context);
 
         if (askMe){
-            log("askMe");
+            logDebug("askMe");
             File[] fs = context.getExternalFilesDirs(null);
             if (fs.length > 1){
                 if (fs[1] == null){
@@ -410,7 +416,7 @@ public class NodeController {
                                         String path = fs[1].getAbsolutePath();
                                         File defaultPathF = new File(path);
                                         defaultPathF.mkdirs();
-                                        showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
+                                        showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
                                         checkSizeBeforeDownload(path, null, sizeFinal, hashesFinal, highPriority);
                                     }
                                     break;
@@ -434,43 +440,38 @@ public class NodeController {
             }
         }
         else{
-            log("NOT askMe");
+            logDebug("NOT askMe");
             File defaultPathF = new File(downloadLocationDefaultPath);
             defaultPathF.mkdirs();
             checkSizeBeforeDownload(downloadLocationDefaultPath, null, size, hashes, highPriority);
         }
     }
 
-    void showSnackbar(int type, String s) {
-        if(context instanceof ManagerActivityLollipop){
+    private void showSnackbar(int type, String s) {
+        if (context instanceof ManagerActivityLollipop) {
             ((ManagerActivityLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if(context instanceof FullScreenImageViewerLollipop){
+        } else if (context instanceof FullScreenImageViewerLollipop) {
             ((FullScreenImageViewerLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if(context instanceof FileInfoActivityLollipop){
+        } else if (context instanceof FileInfoActivityLollipop) {
             ((FileInfoActivityLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if(context instanceof ContactFileListActivityLollipop){
+        } else if (context instanceof ContactFileListActivityLollipop) {
             ((ContactFileListActivityLollipop) context).showSnackbar(type, s);
-        }
-        else if(context instanceof PdfViewerActivityLollipop){
+        } else if (context instanceof PdfViewerActivityLollipop) {
             ((PdfViewerActivityLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if(context instanceof AudioVideoPlayerLollipop){
+        } else if (context instanceof AudioVideoPlayerLollipop) {
             ((AudioVideoPlayerLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if(context instanceof ContactInfoActivityLollipop){
+        } else if (context instanceof ContactInfoActivityLollipop) {
             ((ContactInfoActivityLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if (context instanceof GetLinkActivityLollipop) {
+        } else if (context instanceof GetLinkActivityLollipop) {
             ((GetLinkActivityLollipop) context).showSnackbar(s);
+        } else {
+            showSnackBar(context, type, s, -1);
         }
     }
 
     //Old onFileClick
     public void prepareForDownloadPreLollipop(ArrayList<Long> handleList, boolean highPriority){
-        log("prepareForDownloadPreLollipop: "+handleList.size()+" files to download");
+        logDebug(handleList.size() + " files to download");
         long size = 0;
         long[] hashes = new long[handleList.size()];
         for (int i=0;i<handleList.size();i++){
@@ -480,13 +481,13 @@ public class NodeController {
                 size += nodeTemp.getSize();
             }
         }
-        log("Number of files: "+hashes.length);
+        logDebug("Number of files: " + hashes.length);
 
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        boolean askMe = Util.askMe(context);
+        boolean askMe = askMe(context);
         boolean advancedDevices=false;
         String downloadLocationDefaultPath = getDownloadLocation(context);
         prefs = dbH.getPreferences();
@@ -502,9 +503,9 @@ public class NodeController {
         }
 
         if (askMe){
-            log("askMe");
+            logDebug("askMe");
             if(advancedDevices){
-                log("advancedDevices");
+                logDebug("advancedDevices");
                 //Launch Intent to SAF
                 if(hashes.length==1){
                     if(context instanceof ManagerActivityLollipop){
@@ -533,12 +534,12 @@ public class NodeController {
                 }
             }
             else{
-                log("NOT advancedDevices");
+                logDebug("NOT advancedDevices");
                 requestLocalFolder(highPriority, size, hashes);
             }
         }
         else{
-            log("NOT askMe");
+            logDebug("NOT askMe");
             File defaultPathF = new File(downloadLocationDefaultPath);
             defaultPathF.mkdirs();
             checkSizeBeforeDownload(downloadLocationDefaultPath, null, size, hashes, highPriority);
@@ -549,9 +550,9 @@ public class NodeController {
     //Old downloadTo
     public void checkSizeBeforeDownload(String parentPath, String url, long size, long [] hashes, boolean highPriority){
         //Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
-        log("checkSizeBeforeDownload - parentPath: "+parentPath+ " url: "+url+" size: "+size);
-        log("files to download: "+hashes.length);
-        log("SIZE to download before calculating: "+size);
+        logDebug("parentPath: " + parentPath + ", url: " + url + ", size: " + size);
+        logDebug("Files to download: " + hashes.length);
+        logDebug("SIZE to download before calculating: " + size);
 
         final String parentPathC = parentPath;
         final String urlC = url;
@@ -562,8 +563,8 @@ public class NodeController {
             MegaNode node = megaApi.getNodeByHandle(hash);
             if(node!=null){
                 if(node.isFolder()){
-                    log("node to download is FOLDER");
-                    sizeTemp=sizeTemp+ MegaApiUtils.getFolderSize(node, context);
+                    logDebug("Node to download is FOLDER");
+                    sizeTemp=sizeTemp+ getFolderSize(node, context);
                 }
                 else{
                     sizeTemp = sizeTemp+node.getSize();
@@ -572,7 +573,7 @@ public class NodeController {
         }
 
         final long sizeC = sizeTemp;
-        log("the final size is: "+Util.getSizeString(sizeTemp));
+        logDebug("The final size is: " + getSizeString(sizeTemp));
 
         //Check if there is available space
         double availableFreeSpace = Double.MAX_VALUE;
@@ -582,11 +583,11 @@ public class NodeController {
         }
         catch(Exception ex){}
 
-        log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
+        logDebug("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
 
         if(availableFreeSpace < sizeC) {
-            showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
-            log("Not enough space");
+            showSnackbar(NOT_SPACE_SNACKBAR_TYPE, null);
+            logWarning("Not enough space");
             return;
         }
 
@@ -601,17 +602,17 @@ public class NodeController {
         }
 
         if(ask.equals("false")){
-            log("SIZE: Do not ask before downloading");
+            logDebug("SIZE: Do not ask before downloading");
             checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
         }
         else{
-            log("SIZE: Ask before downloading");
+            logDebug("SIZE: Ask before downloading");
             //Check size to download
             //100MB=104857600
             //10MB=10485760
             //1MB=1048576
             if(sizeC>104857600) {
-                log("Show size confirmacion: " + sizeC);
+                logDebug("Show size confirmacion: " + sizeC);
                 //Show alert
                 if (context instanceof ManagerActivityLollipop) {
                     ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
@@ -642,7 +643,7 @@ public class NodeController {
 
     //Old proceedToDownload
     public void checkInstalledAppBeforeDownload(String parentPath, String url, long size, long [] hashes, boolean highPriority){
-        log("checkInstalledAppBeforeDownload");
+        logDebug("checkInstalledAppBeforeDownload");
         boolean confirmationToDownload = false;
         final String parentPathC = parentPath;
         final String urlC = url;
@@ -657,36 +658,36 @@ public class NodeController {
         String ask=dbH.getAttributes().getAskNoAppDownload();
 
         if(ask==null){
-            log("ask==null");
+            logDebug("ask==null");
             ask="true";
         }
 
         if(ask.equals("false")){
-            log("INSTALLED APP: Do not ask before downloading");
+            logDebug("INSTALLED APP: Do not ask before downloading");
             download(parentPathC, urlC, sizeC, hashesC, highPriority);
         }
         else{
-            log("INSTALLED APP: Ask before downloading");
+            logDebug("INSTALLED APP: Ask before downloading");
             if (hashes != null){
                 for (long hash : hashes) {
                     MegaNode node = megaApi.getNodeByHandle(hash);
                     if(node!=null){
-                        log("Node: "+ node.getName());
+                        logDebug("Node: " + node.getHandle());
 
                         if(node.isFile()){
                             Intent checkIntent = new Intent(Intent.ACTION_GET_CONTENT, null);
-                            log("MimeTypeList: "+ MimeTypeList.typeForName(node.getName()).getType());
+                            logDebug("MimeTypeList: " + MimeTypeList.typeForName(node.getName()).getType());
 
                             checkIntent.setType(MimeTypeList.typeForName(node.getName()).getType());
 
                             try{
-                                if (!MegaApiUtils.isIntentAvailable(context, checkIntent)){
+                                if (!isIntentAvailable(context, checkIntent)){
                                     confirmationToDownload = true;
                                     nodeToDownload=node.getName();
                                     break;
                                 }
                             }catch(Exception e){
-                                log("isIntent EXCEPTION");
+                                logWarning("isIntent EXCEPTION", e);
                                 confirmationToDownload = true;
                                 nodeToDownload=node.getName();
                                 break;
@@ -694,7 +695,7 @@ public class NodeController {
                         }
                     }
                     else{
-                        log("ERROR - node is NULL");
+                        logWarning("ERROR - node is NULL");
                     }
                 }
             }
@@ -732,35 +733,34 @@ public class NodeController {
 
     void askForPermissions () {
         if(context instanceof ManagerActivityLollipop){
-            ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+            ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
         else if (context instanceof FileLinkActivityLollipop) {
-            ActivityCompat.requestPermissions((FileLinkActivityLollipop)context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+            ActivityCompat.requestPermissions((FileLinkActivityLollipop)context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
         else if(context instanceof FullScreenImageViewerLollipop){
-            ActivityCompat.requestPermissions(((FullScreenImageViewerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+            ActivityCompat.requestPermissions(((FullScreenImageViewerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
         else if(context instanceof FileInfoActivityLollipop){
-            ActivityCompat.requestPermissions(((FileInfoActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+            ActivityCompat.requestPermissions(((FileInfoActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
         else if(context instanceof ContactFileListActivityLollipop){
-            ActivityCompat.requestPermissions(((ContactFileListActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+            ActivityCompat.requestPermissions(((ContactFileListActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
         else if(context instanceof PdfViewerActivityLollipop){
-            ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+            ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
         else if(context instanceof AudioVideoPlayerLollipop){
-            ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+            ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
         else if(context instanceof ContactInfoActivityLollipop){
-            ActivityCompat.requestPermissions(((ContactInfoActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+            ActivityCompat.requestPermissions(((ContactInfoActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
     }
 
     public void download(String parentPath, String url, long size, long [] hashes, boolean highPriority){
-        log("download-----------");
-        log("downloadTo, parentPath: "+parentPath+ "url: "+url+" size: "+size);
-        log("files to download: "+hashes.length);
+        logDebug("parentPath: " + parentPath + ", url: " + url + ", size: " + size);
+        logDebug("files to download: " + hashes.length);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasStoragePermission) {
@@ -769,16 +769,16 @@ public class NodeController {
         }
 
         if (hashes == null){
-            log("hashes is null");
+            logWarning("hashes is null");
             if(url != null) {
-                log("url NOT null");
+                logDebug("url NOT null");
                 Intent service = new Intent(context, DownloadService.class);
                 service.putExtra(DownloadService.EXTRA_URL, url);
                 service.putExtra(DownloadService.EXTRA_SIZE, size);
                 service.putExtra(DownloadService.EXTRA_PATH, parentPath);
                 service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
                 if(highPriority){
-                    service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
+                    service.putExtra(HIGH_PRIORITY_TRANSFER, true);
                 }
                 if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                     service.putExtra("fromMV", true);
@@ -787,47 +787,47 @@ public class NodeController {
             }
         }
         else{
-            log("hashes is NOT null");
+            logDebug("hashes is NOT null");
             if(hashes.length == 1){
-                log("hashes.length == 1");
+                logDebug("hashes.length == 1");
                 MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
 
                 if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-                    log("ISFILE");
+                    logDebug("ISFILE");
                     String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
                     MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
                     if(localPath != null){
-                        log("localPath != null");
+                        logDebug("localPath != null");
                         try {
-                            log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
+                            logDebug("Call to copyFile: localPath: " + localPath+" node name: " + tempNode.getName());
                             copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 
                             if(isVideoFile(parentPath+"/"+tempNode.getName())){
-                                log("Is video!!!");
+                                logDebug("Is video!!!");
                                 if (tempNode != null){
                                     if(!tempNode.hasThumbnail()){
-                                        log("The video has not thumb");
-                                        ThumbnailUtilsLollipop.createThumbnailVideo(context, localPath, megaApi, tempNode.getHandle());
+                                        logWarning("The video has not thumb");
+                                        createThumbnailVideo(context, localPath, megaApi, tempNode.getHandle());
                                     }
                                 }
                             }
                             else{
-                                log("NOT video!");
+                                logDebug("NOT video!");
                             }
                         }
                         catch(Exception e) {
-                            log("Exception!!");
+                            logError("Exception!!", e);
                         }
     
                         boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
                         if (!autoPlayEnabled) {
-                            log("auto play disabled");
-                            Util.showSnackBar(context,Constants.SNACKBAR_TYPE,context.getString(R.string.general_already_downloaded),-1);
+                            logDebug("Auto play disabled");
+                            showSnackBar(context,SNACKBAR_TYPE,context.getString(R.string.general_already_downloaded),-1);
                             return;
                         }
                         if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
-                            log("MimeTypeList ZIP");
+                            logDebug("MimeTypeList ZIP");
                             File zipFile = new File(localPath);
 
                             Intent intentZip = new Intent();
@@ -839,9 +839,9 @@ public class NodeController {
 
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
-                            log("Pdf file");
+                            logDebug("Pdf file");
                             if (context instanceof PdfViewerActivityLollipop){
-                                ((PdfViewerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
+                                ((PdfViewerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                             }
                             else {
                                 File pdfFile = new File(localPath);
@@ -861,9 +861,9 @@ public class NodeController {
                             }
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isVideoReproducible() || MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
-                            log("Video/Audio file");
+                            logDebug("Video/Audio file");
                             if (context instanceof AudioVideoPlayerLollipop){
-                                ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
+                                ((AudioVideoPlayerLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                             }
                             else {
                                 File mediaFile = new File(localPath);
@@ -882,7 +882,7 @@ public class NodeController {
                                     internalIntent = true;
                                     mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                                 }
-                                mediaIntent.putExtra("isPlayList", false);
+                                mediaIntent.putExtra(IS_PLAYLIST, false);
                                 mediaIntent.putExtra("HANDLE", tempNode.getHandle());
                                 mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -900,11 +900,11 @@ public class NodeController {
                                     context.startActivity(mediaIntent);
                                 }
                                 else {
-                                    if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+                                    if (isIntentAvailable(context, mediaIntent)){
                                         context.startActivity(mediaIntent);
                                     }
                                     else {
-                                        showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.intent_not_available));
+                                        showSnackbar(SNACKBAR_TYPE, context.getString(R.string.intent_not_available));
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                             intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -913,8 +913,8 @@ public class NodeController {
                                             intentShare.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                         }
                                         intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
-                                            log("call to startActivity(intentShare)");
+                                        if (isIntentAvailable(context, intentShare)) {
+                                            logDebug("Call to startActivity(intentShare)");
                                             context.startActivity(intentShare);
                                         }
                                     }
@@ -922,9 +922,9 @@ public class NodeController {
                             }
                         }
                         else {
-                            log("MimeTypeList other file");
+                            logDebug("MimeTypeList other file");
                             if(context instanceof FullScreenImageViewerLollipop){
-                                ((FullScreenImageViewerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
+                                ((FullScreenImageViewerLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                             }
                             else {
                                 try {
@@ -935,11 +935,11 @@ public class NodeController {
                                         viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
                                     }
                                     viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                    if (MegaApiUtils.isIntentAvailable(context, viewIntent)) {
-                                        log("if isIntentAvailable");
+                                    if (isIntentAvailable(context, viewIntent)) {
+                                        logDebug("IF isIntentAvailable");
                                         context.startActivity(viewIntent);
                                     } else {
-                                        log("ELSE isIntentAvailable");
+                                        logDebug("ELSE isIntentAvailable");
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                             intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -947,22 +947,22 @@ public class NodeController {
                                             intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
                                         }
                                         intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
-                                            log("call to startActivity(intentShare)");
+                                        if (isIntentAvailable(context, intentShare)) {
+                                            logDebug("Call to startActivity(intentShare)");
                                             context.startActivity(intentShare);
                                         }
-                                        showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                                        showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                                     }
                                 }
                                 catch (Exception e){
-                                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                                 }
                             }
                         }
                         return;
                     }
                     else{
-                        log("localPath is NULL");
+                        logWarning("localPath is NULL");
                     }
                 }
             }
@@ -972,22 +972,22 @@ public class NodeController {
             int numberOfNodesPending = 0;
 
             for (long hash : hashes) {
-                log("hashes.length more than 1");
+                logDebug("hashes.length more than 1");
                 MegaNode node = megaApi.getNodeByHandle(hash);
                 if(node != null){
-                    log("node NOT null");
+                    logDebug("node NOT null");
                     Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
                     if (node.getType() == MegaNode.TYPE_FOLDER) {
-                        log("MegaNode.TYPE_FOLDER");
+                        logDebug("MegaNode.TYPE_FOLDER");
                         getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
                     } else {
-                        log("MegaNode.TYPE_FILE");
+                        logDebug("MegaNode.TYPE_FILE");
                         dlFiles.put(node, parentPath);
                     }
 
                     for (MegaNode document : dlFiles.keySet()) {
                         String path = dlFiles.get(document);
-                        log("path of the file: "+path);
+                        logDebug("Path of the file: " + path);
                         numberOfNodesToDownload++;
 
                         File destDir = new File(path);
@@ -995,20 +995,20 @@ public class NodeController {
                         destDir.mkdirs();
                         if (destDir.isDirectory()){
                             destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
-                            log("destDir is Directory. destFile: " + destFile.getAbsolutePath());
+                            logDebug("destDir is Directory. destFile: " + destFile.getAbsolutePath());
                         }
                         else{
-                            log("destDir is File");
+                            logDebug("destDir is File");
                             destFile = destDir;
                         }
 
                         if(destFile.exists() && (document.getSize() == destFile.length())){
                             numberOfNodesAlreadyDownloaded++;
-                            log(destFile.getAbsolutePath() + " already downloaded");
+                            logWarning(destFile.getAbsolutePath() + " already downloaded");
                         }
                         else {
                             numberOfNodesPending++;
-                            log("start service");
+                            logDebug("Start service");
                             Intent service = new Intent(context, DownloadService.class);
                             service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
                             service.putExtra(DownloadService.EXTRA_URL, url);
@@ -1016,7 +1016,7 @@ public class NodeController {
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                             service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
                             if(highPriority){
-                                service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
+                                service.putExtra(HIGH_PRIORITY_TRANSFER, true);
                             }
                             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                                 service.putExtra("fromMV", true);
@@ -1026,8 +1026,8 @@ public class NodeController {
                     }
                 }
                 else if(url != null) {
-                    log("URL NOT null");
-                    log("start service");
+                    logDebug("URL NOT null");
+                    logDebug("Start service");
                     Intent service = new Intent(context, DownloadService.class);
                     service.putExtra(DownloadService.EXTRA_HASH, hash);
                     service.putExtra(DownloadService.EXTRA_URL, url);
@@ -1035,7 +1035,7 @@ public class NodeController {
                     service.putExtra(DownloadService.EXTRA_PATH, parentPath);
                     service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
                     if(highPriority){
-                        service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
+                        service.putExtra(HIGH_PRIORITY_TRANSFER, true);
                     }
                     if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                         service.putExtra("fromMV", true);
@@ -1043,17 +1043,17 @@ public class NodeController {
                     context.startService(service);
                 }
                 else {
-                    log("node NOT fOUND!!!!!");
+                    logWarning("Node NOT fOUND!!!!!");
                 }
             }
-            log("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
+            logDebug("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
             if (numberOfNodesAlreadyDownloaded > 0) {
                 String msg;
                 msg = context.getResources().getQuantityString(R.plurals.file_already_downloaded,numberOfNodesAlreadyDownloaded,numberOfNodesAlreadyDownloaded);
                 if (numberOfNodesPending > 0) {
                     msg = msg + context.getResources().getQuantityString(R.plurals.file_pending_download,numberOfNodesPending,numberOfNodesPending);
                 }
-                showSnackbar(Constants.SNACKBAR_TYPE,msg);
+                showSnackbar(SNACKBAR_TYPE,msg);
             }
         }
     }
@@ -1062,7 +1062,7 @@ public class NodeController {
 	 * Get list of all child files
 	 */
     private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
-        log("getDlList");
+        logDebug("getDlList");
         if (megaApi.getRootNode() == null)
             return;
 
@@ -1081,17 +1081,17 @@ public class NodeController {
     }
 
     public void renameNode(MegaNode document, String newName){
-        log("renameNode");
+        logDebug("renameNode");
         if (newName.compareTo(document.getName()) == 0) {
             return;
         }
 
-        if(!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+        if(!isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
-        log("renaming " + document.getName() + " to " + newName);
+        logDebug("Renaming " + document.getName() + " to " + newName);
 
         megaApi.renameNode(document, newName, ((ManagerActivityLollipop) context));
     }
@@ -1101,8 +1101,7 @@ public class NodeController {
             url = URLDecoder.decode(url, "UTF-8");
         }
         catch (Exception e) {
-            log("Error decoding URL: " + url);
-            log(e.toString());
+            logError("Error decoding URL: " + url, e);
         }
 
         url.replace(' ', '+');
@@ -1110,41 +1109,41 @@ public class NodeController {
             url = url.replace("mega://", "https://mega.co.nz/");
         }
 
-        log("url " + url);
+        logDebug("url " + url);
 
         // Download link
         if (AndroidMegaRichLinkMessage.isFileLink(url)) {
             Intent openFileIntent = new Intent(context, FileLinkActivityLollipop.class);
             openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            openFileIntent.setAction(Constants.ACTION_OPEN_MEGA_LINK);
+            openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
             openFileIntent.setData(Uri.parse(url));
             ((ManagerActivityLollipop) context).startActivity(openFileIntent);
-            return Constants.FILE_LINK;
+            return FILE_LINK;
         }
         else if (AndroidMegaRichLinkMessage.isFolderLink(url)) {
             Intent openFolderIntent = new Intent(context, FolderLinkActivityLollipop.class);
             openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
+            openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
             openFolderIntent.setData(Uri.parse(url));
             ((ManagerActivityLollipop) context).startActivity(openFolderIntent);
-            return Constants.FOLDER_LINK;
+            return FOLDER_LINK;
         }
         else if (AndroidMegaRichLinkMessage.isChatLink(url)) {
-            return Constants.CHAT_LINK;
+            return CHAT_LINK;
         }
         else if (AndroidMegaRichLinkMessage.isContactLink(url)) {
-            return Constants.CONTACT_LINK;
+            return CONTACT_LINK;
         }
 
-        log("wrong url");
-        return Constants.ERROR_LINK;
+        logWarning("wrong url");
+        return ERROR_LINK;
     }
 
     //old getPublicLinkAndShareIt
     public void exportLink(MegaNode document){
-        log("exportLink");
-        if (!Util.isOnline(context)) {
-            showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
+        logDebug("exportLink");
+        if (!isOnline(context)) {
+            showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
             return;
         }
         else if(context instanceof ManagerActivityLollipop){
@@ -1165,9 +1164,9 @@ public class NodeController {
     }
 
     public void exportLinkTimestamp(MegaNode document, int timestamp){
-        log("exportLinkTimestamp: "+timestamp);
-        if (!Util.isOnline(context)) {
-            showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
+        logDebug("exportLinkTimestamp: " + timestamp);
+        if (!isOnline(context)) {
+            showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
         }
         else if (context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).setIsGetLink(true);
@@ -1186,9 +1185,9 @@ public class NodeController {
     }
 
     public void removeLink(MegaNode document){
-        log("removeLink");
-        if (!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+        logDebug("removeLink");
+        if (!isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
         megaApi.disableExport(document, ((ManagerActivityLollipop) context));
@@ -1196,17 +1195,17 @@ public class NodeController {
 
 
     public void selectContactToShareFolders(ArrayList<Long> handleList){
-        log("shareFolders ArrayListLong");
+        logDebug("shareFolders ArrayListLong");
         //TODO shareMultipleFolders
 
-        if (!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+        if (!isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
         Intent intent = new Intent();
         intent.setClass(context, AddContactActivityLollipop.class);
-        intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
+        intent.putExtra("contactType", CONTACT_TYPE_BOTH);
 
         long[] handles=new long[handleList.size()];
         int j=0;
@@ -1217,52 +1216,52 @@ public class NodeController {
         intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, handles);
         //Multiselect=1 (multiple folders)
         intent.putExtra("MULTISELECT", 1);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
+        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
     }
 
     public void selectContactToShareFolder(MegaNode node){
-        log("shareFolder");
+        logDebug("shareFolder");
 
         Intent intent = new Intent();
         intent.setClass(context, AddContactActivityLollipop.class);
-        intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
+        intent.putExtra("contactType", CONTACT_TYPE_BOTH);
         //Multiselect=0
         intent.putExtra("MULTISELECT", 0);
         intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
+        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
     }
 
     public void shareFolder(long folderHandle, ArrayList<String> selectedContacts, int level){
 
-        if(!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+        if(!isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
         MegaNode parent = megaApi.getNodeByHandle(folderHandle);
-        MultipleRequestListener shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_CONTACTS_SHARE, (ManagerActivityLollipop) context);
+        MultipleRequestListener shareMultipleListener = new MultipleRequestListener(MULTIPLE_CONTACTS_SHARE, (ManagerActivityLollipop) context);
         if(parent!=null&parent.isFolder()){
             if(selectedContacts.size()>1){
-                log("Share READ one file multiple contacts");
+                logDebug("Share READ one file multiple contacts");
                 for (int i=0;i<selectedContacts.size();i++){
                     MegaUser user= megaApi.getContact(selectedContacts.get(i));
                     if(user!=null){
                         megaApi.share(parent, user, level,shareMultipleListener);
                     }
                     else {
-                        log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+                        logDebug("USER is NULL when sharing!->SHARE WITH NON CONTACT");
                         megaApi.share(parent, selectedContacts.get(i), level, shareMultipleListener);
                     }
                 }
             }
             else{
-                log("Share READ one file one contact");
+                logDebug("Share READ one file one contact");
                 MegaUser user= megaApi.getContact(selectedContacts.get(0));
                 if(user!=null){
                     megaApi.share(parent, user, level, (ManagerActivityLollipop) context);
                 }
                 else {
-                    log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+                    logDebug("USER is NULL when sharing!->SHARE WITH NON CONTACT");
                     megaApi.share(parent, selectedContacts.get(0), level, (ManagerActivityLollipop) context);
                 }
             }
@@ -1271,55 +1270,55 @@ public class NodeController {
 
     public void shareFolders(long[] nodeHandles, ArrayList<String> contactsData, int level){
 
-        if(!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+        if(!isOnline(context)){
+            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
         MultipleRequestListener shareMultipleListener = null;
 
         if(nodeHandles.length>1){
-            shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_FILE_SHARE, context);
+            shareMultipleListener = new MultipleRequestListener(MULTIPLE_FILE_SHARE, context);
         }
         else{
-            shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_CONTACTS_SHARE, context);
+            shareMultipleListener = new MultipleRequestListener(MULTIPLE_CONTACTS_SHARE, context);
         }
 
         for (int i=0;i<contactsData.size();i++){
             MegaUser u = megaApi.getContact(contactsData.get(i));
             if(nodeHandles.length>1){
-                log("many folder to many contacts");
+                logDebug("Many folder to many contacts");
                 for(int j=0; j<nodeHandles.length;j++){
 
                     final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
                     if(node!=null){
                         if(u!=null){
-                            log("Share: "+ node.getName() + " to "+ u.getEmail());
+                            logDebug("Share: "+ node.getName() + " to "+ u.getEmail());
                             megaApi.share(node, u, level, shareMultipleListener);
                         }
                         else{
-                            log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+                            logDebug("USER is NULL when sharing!->SHARE WITH NON CONTACT");
                             megaApi.share(node, contactsData.get(i), level, shareMultipleListener);
                         }
                     }
                     else{
-                        log("NODE NULL!!!");
+                        logWarning("NODE NULL!!!");
                     }
 
                 }
             }
             else{
-                log("one folder to many contacts");
+                logDebug("One folder to many contacts");
 
                 for(int j=0; j<nodeHandles.length;j++){
 
                     final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
                     if(u!=null){
-                        log("Share: "+ node.getName() + " to "+ u.getEmail());
+                        logDebug("Share: "+ node.getName() + " to "+ u.getEmail());
                         megaApi.share(node, u, level, shareMultipleListener);
                     }
                     else{
-                        log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+                        logDebug("USER is NULL when sharing!->SHARE WITH NON CONTACT");
                         megaApi.share(node, contactsData.get(i), level, shareMultipleListener);
                     }
                 }
@@ -1328,19 +1327,19 @@ public class NodeController {
     }
 
     public void moveToTrash(final ArrayList<Long> handleList, boolean moveToRubbish){
-        log("moveToTrash: "+moveToRubbish);
+        logDebug("moveToTrash: " + moveToRubbish);
 
         MultipleRequestListener moveMultipleListener = null;
         MegaNode parent;
         //Check if the node is not yet in the rubbish bin (if so, remove it)
         if(handleList!=null){
             if(handleList.size()>1){
-                log("MOVE multiple: "+handleList.size());
+                logDebug("MOVE multiple: " + handleList.size());
                 if (moveToRubbish){
-                    moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_SEND_RUBBISH, context);
+                    moveMultipleListener = new MultipleRequestListener(MULTIPLE_SEND_RUBBISH, context);
                 }
                 else{
-                    moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_MOVE, context);
+                    moveMultipleListener = new MultipleRequestListener(MULTIPLE_MOVE, context);
                 }
                 for (int i=0;i<handleList.size();i++){
                     if (moveToRubbish){
@@ -1353,7 +1352,7 @@ public class NodeController {
                 }
             }
             else{
-                log("MOVE single");
+                logDebug("MOVE single");
                 if (moveToRubbish){
                     megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), megaApi.getRubbishNode(), ((ManagerActivityLollipop) context));
                 }
@@ -1363,13 +1362,13 @@ public class NodeController {
             }
         }
         else{
-            log("handleList NULL");
+            logWarning("handleList NULL");
             return;
         }
     }
 
     public void openFolderFromSearch(long folderHandle){
-        log("openFolderFromSearch: "+folderHandle);
+        logDebug("openFolderFromSearch: " + folderHandle);
         ((ManagerActivityLollipop)context).textSubmitted = true;
         ((ManagerActivityLollipop)context).openFolderRefresh = true;
         boolean firstNavigationLevel=true;
@@ -1378,7 +1377,7 @@ public class NodeController {
         if (folderHandle != -1) {
             MegaNode parentIntentN = megaApi.getParentNode(megaApi.getNodeByHandle(folderHandle));
             if (parentIntentN != null) {
-                log("Check the parent node: "+parentIntentN.getName()+" handle: "+parentIntentN.getHandle());
+                logDebug("Check the parent node: " + parentIntentN.getName() + " handle: " + parentIntentN.getHandle());
                 access = megaApi.getAccess(parentIntentN);
                 switch (access) {
                     case MegaShare.ACCESS_OWNER:
@@ -1386,44 +1385,44 @@ public class NodeController {
                         //Not incoming folder, check if Cloud or Rubbish tab
                         if(parentIntentN.getHandle()==megaApi.getRootNode().getHandle()){
                             drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
-                            log("Navigate to TAB CLOUD first level"+ parentIntentN.getName());
+                            logDebug("Navigate to TAB CLOUD first level" + parentIntentN.getName());
                             firstNavigationLevel=true;
                             ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
                         }
                         else if(parentIntentN.getHandle()==megaApi.getRubbishNode().getHandle()){
                             drawerItem = ManagerActivityLollipop.DrawerItem.RUBBISH_BIN;
-                            log("Navigate to TAB RUBBISH first level"+ parentIntentN.getName());
+                            logDebug("Navigate to TAB RUBBISH first level" + parentIntentN.getName());
                             firstNavigationLevel=true;
                             ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
                         }
                         else if(parentIntentN.getHandle()==megaApi.getInboxNode().getHandle()){
-                            log("Navigate to INBOX first level"+ parentIntentN.getName());
+                            logDebug("Navigate to INBOX first level" + parentIntentN.getName());
                             firstNavigationLevel=true;
                             ((ManagerActivityLollipop) context).setParentHandleInbox(parentIntentN.getHandle());
                             drawerItem = ManagerActivityLollipop.DrawerItem.INBOX;
                         }
                         else{
                             int parent = checkParentNodeToOpenFolder(parentIntentN.getHandle());
-                            log("The parent result is: "+parent);
+                            logDebug("The parent result is: " + parent);
 
                             switch (parent){
                                 case 0:{
                                     //ROOT NODE
                                     drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
-                                    log("Navigate to TAB CLOUD with parentHandle");
+                                    logDebug("Navigate to TAB CLOUD with parentHandle");
                                     ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
                                     firstNavigationLevel=false;
                                     break;
                                 }
                                 case 1:{
-                                    log("Navigate to TAB RUBBISH");
+                                    logDebug("Navigate to TAB RUBBISH");
                                     drawerItem = ManagerActivityLollipop.DrawerItem.RUBBISH_BIN;
                                     ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
                                     firstNavigationLevel=false;
                                     break;
                                 }
                                 case 2:{
-                                    log("Navigate to INBOX WITH parentHandle");
+                                    logDebug("Navigate to INBOX WITH parentHandle");
                                     drawerItem = ManagerActivityLollipop.DrawerItem.INBOX;
                                     ((ManagerActivityLollipop) context).setParentHandleInbox(parentIntentN.getHandle());
                                     firstNavigationLevel=false;
@@ -1431,7 +1430,7 @@ public class NodeController {
                                 }
                                 case -1:{
                                     drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
-                                    log("Navigate to TAB CLOUD general");
+                                    logDebug("Navigate to TAB CLOUD general");
                                     ((ManagerActivityLollipop) context).setParentHandleBrowser(-1);
                                     firstNavigationLevel=true;
                                     break;
@@ -1444,10 +1443,10 @@ public class NodeController {
                     case MegaShare.ACCESS_READ:
                     case MegaShare.ACCESS_READWRITE:
                     case MegaShare.ACCESS_FULL: {
-                        log("GO to INCOMING TAB: " + parentIntentN.getName());
+                        logDebug("GO to INCOMING TAB: " + parentIntentN.getName());
                         drawerItem = ManagerActivityLollipop.DrawerItem.SHARED_ITEMS;
                         if(parentIntentN.getHandle()==-1){
-                            log("Level 0 of Incoming");
+                            logDebug("Level 0 of Incoming");
                             ((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
                             ((ManagerActivityLollipop) context).setDeepBrowserTreeIncoming(0);
                             firstNavigationLevel=true;
@@ -1455,15 +1454,15 @@ public class NodeController {
                         else{
                             firstNavigationLevel=false;
                             ((ManagerActivityLollipop) context).setParentHandleIncoming(parentIntentN.getHandle());
-                            int deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(parentIntentN, context);
+                            int deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, context);
                             ((ManagerActivityLollipop) context).setDeepBrowserTreeIncoming(deepBrowserTreeIncoming);
-                            log("After calculating deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
+                            logDebug("After calculating deepBrowserTreeIncoming: " + deepBrowserTreeIncoming);
                         }
                         ((ManagerActivityLollipop) context).setTabItemShares(0);
                         break;
                     }
                     default: {
-                        log("DEFAULT: The intent set the parentHandleBrowser to " + parentIntentN.getHandle());
+                        logDebug("DEFAULT: The intent set the parentHandleBrowser to " + parentIntentN.getHandle());
                         ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
                         drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
                         firstNavigationLevel=true;
@@ -1472,7 +1471,7 @@ public class NodeController {
                 }
             }
             else{
-                log("Parent is already NULL");
+                logWarning("Parent is already NULL");
 
                 drawerItem = ManagerActivityLollipop.DrawerItem.SHARED_ITEMS;
                 ((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
@@ -1487,30 +1486,30 @@ public class NodeController {
     }
 
     public int checkParentNodeToOpenFolder(long folderHandle){
-        log("checkParentNodeToOpenFolder");
+        logDebug("Folder handle: " + folderHandle);
         MegaNode folderNode = megaApi.getNodeByHandle(folderHandle);
         MegaNode parentNode = megaApi.getParentNode(folderNode);
         if(parentNode!=null){
-            log("parentName: "+parentNode.getName());
+            logDebug("Parent handle: "+parentNode.getHandle());
             if(parentNode.getHandle()==megaApi.getRootNode().getHandle()){
-                log("The parent is the ROOT");
+                logDebug("The parent is the ROOT");
                 return 0;
             }
             else if(parentNode.getHandle()==megaApi.getRubbishNode().getHandle()){
-                log("The parent is the RUBBISH");
+                logDebug("The parent is the RUBBISH");
                 return 1;
             }
             else if(parentNode.getHandle()==megaApi.getInboxNode().getHandle()){
-                log("The parent is the INBOX");
+                logDebug("The parent is the INBOX");
                 return 2;
             }
             else if(parentNode.getHandle()==-1){
-                log("The parent is -1");
+                logWarning("The parent is -1");
                 return -1;
             }
             else{
                 int result = checkParentNodeToOpenFolder(parentNode.getHandle());
-                log("Call returns "+result);
+                logDebug("Call returns " + result);
                 switch(result){
                     case -1:
                         return -1;
@@ -1527,35 +1526,35 @@ public class NodeController {
     }
 
     public void leaveIncomingShare (final MegaNode n){
-        log("leaveIncomingShare");
+        logDebug("Node handle: " + n.getHandle());
 
         megaApi.remove(n);
     }
 
     public void leaveMultipleIncomingShares (final ArrayList<Long> handleList){
-        log("leaveMultipleIncomingShares");
+        logDebug("Leaving " + handleList.size() + " incoming shares");
 
-        MultipleRequestListener moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_LEAVE_SHARE, context);
+        MultipleRequestListener moveMultipleListener = new MultipleRequestListener(MULTIPLE_LEAVE_SHARE, context);
         if(handleList.size()>1){
-            log("handleList.size()>1");
+            logDebug("handleList.size()>1");
             for (int i=0; i<handleList.size(); i++){
                 MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
                 megaApi.remove(node, moveMultipleListener);
             }
         }
         else{
-            log("handleList.size()<=1");
+            logDebug("handleList.size()<=1");
             MegaNode node = megaApi.getNodeByHandle(handleList.get(0));
             megaApi.remove(node, (ManagerActivityLollipop)context);
         }
     }
 
     public void removeAllSharingContacts (ArrayList<MegaShare> listContacts, MegaNode node){
-        log("removeAllSharingContacts");
+        logDebug("removeAllSharingContacts");
 
-        MultipleRequestListener shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_REMOVE_SHARING_CONTACTS, context);
+        MultipleRequestListener shareMultipleListener = new MultipleRequestListener(MULTIPLE_REMOVE_SHARING_CONTACTS, context);
         if(listContacts.size()>1){
-            log("listContacts.size()>1");
+            logDebug("listContacts.size()>1");
             for(int j=0; j<listContacts.size();j++){
                 String cMail = listContacts.get(j).getUser();
                 if(cMail!=null){
@@ -1575,7 +1574,7 @@ public class NodeController {
             }
         }
         else{
-            log("listContacts.size()<=1");
+            logDebug("listContacts.size()<=1");
             for(int j=0; j<listContacts.size();j++){
                 String cMail = listContacts.get(j).getUser();
                 if(cMail!=null){
@@ -1597,30 +1596,38 @@ public class NodeController {
     }
 
     public void cleanRubbishBin(){
-        log("cleanRubbishBin");
+        logDebug("cleanRubbishBin");
         megaApi.cleanRubbishBin((ManagerActivityLollipop) context);
     }
 
     public void clearAllVersions(){
-        log("clearAllVersions");
+        logDebug("clearAllVersions");
         megaApi.removeVersions((ManagerActivityLollipop) context);
     }
 
-    private void removeNotOfflineElements(String pathNavigation) {
-        ArrayList<MegaOffline> mOffList = dbH.findByPath(pathNavigation);
+    public void deleteOffline(MegaOffline selectedNode){
+        logDebug("deleteOffline");
+        dbH = DatabaseHandler.getDbHandler(context);
 
-        log("Number of elements: " + mOffList.size());
+        //Delete children
+        ArrayList<MegaOffline> mOffListChildren = dbH.findByParentId(selectedNode.getId());
+        if (mOffListChildren.size() > 0) {
+            //The node have childrens, delete
+            deleteChildrenDB(mOffListChildren);
+        }
 
-        for (int i = 0; i < mOffList.size(); i++) {
-            MegaOffline checkOffline = mOffList.get(i);
-            File offlineFile = getOfflineFile(context, checkOffline);
+        removeNodePhysically(selectedNode);
 
-            if (!isFileAvailable(offlineFile)) {
-                log("Path to remove B: " + (mOffList.get(i).getPath() + mOffList.get(i).getName()));
-                mOffList.remove(i);
-                i--;
-            }
+        dbH.removeById(selectedNode.getId());
 
+        //Check if the parent has to be deleted
+
+        int parentId = selectedNode.getParentId();
+        MegaOffline parentNode = dbH.findById(parentId);
+
+        if (parentNode != null) {
+            logDebug("Parent to check: " + parentNode.getName());
+            checkParentDeletion(parentNode);
         }
 
         if (context instanceof ManagerActivityLollipop) {
@@ -1628,89 +1635,26 @@ public class NodeController {
         }
     }
 
-    public void deleteOffline(MegaOffline selectedNode, String pathNavigation){
-        log("deleteOffline");
-        if (selectedNode == null){
-            log("Delete RK");
-            File file= buildExternalStorageFile(RK_FILE);
-            if(isFileAvailable(file)){
-                file.delete();
-                removeNotOfflineElements(pathNavigation);
-            }
-        }
-        else {
-            if (selectedNode.getHandle().equals("0")) {
-                log("Delete RK");
-                File file = buildExternalStorageFile(RK_FILE);
-                if (isFileAvailable(file)) {
-                    file.delete();
-
-                    if(context instanceof ManagerActivityLollipop){
-                        ((ManagerActivityLollipop) context).invalidateOptionsMenu();
-                        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                        if(mAF!=null && mAF.isAdded()){
-                            mAF.setMkButtonText();
-                        }
-                    }
-
-                    removeNotOfflineElements(pathNavigation);
-                }
-            } else {
-                log("deleteOffline node");
-                dbH = DatabaseHandler.getDbHandler(context);
-
-                ArrayList<MegaOffline> mOffListParent = new ArrayList<MegaOffline>();
-                ArrayList<MegaOffline> mOffListChildren = new ArrayList<MegaOffline>();
-                MegaOffline parentNode = null;
-
-                //Delete children
-                mOffListChildren = dbH.findByParentId(selectedNode.getId());
-                if (mOffListChildren.size() > 0) {
-                    //The node have childrens, delete
-                    deleteChildrenDB(mOffListChildren);
-                }
-
-                removeNodePhysically(selectedNode);
-
-                dbH.removeById(selectedNode.getId());
-
-                //Check if the parent has to be deleted
-
-                int parentId = selectedNode.getParentId();
-                parentNode = dbH.findById(parentId);
-
-                if (parentNode != null) {
-                    log("Parent to check: " + parentNode.getName());
-                    checkParentDeletion(parentNode);
-                }
-
-                if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).updateOfflineView(null);
-                }
-            }
-        }
-    }
-
     private void removeNodePhysically(MegaOffline megaOffline) {
-        log("Remove the node physically");
+        logDebug("Remove the node physically");
         try {
             File offlineFile = getOfflineFile(context, megaOffline);
             deleteFolderAndSubfolders(context, offlineFile);
         } catch (Exception e) {
-            log("EXCEPTION: deleteOffline - adapter");
+            logError("EXCEPTION: deleteOffline - adapter", e);
         }
     }
 
     public void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
 
-        log("deleteChildenDB: "+mOffListChildren.size());
+        logDebug("Size: " + mOffListChildren.size());
         MegaOffline mOffDelete=null;
 
         for(int i=0; i<mOffListChildren.size(); i++){
 
             mOffDelete=mOffListChildren.get(i);
 
-            log("Children "+i+ ": "+ mOffDelete.getName());
+            logDebug("Children " + i + ": "+ mOffDelete.getHandle());
             ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
             if(mOffListChildren2.size()>0){
                 //The node have children, delete
@@ -1718,17 +1662,17 @@ public class NodeController {
             }
 
             int lines = dbH.removeById(mOffDelete.getId());
-            log("Borradas; "+lines);
+            logDebug("Deleted: " + lines);
         }
     }
 
     public void checkParentDeletion (MegaOffline parentToDelete){
-        log("checkParentDeletion: "+parentToDelete.getName());
+        logDebug("parentToDelete: " + parentToDelete.getHandle());
 
         ArrayList<MegaOffline> mOffListChildren=dbH.findByParentId(parentToDelete.getId());
         File destination = null;
         if(mOffListChildren.size()<=0){
-            log("The parent has NO children");
+            logDebug("The parent has NO children");
             //The node have NO childrens, delete it
 
             dbH.removeById(parentToDelete.getId());
@@ -1747,13 +1691,13 @@ public class NodeController {
                                 rootIncomingFile.delete();
                             }
                             catch(Exception e){
-                                log("EXCEPTION: deleteParentIncoming: "+destination);
+                                logError("EXCEPTION: deleteParentIncoming: " + destination, e);
                             };
                         }
                     }
                 }
                 else{
-                    log("rootIncomingFile is NULL");
+                    logWarning("rootIncomingFile is NULL");
                 }
             }
             else{
@@ -1761,7 +1705,7 @@ public class NodeController {
 
                 parentToDelete = dbH.findById(parentId);
                 if(parentToDelete != null){
-                    log("Parent to check: "+parentToDelete.getName());
+                    logDebug("Parent to check: " + parentToDelete.getHandle());
                     checkParentDeletion(parentToDelete);
 
                 }
@@ -1769,14 +1713,14 @@ public class NodeController {
 
         }
         else{
-            log("The parent has children!!! RETURN!!");
+            logDebug("The parent has children!!! RETURN!!");
             return;
         }
 
     }
 
     public void downloadFileLink (final MegaNode document, final String url) {
-        log("downloadFileLink");
+        logDebug("downloadFileLink");
 
         if (document == null){
             return;
@@ -1852,7 +1796,7 @@ public class NodeController {
             return;
         }
 
-        boolean askMe = Util.askMe(context);
+        boolean askMe = askMe(context);
         String downloadLocationDefaultPath = getDownloadLocation(context);
 
         if (askMe){
@@ -1922,21 +1866,21 @@ public class NodeController {
         intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
         if (context instanceof FileLinkActivityLollipop) {
-            ((FileLinkActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            ((FileLinkActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
         else if (context instanceof AudioVideoPlayerLollipop) {
-            ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
         else if (context instanceof FullScreenImageViewerLollipop) {
-            ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
         else if (context instanceof PdfViewerActivityLollipop) {
-            ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            ((PdfViewerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
     }
 
     public void downloadTo(MegaNode currentDocument, String parentPath, String url){
-        log("downloadTo");
+        logDebug("downloadTo");
         double availableFreeSpace = Double.MAX_VALUE;
         try{
             StatFs stat = new StatFs(parentPath);
@@ -1945,7 +1889,7 @@ public class NodeController {
 
         MegaNode tempNode = currentDocument;
         if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-            log("is file");
+            logDebug("is file");
             String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
             if(localPath != null){
                 File file = new File(localPath);
@@ -1954,19 +1898,19 @@ public class NodeController {
                 }catch(Exception e) {}
 
                 if (file != null && file.getParent().equals(parentPath)) {
-                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                 }
                 else {
-                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
+                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
                 }
 
             }
             else{
-                log("LocalPath is NULL");
-                showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.download_began));
+                logDebug("LocalPath is NULL");
+                showSnackbar(SNACKBAR_TYPE, context.getString(R.string.download_began));
 
                 if(tempNode != null){
-                    log("Node!=null: "+tempNode.getName());
+                    logDebug("Node!=null: "+tempNode.getName());
                     Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
                     dlFiles.put(tempNode, parentPath);
 
@@ -1974,16 +1918,16 @@ public class NodeController {
                         String path = dlFiles.get(document);
 
                         if(availableFreeSpace < document.getSize()){
-                            showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
+                            showSnackbar(NOT_SPACE_SNACKBAR_TYPE, null);
                             continue;
                         }
 
                         Intent service = new Intent(context, DownloadService.class);
                         service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-                        service.putExtra(Constants.EXTRA_SERIALIZE_STRING, currentDocument.serialize());
+                        service.putExtra(EXTRA_SERIALIZE_STRING, currentDocument.serialize());
                         service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
                         service.putExtra(DownloadService.EXTRA_PATH, path);
-                        log("intent to DownloadService");
+                        logDebug("intent to DownloadService");
                         if (context instanceof AudioVideoPlayerLollipop || context instanceof FullScreenImageViewerLollipop || context instanceof PdfViewerActivityLollipop) {
                             service.putExtra("fromMV", true);
                         }
@@ -1992,12 +1936,12 @@ public class NodeController {
                 }
                 else if(url != null) {
                     if(availableFreeSpace < currentDocument.getSize()) {
-                        showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
+                        showSnackbar(NOT_SPACE_SNACKBAR_TYPE, null);
                     }
 
                     Intent service = new Intent(context, DownloadService.class);
                     service.putExtra(DownloadService.EXTRA_HASH, currentDocument.getHandle());
-                    service.putExtra(Constants.EXTRA_SERIALIZE_STRING, currentDocument.serialize());
+                    service.putExtra(EXTRA_SERIALIZE_STRING, currentDocument.serialize());
                     service.putExtra(DownloadService.EXTRA_SIZE, currentDocument.getSize());
                     service.putExtra(DownloadService.EXTRA_PATH, parentPath);
                     if (context instanceof AudioVideoPlayerLollipop || context instanceof FullScreenImageViewerLollipop || context instanceof PdfViewerActivityLollipop) {
@@ -2006,13 +1950,9 @@ public class NodeController {
                     context.startService(service);
                 }
                 else {
-                    log("node not found. Let's try the document");
+                    logWarning("Node not found. Let's try the document");
                 }
             }
         }
-    }
-
-    public static void log(String message) {
-        Util.log("NodeController", message);
     }
 }

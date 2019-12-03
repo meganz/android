@@ -8,9 +8,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -19,8 +16,6 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -30,8 +25,10 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.Util.matchRegexs;
 
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
 
@@ -57,7 +54,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		Intent intent = getIntent();
 		String url = intent.getDataString();
-		log("Original url: " + url);
+		logDebug("Original url: " + url);
 
 		setContentView(R.layout.activity_open_link);
 
@@ -69,36 +66,15 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		containerOkButton.setVisibility(View.GONE);
 		containerOkButton.setOnClickListener(this);
 
-		try {
-			url = URLDecoder.decode(url, "UTF-8");
-		}
-		catch (UnsupportedEncodingException e) {}
-		url.replace(' ', '+');
-		if(url.startsWith("mega://")){
-			url = url.replace("mega://", "https://mega.nz/");
-		}
-
-		if (url.startsWith("https://www.mega.co.nz")){
-			url = url.replace("https://www.mega.co.nz", "https://mega.co.nz");
-		}
-
-		if (url.startsWith("https://www.mega.nz")){
-			url = url.replace("https://www.mega.nz", "https://mega.nz");
-		}
-
-		if (url.endsWith("/")) {
-			url = url.substring(0, url.length()-1);
-		}
-
-		log("url " + url);
+		decodeURL(url);
 
 		// File link
-		if (matchRegexs(url, Constants.FILE_LINK_REGEXS)) {
-			log("open link url");
+		if (matchRegexs(url, FILE_LINK_REGEXS)) {
+			logDebug("Open link url");
 
 			Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
 			openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openFileIntent.setAction(Constants.ACTION_OPEN_MEGA_LINK);
+			openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
 			openFileIntent.setData(Uri.parse(url));
 			startActivity(openFileIntent);
 			finish();
@@ -106,8 +82,8 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Confirmation link
-		if (matchRegexs(url, Constants.CONFIRMATION_LINK_REGEXS)) {
-			log("confirmation url");
+		if (matchRegexs(url, CONFIRMATION_LINK_REGEXS)) {
+			logDebug("Confirmation url");
 			urlConfirmationLink = url;
 
 			AccountController aC = new AccountController(this);
@@ -119,12 +95,12 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Folder Download link
-        if (matchRegexs(url, Constants.FOLDER_DOWNLOAD_LINK_REGEXS)) {
-			log("folder link url");
+        if (matchRegexs(url, FOLDER_LINK_REGEXS)) {
+			logDebug("Folder link url");
 
 			Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
 			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
+			openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
 			openFolderIntent.setData(Uri.parse(url));
 			startActivity(openFolderIntent);
 			finish();
@@ -133,23 +109,23 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Chat link
-        if (matchRegexs(url, Constants.CHAT_LINK_REGEXS)) {
-			log("open chat url");
+        if (matchRegexs(url, CHAT_LINK_REGEXS)) {
+			logDebug("Open chat url");
 
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 			}
 			if (dbH != null) {
 				if (dbH.getCredentials() != null) {
-					log("Logged IN");
+					logDebug("Logged IN");
 					Intent openChatLinkIntent = new Intent(this, ManagerActivityLollipop.class);
-					openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+					openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
 					openChatLinkIntent.setData(Uri.parse(url));
 					startActivity(openChatLinkIntent);
 					finish();
 				}
 				else{
-					log("Not logged");
+					logDebug("Not logged");
 					int initResult = megaChatApi.getInitState();
 					if(initResult<MegaChatApi.INIT_WAITING_NEW_SESSION){
 						initResult = megaChatApi.initAnonymous();
@@ -157,13 +133,13 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 					if(initResult!= MegaChatApi.INIT_ERROR){
 						Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
-						openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+						openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
 						openChatLinkIntent.setData(Uri.parse(url));
 						startActivity(openChatLinkIntent);
 						finish();
 					}
 					else{
-						log("open chat url:initAnonymous:INIT_ERROR");
+						logError("Open chat url:initAnonymous:INIT_ERROR");
 						setError(getString(R.string.error_chat_link_init_error));
 					}
 				}
@@ -172,8 +148,8 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Password link
-		if (matchRegexs(url, Constants.PASSWORD_LINK_REGEXS)) {
-			log("link with password url");
+		if (matchRegexs(url, PASSWORD_LINK_REGEXS)) {
+			logDebug("Link with password url");
 
 			Intent openLinkIntent = new Intent(this, OpenPasswordLinkActivity.class);
 			openLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -185,21 +161,21 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Create account invitation - user must be logged OUT
-		if (matchRegexs(url, Constants.ACCOUNT_INVITATION_LINK_REGEXS)) {
-			log("new signup url");
+		if (matchRegexs(url, ACCOUNT_INVITATION_LINK_REGEXS)) {
+			logDebug("New signup url");
 
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 			}
 			if (dbH != null) {
 				if (dbH.getCredentials() != null) {
-					log("Logged IN");
+					logDebug("Logged IN");
 					setError(getString(R.string.log_out_warning));
 				}
 				else{
-					log("Not logged");
+					logDebug("Not logged");
 					Intent createAccountIntent = new Intent(this, LoginActivityLollipop.class);
-					createAccountIntent.putExtra("visibleFragment", Constants.CREATE_ACCOUNT_FRAGMENT);
+					createAccountIntent.putExtra("visibleFragment", CREATE_ACCOUNT_FRAGMENT);
 					startActivity(createAccountIntent);
 					finish();
 				}
@@ -208,21 +184,21 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Export Master Key link - user must be logged IN
-		if (matchRegexs(url, Constants.EXPORT_MASTER_KEY_LINK_REGEXS)) {
-			log("export master key url");
+		if (matchRegexs(url, EXPORT_MASTER_KEY_LINK_REGEXS)) {
+			logDebug("Export master key url");
 
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 			}
 			if (dbH != null) {
 				if (dbH.getCredentials() != null) {
-					log("Logged IN"); //Check fetch nodes is already done in ManagerActivity
+					logDebug("Logged IN"); //Check fetch nodes is already done in ManagerActivity
 					Intent exportIntent = new Intent(this, ManagerActivityLollipop.class);
-					exportIntent.setAction(Constants.ACTION_EXPORT_MASTER_KEY);
+					exportIntent.setAction(ACTION_EXPORT_MASTER_KEY);
 					startActivity(exportIntent);
 					finish();
 				} else {
-					log("Not logged");
+					logDebug("Not logged");
 					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
@@ -230,21 +206,21 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// New mwssage chat- user must be logged IN
-		if (matchRegexs(url, Constants.NEW_MESSAGE_CHAT_LINK_REGEXS)) {
-			log("new message chat url");
+		if (matchRegexs(url, NEW_MESSAGE_CHAT_LINK_REGEXS)) {
+			logDebug("New message chat url");
 
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 			}
 			if (dbH != null) {
 				if (dbH.getCredentials() != null) {
-					log("Logged IN"); //Check fetch nodes is already done in ManagerActivity
+					logDebug("Logged IN"); //Check fetch nodes is already done in ManagerActivity
 					Intent chatIntent = new Intent(this, ManagerActivityLollipop.class);
-					chatIntent.setAction(Constants.ACTION_CHAT_SUMMARY);
+					chatIntent.setAction(ACTION_CHAT_SUMMARY);
 					startActivity(chatIntent);
 					finish();
 				} else {
-					log("Not logged");
+					logDebug("Not logged");
 					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
@@ -252,8 +228,8 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Cancel account  - user must be logged IN
-		if (matchRegexs(url, Constants.CANCEL_ACCOUNT_LINK_REGEXS)) {
-			log("cancel account url");
+		if (matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEXS)) {
+			logDebug("Cancel account url");
 
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -262,20 +238,20 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				if (dbH.getCredentials() != null) {
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode == null) {
-						log("Go to Login to fetch nodes");
+						logDebug("Go to Login to fetch nodes");
 						Intent cancelAccountIntent = new Intent(this, LoginActivityLollipop.class);
-						cancelAccountIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
+						cancelAccountIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						cancelAccountIntent.setAction(ACTION_CANCEL_ACCOUNT);
 						cancelAccountIntent.setData(Uri.parse(url));
 						startActivity(cancelAccountIntent);
 						finish();
 
 					} else {
-						log("Logged IN");
+						logDebug("Logged IN");
 						megaApi.queryCancelLink(url, this);
 					}
 				} else {
-					log("Not logged");
+					logDebug("Not logged");
 					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
@@ -283,8 +259,8 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Verify change mail - user must be logged IN
-		if (matchRegexs(url, Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS)) {
-			log("verify mail url");
+		if (matchRegexs(url, VERIFY_CHANGE_MAIL_LINK_REGEXS)) {
+			logDebug("Verify mail url");
 
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -293,24 +269,24 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				if (dbH.getCredentials() != null) {
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode == null) {
-						log("Go to Login to fetch nodes");
+						logDebug("Go to Login to fetch nodes");
 						Intent changeMailIntent = new Intent(this, LoginActivityLollipop.class);
-						changeMailIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						changeMailIntent.setAction(Constants.ACTION_CHANGE_MAIL);
+						changeMailIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						changeMailIntent.setAction(ACTION_CHANGE_MAIL);
 						changeMailIntent.setData(Uri.parse(url));
 						startActivity(changeMailIntent);
 						finish();
 
 					} else {
-						log("Logged IN");
+						logDebug("Logged IN");
 						Intent changeMailIntent = new Intent(this, ManagerActivityLollipop.class);
-						changeMailIntent.setAction(Constants.ACTION_CHANGE_MAIL);
+						changeMailIntent.setAction(ACTION_CHANGE_MAIL);
 						changeMailIntent.setData(Uri.parse(url));
 						startActivity(changeMailIntent);
 						finish();
 					}
 				} else {
-					log("Not logged");
+					logWarning("Not logged");
 					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
@@ -318,8 +294,9 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Reset password - two options: logged IN or OUT
-		if (matchRegexs(url, Constants.RESET_PASSWORD_LINK_REGEXS)) {
-			log("reset pass url");
+		if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
+			logDebug("Reset pass url");
+
 			//Check if link with MK or not
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -328,24 +305,24 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				if (dbH.getCredentials() != null) {
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode == null) {
-						log("Go to Login to fetch nodes");
+						logDebug("Go to Login to fetch nodes");
 						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-						resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+						resetPassIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						resetPassIntent.setAction(ACTION_RESET_PASS);
 						resetPassIntent.setData(Uri.parse(url));
 						startActivity(resetPassIntent);
 						finish();
 
 					} else {
-						log("Logged IN");
+						logDebug("Logged IN");
 						Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-						resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+						resetPassIntent.setAction(ACTION_RESET_PASS);
 						resetPassIntent.setData(Uri.parse(url));
 						startActivity(resetPassIntent);
 						finish();
 					}
 				} else {
-					log("Not logged");
+					logDebug("Not logged");
 					megaApi.queryResetPasswordLink(url, this);
 				}
 			}
@@ -353,8 +330,8 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Pending contacts
-		if (matchRegexs(url, Constants.PENDING_CONTACTS_LINK_REGEXS)) {
-			log("pending contacts url");
+		if (matchRegexs(url, PENDING_CONTACTS_LINK_REGEXS)) {
+			logDebug("Pending contacts url");
 
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -363,30 +340,32 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				if (dbH.getCredentials() != null) {
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode == null) {
-						log("Go to Login to fetch nodes");
+						logDebug("Go to Login to fetch nodes");
 						Intent ipcIntent = new Intent(this, LoginActivityLollipop.class);
-						ipcIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						ipcIntent.setAction(Constants.ACTION_IPC);
+						ipcIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						ipcIntent.setAction(ACTION_IPC);
 						startActivity(ipcIntent);
 						finish();
 
 					} else {
-						log("Logged IN");
+						logDebug("Logged IN");
 						Intent ipcIntent = new Intent(this, ManagerActivityLollipop.class);
-						ipcIntent.setAction(Constants.ACTION_IPC);
+						ipcIntent.setAction(ACTION_IPC);
 						startActivity(ipcIntent);
 						finish();
 					}
 				} else {
-					log("Not logged");
+					logWarning("Not logged");
 					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
 			return;
 		}
 
-		if (matchRegexs(url, Constants.REVERT_CHANGE_PASSWORD_LINK_REGEXS)) {
-			log("Open revert password change link: " + url);
+		if (matchRegexs(url, REVERT_CHANGE_PASSWORD_LINK_REGEXS)
+				|| matchRegexs(url, MEGA_BLOG_LINK_REGEXS)) {
+			logDebug("Open revert password change link: " + url);
+
 			Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
 			openIntent.setData(Uri.parse(url));
 			startActivity(openIntent);
@@ -394,11 +373,11 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			return;
 		}
 
-		if (matchRegexs(url, Constants.HANDLE_LINK_REGEXS)) {
-			log("handle link url");
+		if (matchRegexs(url, HANDLE_LINK_REGEXS)) {
+			logDebug("Handle link url");
 
 			Intent handleIntent = new Intent(this, ManagerActivityLollipop.class);
-			handleIntent.setAction(Constants.ACTION_OPEN_HANDLE_NODE);
+			handleIntent.setAction(ACTION_OPEN_HANDLE_NODE);
 			handleIntent.setData(Uri.parse(url));
 			startActivity(handleIntent);
 			finish();
@@ -406,7 +385,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		//Contact link
-		if (matchRegexs(url, Constants.CONTACT_LINK_REGEXS)) { //https://mega.nz/C!
+		if (matchRegexs(url, CONTACT_LINK_REGEXS)) { //https://mega.nz/C!
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 			}
@@ -415,12 +394,12 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					String[] s = url.split("C!");
 					long handle = MegaApiAndroid.base64ToHandle(s[1].trim());
 					Intent inviteContact = new Intent(this, ManagerActivityLollipop.class);
-					inviteContact.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
-					inviteContact.putExtra(Constants.CONTACT_HANDLE, handle);
+					inviteContact.setAction(ACTION_OPEN_CONTACTS_SECTION);
+					inviteContact.putExtra(CONTACT_HANDLE, handle);
 					startActivity(inviteContact);
 					finish();
 				} else {
-					log("Not logged");
+					logWarning("Not logged");
 					setError(getString(R.string.alert_not_logged_in));
 				}
 				return;
@@ -428,26 +407,22 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		//MEGA DROP link
-		if (matchRegexs(url, Constants.MEGA_DROP_LINK_REGEXS)) { //https://mega.nz/megadrop
+		if (matchRegexs(url, MEGA_DROP_LINK_REGEXS)) { //https://mega.nz/megadrop
 			setError(getString(R.string.error_MEGAdrop_not_supported));
 			return;
 		}
 
 		// Browser open the link which does not require app to handle
-		log("Browser open link: " + url);
+		logDebug("Browser open link: " + url);
 		Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
 		openIntent.setData(Uri.parse(url));
 		startActivity(openIntent);
 		finish();
 	}
 
-	public static void log(String message) {
-		Util.log("OpenLinkActivity", message);
-	}
-
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart");
+		logDebug("onRequestStart");
 	}
 
 	@Override
@@ -457,60 +432,62 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish");
+		logDebug("onRequestFinish");
 		if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK){
-			log("TYPE_GET_RECOVERY_LINK");
+			logDebug("TYPE_GET_RECOVERY_LINK");
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				String url = request.getLink();
-				if (matchRegexs(url, Constants.CANCEL_ACCOUNT_LINK_REGEXS)) {
-					log("cancel account url");
+				if (matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEXS)) {
+					logDebug("Cancel account url");
+
 					String myEmail = request.getEmail();
 					if(myEmail!=null){
 						if(myEmail.equals(megaApi.getMyEmail())){
-							log("The email matchs!!!");
+							logDebug("The email matchs!!!");
 							Intent cancelAccountIntent = new Intent(this, ManagerActivityLollipop.class);
-							cancelAccountIntent.setAction(Constants.ACTION_CANCEL_ACCOUNT);
+							cancelAccountIntent.setAction(ACTION_CANCEL_ACCOUNT);
 							cancelAccountIntent.setData(Uri.parse(url));
 							startActivity(cancelAccountIntent);
 							finish();
 						}
 						else{
-							log("Not logged with the correct account");
-							log(e.getErrorString() + "___" + e.getErrorCode());
+							logWarning("Not logged with the correct account");
+							logWarning(e.getErrorString() + "___" + e.getErrorCode());
 							setError(getString(R.string.error_not_logged_with_correct_account));
 						}
 					}
 					else{
-						log("My email is NULL in the request");
+						logWarning("My email is NULL in the request");
 					}
 
 				}
-				else if (matchRegexs(url, Constants.RESET_PASSWORD_LINK_REGEXS)) {
-					log("reset pass url");
-					log("The recovery link has been sent");
+				else if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
+					logDebug("Reset pass url");
+					logDebug("The recovery link has been sent");
+
 					boolean mk = request.getFlag();
 					if(mk){
-						log("Link with master key");
+						logDebug("Link with master key");
 						if(url!=null){
 							Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-							resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-							resetPassIntent.setAction(Constants.ACTION_RESET_PASS);
+							resetPassIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+							resetPassIntent.setAction(ACTION_RESET_PASS);
 							resetPassIntent.setData(Uri.parse(url));
 							startActivity(resetPassIntent);
 							finish();
 						}
 						else{
-							log("LINK is null");
-							log(e.getErrorString() + "___" + e.getErrorCode());
+							logWarning("LINK is null");
+							logWarning(e.getErrorString() + "___" + e.getErrorCode());
 							setError(getString(R.string.general_text_error));
 						}
 					}
 					else{
-						log("Link without master key - park account");
+						logDebug("Link without master key - park account");
 						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-						resetPassIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						resetPassIntent.setAction(Constants.ACTION_PARK_ACCOUNT);
+						resetPassIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						resetPassIntent.setAction(ACTION_PARK_ACCOUNT);
 						resetPassIntent.setData(Uri.parse(url));
 						startActivity(resetPassIntent);
 						finish();
@@ -518,30 +495,30 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				}
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXPIRED){
-				log("Error expired link");
-				log(e.getErrorString() + "___" + e.getErrorCode());
+				logWarning("Error expired link");
+				logWarning(e.getErrorString() + "___" + e.getErrorCode());
 				String url = request.getLink();
-				if (matchRegexs(url, Constants.CANCEL_ACCOUNT_LINK_REGEXS)) {
-					log("cancel account url");
+				if (matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEXS)) {
+					logDebug("Cancel account url");
 					setError(getString(R.string.cancel_link_expired));
 				}
-				else if (matchRegexs(url, Constants.RESET_PASSWORD_LINK_REGEXS)) {
-					log("reset pass url");
+				else if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
+					logDebug("Reset pass url");
 					setError(getString(R.string.recovery_link_expired));
 				}
 			}
 			else{
-				log("Error when asking for recovery pass link");
-				log(e.getErrorString() + "___" + e.getErrorCode());
+				logError("Error when asking for recovery pass link");
+				logError(e.getErrorString() + "___" + e.getErrorCode());
 				setError(getString(R.string.invalid_link));
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_LOGOUT){
-			if(Util.isChatEnabled()){
-				log("END logout sdk request - wait chat logout");
+			if(isChatEnabled()){
+				logDebug("END logout sdk request - wait chat logout");
 
 				if(MegaApplication.getUrlConfirmationLink()!=null){
-					log("Confirmation link - show confirmation screen");
+					logDebug("Confirmation link - show confirmation screen");
 					if (dbH == null){
 						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 					}
@@ -553,17 +530,17 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					aC.logoutConfirmed(this);
 
 					Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-					confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-					confirmIntent.putExtra(Constants.EXTRA_CONFIRMATION, urlConfirmationLink);
+					confirmIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+					confirmIntent.putExtra(EXTRA_CONFIRMATION, urlConfirmationLink);
 					confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					confirmIntent.setAction(Constants.ACTION_CONFIRM);
+					confirmIntent.setAction(ACTION_CONFIRM);
 					startActivity(confirmIntent);
 					MegaApplication.setUrlConfirmationLink(null);
 					finish();
 				}
 			}
 			else{
-				log("END logout sdk request - chat disabled");
+				logDebug("END logout sdk request - chat disabled");
 				if (dbH == null){
 					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
@@ -575,17 +552,17 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				aC.logoutConfirmed(this);
 
 				Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-				confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-				confirmIntent.putExtra(Constants.EXTRA_CONFIRMATION, urlConfirmationLink);
+				confirmIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+				confirmIntent.putExtra(EXTRA_CONFIRMATION, urlConfirmationLink);
 				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				confirmIntent.setAction(Constants.ACTION_CONFIRM);
+				confirmIntent.setAction(ACTION_CONFIRM);
 				startActivity(confirmIntent);
 				MegaApplication.setUrlConfirmationLink(null);
 				finish();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
-			log("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
+			logDebug("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
 
 			if(e.getErrorCode() == MegaError.API_OK){
 				AccountController aC = new AccountController(this);

@@ -29,7 +29,7 @@
 			android:layout_marginLeft="7dp"
 			android:layout_marginTop="7dp"/>
 
-		<TextView
+		<mega.privacy.android.app.components.twemoji.EmojiTextView
 			android:id="@+id/contact_grid_initial_letter"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
@@ -69,7 +69,7 @@
 			android:layout_toLeftOf="@+id/contact_grid_three_dots"
 			android:orientation="horizontal">
 
-			<TextView
+			<mega.privacy.android.app.components.twemoji.EmojiTextView
 				android:id="@+id/contact_grid_name"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
