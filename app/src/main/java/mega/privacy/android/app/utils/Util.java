@@ -499,17 +499,17 @@ public class Util {
 		return sizeString;
 	}
 
-    public static String getSizeStringGBBased(long size){
+    public static String getSizeStringGBBased(long gbSize){
         String sizeString = "";
         DecimalFormat decf = new DecimalFormat("###.##");
 
         float TB = 1024;
 
-        if (size < TB){
-            sizeString = decf.format(size) + " " + context.getString(R.string.label_file_size_giga_byte);
+        if (gbSize < TB){
+            sizeString = decf.format(gbSize) + " " + context.getString(R.string.label_file_size_giga_byte);
         }
         else{
-            sizeString = decf.format(size/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
+            sizeString = decf.format(gbSize/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
         }
 
         return sizeString;
