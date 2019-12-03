@@ -11996,36 +11996,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
 		if (oFLol != null){
 			oFLol.setOrder(orderOthers);
-			switch (orderOthers) {
-				case ORDER_DEFAULT_ASC: {
-					oFLol.sortByNameAscending();
-					break;
-				}
-				case ORDER_DEFAULT_DESC: {
-					oFLol.sortByNameDescending();
-					break;
-				}
-				case ORDER_MODIFICATION_ASC: {
-					oFLol.sortByModificationDateAscending();
-					break;
-				}
-				case ORDER_MODIFICATION_DESC: {
-					oFLol.sortByModificationDateDescending();
-					break;
-				}
-				case ORDER_SIZE_ASC: {
-					oFLol.sortBySizeAscending();
-					break;
-				}
-				case ORDER_SIZE_DESC: {
-					oFLol.sortBySizeDescending();
-					break;
-				}
-				default: {
-					break;
-				}
-			}
-
 		}
 	}
 
