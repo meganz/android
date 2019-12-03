@@ -1834,6 +1834,28 @@ public class Util {
 		}
 	}
 
+	public static int getProductLevel(String productId){
+		if (TextUtil.isTextEmpty(productId)) {
+			return -1;
+		}
+		switch (productId) {
+			case SKU_PRO_LITE_MONTH:
+			case SKU_PRO_LITE_YEAR:
+				return 0;
+			case SKU_PRO_I_MONTH:
+			case SKU_PRO_I_YEAR:
+				return 1;
+			case SKU_PRO_II_MONTH:
+			case SKU_PRO_II_YEAR:
+				return 2;
+			case SKU_PRO_III_MONTH:
+			case SKU_PRO_III_YEAR:
+				return 3;
+			default:
+				return -1;
+		}
+	}
+
 	//convert color in int to hex
 	public static String getHexValue(int color){
 		return String.format("#%06X", 0xFFFFFF & color);

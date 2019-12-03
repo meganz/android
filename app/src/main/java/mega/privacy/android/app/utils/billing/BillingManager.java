@@ -40,9 +40,12 @@ import java.util.List;
 
 import mega.privacy.android.app.utils.TextUtil;
 
+import static com.android.billingclient.api.BillingFlowParams.ProrationMode.DEFERRED;
+import static com.android.billingclient.api.BillingFlowParams.ProrationMode.IMMEDIATE_WITH_TIME_PRORATION;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logInfo;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.Util.getProductLevel;
 
 /**
  * Handles all the interactions with Play Store (via Billing library), maintains connection to
@@ -117,6 +120,10 @@ public class BillingManager implements PurchasesUpdatedListener {
      */
     public void initiatePurchaseFlow(final String oldSku, final SkuDetails skuDetails) {
         logDebug("oldSku is:" + oldSku + ", new sku is:" + skuDetails);
+
+        //if user is upgrading, it take effect immediately otherwise wait until current plan expired
+        final int prorationMode = getProductLevel(skuDetails.getSku()) > getProductLevel(oldSku) ? IMMEDIATE_WITH_TIME_PRORATION : DEFERRED;
+        logDebug("prorationMode is " + prorationMode);
         Runnable purchaseFlowRequest = new Runnable() {
             @Override
             public void run() {
@@ -124,6 +131,7 @@ public class BillingManager implements PurchasesUpdatedListener {
                         .newBuilder()
                         .setSkuDetails(skuDetails)
                         .setOldSku(oldSku)
+                        .setReplaceSkusProrationMode(prorationMode)
                         .build();
                 mBillingClient.launchBillingFlow(mActivity, purchaseParams);
             }
