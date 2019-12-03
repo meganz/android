@@ -26,6 +26,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -66,6 +67,8 @@ public final class ChatAdvancedNotificationBuilder {
     MegaChatApiAndroid megaChatApi;
 
     private NotificationCompat.Builder mBuilderCompat;
+
+    private static List<Integer> notificationIds = new ArrayList<>();
 
     private String notificationChannelIdChatSimple = NOTIFICATION_CHANNEL_CHAT_ID;
     private String notificationChannelNameChatSimple = NOTIFICATION_CHANNEL_CHAT_NAME;
@@ -129,7 +132,12 @@ public final class ChatAdvancedNotificationBuilder {
         String chatString = MegaApiJava.userHandleToBase64(chat.getChatId());
 
         int notificationId = chatString.hashCode();
-        notificationManager.notify(notificationId, notification);
+        notify(notificationId, notification);
+    }
+
+    private void notify(int id, Notification notification) {
+        notificationIds.add(id);
+        notificationManager.notify(id, notification);
     }
 
     public void buildNotificationPreN(Uri uriParameter, String vibration, MegaChatRequest request) {
@@ -778,6 +786,10 @@ public final class ChatAdvancedNotificationBuilder {
         logDebug("removeAllChatNotifications");
         notificationManager.cancel(NOTIFICATION_SUMMARY_CHAT);
         notificationManager.cancel(NOTIFICATION_GENERAL_PUSH_CHAT);
+        for(int id : notificationIds) {
+            notificationManager.cancel(id);
+        }
+        notificationIds.clear();
     }
 
     public void showSimpleNotification(){
@@ -918,7 +930,7 @@ public final class ChatAdvancedNotificationBuilder {
                     notificationBuilderO.setLargeIcon(largeIcon);
                 }
 
-                notificationManager.notify(notificationId, notificationBuilderO.build());
+                notify(notificationId, notificationBuilderO.build());
 
             }else{
                 logDebug("Nougat");
@@ -956,7 +968,7 @@ public final class ChatAdvancedNotificationBuilder {
                 }
 
                 //Show the notification:
-                notificationManager.notify(notificationId, notificationBuilder.build());
+                notify(notificationId, notificationBuilder.build());
             }
         }
         else{
@@ -1111,7 +1123,7 @@ public final class ChatAdvancedNotificationBuilder {
                 }
             }
 
-            notificationManager.notify(notificationId, notificationBuilderO.build());
+            notify(notificationId, notificationBuilderO.build());
         }
         else {
 
@@ -1149,7 +1161,7 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
 
-            notificationManager.notify(notificationId, notificationBuilder.build());
+            notify(notificationId, notificationBuilder.build());
         }
     }
 
