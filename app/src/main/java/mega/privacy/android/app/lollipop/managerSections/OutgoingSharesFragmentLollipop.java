@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,12 +65,12 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-
 
 public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 
@@ -91,7 +90,8 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	boolean allFiles = true;
 
 	MegaNodeAdapter adapter;
-	RelativeLayout transfersOverViewLayout;
+
+	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -587,24 +587,22 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			emptyLinearLayout = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
-			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
-			transfersOverViewLayout.setVisibility(View.GONE);
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			if (adapter == null){
-				logDebug("Creating the adapter: " + ((ManagerActivityLollipop)context).parentHandleOutgoing);
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleOutgoing, recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				logDebug("Creating the adapter: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleOutgoing(), recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
-			if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
+			if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
 				logWarning("Parent Handle == -1");
 				findNodes();
 			}else{
-				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
-				logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).parentHandleOutgoing);
+				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
+				logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			}
 
@@ -627,7 +625,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyLinearLayout.setVisibility(View.VISIBLE);
 
-					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleOutgoing||((ManagerActivityLollipop)context).parentHandleOutgoing==-1) {
+					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleOutgoing()||((ManagerActivityLollipop)context).getParentHandleOutgoing()==-1) {
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
 						}else{
@@ -707,21 +705,21 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleOutgoing, recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleOutgoing(), recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
+				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
-			if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
+			if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
 				logWarning("Parent Handle == -1");
 				findNodes();
 			}
 			else{
-				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
-				logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).parentHandleOutgoing);
+				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
+				logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				addSectionTitle(nodes,adapter.getAdapterType());
@@ -741,7 +739,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyLinearLayout.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleOutgoing||((ManagerActivityLollipop)context).parentHandleOutgoing==-1) {
+				if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleOutgoing()||((ManagerActivityLollipop)context).getParentHandleOutgoing()==-1) {
 
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
@@ -798,9 +796,9 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public void refresh (){
-		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).parentHandleOutgoing);
+		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
 
-        if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
+        if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
             findNodes();
 
             ((ManagerActivityLollipop)context).setToolbarTitle();
@@ -816,7 +814,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
                     emptyImageView.setVisibility(View.VISIBLE);
                     emptyLinearLayout.setVisibility(View.VISIBLE);
 
-					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleOutgoing||((ManagerActivityLollipop)context).parentHandleOutgoing==-1) {
+					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleOutgoing()||((ManagerActivityLollipop)context).getParentHandleOutgoing()==-1) {
 
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
@@ -871,7 +869,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			}
         }
         else{
-            MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
+            MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
 
            	((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			((ManagerActivityLollipop)context).setToolbarTitle();
@@ -943,9 +941,9 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public void refreshContent (){
-		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).parentHandleOutgoing);
+		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
 
-		if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
+		if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
 			findNodes();
 			if(adapter != null){
 				logDebug("adapter != null");
@@ -968,7 +966,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			}
 		}
 		else{
-			MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
+			MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
 			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
 			addSectionTitle(nodes,adapter.getAdapterType());
 
@@ -1038,6 +1036,8 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	public void findNodes(){
 		logDebug("findNodes");
 		ArrayList<MegaShare> outNodeList = megaApi.getOutShares();
+		ArrayList<MegaShare> pendingNodeList = megaApi.getPendingOutShares();
+
 		nodes.clear();
 		long lastFolder=-1;		
 		
@@ -1054,14 +1054,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			}
 		}
 
-		if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
-		addSectionTitle(nodes,adapter.getAdapterType());
-		adapter.setNodes(nodes);
+		orderNodes();
 	}
 
 	@Override
@@ -1070,361 +1063,215 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
         context = activity;
     }
 
-    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
-    	if (adapter.isMultipleSelect()){
-			logDebug("Multiselect ON");
-			adapter.toggleSelection(position);
+	public void openFile(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
+		if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()) {
+			Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+			//Put flag to notify FullScreenImageViewerLollipop.
+			intent.putExtra("placeholder", placeholderCount);
+			intent.putExtra("position", position);
+			intent.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
+			intent.putExtra("isFolderLink", false);
 
-			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
-			if (selectedNodes.size() > 0){
-				updateActionModeTitle();
+			if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT) {
+				intent.putExtra("parentNodeHandle", -1L);
+			} else {
+				intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 			}
-		}
-		else{
-			if (nodes.get(position).isFolder()){
 
-				((ManagerActivityLollipop) context).increaseDeepBrowserTreeOutgoing();
-				logDebug("deepBrowserTree after clicking folder" + ((ManagerActivityLollipop) context).deepBrowserTreeOutgoing);
-				
-				MegaNode n = nodes.get(position);
-
-				int lastFirstVisiblePosition = 0;
-				if(((ManagerActivityLollipop)context).isList){
-					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-				}
-				else{
-					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
-					if(lastFirstVisiblePosition==-1){
-						logWarning("Completely -1 then find just visible position");
-						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
-					}
-				}
-
-				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
-				lastPositionStack.push(lastFirstVisiblePosition);
-
-				((ManagerActivityLollipop)context).parentHandleOutgoing=n.getHandle();
-
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				((ManagerActivityLollipop)context).setToolbarTitle();
-
-				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
-				addSectionTitle(nodes,adapter.getAdapterType());
-
-				adapter.setNodes(nodes);
-				recyclerView.scrollToPosition(0);
-				visibilityFastScroller();
-
-				//If folder has no files
-				if (adapter.getItemCount() == 0){
-					recyclerView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyLinearLayout.setVisibility(View.VISIBLE);
-
-					if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-
-						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
-						}else{
-							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
-						}
-
-						String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
-						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
-
-					}else {
-						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-						}else{
-							emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-						}
-						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
-
-					}
-				}
-				else{
-					recyclerView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyLinearLayout.setVisibility(View.GONE);
-				}
-				checkScroll();
-				((ManagerActivityLollipop) context).showFabButton();
+			if (((ManagerActivityLollipop) context).getParentHandleOutgoing() == -1) {
+				intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderOthers);
+			} else {
+				intent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
 			}
-			else{
-				//Is file
-				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
-                    //Put flag to notify FullScreenImageViewerLollipop.
-                    intent.putExtra("placeholder", placeholderCount);
-					intent.putExtra("position", position);
-					intent.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
-					intent.putExtra("isFolderLink", false);
 
-					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
-						intent.putExtra("parentNodeHandle", -1L);
-					}
-					else{
-						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
-					}
+			intent.putExtra("screenPosition", screenPosition);
+			startActivity(intent);
+			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
+			imageDrag = imageView;
+		} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio()) {
+			MegaNode file = nodes.get(position);
 
-					if(((ManagerActivityLollipop)context).parentHandleOutgoing==-1){
-						intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
-					}
-					else{
-						intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					}
+			String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 
-					intent.putExtra("screenPosition", screenPosition);
-					startActivity(intent);
-					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
-					imageDrag = imageView;
+			Intent mediaIntent;
+			boolean internalIntent;
+			boolean opusFile = false;
+			if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()) {
+				mediaIntent = new Intent(Intent.ACTION_VIEW);
+				internalIntent = false;
+				String[] s = file.getName().split("\\.");
+				if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) {
+					opusFile = true;
 				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
-					MegaNode file = nodes.get(position);
+			} else {
+				internalIntent = true;
+				mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+			}
+			mediaIntent.putExtra("position", position);
+			if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT) {
+				mediaIntent.putExtra("parentNodeHandle", -1L);
+			} else {
+				mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+			}
 
-					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					logDebug("FILE HANDLE: " + file.getHandle());
+			if (((ManagerActivityLollipop) context).getParentHandleOutgoing() == -1) {
+				mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderOthers);
+			} else {
+				mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
+			}
+			mediaIntent.putExtra("placeholder", placeholderCount);
+			mediaIntent.putExtra("screenPosition", screenPosition);
 
-					Intent mediaIntent;
-					boolean internalIntent;
-					boolean opusFile = false;
-					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
-						mediaIntent = new Intent(Intent.ACTION_VIEW);
-						internalIntent = false;
-						String[] s = file.getName().split("\\.");
-						if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
-							opusFile = true;
-						}
-					}
-					else {
-						internalIntent = true;
-						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-					}
-					mediaIntent.putExtra("position", position);
-					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
-						mediaIntent.putExtra("parentNodeHandle", -1L);
-					}
-					else{
-						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
-					}
-
-					if(((ManagerActivityLollipop)context).parentHandleOutgoing==-1){
-						mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
-					}
-					else{
-						mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					}
-                    mediaIntent.putExtra("placeholder", placeholderCount);
-					mediaIntent.putExtra("screenPosition", screenPosition);
-
-					mediaIntent.putExtra("HANDLE", file.getHandle());
-					mediaIntent.putExtra("FILENAME", file.getName());
-					mediaIntent.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
-					imageDrag = imageView;
-					boolean isOnMegaDownloads = false;
-					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if(f.exists() && (f.length() == file.getSize())){
-						isOnMegaDownloads = true;
-					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
-						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
-						else{
-							mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
-						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-					}
-					else {
-						if (megaApi.httpServerIsRunning() == 0) {
-							megaApi.httpServerStart();
-						}
-
-						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-						activityManager.getMemoryInfo(mi);
-
-						if(mi.totalMem>BUFFER_COMP){
-							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-						}
-						else{
-							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-						}
-
-						String url = megaApi.httpServerGetLocalLink(file);
-						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-					}
-					if (opusFile){
-						mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
-					}
-					if (internalIntent) {
-						context.startActivity(mediaIntent);
-					}
-					else {
-						if (isIntentAvailable(context, mediaIntent)) {
-							context.startActivity(mediaIntent);
-						}
-						else {
-							((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
-							adapter.notifyDataSetChanged();
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(nodes.get(position).getHandle());
-							NodeController nC = new NodeController(context);
-							nC.prepareForDownload(handleList, true);
-						}
-					}
-					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
-				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
-					MegaNode file = nodes.get(position);
-
-					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					logDebug("FILE HANDLE: " + file.getHandle() + ", TYPE: " + mimeType);
-
-					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-
-					pdfIntent.putExtra("inside", true);
-					pdfIntent.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
-					boolean isOnMegaDownloads = false;
-					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if(f.exists() && (f.length() == file.getSize())){
-						isOnMegaDownloads = true;
-					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
-						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
-						else{
-							pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
-						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-					}
-					else {
-						if (megaApi.httpServerIsRunning() == 0) {
-							megaApi.httpServerStart();
-						}
-
-						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-						activityManager.getMemoryInfo(mi);
-
-						if(mi.totalMem>BUFFER_COMP){
-							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-						}
-						else{
-							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-						}
-
-						String url = megaApi.httpServerGetLocalLink(file);
-						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
-					}
-					pdfIntent.putExtra("HANDLE", file.getHandle());
-					pdfIntent.putExtra("screenPosition", screenPosition);
-					imageDrag = imageView;
-					if (isIntentAvailable(context, pdfIntent)){
-						startActivity(pdfIntent);
-					}
-					else{
-						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList, true);
-					}
-					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+			mediaIntent.putExtra("HANDLE", file.getHandle());
+			mediaIntent.putExtra("FILENAME", file.getName());
+			mediaIntent.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
+			imageDrag = imageView;
+			boolean isOnMegaDownloads = false;
+			String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+			File f = new File(downloadLocationDefaultPath, file.getName());
+			if (f.exists() && (f.length() == file.getSize())) {
+				isOnMegaDownloads = true;
+			}
+			if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
+				File mediaFile = new File(localPath);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+					mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+				} else {
+					mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isURL()) {
-					logDebug("Is URL file");
-					MegaNode file = nodes.get(position);
+				mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			} else {
+				if (megaApi.httpServerIsRunning() == 0) {
+					megaApi.httpServerStart();
+				}
 
-					boolean isOnMegaDownloads = false;
-					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if (f.exists() && (f.length() == file.getSize())) {
-						isOnMegaDownloads = true;
-					}
-					logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
-						File mediaFile = new File(localPath);
-						InputStream instream = null;
+				ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+				ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+				activityManager.getMemoryInfo(mi);
 
-						try {
-							// open the file for reading
-							instream = new FileInputStream(f.getAbsolutePath());
+				if (mi.totalMem > BUFFER_COMP) {
+					logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+					megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
+				} else {
+					logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+					megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
+				}
 
-							// if file the available for reading
-							if (instream != null) {
-								// prepare the file for reading
-								InputStreamReader inputreader = new InputStreamReader(instream);
-								BufferedReader buffreader = new BufferedReader(inputreader);
+				String url = megaApi.httpServerGetLocalLink(file);
+				mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+			}
+			if (opusFile) {
+				mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+			}
+			if (internalIntent) {
+				context.startActivity(mediaIntent);
+			} else {
+				if (isIntentAvailable(context, mediaIntent)) {
+					context.startActivity(mediaIntent);
+				} else {
+					((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
+					adapter.notifyDataSetChanged();
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					handleList.add(nodes.get(position).getHandle());
+					NodeController nC = new NodeController(context);
+					nC.prepareForDownload(handleList, true);
+				}
+			}
+			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
+		} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()) {
+			MegaNode file = nodes.get(position);
 
-								String line1 = buffreader.readLine();
-								if (line1 != null) {
-									String line2 = buffreader.readLine();
+			String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 
-									String url = line2.replace("URL=", "");
+			Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 
-									logDebug("Is URL - launch browser intent");
-									Intent i = new Intent(Intent.ACTION_VIEW);
-									i.setData(Uri.parse(url));
-									startActivity(i);
-								} else {
-									logWarning("Not expected format: Exception on processing url file");
-									Intent intent = new Intent(Intent.ACTION_VIEW);
-									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
-									} else {
-										intent.setDataAndType(Uri.fromFile(f), "text/plain");
-									}
-									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			pdfIntent.putExtra("inside", true);
+			pdfIntent.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
+			boolean isOnMegaDownloads = false;
+			String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+			File f = new File(downloadLocationDefaultPath, file.getName());
+			if (f.exists() && (f.length() == file.getSize())) {
+				isOnMegaDownloads = true;
+			}
+			if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
+				File mediaFile = new File(localPath);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+					pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+				} else {
+					pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+				}
+				pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			} else {
+				if (megaApi.httpServerIsRunning() == 0) {
+					megaApi.httpServerStart();
+				}
 
-									if (isIntentAvailable(context, intent)) {
-										startActivity(intent);
-									} else {
-										ArrayList<Long> handleList = new ArrayList<Long>();
-										handleList.add(nodes.get(position).getHandle());
-										NodeController nC = new NodeController(context);
-										nC.prepareForDownload(handleList, true);
-									}
-								}
-							}
-						} catch (Exception ex) {
+				ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+				ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+				activityManager.getMemoryInfo(mi);
 
+				if (mi.totalMem > BUFFER_COMP) {
+					logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+					megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
+				} else {
+					logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+					megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
+				}
+
+				String url = megaApi.httpServerGetLocalLink(file);
+				pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+			}
+			pdfIntent.putExtra("HANDLE", file.getHandle());
+			pdfIntent.putExtra("screenPosition", screenPosition);
+			imageDrag = imageView;
+			if (isIntentAvailable(context, pdfIntent)) {
+				startActivity(pdfIntent);
+			} else {
+				Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(nodes.get(position).getHandle());
+				NodeController nC = new NodeController(context);
+				nC.prepareForDownload(handleList, true);
+			}
+			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
+		} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isURL()) {
+			logDebug("Is URL file");
+			MegaNode file = nodes.get(position);
+
+			boolean isOnMegaDownloads = false;
+			String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+			File f = new File(downloadLocationDefaultPath, file.getName());
+			if (f.exists() && (f.length() == file.getSize())) {
+				isOnMegaDownloads = true;
+			}
+			logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
+			if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
+				File mediaFile = new File(localPath);
+				InputStream instream = null;
+
+				try {
+					// open the file for reading
+					instream = new FileInputStream(f.getAbsolutePath());
+
+					// if file the available for reading
+					if (instream != null) {
+						// prepare the file for reading
+						InputStreamReader inputreader = new InputStreamReader(instream);
+						BufferedReader buffreader = new BufferedReader(inputreader);
+
+						String line1 = buffreader.readLine();
+						if (line1 != null) {
+							String line2 = buffreader.readLine();
+
+							String url = line2.replace("URL=", "");
+
+							logDebug("Is URL - launch browser intent");
+							Intent i = new Intent(Intent.ACTION_VIEW);
+							i.setData(Uri.parse(url));
+							startActivity(i);
+						} else {
+							logDebug("Not expected format: Exception on processing url file");
 							Intent intent = new Intent(Intent.ACTION_VIEW);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 								intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
@@ -1441,28 +1288,158 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 								NodeController nC = new NodeController(context);
 								nC.prepareForDownload(handleList, true);
 							}
-
-						} finally {
-							// close the file.
-							try {
-								instream.close();
-							} catch (IOException e) {
-								logError("EXCEPTION closing InputStream", e);
-							}
 						}
+					}
+				} catch (Exception ex) {
+
+					Intent intent = new Intent(Intent.ACTION_VIEW);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+					} else {
+						intent.setDataAndType(Uri.fromFile(f), "text/plain");
+					}
+					intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+					if (isIntentAvailable(context, intent)) {
+						startActivity(intent);
 					} else {
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList, true);
 					}
-				} else{
-					adapter.notifyDataSetChanged();
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					handleList.add(nodes.get(position).getHandle());
-					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList, true);
+
+				} finally {
+					// close the file.
+					try {
+						instream.close();
+					} catch (IOException e) {
+						logError("EXCEPTION closing InputStream", e);
+					}
 				}
+			} else {
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(nodes.get(position).getHandle());
+				NodeController nC = new NodeController(context);
+				nC.prepareForDownload(handleList, true);
+			}
+		} else {
+			adapter.notifyDataSetChanged();
+			ArrayList<Long> handleList = new ArrayList<Long>();
+			handleList.add(nodes.get(position).getHandle());
+			NodeController nC = new NodeController(context);
+			nC.prepareForDownload(handleList, true);
+		}
+	}
+
+	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+		if (adapter.isMultipleSelect()) {
+			logDebug("multiselect ON");
+
+			adapter.toggleSelection(position);
+
+			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+			if (selectedNodes.size() > 0) {
+				updateActionModeTitle();
+			}
+		} else {
+			if (nodes.get(position).isFolder()) {
+
+				((ManagerActivityLollipop) context).increaseDeepBrowserTreeOutgoing();
+				logDebug("deepBrowserTree after clicking folder" + ((ManagerActivityLollipop) context).deepBrowserTreeOutgoing);
+
+				MegaNode n = nodes.get(position);
+
+				int lastFirstVisiblePosition = 0;
+				if (((ManagerActivityLollipop) context).isList) {
+					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+				} else {
+					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					if(lastFirstVisiblePosition==-1){
+						logWarning("Completely -1 then find just visible position");
+						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+					}
+				}
+
+				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
+
+				lastPositionStack.push(lastFirstVisiblePosition);
+
+				((ManagerActivityLollipop) context).setParentHandleOutgoing(n.getHandle());
+
+				((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
+				((ManagerActivityLollipop) context).setToolbarTitle();
+
+				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop) context).orderCloud);
+				addSectionTitle(nodes, adapter.getAdapterType());
+
+				adapter.setNodes(nodes);
+				recyclerView.scrollToPosition(0);
+				visibilityFastScroller();
+
+				//If folder has no files
+				if (adapter.getItemCount() == 0) {
+					recyclerView.setVisibility(View.GONE);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyLinearLayout.setVisibility(View.VISIBLE);
+
+					if (megaApi.getRootNode().getHandle() == n.getHandle()) {
+
+						if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
+						} else {
+							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
+						}
+
+						String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
+						try {
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						} catch (Exception e) {
+						}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);
+
+					} else {
+						if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+						} else {
+							emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+						}
+						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+						try {
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						} catch (Exception e) {
+						}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);
+
+					}
+				} else {
+					recyclerView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyLinearLayout.setVisibility(View.GONE);
+				}
+				checkScroll();
+				((ManagerActivityLollipop) context).showFabButton();
+			} else {
+				//Is file
+				openFile(nodes.get(position), position, screenPosition, imageView);
 			}
 		}
 	}
@@ -1499,129 +1476,17 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	public void setNodes(ArrayList<MegaNode> nodes){
 		logDebug("setNodes");
 		this.nodes = nodes;
-		if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortByNameDescending();
-		}
-		else{
-			sortByNameAscending();
-		}
+		orderNodes();
 	}
-	
-	public void sortByNameDescending(){
-		
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
-		
-		
-		for(int k = 0; k < nodes.size() ; k++) {
-			MegaNode node = nodes.get(k);
-			if(node == null) {
-				continue;
-			}
-			if(node.isFolder()){
-				foldersOrder.add(node.getName());
-			}
-			else{
-				filesOrder.add(node.getName());
-			}
-		}
-		
-	
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(foldersOrder);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(filesOrder);
 
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = foldersOrder.get(k);
-				if(nodes.get(j) == null) {
-					continue;
-				}
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));
-				}				
-			}
-			
+	private void orderNodes() {
+		if (((ManagerActivityLollipop) context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC) {
+			sortByNameDescending(this.nodes);
+		} else {
+			sortByNameAscending(this.nodes);
 		}
-		
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = filesOrder.get(k);
-				if(nodes.get(j) == null) {
-					continue;
-				}
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));					
-				}				
-			}
-			
-		}
-		
-		nodes.clear();
-		nodes.addAll(tempOffline);
-		addSectionTitle(nodes,adapter.getAdapterType());
-		adapter.setNodes(nodes);
-	}
-	
-	public void sortByNameAscending(){
-		logDebug("sortByNameAscending");
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
-				
-		for(int k = 0; k < nodes.size() ; k++) {
-			MegaNode node = nodes.get(k);
-			if(node == null) {
-				continue;
-			}
-			if(node == null) {
-				continue;
-			}
-			if(node.isFolder()){
-				foldersOrder.add(node.getName());
-			}
-			else{
-				filesOrder.add(node.getName());
-			}
-		}		
-	
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
 
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = foldersOrder.get(k);
-				if(nodes.get(j) == null) {
-					continue;
-				}
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));
-				}				
-			}			
-		}
-		
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = filesOrder.get(k);
-				if(nodes.get(j) == null) {
-					continue;
-				}
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));
-				}				
-			}
-			
-		}
-		
-		nodes.clear();
-		nodes.addAll(tempOffline);
-		addSectionTitle(nodes,adapter.getAdapterType());
+		addSectionTitle(nodes, adapter.getAdapterType());
 		adapter.setNodes(nodes);
 	}
 			
@@ -1695,7 +1560,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		if(((ManagerActivityLollipop) context).deepBrowserTreeOutgoing==0){
 			logDebug("deepBrowserTree==0");
 			//In the beginning of the navigation
-			((ManagerActivityLollipop)context).parentHandleOutgoing = -1;
+			((ManagerActivityLollipop)context).setParentHandleOutgoing(-1);
 
 			((ManagerActivityLollipop)context).setToolbarTitle();
 			findNodes();
@@ -1729,14 +1594,14 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		else if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing>0){
 			logDebug("Keep navigation");
 
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing));
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing()));
 
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyLinearLayout.setVisibility(View.GONE);
 
-				((ManagerActivityLollipop)context).parentHandleOutgoing=parentNode.getHandle();
+				((ManagerActivityLollipop)context).setParentHandleOutgoing(parentNode.getHandle());
 
 				((ManagerActivityLollipop)context).setToolbarTitle();
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -1770,9 +1635,6 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		}
 		else{
 			logDebug("Back to Cloud");
-			recyclerView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyLinearLayout.setVisibility(View.GONE);
 			((ManagerActivityLollipop) context).deepBrowserTreeOutgoing=0;
 			return 0;
 		}

@@ -2,6 +2,14 @@
 	xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
 
 	<item
+		android:id="@+id/action_return_call"
+		android:orderInCategory="80"
+		android:title="@string/call_in_progress_layout"
+		android:icon="@drawable/ic_call_menu"
+		MEGA:showAsAction="always"
+		MEGA:actionLayout="@layout/layout_menu_return_call" />
+
+	<item
 		android:id="@+id/action_search"
 		android:orderInCategory="85"
 		android:title="@string/action_search"
@@ -13,7 +21,7 @@
 		android:id="@+id/action_grid_view_large_small"
 		android:orderInCategory="90"
 		android:title="@string/action_grid"
-		android:icon="@drawable/ic_menu_gridview"
+		android:icon="@drawable/ic_thumbnail_view"
 		MEGA:showAsAction="ifRoom"
 		android:visible="false"/>
 
@@ -69,17 +77,10 @@
 		MEGA:showAsAction="never" />
 
 	<item
-		android:id="@+id/action_menu_new_chat"
+		android:id="@+id/action_menu_invite"
 		android:orderInCategory="100"
 		MEGA:showAsAction="never"
-		android:title="@string/group_chat_start_conversation_label"
-		android:icon="@drawable/ic_action_bar_null" />
-
-	<item
-		android:id="@+id/action_menu_set_status"
-		android:orderInCategory="100"
-		MEGA:showAsAction="never"
-		android:title="@string/set_status_option_label"
+		android:title="@string/contact_invite"
 		android:icon="@drawable/ic_action_bar_null" />
 
 	<item

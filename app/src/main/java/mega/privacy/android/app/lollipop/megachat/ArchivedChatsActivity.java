@@ -29,6 +29,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
@@ -39,12 +40,17 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ArchivedChatsActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface {
+public class ArchivedChatsActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
 
     AppBarLayout abL;
     Toolbar tB;
@@ -70,6 +76,8 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     String querySearch = "";
     boolean isSearchExpanded = false;
     boolean pendingToOpenSearchView = false;
+
+    private ChatBottomSheetDialogFragment bottomSheetDialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,11 +203,11 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     public void showChatPanel(MegaChatListItem chat){
         logDebug("showChatPanel");
 
-        if(chat!=null){
-            this.selectedChatItemId = chat.getChatId();
-            ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
-            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-        }
+        if (chat == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedChatItemId = chat.getChatId();
+        bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
     @Override
@@ -430,6 +438,42 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
 
     @Override
     public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT) {
+            long requestNumber = request.getNumber();
+            logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + requestNumber);
+            int errorCode = e.getErrorCode();
+            if (errorCode == MegaError.API_OK && requestNumber == MegaContactRequest.INVITE_ACTION_ADD) {
+                showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
+            } else if (errorCode == MegaError.API_EEXIST) {
+                logWarning(request.getEmail() + " is already a contact");
+                showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
+            } else if (errorCode == MegaError.API_EARGS && requestNumber == MegaContactRequest.INVITE_ACTION_ADD) {
+                logWarning("No need to add yourself.");
+                showSnackbar(getString(R.string.error_own_email_as_contact));
+            } else {
+                logWarning("Invite error.");
+                showSnackbar(getString(R.string.general_error));
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
     }
 }

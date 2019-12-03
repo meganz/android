@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">오류. 다시 시도하세요.</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">보조 미디어 폴더가 존재하지 않습니다, 새 폴더를 선택하세요</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">외부 저장 공간이 탐지되지 않았습니다</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">이 폴더는 읽기 전용입니다. 업로드할 권한이 없습니다</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">썸네일 보기</string>
     <string name="action_list" context="Menu item to change from grid view to list view">목록 보기</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">복구 키 백업</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">복구 키 제거</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">구독 취소</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">복구 키 파일이 제거되었습니다</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">구독이 올바르게 취소되었습니다</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">구독을 취소할 수 없습니다. 도움을 받으려면 support&#64;mega.nz로 연락주세요</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">다른 세션 닫기</string>
@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">활성중인 계정</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">파일 목록 준비중</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">MEGA로 공유하려면 로그인하세요</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">확인 링크가 더 이상 유효하지 않습니다. 당신의 계정이 이미 활성화되었거나 등록을 취소했을 수 있습니다.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -231,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">모든 전송을 삭제할까요?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">클라우드 드라이브</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">최근</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">미디어 업로드</string>
     <string name="section_inbox" context="title of the screen that show the inbox">수신함</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">오프라인으로 저장됨</string>
@@ -611,6 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">미리보기가 다운로드 되지 않았습니다. 기다려주세요.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">사용 가능한 메모리가 부족하여 미리 보기를 이용할 수 없습니다. 나중에 다시 시도하세요.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">계정을 만들기 전에 로그아웃 하세요</string>
 
@@ -931,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">오류. 이 이메일 주소는 이미 사용중입니다.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">그 이메일 주소에 대한 확인 링크를 이미 요청하였습니다.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">새 이메일과 이전 이메일이 일치하지 않아야합니다</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">이메일을 변경하는 마지막 단계입니다. 아래에 비밀번호를 입력하세요.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">이메일 변경</string>
 
@@ -1796,7 +1802,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">대화 업로드중</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">대화 미디어 품질</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">대화 동영상 품질</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">동영상 품질</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">카메라 업로드는 당신의 기기의 사진과 다른 미디어에 대한 접근을 필요로 합니다. 설정 페이지에 가서 권한을 부여해주세요.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
@@ -2210,7 +2216,7 @@
     <string name="notification_new_contact" context="Subtitle of the historic notification for a new contact">[A]%s님은 [/A][B]이제 연락처에 등록되었습니다.[/B]</string>
     <string name="notification_new_shared_folder" context="Subtitle of the historic notification for a new shared folder">[A]%s님으로부터 [/A][B]새로 공유된 폴더.[/B]</string>
 
-    <string name="notification_reminder_contact_request" context="Subtitle of the historic notification for a reminder new contact request">[A]다시 알림: [/A][B]%s님이 [/B][C]당신에게 연락처 요청을 보냈습니다.[/C]</string>
+    <string name="notification_reminder_contact_request" context="Subtitle of the historic notification for a reminder new contact request">[A]알림: [/A][B]%s님이 [/B][C]당신에게 연락처 요청을 보냈습니다.[/C]</string>
 
     <string name="title_contact_request_notification_cancelled" context="Title of the historic notification for a contact request cancelled">연락처 요청 취소됨</string>
     <string name="subtitle_contact_request_notification_cancelled" context="Subtitle of the historic notification for contact request cancelled">[A]%s님이 [/A][B]연락처 요청을 취소하였습니다.[/B]</string>
@@ -2320,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">통화 시작</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL 키 오류</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA가 SSL을 통하여 안전하게 연결할 수 없습니다. 추가 요구사항이 있는 공개 WiFi에 연결되어 있을 수 있습니다.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA가 SSL을 통하여 안전하게 연결할 수 없습니다. 추가적인 요구사항이 있는 공개 와이파이에 접속했을 수 있습니다.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[A]알림[/A] [B]없음[/B][B].[/B]</string>
 
@@ -2517,6 +2523,21 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">파일 %d개 보류중.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">최근</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">이미지 1개와 동영상 1개</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">나</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">통화가 진행중이면 음성 메시지를 녹음할 수 없습니다.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">음성 메시지 업로드를 시도하던 중 오류 발생.</string>
 
@@ -2524,4 +2545,7 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">불러오는중</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">잠시만 기다리세요&#8230;</string>
+
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s개의 연락처 보냄.</string>
 </resources>

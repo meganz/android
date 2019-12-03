@@ -31,9 +31,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.listeners.ChatParticipantAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
+import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -86,9 +90,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
     	public ViewHolderParticipants(View v) {
 			super(v);
 		}   	
-
-//        ImageView imageView;
-        TextView textViewContactName;
+		EmojiTextView textViewContactName;
 		RelativeLayout itemLayout;
     }
     
@@ -97,7 +99,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			super(v);
 		}
     	RoundedImageView imageView;
-		TextView contactInitialLetter;
+		EmojiTextView contactInitialLetter;
 		MarqueeTextView textViewContent;
 		RelativeLayout threeDotsLayout;
 		ImageView imageButtonThreeDots;
@@ -132,24 +134,21 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-    
 	    dbH = DatabaseHandler.getDbHandler(context);
 	   
 		View v = null;
 		if(viewType == ITEM_VIEW_TYPE_NORMAL) {
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_participant_chat_list, parent, false);
-//			v = LayoutInflater.from(context).inflate(R.layout.item_participant_chat_list, null);
 			holderList = new ViewHolderParticipantsList(v);
-			holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.participant_list_item_layout);
-			holderList.imageView = (RoundedImageView) v.findViewById(R.id.participant_list_thumbnail);
-			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.participant_list_initial_letter);
-			holderList.textViewContactName = (TextView) v.findViewById(R.id.participant_list_name);
-			holderList.textViewContent = (MarqueeTextView) v.findViewById(R.id.participant_list_content);
-			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.participant_list_three_dots_layout);
-			holderList.imageButtonThreeDots = (ImageView) v.findViewById(R.id.participant_list_three_dots);
-			holderList.permissionsIcon = (ImageView) v.findViewById(R.id.participant_list_permissions);
-			holderList.statusImage = (ImageView) v.findViewById(R.id.group_participants_state_circle);
+			holderList.itemLayout = v.findViewById(R.id.participant_list_item_layout);
+			holderList.imageView = v.findViewById(R.id.participant_list_thumbnail);
+			holderList.contactInitialLetter = v.findViewById(R.id.participant_list_initial_letter);
+			holderList.textViewContactName = v.findViewById(R.id.participant_list_name);
+			holderList.textViewContent = v.findViewById(R.id.participant_list_content);
+			holderList.threeDotsLayout = v.findViewById(R.id.participant_list_three_dots_layout);
+			holderList.imageButtonThreeDots = v.findViewById(R.id.participant_list_three_dots);
+			holderList.permissionsIcon = v.findViewById(R.id.participant_list_permissions);
+			holderList.statusImage = v.findViewById(R.id.group_participants_state_circle);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				logDebug("Landscape configuration");
@@ -161,6 +160,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				holderList.textViewContent.setMaxWidth(scaleWidthPx(180, outMetrics));
 			}
 
+			holderList.textViewContactName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
+			holderList.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
+
 			holderList.itemLayout.setOnClickListener(this);
 			holderList.itemLayout.setTag(holderList);
 			v.setTag(holderList);
@@ -169,12 +171,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		else{
 			logDebug("Last element - type add participant");
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_add_participant_chat_list, parent, false);
-//			v = LayoutInflater.from(context).inflate(R.layout.item_add_participant_chat_list, null);
 			holderAddParticipant = new ViewHolderAddParticipant(v);
-			holderAddParticipant.itemLayout = (RelativeLayout) v.findViewById(R.id.add_participant_list_item_layout);
+			holderAddParticipant.itemLayout = v.findViewById(R.id.add_participant_list_item_layout);
 
-			holderAddParticipant.imageView = (ImageView) v.findViewById(R.id.add_participant_list_icon);
-			holderAddParticipant.textViewContactName = (TextView) v.findViewById(R.id.add_participant_list_text);
+			holderAddParticipant.imageView = v.findViewById(R.id.add_participant_list_icon);
+			holderAddParticipant.textViewContactName = v.findViewById(R.id.add_participant_list_text);
 			holderAddParticipant.itemLayout.setOnClickListener(this);
 			v.setTag(holderAddParticipant);
 			return holderAddParticipant;
@@ -388,52 +389,22 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			radius = defaultAvatar.getHeight()/2;
 
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		((ViewHolderParticipantsList)holder).imageView.setImageBitmap(defaultAvatar);
+		holder.imageView.setImageBitmap(defaultAvatar);
 
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
-		float density  = context.getResources().getDisplayMetrics().density;
 
-//		String fullName;
-		if(holder.fullName!=null&&(!(holder.fullName.trim().isEmpty()))){
-			String firstLetter = holder.fullName.charAt(0) + "";
-			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+		String firstLetter = ChatUtil.getFirstLetter(holder.fullName);
+		if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+			holder.contactInitialLetter.setVisibility(View.GONE);
+		}else {
 			holder.contactInitialLetter.setText(firstLetter);
 			holder.contactInitialLetter.setTextColor(Color.WHITE);
 			holder.contactInitialLetter.setVisibility(View.VISIBLE);
-
-			holder.contactInitialLetter.setTextSize(24);
-		}
-		else{
-			holder.contactInitialLetter.setVisibility(View.GONE);
 		}
 
-	}
-		
-	private int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-		
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
-		}
-		
-		return (int)textSize;
+
 	}
 
 	@Override

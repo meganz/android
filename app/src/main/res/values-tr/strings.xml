@@ -111,9 +111,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Küçük resim görünümü</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Liste görünümü</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Kurtarma Anahtarını yedekle</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Kurtarma Anahtarını sil</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Aboneliği iptal et</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">Kurtarma Anahtarı dosyası silindi</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Abonelik doğru bir şekilde iptal edildi</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Aboneliğinizi iptal edemiyoruz. Lütfen yardım için support&#64;mega.nz adresine ulaşın</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Diğer oturumları kapat</string>

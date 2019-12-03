@@ -40,20 +40,32 @@ import static mega.privacy.android.app.utils.Constants.*;
 
 public class BaseActivity extends AppCompatActivity {
 
-    private MegaApiAndroid megaApi;
-    private MegaChatApiAndroid megaChatApi;
-    private MegaApiAndroid megaApiFolder;
+    protected  MegaApplication app;
+
+    protected MegaApiAndroid megaApi;
+    protected MegaApiAndroid megaApiFolder;
+    protected MegaChatApiAndroid megaChatApi;
 
     private AlertDialog sslErrorDialog;
 
-    boolean delaySignalPresence = false;
+    private boolean delaySignalPresence = false;
+
+    public BaseActivity() {
+        app = MegaApplication.getInstance();
+        megaApi = app.getMegaApi();
+        megaApiFolder = app.getMegaApiFolder();
+
+        if(isChatEnabled()) {
+            megaChatApi = app.getMegaChatApi();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
-        checkMegaApiObjects();
+        checkMegaObjects();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(sslErrorReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED));
@@ -66,7 +78,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onPause() {
         logDebug("onPause");
 
-        checkMegaApiObjects();
+        checkMegaObjects();
         super.onPause();
     }
 
@@ -77,7 +89,7 @@ public class BaseActivity extends AppCompatActivity {
         super.onResume();
         setAppFontSize(this);
 
-        checkMegaApiObjects();
+        checkMegaObjects();
 
         retryConnectionsAndSignalPresence();
     }
@@ -93,23 +105,26 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * Method to check if exist all required MegaApiAndroid and MegaChatApiAndroid objects
+     * Method to check if exist all required objects (MegaApplication, MegaApiAndroid and MegaChatApiAndroid )
      * or create them if necessary.
      */
-    private void checkMegaApiObjects() {
-        logDebug("checkMegaApiObjects");
+    private void checkMegaObjects() {
+
+        if (app == null) {
+            app = MegaApplication.getInstance();
+        }
 
         if (megaApi == null){
-            megaApi = ((MegaApplication)getApplication()).getMegaApi();
+            megaApi = app.getMegaApi();
         }
 
         if (megaApiFolder == null) {
-            megaApiFolder = ((MegaApplication) getApplication()).getMegaApiFolder();
+            megaApiFolder = app.getMegaApiFolder();
         }
 
         if(isChatEnabled()){
             if (megaChatApi == null){
-                megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
+                megaChatApi = app.getMegaChatApi();
             }
         }
     }
@@ -136,7 +151,7 @@ public class BaseActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
                 logDebug("BROADCAST TO SEND SIGNAL PRESENCE");
-                if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending()==false){
+                if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()){
                     delaySignalPresence = false;
                     retryConnectionsAndSignalPresence();
                 }
@@ -221,7 +236,7 @@ public class BaseActivity extends AppCompatActivity {
                 if (megaChatApi != null) {
                     megaChatApi.retryPendingConnections(false, null);
 
-                    if(megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending() == false){
+                    if(megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()){
                         delaySignalPresence = false;
                         if(!(this instanceof ChatCallActivity) && megaChatApi.isSignalActivityRequired()){
                             logDebug("Send signal presence");
@@ -372,11 +387,11 @@ public class BaseActivity extends AppCompatActivity {
         MultipleAttachChatListener listener = null;
 
         if(chats.size()==1){
-            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), false, chats.size());
+            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), chats.size());
             megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
         }
         else{
-            listener = new MultipleAttachChatListener(context, -1, false, chats.size());
+            listener = new MultipleAttachChatListener(context, -1, chats.size());
             for(int i=0;i<chats.size();i++){
                 megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
             }
@@ -393,7 +408,7 @@ public class BaseActivity extends AppCompatActivity {
         logDebug("Check the last call to getAccountDetails");
         if(callToAccountDetails(getApplicationContext())){
             logDebug("megaApi.getAccountDetails SEND");
-            ((MegaApplication) getApplication()).askForAccountDetails();
+            app.askForAccountDetails();
         }
     }
 }

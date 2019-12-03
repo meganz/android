@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -42,10 +43,13 @@ import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.utils.contacts.MegaContactGetter;
+import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 
+import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -125,7 +129,7 @@ public class AccountController implements View.OnClickListener{
     public void removeAvatar() {
         logDebug("removeAvatar");
         File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
-        File qrFile = buildQrFile(context,megaApi.getMyEmail() + "QRcode.jpg");
+        File qrFile = buildQrFile(context,megaApi.getMyEmail() + QR_IMAGE_FILE_NAME);
 
         if (isFileAvailable(avatar)) {
             logDebug("Avatar to delete: " + avatar.getAbsolutePath());
@@ -437,6 +441,13 @@ public class AccountController implements View.OnClickListener{
 
         dbH.clearChatSettings();
         dbH.setEnabledChat(true + "");
+
+        //clear mega contacts and reset last sync time.
+        dbH.clearMegaContacts();
+        SharedPreferences preferences = context.getSharedPreferences(MegaContactGetter.LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
+        preferences.edit().putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0).apply();
+
+        new LastShowSMSDialogTimeChecker(context).reset();
     }
 
     public static void removeFolder(Context context, File folder) {
@@ -452,7 +463,7 @@ public class AccountController implements View.OnClickListener{
         logDebug("logout");
 
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            megaApi = MegaApplication.getInstance().getMegaApi();
         }
 
         if (context instanceof ManagerActivityLollipop){
@@ -480,6 +491,9 @@ public class AccountController implements View.OnClickListener{
         logDebug("logoutConfirmed");
 
         localLogoutApp(context);
+
+        //Clear num verions after logout
+        MegaApplication.getInstance().getMyAccountInfo().setNumVersions(-1);
 
         PackageManager m = context.getPackageManager();
         String s = context.getPackageName();

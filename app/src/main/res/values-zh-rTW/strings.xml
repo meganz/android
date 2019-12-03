@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">發生錯誤。請再試一次。</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-還原金鑰</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">第二媒體資料夾不存在，請選擇一個新的資料夾</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">未能偵測到外部儲存空間(例如：記憶卡)</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">此為唯讀資料夾，您沒有上傳的權限。</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">縮圖檢視</string>
     <string name="action_list" context="Menu item to change from grid view to list view">顯示列表</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">備份還原金鑰</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">移除還原金鑰</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">取消訂購</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">還原金鑰檔案已移除</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">此筆訂購已經成功取消</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">我們無法取消您的訂閱。請聯絡support&#64;mega.nz以獲得協助。</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">關閉其他登入帳戶</string>
@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">啟用帳號</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">正在準備檔案列表</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">請先登入，以便使用MEGA分享功能</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">您的確認連結已無效。您的帳戶可能已啟用，或您可能已取消註冊</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -231,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">要刪除所有傳輸嗎？</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">雲端硬碟</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">近期的</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">媒體上傳</string>
     <string name="section_inbox" context="title of the screen that show the inbox">收件夾</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">離線儲存</string>
@@ -611,6 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">此預覽尚未下載完全，請稍候。</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">由於記憶體不足，無法加載預覽。請稍後再試。</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">請創建新帳戶之前先登出</string>
 
@@ -630,12 +633,12 @@
 
     <string name="menu_take_picture" context="menu item">拍照</string>
 
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">只在Wi-Fi 下</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或數據傳輸方案</string>
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">只在WiFi連線</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或行動網路</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">跳過</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">停止</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">相機上傳正在進行</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">相機上傳正在進行中</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">您想停用相機上傳功能嗎？</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -687,8 +690,8 @@
     <string name="settings_empty_folder" context="settings option">選擇資料夾</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或數據傳輸方案</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">只在Wi-Fi 下</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或行動網路</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">只在WiFi連線</item>
     </string-array>
 
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">檔案上傳</string>
@@ -931,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">發生錯誤，此電子信箱已被使用。</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">你已經為此電子郵件地址申請了確認信。</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">新的和舊的電子郵件不能一模一樣</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">這是變更您電子信箱的最後一步了。請於下方輸入您的密碼。</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">更改電子信箱</string>
 
@@ -1796,7 +1802,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">上傳檔案至聊天</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">聊天媒體品質</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">聊天室影片上傳品質</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">影片品質</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">相機上傳需存取您裝置裡的相片與其他媒體內容，請到設定頁面並且允許其權限。</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
@@ -2320,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">通話開始</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL金鑰錯誤</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA無法安全地透過SSL金鑰連線。您使用的公共WiFi可能有附加條件。</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA無法透過SSL安全地連線，您可能在使用有額外要求的公共Wi-Fi。</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]沒有[/B][A]通知[/A][B]。[/B]</string>
 
@@ -2517,6 +2523,21 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d個待處理檔案。</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">近期的</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1張圖像與1個影片</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">我</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">通話進行中無法錄製語音留言。</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">嘗試上傳語音訊息時發生一個錯誤。</string>
 
@@ -2524,4 +2545,7 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">讀取中</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">請等待&#8230;&#8230;</string>
+
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">已傳給 %s 位聯絡人。</string>
 </resources>

@@ -58,7 +58,13 @@
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
-
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:key="settings_camera_upload_include_gps"
+            android:title="@string/settings_camera_upload_include_gps"
+            android:defaultValue="false"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
 		<android.support.v7.preference.ListPreference
 			android:key="settings_video_upload_quality"
 			android:title="@string/settings_video_upload_quality"
