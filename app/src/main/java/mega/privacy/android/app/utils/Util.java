@@ -498,6 +498,22 @@ public class Util {
 		
 		return sizeString;
 	}
+
+    public static String getSizeStringGBBased(long size){
+        String sizeString = "";
+        DecimalFormat decf = new DecimalFormat("###.##");
+
+        float TB = 1024;
+
+        if (size < TB){
+            sizeString = decf.format(size) + " " + context.getString(R.string.label_file_size_giga_byte);
+        }
+        else{
+            sizeString = decf.format(size/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
+        }
+
+        return sizeString;
+    }
     
 	public static String getDateString(long date){
 		DateFormat datf = DateFormat.getDateTimeInstance();
