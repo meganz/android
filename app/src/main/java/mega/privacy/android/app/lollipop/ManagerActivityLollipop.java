@@ -1273,19 +1273,32 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	@Override
 	public void onPurchasesUpdated(int resultCode, List<Purchase> purchases) {
-		if (resultCode == BillingClient.BillingResponseCode.OK
-				&& purchases != null
-				&& !purchases.isEmpty()) {
-			updateAccountInfo(purchases);
-			String sku = purchases.get(0).getSku();
-			String message = getString(R.string.message_user_purchased_subscription,
-					getSubscriptionType(this, sku),
-					getSubscriptionRenewalType(this, sku));
-			updateSubscriptionLevel(app.getMyAccountInfo());
-			drawerItem = DrawerItem.CLOUD_DRIVE;
-			selectDrawerItemLollipop(drawerItem);
-			showAlert(this, message, null);
-		}
+        if (resultCode == BillingClient.BillingResponseCode.OK) {
+            String message;
+            if (purchases != null && !purchases.isEmpty()) {
+                Purchase purchase = purchases.get(0);
+                //payment may take time to process, we will not give privilege until it has been fully processed
+                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+                    //payment has been processed
+                    updateAccountInfo(purchases);
+                    String sku = purchase.getSku();
+                    message = getString(R.string.message_user_purchased_subscription,
+                            getSubscriptionType(this, sku),
+                            getSubscriptionRenewalType(this, sku));
+                    updateSubscriptionLevel(app.getMyAccountInfo());
+                } else {
+                    //payment is being processed or in unknown state
+                    message = getString(R.string.message_user_payment_pending);
+                }
+                showAlert(this, message, null);
+            } else {
+                //down grade case
+                message = getString(R.string.message_user_purchased_subscription_down_grade);
+                showAlert(this, message, null);
+            }
+            drawerItem = DrawerItem.CLOUD_DRIVE;
+            selectDrawerItemLollipop(drawerItem);
+        }
 	}
 
 	private void updateAccountInfo(List<Purchase> purchases) {

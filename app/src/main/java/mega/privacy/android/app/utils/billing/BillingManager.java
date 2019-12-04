@@ -202,7 +202,7 @@ public class BillingManager implements PurchasesUpdatedListener {
                         if (billingResult.getResponseCode() == BillingResponseCode.OK) {
                             logInfo("purchase acknowledged");
                         } else {
-                            logWarning("purchase acknowledge failed");
+                            logWarning("purchase acknowledge failed, " + billingResult.getDebugMessage());
                         }
                     }
                 };

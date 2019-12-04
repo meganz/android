@@ -506,6 +506,8 @@
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Thank you for your feedback! Are you sure you want to cancel your MEGA subscription?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Your subscription has not been cancelled. Please provide a reason for your cancellation</string>
     <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Thank you for subscribing to %1$s %2$s!</string>
+    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
+    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
     <string name="subscription_type_monthly" context="">Monthly</string>
     <string name="subscription_type_yearly" context="">Yearly</string>
 
