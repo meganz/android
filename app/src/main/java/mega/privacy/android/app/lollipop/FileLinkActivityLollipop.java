@@ -299,12 +299,22 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 					if (value.length() == 0) {
 						return true;
 					}
-					if(value.startsWith("!")){
-						logDebug("Decryption key with exclamation!");
-						url=url+value;
-					}
-					else{
-						url=url+"!"+value;
+					if (url.contains("#!")) {
+						// old folder link format
+						if (value.startsWith("!")) {
+							logDebug("Decryption key with exclamation!");
+							url = url + value;
+						} else {
+							url = url + "!" + value;
+						}
+					} else if (url.contains(SEPARATOR + "file" + SEPARATOR)) {
+						// new folder link format
+						if (value.startsWith("#")) {
+							logDebug("Decryption key with hash!");
+							url = url + value;
+						} else {
+							url = url + "#" + value;
+						}
 					}
 					logDebug("File link to import: " + url);
 					decryptionIntroduced=true;
@@ -339,12 +349,22 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 							askForDecryptionKeyDialog();
 							return;
 						}else{
-							if(value.startsWith("!")){
-								logDebug("Decryption key with exclamation!");
-								url=url+value;
-							}
-							else{
-								url=url+"!"+value;
+							if (url.contains("#!")) {
+								// old folder link format
+								if (value.startsWith("!")) {
+									logDebug("Decryption key with exclamation!");
+									url = url + value;
+								} else {
+									url = url + "!" + value;
+								}
+							} else if (url.contains(SEPARATOR + "file" + SEPARATOR)) {
+								// new folder link format
+								if (value.startsWith("#")) {
+									logDebug("Decryption key with hash!");
+									url = url + value;
+								} else {
+									url = url + "#" + value;
+								}
 							}
 							logDebug("File link to import: " + url);
 							decryptionIntroduced=true;

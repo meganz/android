@@ -1164,7 +1164,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 				return;
 			}
 
-			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			final long folderHandle = intent.getLongExtra("SELECT", 0);			
 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);

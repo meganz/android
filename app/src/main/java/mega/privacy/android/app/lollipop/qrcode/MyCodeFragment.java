@@ -71,8 +71,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     final int AVATAR_LEFT = 182;
     final int AVATAR_RIGHT = 317;
     final int AVATAR_WIDTH = 135;
-    private final static String QR_IMAGE_FILE_NAME_OLD = "QRcode.jpg";
-    private final static String QR_IMAGE_FILE_NAME = "QR_code_image.jpg";
+    public final static String QR_IMAGE_FILE_NAME_OLD = "QRcode.jpg";
+    public final static String QR_IMAGE_FILE_NAME = "QR_code_image.jpg";
 
     MegaUser myUser;
     String myEmail;

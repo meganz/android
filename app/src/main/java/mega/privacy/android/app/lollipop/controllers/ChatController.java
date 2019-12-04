@@ -36,6 +36,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatImportToForwardListener;
 import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
+import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -2162,7 +2163,13 @@ public class ChatController {
         return false;
     }
 
-    public void checkIfNodesAreMineAndAttachNodes(long handles[], long idChat) {
+    public void checkIfNodesAreMineAndAttachNodes(long[] handles, long idChat) {
+        long[] idChats = new long[1];
+        idChats[0] = idChat;
+        checkIfNodesAreMineAndAttachNodes(handles, idChats);
+    }
+
+    public void checkIfNodesAreMineAndAttachNodes(long[] handles, long[] idChats) {
         if (handles == null) {
             return;
         }
@@ -2184,15 +2191,27 @@ public class ChatController {
         nC.checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes);
 
         if (notOwnerNodes.size() == 0) {
-            for(MegaNode node : ownerNodes) {
-                if (context instanceof ChatActivityLollipop) {
-                    megaChatApi.attachNode(idChat, node.getHandle(), (ChatActivityLollipop)context);
+            if (context instanceof ContactInfoActivityLollipop) {
+                ((ContactInfoActivityLollipop) context).sendFilesToChat(handles, idChats[0]);
+                return;
+            } else if (context instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) context).sendFilesToChats(null, idChats, handles);
+                return;
+            } else if (context instanceof ChatActivityLollipop) {
+                MultipleAttachChatListener listener = new MultipleAttachChatListener(context, idChats[0], handles.length);
+                for (long fileHandle : handles) {
+                    megaChatApi.attachNode(idChats[0], fileHandle, listener);
                 }
+                return;
             }
-            return;
         }
 
-        CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChat);
-        copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
+        if (context instanceof ContactInfoActivityLollipop || context instanceof ChatActivityLollipop) {
+            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChats[0]);
+            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
+        } else if (context instanceof ManagerActivityLollipop) {
+            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChats);
+            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
+        }
     }
 }

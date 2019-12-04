@@ -142,21 +142,21 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	public final static String KEY_CHAT_NESTED_NOTIFICATIONS = "settings_nested_notifications_chat";
 
-	public  final static String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
-	public  final static String KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE = "settings_storage_download_location_sd_card_preference";
-	public  final static String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";
-	public  final static String KEY_STORAGE_ADVANCED_DEVICES = "settings_storage_advanced_devices";
-	public  final static String KEY_CAMERA_UPLOAD_ON = "settings_camera_upload_on";
-	public  final static String KEY_CAMERA_UPLOAD_HOW_TO = "settings_camera_upload_how_to_upload";
-	public  final static String KEY_CAMERA_UPLOAD_CHARGING = "settings_camera_upload_charging";
-	public  final static String KEY_CAMERA_UPLOAD_REMOVE_GPS = "settings_camera_upload_remove_gps";
-    public  final static String KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE = "video_compression_queue_size";
-	public  final static String KEY_KEEP_FILE_NAMES = "settings_keep_file_names";
-	public  final static String KEY_CAMERA_UPLOAD_WHAT_TO = "settings_camera_upload_what_to_upload";
-    public  final static String KEY_CAMERA_UPLOAD_VIDEO_QUALITY = "settings_video_upload_quality";
-	public  final static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER = "settings_local_camera_upload_folder";
-	public  final static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD = "settings_local_camera_upload_folder_sdcard";
-	public  final static String KEY_CAMERA_UPLOAD_MEGA_FOLDER = "settings_mega_camera_folder";
+	public static String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
+	public static String KEY_STORAGE_DOWNLOAD_LOCATION_SD_CARD_PREFERENCE = "settings_storage_download_location_sd_card_preference";
+	public static String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";
+	public static String KEY_STORAGE_ADVANCED_DEVICES = "settings_storage_advanced_devices";
+	public static String KEY_CAMERA_UPLOAD_ON = "settings_camera_upload_on";
+	public static String KEY_CAMERA_UPLOAD_HOW_TO = "settings_camera_upload_how_to_upload";
+	public static String KEY_CAMERA_UPLOAD_CHARGING = "settings_camera_upload_charging";
+	public static String KEY_CAMERA_UPLOAD_INCLUDE_GPS = "settings_camera_upload_include_gps";
+    public static String KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE = "video_compression_queue_size";
+	public static String KEY_KEEP_FILE_NAMES = "settings_keep_file_names";
+	public static String KEY_CAMERA_UPLOAD_WHAT_TO = "settings_camera_upload_what_to_upload";
+    public static String KEY_CAMERA_UPLOAD_VIDEO_QUALITY = "settings_video_upload_quality";
+	public static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER = "settings_local_camera_upload_folder";
+	public static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD = "settings_local_camera_upload_folder_sdcard";
+	public static String KEY_CAMERA_UPLOAD_MEGA_FOLDER = "settings_mega_camera_folder";
 
 	public final static String KEY_SECONDARY_MEDIA_FOLDER_ON = "settings_secondary_media_folder_on";
 	public final static String KEY_LOCAL_SECONDARY_MEDIA_FOLDER = "settings_local_secondary_media_folder";
@@ -240,7 +240,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	ListPreference cameraUploadWhat;
 	ListPreference videoQuality;
     SwitchPreferenceCompat cameraUploadCharging;
-    SwitchPreferenceCompat cameraUploadRemoveGPS;
+    SwitchPreferenceCompat cameraUploadIncludeGPS;
 	Preference cameraUploadVideoQueueSize;
 	TwoLineCheckPreference keepFileNames;
 	Preference localCameraUploadFolder;
@@ -287,7 +287,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	boolean cameraUpload = false;
 	boolean secondaryUpload = false;
 	boolean charging = false;
-	boolean removeGPS = true;
+	boolean includeGPS;
 	boolean pinLock = false;
 	boolean chatEnabled = false;
 	boolean askMe = false;
@@ -432,8 +432,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		videoQuality = (ListPreference)findPreference(KEY_CAMERA_UPLOAD_VIDEO_QUALITY);
 		videoQuality.setOnPreferenceChangeListener(this);
 
-        cameraUploadRemoveGPS = (SwitchPreferenceCompat)findPreference(KEY_CAMERA_UPLOAD_REMOVE_GPS);
-        cameraUploadRemoveGPS.setOnPreferenceClickListener(this);
+        cameraUploadIncludeGPS = (SwitchPreferenceCompat)findPreference(KEY_CAMERA_UPLOAD_INCLUDE_GPS);
+        cameraUploadIncludeGPS.setOnPreferenceClickListener(this);
 
         cameraUploadCharging = (SwitchPreferenceCompat)findPreference(KEY_CAMERA_UPLOAD_CHARGING);
         cameraUploadCharging.setOnPreferenceClickListener(this);
@@ -1957,10 +1957,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             }
 			dbH.setConversionOnCharging(charging);
 		}
-		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_REMOVE_GPS) == 0){
-            logDebug("KEY_CAMERA_UPLOAD_REMOVE_GPS");
-            removeGPS = cameraUploadRemoveGPS.isChecked();
-            dbH.setRemoveGPS(removeGPS);
+		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_INCLUDE_GPS) == 0){
+            logDebug("KEY_CAMERA_UPLOAD_INCLUDE_GPS");
+            includeGPS = cameraUploadIncludeGPS.isChecked();
+            dbH.setRemoveGPS(!includeGPS);
             rescheduleCameraUpload(context);
         }
 		else if(preference.getKey().compareTo(KEY_KEEP_FILE_NAMES) == 0){
@@ -2694,20 +2694,20 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	private void setupRemoveGPS() {
         String removeGPSString = prefs.getRemoveGPS();
         if(TextUtils.isEmpty(removeGPSString)) {
-            // default should set as true.
-            removeGPS = true;
+            // default should set as false.
+            includeGPS = false;
             dbH.setRemoveGPS(true);
         } else {
-            removeGPS = Boolean.parseBoolean(removeGPSString);
+            includeGPS = !Boolean.parseBoolean(removeGPSString);
         }
-        cameraUploadRemoveGPS.setChecked(removeGPS);
-        cameraUploadRemoveGPS.setSummary(getResources().getString(R.string.settings_camera_upload_remove_gps_helper_label));
-        cameraUploadCategory.addPreference(cameraUploadRemoveGPS);
+        cameraUploadIncludeGPS.setChecked(includeGPS);
+        cameraUploadIncludeGPS.setSummary(getResources().getString(R.string.settings_camera_upload_include_gps_helper_label));
+        cameraUploadCategory.addPreference(cameraUploadIncludeGPS);
     }
 
     private void removeRemoveGPS() {
-        cameraUploadRemoveGPS.setSummary("");
-        cameraUploadCategory.removePreference(cameraUploadRemoveGPS);
+        cameraUploadIncludeGPS.setSummary("");
+        cameraUploadCategory.removePreference(cameraUploadIncludeGPS);
     }
 
 	private void setWhatToUploadForCameraUpload(){
@@ -2972,7 +2972,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         cameraUploadCategory.removePreference(cameraUploadWhat);
         cameraUploadCategory.removePreference(localCameraUploadFolder);
         cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-        cameraUploadCategory.removePreference(cameraUploadRemoveGPS);
+        cameraUploadCategory.removePreference(cameraUploadIncludeGPS);
 		hideVideoQualitySettingsSection();
         cameraUploadCategory.removePreference(keepFileNames);
         cameraUploadCategory.removePreference(megaCameraFolder);

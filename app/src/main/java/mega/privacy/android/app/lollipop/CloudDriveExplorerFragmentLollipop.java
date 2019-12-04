@@ -161,7 +161,11 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			logDebug("onDestroyActionMode");
+			if (!((FileExplorerActivityLollipop) context).shouldReopenSearch()) {
+				((FileExplorerActivityLollipop) context).clearQuerySearch();
+				getNodes();
+				setNodes(nodes);
+			}
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
@@ -409,6 +413,11 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		recyclerView.setAdapter(adapter);
 		fastScroller.setRecyclerView(recyclerView);
         setNodes(nodes);
+
+        if (((FileExplorerActivityLollipop) context).shouldRestartSearch()) {
+        	setWaitingForSearchedNodes(true);
+            search(((FileExplorerActivityLollipop) context).getQuerySearch());
+        }
 		return v;
 	}
 
@@ -432,60 +441,49 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		if (adapter == null) {
 			return;
 		}
-		if (adapter.getItemCount() == 0){
+		if (adapter.getItemCount() == 0) {
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			if (megaApi.getRootNode().getHandle()==parentHandle) {
 
-				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
-				}else{
+			String textToShow;
+
+			if (megaApi.getRootNode().getHandle() == parentHandle) {
+				if (isScreenInPortrait(context)) {
 					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-				}
-				String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
 				} else {
-					result = Html.fromHtml(textToShow);
+					emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
 				}
-				emptyTextViewFirst.setText(result);
 
+				textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 			} else {
-//				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-				}else{
+				if (isScreenInPortrait(context)) {
 					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-				}
-				String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
 				} else {
-					result = Html.fromHtml(textToShow);
+					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 				}
-				emptyTextViewFirst.setText(result);
+
+				textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 			}
 
-		}
-		else{
+			try {
+				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+				textToShow = textToShow.replace("[/A]", "</font>");
+				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+				textToShow = textToShow.replace("[/B]", "</font>");
+			} catch (Exception e) {
+				logWarning("Exception formatting string", e);
+			}
+
+			Spanned result = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				result = Html.fromHtml(textToShow);
+			}
+
+			emptyTextViewFirst.setText(result);
+		} else {
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -558,9 +556,10 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		ArrayList<MegaNode> clickNodes;
 
-		if (((FileExplorerActivityLollipop) context).isSearchExpanded() && searchNodes != null) {
+		if (searchNodes != null) {
 			clickNodes = searchNodes;
 			shouldResetNodes = false;
+			((FileExplorerActivityLollipop) context).setQueryAfterSearch();
 			((FileExplorerActivityLollipop) context).collapseSearchView();
 		}
 		else {
@@ -570,6 +569,9 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		MegaNode n = clickNodes.get(position);
 
 		if (n.isFolder()){
+		    searchNodes = null;
+			((FileExplorerActivityLollipop) context).setShouldRestartSearch(false);
+
 			if(selectFile && ((FileExplorerActivityLollipop)context).isMultiselect() && adapter.isMultipleSelect()){
 					hideMultipleSelect();
 			}
@@ -622,34 +624,18 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		}
 		else if(selectFile) {
 			if(((FileExplorerActivityLollipop)context).isMultiselect()){
-				logDebug("select file and allow multiselection");
-				int togglePosition = position;
-				if (!clickNodes.equals(nodes)) {
-					MegaNode node;
-					for (int i=0; i<nodes.size(); i++) {
-						node = nodes.get(i);
-						if (node != null && node.getHandle() == n.getHandle()) {
-							togglePosition = i;
-						}
-					}
-				}
-
 				if (adapter.getSelectedItemCount() == 0) {
-					logDebug("Activate the actionMode");
 					activateActionMode();
-					adapter.toggleSelection(togglePosition);
+					adapter.toggleSelection(position);
 					updateActionModeTitle();
-				}
-				else {
-					logDebug("add to selectedNodes");
-					adapter.toggleSelection(togglePosition);
+				} else {
+					adapter.toggleSelection(position);
 
 					List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 					if (selectedNodes.size() > 0){
 						updateActionModeTitle();
 					}
 				}
-
 			}
 			else{
 				//Send file
@@ -760,7 +746,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
-		logDebug("Nodes: " + nodes.size());
 		this.nodes = nodes;
 		if (adapter != null){
 			addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
@@ -920,20 +905,25 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	public void setProgressView(boolean inProgress) {
 		setSearchProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
 	}
-
 	public void setSearchNodes(ArrayList<MegaNode> nodes) {
 		if (adapter == null) return;
-
 		searchNodes = nodes;
+		((FileExplorerActivityLollipop) context).setShouldRestartSearch(true);
 		addSectionTitle(searchNodes, ((FileExplorerActivityLollipop) context).getItemType());
 		adapter.setNodes(searchNodes);
 		showEmptyScreen();
+
+		if (isWaitingForSearchedNodes()) {
+			reDoTheSelectionAfterRotation();
+		}
 	}
 
-	public void closeSearch() {
+	public void closeSearch(boolean collapsedByClick) {
 		setProgressView(false);
 		cancelPreviousAsyncTask();
-		searchNodes = null;
+		if (!collapsedByClick) {
+            searchNodes = null;
+        }
 		if (shouldResetNodes) {
 			getNodes();
 			setNodes(nodes);

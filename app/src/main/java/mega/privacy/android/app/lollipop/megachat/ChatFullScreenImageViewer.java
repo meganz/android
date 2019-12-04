@@ -410,14 +410,9 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 
 		viewPager.setPageMargin(40);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-		}
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		tB = (Toolbar) findViewById(R.id.call_toolbar);
+		tB = findViewById(R.id.call_toolbar);
 		if (tB == null) {
 			logWarning("Tb is Null");
 			return;
@@ -563,7 +558,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 							}
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(0).start();
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -1029,7 +1023,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 							}
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(ANIMATION_DURATION).start();
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -1041,7 +1034,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
 				bottomLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
-				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
 
 		}
@@ -1104,7 +1096,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 		logDebug("activated: " + activated);
 
 		if (activated) {
-//			updateCurrentImage();
 			if (aB != null && aB.isShowing()) {
 				if(tB != null) {
 					tB.animate().translationY(-220).setDuration(0)
@@ -1115,7 +1106,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 								}
 							}).start();
 					bottomLayout.animate().translationY(220).setDuration(0).start();
-					getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				} else {
 					aB.hide();
 				}
