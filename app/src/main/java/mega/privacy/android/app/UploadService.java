@@ -256,141 +256,40 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		    lastModified = file.lastModified();
         }
 		if (file.isDirectory()) {
-            acquireLock();
-            totalFolderUploads++;
-			if (nameInMEGA != null){
-                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,this);
-			}
-			else{
+			// Folder upload
+			acquireLock();
+			totalFolderUploads++;
+			if (nameInMEGA != null) {
+				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
+			} else {
 				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
 			}
-		}
-		else {
-			if (nameInMEGAEdited != null){
-				switch (checkFileToUploadRenamed(file, parentHandle, nameInMEGAEdited)) {
-					case CHECK_FILE_TO_UPLOAD_UPLOAD: {
-						logDebug("CHECK_FILE_TO_UPLOAD_UPLOAD");
-                        acquireLock();
-						totalFileUploads++;
-                        totalUploads++;
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGAEdited, this);
-						break;
-					}
-					case CHECK_FILE_TO_UPLOAD_COPY: {
-						logDebug("CHECK_FILE_TO_UPLOAD_COPY");
-						break;
-					}
-					case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER: {
-						logDebug("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
-						logDebug("Return - file already uploaded");
-						return;
+		} else {
+			// File upload with edited name
+			if (nameInMEGAEdited != null) {
+				acquireLock();
+				totalFileUploads++;
+				totalUploads++;
+				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGAEdited, this);
+			} else {
+				// File upload with original name
+				acquireLock();
+				totalFileUploads++;
 
+				if (lastModified == 0) {
+					if (nameInMEGA != null) {
+						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
+					} else {
+						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
 					}
-				}
-			}
-			else {
-				switch (checkFileToUpload(file, parentHandle)) {
-					case CHECK_FILE_TO_UPLOAD_UPLOAD: {
-						logDebug("CHECK_FILE_TO_UPLOAD_UPLOAD");
-
-                        acquireLock();
-						totalFileUploads++;
-
-                        if (lastModified == 0) {
-                            if (nameInMEGA != null) {
-                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,this);
-                            } else {
-                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),this);
-                            }
-                        } else {
-                            if (nameInMEGA != null) {
-                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,lastModified / 1000,this);
-                            } else {
-                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),lastModified / 1000,this);
-                            }
-                        }
-
-						break;
-					}
-					case CHECK_FILE_TO_UPLOAD_COPY: {
-						logDebug("CHECK_FILE_TO_UPLOAD_COPY");
-						break;
-					}
-					case CHECK_FILE_TO_UPLOAD_OVERWRITE: {
-						logDebug("CHECK_FILE_TO_UPLOAD_OVERWRITE");
-						MegaNode nodeExistsInFolder = megaApi.getNodeByPath(file.getName(), megaApi.getNodeByHandle(parentHandle));
-						megaApi.remove(nodeExistsInFolder);
-
-                        acquireLock();
-						totalFileUploads++;
-
-						if (nameInMEGA != null) {
-							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
-						} else {
-							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
-						}
-						break;
-					}
-					case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER: {
-						logDebug("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
-                        uploadedFileCount++;
-						logDebug("Return - file already uploaded");
-						return;
+				} else {
+					if (nameInMEGA != null) {
+						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, lastModified / 1000, this);
+					} else {
+						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), lastModified / 1000, this);
 					}
 				}
-			}
-		}
-	}
 
-	int checkFileToUploadRenamed (File file, long parentHandle, String nameInMEGAEdited) {
-		MegaNode nodeEditedExistsInFolder = megaApi.getNodeByPath(nameInMEGAEdited, megaApi.getNodeByHandle(parentHandle));
-		if (nodeEditedExistsInFolder == null){
-			String localFingerPrint = megaApi.getFingerprint(file.getAbsolutePath());
-			MegaNode nodeExists = megaApi.getNodeByFingerprint(localFingerPrint);
-			if (nodeExists == null){
-				return CHECK_FILE_TO_UPLOAD_UPLOAD;
-			}
-			else if (nodeExists.getName().equals(nameInMEGAEdited)){
-				transfersCopy.put(localFingerPrint, nameInMEGAEdited);
-				megaApi.copyNode(nodeExists, megaApi.getNodeByHandle(parentHandle), this);
-				return CHECK_FILE_TO_UPLOAD_COPY;
-			}
-			else {
-				return CHECK_FILE_TO_UPLOAD_UPLOAD;
-			}
-		}
-		else{
-			if (file.length() == nodeEditedExistsInFolder.getSize()){
-				return CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER;
-			}
-			else{
-				return CHECK_FILE_TO_UPLOAD_UPLOAD;
-			}
-		}
-	}
-
-	int checkFileToUpload(File file, long parentHandle){
-
-		MegaNode nodeExistsInFolder = megaApi.getNodeByPath(file.getName(), megaApi.getNodeByHandle(parentHandle));
-		if (nodeExistsInFolder == null){
-			String localFingerPrint = megaApi.getFingerprint(file.getAbsolutePath());
-			MegaNode nodeExists = megaApi.getNodeByFingerprint(localFingerPrint);
-			if (nodeExists == null){
-				return CHECK_FILE_TO_UPLOAD_UPLOAD;
-			}
-			else{
-				transfersCopy.put(localFingerPrint, file.getName());
-				megaApi.copyNode(nodeExists, megaApi.getNodeByHandle(parentHandle), this);
-				return CHECK_FILE_TO_UPLOAD_COPY;
-			}
-		}
-		else{
-			if (file.length() == nodeExistsInFolder.getSize()){
-				return CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER;
-			}
-			else{
-				return CHECK_FILE_TO_UPLOAD_UPLOAD;
-				//return CHECK_FILE_TO_UPLOAD_OVERWRITE;
 			}
 		}
 	}
