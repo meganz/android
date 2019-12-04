@@ -26,8 +26,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -68,7 +69,7 @@ public final class ChatAdvancedNotificationBuilder {
 
     private NotificationCompat.Builder mBuilderCompat;
 
-    private static List<Integer> notificationIds = new ArrayList<>();
+    private static Set<Integer> notificationIds = new HashSet<>();
 
     private String notificationChannelIdChatSimple = NOTIFICATION_CHANNEL_CHAT_ID;
     private String notificationChannelNameChatSimple = NOTIFICATION_CHANNEL_CHAT_NAME;
