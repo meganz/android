@@ -348,7 +348,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                         // new file or folder link format
                         String[] s = link.split("#");
                         if (s.length == 2) {
-                            urlString = s[0] + "#";
+                            urlString = s[0];
                         }
                     }
 
