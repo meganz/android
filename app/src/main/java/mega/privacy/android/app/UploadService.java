@@ -21,7 +21,6 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.text.format.Formatter;
 
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
@@ -69,11 +68,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
-
-	public static final int CHECK_FILE_TO_UPLOAD_UPLOAD = 1000;
-	public static final int CHECK_FILE_TO_UPLOAD_COPY = 1001;
-	public static final int CHECK_FILE_TO_UPLOAD_OVERWRITE = 1002;
-	public static final int CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER = 1003;
 
 	private int errorCount = 0;
 	private int copiedCount = 0;
@@ -526,6 +520,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 size = getResources().getQuantityString(R.plurals.upload_service_failed,errorCount,errorCount);
             } else {
                 long transferredBytes = getTransferredByte(mapProgressFileTransfers);
+                // No actual transfers executed, no notification
+                if (transferredBytes == 0) return;
+
                 String totalBytes = getSizeString(transferredBytes);
                 size = getString(R.string.general_total_size,totalBytes);
             }
@@ -550,6 +547,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 notificationSubTitle = getResources().getQuantityString(R.plurals.upload_service_failed,childUploadFailed,childUploadFailed);
             }else{
                 long transferredBytes = getTransferredByte(mapProgressFolderTransfers);
+                // No actual transfers executed, no notification
+                if (transferredBytes == 0) return;
+
                 String totalBytes = getSizeString(transferredBytes);
                 notificationSubTitle = getString(R.string.general_total_size,totalBytes);
             }
