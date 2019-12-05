@@ -497,15 +497,12 @@ public final class ChatAdvancedNotificationBuilder {
             }
         }
 
-        if (vibration != null) {
-            if (vibration.equals("true")) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    //use the channel with vibration
-                    notificationBuilderO.setChannelId(notificationChannelIdChatSummaryV2);
-                }
-                else{
-                    notificationBuilder.setVibrate(new long[] {0, 500});
-                }
+        if (vibration == null || vibration.equals("true")) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                //use the channel with vibration
+                notificationBuilderO.setChannelId(notificationChannelIdChatSummaryV2);
+            } else {
+                notificationBuilder.setVibrate(new long[]{0, 500});
             }
         }
 

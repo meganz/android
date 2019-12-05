@@ -254,7 +254,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
                 }
                 else if(remoteMessageType.equals("2")){
-                    awakeCpu(remoteMessage);
                     logDebug("CHAT notification");
                     if(MegaApplication.isActivityVisible()){
                         logDebug("App on foreground --> return");
@@ -263,6 +262,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
 
                     if(isChatEnabled()){
+                        awakeCpu(remoteMessage);
                         beep = shouldBeep(remoteMessage);
 
                         logDebug("Notification should beep: "+ beep);
