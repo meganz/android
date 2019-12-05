@@ -255,9 +255,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		if(lastModified <= 0){
 		    lastModified = file.lastModified();
         }
+
+        acquireLock();
 		if (file.isDirectory()) {
 			// Folder upload
-			acquireLock();
 			totalFolderUploads++;
 			if (nameInMEGA != null) {
 				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
@@ -267,13 +268,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		} else {
 			// File upload with edited name
 			if (nameInMEGAEdited != null) {
-				acquireLock();
 				totalFileUploads++;
 				totalUploads++;
 				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGAEdited, this);
 			} else {
 				// File upload with original name
-				acquireLock();
 				totalFileUploads++;
 
 				if (lastModified == 0) {
