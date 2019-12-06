@@ -18,7 +18,7 @@ public class KeepAliveService extends Service {
 
     public static final String RETRIEVING_MSG_CHANNEL_ID = "Retrieving message";
 
-    public static final int notificationId = 1086;
+    public static final int NEW_MESSAGE_NOTIFICATION_ID = 1086;
 
     @Override
     public void onDestroy() {
@@ -30,7 +30,7 @@ public class KeepAliveService extends Service {
         stopForeground(true);
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if(manager != null) {
-            manager.cancel(notificationId);
+            manager.cancel(NEW_MESSAGE_NOTIFICATION_ID);
         }
         stopSelf();
     }
@@ -57,7 +57,7 @@ public class KeepAliveService extends Service {
         }
         if (mNotificationManager != null) {
             Notification notification = mBuilder.build();
-            startForeground(notificationId, notification);
+            startForeground(NEW_MESSAGE_NOTIFICATION_ID, notification);
         }
     }
 

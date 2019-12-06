@@ -497,11 +497,13 @@ public final class ChatAdvancedNotificationBuilder {
             }
         }
 
-        if (vibration == null || vibration.equals("true")) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (!"false".equals(vibration)) {
                 //use the channel with vibration
                 notificationBuilderO.setChannelId(notificationChannelIdChatSummaryV2);
-            } else {
+            }
+        } else {
+            if ("true".equals(vibration)) {
                 notificationBuilder.setVibrate(new long[]{0, 500});
             }
         }
@@ -788,6 +790,7 @@ public final class ChatAdvancedNotificationBuilder {
             notificationManager.cancel(id);
         }
         notificationIds.clear();
+        notificationManager.cancel(KeepAliveService.NEW_MESSAGE_NOTIFICATION_ID);
     }
 
     public void showSimpleNotification(){
