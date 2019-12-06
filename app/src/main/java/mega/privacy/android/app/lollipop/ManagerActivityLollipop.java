@@ -18082,6 +18082,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			int inProgress = totalTransfers - pendingTransfers + 1;
+			// For uploading same documents
+			inProgress = inProgress < 0 ? 0 : inProgress;
+
 			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers, totalTransfers, inProgress, totalTransfers);
 			transfersNumberText.setText(progressText);
 		} else {
