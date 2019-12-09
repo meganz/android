@@ -168,7 +168,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
+		rootNode = megaApi.getRootNode();
 	}
 
 	@Override
@@ -189,6 +189,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			megaChatApi.saveCurrentState();
 		}
 
+		rootNode = null;
 		super.onDestroy();
 	}
 
