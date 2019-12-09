@@ -98,6 +98,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private String type = "";
 	private boolean isOverquota = false;
 	private long downloadedBytesToOverquota = 0;
+	private MegaNode rootNode;
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -244,8 +245,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if (credentials != null) {
 
 			String gSession = credentials.getSession();
-
-			if (megaApi.getRootNode() == null) {
+			if (rootNode == null) {
+				rootNode = megaApi.getRootNode();
 				isLoggingIn = MegaApplication.isLoggingIn();
 				if (!isLoggingIn) {
 					isLoggingIn = true;
@@ -507,7 +508,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
-
+		rootNode = null;
 		int total = megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads();
 		logDebug("onQueueComplete: total of files before reset " + total);
 		if(total <= 0){
@@ -1474,6 +1475,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
+		rootNode = null;
 	}
 
 	@Override
