@@ -322,7 +322,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
     public void setPricingInfo(){
         logDebug("setPricingInfo");
 
-        DecimalFormat df = new DecimalFormat("#.##");
+        DecimalFormat df = new DecimalFormat("0.00");
         MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 
         if(myAccountInfo==null)
@@ -334,7 +334,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
             return;
         }
 
-        //TODO maybe should get the storage limit of free account from API in the future.
+        //Currently the API side doesn't return this value, so we have to hardcode.
         String textToShowFreeStorage = "[A] 50 GB [/A]"+getString(R.string.label_storage_upgrade_account)+" ";
         try{
             textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color=\'#000000\'>");

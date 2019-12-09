@@ -271,7 +271,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	public void setPricing() {
 		logDebug("setPricing");
 
-		DecimalFormat df = new DecimalFormat("#.##");
+		DecimalFormat df = new DecimalFormat("0.00");
 
 		if (myAccountInfo == null) {
 			myAccountInfo = ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo();
@@ -1484,7 +1484,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		String priceYearlyInteger = "";
 		String priceYearlyDecimal = "";
 
-		DecimalFormat df = new DecimalFormat("#.##");
+		DecimalFormat df = new DecimalFormat("0.00");
 
 		if(myAccountInfo==null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
