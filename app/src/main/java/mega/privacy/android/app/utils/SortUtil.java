@@ -115,7 +115,7 @@ public class SortUtil {
             return;
         }
 
-        //To remove the redundant offline record
+        //To remove the old-dated offline record, just to keep the latest offline record
         Map<String, MegaOffline> map = new HashMap<>();
         for (MegaOffline megaOffline : mOffList) {
             map.put(megaOffline.getPath() + megaOffline.getName(), megaOffline);
