@@ -668,7 +668,7 @@
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
-	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures and videos were taken, so be careful when sharing them.</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
