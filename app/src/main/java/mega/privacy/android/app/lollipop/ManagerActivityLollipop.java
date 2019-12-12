@@ -5717,6 +5717,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
+	private void removeFragment(Fragment fragment) {
+		if (fragment != null && fragment.isAdded()) {
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.remove(fragment);
+			ft.commit();
+		}
+	}
+
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
 		logDebug("selectDrawerItemLollipop: "+item);
@@ -5726,6 +5734,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		resetActionBar(aB);
 		setTransfersWidget();
 		setCallWidget();
+
+		if (item != DrawerItem.CHAT) {
+			//remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
+			removeFragment(rChatFL);
+		}
 
     	switch (item){
 			case CLOUD_DRIVE:{
