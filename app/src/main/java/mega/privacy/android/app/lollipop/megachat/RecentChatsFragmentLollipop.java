@@ -281,6 +281,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     }
                 } else {
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                         appBarLayout.setElevation(px2dp(4, outMetrics));
                     } else {
