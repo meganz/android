@@ -3483,6 +3483,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void clearCredentials(){
+	    logWarning("Clear local credentials!");
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);
         onCreate(db);
 	}

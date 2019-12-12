@@ -2130,24 +2130,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				}
 				
 				//Go to the login activity
-				/*
-				loginLoggingIn.setVisibility(View.GONE);
-				loginLogin.setVisibility(View.VISIBLE);
-				loginDelimiter.setVisibility(View.VISIBLE);
-				loginCreateAccount.setVisibility(View.VISIBLE);
-				queryingSignupLinkText.setVisibility(View.GONE);
-				confirmingAccountText.setVisibility(View.GONE);
-				generatingKeysText.setVisibility(View.GONE);
-				loggingInText.setVisibility(View.GONE);
-				fetchingNodesText.setVisibility(View.GONE);
-				prepareNodesText.setVisibility(View.GONE);*/
-				
-				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				dbH.clearCredentials();
-				if (dbH.getPreferences() != null){
-					dbH.clearPreferences();
-					dbH.setFirstTime(false);
-				}
 			}
 			else{
 				//LOGIN OK
@@ -2157,15 +2139,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
-				
-				gSession = megaApi.dumpSession();
-				credentials = new UserCredentials(lastEmail, gSession, "", "", "");
-
-				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				dbH.clearCredentials();
 
 				logDebug("Logged in with session");
-
 				megaApi.fetchNodes(this);
 			}
 		}

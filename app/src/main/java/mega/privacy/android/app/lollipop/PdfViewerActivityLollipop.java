@@ -2599,27 +2599,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (request.getType() == MegaRequest.TYPE_LOGIN){
 
             if (e.getErrorCode() != MegaError.API_OK) {
-
                 MegaApplication.setLoggingIn(false);
-
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                dbH.clearCredentials();
-                if (dbH.getPreferences() != null){
-                    dbH.clearPreferences();
-                    dbH.setFirstTime(false);
-                }
             }
             else{
                 //LOGIN OK
-
-                gSession = megaApi.dumpSession();
-                credentials = new UserCredentials(lastEmail, gSession, "", "", "");
-
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                dbH.clearCredentials();
-
                 logDebug("Logged in with session");
-
                 megaApi.fetchNodes(this);
             }
         }
