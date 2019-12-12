@@ -45,6 +45,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -1833,6 +1834,13 @@ public class Util {
 
 	public static void resetActionBar(ActionBar aB) {
 		if (aB != null) {
+			View customView = aB.getCustomView();
+			if(customView != null){
+				ViewParent parent = customView.getParent();
+				if(parent != null){
+					((ViewGroup) parent).removeView(customView);
+				}
+			}
 			aB.setDisplayShowCustomEnabled(false);
 			aB.setDisplayShowTitleEnabled(true);
 		}

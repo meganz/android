@@ -206,6 +206,7 @@ import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -6355,6 +6356,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					levelsSearch = -1;
 					setSearchDrawerItem();
 					selectDrawerItemLollipop(drawerItem);
+				} else if (drawerItem == DrawerItem.CHAT){
+					Util.resetActionBar(aB);
 				}
 				hideCallMenuItem();
 				hideCallWidget();
@@ -6371,6 +6374,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if (rChatFL != null) {
 						rChatFL.closeSearch();
+						rChatFL.setCustomisedActionBar();
 						supportInvalidateOptionsMenu();
 					}
 				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
