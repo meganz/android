@@ -14122,10 +14122,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     private Product getPRO3OneMonth() {
         List<Product> products = MegaApplication.getInstance().getMyAccountInfo().productAccounts;
-        for (Product product : products) {
-            if (product.getLevel() == PRO_III && product.getMonths() == 1) {
-                return product;
+        if (products != null) {
+            for (Product product : products) {
+                if (product.getLevel() == PRO_III && product.getMonths() == 1) {
+                    return product;
+                }
             }
+        } else {
+            // edge case: when this method is called, TYPE_GET_PRICING hasn't finished yet.
+            logWarning("Products haven't been initialized!");
         }
         return null;
     }
