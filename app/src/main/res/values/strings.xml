@@ -996,6 +996,7 @@
 
     <string name="confirmation_delete_avatar" context="Confirmation before deleting the avatar of the user's profile">Delete your profile picture?</string>
     <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Edit</string>
+    <string name="button_save_edit_profile_info" context="Save button label of the Dialog to edit the profile attributes of the user's account">Save</string>
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Set expiry date</string>
     <string name="title_set_password_protection" context="Title of the dialog to get link with password">Set password protection</string>
