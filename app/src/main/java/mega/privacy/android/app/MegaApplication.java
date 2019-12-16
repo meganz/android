@@ -1661,7 +1661,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
 			int callStatus = call.getStatus();
-			logDebug("Call ID: "+call.getId()+". Call Status " + callStatusToString(call.getStatus()));
+			logDebug("Call status changed, current status: "+callStatusToString(call.getStatus()));
 			switch (callStatus) {
 				case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 				case MegaChatCall.CALL_STATUS_RING_IN:
@@ -1678,9 +1678,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 						}
 						if (listAllCalls != null) {
 							if (listAllCalls.size() == 1) {
-								logDebug("One call");
 								long chatId = listAllCalls.get(0);
-
+								logDebug("One call : Chat Id = " + chatId + ", openCall Chat Id = " + openCallChatId);
 								if ( openCallChatId != chatId) {
 									MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
 									if (callToLaunch != null) {

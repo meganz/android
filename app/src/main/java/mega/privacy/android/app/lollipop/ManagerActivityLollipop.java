@@ -17356,16 +17356,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (call == null || call.getChatid() == -1 || !call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) return;
 
 		int callStatus = call.getStatus();
-		logDebug("onChatCallUpdatecallStatus =  " + callStatus);
-
+		logDebug("Call status: " + callStatusToString(callStatus));
 		switch (callStatus) {
 			case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 			case MegaChatCall.CALL_STATUS_RING_IN:
 			case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+			case MegaChatCall.CALL_STATUS_JOINING:
+			case MegaChatCall.CALL_STATUS_RECONNECTING:
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
 				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-				if ((rChatFL != null) && (rChatFL.isVisible())) {
+				if (rChatFL != null && rChatFL.isVisible()) {
 					rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
 				}
 				if(isScreenInPortrait(this)) {
@@ -17482,23 +17483,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	public void setCallBadge() {
-		if(isChatEnabled() && megaChatApi != null) {
-			int numCalls = megaChatApi.getNumCalls();
-			if(numCalls == 0){
-                callBadge.setVisibility(View.GONE);
-			}else if(numCalls == 1){
-				if(megaChatApi!=null){
-					if(participatingInACall(megaChatApi)){
-						callBadge.setVisibility(View.GONE);
-					}else{
-						callBadge.setVisibility(View.VISIBLE);
-					}
-				}
-			}else{
-                callBadge.setVisibility(View.VISIBLE);
-			}
+	private void setCallBadge(){
+		if (!isChatEnabled() || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall(megaChatApi))) {
+			callBadge.setVisibility(View.GONE);
+			return;
 		}
+		callBadge.setVisibility(View.VISIBLE);
 	}
 
 	public void showEvaluatedAppDialog(){
