@@ -15,12 +15,15 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import mega.privacy.android.app.R;
 
+import static mega.privacy.android.app.utils.ChatUtil.*;
+
 public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface {
 
     private float emojiSize;
     private Context mContext;
     private int textViewMaxWidth = 0;
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
+    private boolean necessaryShortCode = true;
 
     public EmojiTextView(final Context context) {
         this(context, null);
@@ -59,8 +62,10 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     @Override
     public void setText(CharSequence rawText, BufferType type) {
         CharSequence text = rawText == null ? "" : rawText;
-        String resultText = EmojiUtilsShortcodes.emojify(text.toString());
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(resultText);
+        if(isNeccessaryShortCode()){
+            text = converterShortCodes(text.toString());
+        }
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
         Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
         float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
         EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
@@ -71,6 +76,14 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, typeEllipsize);
             super.setText(textF, type);
         }
+    }
+
+    public boolean isNeccessaryShortCode() {
+        return necessaryShortCode;
+    }
+
+    public void setNeccessaryShortCode(boolean neccessaryShortCode) {
+        this.necessaryShortCode = neccessaryShortCode;
     }
 
     @Override

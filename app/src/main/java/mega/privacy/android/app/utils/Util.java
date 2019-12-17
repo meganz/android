@@ -96,6 +96,7 @@ import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class Util {
 
@@ -251,6 +252,7 @@ public class Util {
 //            src = src.replaceAll("]]>", "] ]>");
 //            src = "<![CDATA[" + src + "]]>";
         }
+        src = converterShortCodes(src);
         return src;
     }
 
