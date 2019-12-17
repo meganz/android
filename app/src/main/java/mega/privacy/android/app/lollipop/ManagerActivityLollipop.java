@@ -525,6 +525,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private RelativeLayout callInProgressLayout;
 	private Chronometer callInProgressChrono;
+	private TextView callInProgressText;
 
 	boolean firstTimeAfterInstallation = true;
 	private ArrayList<String> offlineSearchPaths = new ArrayList<>();
@@ -2566,6 +2567,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		callInProgressLayout = findViewById(R.id.call_in_progress_layout);
 		callInProgressLayout.setOnClickListener(this);
 		callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
+		callInProgressText = findViewById(R.id.call_in_progress_text);
 		callInProgressLayout.setVisibility(View.GONE);
 
 		///Check the MK or RK file
@@ -17361,8 +17363,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 			case MegaChatCall.CALL_STATUS_RING_IN:
 			case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-			case MegaChatCall.CALL_STATUS_JOINING:
 			case MegaChatCall.CALL_STATUS_RECONNECTING:
+			case MegaChatCall.CALL_STATUS_JOINING:
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
 				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
@@ -17484,7 +17486,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void setCallBadge(){
-		if (!isChatEnabled() || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall(megaChatApi))) {
+		if (!isOnline(this) || !isChatEnabled() || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall(megaChatApi))) {
 			callBadge.setVisibility(View.GONE);
 			return;
 		}
@@ -18106,10 +18108,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			hideCallWidget();
 			return;
 		}
-
-		if (!isOnline(this)) return;
-
-		showCallLayout(megaChatApi, callInProgressLayout, callInProgressChrono);
+		showCallLayout(this, megaChatApi, callInProgressLayout, callInProgressChrono, callInProgressText);
 	}
 
 	private void hideCallWidget() {
