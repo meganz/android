@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">Erro. Por favor, tente novamente.</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">A pasta secundária de mídia não existe. Por favor, selecione uma pasta nova.</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Não foi detectado nenhum dispositivo de armazenamento externo.</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Esta pasta é somente leitura. Você não tem permissão para fazer uploads.</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Visualização em miniaturas</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Visualização em lista</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Salvar chave de recuperação</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Eliminar chave de recuperação</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancelar assinatura</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">A chave de recuperação foi removida</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">A subscrição foi cancelada</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Não foi possível cancelar a sua assinatura. Por favor, entre em contato com support&#64;mega.nz</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Fechar outras sessões</string>
@@ -232,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">Deletar todas as transferências?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Nuvem de arquivos</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Atividades recentes</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Uploads de mídia</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Caixa de entrada</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Offline</string>
@@ -612,7 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">A prévia ainda não foi baixada. Aguarde.</string>
-    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Não foi possível gerar a visualização por falta de memória disponível no seu dispositivo. Por favor, tente novamente mais tarde.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Por favor, faça logout antes de criar a conta</string>
 
@@ -818,8 +819,8 @@
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">CEP</string>
 
     <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Digite os dados de pagamento:</string>
-    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Primeiro nome</string>
-    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Ultimo nome</string>
+    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Nome</string>
+    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Sobrenome</string>
     <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Número do cartão de crédito</string>
     <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">mês</string>
     <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Ano</string>
@@ -933,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Erro. Este endereço de email já está sendo usado.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">Você já solicitou um link de confirmação para esse endereço de email.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">O email novo e o email antigo não podem iguais</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Este é o último passo para alterar o seu email. Por favor, digite a sua senha abaixo.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Alterar email</string>
 
@@ -2218,10 +2222,10 @@
     <string name="subtitle_contact_request_notification_cancelled" context="Subtitle of the historic notification for contact request cancelled">[A]%s [/A][B]cancelou a solicitação de contato.[/B]</string>
 
     <string name="title_contact_notification_deleted" context="Title of the historic notification when an user deletes you as contact">Contato eliminado</string>
-    <string name="subtitle_contact_notification_deleted" context="Subtitle of the historic notification when an user deletes you as contact">[A]%s [/A][B]o eliminou dos seus contatos.[/B]</string>
+    <string name="subtitle_contact_notification_deleted" context="Subtitle of the historic notification when an user deletes you as contact">[A]%s [/A][B]eliminou você dos contatos.[/B]</string>
 
     <string name="title_contact_notification_blocked" context="Title of the historic notification when an user blocks you as contact">Contato bloqueado</string>
-    <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]o bloqueou como contato.[/B]</string>
+    <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B] bloqueou você como contato.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notificações [A](%1$d)[/A]</string>
 
@@ -2242,7 +2246,7 @@
 
     <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for deleted shared folders (one or many)">[B]O acesso às pastas compartilhadas por[/B][A]%s[/A][B]foi eliminado.[/B]</string>
     <string name="notification_left_shared_folder" context="Subtitle of the historic notification when a contact leaves a shared folder">[A]%s[/A][B] saiu de uma pasta compartilhada.[/B]</string>
-    <string name="notification_left_shared_folder_with_name" context="Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known">[A]%1$s[/A][B] saiu da pasta compartilhada [/B][A]%2$s.[/A]</string>
+    <string name="notification_left_shared_folder_with_name" context="Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known">[A]%1$s[/A][B] deixou a pasta compartilhada [/B][A]%2$s.[/A]</string>
 
     <string name="subtitle_incoming_contact_request_ignored" context="Subtitle of the historic notification for incoming contact request ignored">[B]A solicitação de contato de [/B][A]%s [/A][B]foi ignorada[/B]</string>
     <string name="subtitle_incoming_contact_request_accepted" context="Subtitle of the historic notification for incoming contact request accepted">[B]A solicitação de contato de [/B][A]%s [/A][B]foi aceita[/B]</string>
@@ -2277,7 +2281,7 @@
 	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">O tamanho de compressão do vídeo é muito grande</string>
 	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">O tamanho total dos vídeos a serem comprimidos é superior a %s; para continuar, carregue o seu dispositivo.</string>
 	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Esta configuração entrará em vigor na próxima vez em que os Uploads da câmera forem executados</string>
-	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s comprimido</string>
+	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s foi comprimido</string>
 	<string name="title_compress_video" context="notification title when compressing video">Comprimindo vídeos %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">A pasta selecionada é inválida</string>
 
@@ -2322,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Chamada iniciada</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Erro na chave SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">O MEGA não consegue se conectar de forma segura por meio de SSL. Você pode estar usando uma rede Wi-Fi pública com requisitos adicionais.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">Não foi possível conectar-se ao MEGA de forma segura via SSL. Você pode estar usando uma rede Wi-Fi pública com requisitos adicionais.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Não há [/B][A]Notificações[/A][B].[/B]</string>
 
@@ -2519,6 +2523,21 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d arquivos pendentes.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Atividades recentes</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 imagem e 1 vídeo</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Eu</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Não é possível gravar mensagens de voz enquanto houver uma chamada em andamento.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Não foi possível fazer o upload da mensagem de voz.</string>
 
@@ -2527,5 +2546,6 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Carregando</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Por favor, aguarde&#8230;</string>
 
-    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Enviados %s contatos.</string>
 </resources>

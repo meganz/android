@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -49,6 +48,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 
 public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListChatExplorerAdapter.ViewHolderChatExplorerList> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider {
@@ -100,7 +100,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         RelativeLayout itemLayout;
         RelativeLayout itemContainer;
         RoundedImageView avatarImage;
-        TextView initialLetter;
+        EmojiTextView initialLetter;
         EmojiTextView titleText;
         ImageView stateIcon;
         MarqueeTextView lastSeenStateText;
@@ -142,18 +142,10 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         holder.stateIcon = v.findViewById(R.id.chat_explorer_list_contact_state);
         holder.lastSeenStateText = v.findViewById(R.id.chat_explorer_list_last_seen_state);
         holder.participantsText = v.findViewById(R.id.chat_explorer_list_participants);
-
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            holder.titleText.setEmojiSize(scaleWidthPx(10, outMetrics));
-            holder.participantsText.setEmojiSize(scaleWidthPx(10, outMetrics));
-        }
-        else{
-            holder.titleText.setEmojiSize(scaleWidthPx(20, outMetrics));
-            holder.participantsText.setEmojiSize(scaleWidthPx(20, outMetrics));
-        }
+        holder.titleText.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+        holder.initialLetter.setEmojiSize(px2dp(EMOJI_SIZE_MEDIUM, outMetrics));
 
         v.setTag(holder);
-
         return holder;
     }
 
@@ -162,6 +154,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         ChatExplorerListItem item = getItem(position);
         MegaChatListItem chat = item.getChat();
+
+        holder.itemLayout.setBackgroundColor(Color.WHITE);
 
         if (item.isHeader()) {
             holder.itemContainer.setVisibility(View.GONE);
@@ -181,9 +175,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         if (chat != null && chat.isGroup()) {
             if (item.getTitle().length() > 0){
-                String chatTitle = item.getTitle().trim();
-                String firstLetter = chatTitle.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                String firstLetter = getFirstLetter(item.getTitle());
                 holder.initialLetter.setText(firstLetter);
             }
             if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
@@ -192,7 +184,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 holder.initialLetter.setVisibility(View.GONE);
             }
             else{
-                holder.itemLayout.setBackgroundColor(Color.WHITE);
                 createGroupChatAvatar(holder);
             }
             holder.stateIcon.setVisibility(View.GONE);
@@ -229,7 +220,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 holder.initialLetter.setVisibility(View.GONE);
             }
             else{
-                holder.itemLayout.setBackgroundColor(Color.WHITE);
                 setUserAvatar(holder, userHandleEncoded);
             }
             
@@ -424,8 +414,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         if (fullName != null){
             if (fullName.trim().length() > 0){
-                String firstLetter = fullName.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                String firstLetter = getFirstLetter(fullName);
+
                 holder.initialLetter.setText(firstLetter);
                 holder.initialLetter.setTextColor(Color.WHITE);
                 holder.initialLetter.setVisibility(View.VISIBLE);

@@ -38,7 +38,7 @@ import static mega.privacy.android.app.utils.Util.*;
 /*
  * Adapter for FilestorageActivity list
  */
-public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorageLollipopAdapter.ViewHolderFileStorage> implements OnClickListener {
+public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorageLollipopAdapter.ViewHolderFileStorage> implements OnClickListener, View.OnLongClickListener {
 
 	private Context context;
 	private MegaApiAndroid megaApi;
@@ -89,19 +89,21 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;		
+	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
 	    float scaleW = getScaleW(outMetrics, density);
-		
+
 	    View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer, parent, false);
 	    ViewHolderFileStorage holder = new ViewHolderFileStorage(v);
 
-		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_item_layout);
+		holder.itemLayout = v.findViewById(R.id.file_explorer_item_layout);
 		holder.itemLayout.setOnClickListener(this);
-		holder.imageView = (ImageView) v.findViewById(R.id.file_explorer_thumbnail);
-		holder.textViewFileName = (TextView) v.findViewById(R.id.file_explorer_filename);
-		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = px2dp((260*scaleW), outMetrics);
-		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
+		holder.itemLayout.setOnLongClickListener(this);
+		holder.imageView = v.findViewById(R.id.file_explorer_thumbnail);
+		holder.textViewFileName =  v.findViewById(R.id.file_explorer_filename);
+		holder.textViewFileName.setOnClickListener(this);
+		holder.textViewFileName.setOnLongClickListener(this);
+		holder.textViewFileName.setTag(holder);
+		holder.textViewFileSize = v.findViewById(R.id.file_explorer_filesize);
 
 		v.setTag(holder);
 		return holder;
@@ -448,10 +450,22 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		logDebug("In position: " + currentPosition + " document: " + doc.getName());
 
 		switch (v.getId()) {
+			case R.id.file_explorer_filename:
 			case R.id.file_explorer_item_layout:{
 				((FileStorageActivityLollipop) context).itemClick(currentPosition);
 				break;
 			}
 		}
 	}
+	@Override
+	public boolean onLongClick(View view) {
+		logDebug("OnLongClick");
+
+		ViewHolderFileStorage holder = (ViewHolderFileStorage) view.getTag();
+		int currentPosition = holder.getAdapterPosition();
+		((FileStorageActivityLollipop) context).itemClick(currentPosition);
+
+		return true;
+	}
+
 }

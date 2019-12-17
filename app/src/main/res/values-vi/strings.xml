@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">Lỗi. Xin vui lòng, thử lại.</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MAPHUCHOI-MEGA</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">Lỗi. Không tìm thấy thư mục secondary media, xin chọn một thư mục mới</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Không phát hiện bộ lưu trữ ngoài</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Thư mục đã được chỉnh cho "Chỉ Được Xem". Không thể tải lên bất kỳ nội dung nào.</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Hiện dạng ảnh nhỏ</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Xem dạng danh sách</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Sao lưu Mã Phục Hồi</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Xóa Mã Khóa Phục Hồi</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Hủy thuê bao</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">Tệp tin chứa Mã Khóa Phục Hồi đã được xóa</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Gói thuê bao đã bị hủy</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Có rắc rối trong việc hủy bỏ gói cước hạng thành viên. Xin liên hệ với support&#64;mega.nz để được nhận giúp đỡ</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Đóng các phiên khác lại</string>
@@ -232,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">Xóa tất cả truyền tải?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Ổ Mây</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Lịch sử hoạt động</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media uploads</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Hộp Thư</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Lưu về Ngoại Tuyến</string>
@@ -612,7 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Bản xem trước của hình chưa được tải xong. Xin chờ</string>
-    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Preview may not be able to load due to low memory. Please try later.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">The preview is not able to load due to insufficient memory available. Please try again later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Xin đăng xuất trước khi tạo tài khoản mới</string>
 
@@ -933,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Lỗi. Địa chỉ email này đã có người sử dụng.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">Bạn đã yêu cầu gửi một đường liên kết xác thực cho địa chỉ email này rồi.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">Địa chỉ email mới và cũ không được trùng nhau</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Đây là bước cuối cùng để hoàn tất việc thay đổi địa chỉ email. Xin vui lòng nhập mật khẩu ở dưới.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Đổi email</string>
 
@@ -2322,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Cuộc Gọi Đã Bắt Đầu</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL key bị lỗi</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA không thực hiện đuợc kết nối bảo mật thông qua xác thực SSL. Có thể do thiết bị đang dùng mạng WiFi công cộng cần được phải chỉnh thêm.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public Wi-Fi with additional requirements.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Không có [/B][A]Thông Báo[/A][B].[/B]</string>
 
@@ -2519,6 +2523,21 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d tệp tin đang được chờ.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Lịch sử hoạt động</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">1 Hình và 1 Video</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Tôi</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 
@@ -2527,5 +2546,6 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Đang tải</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Vui lòng chớ&#8230;</string>
 
-    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Gửi đến %s tên liên lạc.</string>
 </resources>

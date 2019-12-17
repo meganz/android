@@ -12,13 +12,14 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import nz.mega.sdk.MegaApiJava;
 
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class SorterContentActivity extends BaseActivity {
+public class SorterContentActivity extends PinActivityLollipop {
 
     public void showSortOptions(final Context context, DisplayMetrics outMetrics) {
 
@@ -107,8 +108,8 @@ public class SorterContentActivity extends BaseActivity {
                 }
                 case SHARED_ITEMS: {
                     int index = ((ManagerActivityLollipop) context).getTabItemShares();
-                    if((index==1 && ((ManagerActivityLollipop) context).parentHandleOutgoing == -1)
-                            || (index != 1 && ((ManagerActivityLollipop) context).parentHandleIncoming == -1)){
+                    if((index==1 && ((ManagerActivityLollipop) context).getParentHandleOutgoing() == -1)
+                            || (index != 1 && ((ManagerActivityLollipop) context).getParentHandleIncoming() == -1)){
                         order = ((ManagerActivityLollipop) context).getOrderOthers();
                     }
                     else{
