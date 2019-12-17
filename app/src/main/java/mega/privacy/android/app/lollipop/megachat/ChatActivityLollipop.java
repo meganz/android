@@ -7967,7 +7967,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT || call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
             if (isGroup()) {
-                activateChrono(false, subtitleChronoCall, call);
                 usersWithVideo();
 
                 long callerHandle = call.getCaller();
@@ -7977,15 +7976,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 } else {
                     textLayout = getString(R.string.join_call_layout);
                 }
-                callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
-                showCallInProgressLayout(textLayout, false, call);
+                tapToReturnLayout(call, textLayout);
                 return;
             }
 
             if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && MegaApplication.getCallLayoutStatus(idChat)) {
-                activateChrono(false, subtitleChronoCall, call);
-                callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
-                showCallInProgressLayout(getString(R.string.call_in_progress_layout), false, call);
+                tapToReturnLayout(call, getString(R.string.call_in_progress_layout));
                 return;
             }
 
@@ -7998,9 +7994,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
             if (MegaApplication.getCallLayoutStatus(idChat)) {
-                activateChrono(false, subtitleChronoCall, call);
-                callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
-                showCallInProgressLayout(getString(R.string.call_in_progress_layout), false, call);
+                tapToReturnLayout(call, getString(R.string.call_in_progress_layout));
                 return;
             }
 
@@ -8035,6 +8029,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                     });
         }
+    }
+
+    private void tapToReturnLayout(MegaChatCall call, String text){
+        activateChrono(false, subtitleChronoCall, call);
+        callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
+        showCallInProgressLayout(text, false, call);
     }
 
     private void updateCallInProgressLayout(MegaChatCall call){
