@@ -58,8 +58,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	
 	Context context;
- 
-	int positionClicked;
+
 	public DatabaseHandler dbH;
 
 	private ArrayList<MegaOffline> mOffList = new ArrayList<MegaOffline>();
@@ -368,15 +367,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		logDebug("MegaOfflineListAdapter");
 		this.fragment = _fragment;
 		this.context = _context;
-//		this.getAdapterType() =  getAdapterType();
         this.listFragment = listView;
         this.emptyImageViewFragment = emptyImageView;
         this.emptyTextViewFragment = emptyTextView;
         this.aB = aB;
-        
-        this.positionClicked = -1;
-        //After this.listFragment = listView;
-//        this.mOffList = insertPlaceHolderNode(_mOffList);
+
 		setNodes(_mOffList);
 
 
@@ -394,7 +389,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 		this.mOffList = insertPlaceHolderNode(mOffList);
 		((OfflineFragmentLollipop) fragment).addSectionTitle(this.mOffList);
-		positionClicked = -1;	
 		notifyDataSetChanged();
 	}
 	
@@ -764,17 +758,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     public long getItemId(int position) {
 		logDebug("Position: " + position);
         return position;
-    }    
-    
-    public int getPositionClicked (){
-		logDebug("getPositionClicked");
-    	return positionClicked;
-    }
-    
-    public void setPositionClicked(int p){
-		logDebug("Position: " + p);
-    	positionClicked = p;
-		notifyDataSetChanged();
     }
 
 	@Override

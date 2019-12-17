@@ -87,7 +87,9 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -97,9 +99,10 @@ import static mega.privacy.android.app.utils.Util.*;
 
 
 public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
+
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.2_266";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.2_270";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -112,7 +115,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	MyAccountInfo myAccountInfo;
 	boolean esid = false;
 
-	private int storageState = MegaApiJava.STORAGE_STATE_GREEN; //Default value
+	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
 
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
@@ -147,6 +150,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	private static boolean registeredChatListeners = false;
 
+    private static boolean isVerifySMSShowed = false;
+
 	MegaChatApiAndroid megaChatApi = null;
 
 	private NetworkStateReceiver networkStateReceiver;
@@ -169,6 +174,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		intent.putExtra("actionType", GO_OFFLINE);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
+
+    public static void smsVerifyShowed(boolean isShowed) {
+	    isVerifySMSShowed = isShowed;
+    }
 
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -207,14 +216,26 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			logDebug("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
 
 			if (request.getType() == MegaRequest.TYPE_LOGOUT){
-				if (e.getErrorCode() == MegaError.API_EINCOMPLETE){
+				logDebug("Logout finished: " + e.getErrorString() + "(" + e.getErrorCode() +")");
+				if (e.getErrorCode() == MegaError.API_OK) {
+					if (isChatEnabled()) {
+						logDebug("END logout sdk request - wait chat logout");
+					} else {
+						logDebug("END logout sdk request - chat disabled");
+						DatabaseHandler.getDbHandler(getApplicationContext()).clearEphemeral();
+						AccountController.logoutConfirmed(getApplicationContext());
+
+						Intent tourIntent = new Intent(getApplicationContext(), LoginActivityLollipop.class);
+						tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+						startActivity(tourIntent);
+					}
+				} else if (e.getErrorCode() == MegaError.API_EINCOMPLETE) {
 					if (request.getParamType() == MegaError.API_ESSL) {
 						logWarning("SSL verification failed");
 						Intent intent = new Intent(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED);
 						LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 					}
-				}
-				else if (e.getErrorCode() == MegaError.API_ESID){
+				} else if (e.getErrorCode() == MegaError.API_ESID) {
 					logWarning("TYPE_LOGOUT:API_ESID");
 					myAccountInfo = new MyAccountInfo(getApplicationContext());
 
@@ -228,6 +249,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					}
 
 					AccountController.localLogoutApp(getApplicationContext());
+				} else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
+					api.localLogout();
+					megaChatApi.logout();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -322,7 +346,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				logDebug ("Account details request");
 				if (e.getErrorCode() == MegaError.API_OK){
 
-					dbH.setAccountDetailsTimeStamp();
+					boolean storage = (request.getNumDetails() & myAccountInfo.hasStorageDetails) != 0;
+					if (storage) {
+						dbH.setAccountDetailsTimeStamp();
+					}
 
 					if(myAccountInfo!=null && request.getMegaAccountDetails()!=null){
 						myAccountInfo.setAccountInfo(request.getMegaAccountDetails());
@@ -422,7 +449,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
 		// Setup handler for uncaught exceptions.
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			@Override
@@ -430,7 +456,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				handleUncaughtException(thread, e);
 			}
 		});
-
+        isVerifySMSShowed = false;
 		singleApplicationInstance = this;
 
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
@@ -440,6 +466,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
         scheduleCameraUploadJob(getApplicationContext());
+
+        storageState = dbH.getStorageState();
 
 		setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
@@ -468,7 +496,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				staging = false;
 			}
 		}
-        
+
         setFileLoggerSDK(fileLoggerSDK);
 		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
@@ -477,7 +505,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
 		}
 		else{
-			megaApi.changeApiUrl("https://g.api.mega.co.nz/");
+            megaApi.changeApiUrl("https://g.api.mega.co.nz/");
 		}
 
 		if (DEBUG){
@@ -508,7 +536,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				fileLoggerKarere = false;
 			}
 		}
-        
+
         setFileLoggerKarere(fileLoggerKarere);
 		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, fileLoggerKarere));
 		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
@@ -546,7 +574,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
             public void onReceive(Context context,Intent intent) {
                 if (intent != null) {
                     if (intent.getAction() == ACTION_LOG_OUT) {
-                        storageState = MegaApiJava.STORAGE_STATE_GREEN; //Default value
+                        storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
                     }
                 }
             }
@@ -594,7 +622,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	public void askForFullAccountInfo(){
 		logDebug("askForFullAccountInfo");
 		megaApi.getPaymentMethods(null);
-		megaApi.getAccountDetails(null);
+
+		if (storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN) {
+			megaApi.getAccountDetails();
+		} else {
+			megaApi.getSpecificAccountDetails(false, true, true);
+		}
+
 		megaApi.getPricing(null);
 		megaApi.creditCardQuerySubscriptions(null);
 	}
@@ -628,6 +662,24 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			dbH.resetExtendedAccountDetailsTimestamp();
 		}
 		megaApi.getExtendedAccountDetails(true,false, false, null);
+	}
+
+	public void refreshAccountInfo(){
+		//Check if the call is recently
+		if(callToAccountDetails(context) || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
+			logDebug("megaApi.getAccountDetails SEND");
+			askForAccountDetails();
+		}
+
+		if(callToExtendedAccountDetails(context)){
+			logDebug("megaApi.getExtendedAccountDetails SEND");
+			askForExtendedAccountDetails();
+		}
+
+		if(callToPaymentMethods(context)){
+			logDebug("megaApi.getPaymentMethods SEND");
+			askForPaymentMethods();
+		}
 	}
 
 	static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator) {
@@ -1905,4 +1957,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         super.unregisterReceiver(receiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(logoutReceiver);
     }
+
+    public static boolean isVerifySMSShowed() {
+		return isVerifySMSShowed;
+	}
 }

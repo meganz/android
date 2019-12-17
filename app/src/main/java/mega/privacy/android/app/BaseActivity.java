@@ -32,7 +32,9 @@ import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -41,20 +43,32 @@ import static mega.privacy.android.app.utils.Constants.*;
 
 public class BaseActivity extends AppCompatActivity {
 
-    private MegaApiAndroid megaApi;
-    private MegaChatApiAndroid megaChatApi;
-    private MegaApiAndroid megaApiFolder;
+    protected  MegaApplication app;
+
+    protected MegaApiAndroid megaApi;
+    protected MegaApiAndroid megaApiFolder;
+    protected MegaChatApiAndroid megaChatApi;
 
     private AlertDialog sslErrorDialog;
 
-    boolean delaySignalPresence = false;
+    private boolean delaySignalPresence = false;
+
+    public BaseActivity() {
+        app = MegaApplication.getInstance();
+        megaApi = app.getMegaApi();
+        megaApiFolder = app.getMegaApiFolder();
+
+        if(isChatEnabled()) {
+            megaChatApi = app.getMegaChatApi();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
 
         super.onCreate(savedInstanceState);
-        checkMegaApiObjects();
+        checkMegaObjects();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(sslErrorReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED));
@@ -71,7 +85,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onPause() {
         logDebug("onPause");
 
-        checkMegaApiObjects();
+        checkMegaObjects();
         super.onPause();
     }
 
@@ -82,7 +96,7 @@ public class BaseActivity extends AppCompatActivity {
         super.onResume();
         setAppFontSize(this);
 
-        checkMegaApiObjects();
+        checkMegaObjects();
 
         retryConnectionsAndSignalPresence();
     }
@@ -99,23 +113,26 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * Method to check if exist all required MegaApiAndroid and MegaChatApiAndroid objects
+     * Method to check if exist all required objects (MegaApplication, MegaApiAndroid and MegaChatApiAndroid )
      * or create them if necessary.
      */
-    private void checkMegaApiObjects() {
-        logDebug("checkMegaApiObjects");
+    private void checkMegaObjects() {
+
+        if (app == null) {
+            app = MegaApplication.getInstance();
+        }
 
         if (megaApi == null){
-            megaApi = ((MegaApplication)getApplication()).getMegaApi();
+            megaApi = app.getMegaApi();
         }
 
         if (megaApiFolder == null) {
-            megaApiFolder = ((MegaApplication) getApplication()).getMegaApiFolder();
+            megaApiFolder = app.getMegaApiFolder();
         }
 
         if(isChatEnabled()){
             if (megaChatApi == null){
-                megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
+                megaChatApi = app.getMegaChatApi();
             }
         }
     }
@@ -154,7 +171,7 @@ public class BaseActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
                 logDebug("BROADCAST TO SEND SIGNAL PRESENCE");
-                if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending()==false){
+                if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()){
                     delaySignalPresence = false;
                     retryConnectionsAndSignalPresence();
                 }
@@ -239,7 +256,7 @@ public class BaseActivity extends AppCompatActivity {
                 if (megaChatApi != null) {
                     megaChatApi.retryPendingConnections(false, null);
 
-                    if(megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending() == false){
+                    if(megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()){
                         delaySignalPresence = false;
                         if(!(this instanceof ChatCallActivity) && megaChatApi.isSignalActivityRequired()){
                             logDebug("Send signal presence");
@@ -390,11 +407,11 @@ public class BaseActivity extends AppCompatActivity {
         MultipleAttachChatListener listener = null;
 
         if(chats.size()==1){
-            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), false, chats.size());
+            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), chats.size());
             megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
         }
         else{
-            listener = new MultipleAttachChatListener(context, -1, false, chats.size());
+            listener = new MultipleAttachChatListener(context, -1, chats.size());
             for(int i=0;i<chats.size();i++){
                 megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
             }
@@ -411,7 +428,7 @@ public class BaseActivity extends AppCompatActivity {
         logDebug("Check the last call to getAccountDetails");
         if(callToAccountDetails(getApplicationContext())){
             logDebug("megaApi.getAccountDetails SEND");
-            ((MegaApplication) getApplication()).askForAccountDetails();
+            app.askForAccountDetails();
         }
     }
 
@@ -423,6 +440,8 @@ public class BaseActivity extends AppCompatActivity {
      * @param stringError string shown as an alert in case there is not any specific action for the event
      */
     public void checkWhyAmIBlocked(long eventNumber, String stringError) {
+        Intent intent;
+
         switch (Long.toString(eventNumber)) {
             case ACCOUNT_NOT_BLOCKED:
 //                I am not blocked
@@ -434,10 +453,33 @@ public class BaseActivity extends AppCompatActivity {
                 showErrorAlertDialog(getString(R.string.account_suspended_multiple_breaches_ToS), false, this);
                 break;
             case SMS_VERIFICATION_ACCOUNT_BLOCK:
-//                Pending to merge: #752
+                if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed()) return;
+
+                MegaApplication.smsVerifyShowed(true);
+                String gSession = megaApi.dumpSession();
+                //For first login, keep the valid session,
+                //after added phone number, the account can use this session to fastLogin
+                if (gSession != null) {
+                    MegaUser myUser = megaApi.getMyUser();
+                    String myUserHandle = null;
+                    String lastEmail = null;
+                    if (myUser != null) {
+                        lastEmail = myUser.getEmail();
+                        myUserHandle = myUser.getHandle() + "";
+                    }
+                    UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
+                    dbH.saveCredentials(credentials);
+                }
+
+                logDebug("Show SMS verification activity.");
+                intent = new Intent(getApplicationContext(), SMSVerificationActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(NAME_USER_LOCKED, true);
+                startActivity(intent);
+
                 break;
             case WEAK_PROTECTION_ACCOUNT_BLOCK:
-                Intent intent = new Intent(this, WeakAccountProtectionAlertActivity.class);
+                intent = new Intent(this, WeakAccountProtectionAlertActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
 

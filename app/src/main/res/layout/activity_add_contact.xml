@@ -41,7 +41,7 @@
 				android:background="@color/white">
 
 				<EditText
-					android:id="@+id/type_mail_edittext"
+					android:id="@+id/type_mail_edit_text"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:maxLines="1"
@@ -63,7 +63,7 @@
 					android:layout_marginLeft="22dp"
 					android:layout_marginTop="-10dp"
 					android:id="@+id/add_contact_email_error"
-					android:layout_below="@id/type_mail_edittext">
+					android:layout_below="@id/type_mail_edit_text">
 
 					<ImageView
 						android:layout_width="wrap_content"
@@ -269,21 +269,17 @@
 
 					<Button
 						android:id="@+id/add_contact_list_empty_invite_button"
-						android:layout_width="wrap_content"
-						android:minWidth="96dp"
+						style="@style/AccentBorderBackgroundBorderlessButton"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center_horizontal"
-						android:gravity="center"
 						android:layout_marginTop="32dp"
 						android:layout_marginBottom="32dp"
+						android:minWidth="96dp"
 						android:paddingLeft="20dp"
-						android:paddingRight="20dp"
 						android:paddingTop="10dp"
+						android:paddingRight="20dp"
 						android:paddingBottom="10dp"
-						android:textColor="@color/accentColor"
-						android:textSize="16sp"
-						android:background="@drawable/background_button_border_accent"
-						style="?android:attr/borderlessButtonStyle"/>
+						android:textSize="16sp" />
 
 					<ProgressBar
 						android:id="@+id/add_contact_progress_bar"

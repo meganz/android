@@ -75,6 +75,12 @@
 
                 <include layout="@layout/item_transfers_overview"/>
 
+                <include layout="@layout/item_call_in_progress_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_alignParentTop="true" />
+
             </android.support.design.widget.AppBarLayout>
 
             <mega.privacy.android.app.components.CustomViewPager

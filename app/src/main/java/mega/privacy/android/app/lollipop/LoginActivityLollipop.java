@@ -37,6 +37,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SMSVerificationActivity;
+import mega.privacy.android.app.UserCredentials;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -47,9 +49,11 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.*;
+
 
 public class LoginActivityLollipop extends BaseActivity implements MegaRequestListenerInterface {
 

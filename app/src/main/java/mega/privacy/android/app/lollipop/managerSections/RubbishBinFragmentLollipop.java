@@ -481,14 +481,14 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		display.getMetrics(outMetrics);
 		density  = getResources().getDisplayMetrics().density;
 
-		if (((ManagerActivityLollipop)context).parentHandleRubbish == -1||((ManagerActivityLollipop)context).parentHandleRubbish==megaApi.getRubbishNode().getHandle()){
-			logDebug("Parent is the Rubbish: " + ((ManagerActivityLollipop)context).parentHandleRubbish);
+		if (((ManagerActivityLollipop)context).getParentHandleRubbish() == -1||((ManagerActivityLollipop)context).getParentHandleRubbish()==megaApi.getRubbishNode().getHandle()){
+			logDebug("Parent is the Rubbish: " + ((ManagerActivityLollipop)context).getParentHandleRubbish());
 
 			nodes = megaApi.getChildren(megaApi.getRubbishNode(), ((ManagerActivityLollipop)context).orderCloud);
 
 		}
 		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 
 			if (parentNode != null){
 				logDebug("The parent node is: " + parentNode.getHandle());
@@ -532,23 +532,23 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			
 //			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleRubbish, recyclerView, null, RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleRubbish(), recyclerView, null, RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 				adapter.setListFragment(recyclerView);
 //				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
 			if(megaApi.getRubbishNode()!=null){
-				logDebug("Set content of the Rubbish Bin: " + ((ManagerActivityLollipop)context).parentHandleRubbish);
-				if (((ManagerActivityLollipop)context).parentHandleRubbish == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).parentHandleRubbish==-1){
+				logDebug("Set content of the Rubbish Bin: " + ((ManagerActivityLollipop)context).getParentHandleRubbish());
+				if (((ManagerActivityLollipop)context).getParentHandleRubbish() == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1){
 					contentText.setText(getInfoFolder(megaApi.getRubbishNode(), context));
 
 				}
 				else{
-					MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+					MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 					contentText.setText(getInfoFolder(infoNode, context));
 				}
 			}
@@ -566,7 +566,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
+				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleRubbish()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
 					}else{
@@ -654,21 +654,21 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleRubbish, recyclerView, null, RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleRubbish(), recyclerView, null, RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 				adapter.setListFragment(recyclerView);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
 			if(megaApi.getRubbishNode()!=null){
-				if (((ManagerActivityLollipop)context).parentHandleRubbish == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).parentHandleRubbish==-1){
+				if (((ManagerActivityLollipop)context).getParentHandleRubbish() == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1){
 					contentText.setText(getInfoFolder(megaApi.getRubbishNode(), context));
 				}
 				else{
-					MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+					MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 					contentText.setText(getInfoFolder(infoNode, context));
 				}
 			}
@@ -686,7 +686,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
+				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleRubbish()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
 					}else{
@@ -780,15 +780,15 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
-				((ManagerActivityLollipop)context).parentHandleRubbish = n.getHandle();
+				((ManagerActivityLollipop)context).setParentHandleRubbish(n.getHandle());
 
 				((ManagerActivityLollipop)context).setToolbarTitle();
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 				contentText.setText(getInfoFolder(infoNode, context));
 
-				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
@@ -801,7 +801,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 
-					if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
+					if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleRubbish()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1) {
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 							emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
 						}else{
@@ -1218,17 +1218,17 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			return 0;
 		}
 
-		if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationHandle == (((ManagerActivityLollipop)context).parentHandleRubbish)) {
+		if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationHandle == (((ManagerActivityLollipop)context).getParentHandleRubbish())) {
 			((ManagerActivityLollipop) context).comesFromNotifications = false;
 			((ManagerActivityLollipop) context).comesFromNotificationHandle = -1;
 			((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
-			((ManagerActivityLollipop)context).parentHandleRubbish = ((ManagerActivityLollipop)context).comesFromNotificationHandleSaved;
+			((ManagerActivityLollipop)context).setParentHandleRubbish(((ManagerActivityLollipop)context).comesFromNotificationHandleSaved);
 			((ManagerActivityLollipop)context).comesFromNotificationHandleSaved = -1;
 
 			return 2;
 		}
 		else {
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish));
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish()));
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.GONE);
@@ -1236,7 +1236,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				emptyTextView.setVisibility(View.GONE);
 
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				((ManagerActivityLollipop)context).parentHandleRubbish = parentNode.getHandle();
+				((ManagerActivityLollipop)context).setParentHandleRubbish(parentNode.getHandle());
 
 				((ManagerActivityLollipop)context).setToolbarTitle();
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
@@ -1273,12 +1273,12 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		logDebug("setContentText");
 		MegaNode rN = megaApi.getRubbishNode();
 		if(rN!=null){
-			if (((ManagerActivityLollipop)context).parentHandleRubbish == rN.getHandle()||((ManagerActivityLollipop)context).parentHandleRubbish==-1){
+			if (((ManagerActivityLollipop)context).getParentHandleRubbish() == rN.getHandle()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1){
 				contentText.setText(getInfoFolder(rN, context));
 
 			}
 			else{
-				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 				if (infoNode !=  null){
 					contentText.setText(getInfoFolder(infoNode, context));
 				}
@@ -1293,7 +1293,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	}
 
 	public long getParentHandle(){
-		return ((ManagerActivityLollipop)context).parentHandleRubbish;
+		return ((ManagerActivityLollipop)context).getParentHandleRubbish();
 	}
 	
 	public RecyclerView getRecyclerView(){
@@ -1327,7 +1327,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
+				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleRubbish()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
 					}else{

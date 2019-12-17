@@ -63,9 +63,6 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
 
     private static String emojify(String text, int startIndex) {
         // remove previous handle since we won't be handling emoticons
-
-        text = processStringWithRegex(text, shortCodeOrHtmlEntityPattern, startIndex, true);
-
         // emotions should be processed in second go.
         // this will avoid conflicts with shortcodes. For Example: :p:p should
         // not be processed as shortcode, but as emoticon
