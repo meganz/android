@@ -266,32 +266,27 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
 			}
 		} else {
-			// File upload with edited name
+            totalFileUploads++;
+
 			if (nameInMEGAEdited != null) {
-				totalFileUploads++;
+                // File upload with edited name
 				totalUploads++;
 				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGAEdited, this);
-			} else {
-				// File upload with original name
-				totalFileUploads++;
-
-				if (lastModified == 0) {
-					if (nameInMEGA != null) {
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
-					} else {
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
-					}
-				} else {
-					if (nameInMEGA != null) {
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, lastModified / 1000, this);
-					} else {
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), lastModified / 1000, this);
-					}
-				}
-
-			}
-		}
-	}
+            } else if (lastModified == 0) {
+                if (nameInMEGA != null) {
+                    megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
+                } else {
+                    megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
+                }
+            } else {
+                if (nameInMEGA != null) {
+                    megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, lastModified / 1000, this);
+                } else {
+                    megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), lastModified / 1000, this);
+                }
+            }
+        }
+    }
 
 	/*
 	 * Stop uploading service
