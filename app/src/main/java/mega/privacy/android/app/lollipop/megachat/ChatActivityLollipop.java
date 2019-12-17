@@ -611,10 +611,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         privateIconToolbar.setVisibility(View.GONE);
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
-
         updateNavigationToolbarIcon();
-
-
 
         joinChatLinkLayout = findViewById(R.id.join_chat_layout_chat_layout);
         joinButton = findViewById(R.id.join_button);
