@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.FileProvider;
 import android.util.TypedValue;
 import android.view.View;
@@ -15,10 +16,10 @@ import java.io.File;
 
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -119,13 +120,13 @@ public class UtilsModalBottomSheet {
             ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             activityManager.getMemoryInfo(mi);
 
-            if(mi.totalMem> Constants.BUFFER_COMP){
+            if(mi.totalMem> BUFFER_COMP){
                 logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
             }
             else{
                 logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
             }
 
             String url = megaApi.httpServerGetLocalLink(node);
@@ -149,5 +150,13 @@ public class UtilsModalBottomSheet {
                 Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    public static boolean isBottomSheetDialogShown(BottomSheetDialogFragment bottomSheetDialogFragment) {
+        if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded()) {
+            return true;
+        }
+
+        return false;
     }
 }

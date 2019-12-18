@@ -303,12 +303,22 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					if (value.length() == 0) {
 						return true;
 					}
-					if(value.startsWith("!")){
-						logDebug("Decryption key with exclamation!");
-						url=url+value;
-					}
-					else{
-						url=url+"!"+value;
+					if (url.contains("#!")) {
+						// old folder link format
+						if (value.startsWith("!")) {
+							logDebug("Decryption key with exclamation!");
+							url = url + value;
+						} else {
+							url = url + "!" + value;
+						}
+					} else if (url.contains(SEPARATOR + "file" + SEPARATOR)) {
+						// new folder link format
+						if (value.startsWith("#")) {
+							logDebug("Decryption key with hash!");
+							url = url + value;
+						} else {
+							url = url + "#" + value;
+						}
 					}
 					logDebug("File link to import: " + url);
 					decryptionIntroduced=true;
@@ -343,12 +353,22 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 							askForDecryptionKeyDialog();
 							return;
 						}else{
-							if(value.startsWith("!")){
-								logDebug("Decryption key with exclamation!");
-								url=url+value;
-							}
-							else{
-								url=url+"!"+value;
+							if (url.contains("#!")) {
+								// old folder link format
+								if (value.startsWith("!")) {
+									logDebug("Decryption key with exclamation!");
+									url = url + value;
+								} else {
+									url = url + "!" + value;
+								}
+							} else if (url.contains(SEPARATOR + "file" + SEPARATOR)) {
+								// new folder link format
+								if (value.startsWith("#")) {
+									logDebug("Decryption key with hash!");
+									url = url + value;
+								} else {
+									url = url + "#" + value;
+								}
 							}
 							logDebug("File link to import: " + url);
 							decryptionIntroduced=true;
@@ -465,7 +485,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 //				nameView.setText(document.getName());
 				collapsingToolbar.setTitle(document.getName());
 
-				sizeTextView.setText(Formatter.formatFileSize(this, document.getSize()));
+				sizeTextView.setText(getSizeString(document.getSize()));
 
 				iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 				iconViewLayout.setVisibility(View.VISIBLE);

@@ -108,8 +108,8 @@ public class SorterContentActivity extends PinActivityLollipop {
                 }
                 case SHARED_ITEMS: {
                     int index = ((ManagerActivityLollipop) context).getTabItemShares();
-                    if((index==1 && ((ManagerActivityLollipop) context).parentHandleOutgoing == -1)
-                            || (index != 1 && ((ManagerActivityLollipop) context).parentHandleIncoming == -1)){
+                    if((index==1 && ((ManagerActivityLollipop) context).getParentHandleOutgoing() == -1)
+                            || (index != 1 && ((ManagerActivityLollipop) context).getParentHandleIncoming() == -1)){
                         order = ((ManagerActivityLollipop) context).getOrderOthers();
                     }
                     else{
