@@ -18082,8 +18082,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			int inProgress = totalTransfers - pendingTransfers + 1;
-			// For uploading documents which have been already in the cloud, the inProgress variable may be less than 0
-			inProgress = inProgress < 0 ? 0 : inProgress;
 
 			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers, totalTransfers, inProgress, totalTransfers);
 			transfersNumberText.setText(progressText);
