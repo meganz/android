@@ -986,7 +986,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				adapterType == INCOMING_SHARES_ADAPTER|| adapterType == OUTGOING_SHARES_ADAPTER ||
 				adapterType == SEARCH_ADAPTER || adapterType == FILE_BROWSER_ADAPTER ||
 				adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
-            positionG -= placeholderCount;
+            // only for the first time
+            if(savedInstanceState == null) {
+                positionG -= placeholderCount;
+            }
         }
         MegaApplication app = (MegaApplication)getApplication();
 		if (isFolderLink ){

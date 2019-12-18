@@ -45,6 +45,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -519,6 +520,22 @@ public class Util {
 		
 		return sizeString;
 	}
+
+    public static String getSizeStringGBBased(long gbSize){
+        String sizeString = "";
+        DecimalFormat decf = new DecimalFormat("###.##");
+
+        float TB = 1024;
+
+        if (gbSize < TB){
+            sizeString = decf.format(gbSize) + " " + context.getString(R.string.label_file_size_giga_byte);
+        }
+        else{
+            sizeString = decf.format(gbSize/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
+        }
+
+        return sizeString;
+    }
     
 	public static String getDateString(long date){
 		DateFormat datf = DateFormat.getDateTimeInstance();
@@ -1817,6 +1834,13 @@ public class Util {
 
 	public static void resetActionBar(ActionBar aB) {
 		if (aB != null) {
+			View customView = aB.getCustomView();
+			if(customView != null){
+				ViewParent parent = customView.getParent();
+				if(parent != null){
+					((ViewGroup) parent).removeView(customView);
+				}
+			}
 			aB.setDisplayShowCustomEnabled(false);
 			aB.setDisplayShowTitleEnabled(true);
 		}
