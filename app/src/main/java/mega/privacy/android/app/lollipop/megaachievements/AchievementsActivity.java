@@ -23,16 +23,14 @@ import java.util.Date;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -60,10 +58,6 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     MegaChatApiAndroid megaChatApi;
 
     private android.support.v7.app.AlertDialog successDialog;
-
-    ArrayList<String> mails;
-    ArrayList<String> pendingContacts;
-    boolean pendingAttaches = false;
 
     DisplayMetrics outMetrics;
 
@@ -136,9 +130,6 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         if (savedInstanceState != null) {
             visibleFragment = savedInstanceState.getInt("visibleFragment", ACHIEVEMENTS_FRAGMENT);
             achievementType = savedInstanceState.getInt("achievementType", -1);
-            mails = savedInstanceState.getStringArrayList("mails");
-            pendingContacts = savedInstanceState.getStringArrayList("pendingContacts");
-            pendingAttaches = savedInstanceState.getBoolean("pendingAttaches", false);
         }
     }
 
@@ -148,9 +139,6 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
         outState.putInt("visibleFragment", visibleFragment);
         outState.putInt("achievementType", achievementType);
-        outState.putStringArrayList("mails", mails);
-        outState.putStringArrayList("pendingContacts", pendingContacts);
-        outState.putBoolean("pendingAttaches", pendingAttaches);
     }
 
     @Override
@@ -269,48 +257,12 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                     else {
                         showFragment(visibleFragment, achievementType);
                     }
-                    if (pendingAttaches){
-                        attachPendig();
-                    }
                 }
             }
             else{
                 showSnackbar(getString(R.string.cancel_subscription_error));
             }
         }
-        else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
-            logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
-
-            if (e.getErrorCode() == MegaError.API_OK){
-                logDebug("OK INVITE CONTACT: " + request.getEmail());
-                showInviteConfirmationDialog();
-            }
-            else{
-                logWarning("Code: " + e.getErrorString());
-                if(e.getErrorCode()==MegaError.API_EEXIST)
-                {
-                    showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
-                }
-                else if(request.getNumber()== MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode()==MegaError.API_EARGS)
-                {
-                    showSnackbar(getString(R.string.error_own_email_as_contact));
-                }
-                else{
-                    showSnackbar(getString(R.string.general_error));
-                }
-                logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
-            }
-        }
-    }
-
-    public void inviteFriends(ArrayList<String> mails){
-        logDebug("inviteFriends");
-        hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS);
-
-        showFragment(ACHIEVEMENTS_FRAGMENT, -1);
-
-        ContactController cC = new ContactController(this);
-        cC.inviteMultipleContacts(mails);
     }
 
     public void calculateReferralBonuses() {
@@ -378,35 +330,11 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        logDebug("onActivityResult");
-        if (requestCode == REQUEST_CODE_GET_CONTACTS && resultCode == RESULT_OK){
-            logDebug("REQUEST_CODE_GET_CONTACTS");
-            ArrayList<String> contacts = data.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
-            if (contacts != null) {
-                megaApi.getAccountAchievements(this);
-                pendingAttaches = true;
-                pendingContacts = contacts;
-                visibleFragment = INVITE_FRIENDS_FRAGMENT;
-                achievementType = -1;
-            }
+        if (requestCode == REQUEST_CODE_GET_CONTACTS && resultCode == RESULT_OK && data != null) {
+            //TODO for future use, after PR 1081 been merged.
+            String email = data.getStringExtra(InviteContactActivity.KEY_SENT_EMAIL);
+            int sentNumber = data.getIntExtra(InviteContactActivity.KEY_SENT_NUMBER, 1);
+            showInviteConfirmationDialog();
         }
-        else{
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    void attachPendig () {
-        if (pendingContacts != null) {
-            pendingAttaches = false;
-            pendingContacts.clear();
-        }
-    }
-
-    void setMails (ArrayList<String> mails){
-        this.mails = mails;
-    }
-
-    ArrayList<String> getMails(){
-        return mails;
     }
 }

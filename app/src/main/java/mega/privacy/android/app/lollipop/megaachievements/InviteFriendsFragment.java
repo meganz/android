@@ -108,16 +108,12 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 	@Override
 	public void onClick(View v) {
-		logDebug("onClick");
-		switch (v.getId()) {
-			case R.id.invite_contacts_button: {
-				Intent intent = new Intent(context, InviteContactActivity.class);
-				intent.putExtra("contactType", CONTACT_TYPE_DEVICE);
-				intent.putExtra("fromAchievements", true);
-				((AchievementsActivity)context).startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);
-				break;
-			}
-		}
+		if(v.getId() == R.id.invite_contacts_button) {
+		    logDebug("To InviteContactActivity.");
+            Intent intent = new Intent(context, InviteContactActivity.class);
+            intent.putExtra(InviteContactActivity.KEY_FROM, true);
+            ((AchievementsActivity)context).startActivityForResult(intent, REQUEST_CODE_GET_CONTACTS);
+        }
 	}
 
 	public int onBackPressed(){
