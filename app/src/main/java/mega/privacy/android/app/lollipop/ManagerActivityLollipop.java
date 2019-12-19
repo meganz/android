@@ -11010,6 +11010,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							parentHandle = parentHandleOutgoing;
 						}
 						break;
+                    case INBOX:
+                        parentHandle = getParentHandleInbox();
+                        break;
 				}
 				break;
 
@@ -14280,32 +14283,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			catch(Exception ex){}
 		}
 		dissmisDialog();
-		long parentHandle = -1;
-		MegaNode parentNode = null;
 
-		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			if (getTabItemCloud() == CLOUD_TAB) {
-				parentHandle = parentHandleBrowser;
-				parentNode = megaApi.getNodeByHandle(parentHandle);
-			}
-			if (parentNode == null){
-				parentNode = megaApi.getRootNode();
-			}
-		}
-		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			int index = viewPagerShares.getCurrentItem();
-			if(index==1){
-				parentNode = megaApi.getNodeByHandle(parentHandleOutgoing);
-			}
-			else{
-				parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
-			}
-			if(parentNode==null){
-				logWarning("Incorrect folder to upload");
-				parentNode = megaApi.getRootNode();
-			}
-		}
-		else if(drawerItem == DrawerItem.ACCOUNT){
+		MegaNode parentNode = getCurrentParentNode(getCurrentParentHandle(), -1);
+
+		if(drawerItem == DrawerItem.ACCOUNT){
 			if(infos!=null){
 				for (ShareInfo info : infos) {
 					String avatarPath = info.getFileAbsolutePath();
