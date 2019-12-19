@@ -10,9 +10,6 @@ import android.webkit.MimeTypeMap;
 import java.io.File;
 import java.util.HashMap;
 
-import mega.privacy.android.app.utils.Util;
-
-
 /*
  * Mime type for files
  */
@@ -213,11 +210,17 @@ public class MimeTypeList {
 	public boolean isAudio() {
 		return type.startsWith("audio/") || extension.equals("opus");
 	}
+	/*
+	 * Check is MimeType of voice type
+	 */
+	public boolean isAudioVoiceClip() {
+		return extension.equals("m4a");
+	}
 
 	public boolean isAudioNotSupported() {
 		return extension.equals("flac") || extension.equals("wma") || extension.equals("aif")
-				|| extension.equals("aiff") || extension.equals("iff") || extension.equals("oga")
-				|| extension.equals("3ga") || extension.equals("opus");
+				|| extension.equals("aiff") || extension.equals("iff") || extension.equals("oga")|| extension.equals("opus")
+				|| extension.equals("3ga");
 	}
 
 	/*
@@ -252,9 +255,4 @@ public class MimeTypeList {
 	public boolean isGIF () {
 		return extension.equals("gif");
 	}
-
-	public static void log(String message) {
-		Util.log("MimeType", message);
-	}
-
 }

@@ -1,24 +1,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="80dp"
     android:layout_height="120dp"
-	android:background="@null" >
+    android:background="@null">
 
-		<SurfaceView
-			android:id="@+id/surface_local_video"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:layout_alignParentRight="true"
-			android:background="@android:color/transparent" />
-		<ImageView
-			android:id="@+id/micro_surface_view"
-			android:layout_width="24dp"
-			android:layout_height="24dp"
-			android:layout_alignTop="@id/surface_local_video"
-			android:layout_alignRight="@id/surface_local_video"
-			android:layout_marginRight="4dp"
-			android:layout_marginTop="12dp"
-			android:background="@null"
-			android:src="@drawable/ic_mic_off_ind_call"/>
+    <SurfaceView
+        android:id="@+id/surface_local_video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="@android:color/transparent" />
+
+    <ImageView
+        android:id="@+id/micro_surface_view"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignTop="@id/surface_local_video"
+        android:layout_alignRight="@id/surface_local_video"
+        android:layout_marginTop="12dp"
+        android:layout_marginRight="4dp"
+        android:background="@null"
+        android:src="@drawable/ic_mic_off_ind_call" />
 
 </RelativeLayout>

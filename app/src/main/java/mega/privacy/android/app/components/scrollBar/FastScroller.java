@@ -7,7 +7,6 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -177,7 +176,7 @@ public class FastScroller extends LinearLayout{
     }
 
     private void invalidateVisibility() {
-        if (recyclerView.getAdapter() == null || recyclerView.getAdapter().getItemCount() == 0 || recyclerView.getChildAt(0) == null || isRecyclerViewNotScrollable() || maxVisibility != View.VISIBLE) {
+        if (recyclerView == null || recyclerView.getAdapter() == null || recyclerView.getAdapter().getItemCount() == 0 || recyclerView.getChildAt(0) == null || isRecyclerViewNotScrollable() || maxVisibility != View.VISIBLE) {
             super.setVisibility(INVISIBLE);
         } else {
             super.setVisibility(VISIBLE);

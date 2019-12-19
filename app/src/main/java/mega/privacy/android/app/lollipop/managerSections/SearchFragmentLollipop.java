@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -52,6 +51,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SearchNodesTask;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
@@ -61,72 +61,84 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
+import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
-public class SearchFragmentLollipop extends Fragment{
+public class SearchFragmentLollipop extends RotatableFragment{
+
+	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
 	public static ImageView imageDrag;
 
-	Context context;
-	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
-	FastScroller fastScroller;
+	private Context context;
+	private RecyclerView recyclerView;
+	private LinearLayoutManager mLayoutManager;
+	private CustomizedGridLayoutManager gridLayoutManager;
+	private FastScroller fastScroller;
 
-	ImageView emptyImageView;
-	LinearLayout emptyTextView;
-	TextView emptyTextViewFirst;
+	private ImageView emptyImageView;
+	private LinearLayout emptyTextView;
+	private TextView emptyTextViewFirst;
 
-    MegaNodeAdapter adapter;
-	SearchFragmentLollipop searchFragment = this;
-	ProgressBar progressBar;
-	MegaApiAndroid megaApi;
-	RelativeLayout transfersOverViewLayout;
+	private MegaNodeAdapter adapter;
+	private MegaApiAndroid megaApi;
 
-	Stack<Integer> lastPositionStack;
+	private Stack<Integer> lastPositionStack;
 
     private MenuItem trashIcon;
 
-	ArrayList<MegaNode> nodes;
+	private ArrayList<MegaNode> nodes = new ArrayList<>();
 
 	private ActionMode actionMode;
-	
-	float density;
-	DisplayMetrics outMetrics;
-	Display display;
 
-	boolean allFiles = true;
-	DatabaseHandler dbH;
-	MegaPreferences prefs;
-	String downloadLocationDefaultPath = Util.downloadDIR;
+	private DisplayMetrics outMetrics;
+	private Display display;
 
-	boolean multiselectBoolean=false;
+	private boolean allFiles = true;
+	private String downloadLocationDefaultPath;
+
+	private boolean multiselectBoolean=false;
 
     private int placeholderCount;
 
-	public NewHeaderItemDecoration headerItemDecoration;
+	private NewHeaderItemDecoration headerItemDecoration;
+
+	private SearchNodesTask searchNodesTask;
+	private RelativeLayout contentLayout;
+	private ProgressBar searchProgressBar;
+
+	@Override
+	protected RotatableAdapter getAdapter() {
+		return adapter;
+	}
 
 	public void activateActionMode(){
-		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 	}
 
+	@Override
+	public void multipleItemClick(int position) {
+		adapter.toggleSelection(position);
+	}
+
 	public void updateScrollPosition(int position) {
-		log("updateScrollPosition");
+		logDebug("Position: " + position);
 		if (adapter != null) {
 			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
@@ -139,7 +151,7 @@ public class SearchFragmentLollipop extends Fragment{
 
 
 	public ImageView getImageDrag(int position) {
-		log("getImageDrag");
+		logDebug("Position: " + position);
 		if (adapter != null) {
 			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				View v = mLayoutManager.findViewByPosition(position);
@@ -214,9 +226,9 @@ public class SearchFragmentLollipop extends Fragment{
 				}
 				case R.id.cab_menu_share_link_remove:{
 
-					log("Remove public link option");
+					logDebug("Remove public link option");
 					if(documents.get(0)==null){
-						log("The selected node is NULL");
+						logWarning("The selected node is NULL");
 						break;
 					}
 					((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(documents.get(0));
@@ -227,9 +239,9 @@ public class SearchFragmentLollipop extends Fragment{
 				}
 				case R.id.cab_menu_edit_link:{
 
-					log("Edit link option");
+					logDebug("Edit link option");
 					if(documents.get(0)==null){
-						log("The selected node is NULL");
+						logWarning("The selected node is NULL");
 						break;
 					}
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
@@ -238,7 +250,7 @@ public class SearchFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_send_to_chat:{
-					log("Send files to chat");
+					logDebug("Send files to chat");
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
 					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
@@ -273,18 +285,18 @@ public class SearchFragmentLollipop extends Fragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
             trashIcon = menu.findItem(R.id.cab_menu_trash);
-			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
 			return true;
 		}
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			log("onDestroyActionMode");
+			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
-			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_SEARCH_DELAY);
+			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
 		}
 
@@ -304,7 +316,7 @@ public class SearchFragmentLollipop extends Fragment{
 			boolean showTrash = false;
 			boolean itemsSelected = false;
 
-			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
 
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
@@ -350,7 +362,7 @@ public class SearchFragmentLollipop extends Fragment{
 				}
 
 				if(allFiles){
-					if (Util.isChatEnabled()) {
+					if (isChatEnabled()) {
 						showSendToChat = true;
 					}
 					else {
@@ -461,21 +473,8 @@ public class SearchFragmentLollipop extends Fragment{
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		dbH = DatabaseHandler.getDbHandler(context);
-		prefs = dbH.getPreferences();
-		if (prefs != null){
-			log("prefs != null");
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					log("askMe==false");
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
+		downloadLocationDefaultPath = getDownloadLocation(context);
+
 		lastPositionStack = new Stack<>();
 		super.onCreate(savedInstanceState);
 	}
@@ -534,20 +533,24 @@ public class SearchFragmentLollipop extends Fragment{
             }
         } else {
             placeholderCount = 0;
-            sections.put(0, getString(R.string.general_folders));
-            sections.put(folderCount, getString(R.string.general_files));
+            sections.put(0, context.getString(R.string.general_folders));
+            sections.put(folderCount, context.getString(R.string.general_files));
         }
 		if (headerItemDecoration == null) {
+			logDebug("Create new decoration");
 			headerItemDecoration = new NewHeaderItemDecoration(context);
-			recyclerView.addItemDecoration(headerItemDecoration);
+		} else {
+			logDebug("Remove old decoration");
+			recyclerView.removeItemDecoration(headerItemDecoration);
 		}
 		headerItemDecoration.setType(type);
 		headerItemDecoration.setKeys(sections);
+		recyclerView.addItemDecoration(headerItemDecoration);
     }
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");
+		logDebug("onCreateView");
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -560,36 +563,17 @@ public class SearchFragmentLollipop extends Fragment{
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
 
-		((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_SEARCH);
-		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
-			if(((ManagerActivityLollipop)context).searchQuery!=null){
-				if(!((ManagerActivityLollipop)context).searchQuery.isEmpty()){
-					log("SEARCH NODES: " + ((ManagerActivityLollipop)context).searchQuery);
-					nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery,ORDER_DEFAULT_ASC);
-					log("Nodes found = " + nodes.size());
-
-				}
-			}
-		}
-		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleSearch);
-			if(parentNode!=null){
-				log("parentNode: "+parentNode.getName());
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-			}
-		}
-
+		View v;
 		if (((ManagerActivityLollipop)context).isList){
 			
-			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
+			v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
             //Add bottom padding for recyclerView like in other fragments.
-            recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+            recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
             recyclerView.setClipToPadding(false);
 			recyclerView.setClipToPadding(false);
 //			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
@@ -605,42 +589,26 @@ public class SearchFragmentLollipop extends Fragment{
 				}
 			});
 
-			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
-			progressBar.setVisibility(View.GONE);
-
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
-			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
-			transfersOverViewLayout.setVisibility(View.GONE);
-
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleSearch(), recyclerView, null, SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setListFragment(recyclerView);
                 adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
-
-			adapter.setMultipleSelect(false);
-	
-			recyclerView.setAdapter(adapter);
-			fastScroller.setRecyclerView(recyclerView);
+		} else {
+			logDebug("Grid View");
 			
-			setNodes(nodes);
-
-			return v;
-		}
-		else{
-			log("Grid View");
-			
-			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
+			v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-			//recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+			//recyclerView.setPadding(0, 0, 0, scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 
 			recyclerView.setHasFixedSize(true);
@@ -653,153 +621,123 @@ public class SearchFragmentLollipop extends Fragment{
 					checkScroll();
 				}
 			});
-			
-			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleSearch(), recyclerView, null, SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
-			adapter.setMultipleSelect(false);
+		}
 
-			recyclerView.setAdapter(adapter);
-			fastScroller.setRecyclerView(recyclerView);
+		adapter.setMultipleSelect(false);
 
-			setNodes(nodes);
+		recyclerView.setAdapter(adapter);
+		fastScroller.setRecyclerView(recyclerView);
 
-			return v;
+		contentLayout = v.findViewById(R.id.content_layout);
+		searchProgressBar = v.findViewById(R.id.progressbar);
+
+		return v;
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		String query = ((ManagerActivityLollipop) context).getSearchQuery();
+		if (isAdded() && query != null) {
+			newSearchNodesTask();
+			((ManagerActivityLollipop) context).showFabButton();
 		}
 	}
 
-	@Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
-    }
+	public void newSearchNodesTask() {
+		setProgressView(true);
+		cancelPreviousAsyncTask();
+		searchNodesTask = new SearchNodesTask(context,
+				this,
+				((ManagerActivityLollipop) context).getSearchQuery(),
+				((ManagerActivityLollipop) context).getParentHandleSearch(),
+				nodes);
+		searchNodesTask.execute();
+	}
+
+	public void cancelPreviousAsyncTask() {
+		if (searchNodesTask != null) {
+			searchNodesTask.cancelSearch();
+			searchNodesTask.cancel(true);
+		}
+	}
+
+	public void setProgressView(boolean inProgress) {
+		setSearchProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
+	}
 
 	@Override
 	public void onAttach(Context context) {
-		log("onAttach");
+		logDebug("onAttach");
 		super.onAttach(context);
 		this.context = context;
 	}
+
+	private void serializeNodes(Intent intent) {
+		ArrayList<String> serialized = new ArrayList<>();
+		for (MegaNode node : nodes) {
+			if (node != null) {
+				serialized.add(node.serialize());
+			}
+		}
+		intent.putExtra(ARRAY_SEARCH, serialized);
+	}
 	
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
-		log("itemClick: "+position);
+		logDebug("Position: " + position);
 
 		if (adapter.isMultipleSelect()){
-			log("multiselect ON");
+			logDebug("Multiselect ON");
 			adapter.toggleSelection(position);
 
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-
 			}
 		}
 		else{
-//			((ManagerActivityLollipop)context).textSubmitted = true;
-			((ManagerActivityLollipop)context).setTextSubmitted();
-			log("nodes.size(): "+nodes.size());
-			if (nodes.get(position).isFolder()){
-				log("is a folder");
-				MegaNode n = nodes.get(position);
+			logDebug("nodes.size(): "+nodes.size());
+			((ManagerActivityLollipop) context).setTextSubmitted();
 
-				int lastFirstVisiblePosition = 0;
+			if (!((ManagerActivityLollipop) context).isValidSearchQuery()) {
+				((ManagerActivityLollipop) context).closeSearchView();
+				((ManagerActivityLollipop) context).openSearchNode(nodes.get(position), position, screenPosition, imageView);
+				return;
+			}
+
+			if (nodes.get(position).isFolder()){
+				logDebug("is a folder");
+				((ManagerActivityLollipop)context).setParentHandleSearch(nodes.get(position).getHandle());
+				((ManagerActivityLollipop)context).levelsSearch ++;
+
+				int lastFirstVisiblePosition;
 				if(((ManagerActivityLollipop)context).isList){
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
 					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
-						log("Completely -1 then find just visible position");
+						logWarning("Completely -1 then find just visible position");
 						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
-				log("Push to stack "+lastFirstVisiblePosition+" position");
+				logDebug("Push to stack "+lastFirstVisiblePosition+" position");
 				lastPositionStack.push(lastFirstVisiblePosition);
-
-				((ManagerActivityLollipop)context).parentHandleSearch= n.getHandle();
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				((ManagerActivityLollipop)context).setToolbarTitle();
-
-				nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
-                addSectionTitle(nodes,adapter.getAdapterType());
-				adapter.setNodes(nodes);
-				recyclerView.scrollToPosition(0);
-
-				((ManagerActivityLollipop)context).levelsSearch ++;
-
-				visibilityFastScroller();
-
-				//If folder has no files
-				if (adapter.getItemCount() == 0){
-					recyclerView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
-						}else{
-							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-						}
-
-						String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
-						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
-					} else {
-//						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-						}else{
-							emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-						}
-						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
-					}
-				}
-				else{
-					log("folder with files");
-					recyclerView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}
-
-				((ManagerActivityLollipop) context).showFabButton();
+				clickAction();
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
@@ -807,9 +745,9 @@ public class SearchFragmentLollipop extends Fragment{
                     //Put flag to notify FullScreenImageViewerLollipop.
                     intent.putExtra("placeholder", placeholderCount);
 					intent.putExtra("position", position);
-					intent.putExtra("searchQuery", ((ManagerActivityLollipop)context).searchQuery);
-					intent.putExtra("adapterType", Constants.SEARCH_ADAPTER);
-					if (((ManagerActivityLollipop)context).parentHandleSearch == -1){
+					intent.putExtra("searchQuery", ((ManagerActivityLollipop)context).getSearchQuery());
+					intent.putExtra("adapterType", SEARCH_ADAPTER);
+					if (((ManagerActivityLollipop)context).getParentHandleSearch() == -1){
 						intent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
@@ -818,15 +756,16 @@ public class SearchFragmentLollipop extends Fragment{
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
-					context.startActivity(intent);
-					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					serializeNodes(intent);
+					startActivity(intent);
+					getActivity().overridePendingTransition(0,0);
 					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
 
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					log("FILENAME: " + file.getName());
+					logDebug("FILE HANDLE: " + file.getHandle());
 
 					Intent mediaIntent;
 					boolean internalIntent;
@@ -845,9 +784,9 @@ public class SearchFragmentLollipop extends Fragment{
 					}
                     mediaIntent.putExtra("placeholder", placeholderCount);
 					mediaIntent.putExtra("position", position);
-					mediaIntent.putExtra("searchQuery", ((ManagerActivityLollipop)context).searchQuery);
-					mediaIntent.putExtra("adapterType", Constants.SEARCH_ADAPTER);
-					if (((ManagerActivityLollipop)context).parentHandleSearch == -1){
+					mediaIntent.putExtra("searchQuery", ((ManagerActivityLollipop)context).getSearchQuery());
+					mediaIntent.putExtra("adapterType", SEARCH_ADAPTER);
+					if (((ManagerActivityLollipop)context).getParentHandleSearch() == -1){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
@@ -855,12 +794,13 @@ public class SearchFragmentLollipop extends Fragment{
 					}
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					mediaIntent.putExtra("screenPosition", screenPosition);
+					serializeNodes(mediaIntent);
 
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					imageDrag = imageView;
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -885,13 +825,13 @@ public class SearchFragmentLollipop extends Fragment{
 						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 						activityManager.getMemoryInfo(mi);
 
-						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						if(mi.totalMem>BUFFER_COMP){
+							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
 						}
 						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
 						}
 
 						String url = megaApi.httpServerGetLocalLink(file);
@@ -904,11 +844,11 @@ public class SearchFragmentLollipop extends Fragment{
 						context.startActivity(mediaIntent);
 					}
 					else {
-						if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
+						if (isIntentAvailable(context, mediaIntent)) {
 							context.startActivity(mediaIntent);
 						}
 						else {
-							((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
+							((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
 							adapter.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());
@@ -921,14 +861,14 @@ public class SearchFragmentLollipop extends Fragment{
 					MegaNode file = nodes.get(position);
 
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+					logDebug("FILEHANDLE: " + file.getHandle() + ", TYPE: " + mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 
 					pdfIntent.putExtra("inside", true);
-					pdfIntent.putExtra("adapterType", Constants.SEARCH_ADAPTER);
+					pdfIntent.putExtra("adapterType", SEARCH_ADAPTER);
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
@@ -952,13 +892,13 @@ public class SearchFragmentLollipop extends Fragment{
 						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 						activityManager.getMemoryInfo(mi);
 
-						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						if(mi.totalMem>BUFFER_COMP){
+							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
 						}
 						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
 						}
 
 						String url = megaApi.httpServerGetLocalLink(file);
@@ -967,7 +907,7 @@ public class SearchFragmentLollipop extends Fragment{
 					pdfIntent.putExtra("HANDLE", file.getHandle());
 					pdfIntent.putExtra("screenPosition", screenPosition);
 					imageDrag = imageView;
-					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
+					if (isIntentAvailable(context, pdfIntent)){
 						context.startActivity(pdfIntent);
 					}
 					else{
@@ -981,16 +921,16 @@ public class SearchFragmentLollipop extends Fragment{
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isURL()) {
-					log("Is URL file");
+					logDebug("Is URL file");
 					MegaNode file = nodes.get(position);
 
 					boolean isOnMegaDownloads = false;
-					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
 					if (f.exists() && (f.length() == file.getSize())) {
 						isOnMegaDownloads = true;
 					}
-					log("isOnMegaDownloads: " + isOnMegaDownloads);
+					logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
 						File mediaFile = new File(localPath);
 						InputStream instream = null;
@@ -1011,12 +951,12 @@ public class SearchFragmentLollipop extends Fragment{
 
 									String url = line2.replace("URL=", "");
 
-									log("Is URL - launch browser intent");
+									logDebug("Is URL - launch browser intent");
 									Intent i = new Intent(Intent.ACTION_VIEW);
 									i.setData(Uri.parse(url));
 									startActivity(i);
 								} else {
-									log("Not expected format: Exception on processing url file");
+									logWarning("Not expected format: Exception on processing url file");
 									Intent intent = new Intent(Intent.ACTION_VIEW);
 									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
@@ -1025,7 +965,7 @@ public class SearchFragmentLollipop extends Fragment{
 									}
 									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-									if (MegaApiUtils.isIntentAvailable(context, intent)) {
+									if (isIntentAvailable(context, intent)) {
 										startActivity(intent);
 									} else {
 										ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1045,7 +985,7 @@ public class SearchFragmentLollipop extends Fragment{
 							}
 							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-							if (MegaApiUtils.isIntentAvailable(context, intent)) {
+							if (isIntentAvailable(context, intent)) {
 								startActivity(intent);
 							} else {
 								ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1059,7 +999,7 @@ public class SearchFragmentLollipop extends Fragment{
 							try {
 								instream.close();
 							} catch (IOException e) {
-								log("EXCEPTION closing InputStream");
+								logError("EXCEPTION closing InputStream", e);
 							}
 						}
 					} else {
@@ -1087,8 +1027,9 @@ public class SearchFragmentLollipop extends Fragment{
 			adapter.clearSelections();
 		}
 	}
-	
-	private void updateActionModeTitle() {
+
+	@Override
+	protected void updateActionModeTitle() {
 		if (actionMode == null || context == null) {
 			return;
 		}
@@ -1122,7 +1063,7 @@ public class SearchFragmentLollipop extends Fragment{
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			log("oninvalidate error");
+			logError("Invalidate error", e);
 		}
 		// actionMode.
 	}
@@ -1139,7 +1080,7 @@ public class SearchFragmentLollipop extends Fragment{
 	}
 	
 	public void selectAll(){
-		log("selectAll");
+		logDebug("selectAll");
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
 				adapter.selectAll();
@@ -1166,97 +1107,37 @@ public class SearchFragmentLollipop extends Fragment{
 	}
 	
 	public int onBackPressed(){
-		log("onBackPressed");
+		logDebug("onBackPressed");
+		cancelPreviousAsyncTask();
+		int levelSearch = ((ManagerActivityLollipop)context).levelsSearch;
 
-		if (((ManagerActivityLollipop)context).levelsSearch > 0){
-			log("levels > 0");
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleSearch));
-			if (parentNode != null){
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
+		if (levelSearch >= 0) {
+			if (levelSearch > 0) {
+				MegaNode node = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleSearch());
 
-				((ManagerActivityLollipop)context).parentHandleSearch=parentNode.getHandle();
-				((ManagerActivityLollipop)context).setToolbarTitle();
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-
-				visibilityFastScroller();
-
-				if(nodes!=null){
-					log("nodes.size: "+nodes.size());
-					if(nodes.size()>0){
-						recyclerView.setVisibility(View.VISIBLE);
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
-					}
-					else{
-						recyclerView.setVisibility(View.GONE);
-						emptyImageView.setVisibility(View.VISIBLE);
-						emptyTextView.setVisibility(View.VISIBLE);
+				if (node == null) {
+					((ManagerActivityLollipop) context).setParentHandleSearch(-1);
+				} else {
+					MegaNode parentNode = megaApi.getParentNode(node);
+					if (parentNode == null) {
+						((ManagerActivityLollipop) context).setParentHandleSearch(-1);
+					} else {
+						((ManagerActivityLollipop) context).setParentHandleSearch(parentNode.getHandle());
 					}
 				}
-                addSectionTitle(nodes,adapter.getAdapterType());
-				adapter.setNodes(nodes);
-
-				int lastVisiblePosition = 0;
-				if(!lastPositionStack.empty()){
-					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack "+lastVisiblePosition+" position");
-				}
-				log("Scroll to "+lastVisiblePosition+" position");
-
-				if(lastVisiblePosition>=0){
-
-					if(((ManagerActivityLollipop)context).isList){
-						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-					else{
-						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-				}
-
-				((ManagerActivityLollipop)context).levelsSearch--;
-				((ManagerActivityLollipop) context).showFabButton();
-				return 2;
+			} else {
+				((ManagerActivityLollipop) context).setParentHandleSearch(-1);
 			}
-			else{
-				((ManagerActivityLollipop) context).showFabButton();
-				return 0;
-			}
-		}
-		else if (((ManagerActivityLollipop)context).levelsSearch == -1){
-			log("levels == -1");
-			((ManagerActivityLollipop) context).showFabButton();
-			return 0;
-		}
-		else{
-			log("levels searchQuery: "+((ManagerActivityLollipop)context).levelsSearch);
-			log("searchQuery: "+((ManagerActivityLollipop)context).searchQuery);
-			((ManagerActivityLollipop)context).setParentHandleSearch(-1);
-			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery,ORDER_DEFAULT_ASC);
-			setNodes(nodes);
-			visibilityFastScroller();
 
-			if(nodes!=null){
-				log("nodes.size: "+nodes.size());
-				if(nodes.size()>0){
-					recyclerView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}else{
-					recyclerView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-				}
-			}
+			((ManagerActivityLollipop)context).levelsSearch--;
+			clickAction();
+
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
-				log("Pop of the stack "+lastVisiblePosition+" position");
+				logDebug("Pop of the stack " + lastVisiblePosition + " position");
 			}
-			log("Scroll to "+lastVisiblePosition+" position");
+			logDebug("Scroll to " + lastVisiblePosition + " position");
 
 			if(lastVisiblePosition>=0){
 
@@ -1267,33 +1148,29 @@ public class SearchFragmentLollipop extends Fragment{
 					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 				}
 			}
-			((ManagerActivityLollipop)context).levelsSearch--;
-			((ManagerActivityLollipop)context).setToolbarTitle();
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			((ManagerActivityLollipop) context).showFabButton();
-			return 3;
+			return 2;
 		}
+
+		logDebug("levels == -1");
+		((ManagerActivityLollipop) context).showFabButton();
+		return 0;
+	}
+
+	private void clickAction() {
+		newSearchNodesTask();
+		((ManagerActivityLollipop)context).setToolbarTitle();
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+		((ManagerActivityLollipop) context).showFabButton();
 	}
 	
 	public long getParentHandle(){
-		return ((ManagerActivityLollipop)context).parentHandleSearch;
+		return ((ManagerActivityLollipop)context).getParentHandleSearch();
 
 	}
 
 	public void refresh(){
-		log("refresh ");
-		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
-			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery,ORDER_DEFAULT_ASC);
-		}else{
-			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleSearch);
-			if(parentNode!=null){
-				log("parentNode: "+parentNode.getName());
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-			}else{
-				nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery,ORDER_DEFAULT_ASC);
-			}
-		}
-		setNodes(nodes);
+		logDebug("refresh ");
+		newSearchNodesTask();
 
 		if(adapter != null){
 			adapter.notifyDataSetChanged();
@@ -1303,26 +1180,6 @@ public class SearchFragmentLollipop extends Fragment{
 		visibilityFastScroller();
 
 	}
-
-//	public void refresh(){
-//		log("refresh ");
-//		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
-//			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
-//		}
-//		else{
-//			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleSearch);
-//			if(parentNode!=null){
-//				log("parentNode: "+parentNode.getName());
-//				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-//				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-//			}
-//		}
-//		setNodes(nodes);
-//
-//		if(adapter != null){
-//			adapter.notifyDataSetChanged();
-//		}
-//	}
 
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
@@ -1341,89 +1198,86 @@ public class SearchFragmentLollipop extends Fragment{
 		}
 	    return null;
 	}
-	
-	public void setNodes(ArrayList<MegaNode> nodes){
-		log("setNodes");
-        if(nodes == null) {
-            return;
-        }
-		this.nodes = nodes;
-		if (adapter != null){
-            addSectionTitle(nodes,adapter.getAdapterType());
-			adapter.setNodes(nodes);
-			visibilityFastScroller();
 
-			if (adapter.getItemCount() == 0){
-				log("no results");
-				recyclerView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-				if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-					}else{
-						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-					}
-					emptyTextViewFirst.setText(R.string.no_results_found);
+	public void setNodes(ArrayList<MegaNode> nodes) {
+		this.nodes = nodes;
+
+		if (nodes == null || adapter == null) {
+			return;
+		}
+
+		addSectionTitle(nodes, adapter.getAdapterType());
+		adapter.setNodes(nodes);
+		visibilityFastScroller();
+
+		if (adapter.getItemCount() == 0) {
+			logDebug("No results");
+			recyclerView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			if (((ManagerActivityLollipop) context).getParentHandleSearch() == -1) {
+				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
 				}
-				else if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleSearch) {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					}
-					String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
+				emptyTextViewFirst.setText(R.string.no_results_found);
+			} else if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop) context).getParentHandleSearch()) {
+				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+					emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 				}
-				else {
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-					}else{
-						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-					}
-					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
+				String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
+				try {
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				} catch (Exception e) {
 				}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
+			} else {
+				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+				}
+				String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+				try {
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				} catch (Exception e) {
+				}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 			}
-			else{
-//				recyclerView.setVisibility(View.VISIBLE);
-//				emptyImageView.setVisibility(View.GONE);
-//				emptyTextView.setVisibility(View.GONE);
-			}			
+		} else {
+			recyclerView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		}
+
+		if (isWaitingForSearchedNodes()) {
+			reDoTheSelectionAfterRotation();
 		}
 	}
 
 	public static SearchFragmentLollipop newInstance() {
-		log("newInstance");
+		logDebug("newInstance");
 		SearchFragmentLollipop fragment = new SearchFragmentLollipop();
 		return fragment;
 	}
@@ -1434,15 +1288,11 @@ public class SearchFragmentLollipop extends Fragment{
 		}
 	}
 
-	private static void log(String log) {
-		Util.log("SearchFragmentLollipop", log);
-	}
-
 	public void visibilityFastScroller(){
 		if(adapter == null){
 			fastScroller.setVisibility(View.GONE);
 		}else{
-			if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
+			if(adapter.getItemCount() < MIN_ITEMS_SCROLLBAR){
 				fastScroller.setVisibility(View.GONE);
 			}else{
 				fastScroller.setVisibility(View.VISIBLE);
@@ -1458,4 +1308,7 @@ public class SearchFragmentLollipop extends Fragment{
 		multiselectBoolean = option;
 	}
 
+	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
+		this.headerItemDecoration = headerItemDecoration;
+	}
 }

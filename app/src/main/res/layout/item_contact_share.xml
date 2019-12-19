@@ -22,7 +22,7 @@
             rounded:corner_radius="20dp"
             android:layout_centerVertical="true"/>
 
-        <TextView
+        <mega.privacy.android.app.components.twemoji.EmojiTextView
             android:id="@+id/contact_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

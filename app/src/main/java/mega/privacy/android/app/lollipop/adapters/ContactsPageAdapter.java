@@ -10,7 +10,8 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ContactsPageAdapter extends FragmentPagerAdapter {
 
@@ -24,7 +25,7 @@ public class ContactsPageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        log("getItem: "+position);
+        logDebug("Position: " + position);
         switch (position){
             case 0: {
                 ContactsFragmentLollipop cF = (ContactsFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.CONTACTS.getTag());
@@ -62,13 +63,13 @@ public class ContactsPageAdapter extends FragmentPagerAdapter {
         // Generate title based on item position
         switch (position){
             case 0: {
-                return context.getString(R.string.section_contacts).toLowerCase();
+                return context.getString(R.string.section_contacts);
             }
             case 1:{
-                return context.getString(R.string.tab_sent_requests).toLowerCase();
+                return context.getString(R.string.tab_sent_requests);
             }
             case 2:{
-                return context.getString(R.string.tab_received_requests).toLowerCase();
+                return context.getString(R.string.tab_received_requests);
             }
         }
         return null;
@@ -77,9 +78,5 @@ public class ContactsPageAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return PAGE_COUNT;
-    }
-
-    private static void log(String log) {
-        Util.log("ContactsPageAdapter", log);
     }
 }

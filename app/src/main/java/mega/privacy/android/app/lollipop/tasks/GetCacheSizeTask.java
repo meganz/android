@@ -5,7 +5,9 @@ import android.os.AsyncTask;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 /*
 	 * Background task to calculate the size of cache folder
@@ -19,22 +21,18 @@ public class GetCacheSizeTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        log("doInBackground-Async Task GetCacheSizeTask");
+        logDebug("doInBackground-Async Task GetCacheSizeTask");
 
-        String size = Util.getCacheSize(context);
+        String size = getCacheSize(context);
         return size;
     }
 
     @Override
     protected void onPostExecute(String size) {
-        log("GetCacheSizeTask::onPostExecute");
+        logDebug("GetCacheSizeTask::onPostExecute");
         SettingsFragmentLollipop sttFLol = ((ManagerActivityLollipop)context).getSettingsFragment();
         if(sttFLol!=null){
             sttFLol.setCacheSize(size);
         }
-    }
-
-    public static void log(String message) {
-        Util.log("GetCacheSizeTask", message);
     }
 }

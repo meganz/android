@@ -8,6 +8,7 @@
 
 ### Android Studio files ###
 *.iml
+.idea/assetWizardSettings.xml
 
 # User-specific stuff:
 .idea/workspace.xml
@@ -25,6 +26,8 @@
 .idea/gradle.xml
 .idea/libraries
 .idea/encodings.xml
+.idea/misc.xml
+.idea/vcs.xml
 .gradle
 
 #Captures
@@ -35,3 +38,7 @@ captures
 *.iws
 /.idea/codeStyles/Project.xml
 /.idea/caches/build_file_checksums.ser
+
+## Google API key files
+/app/src/debug/res/values/google_maps_api.xml
+/app/src/release/res/values/google_maps_api.xml

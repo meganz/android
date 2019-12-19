@@ -4,12 +4,15 @@ set -e
 ##################################################
 ### SET THE PATH TO YOUR ANDROID NDK DIRECTORY ###
 ##################################################
-NDK_ROOT=${HOME}/android-ndk
+NDK_ROOT32=${HOME}/android-ndk32
+NDK_ROOT64=${HOME}/android-ndk64
 ##################################################
 
-NDK_BUILD=${NDK_ROOT}/ndk-build
+NDK_BUILD32=${NDK_ROOT32}/ndk-build
+NDK_BUILD64=${NDK_ROOT64}/ndk-build
 JNI_PATH=`pwd`
-CC=`${NDK_ROOT}/ndk-which gcc`
+CC32=`${NDK_ROOT32}/ndk-which gcc`
+CC64=`${NDK_ROOT64}/ndk-which gcc`
 LIBDIR=${JNI_PATH}/../obj/local/armeabi
 JAVA_OUTPUT_PATH=${JNI_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
@@ -32,13 +35,13 @@ SQLITE_DOWNLOAD_URL=http://www.sqlite.org/${SQLITE_YEAR}/${SQLITE_SOURCE_FILE}
 SQLITE_SHA1="22632bf0cfacedbeddde9f92695f71cab8d8c0a5"
 
 CURL=curl
-CURL_VERSION=7.48.0
+CURL_VERSION=7.67.0
 C_ARES_VERSION=1.15.0
 CURL_EXTRA="--disable-smb --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smtp --disable-gopher --disable-sspi"
 CURL_SOURCE_FILE=curl-${CURL_VERSION}.tar.gz
 CURL_SOURCE_FOLDER=curl-${CURL_VERSION}
 CURL_DOWNLOAD_URL=http://curl.haxx.se/download/${CURL_SOURCE_FILE}
-CURL_SHA1="eac95625b849408362cf6edb0bc9489da317ba30"
+CURL_SHA1="a91652f1eaa810866dce55b2d177c5b20f4aa7a7"
 
 ARES_SOURCE_FILE=c-ares-${C_ARES_VERSION}.tar.gz
 ARES_SOURCE_FOLDER=c-ares-${C_ARES_VERSION}
@@ -83,11 +86,11 @@ ZENLIB_DOWNLOAD_URL=https://github.com/MediaArea/ZenLib/archive/${ZENLIB_SOURCE_
 ZENLIB_SHA1="1af04654c9618f54ece624a0bad881a3cfef3692"
 
 LIBWEBSOCKETS=libwebsockets
-LIBWEBSOCKETS_VERSION=91de9a4a69b9b4af38b662c8bd9adbd1b4370ae0
+LIBWEBSOCKETS_VERSION=33a1e905113f05c3c1eec3b75e0727ca81a551b1
 LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-${LIBWEBSOCKETS_VERSION}.zip
 LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
 LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/${LIBWEBSOCKETS_VERSION}.zip
-LIBWEBSOCKETS_SHA1="ec7b329dfa37452d08d873afd5aaec4ac61e16db"
+LIBWEBSOCKETS_SHA1="cb99f397f586ce7333a1dc8b3e4a831cfb854dbc"
 
 PDFVIEWER=pdfviewer
 PDFVIEWER_VERSION=1.8.2
@@ -152,8 +155,13 @@ function createMEGAchatBindings
     popd &>> ${LOG_FILE}
 }
 
-if [ ! -d "${NDK_ROOT}" ]; then
-    echo "* NDK_ROOT not set. Please edit this file to configure it correctly and try again."    
+if [ ! -d "${NDK_ROOT32}" ]; then
+    echo "* NDK_ROOT for 32 bits not set. Please download ndk 14 and create a link at ${HOME}/android-ndk32 and try again."
+    exit 1
+fi
+
+if [ ! -d "${NDK_ROOT64}" ]; then
+    echo "* NDK_ROOT for 64 bits not set. Please download ndk 16 and create a link at ${HOME}/android-ndk64 and try again."
     exit 1
 fi
 
@@ -180,6 +188,8 @@ if [ "$1" == "clean_mega" ]; then
     echo "* Deleting tarballs"
     rm -rf ../obj/local/armeabi
     rm -rf ../obj/local/x86
+    rm -rf ../obj/local/arm64-v8a
+    rm -rf ../obj/local/x86_64
     echo "* Task finished OK"
     exit 0
 fi
@@ -232,19 +242,19 @@ if [ "$1" == "clean" ]; then
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
 
     echo "* Deleting object files"
-    rm -rf ../obj/local/armeabi-v7a/	
-    rm -rf ../obj/local/armeabi/
+    rm -rf ../obj/local/armeabi-v7a
+    rm -rf ../obj/local/arm64-v8a
     rm -rf ../obj/local/x86
+    rm -rf ../obj/local/x86_64
     
     echo "* Deleting libraries"
     rm -rf ../libs/armeabi-v7a
-    rm -rf ../libs/armeabi
+    rm -rf ../libs/arm64-v8a
     rm -rf ../libs/x86
+    rm -rf ../libs/x86_64
 
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
-    rm -rf ../obj/local/armeabi/
-    rm -rf ../obj/local/x86
     echo "* Task finished OK"
     exit 0
 fi
@@ -266,20 +276,27 @@ if [ ! -f ${SODIUM}/${SODIUM_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${SODIUM_DOWNLOAD_URL} ${SODIUM}/${SODIUM_SOURCE_FILE} ${SODIUM_SHA1} ${SODIUM}
     ln -sf ${SODIUM_SOURCE_FOLDER} ${SODIUM}/${SODIUM}
     pushd ${SODIUM}/${SODIUM} &>> ${LOG_FILE}
-    export ANDROID_NDK_HOME=${NDK_ROOT}
+    export ANDROID_NDK_HOME=${NDK_ROOT32}
     ./autogen.sh &>> ${LOG_FILE}
     echo "#include <limits.h>" >>  src/libsodium/include/sodium/export.h
     sed -i 's/enable-minimal/enable-minimal --disable-pie/g' dist-build/android-build.sh
-    echo "* Prebuilding libsodium for ARM"
-    dist-build/android-arm.sh &>> ${LOG_FILE}
+    
     echo "* Prebuilding libsodium for ARMv7"
     dist-build/android-armv7-a.sh &>> ${LOG_FILE}
+    ln -sf libsodium-android-armv7-a libsodium-android-armeabi-v7a
+    
+    echo "* Prebuilding libsodium for ARMv8"
+    dist-build/android-armv8-a.sh &>> ${LOG_FILE}
+    ln -sf libsodium-android-armv8-a libsodium-android-arm64-v8a
+    
     echo "* Prebuilding libsodium for x86"
     dist-build/android-x86.sh &>> ${LOG_FILE}
-    ln -sf libsodium-android-armv6 libsodium-android-armeabi
-    ln -sf libsodium-android-armv6 libsodium-android-armeabi-v7
-    ln -sf libsodium-android-armv7-a libsodium-android-armeabi-v7a
     ln -sf libsodium-android-i686 libsodium-android-x86
+    
+    echo "* Prebuilding libsodium for x86_64"
+    dist-build/android-x86_64.sh &>> ${LOG_FILE}
+    ln -sf libsodium-android-westmere libsodium-android-x86_64
+    
     popd &>> ${LOG_FILE}
     touch ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
 fi
@@ -289,7 +306,7 @@ echo "* Setting up Crypto++"
 if [ ! -f ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready ]; then
     mkdir -p ${CRYPTOPP}/${CRYPTOPP}
     downloadCheckAndUnpack ${CRYPTOPP_DOWNLOAD_URL} ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE} ${CRYPTOPP_SHA1} ${CRYPTOPP}/${CRYPTOPP}
-    cp ${NDK_ROOT}/sources/android/cpufeatures/cpu-features.h ${CRYPTOPP}/${CRYPTOPP}/
+    cp ${NDK_ROOT32}/sources/android/cpufeatures/cpu-features.h ${CRYPTOPP}/${CRYPTOPP}/
     touch ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready
 fi
 echo "* Crypto++ is ready"
@@ -366,8 +383,8 @@ echo "* libwebsockets is ready"
 
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
-    if [ ! -d megachat/webrtc/include ]; then
-        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#!lxNFnYqA!A7zXNm0JBCSVgowjIrFTkRUwj0zbNHJ37iHXF58rzc4"
+    if [ ! -d megachat/webrtc/include ] || [ ! -f megachat/webrtc/libwebrtc_x86_64.a ] || [ ! -f megachat/webrtc/libwebrtc_arm64.a ]; then
+        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#F!BzwF0Qba!-KXBHgwonRUnSptmVJr4qg"
         echo "and uncompress it in megachat/webrtc"
         exit 1
     else
@@ -397,8 +414,29 @@ fi
 echo "* PdfViewer is ready"
 
 echo "* All dependencies are prepared!"
-echo "* Running ndk-build"
-${NDK_BUILD} -j8
-echo "* ndk-build finished"
+
+rm -rf ../tmpLibs
+mkdir ../tmpLibs
+echo "* Running ndk-build x86"
+${NDK_BUILD32} -j8 APP_ABI=x86
+cp -R ../libs/x86 ../tmpLibs/
+echo "* ndk-build finished for x86"
+
+echo "* Running ndk-build arm 32bits"
+${NDK_BUILD32} -j8 APP_ABI=armeabi-v7a
+cp -R ../libs/armeabi-v7a ../tmpLibs/
+echo "* ndk-build finished for arm 32bits"
+
+echo "* Running ndk-build x86_64"
+${NDK_BUILD64} -j8 APP_ABI=x86_64
+cp -R ../libs/x86_64 ../tmpLibs/
+echo "* ndk-build finished for x86_64"
+
+echo "* Running ndk-build arm 64bits"
+${NDK_BUILD64} -j8 APP_ABI=arm64-v8a
+echo "* ndk-build finished for arm 64bits"
+mv ../tmpLibs/* ../libs/
+rmdir ../tmpLibs/
+
 echo "* Task finished OK"
 

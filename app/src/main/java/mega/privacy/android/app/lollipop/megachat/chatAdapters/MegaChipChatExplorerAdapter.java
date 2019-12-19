@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,16 +26,21 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipChatExplorerAdapter.ViewHolderChips> implements View.OnClickListener{
 
@@ -66,7 +70,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             super(itemView);
         }
 
-        TextView textViewName;
+        EmojiTextView textViewName;
         ImageView deleteIcon;
         RoundedImageView avatar;
         RelativeLayout itemLayout;
@@ -87,7 +91,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
     @Override
     public MegaChipChatExplorerAdapter.ViewHolderChips onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder");
+        logDebug("onCreateViewHolder");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -96,14 +100,12 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chip_avatar, parent, false);
 
         holder = new ViewHolderChips(v);
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
-
-        holder.textViewName = (TextView) v.findViewById(R.id.name_chip);
+        holder.itemLayout = v.findViewById(R.id.item_layout_chip);
+        holder.textViewName = v.findViewById(R.id.name_chip);
+        holder.textViewName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
-
-        holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
-
-        holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
+        holder.avatar = v.findViewById(R.id.rounded_avatar);
+        holder.deleteIcon = v.findViewById(R.id.delete_icon_chip);
         holder.deleteIcon.setOnClickListener(this);
 
         holder.deleteIcon.setTag(holder);
@@ -115,7 +117,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
     @Override
     public void onBindViewHolder(MegaChipChatExplorerAdapter.ViewHolderChips holder, int position) {
-        log("onBindViewHolderList");
+        logDebug("onBindViewHolderList");
 
         ChatExplorerListItem item = getItem(position);
         if (item.getChat() != null && item.getChat().isGroup()) {
@@ -160,15 +162,15 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
     @Override
     public void onClick(View view) {
-        log("onClick");
+        logDebug("onClick");
 
         MegaChipChatExplorerAdapter.ViewHolderChips holder = (MegaChipChatExplorerAdapter.ViewHolderChips) view.getTag();
         if(holder!=null){
             int currentPosition = holder.getLayoutPosition();
-            log("onClick -> Current position: "+currentPosition);
+            logDebug("Current position: " + currentPosition);
 
             if(currentPosition<0){
-                log("Current position error - not valid value");
+                logWarning("Current position error - not valid value");
                 return;
             }
             switch (view.getId()) {
@@ -179,7 +181,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             }
         }
         else{
-            log("Error. Holder is Null");
+            logWarning("Error. Holder is Null");
         }
     }
 
@@ -190,13 +192,13 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
     }
 
     public void setItems (ArrayList<ChatExplorerListItem> items){
-        log("setContacts");
+        logDebug("setContacts");
         this.items = items;
         notifyDataSetChanged();
     }
 
     public ChatExplorerListItem getItem(int position) {
-        log("getItem");
+        logDebug("position: " + position);
         return items.get(position);
     }
 
@@ -205,7 +207,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
     }
 
     public void setUserAvatar(ViewHolderChips holder, ChatExplorerListItem item){
-        log("setUserAvatar");
+        logDebug("setUserAvatar");
 
         if (item.getChat() != null && item.getChat().isGroup()) {
             createGroupChatAvatar(holder, item);
@@ -246,18 +248,18 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                         avatar.delete();
 
                         if(megaApi==null){
-                            log("setUserAvatar: megaApi is Null in Offline mode");
+                            logWarning("megaApi is Null in Offline mode");
                             return;
                         }
 
                         megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
                     }else{
-                        holder.avatar.setImageBitmap(Util.getCircleBitmap(bitmap));
+                        holder.avatar.setImageBitmap(getCircleBitmap(bitmap));
                     }
                 }else{
 
                     if(megaApi==null){
-                        log("setUserAvatar: megaApi is Null in Offline mode");
+                        logWarning("megaApi is Null in Offline mode");
                         return;
                     }
 
@@ -266,7 +268,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             }else{
 
                 if(megaApi==null){
-                    log("setUserAvatar: megaApi is Null in Offline mode");
+                    logWarning("megaApi is Null in Offline mode");
                     return;
                 }
 
@@ -276,9 +278,9 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
     }
 
     void createGroupChatAvatar(ViewHolderChips holder, ChatExplorerListItem item){
-        log("createGroupChatAvatar()");
+        logDebug("createGroupChatAvatar()");
 
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint paintText = new Paint();
         Paint paintCircle = new Paint();
@@ -303,23 +305,23 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-        String firstLetter = item.getTitle().charAt(0) + "";
+        String firstLetter = ChatUtil.getFirstLetter(item.getTitle());
 
-        log("Draw letter: "+firstLetter);
+        logDebug("Draw letter: " + firstLetter);
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
         int xPos = (c.getWidth()/2);
         int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-        c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
+        c.drawText(firstLetter, xPos, yPos, paintText);
 
         holder.avatar.setImageBitmap(defaultAvatar);;
     }
 
     public void createDefaultAvatar(ViewHolderChips holder, ChatExplorerListItem item){
-        log("createDefaultAvatar()");
+        logDebug("createDefaultAvatar()");
 
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint paintText = new Paint();
         Paint paintCircle = new Paint();
@@ -339,11 +341,11 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             color = megaApi.getUserAvatarColor(item.getContact().getMegaUser());
         }
         if(color!=null){
-            log("The color to set the avatar is "+color);
+            logDebug("The color to set the avatar is " + color);
             paintCircle.setColor(Color.parseColor(color));
         }
         else{
-            log("Default color to the avatar");
+            logDebug("Default color to the avatar");
             paintCircle.setColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
         }
         paintCircle.setAntiAlias(true);
@@ -355,10 +357,10 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             radius = defaultAvatar.getHeight()/2;
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-
-        String firstLetter = item.getTitle().charAt(0) + "";
-
-        log("Draw letter: "+firstLetter);
+        String firstLetter = ChatUtil.getFirstLetter(item.getTitle());
+        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
+            firstLetter = " ";
+        }
         Rect bounds = new Rect();
 
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
@@ -367,9 +369,5 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
 
         holder.avatar.setImageBitmap(defaultAvatar);
-    }
-
-    private static void log(String log) {
-        Util.log("MegaChipChatExplorerAdapter", log);
     }
 }

@@ -11,7 +11,6 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.FileProvider;
@@ -37,10 +36,14 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -57,9 +60,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
     TextView nodeInfo;
     LinearLayout optionDeleteOffline;
     private LinearLayout optionOpenWith;
-    LinearLayout optionPrint;
-    LinearLayout copyClip;
-    LinearLayout saveFilesystem;
 
     DisplayMetrics outMetrics;
     private int heightDisplay;
@@ -80,19 +80,13 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
         if(savedInstanceState!=null) {
-            log("Bundle is NOT NULL");
+            logDebug("Bundle is NOT NULL");
             String handle = savedInstanceState.getString("handle");
-            log("Handle of the node offline: "+handle);
-            if(handle.equals("0")){
-                //recovery key will have handle as 0 and have to be handled specifically
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-                nodeOffline = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
-            }else{
-                nodeOffline = dbH.findByHandle(handle);
-            }
+            logDebug("Handle of the node offline: " + handle);
+            nodeOffline = dbH.findByHandle(handle);
         }
         else{
-            log("Bundle NULL");
+            logWarning("Bundle NULL");
             if(context instanceof ManagerActivityLollipop){
                 nodeOffline = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
             }
@@ -123,24 +117,15 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         optionDeleteOffline = (LinearLayout) contentView.findViewById(R.id.option_delete_offline_layout);
         optionOpenWith = (LinearLayout) contentView.findViewById(R.id.option_open_with_layout);
 
-        optionPrint = (LinearLayout) contentView.findViewById(R.id.option_print_offline_layout);
-        copyClip = (LinearLayout) contentView.findViewById(R.id.option_copy_offline_layout);
-        saveFilesystem = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
-
-        optionPrint.setOnClickListener(this);
-        copyClip.setOnClickListener(this);
-        saveFilesystem.setOnClickListener(this);
         optionDeleteOffline.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
 
-        LinearLayout separatorRK = (LinearLayout) contentView.findViewById(R.id.separator_rk);
         LinearLayout separatorOpen = (LinearLayout) contentView.findViewById(R.id.separator_open);
 
-        nodeName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
-        nodeInfo.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+        nodeName.setMaxWidth(scaleWidthPx(200, outMetrics));
+        nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
 
         if(nodeOffline!=null){
-
             if (MimeTypeList.typeForName(nodeOffline.getName()).isVideoReproducible() || MimeTypeList.typeForName(nodeOffline.getName()).isVideo() || MimeTypeList.typeForName(nodeOffline.getName()).isAudio()
                     || MimeTypeList.typeForName(nodeOffline.getName()).isImage() || MimeTypeList.typeForName(nodeOffline.getName()).isPdf()) {
                 optionOpenWith.setVisibility(View.VISIBLE);
@@ -153,106 +138,53 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
             nodeName.setText(nodeOffline.getName());
 
-            //Check if the node is the Master Key file
-            if(nodeOffline.getHandle().equals("0")){
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-                file= new File(path);
-                if(file.exists()){
-                    if(file.exists()){
-                        long nodeSize = file.length();
-                        nodeInfo.setText(Util.getSizeString(nodeSize));
+            logDebug("Set node info");
+            file = getOfflineFile(context, nodeOffline);
+            if (!isFileAvailable(file)) return;
+
+            int folders=0;
+            int files=0;
+            if (file.isDirectory()){
+
+                File[] fList = file.listFiles();
+                if(fList != null){
+                    for (File f : fList){
+                        if (f.isDirectory()){
+                            folders++;
+                        }
+                        else{
+                            files++;
+                        }
                     }
-                    nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
+
+                    String info = "";
+                    if (folders > 0){
+                        info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
+                        if (files > 0){
+                            info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+                        }
+                    }
+                    else {
+                        info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
+                    }
+
+                    nodeInfo.setText(info);
+                }else{
+                    nodeInfo.setText(" ");
                 }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-                    optionPrint.setVisibility(View.VISIBLE);
-                }
-                else {
-                    optionPrint.setVisibility(View.GONE);
-                }
-                copyClip.setVisibility(View.VISIBLE);
-                saveFilesystem.setVisibility(View.VISIBLE);
-                separatorRK.setVisibility(View.VISIBLE);
             }
             else{
+                long nodeSize = file.length();
+                nodeInfo.setText(getSizeString(nodeSize));
+            }
 
-                optionPrint.setVisibility(View.GONE);
-                copyClip.setVisibility(View.GONE);
-                saveFilesystem.setVisibility(View.GONE);
-                separatorRK.setVisibility(View.GONE);
-
-                log("Set node info");
-                String path=null;
-
-                if(nodeOffline.getOrigin()==MegaOffline.INCOMING){
-                    path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + nodeOffline.getHandleIncoming() + "/";
-                }
-                else if(nodeOffline.getOrigin()==MegaOffline.INBOX){
-                    path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in";
-                }
-                else{
-                    path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
-                }
-
-                if (Environment.getExternalStorageDirectory() != null){
-                    String finalPath = path + nodeOffline.getPath()+nodeOffline.getName();
-                    file = new File(finalPath);
-                    log("Path to find file: "+finalPath);
-                }
-                else{
-                    file = context.getFilesDir();
-                }
-
-                int folders=0;
-                int files=0;
-                if (file.isDirectory()){
-
-                    File[] fList = file.listFiles();
-                    if(fList != null){
-                        for (File f : fList){
-
-                            if (f.isDirectory()){
-                                folders++;
-                            }
-                            else{
-                                files++;
-                            }
-                        }
-
-                        String info = "";
-                        if (folders > 0){
-                            info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
-                            if (files > 0){
-                                info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
-                            }
-                        }
-                        else {
-                            info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
-                        }
-
-                        nodeInfo.setText(info);
-                    }else{
-                        nodeInfo.setText(" ");
-                    }
-                }
-                else{
-                    long nodeSize = file.length();
-                    nodeInfo.setText(Util.getSizeString(nodeSize));
-                }
-
-                log("Set node thumb");
-                if (file.isFile()){
-                    log("...........................Busco Thumb");
-                    if (MimeTypeList.typeForName(nodeOffline.getName()).isImage()){
-                        Bitmap thumb = null;
-                        if (file.exists()){
-                            thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(nodeOffline.getHandle()));
-                            if (thumb != null){
-                                nodeThumb.setImageBitmap(thumb);
-                            }
-                            else{
-                                nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
-                            }
+            if (file.isFile()){
+                if (MimeTypeList.typeForName(nodeOffline.getName()).isImage()){
+                    Bitmap thumb = null;
+                    if (file.exists()){
+                        thumb = getThumbnailFromCache(Long.parseLong(nodeOffline.getHandle()));
+                        if (thumb != null){
+                            nodeThumb.setImageBitmap(thumb);
                         }
                         else{
                             nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
@@ -263,26 +195,20 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                     }
                 }
                 else{
-                    nodeThumb.setImageResource(R.drawable.ic_folder_list);
+                    nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
                 }
-
-                optionDeleteOffline.setVisibility(View.VISIBLE);
             }
+            else{
+                nodeThumb.setImageResource(R.drawable.ic_folder_list);
+            }
+
+            optionDeleteOffline.setVisibility(View.VISIBLE);
         }
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//
-//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-//        }
-//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//        }
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
     }
 
 
@@ -292,41 +218,19 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         switch(v.getId()){
 
             case R.id.option_delete_offline_layout:{
-                log("Delete Offline");
+                logDebug("Delete Offline");
                 if(context instanceof ManagerActivityLollipop){
                     ((ManagerActivityLollipop) context).showConfirmationRemoveFromOffline();
                 }
                 break;
             }
             case R.id.option_open_with_layout:{
-                log("Open with");
+                logDebug("Open with");
                 openWith();
                 break;
             }
-            case R.id.option_print_offline_layout:{
-                log("Option print rK");
-                printRK();
-                break;
-            }
-            case R.id.option_save_offline_layout:{
-                log("Option save on filesystem");
-                AccountController aC = new AccountController(getContext());
-                aC.saveRkToFileSystem(true);
-                break;
-            }
-            case R.id.option_copy_offline_layout:{
-                log("Option copy to clipboard");
-                if (Util.isOnline(context)){
-                    AccountController aC = new AccountController(getContext());
-                    aC.copyMK(false);
-                }
-                else {
-                    copyFromFile();
-                }
-                break;
-            }
         }
-//        dismiss();
+
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
@@ -342,7 +246,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 line = br.readLine();
             }
             catch (IOException e) {
-                log("IOException: " + e.getMessage());
+                logError("IOException", e);
             }
             return line;
         }
@@ -358,20 +262,20 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
             clipboard.setPrimaryClip(clip);
             if (clipboard.getPrimaryClip() != null) {
-                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+                showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
             }
             else {
-                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
+                showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
             }
         }
         else {
-            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
+            showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
         }
     }
 
     public void printRK(){
         Bitmap rKBitmap = null;
-        if (Util.isOnline(context)) {
+        if (isOnline(context)) {
             AccountController aC = new AccountController(getContext());
             rKBitmap = aC.createRkBitmap();
         }
@@ -391,7 +295,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 canvas.drawText(key, x, height+15f, paint);
             }
             else {
-                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
+                showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
             }
 
         }
@@ -403,7 +307,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
     }
 
     public void openWith () {
-        log("openWith");
+        logDebug("openWith");
         String type = MimeTypeList.typeForName(nodeOffline.getName()).getType();
 
         Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
@@ -416,7 +320,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         }
         mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-        if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+        if (isIntentAvailable(context, mediaIntent)){
             startActivity(mediaIntent);
         }
         else{
@@ -440,14 +344,10 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        log("onSaveInstanceState");
+        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         String handle = nodeOffline.getHandle();
-        log("Handle of the node offline: "+handle);
+        logDebug("Handle of the node offline: " + handle);
         outState.putString("handle", handle);
-    }
-
-    private static void log(String log) {
-        Util.log("OfflineOptionsBottomSheetDialogFragment", log);
     }
 }
