@@ -764,12 +764,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		}
 	}
 
-	public boolean isFolder(int position){
-		MegaNode node = nodes.get(position);
-
-		return node == null || node.isFolder();
-	}
-
 	/*
 	 * Clear all selected items
 	 */
