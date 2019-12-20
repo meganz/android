@@ -116,6 +116,7 @@ import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 @SuppressLint("NewApi")
 public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
@@ -1552,29 +1553,19 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						MegaUser user= megaApi.getContact(mS.getUser());
 						contactMail=user.getEmail();
 						if(user!=null){
-							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-
-							if(contactDB!=null){
-								if(!contactDB.getName().equals("")){
-									ownerLabel.setText(contactDB.getName()+" "+contactDB.getLastName());
-									ownerInfo.setText(user.getEmail());
-									setOwnerState(user.getHandle());
-									createDefaultAvatar(ownerRoundeImage, user, contactDB.getName());
-								}
-								else{
-									ownerLabel.setText(user.getEmail());
-									ownerInfo.setText(user.getEmail());
-                                    setOwnerState(user.getHandle());
-									createDefaultAvatar(ownerRoundeImage, user, user.getEmail());
-								}
-							}
-							else{
+						    String name = getMegaUserNameDB(user);
+						    if(name != null){
+						        ownerLabel.setText(name);
+						        ownerInfo.setText(user.getEmail());
+						        setOwnerState(user.getHandle());
+						        createDefaultAvatar(ownerRoundeImage, user, name);
+                            }else{
                                 logWarning("The contactDB is null: ");
-								ownerLabel.setText(user.getEmail());
-								ownerInfo.setText(user.getEmail());
+                                ownerLabel.setText(user.getEmail());
+                                ownerInfo.setText(user.getEmail());
                                 setOwnerState(user.getHandle());
-								createDefaultAvatar(ownerRoundeImage, user, user.getEmail());
-							}
+                                createDefaultAvatar(ownerRoundeImage, user, user.getEmail());
+                            }
 						}
 						else{
 							ownerLabel.setText(mS.getUser());

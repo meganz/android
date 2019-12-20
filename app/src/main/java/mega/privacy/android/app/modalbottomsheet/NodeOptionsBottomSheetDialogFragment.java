@@ -48,6 +48,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -619,17 +620,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             if (mS.getNodeHandle() == node.getHandle()) {
                                 MegaUser user = megaApi.getContact(mS.getUser());
                                 if (user != null) {
-                                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-                                    if (contactDB != null) {
-                                        if (!contactDB.getName().equals("")) {
-                                            nodeInfo.setText(contactDB.getName() + " " + contactDB.getLastName());
-                                        } else {
-                                            nodeInfo.setText(user.getEmail());
-                                        }
-                                    } else {
-                                        logDebug("The contactDB is null: ");
-                                        nodeInfo.setText(user.getEmail());
-                                    }
+                                    nodeInfo.setText(getMegaUserNameDB(user));
                                 } else {
                                     nodeInfo.setText(mS.getUser());
                                 }
@@ -845,17 +836,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             if (mS.getNodeHandle() == node.getHandle()) {
                                 MegaUser user = megaApi.getContact(mS.getUser());
                                 if (user != null) {
-                                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-                                    if (contactDB != null) {
-                                        if (!contactDB.getName().equals("")) {
-                                            nodeInfo.setText(contactDB.getName() + " " + contactDB.getLastName());
-                                        } else {
-                                            nodeInfo.setText(user.getEmail());
-                                        }
-                                    } else {
-                                        logWarning("The contactDB is null: ");
-                                        nodeInfo.setText(user.getEmail());
-                                    }
+                                    nodeInfo.setText(getMegaUserNameDB(user));
                                 } else {
                                     nodeInfo.setText(mS.getUser());
                                 }

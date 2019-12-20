@@ -151,7 +151,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 				logDebug("Contact Handle: " + handle);
 				String handleString = megaApi.userHandleToBase64(handle);
 
-				MegaContactDB contactDB = new MegaContactDB(handleString, email, name, "");
+				MegaContactDB contactDB = new MegaContactDB(handleString, email, name, "", null);
 				contacts.add(contactDB);
 			}
 		}

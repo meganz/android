@@ -53,6 +53,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public final class ChatAdvancedNotificationBuilder {
 
@@ -943,7 +944,11 @@ public final class ChatAdvancedNotificationBuilder {
                     notificationBuilderO.setContentTitle(chatToAnswer.getTitle());
                 }
                 else{
-                    notificationBuilderO.setContentTitle(chatToAnswer.getPeerFullname(0));
+                    String fullName = getNicknameContact(chatToAnswer.getPeerHandle(0));
+                    if(fullName == null){
+                        fullName = chatToAnswer.getPeerFullname(0);
+                    }
+                    notificationBuilderO.setContentTitle(fullName);
                 }
 
                 Bitmap largeIcon = setUserAvatar(chatToAnswer);
@@ -970,7 +975,11 @@ public final class ChatAdvancedNotificationBuilder {
                 if(chatToAnswer.isGroup()){
                     notificationBuilder.setContentTitle(chatToAnswer.getTitle());
                 }else{
-                    notificationBuilder.setContentTitle(chatToAnswer.getPeerFullname(0));
+                    String fullName = getNicknameContact(chatToAnswer.getPeerHandle(0));
+                    if(fullName == null){
+                        fullName = chatToAnswer.getPeerFullname(0);
+                    }
+                    notificationBuilder.setContentTitle(fullName);
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1099,7 +1108,10 @@ public final class ChatAdvancedNotificationBuilder {
         if (chat.isGroup()) {
             notificationContent = chat.getTitle();
         } else {
-            notificationContent = chat.getPeerFullname(0);
+            notificationContent = getNicknameContact(chat.getPeerHandle(0));
+            if(notificationContent == null){
+                notificationContent = chat.getPeerFullname(0);
+            }
         }
 
         long chatCallId = call.getId();

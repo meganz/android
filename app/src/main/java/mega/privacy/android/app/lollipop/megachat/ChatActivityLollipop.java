@@ -50,7 +50,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -155,10 +154,11 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
-import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
+import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.extractMegaLink;
+import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.isChatLink;
+import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.isFileLink;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
-import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -167,7 +167,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, MyChatFilesExisitListener<ArrayList<AndroidMegaChatMessage>> {
 
@@ -1543,54 +1543,30 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(i!=0){
                 customSubtitle.append(", ");
             }
+            String participant;
 
             String participantName = chatRoom.getPeerFirstname(i);
-            if(participantName==null){
+            if (participantName == null || participantName.trim().isEmpty()) {
                 //Get the lastname
                 String participantLastName = chatRoom.getPeerLastname(i);
-                if(participantLastName==null){
+                if (participantLastName == null || participantLastName.trim().isEmpty()) {
                     //Get the email
-                    String participantEmail = chatRoom.getPeerEmail(i);
-                    customSubtitle.append(participantEmail);
+                    participant = chatRoom.getPeerEmail(i);
+                } else {
+                    //Append last name to the title
+                    participant = participantLastName;
                 }
-                else{
-                    if(participantLastName.trim().isEmpty()){
-                        //Get the email
-                        String participantEmail = chatRoom.getPeerEmail(i);
-                        customSubtitle.append(participantEmail);
-                    }
-                    else{
-                        //Append last name to the title
-                        customSubtitle.append(participantLastName);
-                    }
-                }
+            } else {
+                //Append first name to the title
+                participant = participantName;
             }
-            else{
-                if(participantName.trim().isEmpty()){
-                    //Get the lastname
-                    String participantLastName = chatRoom.getPeerLastname(i);
-                    if(participantLastName==null){
-                        //Get the email
-                        String participantEmail = chatRoom.getPeerEmail(i);
-                        customSubtitle.append(participantEmail);
-                    }
-                    else{
-                        if(participantLastName.trim().isEmpty()){
-                            //Get the email
-                            String participantEmail = chatRoom.getPeerEmail(i);
-                            customSubtitle.append(participantEmail);
-                        }
-                        else{
-                            //Append last name to the title
-                            customSubtitle.append(participantLastName);
-                        }
-                    }
-                }
-                else{
-                    //Append first name to the title
-                    customSubtitle.append(participantName);
-                }
+
+            //Check nickname
+            String nickname = getNicknameContact(chatRoom.getPeerHandle(i));
+            if(nickname != null){
+                participant = nickname;
             }
+            customSubtitle.append(participant);
         }
         if (customSubtitle.toString().trim().isEmpty()){
             groupalSubtitleToolbar.setText(null);

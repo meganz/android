@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.tasks;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -34,17 +33,15 @@ public class FillDBContactsTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        logDebug("doInBackground-Async Task FillDBContactsTask");
-
         ArrayList<MegaUser> contacts = megaApi.getContacts();
 
-        ContactNameListener listener = new ContactNameListener(context);
-
         for(int i=0; i<contacts.size(); i++){
-            MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "");
+            MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "", null);
             dbH.setContact(megaContactDB);
-            megaApi.getUserAttribute(contacts.get(i), 1, listener);
-            megaApi.getUserAttribute(contacts.get(i), 2, listener);
+            megaApi.getUserAttribute(contacts.get(i), 1, new ContactNameListener(context));
+            megaApi.getUserAttribute(contacts.get(i), 2, new ContactNameListener(context));
+            megaApi.getUserAlias(contacts.get(i).getHandle(), new ContactNameListener(context));
+
         }
         return null;
     }

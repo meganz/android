@@ -85,7 +85,7 @@ import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight {
 
@@ -543,9 +543,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			{
 				finish();
 			}
-
-			ContactController cC = new ContactController(this);
-			fullName =  cC.getContactFullName(contact.getHandle());
+			fullName =  getMegaUserNameDB(contact);
 
 			if(aB!=null){
 				aB.setDisplayHomeAsUpEnabled(true);

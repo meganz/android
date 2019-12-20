@@ -41,7 +41,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProviderLollipopAdapter.ViewHolderLollipopProvider> implements OnClickListener, View.OnLongClickListener{
 	
@@ -188,19 +188,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 					if(mS.getNodeHandle() == node.getHandle()){
 						MegaUser user = megaApi.getContact(mS.getUser());
 						if(user != null){
-							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-							if(contactDB != null){
-								if(!contactDB.getName().equals("")){
-									holder.textViewFileSize.setText(contactDB.getName()+" "+contactDB.getLastName());
-								}
-								else{
-									holder.textViewFileSize.setText(user.getEmail());
-								}
-							}
-							else{
-								logWarning("The contactDB is null: ");
-								holder.textViewFileSize.setText(user.getEmail());
-							}
+							holder.textViewFileSize.setText(getMegaUserNameDB(user));
 						}
 						else{
 							holder.textViewFileSize.setText(mS.getUser());

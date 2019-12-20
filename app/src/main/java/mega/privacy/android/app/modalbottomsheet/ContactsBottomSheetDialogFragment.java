@@ -52,6 +52,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -109,16 +110,12 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
             logDebug("Email of the contact: " + email);
             if(email!=null){
                 MegaUser megaUser = megaApi.getContact(email);
-                MegaContactDB contactDB = dbH.findContactByHandle(megaUser.getHandle()+"");
-                String fullName = "";
-                if(contactDB!=null){
-                    fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), megaUser.getEmail());
-                }
-                else{
+
+                String fullName = getMegaUserNameDB(megaUser);
+                if(fullName ==  null){
                     fullName = megaUser.getEmail();
                 }
-
-                contact = new MegaContactAdapter(contactDB, megaUser, fullName);
+                contact = new MegaContactAdapter(getContactDB(megaUser.getHandle()), megaUser, fullName);
             }
         }
         else{

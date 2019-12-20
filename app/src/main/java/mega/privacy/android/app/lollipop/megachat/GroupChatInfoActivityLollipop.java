@@ -82,6 +82,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -563,6 +564,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public String getParticipantFullName(long i) {
+
+        String nickname = getNicknameContact(chat.getPeerHandle(i));
+        if(nickname != null){
+           return nickname;
+        }
 
         String fullName = chat.getPeerFullname(i);
         if(fullName!=null){

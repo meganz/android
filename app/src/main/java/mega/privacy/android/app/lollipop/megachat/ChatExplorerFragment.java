@@ -50,6 +50,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -291,13 +292,8 @@ public class ChatExplorerFragment extends Fragment {
             return null;
         }
 
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(handle+""));
-        String fullName = "";
-        if(contactDB!=null){
-            ContactController cC = new ContactController(context);
-            fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), user.getEmail());
-        }
-        else{
+        String fullName = getContactNameDB(handle);
+        if(fullName ==  null){
             fullName = user.getEmail();
         }
 
@@ -309,7 +305,7 @@ public class ChatExplorerFragment extends Fragment {
             }
         }
 
-        return new MegaContactAdapter(contactDB, user, fullName);
+        return new MegaContactAdapter(getContactDB(handle), user, fullName);
     }
 
     @Override
@@ -355,18 +351,12 @@ public class ChatExplorerFragment extends Fragment {
         for (int i=0;i<contactsMEGA.size();i++){
             logDebug("Contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
             if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-
-                MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
-                String fullName = "";
-                if(contactDB!=null){
-                    ContactController cC = new ContactController(context);
-                    fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
-                }
-                else{
+                long contactHandle = contactsMEGA.get(i).getHandle();
+                String fullName = getContactNameDB(contactHandle);
+                if(fullName ==  null){
                     fullName = contactsMEGA.get(i).getEmail();
                 }
-
-                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
+                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contactsMEGA.get(i), fullName);
                 contacts.add(megaContactAdapter);
             }
         }

@@ -4,9 +4,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -24,12 +26,14 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -68,10 +72,12 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MarqueeTextView;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
@@ -81,6 +87,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -106,7 +113,6 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.*;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -115,6 +121,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 
 @SuppressLint("NewApi")
@@ -132,7 +139,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	RelativeLayout imageLayout;
 	android.app.AlertDialog permissionsDialog;
 	ProgressDialog statusDialog;
-
+	AlertDialog setNicknameDialog;
 	ContactInfoActivityLollipop contactInfoActivityLollipop;
 	CoordinatorLayout fragmentContainer;
 	CollapsingToolbarLayout collapsingToolbar;
@@ -142,8 +149,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	LinearLayout optionsLayout;
 
 	//Info of the user
-	EmojiTextView nameText;
-	TextView emailText;
+	private EmojiTextView nameText;
+	private TextView emailText;
+	private TextView setNicknameText;
 
 	LinearLayout chatOptionsLayout;
 	View dividerChatOptionsLayout;
@@ -221,8 +229,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     NodeController nC;
     boolean moveToRubbish;
     long parentHandle;
+	private String nickname;
 
     private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
+	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
 
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
@@ -283,7 +293,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-
+			LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+			if (localBroadcastManager != null) {
+				localBroadcastManager.registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_ALIAS));
+			}
 			setContentView(R.layout.activity_chat_contact_properties);
             fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container);
 			toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -304,9 +317,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			secondLineTextToolbar = (MarqueeTextView) findViewById(R.id.second_line_toolbar);
 			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
 
-			nameText = (EmojiTextView) findViewById(R.id.chat_contact_properties_name_text);
-			nameText.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
-			emailText =(TextView) findViewById(R.id.chat_contact_properties_email_text);
+			nameText = findViewById(R.id.chat_contact_properties_name_text);
+			emailText = findViewById(R.id.chat_contact_properties_email_text);
+			setNicknameText = findViewById(R.id.chat_contact_properties_nickname);
+			setNicknameText.setOnClickListener(this);
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				logDebug("Landscape configuration");
@@ -413,6 +427,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			chatHandle = extras.getLong("handle",-1);
 			userEmailExtra = extras.getString("name");
+
 			if (chatHandle != -1) {
 
 				logDebug("From chat!!");
@@ -423,65 +438,28 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
 				user = megaApi.getContact(userHandleEncoded);
-				if(user!=null){
-					logDebug("User foundd!!!");
-				}
-
 				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 
-				if (chat.getTitle() != null && !chat.getTitle().isEmpty() && !chat.getTitle().equals("")){
-					firstLineTextToolbar.setText(chat.getTitle());
-					firstLineLengthToolbar.setText(chat.getTitle());
-					nameText.setText(chat.getTitle());
-				}
-				else {
-					if (userEmailExtra != null) {
-
-						firstLineTextToolbar.setText(userEmailExtra);
-						firstLineLengthToolbar.setText(userEmailExtra);
-						nameText.setText(userEmailExtra);
+				if (user != null) {
+					checkNickname(user.getHandle());
+				} else {
+					String fullName = "";
+					if (chat.getTitle() != null && !chat.getTitle().isEmpty() && !chat.getTitle().equals("")) {
+						fullName = chat.getTitle();
+					} else if (userEmailExtra != null) {
+						fullName = userEmailExtra;
 					}
+					withoutNickname(fullName);
 				}
-				String fullname = firstLineTextToolbar.getText().toString();
-				setDefaultAvatar(fullname);
 			}
 			else{
 				logDebug("From contacts!!");
-
 				fromContacts = true;
 				user = megaApi.getContact(userEmailExtra);
-
-				String fullName = "";
-				if(user!=null){
-					logDebug("User handle: " + user.getHandle());
-					MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-					if(contactDB!=null){
-						logDebug("Contact DB found!");
-						String firstNameText = "";
-						String lastNameText = "";
-
-						firstNameText = contactDB.getName();
-						lastNameText = contactDB.getLastName();
-
-						if (firstNameText.trim().length() <= 0){
-							fullName = lastNameText;
-						}
-						else{
-							fullName = firstNameText + " " + lastNameText;
-						}
-
-						if (fullName.trim().length() <= 0){
-							logDebug("Put email as fullname");
-							fullName= user.getEmail();
-						}
-
-						firstLineTextToolbar.setText(fullName);
-						firstLineLengthToolbar.setText(fullName);
-						nameText.setText(fullName);
-					}
-					else{
-						logWarning("The contactDB is null: ");
-					}
+				if (user != null) {
+					checkNickname(user.getHandle());
+				} else {
+					withoutNickname(userEmailExtra);
 				}
 
 				//Find chat with this contact
@@ -514,7 +492,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					}
 
 				}
-				setDefaultAvatar(fullName);
 			}
 
 			if(isOnline(this)){
@@ -566,7 +543,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 							//shareContactText.setText(chat.getPeerEmail(0));
 							secondLineLengthToolbar.setText(chat.getPeerEmail(0));
 
-							emailText.setText(user.getEmail());
+							emailText.setText(chat.getPeerEmail(0));
 
 							clearChatLayout.setVisibility(View.VISIBLE);
 							dividerClearChatLayout.setVisibility(View.VISIBLE);
@@ -593,7 +570,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					String userEmail = chat.getPeerEmail(0);
 					setOfflineAvatar(userEmail);
 				//	shareContactText.setText(userEmail);
-					emailText.setText(user.getEmail());
+					emailText.setText(userEmail);
 				}
 				sharedFoldersLayout.setVisibility(View.GONE);
 				dividerSharedFoldersLayout.setVisibility(View.GONE);
@@ -648,6 +625,40 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		} else {
 			logWarning("Extras is NULL");
 		}
+	}
+
+	private void checkNickname(long contactHandle){
+		MegaContactDB contactDB = getContactDB(contactHandle);
+		if (contactDB != null) {
+			String fullName = buildFullName(contactDB.getName(), contactDB.getLastName(), contactDB.getMail());
+			//Check if the contact has nickname:
+			String nicknameText = contactDB.getNickname();
+			if(nicknameText == null || nicknameText.trim().length()<=0){
+				withoutNickname(fullName);
+			}else{
+				withNickname(fullName, nicknameText);
+			}
+		} else {
+			logWarning("checkNickname:: The contactDB is null: ");
+		}
+	}
+
+	private void withoutNickname(String name){
+		firstLineTextToolbar.setText(name);
+		firstLineLengthToolbar.setText(name);
+		nameText.setVisibility(View.GONE);
+		setNicknameText.setText(getString(R.string.add_nickname));
+		setDefaultAvatar();
+
+	}
+	private void withNickname(String name, String nickname){
+		firstLineTextToolbar.setText(nickname);
+		firstLineLengthToolbar.setText(nickname);
+		nameText.setText(name);
+		nameText.setVisibility(View.VISIBLE);
+		setNicknameText.setText(getString(R.string.edit_nickname));
+		setDefaultAvatar();
+
 	}
 
 	public void setContactPresenceStatus(){
@@ -1182,10 +1193,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		return dominantColor;
 	}
 
-	public void setDefaultAvatar(String title) {
+	public void setDefaultAvatar() {
 		logDebug("setDefaultAvatar");
-
-
 		Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
@@ -1325,6 +1334,147 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				startActivity(nodeHistoryIntent);
 				break;
 			}
+			case R.id.chat_contact_properties_nickname:{
+				if(setNicknameText.getText().toString().equals(getString(R.string.add_nickname))){
+					showConfirmationSetNickname(null);
+				}else{
+					if (user == null || isBottomSheetDialogShown(contactNicknameBottomSheetDialogFragment)) return;
+					nickname = firstLineTextToolbar.getText().toString();
+					contactNicknameBottomSheetDialogFragment = new ContactNicknameBottomSheetDialogFragment();
+					contactNicknameBottomSheetDialogFragment.show(getSupportFragmentManager(), contactNicknameBottomSheetDialogFragment.getTag());
+				}
+				break;
+			}
+		}
+	}
+
+	public void showConfirmationSetNickname(final String alias) {
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(16, outMetrics), scaleWidthPx(17, outMetrics), 0);
+		final EmojiEditText input = new EmojiEditText(this);
+		layout.addView(input, params);
+
+		input.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				return false;
+			}
+		});
+		input.setSingleLine();
+		input.setSelectAllOnFocus(true);
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+		input.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+		input.addTextChangedListener(new TextWatcher() {
+			private void handleText() {
+				final Button okButton = setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+				if (input.getText().length() == 0) {
+					okButton.setEnabled(false);
+				} else {
+					okButton.setEnabled(true);
+				}
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				handleText();
+
+			}
+		});
+
+		input.setImeActionLabel(getString(R.string.add_nickname), EditorInfo.IME_ACTION_DONE);
+		if (alias == null) {
+			input.setHint(getString(R.string.add_nickname));
+			builder.setTitle(getString(R.string.add_nickname));
+
+		} else {
+			input.setHint(alias);
+			builder.setTitle(getString(R.string.edit_nickname));
+		}
+		builder.setPositiveButton(getString(R.string.button_set),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String name = input.getText().toString();
+						if (name.equals("") || name.isEmpty() || name.trim().isEmpty()) {
+							input.setError(getString(R.string.invalid_string));
+							input.requestFocus();
+						} else {
+							addNickname(alias, name);
+							setNicknameDialog.dismiss();
+						}
+					}
+				});
+
+
+		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				hideKeyboard(contactInfoActivityLollipop, InputMethodManager.HIDE_NOT_ALWAYS);
+			}
+		});
+
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		setNicknameDialog = builder.create();
+		setNicknameDialog.show();
+		setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+		setNicknameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				logDebug("OK BTTN CHANGE");
+				String name = input.getText().toString();
+				if (name.equals("") || name.isEmpty() || name.trim().isEmpty()) {
+					logWarning("Input is empty");
+					input.setError(getString(R.string.invalid_string));
+					input.requestFocus();
+				} else {
+					addNickname(alias, name);
+					setNicknameDialog.dismiss();
+				}
+			}
+		});
+
+	}
+
+	public void addNickname(String oldNickname, String newNickname){
+		if(oldNickname != null && newNickname != null && oldNickname.equals(newNickname)) return;
+		//Update the new nickname
+		megaApi.setUserAlias(user.getHandle(), newNickname, new ContactNameListener(this));
+	}
+
+	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null) {
+				long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+				String resultTransfer = intent.getStringExtra(EXTRA_USER_NICKNAME);
+				if(user != null && userHandle == user.getHandle()){
+					checkNickname(user.getHandle());
+					updateAvatar();
+				}
+			}
+		}
+	};
+
+	private void updateAvatar(){
+		if(isOnline(this)){
+			setAvatar();
+		}else if (chat != null){
+			setOfflineAvatar(chat.getPeerEmail(0));
 		}
 	}
 
@@ -1762,6 +1912,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
 
 		if(drawableArrow == null) return;
 
@@ -1954,8 +2105,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     public void setSelectedNode(MegaNode selectedNode) {
         this.selectedNode = selectedNode;
     }
-    
-    public void onFileClick(ArrayList<Long> handleList) {
+
+	public String getNickname() {
+		return nickname;
+	}
+
+
+	public void onFileClick(ArrayList<Long> handleList) {
         
         if(nC==null){
             nC = new NodeController(this);

@@ -77,6 +77,7 @@ import static android.app.Activity.RESULT_OK;
 import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_RECENT;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -1546,6 +1547,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public String getParticipantFullName(MegaChatRoom chat, long i) {
+
+        String nickname = getNicknameContact(chat.getPeerHandle(i));
+        if(nickname != null) return nickname;
+
         String participantFirstName = chat.getPeerFirstname(i);
         String participantLastName = chat.getPeerLastname(i);
 

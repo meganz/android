@@ -95,6 +95,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
@@ -1078,25 +1079,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				MegaShare mS = sharesIncoming.get(j);
 				if (mS.getNodeHandle() == n.getHandle()) {
 					MegaUser user = megaApi.getContact(mS.getUser());
-					if (user != null) {
-						MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
 
-						if (contactDB != null) {
-							if (!contactDB.getName().equals("")) {
-								name = contactDB.getName() + " " + contactDB.getLastName();
-
-							} else {
-								name = user.getEmail();
-
-							}
-						} else {
-							logWarning("The contactDB is null: ");
-							name = user.getEmail();
-
-						}
-					} else {
-						name = user.getEmail();
-					}
+					name = getMegaUserNameDB(user);
+					if(name == null) name = "";
 				}
 			}
 

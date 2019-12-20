@@ -250,6 +250,7 @@ import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -2774,7 +2775,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			nVEmail.setVisibility(View.VISIBLE);
 			nVEmail.setText(megaApi.getMyEmail());
 //				megaApi.getUserData(this);
-
 			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
 
 			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
@@ -5959,18 +5959,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					contacts = megaApi.getContacts();
 					for (int i=0;i<contacts.size();i++){
 						if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+                            long contactHandle = contacts.get(i).getHandle();
+                            String fullName = getContactNameDB(contactHandle);
+                            if(fullName ==  null){
+                                fullName = contacts.get(i).getEmail();
+                            }
 
-							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contacts.get(i).getHandle()+""));
-							String fullName = "";
-							if(contactDB!=null){
-								ContactController cC = new ContactController(this);
-								fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contacts.get(i).getEmail());
-							}
-							else{
-								//No name, ask for it and later refresh!!
-								logWarning("CONTACT DB is null");
-								fullName = contacts.get(i).getEmail();
-							}
 							visibleContacts.add(contacts.get(i));
 						}
 					}
@@ -15785,6 +15779,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 								logDebug("The user: " + user.getHandle() + "changed his last name");
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(this));
 							}
+						}
+
+						if(user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)){
+							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new ContactNameListener(this));
 						}
 
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){

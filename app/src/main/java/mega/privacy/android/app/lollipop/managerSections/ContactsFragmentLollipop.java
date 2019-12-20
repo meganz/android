@@ -73,6 +73,7 @@ import nz.mega.sdk.MegaUser;
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -801,8 +802,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		logDebug("onCreate");
-		
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -853,8 +853,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		logDebug("onCreateView");
-
 		if(myAccountInfo == null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
@@ -974,7 +972,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_grid_empty_text_first);
-
 			setContacts(megaApi.getContacts());
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
@@ -1039,23 +1036,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		this.contacts = contacts;
 
 		visibleContacts.clear();
-
 		for (int i=0;i<contacts.size();i++){
 			logDebug("Contact: " + contacts.get(i).getHandle() + "_" + contacts.get(i).getVisibility());
 			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-
-				MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contacts.get(i).getHandle()+""));
-				String fullName = "";
-				if(contactDB!=null){
-					ContactController cC = new ContactController(context);
-					fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contacts.get(i).getEmail());
-				}
-				else{
-					//No name, ask for it and later refresh!!
+				long contactHandle = contacts.get(i).getHandle();
+				String fullName = getContactNameDB(contactHandle);
+				logDebug("setContacts:: fullName = "+fullName);
+				if(fullName ==  null){
 					fullName = contacts.get(i).getEmail();
 				}
 
-				MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
+				MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contacts.get(i), fullName);
 				visibleContacts.add(megaContactAdapter);
 			}
 		}

@@ -64,6 +64,8 @@ public class Constants {
     public static final String EXTRA_RESULT_TRANSFER = "RESULT_TRANSFER";
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
+    public static final String EXTRA_USER_HANDLE = "USER_HANDLE";
+    public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
 
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
 
@@ -243,6 +245,7 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_VIEW = "INTENT_UPDATE_VIEW";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
+    public static final String BROADCAST_ACTION_INTENT_FILTER_ALIAS = "INTENT_FILTER_ALIAS";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;

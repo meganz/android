@@ -78,11 +78,11 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.ChatUtil.showErrorAlertDialogGroupCall;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -788,6 +788,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         } else {
             email = chat.getPeerEmail(0);
             name = chat.getPeerFullname(0);
+            String nickname = getNicknameContact(chat.getPeerHandle(0));
+            if(nickname != null){
+                name = nickname;
+            }
         }
 
         Bitmap bitmap = profileAvatar(peerId, email);
@@ -3054,6 +3058,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (userSession.getStatus() == MegaChatSession.SESSION_STATUS_INITIAL || userSession.hasAudio()) {
             mutateContactCallLayout.setVisibility(View.GONE);
         } else {
+
             String name = chat.getPeerFirstname(0);
             if ((name == null) || (name == " ")) {
                 if (megaChatApi != null) {
@@ -3063,6 +3068,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     name = " ";
                 }
             }
+
+            String nickname = getNicknameContact(chat.getPeerHandle(0));
+            if(nickname != null){
+                name = nickname;
+            }
+
             mutateCallText.setText(getString(R.string.muted_contact_micro, name));
             mutateContactCallLayout.setVisibility(View.VISIBLE);
         }

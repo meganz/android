@@ -37,6 +37,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -198,18 +199,11 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		MegaUser contact = megaApi.getContact(holder.contactMail);
 		long handle = contact.getHandle();
 
-		MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(handle+""));
-		String fullName = "";
-		if(contactDB!=null){
-			ContactController cC = new ContactController(context);
-			fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), holder.contactMail);
-		}
-		else{
-			//No name, ask for it and later refresh!!
-			logWarning("CONTACT DB is null");
+
+		String fullName = getContactNameDB(handle);
+		if(fullName ==  null){
 			fullName = holder.contactMail;
 		}
-
 
 		logDebug("Contact: " + holder.contactMail + " name: " + fullName);
 

@@ -373,23 +373,21 @@ public class ContactController {
 
 
     public void addContactDB(String email){
-        logDebug("addContactDB");
 
         MegaUser user = megaApi.getContact(email);
         if(user!=null){
-            logDebug("User to add: " + user.getEmail());
             //Check the user is not previously in the DB
             if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
-                logDebug("The contact NOT exists -> add to DB");
-                MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "");
+                MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "", null);
                 dbH.setContact(megaContactDB);
                 megaApi.getUserAttribute(user, 1, new ContactNameListener(context));
                 megaApi.getUserAttribute(user, 2, new ContactNameListener(context));
+                megaApi.getUserAlias(user.getHandle(), new ContactNameListener(context));
             }
             else{
-                logDebug("The contact already exists -> update");
                 megaApi.getUserAttribute(user, 1, new ContactNameListener(context));
                 megaApi.getUserAttribute(user, 2, new ContactNameListener(context));
+                megaApi.getUserAlias(user.getHandle(), new ContactNameListener(context));
             }
         }
     }
@@ -418,48 +416,6 @@ public class ContactController {
     public void removeInvitationContact(MegaContactRequest c){
         logDebug("removeInvitationContact");
         megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, (ManagerActivityLollipop) context);
-    }
-
-    public String getContactFullName(long userHandle){
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
-        if(contactDB!=null){
-
-            String name = contactDB.getName();
-            String lastName = contactDB.getLastName();
-
-            if(name==null){
-                name="";
-            }
-            if(lastName==null){
-                lastName="";
-            }
-            String fullName = "";
-
-            if (name.trim().length() <= 0){
-                fullName = lastName;
-            }
-            else{
-                fullName = name + " " + lastName;
-            }
-
-            if (fullName.trim().length() <= 0){
-                logWarning("Full name empty");
-                logDebug("Put email as fullname");
-                String mail = contactDB.getMail();
-                if(mail==null){
-                    mail="";
-                }
-                if (mail.trim().length() <= 0){
-                    return "";
-                }
-                else{
-                    return mail;
-                }
-            }
-
-            return fullName;
-        }
-        return "";
     }
 
     public String getFullName(String name, String lastName, String mail){

@@ -56,6 +56,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -329,15 +330,13 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
         for (int i = 0; i < contacts.size(); i++) {
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-
-                MegaContactDB contactDB = dbH.findContactByHandle(contacts.get(i).getHandle() + "");
-                String fullName = "";
-                if (contactDB != null) {
-                    ContactController cC = new ContactController(context);
-                    fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contacts.get(i).getEmail());
+                long contactHandle = contacts.get(i).getHandle();
+                String fullName = getContactNameDB(contactHandle);
+                if(fullName ==  null){
+                    fullName = contacts.get(i).getEmail();
                 }
 
-                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
+                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contacts.get(i), fullName);
                 visibleContacts.add(megaContactAdapter);
             }
         }

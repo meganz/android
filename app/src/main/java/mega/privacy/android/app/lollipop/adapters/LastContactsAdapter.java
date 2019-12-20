@@ -37,8 +37,9 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapter.ViewHolder> {
     
@@ -184,7 +185,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     }
     
     private void displayFirstLetter(MegaUser contact,ViewHolder holder) {
-        String fullName = getName(contact);
+        String fullName = getMegaUserNameDB(contact);
         String firstLetter = ChatUtil.getFirstLetter(fullName);
         if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
             holder.contactInitialLetter.setVisibility(View.INVISIBLE);
@@ -196,19 +197,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         }
 
     }
-    
-    private String getName(MegaUser contact) {
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
-        String fullName;
-        if (contactDB != null) {
-            ContactController cC = new ContactController(context);
-            fullName = cC.getFullName(contactDB.getName(),contactDB.getLastName(),contact.getEmail());
-        } else {
-            fullName = contact.getEmail();
-        }
-        return fullName;
-    }
-    
+
     @Override
     public int getItemCount() {
         return lastContacts.size();
