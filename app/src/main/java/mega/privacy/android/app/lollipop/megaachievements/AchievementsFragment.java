@@ -143,6 +143,8 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 	private Button inviteFriendsButton;
 
+	private boolean achievementUpdated;
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		logDebug("onCreate");
@@ -384,6 +386,10 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	@Override
 	public void onClick(View v) {
 		logDebug("onClick");
+		// wait for TYPE_GET_ACHIEVEMENTS has compeleted.
+        if(!achievementUpdated) {
+            return;
+        }
 		switch (v.getId()) {
 
 			case R.id.referral_bonuses_layout:{
@@ -739,5 +745,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 		logDebug("My calculated totalTransfer: " + totalTransfer);
 		figureUnlockedRewardTransfer.setText(getSizeString(transferQuota));
+
+		achievementUpdated = true;
 	}
 }
