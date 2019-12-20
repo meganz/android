@@ -108,6 +108,8 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
+	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
+	private final static String QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH";
 
 	public final static int CLOUD_FRAGMENT = 0;
 	public final static int INCOMING_FRAGMENT = 1;
@@ -242,10 +244,14 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private String querySearch = "";
 	private boolean isSearchExpanded;
+	private boolean collapsedByClick;
 	private boolean pendingToOpenSearchView;
 	private int pendingToAttach;
 	private int totalAttached;
 	private int totalErrors;
+
+	private boolean shouldRestartSearch;
+	private String queryAfterSearch;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -381,6 +387,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			pendingToAttach = savedInstanceState.getInt("pendingToAttach", 0);
 			totalAttached = savedInstanceState.getInt("totalAttached", 0);
 			totalErrors = savedInstanceState.getInt("totalErrors", 0);
+			shouldRestartSearch = savedInstanceState.getBoolean(SHOULD_RESTART_SEARCH, false);
+			queryAfterSearch = savedInstanceState.getString(QUERY_AFTER_SEARCH, null);
 
 			if (isSearchExpanded) {
 				pendingToOpenSearchView = true;
@@ -560,12 +568,12 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		aB.setDisplayShowHomeEnabled(true);
 
 		if ((intent != null) && (intent.getAction() != null)){
+            selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			logDebug("intent OK: " + intent.getAction());
 			if (intent.getAction().equals(ACTION_SELECT_FOLDER_TO_SHARE)){
 				logDebug("action = ACTION_SELECT_FOLDER_TO_SHARE");
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 				mode = SELECT;
-				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(CLOUD_TAB, false, -1);
@@ -577,7 +585,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 				mode = SELECT;
 				selectFile = true;
-				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
 				aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 1).toUpperCase());
 				setView(CLOUD_TAB, false, -1);
@@ -654,7 +661,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			else if ((intent.getAction().equals(ACTION_SELECT_FOLDER))){
 				logDebug("action = ACTION_SELECT_FOLDER");
 				mode = SELECT;
-				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(SHOW_TABS, false, CHAT_TAB);
@@ -767,7 +773,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						if (!multiselect) {
 							return;
 						}
-						collapseSearchView();
+						
+						if (isSearchExpanded && !pendingToOpenSearchView) {
+							clearQuerySearch();
+							collapseSearchView();
+						}
 						cDriveExplorer = getCloudExplorerFragment();
 						iSharesExplorer = getIncomingExplorerFragment();
 						if (position == 0) {
@@ -927,10 +937,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				isSearchExpanded = false;
 				if (isSearchMultiselect()) {
 					if (isCloudVisible()) {
-						cDriveExplorer.closeSearch();
+						cDriveExplorer.closeSearch(collapsedByClick);
 					}
 					else if (isIncomingVisible()) {
-						iSharesExplorer.closeSearch();
+						iSharesExplorer.closeSearch(collapsedByClick);
 					}
 					supportInvalidateOptionsMenu();
 				}
@@ -955,7 +965,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-				querySearch = newText;
+				if (!collapsedByClick) {
+					querySearch = newText;
+				} else {
+					collapsedByClick = false;
+				}
 				if (isSearchMultiselect()) {
 					if (isCloudVisible()) {
 						cDriveExplorer.search(newText);
@@ -983,12 +997,17 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	public void isPendingToOpenSearchView () {
 		if (pendingToOpenSearchView && searchMenuItem != null) {
-			String query = querySearch;
-			searchMenuItem.expandActionView();
-			searchView.setQuery(query, false);
+			openSearchView(querySearch);
 			pendingToOpenSearchView = false;
 		}
 	}
+
+	private void openSearchView(String search) {
+	    if (searchMenuItem == null) return;
+
+        searchMenuItem.expandActionView();
+        searchView.setQuery(search, false);
+    }
 
 	private void setCreateFolderVisibility() {
 		if (intent == null) {
@@ -1025,7 +1044,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
-//						searchMenuItem.setVisible(true);
+						searchMenuItem.setVisible(true);
 					}
 				}
 
@@ -1066,7 +1085,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
-//						searchMenuItem.setVisible(true);
+						searchMenuItem.setVisible(true);
 					}
 				}
 			}
@@ -1408,6 +1427,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		bundle.putInt("pendingToAttach", pendingToAttach);
 		bundle.putInt("totalAttached", totalAttached);
 		bundle.putInt("totalErrors", totalErrors);
+		bundle.putBoolean(SHOULD_RESTART_SEARCH, shouldRestartSearch);
+		bundle.putString(QUERY_AFTER_SEARCH, queryAfterSearch);
 	}
 	
 	@Override
@@ -1716,8 +1737,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		logDebug("handles: " + handles.length);
 
         Intent intent = new Intent();
-        intent.putExtra("NODE_HANDLES", handles);
-        intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
+        intent.putExtra(NODE_HANDLES, handles);
+        intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
         setResult(RESULT_OK, intent);
 		finishActivity();
     }
@@ -1876,7 +1897,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			{
 				Intent intent = new Intent();
 				intent.putExtra("SELECT", handle);
-				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
+				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();
 			}
@@ -1889,7 +1910,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 				Intent intent = new Intent();
 				intent.putExtra("SELECT", parentNode.getHandle());
-				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
+				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();
 			}
@@ -3353,6 +3374,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		if (searchMenuItem == null) {
 			return;
 		}
+		collapsedByClick = true;
 		searchMenuItem.collapseActionView();
 	}
 
@@ -3446,10 +3468,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		return null;
 	}
 
-	public boolean isSearchExpanded () {
-		return isSearchExpanded;
-	}
-
 	public boolean isList () {
 		return isList;
 	}
@@ -3466,4 +3484,32 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public boolean isMultiselect() {
 		return multiselect;
 	}
+
+	public void setShouldRestartSearch(boolean shouldRestartSearch) {
+		this.shouldRestartSearch = shouldRestartSearch;
+	}
+
+	public boolean shouldRestartSearch() {
+		return shouldRestartSearch;
+	}
+
+	public String getQuerySearch() {
+		return querySearch;
+	}
+
+	public void clearQuerySearch() {
+		querySearch = null;
+	}
+
+    public void setQueryAfterSearch() {
+	    this.queryAfterSearch = querySearch;
+    }
+
+    public boolean shouldReopenSearch() {
+	    if (queryAfterSearch == null) return false;
+
+        openSearchView(queryAfterSearch);
+	    queryAfterSearch = null;
+	    return true;
+    }
 }
