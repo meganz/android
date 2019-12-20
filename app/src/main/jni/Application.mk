@@ -2,7 +2,7 @@ DISABLE_WEBRTC = false
 USE_LIBWEBSOCKETS = true
 
 USE_LIBWEBSOCKETS = true
-APP_PLATFORM = android-24
+APP_PLATFORM = android-16
 
 NDK_TOOLCHAIN_VERSION=clang
 APP_STL := c++_shared
