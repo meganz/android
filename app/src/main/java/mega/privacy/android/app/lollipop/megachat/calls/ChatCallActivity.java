@@ -1155,6 +1155,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             logDebug("CHANGE_TYPE_STATUS -> status: " + callStatus+", group chat "+chat.isGroup());
 
             switch (callStatus) {
+                case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM: {
+                    updateLocalAV();
+                    break;
+                }
                 case MegaChatCall.CALL_STATUS_JOINING:
                 case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
                     if (chat.isGroup()) {
