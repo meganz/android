@@ -8854,6 +8854,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	private void checkIfShouldCloseSearchView(DrawerItem oldDrawerItem, DrawerItem newDrawerItem) {
+    	if (!searchExpand || oldDrawerItem == newDrawerItem) return;
+
+		if (oldDrawerItem == DrawerItem.CHAT || oldDrawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+			searchExpand = false;
+		}
+	}
+
 	@Override
 	public boolean onNavigationItemSelected(MenuItem menuItem) {
 		logDebug("onNavigationItemSelected");
@@ -8862,6 +8870,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			Menu nVMenu = nV.getMenu();
 			resetNavigationViewMenu(nVMenu);
 		}
+
+		DrawerItem oldDrawerItem = drawerItem;
 
 		switch (menuItem.getItemId()){
 			case R.id.bottom_navigation_item_cloud_drive: {
@@ -8929,6 +8939,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				break;
 			}
 		}
+
+		checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 		selectDrawerItemLollipop(drawerItem);
 		drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -10998,6 +11010,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							parentHandle = parentHandleOutgoing;
 						}
 						break;
+                    case INBOX:
+                        parentHandle = getParentHandleInbox();
+                        break;
 				}
 				break;
 
@@ -12222,6 +12237,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void onClick(View v) {
 		logDebug("onClick");
 
+		DrawerItem oldDrawerItem = drawerItem;
+
 		switch(v.getId()){
 			case R.id.navigation_drawer_add_phone_number_button:{
                 Intent intent = new Intent(this,SMSVerificationActivity.class) ;
@@ -12262,6 +12279,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					drawerItem = DrawerItem.ACCOUNT;
 					accountFragment = MY_ACCOUNT_FRAGMENT;
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+					checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 					selectDrawerItemLollipop(drawerItem);
 				}
 				break;
@@ -12269,24 +12287,28 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			case R.id.inbox_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.INBOX;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.contacts_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.CONTACTS;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.notifications_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.NOTIFICATIONS;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.settings_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.SETTINGS;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -12297,6 +12319,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				drawerItem = DrawerItem.ACCOUNT;
 				accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
 				displayedAccountType = -1;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -14260,32 +14283,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			catch(Exception ex){}
 		}
 		dissmisDialog();
-		long parentHandle = -1;
-		MegaNode parentNode = null;
 
-		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			if (getTabItemCloud() == CLOUD_TAB) {
-				parentHandle = parentHandleBrowser;
-				parentNode = megaApi.getNodeByHandle(parentHandle);
-			}
-			if (parentNode == null){
-				parentNode = megaApi.getRootNode();
-			}
-		}
-		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			int index = viewPagerShares.getCurrentItem();
-			if(index==1){
-				parentNode = megaApi.getNodeByHandle(parentHandleOutgoing);
-			}
-			else{
-				parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
-			}
-			if(parentNode==null){
-				logWarning("Incorrect folder to upload");
-				parentNode = megaApi.getRootNode();
-			}
-		}
-		else if(drawerItem == DrawerItem.ACCOUNT){
+		MegaNode parentNode = getCurrentParentNode(getCurrentParentHandle(), -1);
+
+		if(drawerItem == DrawerItem.ACCOUNT){
 			if(infos!=null){
 				for (ShareInfo info : infos) {
 					String avatarPath = info.getFileAbsolutePath();
