@@ -270,7 +270,7 @@ public class NodeController {
         }
 
         Intent i = new Intent(context, ChatExplorerActivity.class);
-        i.putExtra("NODE_HANDLES", longArray);
+        i.putExtra(NODE_HANDLES, longArray);
 
         if(context instanceof FullScreenImageViewerLollipop){
             ((FullScreenImageViewerLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);

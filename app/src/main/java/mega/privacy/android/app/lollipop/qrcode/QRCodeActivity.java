@@ -43,6 +43,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
+import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -295,7 +296,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                     megaApi = ((MegaApplication) getApplication()).getMegaApi();
                 }
                 String myEmail = megaApi.getMyEmail();
-                qrFile = buildQrFile(this,myEmail + "QRcode.jpg");
+                qrFile = buildQrFile(this,myEmail + QR_IMAGE_FILE_NAME);
                 if (qrFile == null) {
                     showSnackbar(drawerLayout, getString(R.string.general_error));
                 }
@@ -319,7 +320,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                             showSnackbar(drawerLayout, getString(R.string.error_not_enough_free_space));
                             return;
                         }
-                        File newQrFile = new File(parentPath, myEmail + "QRcode.jpg");
+                        File newQrFile = new File(parentPath, myEmail + QR_IMAGE_FILE_NAME);
                         if (newQrFile == null) {
                             showSnackbar(drawerLayout, getString(R.string.general_error));
                         }

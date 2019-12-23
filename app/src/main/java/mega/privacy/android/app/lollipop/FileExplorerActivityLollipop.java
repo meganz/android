@@ -70,6 +70,7 @@ import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -110,11 +111,16 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
+	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
+	private final static String QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH";
 
 	public final static int CLOUD_FRAGMENT = 0;
 	public final static int INCOMING_FRAGMENT = 1;
 	public final static int CHAT_FRAGMENT = 3;
 	public final static int IMPORT_FRAGMENT = 4;
+    public static final String EXTRA_SHARE_INFOS = "share_infos";
+    public static final String EXTRA_SHARE_ACTION = "share_action";
+    public static final String EXTRA_SHARE_TYPE = "share_type";
 
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
@@ -240,14 +246,20 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private SearchView searchView;
 
+    private boolean needLogin;
+
 	private FileExplorerActivityLollipop fileExplorerActivityLollipop;
 
 	private String querySearch = "";
 	private boolean isSearchExpanded;
+	private boolean collapsedByClick;
 	private boolean pendingToOpenSearchView;
 	private int pendingToAttach;
 	private int totalAttached;
 	private int totalErrors;
+
+	private boolean shouldRestartSearch;
+	private String queryAfterSearch;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -320,12 +332,31 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		@Override
 		protected List<ShareInfo> doInBackground(Intent... params) {
 			logDebug("OwnFilePrepareTask: doInBackground");
-			return ShareInfo.processIntent(params[0], context);
+            Intent intent = params[0];
+            List<ShareInfo> shareInfos = (List<ShareInfo>) intent.getSerializableExtra(EXTRA_SHARE_INFOS);
+            if(shareInfos != null) {
+                return  shareInfos;
+            }
+            return ShareInfo.processIntent(intent, context);
 		}
 
 		@Override
 		protected void onPostExecute(List<ShareInfo> info) {
 			filePreparedInfos = info;
+			if(needLogin) {
+                Intent loginIntent = new Intent(FileExplorerActivityLollipop.this, LoginActivityLollipop.class);
+                loginIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+                loginIntent.putExtra(EXTRA_SHARE_ACTION, getIntent().getAction());
+                loginIntent.putExtra(EXTRA_SHARE_TYPE, getIntent().getType());
+                loginIntent.putExtra(EXTRA_SHARE_INFOS,new ArrayList<>(info));
+                // close previous login page
+                loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                loginIntent.setAction(ACTION_FILE_EXPLORER_UPLOAD);
+                needLogin = false;
+                startActivity(loginIntent);
+                finish();
+                return;
+            }
 			if (action != null && getIntent() != null) {
 				getIntent().setAction(action);
 			}
@@ -383,6 +414,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			pendingToAttach = savedInstanceState.getInt("pendingToAttach", 0);
 			totalAttached = savedInstanceState.getInt("totalAttached", 0);
 			totalErrors = savedInstanceState.getInt("totalErrors", 0);
+			shouldRestartSearch = savedInstanceState.getBoolean(SHOULD_RESTART_SEARCH, false);
+			queryAfterSearch = savedInstanceState.getString(QUERY_AFTER_SEARCH, null);
 
 			if (isSearchExpanded) {
 				pendingToOpenSearchView = true;
@@ -419,11 +452,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		
 		if (credentials == null){
 			logWarning("User credentials NULL");
-			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-			loginIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
-			loginIntent.setAction(ACTION_FILE_EXPLORER_UPLOAD);
-			startActivity(loginIntent);
-			finish();
+            needLogin = true;
+            OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
+            ownFilePrepareTask.execute(getIntent());
+            createAndShowProgressDialog(false, R.string.upload_prepare);
 			return;
 		}
 		else{
@@ -562,12 +594,12 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		aB.setDisplayShowHomeEnabled(true);
 
 		if ((intent != null) && (intent.getAction() != null)){
+            selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			logDebug("intent OK: " + intent.getAction());
 			if (intent.getAction().equals(ACTION_SELECT_FOLDER_TO_SHARE)){
 				logDebug("action = ACTION_SELECT_FOLDER_TO_SHARE");
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 				mode = SELECT;
-				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(CLOUD_TAB, false, -1);
@@ -579,7 +611,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 				mode = SELECT;
 				selectFile = true;
-				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
 				aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 1).toUpperCase());
 				setView(CLOUD_TAB, false, -1);
@@ -656,7 +687,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			else if ((intent.getAction().equals(ACTION_SELECT_FOLDER))){
 				logDebug("action = ACTION_SELECT_FOLDER");
 				mode = SELECT;
-				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(SHOW_TABS, false, CHAT_TAB);
@@ -769,7 +799,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						if (!multiselect) {
 							return;
 						}
-						collapseSearchView();
+
+						if (isSearchExpanded && !pendingToOpenSearchView) {
+							clearQuerySearch();
+							collapseSearchView();
+						}
 						cDriveExplorer = getCloudExplorerFragment();
 						iSharesExplorer = getIncomingExplorerFragment();
 						if (position == 0) {
@@ -870,7 +904,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 		return false;
 	}
-	
+
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		logDebug("onCreateOptionsMenuLollipop");
@@ -929,10 +963,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				isSearchExpanded = false;
 				if (isSearchMultiselect()) {
 					if (isCloudVisible()) {
-						cDriveExplorer.closeSearch();
+						cDriveExplorer.closeSearch(collapsedByClick);
 					}
 					else if (isIncomingVisible()) {
-						iSharesExplorer.closeSearch();
+						iSharesExplorer.closeSearch(collapsedByClick);
 					}
 					supportInvalidateOptionsMenu();
 				}
@@ -957,7 +991,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-				querySearch = newText;
+				if (!collapsedByClick) {
+					querySearch = newText;
+				} else {
+					collapsedByClick = false;
+				}
 				if (isSearchMultiselect()) {
 					if (isCloudVisible()) {
 						cDriveExplorer.search(newText);
@@ -985,12 +1023,17 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	public void isPendingToOpenSearchView () {
 		if (pendingToOpenSearchView && searchMenuItem != null) {
-			String query = querySearch;
-			searchMenuItem.expandActionView();
-			searchView.setQuery(query, false);
+			openSearchView(querySearch);
 			pendingToOpenSearchView = false;
 		}
 	}
+
+	private void openSearchView(String search) {
+	    if (searchMenuItem == null) return;
+
+        searchMenuItem.expandActionView();
+        searchView.setQuery(search, false);
+    }
 
 	private void setCreateFolderVisibility() {
 		if (intent == null) {
@@ -1410,6 +1453,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		bundle.putInt("pendingToAttach", pendingToAttach);
 		bundle.putInt("totalAttached", totalAttached);
 		bundle.putInt("totalErrors", totalErrors);
+		bundle.putBoolean(SHOULD_RESTART_SEARCH, shouldRestartSearch);
+		bundle.putString(QUERY_AFTER_SEARCH, queryAfterSearch);
 	}
 	
 	@Override
@@ -1713,8 +1758,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		logDebug("handles: " + handles.length);
 
         Intent intent = new Intent();
-        intent.putExtra("NODE_HANDLES", handles);
-        intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
+        intent.putExtra(NODE_HANDLES, handles);
+        intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
         setResult(RESULT_OK, intent);
 		finishActivity();
     }
@@ -1873,7 +1918,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			{
 				Intent intent = new Intent();
 				intent.putExtra("SELECT", handle);
-				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
+				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();
 			}
@@ -1886,7 +1931,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 				Intent intent = new Intent();
 				intent.putExtra("SELECT", parentNode.getHandle());
-				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
+				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();
 			}
@@ -2218,7 +2263,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		logDebug("onNodesUpdate");
-		if (cDriveExplorer != null){
+		if (getCloudExplorerFragment() != null){
 			if (megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()) != null){
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
 				cDriveExplorer.setNodes(nodes);
@@ -3211,7 +3256,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			c = (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
 		}
 
-		if (c != null && c.isAdded()) {
+		if (c.isAdded()) {
 			return c;
 		}
 
@@ -3234,7 +3279,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			iS = (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
 		}
 
-		if (iS != null && iS.isAdded()) {
+		if (iS.isAdded()) {
 			return iS;
 		}
 
@@ -3257,7 +3302,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			cD = (CloudDriveExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
 		}
 
-		if (cD != null && cD.isAdded()) {
+		if (cD.isAdded()) {
 			return cD;
 		}
 
@@ -3324,6 +3369,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		if (searchMenuItem == null) {
 			return;
 		}
+		collapsedByClick = true;
 		searchMenuItem.collapseActionView();
 	}
 
@@ -3417,10 +3463,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		return null;
 	}
 
-	public boolean isSearchExpanded () {
-		return isSearchExpanded;
-	}
-
 	public boolean isList () {
 		return isList;
 	}
@@ -3462,4 +3504,32 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			}
 		}
 	}
+
+	public void setShouldRestartSearch(boolean shouldRestartSearch) {
+		this.shouldRestartSearch = shouldRestartSearch;
+	}
+
+	public boolean shouldRestartSearch() {
+		return shouldRestartSearch;
+	}
+
+	public String getQuerySearch() {
+		return querySearch;
+	}
+
+	public void clearQuerySearch() {
+		querySearch = null;
+	}
+
+    public void setQueryAfterSearch() {
+	    this.queryAfterSearch = querySearch;
+    }
+
+    public boolean shouldReopenSearch() {
+	    if (queryAfterSearch == null) return false;
+
+        openSearchView(queryAfterSearch);
+	    queryAfterSearch = null;
+	    return true;
+    }
 }
