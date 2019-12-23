@@ -90,6 +90,7 @@
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
+    <string name="confirm_to_send" context="Button label, confirm to send invitation to contact">Send</string>
 
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Menu item">Upload</string>
@@ -101,6 +102,7 @@
 
     <string name="action_settings" context="Menu item">Settings</string>
     <string name="action_search" context="Search button">Search</string>
+    <string name="action_search_country" context="Select country page title">Select country</string>
     <string name="action_play" context="Search button">Play</string>
     <string name="action_pause" context="Search button">Pause</string>
     <string name="action_refresh" context="Menu item">Refresh</string>
@@ -128,6 +130,11 @@
     <plurals name="general_num_contacts">
         <item context="referring to a contact in the contact list of the user" quantity="one">contact</item>
         <item context="Title of the contact list" quantity="other">contacts</item>
+    </plurals>
+
+    <plurals name="num_contacts_selected">
+        <item context="chat invitation - tool bar subtitle, when users selected single contact. Placeholder - number of contacts selected " quantity="one">%d contact</item>
+        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d contacts</item>
     </plurals>
 
     <plurals name="general_num_folders">
@@ -182,6 +189,7 @@
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Invalid email address</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Please enter your password</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">No network connection</string>
+    <string name="error_unable_to_change_status" context="Error message for unknown host error when user is trying to change online status">Unable to change the status.</string>
     <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">You have been logged out on this device from another location</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calculating encryption keys</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Connecting to the server</string>
@@ -653,7 +661,7 @@
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
-	<string name="settings_camera_upload_remove_gps_helper_label" context="Helper text to explain the things to note if turn off the feature of removing GPS info">If turn off, your uploaded pictures via Camera Uploads will contain information about where they were taken, so be careful when sharing them.</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
@@ -668,6 +676,30 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Default download location</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Always ask for download location</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
+	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
+	<string name="verify_account_title" context="Title of verify phone number page">Verify your account</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+    <string name="general_country_label" context="Country label for a button, title, etc.">Country</string>
+	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Your phone number</string>
+    <string name="general_back_button" context="Button label - go to previous page">Back</string>
+	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
+    <string name="general_confirm_button" context="Button label - confirm some action">Confirm</string>
+	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
+    <string name="verify_account_not_loading_country_code" context="error message if the country code cannot be fetched">Country codes could not be fetched.</string>
+	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
+	<string name="verify_account_already_verified" context="error message if user proceeds with an already added phone number">Your phone number has been verified</string>
+	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Please type the verification code sent to</string>
+	<string name="verify_account_enter_code_title" context="enter verification code page title">Verify your account</string>
+	<string name="verify_account_incorrect_code" context="error message when user entered an incorrect verification code">Wrong code. Please try again or resend.</string>
+	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">You didn\'t receive a code?</string>
+    <string name="general_resend_button" context="Label for resend button">Resend</string>
+	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This number is already associated with a Mega account.</string>
+	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
+	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">The verification code doesn\'t match.</string>
+	<string name="verify_account_verify_limit" context="error message that will show to user when provide a verification code which doesn\'t match.">Only two attempts to verify per code</string>
+	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
+	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
+	<string name="verify_account_successfully" context="verify phone number successfully">Your phone number has been verified successfully</string>
 
     <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
         <item context="internal storage option">Internal storage</item>
@@ -703,7 +735,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Only when charging</string>
-    <string name="settings_camera_upload_remove_gps" context="Title of 'Remove location tags' setting option. Once enabled, Camera Uploads will remove the location info from pictures those are being uploaded">Remove location tags</string>
+    <string name="settings_camera_upload_include_gps" context="Title of 'Include location tags' setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded">Include location tags</string>
     <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Require me to actively charge my device</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Keep file names as in the device</string>
 
@@ -1226,7 +1258,8 @@
     <!--
     <string name="list_message_deleted" context="Text show in list of chats when the last message has been deleted">Message deleted</string>
     -->
-
+    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A] to enter with another account</string>
+    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user's confirmation.">Are you sure that you want to logout current account?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">This message has been deleted by %1$s</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Chat history was cleared</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">Chat history cleared by %1$s</string>
@@ -1282,6 +1315,7 @@
         <item context="Plural" quantity="other">%1$s [A]are typing&#8230;[/A]</item>
     </plurals>
 
+
     <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]and more are typing&#8230;[/A]</string>
     <string name="label_more" context="button label more">More</string>
     <string name="label_close" context="button label Close">Close</string>
@@ -1307,7 +1341,6 @@
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without a connection.</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
-
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
 
     <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">Invitation accepted</string>
@@ -1341,6 +1374,7 @@
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">No files Saved for Offline</string>
 
     <string name="general_enable" context="Positive confirmation to enable logs">Enable</string>
+    <string name="general_allow" context="Positive confirmation to allow MEGA to read contacts book.">Allow</string>
     <string name="enable_log_text_dialog" context="Dialog to confirm the action of enabling logs">Logs can contain information related to your account</string>
 
     <string name="confirmation_to_reconnect" context="Dialog to confirm the reconnect action">Network connection recovered. Connect to MEGA?</string>
@@ -1582,6 +1616,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">Referral Bonuses</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">Install a mobile app</string>
+    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">Add mobile phone</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Registration bonus</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Install MEGA desktop app</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Account Base Quota</string>
@@ -1606,9 +1641,11 @@
 
     <string name="paragraph_info_achievement_install_desktop" context="info paragraph about the achievement install megasync">When you install MEGAsync you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
     <string name="paragraph_info_achievement_install_mobile_app" context="info paragraph about the achievement install mobile app">When you install our mobile app you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days. We provide mobiles apps for iOS, Android and Windows Phone.</string>
+    <string name="paragraph_info_achievement_add_phone" context="info paragraph about the achievement 'add phone number'. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">When you verify your phone number you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days.</string>
 
     <string name="result_paragraph_info_achievement_install_desktop" context="info paragraph about the completed achievement install megasync">You have received %1$s storage space and %2$s transfer quota for installing our MEGA desktop app.</string>
     <string name="result_paragraph_info_achievement_install_mobile_app" context="info paragraph about the completed achievement install mobile app">You have received %1$s storage space and %2$s transfer quota for installing our mobile app.</string>
+    <string name="result_paragraph_info_achievement_add_phone" context="info paragraph about the completed achievement of 'add phone number'. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">You have received %1$s storage space and %2$s transfer quota for verifying your phone number.</string>
     <string name="result_paragraph_info_achievement_registration" context="info paragraph about the completed achievement registration">You have received %1$s storage space as your free registration bonus.</string>
 
     <string name="expiration_date_for_achievements" context="info paragraph about the completed achievement registration">Bonus expires in %1$d days</string>
@@ -1765,9 +1802,8 @@
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Click to go back to the call</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Return to the call</string>
 
-    <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list's header">On MEGA</string>
+    <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list's header">Contacts on MEGA</string>
     <string name="contacts_phone" context="When it lists contacts of phone, the title of list's header">Phone contacts</string>
-
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Your account has been suspended due to multiple breaches of MEGA’s Terms of Service. Please check your email inbox.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Your account was terminated due to a breach of MEGA’s Terms of Service, such as abuse of rights of others; sharing and/or importing illegal data; or system abuse.</string>
 
@@ -2078,7 +2114,7 @@
     <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
     <string name="choose_chat" context="section title to select a chat to send a file">Choose chat</string>
 
-    <string name="type_mail" context="Hint shown to guide user on activity add contacts">Tap, enter name or email</string>
+    <string name="type_mail" context="Hint shown to guide user on activity add contacts">Enter contact detail to search or add</string>
 
     <string name="confirmation_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Add %s to your contacts?</string>
     <string name="confirmation_not_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and the contact is already a contact">You have already added the contact %s.</string>
@@ -2095,11 +2131,11 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Invalid code</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Cloud Drive is almost full. Upgrade to PRO and get up to 8 TB of storage and 16 TB of transfer quota.</string>
-    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Cloud Drive is almost full. Upgrade now and get up to 8 TB of storage and 16 TB of transfer quota.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Cloud Drive is almost full. Upgrade to PRO and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Cloud Drive is almost full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Cloud Drive is almost full. If you need more storage please contact MEGA support to get a custom plan.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Cloud Drive is full. Upgrade to PRO and get up to 8 TB of storage and 16 TB of transfer quota.</string>
-    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Cloud Drive is full. Upgrade now and get up to 8 TB of storage and 16 TB of transfer quota.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Cloud Drive is full. Upgrade to PRO and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Cloud Drive is full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Cloud Drive is full. If you need more storage please contact MEGA support to get a custom plan.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">See plans</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Custom plan</string>
@@ -2123,6 +2159,8 @@
         <item context="one file" quantity="one">Choose File</item>
         <item context="more files" quantity="other">Choose Files</item>
     </plurals>
+
+    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">Invite %1$s?</string>
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Choose folder</string>
 
@@ -2335,6 +2373,9 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Allow access to your camera to scan documents, take pictures and make video calls.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
+    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Enable access to contacts</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA needs access to your contacts to help you connect with other people on MEGA.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Allow access to your microphone to make encrypted calls.</string>
     <string name="general_enable_access" context="General enable access">Enable access</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>
@@ -2411,6 +2452,15 @@
         <item context="Plural of file. 2 files" quantity="other">%d messages were not sent to %d chats</item>
     </plurals>
 
+    <plurals name="quantity_of_local_contact" context="How many local contacts have been on MEGA">
+        <item context="Singular of local contact. 1 contact" quantity="one">%d Contact found on MEGA</item>
+        <item context="Plural of local contact. 2 contacts" quantity="other">%d Contacts found on MEGA</item>
+    </plurals>
+    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Invite contact now?</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
+    <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
+
+
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
 
     <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created successfully</string>
@@ -2436,6 +2486,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
+    <string name="invite_more" context="Invite button for chat top cell">Invite more...</string>
 
     <string name="title_tour_one" context="Title of first tour screen">You hold the keys</string>
     <string name="content_tour_one" cotext="Content of first tour screen">Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access your files.</string>
@@ -2496,6 +2547,9 @@
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">Enter group name</string>
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">To create a chat link you must name the group.</string>
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
+    <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">Start chatting securely with your contacts using end-to-end encryption</string>
+
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hi! Have secure conversations on MEGA with me and get up to 50GB free storage. %1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">No chat link available.</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chat link deleted successfully.</string>
@@ -2513,6 +2567,8 @@
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
 
+    <string name="invite_contact_chooser_title" context="Title of popup when user click 'Share' button on invite contact page">Invite a friend via</string>
+    <string name="invite_contact_action_button" context="Action button label">Invite a friend via...</string>
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
@@ -2538,6 +2594,8 @@
     <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
     <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Me</string>
 
+    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get free %1$s when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 

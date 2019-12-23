@@ -31,14 +31,14 @@ import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
-
 import android.support.v4.app.ActivityCompat;
-
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.telephony.PhoneNumberUtils;
+import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.format.Formatter;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -55,6 +55,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -78,6 +79,7 @@ import javax.crypto.spec.SecretKeySpec;
 import mega.privacy.android.app.AndroidLogger;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
@@ -94,6 +96,7 @@ import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 
 public class Util {
@@ -191,6 +194,25 @@ public class Util {
 		showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
 	}
 
+	public static String getCountryCodeByNetwork(Context context) {
+		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		if (tm != null) {
+			return tm.getNetworkCountryIso();
+		}
+		return null;
+	}
+
+	public static boolean isRoaming(Context context) {
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (cm != null) {
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			if(ni != null) {
+                return ni.isRoaming();
+            }
+		}
+		return true;
+	}
+
 	public static int countMatches(Pattern pattern, String string)
 	{
 		Matcher matcher = pattern.matcher(string);
@@ -231,6 +253,7 @@ public class Util {
 //            src = src.replaceAll("]]>", "] ]>");
 //            src = "<![CDATA[" + src + "]]>";
         }
+        src = converterShortCodes(src);
         return src;
     }
 
@@ -498,6 +521,22 @@ public class Util {
 		
 		return sizeString;
 	}
+
+    public static String getSizeStringGBBased(long gbSize){
+        String sizeString = "";
+        DecimalFormat decf = new DecimalFormat("###.##");
+
+        float TB = 1024;
+
+        if (gbSize < TB){
+            sizeString = decf.format(gbSize) + " " + context.getString(R.string.label_file_size_giga_byte);
+        }
+        else{
+            sizeString = decf.format(gbSize/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
+        }
+
+        return sizeString;
+    }
     
 	public static String getDateString(long date){
 		DateFormat datf = DateFormat.getDateTimeInstance();
@@ -1307,6 +1346,13 @@ public class Util {
 		}
 	}
 
+	public static boolean canVoluntaryVerifyPhoneNumber() {
+        MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
+	    boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;
+	    boolean allowVerify = api.smsAllowedState() == 2;
+	    return hasNotVerified && allowVerify;
+    }
+
 	public static void resetAndroidLogger(){
 
 		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
@@ -1467,6 +1513,20 @@ public class Util {
 		}
 	}
 
+    public static Bitmap createAvatarBackground(String colorString) {
+        Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(circle);
+        Paint paintCircle = new Paint();
+        paintCircle.setAntiAlias(true);
+        int color = (colorString == null) ?
+                ContextCompat.getColor(context, R.color.lollipop_primary_color) :
+                Color.parseColor(colorString);
+        paintCircle.setColor(color);
+        int radius = circle.getWidth() / 2;
+        c.drawCircle(radius, radius, radius, paintCircle);
+        return circle;
+    }
+
 	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
 		logDebug("color: '" + color + "' firstLetter: '" + firstLetter + "'");
 
@@ -1537,7 +1597,18 @@ public class Util {
 		}
 		return true;
 	}
-    
+
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
     public static void showSnackBar(Context context,int snackbarType,String message,int idChat) {
         if (context instanceof ChatFullScreenImageViewer) {
             ((ChatFullScreenImageViewer)context).showSnackbar(snackbarType,message,idChat);
@@ -1560,7 +1631,7 @@ public class Util {
             }
         }
     }
-    
+
     private static View getRootViewFromContext(Context context) {
         BaseActivity activity = (BaseActivity)context;
         View rootView = null;
@@ -1576,6 +1647,18 @@ public class Util {
 			logError("ERROR", e);
         }
         return rootView;
+    }
+
+    public static String normalizePhoneNumber(String phoneNumber,String countryCode) {
+        return PhoneNumberUtils.formatNumberToE164(phoneNumber, countryCode);
+    }
+
+    public static String normalizePhoneNumberByNetwork(Context context,String phoneNumber) {
+        String countryCode = getCountryCodeByNetwork(context);
+        if(countryCode == null) {
+            return null;
+        }
+        return normalizePhoneNumber(phoneNumber, countryCode.toUpperCase());
     }
 
 	/**
@@ -1690,6 +1773,42 @@ public class Util {
 
 	}
 
+	/**
+	 * This method decodes a url and formats it before its treatment
+	 *
+	 * @param url the passed url to be decoded
+	 */
+	public static void decodeURL(String url) {
+		try {
+			url = URLDecoder.decode(url, "UTF-8");
+		} catch (Exception e) {
+			logDebug("Exception decoding url: "+url);
+			e.printStackTrace();
+		}
+
+		url.replace(' ', '+');
+
+		if (url.startsWith("mega://")) {
+			url = url.replaceFirst("mega://", "https://mega.nz/");
+		} else if (url.startsWith("mega.")) {
+			url = url.replaceFirst("mega.", "https://mega.");
+		}
+
+		if (url.startsWith("https://www.mega.co.nz")) {
+			url = url.replaceFirst("https://www.mega.co.nz", "https://mega.co.nz");
+		}
+
+		if (url.startsWith("https://www.mega.nz")) {
+			url = url.replaceFirst("https://www.mega.nz", "https://mega.nz");
+		}
+
+		if (url.endsWith("/")) {
+			url = url.substring(0, url.length() - 1);
+		}
+
+		logDebug("URL decoded: " + url);
+	}
+
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
@@ -1712,4 +1831,11 @@ public class Util {
             }
         }, 50);
     }
+
+	public static void resetActionBar(ActionBar aB) {
+		if (aB != null) {
+			aB.setDisplayShowCustomEnabled(false);
+			aB.setDisplayShowTitleEnabled(true);
+		}
+	}
 }

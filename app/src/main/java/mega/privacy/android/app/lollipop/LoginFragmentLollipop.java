@@ -1,11 +1,13 @@
 package mega.privacy.android.app.lollipop;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -16,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -43,6 +46,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -50,6 +54,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
@@ -74,6 +79,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -82,6 +88,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
+    private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
     private AlertDialog insertMailDialog;
     private AlertDialog insertMKDialog;
@@ -199,6 +206,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private boolean pinLongClick = false;
 
     private boolean twoFA = false;
+    public static final String NAME_USER_LOCKED = "NAME_USER_LOCKED";
+    private Intent receivedIntent;
+    private ArrayList<ShareInfo> shareInfos;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -2047,7 +2057,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (parentHandle != -1){
                     Intent intent = new Intent();
                     intent.putExtra("PARENT_HANDLE", parentHandle);
-                    ((LoginActivityLollipop) context).setResult(Activity.RESULT_OK, intent);
+                    ((LoginActivityLollipop) context).setResult(RESULT_OK, intent);
                     ((LoginActivityLollipop) context).finish();
                 }
                 else{
@@ -2251,18 +2261,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     closeCancelDialog();
                     firstPin.requestFocus();
                     firstPin.setCursorVisible(true);
+                    return;
                 }
                 else if (error.getErrorCode() == MegaError.API_EFAILED || error.getErrorCode() == MegaError.API_EEXPIRED) {
                     if (verify2faProgressBar != null) {
                         verify2faProgressBar.setVisibility(View.GONE);
                     }
                     verifyShowError();
+                    return;
                 }
                 else{
                     if (error.getErrorCode() == MegaError.API_ENOENT) {
-                        if (is2FAEnabled) {
-                            returnToLogin();
-                        }
                         errorMessage = getString(R.string.error_incorrect_email_or_password);
                     }
                     else if (error.getErrorCode() == MegaError.API_ETOOMANY){
@@ -2271,12 +2280,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
                         errorMessage = getString(R.string.account_not_validated_login);
                     }
-                    else if (error.getErrorCode() == MegaError.API_EBLOCKED){
-                        errorMessage = getString(R.string.error_account_suspended);
-                    } else if(error.getErrorCode() == MegaError.API_EACCESS) {
+                    else if(error.getErrorCode() == MegaError.API_EACCESS) {
                         errorMessage = error.getErrorString();
-                    }
-                    else{
+                    } else if (error.getErrorCode() == MegaError.API_EBLOCKED) {
+                        //It will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
+                        logWarning("Suspended account - Reason: " + request.getNumber());
+                        return;
+                    } else {
                         errorMessage = error.getErrorString();
                     }
                     logError("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
@@ -2304,22 +2314,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
 
-                if (!is2FAEnabled) {
-                    loginLoggingIn.setVisibility(View.GONE);
-                    loginLogin.setVisibility(View.VISIBLE);
-                    closeCancelDialog();
-                    scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
-                    loginCreateAccount.setVisibility(View.VISIBLE);
-                    queryingSignupLinkText.setVisibility(View.GONE);
-                    confirmingAccountText.setVisibility(View.GONE);
-                    generatingKeysText.setVisibility(View.GONE);
-                    loggingInText.setVisibility(View.GONE);
-                    fetchingNodesText.setVisibility(View.GONE);
-                    prepareNodesText.setVisibility(View.GONE);
-                    serversBusyText.setVisibility(View.GONE);
-                }
-            }
-            else{
+                returnToLogin();
+            } else {
                 if (is2FAEnabled){
                     loginVerificationLayout.setVisibility(View.GONE);
                     ((LoginActivityLollipop) context).hideAB();
@@ -2338,23 +2334,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 gSession = megaApi.dumpSession();
 
                 logDebug("Logged in with session");
-
-//				String session = megaApi.dumpSession();
-//				Toast.makeText(this, "Session = " + session, Toast.LENGTH_LONG).show();
-
-                //TODO
-                //addAccount (email, session)
-//				String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
-//				if (accountType != null){
-//					authTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
-//					if (authTokenType == null){
-//						authTokenType = .AUTH_TOKEN_TYPE_INSTANTIATE;
-//					}
-//					Account account = new Account(lastEmail, accountscroll_view_loginType);
-//					accountManager.addAccountExplicitly(account, gSession, null);
-//					log("AUTTHO: _" + authTokenType + "_");
-//					accountManager.setAuthToken(account, authTokenType, gSession);
-//				}
 
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                 dbH.clearEphemeral();
@@ -2409,8 +2388,20 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 dbH.saveCredentials(credentials);
 
                 logDebug("readyToManager");
+                receivedIntent = ((LoginActivityLollipop) context).getIntentReceived();
+                if (receivedIntent != null) {
+                    shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivityLollipop.EXTRA_SHARE_INFOS);
+                    if (shareInfos != null && shareInfos.size() > 0) {
+                        boolean canRead = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+                        if (canRead) {
+                            toSharePage();
+                        } else {
+                            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_MEDIA_PERMISSION);
+                        }
+                        return;
+                    }
+                }
                 readyToManager();
-
             }else{
                 if(confirmLogoutDialog != null) {
                     confirmLogoutDialog.dismiss();
@@ -2426,9 +2417,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
                     errorMessage = getString(R.string.account_not_validated_login);
-                }
-                else if (error.getErrorCode() == MegaError.API_EBLOCKED){
-                    errorMessage = getString(R.string.error_account_suspended);
                 }
                 else{
                     errorMessage = error.getErrorString();
@@ -2459,7 +2447,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
                 else{
-                    ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    if(error.getErrorCode() != MegaError.API_EBLOCKED) {
+                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    }
                 }
 
                 if(chatSettings==null) {
@@ -2546,6 +2536,26 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
             }
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == READ_MEDIA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                toSharePage();
+            } else {
+                readyToManager();
+            }
+        }
+    }
+
+    private void toSharePage() {
+        Intent shareIntent = new Intent(context, FileExplorerActivityLollipop.class);
+        shareIntent.putExtra(FileExplorerActivityLollipop.EXTRA_SHARE_INFOS,shareInfos);
+        shareIntent.setAction(receivedIntent.getStringExtra(FileExplorerActivityLollipop.EXTRA_SHARE_ACTION));
+        shareIntent.setType(receivedIntent.getStringExtra(FileExplorerActivityLollipop.EXTRA_SHARE_TYPE));
+        startActivity(shareIntent);
+        ((LoginActivityLollipop) context).finish();
     }
 
     private void closeCancelDialog() {
