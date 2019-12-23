@@ -122,6 +122,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     
     private MegaPreferences prefs;
     private String localPath = "";
+    private boolean removeGPS = true;
     private ChatSettings chatSettings;
     private long cameraUploadHandle = -1;
     private boolean secondaryEnabled = false;
@@ -573,38 +574,43 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
 
             if (file.getType() == SyncRecord.TYPE_PHOTO && !file.isCopyOnly()) {
-                String newPath = createTempFile(file);
-                //IOException occurs.
-                if (ERROR_CREATE_FILE_IO_ERROR.equals(newPath)) {
-                    continue;
-                }
-
-                // only retry for 60 seconds
-                int counter = 60;
-                while (ERROR_NOT_ENOUGH_SPACE.equals(newPath) && running && counter != 0) {
-                    counter--;
-                    try {
-                        logDebug("Waiting for disk space to process");
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                if(removeGPS) {
+                    String newPath = createTempFile(file);
+                    //IOException occurs.
+                    if (ERROR_CREATE_FILE_IO_ERROR.equals(newPath)) {
+                        continue;
                     }
 
-                    //show no space notification
-                    if (megaApi.getNumPendingUploads() == 0) {
-                        logWarning("Stop service due to out of space issue");
-                        finish();
-                        String title = getString(R.string.title_out_of_space);
-                        String message = getString(R.string.error_not_enough_free_space);
-                        Intent intent = new Intent(this,ManagerActivityLollipop.class);
-                        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
-                        showNotification(title,message,pendingIntent,true);
-                        return;
+                    // only retry for 60 seconds
+                    int counter = 60;
+                    while (ERROR_NOT_ENOUGH_SPACE.equals(newPath) && running && counter != 0) {
+                        counter--;
+                        try {
+                            logDebug("Waiting for disk space to process");
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        //show no space notification
+                        if (megaApi.getNumPendingUploads() == 0) {
+                            logWarning("Stop service due to out of space issue");
+                            finish();
+                            String title = getString(R.string.title_out_of_space);
+                            String message = getString(R.string.error_not_enough_free_space);
+                            Intent intent = new Intent(this,ManagerActivityLollipop.class);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
+                            showNotification(title,message,pendingIntent,true);
+                            return;
+                        }
+                        newPath = createTempFile(file);
                     }
-                    newPath = createTempFile(file);
-                }
-                if (!newPath.equals(file.getNewPath())) {
-                    file.setNewPath(newPath);
+                    if (!newPath.equals(file.getNewPath())) {
+                        file.setNewPath(newPath);
+                    }
+                } else {
+                    // set as don't remove GPS
+                    file.setNewPath(file.getLocalPath());
                 }
             }
 
@@ -913,6 +919,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             logDebug("Localpath: " + localPath);
                         }
                     }
+
+                    if(prefs.getRemoveGPS() != null) {
+                        removeGPS = Boolean.parseBoolean(prefs.getRemoveGPS());
+                        logDebug("Should remove GPS: " + removeGPS);
+                    }
                     
                     boolean isWifi = isOnWifi(this);
                     if (prefs.getCamSyncWifi() == null) {
@@ -1027,6 +1038,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } else {
             logDebug("if (prefs.getCamSyncHandle() != null)");
             cameraUploadHandle = Long.parseLong(prefs.getCamSyncHandle());
+        }
+
+        if(prefs.getRemoveGPS() != null) {
+            removeGPS = Boolean.parseBoolean(prefs.getRemoveGPS());
+            logDebug("Should remove GPS: " + removeGPS);
         }
         
         if (prefs.getSecondaryMediaFolderEnabled() == null) {

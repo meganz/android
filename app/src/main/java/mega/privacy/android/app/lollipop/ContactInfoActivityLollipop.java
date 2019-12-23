@@ -68,6 +68,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MarqueeTextView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -105,8 +106,8 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_COPY_FOLDER;
-import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_MOVE_FOLDER;
+import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.*;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -141,7 +142,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	LinearLayout optionsLayout;
 
 	//Info of the user
-	TextView nameText;
+	EmojiTextView nameText;
 	TextView emailText;
 
 	LinearLayout chatOptionsLayout;
@@ -174,7 +175,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	//Toolbar elements
 	ImageView contactStateIcon;
-	TextView firstLineTextToolbar;
+	EmojiTextView firstLineTextToolbar;
 	TextView firstLineLengthToolbar;
 	MarqueeTextView secondLineTextToolbar;
 	TextView secondLineLengthToolbar;
@@ -220,6 +221,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     NodeController nC;
     boolean moveToRubbish;
     long parentHandle;
+
+    private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
@@ -294,14 +297,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
 
 			/*TITLE*/
-			firstLineTextToolbar = (TextView) findViewById(R.id.first_line_toolbar);
+			firstLineTextToolbar = (EmojiTextView) findViewById(R.id.first_line_toolbar);
 			firstLineLengthToolbar = (TextView) findViewById(R.id.first_line_length_toolbar);
 
 			/*SUBTITLE*/
 			secondLineTextToolbar = (MarqueeTextView) findViewById(R.id.second_line_toolbar);
 			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
 
-			nameText = (TextView) findViewById(R.id.chat_contact_properties_name_text);
+			nameText = (EmojiTextView) findViewById(R.id.chat_contact_properties_name_text);
+			nameText.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 			emailText =(TextView) findViewById(R.id.chat_contact_properties_email_text);
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -438,7 +442,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						nameText.setText(userEmailExtra);
 					}
 				}
-				String fullname = (String)firstLineTextToolbar.getText();
+				String fullname = firstLineTextToolbar.getText().toString();
 				setDefaultAvatar(fullname);
 			}
 			else{
@@ -678,7 +682,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 				logDebug("This user is offline");
 				contactStateIcon.setVisibility(View.VISIBLE);
-				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_offline));
+				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.offline_status));
 				secondLineLengthToolbar.setText(getString(R.string.offline_status));
@@ -1012,7 +1016,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER_TO_SHARE);
 			ArrayList<String> contacts = new ArrayList<String>();
 			contacts.add(email);
-			intent.putExtra("SELECTED_CONTACTS", contacts);
+			intent.putExtra(SELECTED_CONTACTS, contacts);
 			startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
 		}
 		else{
@@ -1228,17 +1232,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_send_message_layout:{
 				logDebug("Send message option");
-				if(!isOnline(this)){
-
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-					return;
-				}
+				if(!checkConnection()) return;
 
 				sendMessageToChat();
 				break;
 			}
 			case R.id.chat_contact_properties_chat_call_layout:{
 				logDebug("Start audio call option");
+				if(!checkConnection()) return;
+
 				if(megaChatApi!=null){
 					if(!participatingInACall(megaChatApi)){
 						logDebug("I'm not in a call");
@@ -1252,6 +1254,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_video_layout:{
 				logDebug("Star video call option");
+				if(!checkConnection()) return;
+
 				if(megaChatApi!=null) {
 					if (!participatingInACall(megaChatApi)) {
 						logDebug("I'm not in a call");
@@ -1324,6 +1328,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
+	private boolean checkConnection() {
+		if (!isOnline(this)) {
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
@@ -1336,7 +1348,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
-			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
@@ -1404,19 +1416,23 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
-			long fileHandle = intent.getLongExtra("SELECT", 0);
+			long fileHandles[] = intent.getLongArrayExtra(NODE_HANDLES);
+
+			if (fileHandles == null) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error), -1);
+				return;
+			}
 
 			MegaChatRoom chatRoomToSend = megaChatApi.getChatRoomByUser(user.getHandle());
 			if(chatRoomToSend!=null){
-				MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatRoomToSend.getChatId(), false, 1);
-				megaChatApi.attachNode(chatRoomToSend.getChatId(), fileHandle, listener);
+				checkIfNodesAreMineBeforeAttach(fileHandles, chatRoomToSend.getChatId());
 			}
 			else{
 				//Create first the chat
 				ArrayList<MegaChatRoom> chats = new ArrayList<>();
 				ArrayList<MegaUser> usersNoChat = new ArrayList<>();
 				usersNoChat.add(user);
-				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandle, this, CreateChatToPerformActionListener.SEND_FILE);
+				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandles, this, CreateChatToPerformActionListener.SEND_FILES, -1);
 				MegaChatPeerList peers = MegaChatPeerList.createInstance();
 				peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 				megaChatApi.createChat(false, peers, listener);
@@ -1488,6 +1504,17 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         }
 
 		super.onActivityResult(requestCode, resultCode, intent);
+	}
+
+	public void checkIfNodesAreMineBeforeAttach(long[] fileHandles, long chatId) {
+		new ChatController(this).checkIfNodesAreMineAndAttachNodes(fileHandles, chatId);
+	}
+
+	public void sendFilesToChat(long[] fileHandles, long chatId) {
+		MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatId, fileHandles.length);
+		for (long fileHandle : fileHandles) {
+			megaChatApi.attachNode(chatId, fileHandle, listener);
+		}
 	}
 
 	/*
@@ -1911,12 +1938,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	}
     
     public void showOptionsPanel(MegaNode node){
-		logDebug("Node handle: " + node.getHandle());
-        if(node!=null){
-            this.selectedNode = node;
-            ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment = new ContactInfoBottomSheetDialogFragment();
-            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-        }
+		logDebug("showOptionsPanel");
+
+        if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedNode = node;
+		bottomSheetDialogFragment = new ContactInfoBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
     
     public MegaNode getSelectedNode() {

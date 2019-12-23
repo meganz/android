@@ -60,7 +60,6 @@
              colorControlHighlight & colorSwitchThumbNormal. -->
         <item name="preferenceTheme">@style/PreferenceStyle</item>
     </style>
-
     <style name="Theme.Megaactionbar.Secondary" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
 
@@ -296,6 +295,27 @@
         <item name="android:textColor">@color/pass_weak</item>
     </style>
 
+	<style name="SMSVerificationStyle" parent="Theme.AppCompat.Light.NoActionBar">
+		<item name="colorPrimaryDark">#3490B1</item>
+		<item name="android:windowNoTitle">true</item>
+	</style>
+
+	<style name="SMSVerificationReceiveTxtActivityTheme" parent="Theme.Megaactionbar">
+		<item name="colorPrimaryDark">#3490B1</item>
+		<item name="colorPrimary">#FFF9F9F9</item>
+	</style>
+
+    <style name="GetFreeXxGbWhen" parent="@style/TextAppearance.AppCompat">
+        <item name="android:fontFamily">Roboto</item>
+        <item name="android:textColor">#FF666666</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Button" parent="@style/ButtonStyle">
+        <item name="android:textColor">#FF00BFA5</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="InputTextAppearanceMedium" parent="TextAppearance.Design.Error">
         <item name="android:textColor">@color/green_unlocked_rewards</item>
     </style>
@@ -328,5 +348,24 @@
         <item name="android:progressBackgroundTint">@color/status_bar_login</item>
         <item name="android:progressTint">@color/accentColor</item>
         <item name="android:colorControlActivated">@color/accentColor</item>
+    </style>
+
+    <style name="AccentBorderBackgroundBorderlessButton" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/background_button_border_accent</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textColor">@color/accentColor</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="AccentBorderBackgroundButton" parent="ButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textColor">@color/accentColor</item>
+        <item name="android:background">@drawable/background_button_border_accent</item>
+    </style>
+    
+    <style name="TransparentBlackTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/mail_my_account</item>
     </style>
 </resources>

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.SystemClock;
@@ -16,10 +17,14 @@ import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.components.SimpleSpanBuilder;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -96,7 +101,6 @@ public class ChatUtil {
 
     /*Method to return to the call which I am participating*/
     public static void returnCall(Context context, MegaChatApiAndroid megaChatApi) {
-        logDebug("returnCall()");
         if ((megaChatApi == null) || (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)) == null))
             return;
         long chatId = getChatCallInProgress(megaChatApi);
@@ -110,12 +114,12 @@ public class ChatUtil {
 
     }
 
-    /*Method to show or hide the "return the call" layout*/
-    public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono) {
+    /*Method to show or hide the "Tap to return to call" banner*/
+    public static void showCallLayout(MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono) {
         if (megaChatApi == null || callInProgressLayout == null) return;
         logDebug("showCallLayout");
 
-        if (!Util.isChatEnabled() || !(context instanceof ManagerActivityLollipop) || !participatingInACall(megaChatApi)) {
+        if (!isChatEnabled() || !participatingInACall(megaChatApi)) {
             callInProgressLayout.setVisibility(View.GONE);
             activateChrono(false, callInProgressChrono, null);
             return;
@@ -160,7 +164,31 @@ public class ChatUtil {
         return actionBarHeight;
     }
 
-    public static void showShareChatLinkDialog(final Context context, MegaChatRoom chat, final String chatLink) {
+    public static int getMaxAllowed(@Nullable final CharSequence text) {
+        int numEmojis = EmojiManager.getInstance().getNumEmojis(text);
+        if (numEmojis > 0) {
+            int realLenght = text.length() + (numEmojis * 2);
+            if (realLenght >= MAX_ALLOWED_CHARACTERS_AND_EMOJIS) return text.length();
+        }
+        return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
+    }
+
+    public static String getFirstLetter(String title) {
+        String resultTitle = EmojiUtilsShortcodes.emojify(title);
+        resultTitle = resultTitle.trim();
+        if (resultTitle.isEmpty()) return "";
+        if (resultTitle.length() == 1) return resultTitle;
+        String lastEmoji = resultTitle.substring(0, 2);
+        int numEmojis = EmojiManager.getInstance().getNumEmojis(lastEmoji);
+        if (numEmojis > 0) return lastEmoji;
+        String result = String.valueOf(resultTitle.charAt(0)).toUpperCase(Locale.getDefault());
+
+        return result;
+    }
+
+
+    public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         LayoutInflater inflater = null;
         if (context instanceof GroupChatInfoActivityLollipop) {
@@ -289,16 +317,18 @@ public class ChatUtil {
     }
 
     public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall callChat) {
-        if (chronometer == null || callChat == null) return;
-        if (activateChrono) {
+        if (chronometer == null) return;
+        if(!activateChrono){
+            chronometer.stop();
+            chronometer.setVisibility(View.GONE);
+            return;
+        }
+        if (callChat != null) {
             chronometer.setVisibility(View.VISIBLE);
             chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration() * 1000));
             chronometer.start();
             chronometer.setFormat(" %s");
-            return;
         }
-        chronometer.stop();
-        chronometer.setVisibility(View.GONE);
     }
 
     /**
@@ -453,4 +483,24 @@ public class ChatUtil {
                 return  String.valueOf(status);
         }
     }
+
+    public static String converterShortCodes(String text) {
+        if (text == null || text.isEmpty()) return text;
+        return EmojiUtilsShortcodes.emojify(text);
+    }
+
+    public static SimpleSpanBuilder formatText(Context context, String text) {
+
+        SimpleSpanBuilder result;
+
+        try {
+            RTFFormatter formatter = new RTFFormatter(text, context);
+            result = formatter.setRTFFormat();
+        } catch (Exception e) {
+            logError("FORMATTER EXCEPTION!!!", e);
+            result = null;
+        }
+        return result;
+    }
+
 }

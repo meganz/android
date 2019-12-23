@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_relative_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <RelativeLayout
+        android:id="@+id/content_layout_chat_explorer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/linear_layout_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/new_group_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/new_group_chat_label"
+                android:paddingLeft="16dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:textColor="@color/accentColor"
+                android:gravity="left|center_vertical"
+                style="?android:attr/borderlessButtonStyle"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/contact_adds_recycler_view"
+                android:layout_width="wrap_content"
+                android:layout_height="88dp"
+                android:orientation="horizontal"
+                android:layout_gravity="center"/>
+        </android.support.design.widget.AppBarLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_empty_layout_chat_recent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/empty_text_chat_recent_invite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="300dp"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/mail_my_account"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/empty_image_view_recent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"/>
+
+            <TextView
+                android:id="@+id/empty_text_chat_recent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/adapters_background"
+                android:textSize="18sp" />
+
+
+            <Button
+                android:id="@+id/invite_button"
+                style="@style/AccentBorderBackgroundBorderlessButton"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:minWidth="96dp"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="10dp"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <include layout="@layout/item_call_in_progress_layout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/linear_layout_add"/>
+
+        <LinearLayout
+            android:id="@+id/linear_layout_recycler"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_below="@id/call_in_progress_layout">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/chat_recent_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:choiceMode="multipleChoice" />
+
+                <mega.privacy.android.app.components.scrollBar.FastScroller
+                    android:id="@+id/fastscroll_chat"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:gravity="right"/>
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progressbar_chat_explorer"
+        style="?android:attr/progressBarStyleLargeInverse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+</RelativeLayout>
