@@ -142,7 +142,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
 
         if(contact!=null){
-            fullName = getMegaUserNameDB(contact);
+            fullName = getMegaUserNameDB(megaApi, context, contact);
         }
         else{
             logWarning("Contact NULL");

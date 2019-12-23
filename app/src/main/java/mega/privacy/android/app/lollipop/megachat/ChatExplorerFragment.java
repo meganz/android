@@ -292,7 +292,7 @@ public class ChatExplorerFragment extends Fragment {
             return null;
         }
 
-        String fullName = getContactNameDB(handle);
+        String fullName = getContactNameDB(megaApi, context, handle);
         if(fullName ==  null){
             fullName = user.getEmail();
         }
@@ -352,7 +352,7 @@ public class ChatExplorerFragment extends Fragment {
             logDebug("Contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
             if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                 long contactHandle = contactsMEGA.get(i).getHandle();
-                String fullName = getContactNameDB(contactHandle);
+                String fullName = getContactNameDB(megaApi, context, contactHandle);
                 if(fullName ==  null){
                     fullName = contactsMEGA.get(i).getEmail();
                 }

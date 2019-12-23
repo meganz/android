@@ -185,7 +185,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     }
     
     private void displayFirstLetter(MegaUser contact,ViewHolder holder) {
-        String fullName = getMegaUserNameDB(contact);
+        String fullName = getMegaUserNameDB(megaApi, context, contact);
         String firstLetter = ChatUtil.getFirstLetter(fullName);
         if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
             holder.contactInitialLetter.setVisibility(View.INVISIBLE);

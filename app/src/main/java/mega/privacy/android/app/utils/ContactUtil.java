@@ -1,6 +1,11 @@
 package mega.privacy.android.app.utils;
 
+import android.content.Context;
+
 import mega.privacy.android.app.MegaContactDB;
+import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -10,30 +15,37 @@ public class ContactUtil {
         return dbH.findContactByHandle(String.valueOf(contactHandle));
     }
 
-    public static String getMegaUserNameDB(MegaUser user) {
+    public static String getMegaUserNameDB(MegaApiAndroid megaApi, Context context, MegaUser user) {
         if (user == null) return null;
 
-        String nameContact = getContactNameDB(user.getHandle());
+        String nameContact = getContactNameDB(megaApi, context, user.getHandle());
         if (nameContact != null) return nameContact;
-
-        //It isn't in the DB, ask for it to megaApi and listen for it in a broadcast. For the moment, email it will be the name.
-//        ContactNameListener listener = new ContactNameListener(context);
-//        megaApi.getUserAttribute(user, USER_ATTR_FIRSTNAME, listener);
-//        megaApi.getUserAttribute(user, USER_ATTR_LASTNAME, listener);
-//        megaApi.getUserAlias(user, listener);
         return user.getEmail();
     }
 
-    public static String getContactNameDB(long contactHandle) {
+    public static String getContactNameDB(MegaApiAndroid megaApi, Context context, long contactHandle) {
         MegaContactDB contactDB = getContactDB(contactHandle);
         if (contactDB != null) {
             String nicknameText = contactDB.getNickname();
-            if(nicknameText != null) return nicknameText;
+            if(nicknameText != null){
+                return nicknameText;
+            }
 
             String firstNameText = contactDB.getName();
+            if (firstNameText == null || firstNameText.trim().length()<=0) {
+                MegaUser user = megaApi.getContact(contactDB.getMail());
+                megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(context));
+            }
+
             String lastNameText = contactDB.getLastName();
+            if (lastNameText == null || lastNameText.trim().length()<=0) {
+                MegaUser user = megaApi.getContact(contactDB.getMail());
+                megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(context));
+            }
+
             String emailText = contactDB.getMail();
-            return buildFullName(firstNameText, lastNameText, emailText);
+            String nameResult = buildFullName(firstNameText, lastNameText, emailText);
+            return nameResult;
         }
         return null;
     }
@@ -46,8 +58,7 @@ public class ContactUtil {
     }
 
     public static String buildFullName(String name, String lastName, String mail) {
-
-        if (name == null) {
+        if (name == null || name.trim().length()<=0) {
             name = "";
         }
         if (lastName == null) {

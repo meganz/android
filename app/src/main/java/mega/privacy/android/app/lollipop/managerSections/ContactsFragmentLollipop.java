@@ -1040,12 +1040,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			logDebug("Contact: " + contacts.get(i).getHandle() + "_" + contacts.get(i).getVisibility());
 			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 				long contactHandle = contacts.get(i).getHandle();
-				String fullName = getContactNameDB(contactHandle);
-				logDebug("setContacts:: fullName = "+fullName);
-				if(fullName ==  null){
-					fullName = contacts.get(i).getEmail();
-				}
-
+				String fullName = getContactNameDB(megaApi, context, contactHandle);
 				MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contacts.get(i), fullName);
 				visibleContacts.add(megaContactAdapter);
 			}
@@ -1123,6 +1118,43 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
+	}
+
+	public void updateContact(long contactHandle){
+		int positionVisibleContacts = -1;
+		int positionContacts = -1;
+		for(int i=0; i<visibleContacts.size(); i++){
+			if(visibleContacts.get(i).getMegaUser().getHandle() == contactHandle){
+				positionVisibleContacts = i;
+				break;
+
+			}
+		}
+		for(int i=0; i<contacts.size(); i++){
+			if(contacts.get(i).getHandle() == contactHandle){
+				positionContacts = i;
+				break;
+			}
+		}
+		if(positionVisibleContacts != -1 && positionContacts != -1){
+			MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contacts.get(positionContacts), getContactNameDB(megaApi, context, contactHandle));
+			visibleContacts.set(positionVisibleContacts, megaContactAdapter);
+
+			if(adapter == null){
+				if (((ManagerActivityLollipop)context).isList()) {
+					logDebug("isList");
+					adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				}
+				else{
+					adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				}
+			}
+			else{
+				adapter.notifyItemChanged(positionVisibleContacts);
+			}
+			sortBy();
+			updateOrder();
+		}
 	}
 
 	public void updateView () {

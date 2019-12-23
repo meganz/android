@@ -1080,7 +1080,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				if (mS.getNodeHandle() == n.getHandle()) {
 					MegaUser user = megaApi.getContact(mS.getUser());
 
-					name = getMegaUserNameDB(user);
+					name = getMegaUserNameDB(megaApi, this, user);
 					if(name == null) name = "";
 				}
 			}

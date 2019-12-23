@@ -1553,7 +1553,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						MegaUser user= megaApi.getContact(mS.getUser());
 						contactMail=user.getEmail();
 						if(user!=null){
-						    String name = getMegaUserNameDB(user);
+						    String name = getMegaUserNameDB(megaApi, this, user);
 						    if(name != null){
 						        ownerLabel.setText(name);
 						        ownerInfo.setText(user.getEmail());

@@ -24,6 +24,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -380,15 +381,12 @@ public class ContactController {
             if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
                 MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "", null);
                 dbH.setContact(megaContactDB);
-                megaApi.getUserAttribute(user, 1, new ContactNameListener(context));
-                megaApi.getUserAttribute(user, 2, new ContactNameListener(context));
-                megaApi.getUserAlias(user.getHandle(), new ContactNameListener(context));
+
             }
-            else{
-                megaApi.getUserAttribute(user, 1, new ContactNameListener(context));
-                megaApi.getUserAttribute(user, 2, new ContactNameListener(context));
-                megaApi.getUserAlias(user.getHandle(), new ContactNameListener(context));
-            }
+            megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(context));
+            megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(context));
+            megaApi.getUserAlias(user.getHandle(), new ContactNameListener(context));
+
         }
     }
 

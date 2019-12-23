@@ -2376,7 +2376,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             }
 
                             long contactHandle = contactsMEGA.get(i).getHandle();
-                            String fullName = getContactNameDB(contactHandle);
+                            String fullName = getContactNameDB(megaApi, this, contactHandle);
                             if(fullName ==  null){
                                 fullName = contactsMEGA.get(i).getEmail();
                             }
@@ -2398,7 +2398,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 
                             long contactHandle = contactsMEGA.get(i).getHandle();
-                            String fullName = getContactNameDB(contactHandle);
+                            String fullName = getContactNameDB(megaApi, this, contactHandle);
                             if(fullName ==  null){
                                 fullName = contactsMEGA.get(i).getEmail();
                             }
@@ -2424,7 +2424,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 
                     long contactHandle = contactsMEGA.get(i).getHandle();
-                    String fullName = getContactNameDB(contactHandle);
+                    String fullName = getContactNameDB(megaApi, this, contactHandle);
                     if(fullName ==  null){
                         fullName = contactsMEGA.get(i).getEmail();
                     }
@@ -2449,7 +2449,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 
                     long contactHandle = contactsMEGA.get(i).getHandle();
-                    String fullName = getContactNameDB(contactHandle);
+                    String fullName = getContactNameDB(megaApi, this, contactHandle);
                     if(fullName ==  null){
                         fullName = contactsMEGA.get(i).getEmail();
                     }

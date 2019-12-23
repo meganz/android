@@ -659,7 +659,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     if (mS.getNodeHandle() == node.getHandle()) {
                         MegaUser user = megaApi.getContact(mS.getUser());
                         if (user != null) {
-                            holder.textViewFileSize.setText(getMegaUserNameDB(user));
+                            holder.textViewFileSize.setText(getMegaUserNameDB(megaApi, context, user));
                         } else {
                             holder.textViewFileSize.setText(mS.getUser());
                         }
@@ -913,7 +913,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     if (mS.getNodeHandle() == node.getHandle()) {
                         MegaUser user = megaApi.getContact(mS.getUser());
                         if (user != null) {
-                            holder.textViewFileSize.setText(getMegaUserNameDB(user));
+                            holder.textViewFileSize.setText(getMegaUserNameDB(megaApi, context, user));
                         } else {
                             holder.textViewFileSize.setText(mS.getUser());
                         }

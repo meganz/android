@@ -543,7 +543,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			{
 				finish();
 			}
-			fullName =  getMegaUserNameDB(contact);
+			fullName =  getMegaUserNameDB(megaApi, this, contact);
 
 			if(aB!=null){
 				aB.setDisplayHomeAsUpEnabled(true);

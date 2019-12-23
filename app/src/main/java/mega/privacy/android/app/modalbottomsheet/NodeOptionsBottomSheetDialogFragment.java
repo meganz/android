@@ -620,7 +620,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             if (mS.getNodeHandle() == node.getHandle()) {
                                 MegaUser user = megaApi.getContact(mS.getUser());
                                 if (user != null) {
-                                    nodeInfo.setText(getMegaUserNameDB(user));
+                                    nodeInfo.setText(getMegaUserNameDB(megaApi, context, user));
                                 } else {
                                     nodeInfo.setText(mS.getUser());
                                 }
@@ -836,7 +836,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             if (mS.getNodeHandle() == node.getHandle()) {
                                 MegaUser user = megaApi.getContact(mS.getUser());
                                 if (user != null) {
-                                    nodeInfo.setText(getMegaUserNameDB(user));
+                                    nodeInfo.setText(getMegaUserNameDB(megaApi, context, user));
                                 } else {
                                     nodeInfo.setText(mS.getUser());
                                 }

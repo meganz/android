@@ -1106,7 +1106,7 @@ public class ChatController {
             MegaUser contact = megaApi.getContact(handleString);
             if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
                 logDebug("Is contact!");
-                String nameContact = getContactNameDB(userHandle);
+                String nameContact = getContactNameDB(megaApi, context, userHandle);
                 if(nameContact != null) return nameContact;
                 return "";
             }

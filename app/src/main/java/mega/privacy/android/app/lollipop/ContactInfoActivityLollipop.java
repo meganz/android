@@ -1461,7 +1461,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null) {
 				long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-				String resultTransfer = intent.getStringExtra(EXTRA_USER_NICKNAME);
 				if(user != null && userHandle == user.getHandle()){
 					checkNickname(user.getHandle());
 					updateAvatar();

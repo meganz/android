@@ -905,6 +905,20 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
     };
 
+	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null) {
+				long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
+				if(cFLol!=null){
+					cFLol.updateContact(userHandle);
+				}
+			}
+		}
+	};
+
+
 	private BroadcastReceiver receiverUpdatePosition = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -2044,6 +2058,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
 		if (localBroadcastManager != null) {
+			localBroadcastManager.registerReceiver(nicknameReceiver,
+					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_ALIAS));
+
 			localBroadcastManager.registerReceiver(receiverUpdatePosition,
 					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 
@@ -4561,6 +4578,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
 		isStorageStatusDialogShown = false;
 
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
@@ -5960,7 +5978,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					for (int i=0;i<contacts.size();i++){
 						if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                             long contactHandle = contacts.get(i).getHandle();
-                            String fullName = getContactNameDB(contactHandle);
+                            String fullName = getContactNameDB(megaApi, this, contactHandle);
                             if(fullName ==  null){
                                 fullName = contacts.get(i).getEmail();
                             }
@@ -15782,7 +15800,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						}
 
 						if(user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)){
-							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new ContactNameListener(this));
+							logDebug("I change the user: " + user.getHandle() + "nickname");
+
+//							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new ContactNameListener(this));
 						}
 
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
