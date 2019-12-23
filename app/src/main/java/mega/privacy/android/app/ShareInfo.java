@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,11 +36,11 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 /*
  * Helper class to process shared files from other activities
  */
-public class ShareInfo {
+public class ShareInfo implements Serializable {
 
 	public String title = null;
 	private long lastModified;
-	public InputStream inputStream = null;
+	public transient InputStream inputStream = null;
 	public long size = -1;
 	private File file = null;
 	public boolean isContact = false;
