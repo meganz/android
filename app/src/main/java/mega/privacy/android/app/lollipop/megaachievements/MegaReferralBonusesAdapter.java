@@ -196,9 +196,14 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		ReferralBonus referralBonus = (ReferralBonus) getItem(position);
 		holder.contactMail = referralBonus.getEmails().get(0);
 		MegaUser contact = megaApi.getContact(holder.contactMail);
-		long handle = contact.getHandle();
+		MegaContactDB contactDB = null;
 
-		MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(handle+""));
+        //is full contact
+        if (contact != null) {
+            long handle = contact.getHandle();
+            contactDB = dbH.findContactByHandle(handle + "");
+        }
+
 		String fullName = "";
 		if(contactDB!=null){
 			ContactController cC = new ContactController(context);
@@ -232,7 +237,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 				if (bitmap == null) {
 					avatar.delete();
-                    megaApi.getUserAvatar(contact,buildAvatarFile(context,contact.getEmail() + ".jpg").getAbsolutePath(),listener);
+                    megaApi.getUserAvatar(holder.contactMail,buildAvatarFile(context,holder.contactMail + ".jpg").getAbsolutePath(),listener);
                 }
 				else{
 					logDebug("Do not ask for user avatar - its in cache: " + avatar.getAbsolutePath());
@@ -241,11 +246,11 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 				}
 			}
 			else{
-                megaApi.getUserAvatar(contact,buildAvatarFile(context,contact.getEmail() + ".jpg").getAbsolutePath(),listener);
+                megaApi.getUserAvatar(holder.contactMail,buildAvatarFile(context,holder.contactMail + ".jpg").getAbsolutePath(),listener);
 			}
 		}
 		else{
-            megaApi.getUserAvatar(contact,buildAvatarFile(context,contact.getEmail() + ".jpg").getAbsolutePath(),listener);
+            megaApi.getUserAvatar(holder.contactMail,buildAvatarFile(context,holder.contactMail + ".jpg").getAbsolutePath(),listener);
 		}
 
 
