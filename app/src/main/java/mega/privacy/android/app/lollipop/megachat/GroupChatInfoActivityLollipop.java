@@ -1,9 +1,11 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -216,7 +219,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             dbH = DatabaseHandler.getDbHandler(getApplicationContext());
             chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
-
+            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+            if (localBroadcastManager != null) {
+                localBroadcastManager.registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_ALIAS));
+            }
             setContentView(R.layout.activity_group_chat_properties);
 
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
@@ -488,11 +494,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     @Override
     protected void onDestroy(){
         logDebug("onDestroy()");
+        super.onDestroy();
         if (megaChatApi != null) {
             megaChatApi.removeChatListener(this);
         }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
 
-        super.onDestroy();
     }
 
     public void setParticipants(){
@@ -515,8 +522,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
 
             long peerHandle = chat.getPeerHandle(i);
-
-            String fullName = getParticipantFullName(i);
+            String fullName = getNicknameContact(peerHandle);
+            if(fullName == null){
+                fullName = getParticipantFullName(i);
+            }
             String participantEmail = chat.getPeerEmail(i);
 
             logDebug(i + " - Handle of the peer: "+ peerHandle + ", Pprivilege: " + peerPrivilege);
@@ -563,35 +572,51 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    public String getParticipantFullName(long i) {
+    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+        if (intent != null) {
+            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+            updateAdapter(userHandle);
+        }
+        }
+    };
 
-        String nickname = getNicknameContact(chat.getPeerHandle(i));
+    private void updateAdapter(long contactHandle){
+        int position = -1;
+        if(participants != null && participants.size()>0){
+            for (int i=0; i< participants.size(); i++){
+                long participantHandle = participants.get(i).getHandle();
+                if(participantHandle == contactHandle){
+                    position = i;
+                    break;
+                }
+            }
+        }
+
+        if(position != -1){
+            String fullName = getNicknameContact(contactHandle);
+            if(fullName == null){
+                fullName = getParticipantFullName(position);
+            }
+            participants.get(position).setFullName(fullName);
+            adapter.updateParticipant(position+1, participants);
+        }
+    }
+
+    public String getParticipantFullName(long contact) {
+
+        String nickname = getNicknameContact(contact);
         if(nickname != null){
            return nickname;
         }
 
-        String fullName = chat.getPeerFullname(i);
-        if(fullName!=null){
-            if(fullName.isEmpty()){
-                logDebug("Put email as fullname");
-                fullName = chat.getPeerEmail(i);
-                return fullName;
-            }
-            else{
-                if (fullName.trim().length() <= 0){
-                    logDebug("Put email as fullname");
-                    fullName = chat.getPeerEmail(i);
-                    return fullName;
-                } else {
-                    return fullName;
-                }
-            }
+        String fullName = chat.getPeerFullname(contact);
+        if(fullName == null || fullName.trim().length()<=0){
+            String email = chat.getPeerEmail(contact);
+            return email;
         }
-        else{
-            logDebug("Put email as fullname");
-            fullName = chat.getPeerEmail(i);
-            return fullName;
-        }
+        return fullName;
     }
 
     @Override
