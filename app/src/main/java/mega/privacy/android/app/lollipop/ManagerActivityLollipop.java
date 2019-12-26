@@ -15800,9 +15800,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						}
 
 						if(user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)){
-							logDebug("I change the user: " + user.getHandle() + "nickname");
-
-//							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new ContactNameListener(this));
+							logDebug("I changed the user: " + user.getHandle() + " nickname");
+							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new ContactNameListener(this));
 						}
 
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){

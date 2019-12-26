@@ -1,24 +1,33 @@
 package mega.privacy.android.app.lollipop.listeners;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Base64;
 
+import java.util.ArrayList;
+
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringMap;
+import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
+
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_ALIAS;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME;
@@ -26,10 +35,14 @@ import static nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME;
 public class ContactNameListener implements MegaRequestListenerInterface {
     Context context;
     DatabaseHandler dbH;
+    MegaApiAndroid megaApi;
 
     public ContactNameListener(Context context) {
         this.context = context;
         dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+        if (megaApi == null){
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
     }
 
     @Override
@@ -42,8 +55,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
             case USER_ATTR_FIRSTNAME: {
                 if (e.getErrorCode() == MegaError.API_OK) {
                     String firstName = request.getText();
-                    int rows = dbH.setContactName(firstName, request.getEmail());
-                    logDebug("Rows affected: " + rows);
+                    dbH.setContactName(firstName, request.getEmail());
                     if (context != null && context instanceof ManagerActivityLollipop) {
                         ContactsFragmentLollipop cFLol = ((ManagerActivityLollipop) context).getContactsFragment();
                         if (cFLol != null) {
@@ -56,8 +68,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
             case USER_ATTR_LASTNAME: {
                 if (e.getErrorCode() == MegaError.API_OK) {
                     String lastName = request.getText();
-                    int rows = dbH.setContactLastName(lastName, request.getEmail());
-                    logDebug("Rows affected: " + rows);
+                    dbH.setContactLastName(lastName, request.getEmail());
                     if (context != null && context instanceof ManagerActivityLollipop) {
                         ContactsFragmentLollipop cFLol = ((ManagerActivityLollipop) context).getContactsFragment();
                         if (cFLol != null) {
@@ -72,8 +83,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
                     String nickname = null;
                     if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
                         nickname = request.getText();
-                        int rows = dbH.setContactNickname(nickname, request.getNodeHandle());
-                        logDebug("Rows affected: " + rows);
+                        dbH.setContactNickname(nickname, request.getNodeHandle());
                     } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
                         nickname = request.getName();
                         if (nickname == null) {
@@ -91,20 +101,15 @@ public class ContactNameListener implements MegaRequestListenerInterface {
                         }
                     }
 
-                    logDebug("notify of a nickname updated");
                     notifyNicknameUpdate(request.getNodeHandle(), nickname);
 
                 } else if (e.getErrorCode() == MegaError.API_ENOENT) {
                     logDebug("USER_ATTR_ALIAS::API_ENOENT");
 
                     if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
-                        int rows = dbH.setContactNickname(null, request.getNodeHandle());
-                        logDebug("Rows affected: " + rows);
+                        dbH.setContactNickname(null, request.getNodeHandle());
                     }
-
-                    logDebug("notify of a nickname removed");
                     notifyNicknameUpdate(request.getNodeHandle(), null);
-
                 } else {
                     logDebug("Error recovering, updating or removing the alias" + e.getErrorCode());
                 }
@@ -113,23 +118,73 @@ public class ContactNameListener implements MegaRequestListenerInterface {
         }
     }
 
-    private void updateDBNickname(MegaStringMap map) {
-        if (map == null || map.size() == 0) {
-            return;
-        }
-        MegaStringList listHandles = map.getKeys();
-        for (int i = 0; i < listHandles.size(); i++) {
-            String nickString = map.get(listHandles.get(i));
-
-            try {
-                String nickname = Base64.decode(nickString, 0).toString();
-                long userHandle = MegaApiJava.base64ToUserHandle(listHandles.get(i));
-                dbH.setContactNickname(nickname, userHandle);
-                notifyNicknameUpdate(userHandle, nickname);
-            } catch (java.lang.Exception e) {
-                return;
+    private ArrayList<MegaContactAdapter> getContactsDBList(){
+        ArrayList<MegaContactAdapter> visibleContacts = new ArrayList<>();
+        ArrayList<MegaUser> contacts = megaApi.getContacts();
+        for (int i=0;i<contacts.size();i++){
+            if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+                long contactHandle = contacts.get(i).getHandle();
+                String fullName = getContactNameDB(megaApi, context, contactHandle);
+                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contacts.get(i), fullName);
+                visibleContacts.add(megaContactAdapter);
             }
         }
+        return visibleContacts;
+
+    }
+
+    private void updateDBNickname(MegaStringMap map) {
+        ArrayList<MegaContactAdapter> contactsDB = getContactsDBList();
+
+        //No nicknames
+        if (map == null || map.size() == 0) {
+            if (contactsDB != null && !contactsDB.isEmpty()) {
+                for (int i = 0; i < contactsDB.size(); i++) {
+                    long contactDBHandle = contactsDB.get(i).getMegaUser().getHandle();
+                    String nickname = getNicknameContact(contactDBHandle);
+                    if(nickname != null){
+                        dbH.setContactNickname(null, contactDBHandle);
+                        notifyNicknameUpdate(contactDBHandle, null);
+                    }
+                }
+            }
+            return;
+        }
+
+        //Some nicknames
+        MegaStringList listHandles = map.getKeys();
+        if (contactsDB != null && !contactsDB.isEmpty()) {
+            for (int i = 0; i < contactsDB.size(); i++) {
+                long contactDBHandle = contactsDB.get(i).getMegaUser().getHandle();
+                String newNickname = null;
+                for (int j = 0; j < listHandles.size(); j++) {
+                    long userHandle = MegaApiJava.base64ToUserHandle(listHandles.get(j));
+                    if(contactDBHandle == userHandle){
+                        newNickname = getNewNickname(map, listHandles.get(j));
+                        break;
+                    }
+                }
+                String oldNickname = contactsDB.get(i).getMegaContactDB().getNickname();
+                if((newNickname == null && oldNickname == null)||(newNickname != null && oldNickname != null && newNickname.equals(oldNickname))){
+                    continue;
+                }else{
+                    dbH.setContactNickname(newNickname, contactDBHandle);
+                    notifyNicknameUpdate(contactDBHandle, newNickname);
+                }
+
+            }
+        }
+    }
+
+    private String getNewNickname(MegaStringMap map, String key){
+        String nicknameEncoded = map.get(key);
+        try {
+            byte[] decrypt= Base64.decode(nicknameEncoded, Base64.DEFAULT);
+            return new String(decrypt, "UTF-8");
+        } catch (java.lang.Exception e) {
+            return null;
+        }
+
     }
 
     @Override
