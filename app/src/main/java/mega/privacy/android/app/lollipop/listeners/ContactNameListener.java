@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Base64;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -25,9 +26,8 @@ import nz.mega.sdk.MegaStringMap;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-
+import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_ALIAS;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME;
@@ -40,8 +40,8 @@ public class ContactNameListener implements MegaRequestListenerInterface {
     public ContactNameListener(Context context) {
         this.context = context;
         dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
     }
 
@@ -56,12 +56,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
                 if (e.getErrorCode() == MegaError.API_OK) {
                     String firstName = request.getText();
                     dbH.setContactName(firstName, request.getEmail());
-                    if (context != null && context instanceof ManagerActivityLollipop) {
-                        ContactsFragmentLollipop cFLol = ((ManagerActivityLollipop) context).getContactsFragment();
-                        if (cFLol != null) {
-                            cFLol.updateView();
-                        }
-                    }
+                    updateView();
                 }
                 break;
             }
@@ -69,12 +64,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
                 if (e.getErrorCode() == MegaError.API_OK) {
                     String lastName = request.getText();
                     dbH.setContactLastName(lastName, request.getEmail());
-                    if (context != null && context instanceof ManagerActivityLollipop) {
-                        ContactsFragmentLollipop cFLol = ((ManagerActivityLollipop) context).getContactsFragment();
-                        if (cFLol != null) {
-                            cFLol.updateView();
-                        }
-                    }
+                    updateView();
                 }
                 break;
             }
@@ -101,15 +91,13 @@ public class ContactNameListener implements MegaRequestListenerInterface {
                         }
                     }
 
-                    notifyNicknameUpdate(request.getNodeHandle(), nickname);
+                    notifyNicknameUpdate(request.getNodeHandle());
 
                 } else if (e.getErrorCode() == MegaError.API_ENOENT) {
-                    logDebug("USER_ATTR_ALIAS::API_ENOENT");
-
                     if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
                         dbH.setContactNickname(null, request.getNodeHandle());
+                        notifyNicknameUpdate(request.getNodeHandle());
                     }
-                    notifyNicknameUpdate(request.getNodeHandle(), null);
                 } else {
                     logDebug("Error recovering, updating or removing the alias" + e.getErrorCode());
                 }
@@ -118,11 +106,11 @@ public class ContactNameListener implements MegaRequestListenerInterface {
         }
     }
 
-    private ArrayList<MegaContactAdapter> getContactsDBList(){
+    private ArrayList<MegaContactAdapter> getContactsDBList() {
         ArrayList<MegaContactAdapter> visibleContacts = new ArrayList<>();
         ArrayList<MegaUser> contacts = megaApi.getContacts();
-        for (int i=0;i<contacts.size();i++){
-            if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+        for (int i = 0; i < contacts.size(); i++) {
+            if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 long contactHandle = contacts.get(i).getHandle();
                 String fullName = getContactNameDB(megaApi, context, contactHandle);
                 MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contacts.get(i), fullName);
@@ -142,9 +130,9 @@ public class ContactNameListener implements MegaRequestListenerInterface {
                 for (int i = 0; i < contactsDB.size(); i++) {
                     long contactDBHandle = contactsDB.get(i).getMegaUser().getHandle();
                     String nickname = getNicknameContact(contactDBHandle);
-                    if(nickname != null){
+                    if (nickname != null) {
                         dbH.setContactNickname(null, contactDBHandle);
-                        notifyNicknameUpdate(contactDBHandle, null);
+                        notifyNicknameUpdate(contactDBHandle);
                     }
                 }
             }
@@ -159,32 +147,40 @@ public class ContactNameListener implements MegaRequestListenerInterface {
                 String newNickname = null;
                 for (int j = 0; j < listHandles.size(); j++) {
                     long userHandle = MegaApiJava.base64ToUserHandle(listHandles.get(j));
-                    if(contactDBHandle == userHandle){
+                    if (contactDBHandle == userHandle) {
                         newNickname = getNewNickname(map, listHandles.get(j));
                         break;
                     }
                 }
                 String oldNickname = contactsDB.get(i).getMegaContactDB().getNickname();
-                if((newNickname == null && oldNickname == null)||(newNickname != null && oldNickname != null && newNickname.equals(oldNickname))){
+                if ((newNickname == null && oldNickname == null) || (newNickname != null && oldNickname != null && newNickname.equals(oldNickname))) {
                     continue;
-                }else{
+                } else {
                     dbH.setContactNickname(newNickname, contactDBHandle);
-                    notifyNicknameUpdate(contactDBHandle, newNickname);
+                    notifyNicknameUpdate(contactDBHandle);
                 }
 
             }
         }
     }
 
-    private String getNewNickname(MegaStringMap map, String key){
+    private String getNewNickname(MegaStringMap map, String key) {
         String nicknameEncoded = map.get(key);
         try {
-            byte[] decrypt= Base64.decode(nicknameEncoded, Base64.DEFAULT);
-            return new String(decrypt, "UTF-8");
+            byte[] decrypt = Base64.decode(nicknameEncoded, Base64.DEFAULT);
+            return new String(decrypt, StandardCharsets.UTF_8);
         } catch (java.lang.Exception e) {
             return null;
         }
+    }
 
+    private void updateView() {
+        if (context != null && context instanceof ManagerActivityLollipop) {
+            ContactsFragmentLollipop cFLol = ((ManagerActivityLollipop) context).getContactsFragment();
+            if (cFLol != null) {
+                cFLol.updateView();
+            }
+        }
     }
 
     @Override
@@ -195,10 +191,9 @@ public class ContactNameListener implements MegaRequestListenerInterface {
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
     }
 
-    private void notifyNicknameUpdate(long userHandle, String nickname) {
+    private void notifyNicknameUpdate(long userHandle) {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_ALIAS);
         intent.putExtra(EXTRA_USER_HANDLE, userHandle);
-        intent.putExtra(EXTRA_USER_NICKNAME, nickname);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }

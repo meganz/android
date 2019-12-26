@@ -154,11 +154,9 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
-import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.extractMegaLink;
-import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.isChatLink;
-import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.isFileLink;
+import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -459,7 +457,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
                 long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-                showChat(null);
+                titleToolbar.setText(chatRoom.getTitle());
+                setChatSubtitle();
+//                showChat(null);
             }
         }
     };
@@ -1204,7 +1204,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 setPreviewersView();
                 titleToolbar.setText(chatRoom.getTitle());
                 setChatSubtitle();
-
                 if (!chatRoom.isPublic()) {
                     privateIconToolbar.setVisibility(View.VISIBLE);
                 }
@@ -5313,7 +5312,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         if(msg.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
-            logDebug("Change of chat title");
             String newTitle = msg.getContent();
             if(newTitle!=null){
                 titleToolbar.setText(newTitle);
@@ -7561,6 +7559,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             activityVisible = true;
             showCallLayout(megaChatApi.getChatCall(idChat));
             if(aB != null && aB.getTitle() != null){
+                logDebug("***** 1 titleToolbar.setText = "+titleToolbar.getText().toString());
                 titleToolbar.setText(adjustForLargeFont(titleToolbar.getText().toString()));
             }
         }
