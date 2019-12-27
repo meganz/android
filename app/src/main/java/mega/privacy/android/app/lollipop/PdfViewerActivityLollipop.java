@@ -2568,6 +2568,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
+            } catch (IllegalStateException e) {
+                logError("Exception getting pdf name", e);
             } finally {
                 if (cursor != null) {
                     cursor.close();
