@@ -457,9 +457,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
                 long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-                titleToolbar.setText(chatRoom.getTitle());
-                setChatSubtitle();
-//                showChat(null);
+                if(userHandle != 0) showChat(null);
             }
         }
     };

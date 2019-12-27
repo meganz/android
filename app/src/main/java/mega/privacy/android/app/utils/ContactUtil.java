@@ -1,7 +1,6 @@
 package mega.privacy.android.app.utils;
 
 import android.content.Context;
-
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import nz.mega.sdk.MegaApiAndroid;

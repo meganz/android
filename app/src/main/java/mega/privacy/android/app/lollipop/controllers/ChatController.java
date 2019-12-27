@@ -1184,7 +1184,10 @@ public class ChatController {
 
     public String getParticipantFirstName(long userHandle, MegaChatRoom chatRoom){
         logDebug("User handle: " + userHandle + ", Chat ID: " + chatRoom.getChatId());
-        String firstName = chatRoom.getPeerFirstnameByHandle(userHandle);
+        String firstName = getFirstNameDB(userHandle);
+        if(firstName == null) {
+            firstName = chatRoom.getPeerFirstnameByHandle(userHandle);
+        }
 
         if(firstName==null){
             firstName="";
@@ -1221,16 +1224,15 @@ public class ChatController {
 
     public String getParticipantFullName(long userHandle, MegaChatRoom chatRoom){
         logDebug("User handle: " + userHandle + ", Chat ID: " + chatRoom.getChatId());
-        String fullName = chatRoom.getPeerFullnameByHandle(userHandle);
 
-        if(fullName!=null && !fullName.trim().isEmpty()) {
-            return fullName;
+        String fullName = getNicknameContact(userHandle);
+        if(fullName == null){
+            fullName = chatRoom.getPeerFullnameByHandle(userHandle);
+            if (fullName == null || fullName.trim().isEmpty() || fullName.equals("")) {
+                fullName = chatRoom.getPeerEmailByHandle(userHandle);
+            }
         }
-        else {
-            logDebug("Put email as fullname");
-            String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
-            return participantEmail;
-        }
+        return fullName;
     }
 
     public String getMyFullName(){
