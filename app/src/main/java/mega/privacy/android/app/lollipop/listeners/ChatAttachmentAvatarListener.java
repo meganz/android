@@ -43,10 +43,10 @@ public class ChatAttachmentAvatarListener implements MegaRequestListenerInterfac
 
             String mail = "";
             if(myOwnMsg){
-                mail = (String) holder.contentOwnMessageContactEmail.getText();
+                mail = holder.contentOwnMessageContactEmail.getText().toString();
             }
             else{
-                mail = (String) holder.contentContactMessageContactEmail.getText();
+                mail = holder.contentContactMessageContactEmail.getText().toString();
             }
 
             if (mail.compareTo(request.getEmail()) == 0){

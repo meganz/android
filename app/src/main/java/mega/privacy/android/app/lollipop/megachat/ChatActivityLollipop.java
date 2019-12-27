@@ -371,6 +371,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private AlertDialog locationDialog;
     private boolean isLocationDialogShown = false;
+    private RelativeLayout inputTextLayout;
+    private LinearLayout separatorOptions;
 
     /*Voice clips*/
     private String outputFileVoiceNotes = null;
@@ -383,6 +385,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private TextView bubbleText;
     private RecordView recordView;
     private FrameLayout fragmentVoiceClip;
+    private RelativeLayout voiceClipLayout;
 
     private boolean isShareLinkDialogDismissed = false;
 
@@ -596,6 +599,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         fragmentContainer = findViewById(R.id.fragment_container_chat);
         writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
+        inputTextLayout = findViewById(R.id.write_layout);
+        separatorOptions = findViewById(R.id.separator_layout_options);
 
         titleToolbar.setText("");
         titleToolbar.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
@@ -662,6 +667,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         sendIcon.setEnabled(true);
 
         //Voice clip elements
+        voiceClipLayout =  findViewById(R.id.voice_clip_layout);
         fragmentVoiceClip = findViewById(R.id.fragment_voice_clip);
         recordLayout = findViewById(R.id.layout_button_layout);
         recordButtonLayout = findViewById(R.id.record_button_layout);
@@ -681,12 +687,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         bubbleText.setMaxWidth(px2dp(MAX_WIDTH_BUBBLE, outMetrics));
         recordButton.setRecordView(recordView);
         myAudioRecorder = new MediaRecorder();
+        showInputText();
 
         //Input text:
         handlerKeyboard = new Handler();
         handlerEmojiKeyboard = new Handler();
-
-
 
         emojiKeyboard = findViewById(R.id.emojiView);
         emojiKeyboard.init(this, textChat, keyboardTwemojiButton);
@@ -877,10 +882,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         });
 
         messageJumpLayout.setOnClickListener(this);
-        fragmentContainerFileStorage = findViewById(R.id.fragment_container_file_storage);
-        fileStorageLayout = findViewById(R.id.relative_layout_file_storage);
-        fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
 
         listView = findViewById(R.id.messages_chat_list_view);
         listView.setClipToPadding(false);
@@ -977,6 +978,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void hideFileStorage() {
         if ((!fileStorageLayout.isShown())) return;
+        showInputText();
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
         placeRecordButton(RECORD_BUTTON_DEACTIVATED);
@@ -984,6 +986,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fileStorageF.clearSelections();
         fileStorageF.hideMultipleSelect();
     }
+
+    /*
+     * Hide input text when file storage is shown
+     */
+
+    private void hideInputText(){
+        inputTextLayout.setVisibility(View.GONE);
+        separatorOptions.setVisibility(View.VISIBLE);
+        voiceClipLayout.setVisibility(View.GONE);
+    }
+
+    /*
+     * Show input text when file storage is hidden
+     */
+
+    private void showInputText(){
+        inputTextLayout.setVisibility(View.VISIBLE);
+        separatorOptions.setVisibility(View.GONE);
+        voiceClipLayout.setVisibility(View.VISIBLE);
+
+    }
+
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){
         logDebug("initAfterIntent");
@@ -3332,6 +3356,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         logDebug("attachFromFileStorage");
         fileStorageF = ChatFileStorageFragment.newInstance();
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF").commitNowAllowingStateLoss();
+        hideInputText();
         fileStorageLayout.setVisibility(View.VISIBLE);
         pickFileStorageButton.setImageResource(R.drawable.ic_g_select_image);
         placeRecordButton(RECORD_BUTTON_DEACTIVATED);
@@ -8278,19 +8303,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
     }
-
-
-    public void hideFileStorageSection(){
-        logDebug("hideFileStorageSEctocioon");
-        if (fileStorageF != null) {
-            fileStorageF.clearSelections();
-            fileStorageF.hideMultipleSelect();
-        }
-        fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
-    }
-
-
 
     public void setShareLinkDialogDismissed (boolean dismissed) {
         isShareLinkDialogDismissed = dismissed;
