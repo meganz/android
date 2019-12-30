@@ -964,7 +964,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         microFAB.hide();
         speakerFAB.hide();
         rejectFAB.hide();
-        hangFAB.hide();
         answerCallFAB.hide();
 
         linearArrowCall.setVisibility(View.GONE);
@@ -2359,68 +2358,71 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (getCall() == null) return;
         logDebug("Call Status: "+callStatusToString(callChat.getStatus()));
 
-        if(callChat.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING){
-            activateChrono(false, callInProgressChrono, callChat);
-            subtitleToobar.setVisibility(View.GONE);
-            return;
-        }
+        switch (callChat.getStatus()){
+            case MegaChatCall.CALL_STATUS_RECONNECTING:{
+                activateChrono(false, callInProgressChrono, callChat);
+                subtitleToobar.setVisibility(View.GONE);
+                return;
+            }
 
+            case MegaChatCall.CALL_STATUS_REQUEST_SENT:{
+                subtitleToobar.setVisibility(View.VISIBLE);
+                activateChrono(false, callInProgressChrono, callChat);
+                subtitleToobar.setText(getString(R.string.outgoing_call_starting));
+                return;
+            }
 
-        if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-            subtitleToobar.setVisibility(View.VISIBLE);
-            activateChrono(false, callInProgressChrono, callChat);
-            subtitleToobar.setText(getString(R.string.outgoing_call_starting));
-            return;
-        }
+            case MegaChatCall.CALL_STATUS_RING_IN:{
+                subtitleToobar.setVisibility(View.VISIBLE);
+                activateChrono(false, callInProgressChrono, callChat);
+                subtitleToobar.setText(getString(R.string.incoming_call_starting));
+                return;
+            }
 
-        if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-            subtitleToobar.setVisibility(View.VISIBLE);
-            activateChrono(false, callInProgressChrono, callChat);
-            subtitleToobar.setText(getString(R.string.incoming_call_starting));
-            return;
-
-        }
-        if (callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS || callChat.getStatus() == MegaChatCall.CALL_STATUS_JOINING) {
-            if (chat.isGroup()) {
-                boolean isInProgress = false;
-                MegaHandleList listPeerids = callChat.getSessionsPeerid();
-                MegaHandleList listClientids = callChat.getSessionsClientid();
-                for (int i = 0; i < listPeerids.size(); i++) {
-                    MegaChatSession userSession = callChat.getMegaChatSession(listPeerids.get(i), listClientids.get(i));
-                    if (userSession != null && userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
-                        isInProgress = true;
-                        break;
+            case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+            case MegaChatCall.CALL_STATUS_JOINING:{
+                if (chat.isGroup()) {
+                    boolean isInProgress = false;
+                    MegaHandleList listPeerids = callChat.getSessionsPeerid();
+                    MegaHandleList listClientids = callChat.getSessionsClientid();
+                    for (int i = 0; i < listPeerids.size(); i++) {
+                        MegaChatSession userSession = callChat.getMegaChatSession(listPeerids.get(i), listClientids.get(i));
+                        if (userSession != null && userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
+                            isInProgress = true;
+                            break;
+                        }
                     }
+                    if (isInProgress) {
+                        logDebug("Session in progress");
+                        subtitleToobar.setVisibility(View.GONE);
+                        activateChrono(true, callInProgressChrono, callChat);
+                        return;
+                    }
+
+                    logWarning("Error getting the session of the user or session not in progress");
+                    connectingCall();
+                    return;
                 }
-                if (isInProgress) {
+
+                logDebug("Individual call in progress");
+
+                linearParticipants.setVisibility(View.GONE);
+                MegaChatSession userSession = callChat.getMegaChatSession(callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
+                if (userSession == null) {
+                    logWarning("userSession is null");
+                    connectingCall();
+                    return;
+                }
+
+                if (userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
                     logDebug("Session in progress");
                     subtitleToobar.setVisibility(View.GONE);
                     activateChrono(true, callInProgressChrono, callChat);
                     return;
                 }
-
-                logWarning("Error getting the session of the user or session not in progress");
-                connectingCall();
-                return;
-            }
-
-            logDebug("Individual call in progress");
-
-            linearParticipants.setVisibility(View.GONE);
-            MegaChatSession userSession = callChat.getMegaChatSession(callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
-            if (userSession == null) {
-                logWarning("userSession is null");
-                connectingCall();
-                return;
-            }
-
-            if (userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
-                logDebug("Session in progress");
-                subtitleToobar.setVisibility(View.GONE);
-                activateChrono(true, callInProgressChrono, callChat);
-                return;
             }
         }
+
         subtitleToobar.setVisibility(View.GONE);
         activateChrono(false, callInProgressChrono, callChat);
     }
