@@ -1318,7 +1318,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         numErrors++;
         player.stop();
         if (numErrors <= 6) {
-            if (isPlayList && size > 1 && playListCreated) {
+            if (isPlayList && size > 1 && playListCreated && concatenatingMediaSource != null) {
 //                player.prepare(finalLoopingMediaSource);
                 player.prepare(concatenatingMediaSource);
             }
@@ -4150,6 +4150,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     void initPlaylist (int index, long time) {
+        if (concatenatingMediaSource == null) return;
+
         creatingPlaylist = false;
         player.prepare(concatenatingMediaSource);
         player.seekTo(index, time);
