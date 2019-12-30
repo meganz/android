@@ -157,6 +157,8 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
     @Override
     public int getItemCount() {
+        if (items == null) return 0;
+
         return  items.size();
     }
 
