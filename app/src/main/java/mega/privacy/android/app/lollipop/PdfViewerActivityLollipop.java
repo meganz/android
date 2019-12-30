@@ -2563,12 +2563,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     public String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            Cursor cursor = null;
             try {
+                cursor = getContentResolver().query(uri, null, null, null, null);
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
-            } catch (IllegalStateException e) {
+            } catch (Exception e) {
                 logError("Exception getting pdf name", e);
             } finally {
                 if (cursor != null) {
