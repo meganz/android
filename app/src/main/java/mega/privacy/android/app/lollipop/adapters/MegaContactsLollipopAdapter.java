@@ -767,9 +767,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		holder.threeDotsLayout.setOnClickListener(this);
 	}
 	
-	public void createDefaultAvatar(ViewHolderContacts holder, MegaContactAdapter contact){
-		logDebug("Contact handle:" + contact.getMegaUser().getHandle());
-
+	private void createDefaultAvatar(ViewHolderContacts holder, MegaContactAdapter contact){
 		int color = colorAvatar(context, megaApi, contact.getMegaUser());
 		String fullName = contact.getFullName();
 

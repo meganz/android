@@ -40,7 +40,7 @@ import nz.mega.sdk.MegaContactRequest;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<MegaContactRequestLollipopAdapter.ViewHolderContactsRequestList> implements OnClickListener, View.OnLongClickListener {
 	
@@ -82,7 +82,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			// TODO Auto-generated constructor stub
 		}
     	RoundedImageView imageView;
-    	EmojiTextView contactInitialLetter;
 		EmojiTextView textViewContactName;
         TextView textViewContent;
         RelativeLayout threeDotsLayout;
@@ -97,8 +96,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	public void onBindViewHolder(ViewHolderContactsRequestList holder, int position) {		
 
 		holder.imageView.setImageBitmap(null);
-		holder.contactInitialLetter.setText("");
-
 		logDebug("Get the MegaContactRequest");
 		MegaContactRequest contact = (MegaContactRequest) getItem(position);
 
@@ -131,7 +128,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			else{
 				logDebug("NOT selected");
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-
 				createDefaultAvatar(holder);
 			}
 		}
@@ -181,7 +177,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		holder = new ViewHolderContactsRequestList(v);
 		holder.itemLayout = v.findViewById(R.id.contact_request_list_item_layout);
 		holder.imageView = v.findViewById(R.id.contact_request_list_thumbnail);
-		holder.contactInitialLetter = v.findViewById(R.id.contact_request_list_initial_letter);
 		holder.textViewContactName = v.findViewById(R.id.contact_request_list_name);
 		if(!isScreenInPortrait(context)){
 			holder.textViewContactName.setMaxWidthEmojis(scaleWidthPx(280, outMetrics));
@@ -198,68 +193,12 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		return holder;
 	}
 	
-	public void createDefaultAvatar(ViewHolderContactsRequestList holder){
-		logDebug("createDefaultAvatar()");
-		
-		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-		
-		int radius; 
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-        	radius = defaultAvatar.getWidth()/2;
-        else
-        	radius = defaultAvatar.getHeight()/2;
-        
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+	private void createDefaultAvatar(ViewHolderContactsRequestList holder){
+		int color = ContextCompat.getColor(context, R.color.lollipop_primary_color);
+		Bitmap defaultAvatar = getDefaultAvatar(context, color, holder.contactMail , AVATAR_SIZE, true);
 		holder.imageView.setImageBitmap(defaultAvatar);
-		
-		
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    float density  = context.getResources().getDisplayMetrics().density;
-	    
-	    int avatarTextSize = getAvatarTextSize(density);
-		logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
-	    if (holder.contactMail != null){
-		    if (holder.contactMail.length() > 0){
-		    	String firstLetter = holder.contactMail.charAt(0) + "";
-		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-		    	holder.contactInitialLetter.setVisibility(View.VISIBLE);
-		    	holder.contactInitialLetter.setText(firstLetter);
-		    	holder.contactInitialLetter.setTextSize(24);
-		    	holder.contactInitialLetter.setTextColor(Color.WHITE);
-		    }
-	    }
 	}
 		
-	private int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-		
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
-		}
-		
-		return (int)textSize;
-	}
 
 	@Override
     public int getItemCount() {

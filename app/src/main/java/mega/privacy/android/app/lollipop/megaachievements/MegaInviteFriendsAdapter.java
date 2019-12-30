@@ -129,31 +129,6 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 		}
 	}
 
-	private int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
-		}
-
-		return (int)textSize;
-	}
-
 	@Override
 	public long getItemId(int position) {
 		return position;

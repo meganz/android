@@ -841,27 +841,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         avatarImageView.setImageBitmap(getDefaultAvatar(this, color, title, AVATAR_SIZE, true));
     }
 
-    private int getAvatarTextSize(float density) {
-        float textSize;
-
-        if (density > 3.0) {
-            textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-        } else if (density > 2.0) {
-            textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-        } else if (density > 1.5) {
-            textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-        } else if (density > 1.0) {
-            textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-        } else if (density > 0.75) {
-            textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-        } else {
-            textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
-        }
-
-        return (int) textSize;
-    }
-
-
     public void showParticipantsPanel(MegaChatParticipant participant){
         logDebug("Participant Handle: " + participant.getHandle());
 
