@@ -57,7 +57,10 @@ public class ContactInfoListDialog {
         List<String> added = new ArrayList<>();
         if (addedContacts != null && addedContacts.size() != 0) {
             for (InvitationContactInfo info : addedContacts) {
-                added.add(info.getDisplayInfo());
+                // the same local contact, in case different contacts has same contact info.
+                if(info.getId() == current.getId()) {
+                    added.add(info.getDisplayInfo());
+                }
             }
         }
 
