@@ -122,11 +122,8 @@ public class ContactInfoListDialog {
                     }
                     // In fact the `CloneNotSupportedException` would never happen, so `info` would never be `null`.
                     info.setDisplayInfo(content);
+                    // ignore `isChecked` the callback will handle.
                     selected.add(info);
-//                    if (isChecked) {
-//                    } else {
-//                        selected.remove(info);
-//                    }
                 }
             });
         }
