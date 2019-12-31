@@ -3,12 +3,15 @@ package mega.privacy.android.app.lollipop;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.contacts.ContactWithEmail;
+import java.util.List;
+import java.util.Objects;
 
-public class InvitationContactInfo implements Parcelable, ContactWithEmail {
+import mega.privacy.android.app.utils.ChatUtil;
+
+public class InvitationContactInfo implements Parcelable,Cloneable {
 
     public static final int TYPE_MEGA_CONTACT_HEADER = 0;
     public static final int TYPE_PHONE_CONTACT_HEADER = 1;
@@ -33,11 +36,16 @@ public class InvitationContactInfo implements Parcelable, ContactWithEmail {
     private int type;
     private Bitmap bitmap;
     private String name, displayInfo, handle, avatarColor;
-    private String normalizedNumber = "";
 
-    public InvitationContactInfo(long id, String name, int type, String displayInfo, String avatarColor) {
+    /**
+     * Phone numbers and emails which don't exist on MEGA.
+     */
+    private List<String> filteredContactInfos;
+
+    public InvitationContactInfo(long id, String name, int type, List<String> filteredContactInfos, String displayInfo, String avatarColor) {
         this.id = id;
         this.type = type;
+        this.filteredContactInfos = filteredContactInfos;
         this.name = name;
         this.displayInfo = displayInfo;
         this.avatarColor = avatarColor;
@@ -51,6 +59,29 @@ public class InvitationContactInfo implements Parcelable, ContactWithEmail {
         this.displayInfo = "";
     }
 
+    public void setDisplayInfo(String displayInfo) {
+        this.displayInfo = displayInfo;
+    }
+
+    public static InvitationContactInfo createManualInputEmail(String inputString, String avatarColor) {
+        return new InvitationContactInfo(inputString.hashCode(), "", TYPE_MANUAL_INPUT_EMAIL, null, inputString, avatarColor);
+    }
+
+    public static InvitationContactInfo createManualInputPhone(String inputString, String avatarColor) {
+        return new InvitationContactInfo(inputString.hashCode(), "", TYPE_MANUAL_INPUT_PHONE, null, inputString, avatarColor);
+    }
+
+    public List<String> getFilteredContactInfos() {
+        return filteredContactInfos;
+    }
+
+    public boolean hasMultipleContactInfos() {
+        if(filteredContactInfos == null) {
+            return false;
+        }
+        return filteredContactInfos.size() > 1;
+    }
+
     @Override
     public String toString() {
         return "\n{" +
@@ -62,7 +93,6 @@ public class InvitationContactInfo implements Parcelable, ContactWithEmail {
                 ", displayInfo='" + displayInfo + '\'' +
                 ", handle='" + handle + '\'' +
                 ", avatarColor='" + avatarColor + '\'' +
-                ", normalizedNumber='" + normalizedNumber + '\'' +
                 '}';
     }
 
@@ -124,10 +154,6 @@ public class InvitationContactInfo implements Parcelable, ContactWithEmail {
         return handle;
     }
 
-    public String getNormalizedNumber() {
-        return  normalizedNumber;
-    }
-
     public void setHandle(String handle) {
         this.handle = handle;
     }
@@ -142,12 +168,6 @@ public class InvitationContactInfo implements Parcelable, ContactWithEmail {
 
     public String getAvatarColor() {
         return avatarColor;
-    }
-
-    public void setNormalizedNumber(String normalizedNumber) {
-        if (normalizedNumber != null) {
-            this.normalizedNumber = normalizedNumber;
-        }
     }
 
     @Override
@@ -174,5 +194,24 @@ public class InvitationContactInfo implements Parcelable, ContactWithEmail {
         displayInfo = in.readString();
         handle = in.readString();
         avatarColor = in.readString();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InvitationContactInfo info = (InvitationContactInfo) o;
+        return id == info.id &&
+                displayInfo.equals(info.displayInfo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, displayInfo);
     }
 }

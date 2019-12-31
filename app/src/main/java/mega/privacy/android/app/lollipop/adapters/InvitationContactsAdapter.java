@@ -94,11 +94,9 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
             if (callback != null && position >= 0 && position < contactData.size()) {
                 InvitationContactInfo invitationContactInfo = contactData.get(position);
                 if (invitationContactInfo.getType() == TYPE_MEGA_CONTACT || invitationContactInfo.getType() == TYPE_PHONE_CONTACT) {
-                    boolean isSelected = !invitationContactInfo.isHighlighted();
-                    if (isSelected) {
-                        invitationContactInfo.setHighlighted(true);
-                    } else {
-                        invitationContactInfo.setHighlighted(false);
+                    if(!invitationContactInfo.hasMultipleContactInfos()) {
+                        boolean isSelected = !invitationContactInfo.isHighlighted();
+                        invitationContactInfo.setHighlighted(isSelected);
                     }
                     callback.onItemClick(position);
                 }

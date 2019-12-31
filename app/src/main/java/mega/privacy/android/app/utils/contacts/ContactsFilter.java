@@ -1,68 +1,60 @@
 package mega.privacy.android.app.utils.contacts;
 
-import java.util.ArrayList;
+import android.content.Context;
+
 import java.util.Iterator;
 import java.util.List;
 
-import mega.privacy.android.app.lollipop.InvitationContactInfo;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaUser;
 
 public class ContactsFilter {
 
-    public static <T extends ContactWithEmail> ArrayList<T> filterOutContacts(MegaApiJava api, ArrayList<T> list) {
+    public static void filterOutContacts(MegaApiJava api, List<String> list) {
         for (MegaUser user : api.getContacts()) {
-            Iterator<T> iterator = list.iterator();
+            Iterator<String> iterator = list.iterator();
             while (iterator.hasNext()) {
-                T t = iterator.next();
-                if (isContact(user, t.getEmail())) {
+                String email = iterator.next();
+                if (isContact(user, email)) {
                     iterator.remove();
                 }
             }
         }
-        return list;
     }
 
-    public static <T extends ContactWithEmail> ArrayList<T> filterOutPendingContacts(MegaApiJava api, ArrayList<T> list) {
+    public static void filterOutPendingContacts(MegaApiJava api, List<String> list) {
         for (MegaContactRequest request : api.getOutgoingContactRequests()) {
-            Iterator<T> iterator = list.iterator();
+            Iterator<String> iterator = list.iterator();
             while (iterator.hasNext()) {
-                T t = iterator.next();
-                if (isPending(request,t.getEmail())) {
+                String email = iterator.next();
+                if (isPending(request, email)) {
                     iterator.remove();
                 }
             }
         }
-        return list;
     }
 
-    public static <T extends ContactWithEmail> ArrayList<T> filterOutMyself(MegaApiJava api, ArrayList<T> list) {
-        Iterator<T> iterator = list.iterator();
+    public static void filterOutMyself(MegaApiJava api, List<String> list) {
+        Iterator<String> iterator = list.iterator();
         while (iterator.hasNext()) {
-            T t = iterator.next();
-            if (isMySelf(api, t.getEmail())) {
+            String email = iterator.next();
+            if (isMySelf(api, email)) {
                 iterator.remove();
             }
         }
-        return list;
     }
 
-    public static void filterOutMegaUsers(List<InvitationContactInfo> megaContacts, List<InvitationContactInfo> phoneContacts) {
-        for (InvitationContactInfo megaContact : megaContacts) {
-            Iterator<InvitationContactInfo> iterator = phoneContacts.iterator();
+    public static void filterOutMegaUsers(Context context , List<MegaContactGetter.MegaContact> megaContacts, List<String> contactInfos) {
+        for (MegaContactGetter.MegaContact megaContact : megaContacts) {
+            Iterator<String> iterator = contactInfos.iterator();
             while (iterator.hasNext()) {
-                InvitationContactInfo phoneContact = iterator.next();
-                boolean isNotHeader =
-                        megaContact.getType() != InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER &&
-                                megaContact.getType() != InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER &&
-                                phoneContact.getType() != InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER &&
-                                phoneContact.getType() != InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
-                if (isNotHeader) {
-                    if (megaContact.getEmail().equals(phoneContact.getEmail()) ||
-                            megaContact.getNormalizedNumber().equals(phoneContact.getNormalizedNumber())) {
-                        iterator.remove();
-                    }
+                // phone number or email
+                String contactInfo = iterator.next();
+                if (megaContact.getEmail().equals(contactInfo) ||
+                        megaContact.getNormalizedPhoneNumber().equals(Util.normalizePhoneNumberByNetwork(context, contactInfo))) {
+                    iterator.remove();
                 }
             }
         }
