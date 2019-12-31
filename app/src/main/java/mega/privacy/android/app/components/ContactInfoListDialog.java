@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.InvitationContactInfo;

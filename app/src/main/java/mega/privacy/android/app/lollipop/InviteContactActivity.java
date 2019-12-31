@@ -56,7 +56,6 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.ContactsFilter;
 import mega.privacy.android.app.utils.contacts.ContactsUtil;

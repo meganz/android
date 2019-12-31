@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.Objects;
 
 import mega.privacy.android.app.utils.ChatUtil;
 
-public class InvitationContactInfo implements Parcelable,Cloneable {
+public class InvitationContactInfo implements Parcelable, Cloneable {
 
     public static final int TYPE_MEGA_CONTACT_HEADER = 0;
     public static final int TYPE_PHONE_CONTACT_HEADER = 1;
