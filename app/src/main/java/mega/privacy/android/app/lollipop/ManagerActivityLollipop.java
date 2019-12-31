@@ -12014,14 +12014,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	public void refreshCloudDrive () {
-		if (isCloudAdded()){
+	public void refreshCloudDrive() {
+		MegaNode parentNode = megaApi.getRootNode();
+		if (parentNode == null) return;
+
+		if (isCloudAdded()) {
 			ArrayList<MegaNode> nodes;
-			if(parentHandleBrowser==-1){
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
-			}
-			else{
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+			if (parentHandleBrowser == -1) {
+				nodes = megaApi.getChildren(parentNode, orderCloud);
+			} else {
+				parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+				if (parentNode == null) return;
+
+				nodes = megaApi.getChildren(parentNode, orderCloud);
 			}
 			logDebug("Nodes: " + nodes.size());
 			fbFLol.hideMultipleSelect();
