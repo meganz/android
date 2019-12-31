@@ -10970,7 +10970,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public long getParentHandleBrowser() {
 		if (parentHandleBrowser == -1) {
-			return megaApi.getRootNode().getHandle();
+			MegaNode rootNode = megaApi.getRootNode();
+			parentHandleBrowser = rootNode != null ? rootNode.getParentHandle() : parentHandleBrowser;
 		}
 
 		return parentHandleBrowser;
