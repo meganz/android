@@ -52,20 +52,23 @@ public class ContactInfoListDialog {
         });
     }
 
+    /**
+     * @param addedContacts The contact info which are already added to the EditText.
+     */
     public void showInfo(ArrayList<InvitationContactInfo> addedContacts) {
         selected.clear();
         List<String> added = new ArrayList<>();
         if (addedContacts != null && addedContacts.size() != 0) {
             for (InvitationContactInfo info : addedContacts) {
-                // the same local contact, in case different contacts has same contact info.
-                if(info.getId() == current.getId()) {
+                // only add to the same local contact, in case different contacts has same contact info.
+                if (info.getId() == current.getId()) {
                     added.add(info.getDisplayInfo());
                 }
             }
         }
 
         dialog = new AlertDialog.Builder(context)
-                .setTitle(current .getName() )
+                .setTitle(current.getName())
                 .setView(contentView)
                 .create();
         listView.setAdapter(new ContactInfoAdapter(current.getFilteredContactInfos(), added));
@@ -74,13 +77,22 @@ public class ContactInfoListDialog {
 
     public interface OnMultipleSelectedListener {
 
-        void onSelect(List<InvitationContactInfo> selected);
+        /**
+         * @param contactInfos The selected/unselected contact infos.
+         */
+        void onSelect(List<InvitationContactInfo> contactInfos);
     }
 
     private class ContactInfoAdapter extends RecyclerView.Adapter<ContactInfoAdapter.ContactInfoViewHolder> {
 
+        /**
+         * The filtered contact info list of a local contact.
+         */
         private List<String> contents;
 
+        /**
+         * The already added contact info of the local contact.
+         */
         private List<String> added;
 
         private ContactInfoAdapter(List<String> contents, List<String> added) {
@@ -107,11 +119,11 @@ public class ContactInfoListDialog {
             String content = contents.get(i);
             viewHolder.textView.setText(content);
             if (added.contains(content)) {
-                // content will be added to `selected`.
                 viewHolder.checkBox.setChecked(true);
             } else {
                 viewHolder.checkBox.setChecked(false);
             }
+            // set listener after `setChecked`, or the listener will trigger
             viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
                 @Override
