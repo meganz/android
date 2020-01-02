@@ -293,7 +293,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
     public void setUserAvatar(ViewHolderChatExplorerList holder, String userHandle){
 		/*Default Avatar*/
-        int color= colorAvatar(context, megaApi, userHandle);
+        int color= getColorAvatar(context, megaApi, userHandle);
         String fullName = holder.titleText.getText().toString();
         if ((fullName == null || fullName.trim().length() <= 0) && holder.email != null && holder.email.length() > 0){
             fullName = holder.email;

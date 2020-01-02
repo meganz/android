@@ -70,6 +70,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 
 public class InviteContactActivity extends PinActivityLollipop implements MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
@@ -694,7 +695,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
             String name = contact.getLocalName();
             String email = contact.getEmail();
             String handle = contact.getId();
-            int color = AvatarUtil.colorAvatar(this, megaApi, handle);
+            int color = getColorAvatar(this, megaApi, handle);
             InvitationContactInfo info = new InvitationContactInfo(id, name, TYPE_MEGA_CONTACT, email, color);
             info.setHandle(handle);
             info.setNormalizedNumber(contact.getNormalizedPhoneNumber());

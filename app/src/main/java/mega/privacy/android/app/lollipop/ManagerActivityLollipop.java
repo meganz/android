@@ -4189,7 +4189,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		if (nVPictureProfile != null){
-			nVPictureProfile.setImageBitmap(getDefaultAvatar(this, colorAvatar(this, megaApi, myHandle), name, AVATAR_SIZE, true));
+			nVPictureProfile.setImageBitmap(getDefaultAvatar(this, getColorAvatar(this, megaApi, myHandle), name, AVATAR_SIZE, true));
 		}
 	}
 

@@ -487,7 +487,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 
 	public void createDefaultAvatar(ViewHolderContacts holder, MegaContactDB contact){
-		int color = colorAvatar(context, megaApi, contact.getHandle());
+		int color = getColorAvatar(context, megaApi, contact.getHandle());
 		String fullName = contact.getName();
 
 		if (holder instanceof ViewHolderContactsList){

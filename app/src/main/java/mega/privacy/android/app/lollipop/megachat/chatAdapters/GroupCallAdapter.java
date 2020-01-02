@@ -727,7 +727,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     //Group call: default my avatar
     private void createDefaultAvatar(ViewHolderGroupCall holder, long peerId, String peerName, String peerEmail){
-        int color = colorAvatar(context,megaApi, peerId);
+        int color = getColorAvatar(context,megaApi, peerId);
         String name = null;
         if(peerName != null && peerName.trim().length() > 0){
             name = peerName;

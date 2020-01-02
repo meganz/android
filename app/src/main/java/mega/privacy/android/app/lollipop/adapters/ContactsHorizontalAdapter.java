@@ -147,7 +147,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
     }
 
     public void setDefaultAvatar(MegaContactGetter.MegaContact contact, ContactViewHolder holder) {
-        int color = colorAvatar(context, megaApi, contact.getId());
+        int color = getColorAvatar(context, megaApi, contact.getId());
         Bitmap background = getDefaultAvatar(context, color, contact.getLocalName(), AVATAR_SIZE, true);
         holder.avatar.setImageBitmap(background);
     }

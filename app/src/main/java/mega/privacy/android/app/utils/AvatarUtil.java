@@ -57,13 +57,13 @@ public class AvatarUtil {
         return getColorAvatar(context, megaApi.getUserAvatarColor(user));
     }
 
-    public static int colorAvatar(Context context, MegaApiAndroid megaApi, long handle) {
+    public static int getColorAvatar(Context context, MegaApiAndroid megaApi, long handle) {
         if(handle == -1 ) return getColorAvatar(context, null);
 
         return getColorAvatar(context, megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(handle)));
     }
 
-    public static int colorAvatar(Context context, MegaApiAndroid megaApi, String handle) {
+    public static int getColorAvatar(Context context, MegaApiAndroid megaApi, String handle) {
         if(handle == null ) return getColorAvatar(context, null);
 
         return getColorAvatar(context, megaApi.getUserAvatarColor(handle));

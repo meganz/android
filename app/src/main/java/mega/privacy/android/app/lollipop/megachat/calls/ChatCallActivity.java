@@ -803,7 +803,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             name = chat.getPeerFullname(0);
         }
         /*Default Avatar*/
-        Bitmap defaultBitmapAvatar = getDefaultAvatar(this, colorAvatar(this, megaApi, peerId), name, AVATAR_SIZE, true);
+        Bitmap defaultBitmapAvatar = getDefaultAvatar(this, getColorAvatar(this, megaApi, peerId), name, AVATAR_SIZE, true);
         setBitmap(defaultBitmapAvatar, peerId);
 
         /*Avatar*/
@@ -835,7 +835,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         /*Default Avatar*/
-        avatarBigCameraGroupCallImage.setImageBitmap(getDefaultAvatar(this, colorAvatar(this, megaApi, peerId), avatarLetter, BIG_LETTER_SIZE, true));
+        avatarBigCameraGroupCallImage.setImageBitmap(getDefaultAvatar(this, getColorAvatar(this, megaApi, peerId), avatarLetter, BIG_LETTER_SIZE, true));
         /*Avatar*/
         Bitmap bitmap = profileAvatar(peerId, peerEmail);
         if (bitmap == null) return;

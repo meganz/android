@@ -325,7 +325,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     private Bitmap createDefaultAvatar(long userHandle, String fullName) {
         int color;
         if (userHandle != -1) {
-            color = colorAvatar(this, megaApi, userHandle);
+            color = getColorAvatar(this, megaApi, userHandle);
         }else{
             color = ContextCompat.getColor(this, R.color.divider_upgrade_account);
         }

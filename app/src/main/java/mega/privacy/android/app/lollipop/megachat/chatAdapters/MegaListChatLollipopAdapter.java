@@ -407,7 +407,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public void setUserAvatar(ViewHolderChatList holder, String userHandle){
 
 		/*Default Avatar*/
-		int color = colorAvatar(context, megaApi, userHandle);
+		int color = getColorAvatar(context, megaApi, userHandle);
 		String name = null;
 		if (((ViewHolderNormalChatList)holder).fullName != null && ((ViewHolderNormalChatList)holder).fullName.trim().length() > 0){
 			name = ((ViewHolderNormalChatList)holder).fullName;

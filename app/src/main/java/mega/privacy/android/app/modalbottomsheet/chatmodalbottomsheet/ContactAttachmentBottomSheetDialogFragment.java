@@ -434,7 +434,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     public void addAvatarParticipantPanel(long handle, String email, String name){
         logDebug("handle: " + handle);
         /*Default Avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(context, colorAvatar(context, megaApi, handle), name, AVATAR_SIZE, true));
+        contactImageView.setImageBitmap(getDefaultAvatar(context, getColorAvatar(context, megaApi, handle), name, AVATAR_SIZE, true));
 
         if (handle != -1) {
             /*Avatar*/
