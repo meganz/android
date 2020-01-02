@@ -51,7 +51,7 @@ public class AvatarUtil {
     }
 
     /*Methods to obtain the color of the avatar*/
-    public static int colorAvatar(Context context, MegaApiAndroid megaApi, MegaUser user) {
+    public static int getColorAvatar(Context context, MegaApiAndroid megaApi, MegaUser user) {
         if(user == null)return getColorAvatar(context, null);
 
         return getColorAvatar(context, megaApi.getUserAvatarColor(user));
@@ -144,7 +144,7 @@ public class AvatarUtil {
         if(contact.isPhoneContact()){
             color = ContextCompat.getColor(context, R.color.color_default_avatar_phone);
         }else{
-            color = colorAvatar(context, megaApi, contact.getMegaContactAdapter().getMegaUser());
+            color = getColorAvatar(context, megaApi, contact.getMegaContactAdapter().getMegaUser());
         }
 
         String fullName = null;

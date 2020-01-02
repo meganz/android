@@ -450,7 +450,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
     private Bitmap createDefaultAvatar(String email){
         MegaUser contact = megaApi.getContact(email);
-        int color = colorAvatar(context, megaApi, contact);
+        int color = getColorAvatar(context, megaApi, contact);
         return getDefaultAvatar(context, color, email, AVATAR_SIZE, true, false);
     }
 

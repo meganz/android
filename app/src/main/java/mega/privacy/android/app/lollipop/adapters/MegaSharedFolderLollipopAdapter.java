@@ -337,7 +337,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				/*Default Avatar*/
-				int color = colorAvatar(context, megaApi, contact);
+				int color = getColorAvatar(context, megaApi, contact);
 				String name = " ";
 				if(holder.textViewContactName!=null){
 					name = holder.textViewContactName.getText().toString();

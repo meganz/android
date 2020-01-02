@@ -362,7 +362,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             color = ContextCompat.getColor(context, R.color.divider_upgrade_account);
         }else{
             MegaUser contact = megaApi.getContact(contactMail);
-            color = colorAvatar(context, megaApi, contact);
+            color = getColorAvatar(context, megaApi, contact);
         }
 
         chatImageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, false));

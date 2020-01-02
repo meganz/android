@@ -211,7 +211,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 
 		holder.itemLayout.setBackgroundColor(Color.WHITE);
 
-		Bitmap defaultAvatar = getDefaultAvatar(context, colorAvatar(context, megaApi, contact), fullName, AVATAR_SIZE, true);
+		Bitmap defaultAvatar = getDefaultAvatar(context, getColorAvatar(context, megaApi, contact), fullName, AVATAR_SIZE, true);
 		((ViewHolderReferralBonusesList)holder).imageView.setImageBitmap(defaultAvatar);
 
 		UserAvatarListenerList listener = new UserAvatarListenerList(context, ((ViewHolderReferralBonusesList)holder), this);

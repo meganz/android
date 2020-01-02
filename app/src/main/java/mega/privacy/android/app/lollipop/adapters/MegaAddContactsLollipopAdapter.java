@@ -191,7 +191,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
             mail = contact.getFullName();
         }
 
-        int color = colorAvatar(context, megaApi, contact.getMegaUser());
+        int color = getColorAvatar(context, megaApi, contact.getMegaUser());
 
         if (contact.getMegaUser() == null && contact.getMegaContactDB() == null) {
             return getDefaultAvatar(context, color, contact.getFullName(), AVATAR_SIZE,true);

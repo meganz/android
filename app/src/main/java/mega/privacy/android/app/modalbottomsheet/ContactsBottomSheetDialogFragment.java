@@ -363,7 +363,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
     public void addAvatarContactPanel(MegaContactAdapter contact){
         /*Default Avatar*/
-        int color = colorAvatar(context, megaApi, contact.getMegaUser());
+        int color = getColorAvatar(context, megaApi, contact.getMegaUser());
         contactImageView.setImageBitmap(getDefaultAvatar(context, color, contact.getFullName(), AVATAR_SIZE, true));
 
         /*Avatar*/

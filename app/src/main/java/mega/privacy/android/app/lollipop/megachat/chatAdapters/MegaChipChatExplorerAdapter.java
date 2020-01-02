@@ -208,7 +208,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             if (item.getContact() != null && item.getContact().getMegaUser() != null) {
                 user = item.getContact().getMegaUser();
             }
-            holder.avatar.setImageBitmap(getDefaultAvatar(context, colorAvatar(context, megaApi, user), item.getTitle(), AVATAR_SIZE, true));
+            holder.avatar.setImageBitmap(getDefaultAvatar(context, getColorAvatar(context, megaApi, user), item.getTitle(), AVATAR_SIZE, true));
 
             ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
             File avatar = null;

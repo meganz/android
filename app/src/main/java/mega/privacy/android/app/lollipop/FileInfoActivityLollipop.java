@@ -1684,7 +1684,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	}
 
 	private void createDefaultAvatar(ImageView ownerRoundeImage, MegaUser user, String name){
-        int color = colorAvatar(this, megaApi, user);
+        int color = getColorAvatar(this, megaApi, user);
 		ownerRoundeImage.setImageBitmap(getDefaultAvatar(this, color, name, AVATAR_SIZE, true));
 	}
 
