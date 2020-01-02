@@ -2613,5 +2613,6 @@
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
 
     <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please, select one or more contacts.</string>
+    <string name="title_long" context="Error when the chat title is too long">The title is too long</string>
 
 </resources>

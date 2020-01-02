@@ -248,7 +248,7 @@ public final class EmojiManager {
     int num = emojis.size();
     return num;
   }
-  @NonNull List<EmojiRange> findAllEmojis(@Nullable final CharSequence text) {
+  public @NonNull List<EmojiRange> findAllEmojis(@Nullable final CharSequence text) {
     logDebug("findAllEmojis");
     final List<EmojiRange> result = new ArrayList<>();
     try {
