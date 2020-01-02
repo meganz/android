@@ -850,8 +850,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
             else if(adapterType == SEARCH_ADAPTER){
                 mediaHandles = new ArrayList<>();
-                ArrayList<String> serialized = getIntent().getStringArrayListExtra(ARRAY_SEARCH);
-                getMediaHandles(getSearchedNodes(serialized));
+                ArrayList<String> handles = getIntent().getStringArrayListExtra(ARRAY_SEARCH);
+                getMediaHandles(getSearchedNodes(handles));
             }
             else if(adapterType == FILE_LINK_ADAPTER){
                 if (currentDocument != null) {
