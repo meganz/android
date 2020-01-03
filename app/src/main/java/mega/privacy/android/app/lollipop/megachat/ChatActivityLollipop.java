@@ -3097,19 +3097,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onBackPressed() {
-        logDebug("onBackPressed");
         retryConnectionsAndSignalPresence();
 
-        if(emojiKeyboard!=null && (emojiKeyboard.getLetterKeyboardShown() || emojiKeyboard.getEmojiKeyboardShown())){
+        if (emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
             emojiKeyboard.hideBothKeyboard(this);
-        }else{
-            if(fileStorageLayout.isShown()){
+        } else {
+            if (fileStorageLayout.isShown()) {
                 hideFileStorage();
-            }else{
-                if (handlerEmojiKeyboard != null){
+            } else {
+                if (handlerEmojiKeyboard != null) {
                     handlerEmojiKeyboard.removeCallbacksAndMessages(null);
                 }
-                if (handlerKeyboard != null){
+                if (handlerKeyboard != null) {
                     handlerKeyboard.removeCallbacksAndMessages(null);
                 }
                 closeChat(true);
