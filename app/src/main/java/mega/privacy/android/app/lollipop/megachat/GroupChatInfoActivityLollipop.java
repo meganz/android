@@ -18,10 +18,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -154,8 +152,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     private RoundedImageView avatarImageView;
     private EmojiTextView infoTitleChatText;
     private MegaApiAndroid megaApi = null;
-
-    private int previewMax = -1;
 
     private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
 
@@ -1093,13 +1089,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String title = input.getText().toString();
-                    boolean result = isAllowedTitle(title);
                     if (title.equals("") || title.isEmpty() || title.trim().isEmpty()) {
                         logWarning("Input is empty");
                         input.setError(getString(R.string.invalid_string));
                         input.requestFocus();
                     }
-                    else if(!result){
+                    else if(!isAllowedTitle(title)){
                         logWarning("Title is too long");
                         input.setError(getString(R.string.title_long));
                         input.requestFocus();
@@ -1122,13 +1117,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String title = input.getText().toString();
-                        boolean result = isAllowedTitle(title);
                         if (title.equals("") || title.isEmpty() || title.trim().isEmpty()) {
                             logWarning("Input is empty");
                             input.setError(getString(R.string.invalid_string));
                             input.requestFocus();
                         }
-                        else if(!result){
+                        else if(!isAllowedTitle(title)){
                             logWarning("Title is too long");
                             input.setError(getString(R.string.title_long));
                             input.requestFocus();
@@ -1159,13 +1153,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             public void onClick(View v) {
                 logDebug("OK BTTN CHANGE");
                 String title = input.getText().toString();
-                boolean result = isAllowedTitle(title);
                 if (title.equals("") || title.isEmpty() || title.trim().isEmpty()) {
                     logWarning("Input is empty");
                     input.setError(getString(R.string.invalid_string));
                     input.requestFocus();
                 }
-                else if(!result){
+                else if(!isAllowedTitle(title)){
                     logWarning("Title is too long");
                     input.setError(getString(R.string.title_long));
                     input.requestFocus();
