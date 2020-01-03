@@ -1094,8 +1094,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String title = input.getText().toString();
                     boolean result = isAllowedTitle(title);
-                    logDebug("****** 1 result = "+result);
-
                     if (title.equals("") || title.isEmpty() || title.trim().isEmpty()) {
                         logWarning("Input is empty");
                         input.setError(getString(R.string.invalid_string));
@@ -1125,7 +1123,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String title = input.getText().toString();
                         boolean result = isAllowedTitle(title);
-                        logDebug("****** 2 result = "+result);
                         if (title.equals("") || title.isEmpty() || title.trim().isEmpty()) {
                             logWarning("Input is empty");
                             input.setError(getString(R.string.invalid_string));
@@ -1163,7 +1160,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 logDebug("OK BTTN CHANGE");
                 String title = input.getText().toString();
                 boolean result = isAllowedTitle(title);
-                logDebug("****** 3 result = "+result);
                 if (title.equals("") || title.isEmpty() || title.trim().isEmpty()) {
                     logWarning("Input is empty");
                     input.setError(getString(R.string.invalid_string));

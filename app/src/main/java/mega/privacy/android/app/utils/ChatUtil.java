@@ -166,48 +166,31 @@ public class ChatUtil {
         return actionBarHeight;
     }
 
-//    public static int getMaxAllowed(@Nullable final CharSequence text) {
-//        int numEmojis = EmojiManager.getInstance().getNumEmojis(text);
-//        if (numEmojis > 0) {
-//            int realLenght = text.length() + (numEmojis * 2);
-//            if (realLenght >= MAX_ALLOWED_CHARACTERS_AND_EMOJIS) return text.length();
-//        }
-//        return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
-//    }
-
-
-
-    public static int getMaxAllowed(@Nullable CharSequence text) {
-        List<EmojiRange> emojisFound = EmojiManager.getInstance().findAllEmojis(text);
-        int count = 0;
-        if(emojisFound.size() > 0){
-            for (int i=0; i<emojisFound.size();i++) {
-                count = count + (emojisFound.get(i).end - emojisFound.get(i).start);
-            }
-            int realLenght = text.length() + count;
-
-            if (realLenght > MAX_ALLOWED_CHARACTERS_AND_EMOJIS){
-                int finalMax = text.length() -1;
-                return finalMax;
-            }
-        }
-
-        return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
-    }
-    public static boolean isAllowedTitle(String text) {
+    private static int getRealLength(CharSequence text) {
         int length = text.length();
+
         List<EmojiRange> emojisFound = EmojiManager.getInstance().findAllEmojis(text);
         int count = 0;
-
         if (emojisFound.size() > 0) {
             for (int i = 0; i < emojisFound.size(); i++) {
-                int size = emojisFound.get(i).end - emojisFound.get(i).start;
-                count = count + size;
+                count = count + (emojisFound.get(i).end - emojisFound.get(i).start);
             }
+            return length + count;
         }
+        return -1;
+    }
 
-        int realLength = length + count;
-        return realLength <= MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
+    public static int getMaxAllowed(@Nullable CharSequence text) {
+
+        int realLength = getRealLength(text);
+        if (realLength > MAX_ALLOWED_CHARACTERS_AND_EMOJIS) {
+            return text.length();
+        }
+        return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
+    }
+
+    public static boolean isAllowedTitle(String text) {
+        return getMaxAllowed(text) != text.length();
     }
 
 
