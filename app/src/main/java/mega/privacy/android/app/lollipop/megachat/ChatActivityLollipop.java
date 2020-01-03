@@ -186,7 +186,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private final static int ROTATION_LANDSCAPE = 1;
     private final static int ROTATION_REVERSE_PORTRAIT = 2;
     private final static int ROTATION_REVERSE_LANDSCAPE = 3;
-
+    private final static int MAX_LINES_INPUT_TEXT = 5;
 
     public static int MEGA_FILE_LINK = 1;
     public static int MEGA_FOLDER_LINK = 2;
@@ -696,18 +696,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         observersNumberText = findViewById(R.id.observers_text);
 
         textChat.addTextChangedListener(new TextWatcher() {
-            public void afterTextChanged(Editable s) { }
+            public void afterTextChanged(Editable s) {}
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 if (s != null && !s.toString().isEmpty()) {
                     sendIcon.setEnabled(true);
                     sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
                     textChat.setHint(" ");
-                    textChat.setMinLines(1);
-                    textChat.setMaxLines(5);
+                    setSizeInputText(false);
                     sendIcon.setVisibility(View.VISIBLE);
                     currentRecordButtonState = 0;
                     recordLayout.setVisibility(View.GONE);
@@ -1104,9 +1102,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 sendIcon.setEnabled(true);
                 sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
                 textChat.setHint(" ");
-                textChat.setMinLines(1);
-                textChat.setMaxLines(5);
-
+                setSizeInputText(false);
                 currentRecordButtonState = 0;
                 recordLayout.setVisibility(View.GONE);
                 recordButtonLayout.setVisibility(View.GONE);
@@ -1133,9 +1129,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
             }
         }
-
-        textChat.setMinLines(1);
-        textChat.setMaxLines(1);
+        setSizeInputText(true);
     }
 
     public void showChat(String textSnackbar){
@@ -2929,6 +2923,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    private void setSizeInputText(boolean isEmpty){
+        textChat.setMinLines(1);
+
+        if(isEmpty){
+            textChat.setMaxLines(1);
+        }else if(textChat.getMaxLines() < MAX_LINES_INPUT_TEXT && textChat.getLineCount() == textChat.getMaxLines()){
+            textChat.setMaxLines(textChat.getLineCount() + 1);
+        }
+    }
     private void endCall(long chatHang){
         logDebug("chatHang: " + chatHang);
         if(megaChatApi!=null){
