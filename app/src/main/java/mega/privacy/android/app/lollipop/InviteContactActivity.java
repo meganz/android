@@ -1083,8 +1083,9 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         }
         if (info != null) {
             int index = isUserEnteredContactExistInList(info);
-            if (index >= 0) {
-                recyclerViewList.findViewHolderForAdapterPosition(index).itemView.performClick();
+            RecyclerView.ViewHolder holder = recyclerViewList.findViewHolderForAdapterPosition(index);
+            if (index >= 0 &&  holder != null) {
+                holder.itemView.performClick();
             } else if (!isContactAdded(info)) {
                 addedContacts.add(info);
                 refreshAddedContactsView();
