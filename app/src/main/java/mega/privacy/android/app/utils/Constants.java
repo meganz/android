@@ -383,6 +383,9 @@ public class Constants {
     public static final int MESSAGE_SNACKBAR_TYPE = 1;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
 
+    public static final int INFO_ANIMATION = 3000;
+    public static final int QUICK_INFO_ANIMATION = 500;
+
     public static final int HEADER_VIEW_TYPE = 0;
     public static final int ITEM_VIEW_TYPE = 1;
 
