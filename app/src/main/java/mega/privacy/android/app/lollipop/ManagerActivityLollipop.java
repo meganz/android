@@ -13118,31 +13118,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		else if (requestCode == TAKE_PHOTO_CODE) {
 			logDebug("TAKE_PHOTO_CODE");
             if (resultCode == Activity.RESULT_OK) {
-                long parentHandleUpload = -1;
-
-                if (drawerItem == DrawerItem.SHARED_ITEMS) {
-                    switch (viewPagerShares.getCurrentItem()) {
-                        case 0: {
-                            parentHandleUpload = parentHandleIncoming;
-                            break;
-                        }
-                        case 1: {
-                            parentHandleUpload = parentHandleOutgoing;
-                            break;
-                        }
-                    }
-                } else if (getTabItemCloud() == CLOUD_TAB && isCloudAdded() && parentHandleBrowser != -1) {
-					parentHandleUpload = parentHandleBrowser;
-				} else {
-                    fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-                    if (fbFLol != null && parentHandleBrowser != -1) {
-                        parentHandleUpload = parentHandleBrowser;
-                    }
-                }
-				if (parentHandleUpload == -1) {
-					parentHandleUpload = megaApi.getRootNode().getHandle();
-				}
-                uploadTakePicture(this, parentHandleUpload, megaApi);
+                uploadTakePicture(this, getCurrentParentHandle(), megaApi);
             } else {
                 logWarning("TAKE_PHOTO_CODE--->ERROR!");
             }
