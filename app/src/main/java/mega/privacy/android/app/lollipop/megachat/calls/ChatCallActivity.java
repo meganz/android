@@ -317,10 +317,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
         super.onCreate(savedInstanceState);
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        if(manager != null) {
-            manager.cancel(INCOMING_CALL_NOTI_ID);
-        }
+        cancelIncomingCallNotification(this);
         setContentView(R.layout.activity_calls_chat);
         application.setShowPinScreen(true);
 

@@ -1779,10 +1779,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				    if(shouldNotify(this)) {
                         toSystemSettingNotification(this);
                     }
-                    NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                    if(manager != null) {
-                        manager.cancel(INCOMING_CALL_NOTI_ID);
-                    }
+                    cancelIncomingCallNotification(this);
 					hashMapSpeaker.remove(call.getChatid());
 					clearIncomingCallNotification(call.getId());
 					removeChatAudioManager();

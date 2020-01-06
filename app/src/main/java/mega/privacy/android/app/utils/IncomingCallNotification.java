@@ -23,6 +23,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
 import static mega.privacy.android.app.utils.Constants.CALL_ID;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 
@@ -38,7 +39,7 @@ public class IncomingCallNotification {
 
     public static void toSystemSettingNotification(Context context) {
         if (shouldNotify(context)) {
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
             NotificationChannel channel = new NotificationChannel(INCOMING_CALL_CHANNEL_ID, INCOMING_CALL_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(channel);
 
@@ -48,7 +49,7 @@ public class IncomingCallNotification {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, INCOMING_CALL_CHANNEL_ID);
             notificationBuilder
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText("Click to allow system to give priority to the call interface."))
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getString(R.string.notification_enable_display)))
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true);
             notificationManager.notify(TO_SYSTEM_SETTING_ID, notificationBuilder.build());
@@ -57,7 +58,7 @@ public class IncomingCallNotification {
 
     @TargetApi(29)
     public static void toIncomingCall(Context context, MegaChatCall callToLaunch, MegaChatApiAndroid megaChatApi) {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         NotificationChannel channel = new NotificationChannel(INCOMING_CALL_CHANNEL_ID, INCOMING_CALL_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
         channel.enableVibration(false);
         channel.setSound(null, null);
@@ -72,9 +73,9 @@ public class IncomingCallNotification {
         NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(context, INCOMING_CALL_CHANNEL_ID);
         mBuilderCompat
                 .setSmallIcon(R.drawable.ic_stat_notify)
-                .setContentText("Incoming call")
+                .setContentText(context.getString(R.string.notification_subtitle_incoming))
                 .setAutoCancel(false)
-                .addAction(R.drawable.ic_phone_white, "Go to the call", pendingIntent)
+                .addAction(R.drawable.ic_phone_white, context.getString(R.string.notification_incoming_action), pendingIntent)
                 .setFullScreenIntent(pendingIntent, true)
                 .setOngoing(true)
                 .setColor(ContextCompat.getColor(context, R.color.mega))
@@ -87,6 +88,13 @@ public class IncomingCallNotification {
         }
 
         notificationManager.notify(INCOMING_CALL_NOTI_ID, mBuilderCompat.build());
+    }
+
+    public static void cancelIncomingCallNotification(Context context) {
+        NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        if (manager != null) {
+            manager.cancel(INCOMING_CALL_NOTI_ID);
+        }
     }
 
     public static boolean shouldNotify(Context context) {

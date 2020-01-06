@@ -1908,6 +1908,8 @@
 
 
     <string name="notification_subtitle_incoming" context="notification subtitle of incoming calls">Incoming call</string>
+    <string name="notification_incoming_action" context="notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_enable_display" context="text explains why needs to go to system setting to enable allow display over other apps">Click to allow system to give priority to the call interface.</string>
 
     <plurals name="number_unread_messages" context="Subtitle to show the number of unread messages on a chat">
         <item context="unread message" quantity="one">%1$s unread message</item>
