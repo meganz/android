@@ -130,6 +130,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
+import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
@@ -13975,6 +13976,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		ImageView image = (ImageView) dialogView.findViewById(R.id.image_storage_status);
 		TextView text = (TextView) dialogView.findViewById(R.id.text_storage_status);
 
+		Product pro3 = getPRO3OneMonth();
+		String storageString = "";
+		String transferString = "";
+        if(pro3 != null) {
+            storageString = getSizeStringGBBased(pro3.getStorage());
+            transferString = getSizeStringGBBased(pro3.getTransfer());
+        }
+
 		switch (storageState) {
 			case MegaApiJava.STORAGE_STATE_GREEN:
 				logDebug("STORAGE STATE GREEN");
@@ -13982,12 +13991,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			case MegaApiJava.STORAGE_STATE_ORANGE:
 				image.setImageResource(R.drawable.ic_storage_almost_full);
-				text.setText(getString(R.string.text_almost_full_warning));
+				text.setText(String.format(getString(R.string.text_almost_full_warning), storageString,transferString));
 				break;
 
 			case MegaApiJava.STORAGE_STATE_RED:
 				image.setImageResource(R.drawable.ic_storage_full);
-				text.setText(getString(R.string.text_storage_full_warning));
+				text.setText(String.format(getString(R.string.text_storage_full_warning), storageString,transferString));
 				break;
 
 			default:
@@ -14071,9 +14080,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("Show storage status dialog for USER PRO");
 				if (!overquotaAlert) {
 					if (storageState == MegaApiJava.STORAGE_STATE_ORANGE) {
-						text.setText(getString(R.string.text_almost_full_warning_pro_account));
+						text.setText(String.format(getString(R.string.text_almost_full_warning_pro_account),storageString,transferString));
 					} else if (storageState == MegaApiJava.STORAGE_STATE_RED){
-						text.setText(getString(R.string.text_storage_full_warning_pro_account));
+						text.setText(String.format(getString(R.string.text_storage_full_warning_pro_account),storageString,transferString));
 					}
 				}
 				horizontalActionButton.setText(getString(R.string.my_account_upgrade_pro));
@@ -14109,6 +14118,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		alertDialogStorageStatus.show();
 	}
+
+    private Product getPRO3OneMonth() {
+        List<Product> products = MegaApplication.getInstance().getMyAccountInfo().productAccounts;
+		if (products != null) {
+			for (Product product : products) {
+				if (product != null && product.getLevel() == PRO_III && product.getMonths() == 1) {
+					return product;
+				}
+			}
+		} else {
+			// Edge case: when this method is called, TYPE_GET_PRICING hasn't finished yet.
+			logWarning("Products haven't been initialized!");
+		}
+        return null;
+    }
 
 	public void askForCustomizedPlan(){
 		logDebug("askForCustomizedPlan");

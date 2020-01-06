@@ -107,6 +107,7 @@ import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PRO
 import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 
 public class Util {
@@ -263,6 +264,7 @@ public class Util {
 //            src = src.replaceAll("]]>", "] ]>");
 //            src = "<![CDATA[" + src + "]]>";
         }
+        src = converterShortCodes(src);
         return src;
     }
 
@@ -530,7 +532,23 @@ public class Util {
 		
 		return sizeString;
 	}
-    
+
+    public static String getSizeStringGBBased(long gbSize){
+        String sizeString = "";
+        DecimalFormat decf = new DecimalFormat("###.##");
+
+        float TB = 1024;
+
+        if (gbSize < TB){
+            sizeString = decf.format(gbSize) + " " + context.getString(R.string.label_file_size_giga_byte);
+        }
+        else{
+            sizeString = decf.format(gbSize/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
+        }
+
+        return sizeString;
+    }
+
 	public static String getDateString(long date){
 		DateFormat datf = DateFormat.getDateTimeInstance();
 		String dateString = "";
