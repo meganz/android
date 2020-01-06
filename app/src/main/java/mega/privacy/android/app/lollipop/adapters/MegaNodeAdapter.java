@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -529,7 +528,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         } else if (viewType == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             logDebug("type: ITEM_VIEW_TYPE_GRID");
 
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid_new, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid, parent, false);
             MegaNodeAdapter.ViewHolderBrowserGrid holderGrid = new MegaNodeAdapter.ViewHolderBrowserGrid(v);
 
             holderGrid.folderLayout = v.findViewById(R.id.item_file_grid_folder);
@@ -630,9 +629,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         if (node.isTakenDown()) {
             holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
+            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
             holder.takenDownImage.setVisibility(View.VISIBLE);
         } else {
             holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.black));
+            holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
             holder.takenDownImage.setVisibility(View.GONE);
         }
 
