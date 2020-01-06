@@ -87,6 +87,7 @@ import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.UploadUtil.*;
 
 
 public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight, UploadBottomSheetDialogActionListener {
@@ -191,25 +192,25 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void uploadFromDevice() {
-		UploadUtil.chooseFromDevice(this);
+		chooseFromDevice(this);
 	}
 
 	@Override
 	public void uploadFromSystem() {
-		UploadUtil.uploadFromSystem(this);
+		chooseFromSystem(this);
 	}
 
 	@Override
 	public void takePictureAndUpload() {
-		if (!Util.hasPermissions(this, Manifest.permission.CAMERA)) {
-			Util.requestPermission(this, Constants.REQUEST_CAMERA, Manifest.permission.CAMERA);
+		if (!hasPermissions(this, Manifest.permission.CAMERA)) {
+			requestPermission(this, Constants.REQUEST_CAMERA, Manifest.permission.CAMERA);
 			return;
 		}
-		if (!Util.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			Util.requestPermission(this, Constants.REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			requestPermission(this, Constants.REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			return;
 		}
-		Util.takePicture(this);
+		takePicture(this);
 	}
 
 	@Override

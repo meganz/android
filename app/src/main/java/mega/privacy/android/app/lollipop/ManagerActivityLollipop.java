@@ -206,9 +206,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.UploadUtil;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -259,6 +256,7 @@ import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
@@ -1632,7 +1630,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 									REQUEST_WRITE_STORAGE);
 		        		}
 		        		else{
-		        			this.takePicture();
+		        			takePicture(this);
 							typesCameraPermission = -1;
 		        		}
 		        	}
@@ -1680,7 +1678,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 								ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
 							}
 							else{
-								this.takePicture();
+								takePicture(this);
 								typesCameraPermission = -1;
 							}
 						}
@@ -1707,7 +1705,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 									REQUEST_CAMERA);
 						}
 						else{
-							this.takePicture();
+							takePicture(this);
 							typesCameraPermission = -1;
 						}
 					}
@@ -3877,7 +3875,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     			}
     			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
 					logDebug("Intent take selfie");
-    				takePicture();
+    				takePicture(this);
     			}
 				else if (intent.getAction().equals(SHOW_REPEATED_UPLOAD)){
 					logDebug("Intent SHOW_REPEATED_UPLOAD");
@@ -7874,11 +7872,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 
 					if (hasStoragePermission && hasCameraPermission){
-						this.takePicture();
+						takePicture(this);
 					}
 				}
 		    	else{
-		    		this.takePicture();
+		    		takePicture(this);
 		    	}
 
 		    	return true;
@@ -10247,10 +10245,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void takePicture(){
-		Util.takePicture(this);
-	}
-
 	public void checkPermissions(){
 		logDebug("checkPermissionsCall");
 
@@ -10431,25 +10425,25 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	@Override
 	public void uploadFromDevice() {
-		UploadUtil.chooseFromDevice(this);
+		chooseFromDevice(this);
 	}
 
 	@Override
 	public void uploadFromSystem() {
-		UploadUtil.uploadFromSystem(this);
+		chooseFromSystem(this);
 	}
 
 	@Override
 	public void takePictureAndUpload() {
 		if (!hasPermissions(this, Manifest.permission.CAMERA)) {
-			requestPermission(this, Constants.REQUEST_CAMERA, Manifest.permission.CAMERA);
+			requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
 			return;
 		}
 		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			requestPermission(this, Constants.REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+			requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			return;
 		}
-		Util.takePicture(this);
+		takePicture(this);
 	}
 
 	@Override
@@ -11832,7 +11826,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void showUploadPanel() {
 		logDebug("showUploadPanel");
 		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			requestPermission(this, Constants.REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+			requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
 		} else {
 			onGetReadWritePermission();
 		}
@@ -13121,7 +13115,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}catch (Exception e){}
 			}
 		}
-		else if (requestCode == Constants.TAKE_PHOTO_CODE) {
+		else if (requestCode == TAKE_PHOTO_CODE) {
 			logDebug("TAKE_PHOTO_CODE");
             if (resultCode == Activity.RESULT_OK) {
                 long parentHandleUpload = -1;
@@ -13148,12 +13142,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (parentHandleUpload == -1) {
 					parentHandleUpload = megaApi.getRootNode().getHandle();
 				}
-                UploadUtil.uploadTakePicture(this, parentHandleUpload, megaApi);
+                uploadTakePicture(this, parentHandleUpload, megaApi);
             } else {
                 logWarning("TAKE_PHOTO_CODE--->ERROR!");
             }
 		}
-		else if (requestCode == Constants.TAKE_PICTURE_PROFILE_CODE){
+		else if (requestCode == TAKE_PICTURE_PROFILE_CODE){
 			logDebug("TAKE_PICTURE_PROFILE_CODE");
 
 			if(resultCode == Activity.RESULT_OK){

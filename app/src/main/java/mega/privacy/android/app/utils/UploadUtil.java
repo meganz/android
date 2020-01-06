@@ -88,7 +88,7 @@ public class UploadUtil {
      *
      * @param activity the activity the camera would start from
      */
-    public static void uploadFromSystem(final Activity activity) {
+    public static void chooseFromSystem(final Activity activity) {
         final File[] fs = activity.getExternalFilesDirs(null);
         //has SD card
         if (fs.length > 1) {
