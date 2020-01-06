@@ -17,14 +17,17 @@ import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -1458,31 +1461,60 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     private void showTakendownDialog(boolean isFolder, final View view, final int currentPosition) {
         int alertMessageID = isFolder ? R.string.message_folder_takedown_pop_out_notification : R.string.message_file_takedown_pop_out_notification;
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getString(R.string.general_error_word))
-               .setMessage(context.getString(alertMessageID))
-               .setCancelable(false)
-               .setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int i) {
-                       dialog.dismiss();
-                   }
-               })
-               .setPositiveButton(R.string.dispute_takendown_file, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialogInterface, int i) {
-                       String url = "https://mega.nz/dispute";
-                       Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
-                       openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                       openTermsIntent.setData(Uri.parse(url));
-                       context.startActivity(openTermsIntent);
-                   }
-               })
-               .setNeutralButton(R.string.open_takendown_file, new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialogInterface, int i) {
-                       fileClicked(currentPosition, view);
-                   }
-               }).show();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View v = inflater.inflate(R.layout.dialog_three_vertical_buttons, null);
+        builder.setView(v);
+
+        TextView title = v.findViewById(R.id.dialog_title);
+        TextView text = v.findViewById(R.id.dialog_text);
+
+        Button openButton = v.findViewById(R.id.dialog_first_button);
+        Button disputeButton = v.findViewById(R.id.dialog_second_button);
+        Button cancelButton = v.findViewById(R.id.dialog_third_button);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.RIGHT;
+
+        title.setText(R.string.general_error_word);
+        text.setText(alertMessageID);
+        openButton.setText(R.string.open_takendown_file);
+        disputeButton.setText(R.string.dispute_takendown_file);
+        cancelButton.setText(R.string.general_cancel);
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+
+        openButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                fileClicked(currentPosition, view);
+            }
+        });
+
+        disputeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                openTermsIntent.setData(Uri.parse(DISPUTE_URL));
+                context.startActivity(openTermsIntent);
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 }
