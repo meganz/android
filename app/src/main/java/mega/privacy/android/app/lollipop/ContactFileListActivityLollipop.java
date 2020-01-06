@@ -65,9 +65,6 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.UploadUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -203,11 +200,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void takePictureAndUpload() {
 		if (!hasPermissions(this, Manifest.permission.CAMERA)) {
-			requestPermission(this, Constants.REQUEST_CAMERA, Manifest.permission.CAMERA);
+			requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
 			return;
 		}
 		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			requestPermission(this, Constants.REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+			requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			return;
 		}
 		takePicture(this);
@@ -597,8 +594,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	public void showUploadPanel() {
 		logDebug("showUploadPanel");
-		if (!Util.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			Util.requestPermission(this, Constants.REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
 		} else {
 			onGetReadWritePermission();
 		}
@@ -631,15 +628,15 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			return;
 		}
 		switch (requestCode) {
-			case Constants.REQUEST_CAMERA: {
-				if (!Util.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-					Util.requestPermission(this, Constants.REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+			case REQUEST_CAMERA: {
+				if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+					requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 				} else {
 					takePictureAndUpload();
 				}
 				break;
 			}
-			case Constants.REQUEST_READ_WRITE_STORAGE: {
+			case REQUEST_READ_WRITE_STORAGE: {
 				logDebug("REQUEST_READ_WRITE_STORAGE");
 				onGetReadWritePermission();
 				break;
@@ -1255,11 +1252,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				startService(uploadServiceIntent);
 				i++;
 			}
-		} else if (requestCode == Constants.TAKE_PHOTO_CODE) {
+		} else if (requestCode == TAKE_PHOTO_CODE) {
 			logDebug("TAKE_PHOTO_CODE");
 			if (resultCode == Activity.RESULT_OK) {
 				long parentHandle = cflF.getParentHandle();
-				UploadUtil.uploadTakePicture(this, parentHandle, megaApi);
+				uploadTakePicture(this, parentHandle, megaApi);
 			} else {
 				logWarning("TAKE_PHOTO_CODE--->ERROR!");
 			}
