@@ -835,7 +835,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				if (totalFileUploadsCompleted == totalFileUploads && transfersCount == 0) {
 					onQueueComplete();
 				} else{
-                    updateProgressNotification(transfer.isFolderTransfer());
+				    if (totalFileUploads != 0 && totalFileUploadsCompleted != 0) {
+                        updateProgressNotification(transfer.isFolderTransfer());
+                    }
 				}
 			}
 		}
