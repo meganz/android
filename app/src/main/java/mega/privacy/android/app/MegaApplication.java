@@ -57,6 +57,7 @@ import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatAudioManager;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.utils.IncomingCallNotification;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -89,6 +90,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
+import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1685,7 +1687,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 									if (callToLaunch != null) {
 										if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
 											logDebug("One call: open call");
-											launchCallActivity(callToLaunch);
+                                            if (shouldNotify(this)) {
+                                                toIncomingCall(this, callToLaunch, megaChatApi);
+                                            } else {
+                                                launchCallActivity(callToLaunch);
+                                            }
 										} else {
 											logWarning("Launch not in correct status");
 										}
@@ -1770,6 +1776,13 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				}
 
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
+				    if(shouldNotify(this)) {
+                        toSystemSettingNotification(this);
+                    }
+                    NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                    if(manager != null) {
+                        manager.cancel(INCOMING_CALL_NOTI_ID);
+                    }
 					hashMapSpeaker.remove(call.getChatid());
 					clearIncomingCallNotification(call.getId());
 					removeChatAudioManager();

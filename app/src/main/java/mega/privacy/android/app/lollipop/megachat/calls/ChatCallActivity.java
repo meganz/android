@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -82,8 +83,8 @@ import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.ChatUtil.showErrorAlertDialogGroupCall;
 import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -316,7 +317,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
         super.onCreate(savedInstanceState);
-
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if(manager != null) {
+            manager.cancel(INCOMING_CALL_NOTI_ID);
+        }
         setContentView(R.layout.activity_calls_chat);
         application.setShowPinScreen(true);
 
