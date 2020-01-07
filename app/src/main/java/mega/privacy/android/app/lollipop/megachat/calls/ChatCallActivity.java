@@ -10,14 +10,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
@@ -59,6 +54,7 @@ import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
+import mega.privacy.android.app.interfaces.OnSpeakerListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
@@ -82,12 +78,11 @@ import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.ChatUtil.showErrorAlertDialogGroupCall;
 import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
+public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback {
 
     final private static int REMOTE_VIDEO_NOT_INIT = -1;
     final private static int REMOTE_VIDEO_ENABLED = 1;
@@ -187,14 +182,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private LocalCameraCallFullScreenFragment localCameraFragmentFS = null;
     private RemoteCameraCallFullScreenFragment remoteCameraFragmentFS = null;
     private BigCameraGroupCallFragment bigCameraGroupCallFragment = null;
-    private SensorManager mSensorManager = null;
-    private Sensor mSensor;
-    private PowerManager powerManager;
-    private PowerManager.WakeLock wakeLock;
-    private int field = 0x00000020;
-
     private MegaApplication application =  MegaApplication.getInstance();
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -354,19 +342,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             finish();
             return;
         }
-
         megaChatApi.addChatCallListener(this);
-
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-
-        try {
-            field = PowerManager.class.getClass().getField("PROXIMITY_SCREEN_OFF_WAKE_LOCK").getInt(null);
-        } catch (Throwable ignored) {
-        }
-
-        powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(field, getLocalClassName());
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         fragmentContainer = findViewById(R.id.file_info_fragment_container);
@@ -655,6 +631,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             } else {
                 logDebug("Other status: " + callStatus);
             }
+
+            rtcAudioManager.setOnSpeakerListener(new OnSpeakerListener() {
+                @Override
+                public void needToUpdate(boolean statusSpeaker) {
+                    application.setSpeakerStatus(callChat.getChatid(), statusSpeaker);
+                    updateLocalSpeakerStatus();
+                }
+            });
 
         }
         if (checkPermissions()) {
@@ -989,9 +973,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     public void onPause() {
         application.activityPaused();
         super.onPause();
-        if (mSensorManager == null) return;
-        mSensorManager.unregisterListener(this);
-        mSensorManager = null;
+        if(rtcAudioManager!=null){
+            rtcAudioManager.unregisterProximitySensor();
+        }
     }
 
     @Override
@@ -1000,15 +984,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         super.onResume();
         stopService(new Intent(this, IncomingCallService.class));
         restoreHeightAndWidth();
-        if (mSensorManager != null) {
-            mSensorManager.unregisterListener(this);
-            mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        if(rtcAudioManager!=null){
+            rtcAudioManager.startProximitySensor(this);
         }
         application.createChatAudioManager();
-
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         application.activityResumed();
 
         sendSignalPresence();
@@ -1035,8 +1016,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onDestroy() {
         logDebug("onDestroy");
-        if (mSensorManager != null) {
-            mSensorManager.unregisterListener(this);
+        if(rtcAudioManager!=null){
+           rtcAudioManager.unregisterProximitySensor();
         }
         clearHandlers();
         activateChrono(false, callInProgressChrono, callChat);
@@ -1097,10 +1078,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
             logDebug("TYPE_HANG_CHAT_CALL");
-            if (mSensorManager != null) {
-                mSensorManager.unregisterListener(this);
-            }
-
             if (getCall() == null) return;
             application.setSpeakerStatus(callChat.getChatid(), false);
             finishActivity();
@@ -1982,12 +1959,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void updateLocalSpeakerStatus() {
+
+        boolean speakerStatus = application.getSpeakerStatus(callChat.getChatid());
         if (rtcAudioManager == null) {
-            rtcAudioManager = AppRTCAudioManager.create(getApplicationContext(), application.getSpeakerStatus(callChat.getChatid()));
-            rtcAudioManager.start(null);
+            rtcAudioManager = AppRTCAudioManager.create(getApplicationContext(), speakerStatus);
         }
+
         logDebug("Enable speaker");
-        rtcAudioManager.activateSpeaker(application.getSpeakerStatus(callChat.getChatid()));
+        rtcAudioManager.activateSpeaker(speakerStatus);
         speakerFAB.hide();
 
         if (application.getSpeakerStatus(callChat.getChatid())) {
@@ -2198,15 +2177,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.values[0] == 0 || !wakeLock.isHeld()) {
-            wakeLock.acquire();
-        } else if (wakeLock.isHeld()) {
-            wakeLock.release();
-        }
-    }
-
     public void remoteCameraClick() {
         logDebug("remoteCameraClick");
         if (getCall() == null || callChat.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS)
@@ -2260,13 +2230,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             peerSelected = peer;
             updateUserSelected();
         }
-
     }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    }
-
 
     private void answerCall(boolean isVideoCall) {
         logDebug("answerCall");
