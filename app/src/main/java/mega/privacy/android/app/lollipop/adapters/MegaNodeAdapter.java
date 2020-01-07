@@ -569,6 +569,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 logWarning("textViewMessageInfo is NULL");
             }
 
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                holderGrid.textViewFileNameForFile.setMaxWidth(scaleWidthPx(70, outMetrics));
+            } else {
+                holderGrid.textViewFileNameForFile.setMaxWidth(scaleWidthPx(140, outMetrics));
+            }
+
+
             holderGrid.savedOffline.setVisibility(View.INVISIBLE);
             holderGrid.publicLinkImage.setVisibility(View.GONE);
             holderGrid.takenDownImage.setVisibility(View.GONE);
