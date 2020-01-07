@@ -10435,6 +10435,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
 	public void takePictureAndUpload() {
 		if (!hasPermissions(this, Manifest.permission.CAMERA)) {
+			setTypesCameraPermission(TAKE_PICTURE_OPTION);
 			requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
 			return;
 		}
