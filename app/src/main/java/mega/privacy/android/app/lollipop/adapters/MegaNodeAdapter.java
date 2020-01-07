@@ -140,6 +140,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView fileGridIconForFile;
         public ImageButton imageButtonThreeDotsForFile;
         public TextView textViewFileNameForFile;
+        public ImageView takenDownImageForFile;
         public ImageView fileGridSelected;
     }
 
@@ -548,6 +549,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holderGrid.separator = v.findViewById(R.id.file_grid_separator);
             holderGrid.publicLinkImage = v.findViewById(R.id.file_grid_public_link);
             holderGrid.takenDownImage = v.findViewById(R.id.file_grid_taken_down);
+            holderGrid.takenDownImageForFile = v.findViewById(R.id.file_grid_taken_down_for_file);
             holderGrid.imageViewVideoIcon = v.findViewById(R.id.file_grid_video_icon);
             holderGrid.videoDuration = v.findViewById(R.id.file_grid_title_video_duration);
             holderGrid.videoInfoLayout = v.findViewById(R.id.item_file_videoinfo_layout);
@@ -570,6 +572,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holderGrid.savedOffline.setVisibility(View.INVISIBLE);
             holderGrid.publicLinkImage.setVisibility(View.GONE);
             holderGrid.takenDownImage.setVisibility(View.GONE);
+            holderGrid.takenDownImageForFile.setVisibility(View.GONE);
 
             holderGrid.itemLayout.setTag(holderGrid);
             holderGrid.itemLayout.setOnClickListener(this);
@@ -631,10 +634,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
             holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
             holder.takenDownImage.setVisibility(View.VISIBLE);
+            holder.takenDownImageForFile.setVisibility(View.VISIBLE);
         } else {
             holder.textViewFileNameForFile.setTextColor(context.getResources().getColor(R.color.black));
             holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
             holder.takenDownImage.setVisibility(View.GONE);
+            holder.takenDownImageForFile.setVisibility(View.GONE);
         }
 
         if (node.isFolder()) {

@@ -194,7 +194,7 @@
                 tools:ignore="ContentDescription" />
         </RelativeLayout>
     </RelativeLayout>
-    <!--no use in grid-->
+
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
