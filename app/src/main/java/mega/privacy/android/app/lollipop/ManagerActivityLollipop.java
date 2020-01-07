@@ -3626,12 +3626,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		setTabsVisibility();
 		abL.setVisibility(View.GONE);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.turn_on_notifications_statusbar));
-		}
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.turn_on_notifications_statusbar));
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -5664,6 +5662,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		viewPagerTransfers.setVisibility(View.GONE);
 
     	fragmentContainer.setVisibility(View.GONE);
+
+    	if (turnOnNotifications) {
+			fragmentContainer.setVisibility(View.VISIBLE);
+			drawerLayout.closeDrawer(Gravity.LEFT);
+			return;
+		}
 
     	switch (drawerItem) {
 			case CLOUD_DRIVE: {
