@@ -33,30 +33,33 @@ public class IncomingCallNotification {
 
     public static final int INCOMING_CALL_NOTI_ID = 13993;
 
+    /**
+     * Equals Build.VERSION_CODES.Q. After targetSdkVersion updates to 29, it should be replaced.
+     */
+    public static final int ANDROID_10_Q = 29;
+
     public static final String INCOMING_CALL_CHANNEL_ID = "incoming_call_channel_id";
     public static final String INCOMING_CALL_CHANNEL_NAME = "Incoming call";
 
-
+    @TargetApi(ANDROID_10_Q)
     public static void toSystemSettingNotification(Context context) {
-        if (shouldNotify(context)) {
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-            NotificationChannel channel = new NotificationChannel(INCOMING_CALL_CHANNEL_ID, INCOMING_CALL_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
-            notificationManager.createNotificationChannel(channel);
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        NotificationChannel channel = new NotificationChannel(INCOMING_CALL_CHANNEL_ID, INCOMING_CALL_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
+        notificationManager.createNotificationChannel(channel);
 
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
-            @NoMeaning int i = 0;
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, i, intent, PendingIntent.FLAG_ONE_SHOT);
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, INCOMING_CALL_CHANNEL_ID);
-            notificationBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getString(R.string.notification_enable_display)))
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true);
-            notificationManager.notify(TO_SYSTEM_SETTING_ID, notificationBuilder.build());
-        }
+        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
+        @NoMeaning int i = 0;
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, i, intent, PendingIntent.FLAG_ONE_SHOT);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, INCOMING_CALL_CHANNEL_ID);
+        notificationBuilder
+                .setSmallIcon(R.drawable.ic_stat_notify)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getString(R.string.notification_enable_display)))
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+        notificationManager.notify(TO_SYSTEM_SETTING_ID, notificationBuilder.build());
     }
 
-    @TargetApi(29)
+    @TargetApi(ANDROID_10_Q)
     public static void toIncomingCall(Context context, MegaChatCall callToLaunch, MegaChatApiAndroid megaChatApi) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         NotificationChannel channel = new NotificationChannel(INCOMING_CALL_CHANNEL_ID, INCOMING_CALL_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
@@ -98,7 +101,7 @@ public class IncomingCallNotification {
     }
 
     public static boolean shouldNotify(Context context) {
-        return Build.VERSION.SDK_INT >= 29 && !Settings.canDrawOverlays(context);
+        return Build.VERSION.SDK_INT >= ANDROID_10_Q && !Settings.canDrawOverlays(context);
     }
 
     @Retention(RetentionPolicy.SOURCE)
