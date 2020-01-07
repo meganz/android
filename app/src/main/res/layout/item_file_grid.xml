@@ -163,11 +163,25 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
-                android:layout_toStartOf="@+id/file_grid_three_dots_for_file"
+                android:layout_toStartOf="@+id/file_grid_taken_down_for_file"
                 android:ellipsize="middle"
                 android:singleLine="true"
                 android:textColor="#DE000000"
                 android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/file_grid_taken_down_for_file"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="22dp"
+                android:background="@null"
+                android:src="@drawable/ic_input_warning"
+                android:tint="@color/login_warning"
+                tools:ignore="ContentDescription" />
 
             <ImageButton
                 android:id="@+id/file_grid_three_dots_for_file"
