@@ -970,6 +970,10 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	public void showFabButton(MegaNode node){
+		if (node == null) {
+			return;
+		}
+
 		logDebug("Node handle: " + node.getHandle());
 		int accessLevel = megaApi.getAccess(node);
 
