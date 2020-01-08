@@ -127,6 +127,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private static long openChatId = -1;
 
 	private static boolean closedChat = true;
+	private static HashMap<Long, Boolean> hashMapVideo = new HashMap<>();
 	private static HashMap<Long, Boolean> hashMapSpeaker = new HashMap<>();
 	private static HashMap<Long, Boolean> hashMapCallLayout = new HashMap<>();
 
@@ -1764,13 +1765,13 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				}
 
 				case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION: {
-					hashMapSpeaker.remove(call.getChatid());
+					removeStatusVideoAndSpeaker(call.getChatid());
 					removeChatAudioManager();
 					break;
 				}
 
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
-					hashMapSpeaker.remove(call.getChatid());
+					removeStatusVideoAndSpeaker(call.getChatid());
 					clearIncomingCallNotification(call.getId());
 					removeChatAudioManager();
 
@@ -1925,6 +1926,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 	}
 
+	private void removeStatusVideoAndSpeaker(long chatId){
+		hashMapSpeaker.remove(chatId);
+		hashMapVideo.remove(chatId);
+	}
+
 	public void createChatAudioManager() {
 		if (chatAudioManager != null) return;
 		chatAudioManager = ChatAudioManager.create(getApplicationContext());
@@ -2065,6 +2071,18 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		hashMapSpeaker.put(chatId, speakerStatus);
 	}
 
+	public static boolean getVideoStatus(long chatId) {
+		boolean entryExists = hashMapVideo.containsKey(chatId);
+		if (entryExists) {
+			return hashMapVideo.get(chatId);
+		}
+		setVideoStatus(chatId, false);
+		return false;
+	}
+
+	public static void setVideoStatus(long chatId, boolean videoStatus) {
+		hashMapVideo.put(chatId, videoStatus);
+	}
 	public static boolean getCallLayoutStatus(long chatId) {
 		boolean entryExists = hashMapCallLayout.containsKey(chatId);
 		if (entryExists) {

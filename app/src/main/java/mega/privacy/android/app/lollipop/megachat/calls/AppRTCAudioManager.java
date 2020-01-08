@@ -23,8 +23,7 @@ import org.webrtc.ThreadUtils;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import mega.privacy.android.app.interfaces.OnSpeakerListener;
-
+import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 /**
@@ -48,7 +47,7 @@ public class AppRTCAudioManager {
     private boolean savedIsMicrophoneMute = false;
     private boolean hasWiredHeadset = false;
     private boolean isSpeakerOn = false;
-    private OnSpeakerListener speakerListener;
+    private OnProximitySensorListener proximitySensorListener;
 
     // Default audio device; speaker phone for video calls or earpiece for audio
     // only calls.
@@ -99,8 +98,8 @@ public class AppRTCAudioManager {
         AppRTCUtils.logDeviceInfo(TAG);
     }
 
-    public void setOnSpeakerListener(OnSpeakerListener speakerListener) {
-        this.speakerListener = speakerListener;
+    public void setOnSpeakerListener(OnProximitySensorListener proximitySensorListener) {
+        this.proximitySensorListener = proximitySensorListener;
     }
 
 
@@ -132,23 +131,27 @@ public class AppRTCAudioManager {
         // The proximity sensor should only be activated when there are exactly two available audio devices.
         if (audioDevices.size() == 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE) && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
             if (proximitySensor.sensorReportsNearState()) {
-                logDebug("Proximity sensor status: near");
+                logDebug("Status of proximity sensor is: Near");
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
                 if (isSpeakerOn) {
+                    logDebug("Disabling the speakerphone");
                     setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
-                    if (speakerListener != null) speakerListener.needToUpdate(false);
                 }
+                logDebug("Updating the video");
+                if (proximitySensorListener != null) proximitySensorListener.needToUpdate(true);
+
             } else {
-                logDebug("Proximity sensor status: far");
+
+                logDebug("Status of proximity sensor is: Far");
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
                 if (isSpeakerOn) {
+                    logDebug("Enabling the speakerphone");
                     setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
-                    if (speakerListener != null) {
-                        speakerListener.needToUpdate(true);
-                    }
                 }
+                logDebug("Updating the video");
+                if (proximitySensorListener != null) proximitySensorListener.needToUpdate(false);
             }
         }
     }
@@ -167,10 +170,10 @@ public class AppRTCAudioManager {
         return new AppRTCAudioManager(context, isSpeakerOn);
     }
 
-    public void activateSpeaker(boolean statusSpeaker) {
-        Log.d(TAG, "activateSpeaker() =  " + statusSpeaker);
+    public void updateSpeakerStatus(boolean speakerStatus) {
+        logDebug("The speaker status is "+speakerStatus);
         if (audioDevices.size() == 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE) && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
-            if (statusSpeaker) {
+            if (speakerStatus) {
                 isSpeakerOn = true;
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 defaultAudioDevice = AudioDevice.SPEAKER_PHONE;

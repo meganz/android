@@ -54,7 +54,7 @@ import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
-import mega.privacy.android.app.interfaces.OnSpeakerListener;
+import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
@@ -183,6 +183,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private RemoteCameraCallFullScreenFragment remoteCameraFragmentFS = null;
     private BigCameraGroupCallFragment bigCameraGroupCallFragment = null;
     private MegaApplication application =  MegaApplication.getInstance();
+    private boolean inTemporaryState = false;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -632,11 +633,19 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 logDebug("Other status: " + callStatus);
             }
 
-            rtcAudioManager.setOnSpeakerListener(new OnSpeakerListener() {
+            rtcAudioManager.setOnSpeakerListener(new OnProximitySensorListener() {
                 @Override
-                public void needToUpdate(boolean statusSpeaker) {
-                    application.setSpeakerStatus(callChat.getChatid(), statusSpeaker);
-                    updateLocalSpeakerStatus();
+                public void needToUpdate(boolean isNear) {
+                    boolean realStatus = application.getVideoStatus(callChat.getChatid());
+                    if(!realStatus){
+                        inTemporaryState = false;
+                    }else if(isNear){
+                        inTemporaryState = true;
+                        megaChatApi.disableVideo(chatId, ChatCallActivity.this);
+                    }else{
+                        inTemporaryState = false;
+                        megaChatApi.enableVideo(chatId, ChatCallActivity.this);
+                    }
                 }
             });
 
@@ -1755,6 +1764,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (getCall() == null) return;
         int callStatus = callChat.getStatus();
         logDebug("Call Status "+callStatus);
+        boolean isVideoOn = callChat.hasLocalVideo();
+        if(!inTemporaryState){
+            application.setVideoStatus(callChat.getChatid(), isVideoOn);
+        }
         if (chat.isGroup()) {
             if (callChat.hasLocalVideo()) {
                 logDebug("group:Video local connected");
@@ -1959,17 +1972,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void updateLocalSpeakerStatus() {
-
         boolean speakerStatus = application.getSpeakerStatus(callChat.getChatid());
         if (rtcAudioManager == null) {
             rtcAudioManager = AppRTCAudioManager.create(getApplicationContext(), speakerStatus);
         }
-
-        logDebug("Enable speaker");
-        rtcAudioManager.activateSpeaker(speakerStatus);
+        rtcAudioManager.updateSpeakerStatus(speakerStatus);
         speakerFAB.hide();
 
-        if (application.getSpeakerStatus(callChat.getChatid())) {
+        if (speakerStatus) {
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
             speakerFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_speaker_on));
         } else {
@@ -1979,9 +1989,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         speakerFAB.show();
         application.setAudioManagerValues(callChat);
-
     }
-
 
     private void updateRemoteVideoStatus(long userPeerId, long userClientId) {
         logDebug("(peerid = " + userPeerId + ", clientid = " + userClientId + ")");
