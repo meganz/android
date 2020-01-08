@@ -44,9 +44,7 @@ public class IncomingCallNotification {
     @TargetApi(ANDROID_10_Q)
     public static void toSystemSettingNotification(Context context) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        NotificationChannel channel = new NotificationChannel(INCOMING_CALL_CHANNEL_ID, INCOMING_CALL_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
-        notificationManager.createNotificationChannel(channel);
-
+        createChannel(notificationManager);
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
         @NoMeaning int i = 0;
         PendingIntent pendingIntent = PendingIntent.getActivity(context, i, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -60,13 +58,17 @@ public class IncomingCallNotification {
     }
 
     @TargetApi(ANDROID_10_Q)
-    public static void toIncomingCall(Context context, MegaChatCall callToLaunch, MegaChatApiAndroid megaChatApi) {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+    private static void createChannel(NotificationManager notificationManager) {
         NotificationChannel channel = new NotificationChannel(INCOMING_CALL_CHANNEL_ID, INCOMING_CALL_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
         channel.enableVibration(false);
         channel.setSound(null, null);
         notificationManager.createNotificationChannel(channel);
+    }
 
+    @TargetApi(ANDROID_10_Q)
+    public static void toIncomingCall(Context context, MegaChatCall callToLaunch, MegaChatApiAndroid megaChatApi) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        createChannel(notificationManager);
         Intent intent = new Intent(context, ChatCallActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(CHAT_ID, callToLaunch.getChatid());
