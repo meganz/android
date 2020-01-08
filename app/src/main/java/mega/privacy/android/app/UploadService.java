@@ -113,8 +113,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	//2 - pre-overquota
     private int isOverquota = 0;
 
-    private int uploadedFileCount;
-
     @SuppressLint("NewApi")
 	@Override
 	public void onCreate() {
@@ -181,19 +179,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		onHandleIntent(intent);
 		logDebug(currentUpload +" / " + uploadCount);
-        if(currentUpload == uploadCount && uploadedFileCount != 0) {
-			logDebug("Send message");
-            Intent i = new Intent(this, ManagerActivityLollipop.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.setAction(SHOW_REPEATED_UPLOAD);
-            String file = getResources().getQuantityString(R.plurals.new_general_num_files,uploadedFileCount,uploadedFileCount);
-            String sShow = file + " " + getString(R.string.general_already_uploaded);
-            i.putExtra("MESSAGE", sShow);
-            startActivity(i);
-            //reset
-            currentUpload = 0;
-            uploadedFileCount = 0;
-        }
 		return START_NOT_STICKY;
 	}
 
