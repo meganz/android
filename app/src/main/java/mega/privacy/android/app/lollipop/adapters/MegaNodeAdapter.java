@@ -886,7 +886,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (node.isTakenDown()) {
             holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.dark_primary_color));
             holder.takenDownImage.setVisibility(View.VISIBLE);
-            holder.publicLinkImage.setVisibility(View.GONE);
         } else {
             holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
             holder.takenDownImage.setVisibility(View.GONE);
