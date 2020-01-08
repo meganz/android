@@ -1175,8 +1175,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			fileNameTextView.setText(new File(paths.get(positionG)).getName());
 		}
 		else if(adapterType == SEARCH_ADAPTER){
-			ArrayList<String> serialized = intent.getStringArrayListExtra(ARRAY_SEARCH);
-			getImageHandles(getSearchedNodes(serialized), savedInstanceState);
+			ArrayList<String> handles = intent.getStringArrayListExtra(ARRAY_SEARCH);
+			getImageHandles(getSearchedNodes(handles), savedInstanceState);
 		}else if(adapterType == SEARCH_BY_ADAPTER){
 			handlesNodesSearched = intent.getLongArrayExtra("handlesNodesSearch");
 
