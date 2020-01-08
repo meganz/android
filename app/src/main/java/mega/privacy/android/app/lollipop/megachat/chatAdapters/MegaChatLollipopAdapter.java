@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.media.AudioManager;
 import android.media.ExifInterface;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -8247,6 +8248,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         stopAllReproductionsInProgress();
         final long mId = m.getIdMessage();
         if(voiceClipPath == null){
+            ((ChatActivityLollipop) context).createAudioManager();
             m.getMediaPlayer().seekTo(m.getProgress());
             m.getMediaPlayer().start();
             m.setPaused(false);
@@ -8255,6 +8257,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             try {
                 m.getMediaPlayer().reset();
                 m.getMediaPlayer().setDataSource(voiceClipPath);
+                m.getMediaPlayer().setAudioStreamType(AudioManager.STREAM_MUSIC);
                 m.getMediaPlayer().setLooping(false);
                 m.getMediaPlayer().prepare();
                 m.setPaused(false);
@@ -8267,6 +8270,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         m.getMediaPlayer().setOnErrorListener(new MediaPlayer.OnErrorListener() {
             public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
                 logDebug("mediaPlayerVoiceNotes:onError");
+                ((ChatActivityLollipop) context).stopSpeakerAudioManger();
                 mediaPlayer.reset();
                 return true;
             }
@@ -8275,6 +8279,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
                 logDebug("mediaPlayerVoiceNotes:onPrepared");
+                ((ChatActivityLollipop) context).createAudioManager();
                 mediaPlayer.start();
                 prepareMediaPlayer(mId);
 
@@ -8294,6 +8299,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     /*
     * Stop the playing when this message is removed*/
     public void stopPlaying(long msgId){
+        ((ChatActivityLollipop) context).stopSpeakerAudioManger();
+
         if(messagesPlaying==null || messagesPlaying.isEmpty()) return;
 
         for(MessageVoiceClip m: messagesPlaying) {
@@ -8304,6 +8311,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 m.getMediaPlayer().release();
                 m.setMediaPlayer(null);
                 messagesPlaying.remove(m);
+                break;
+            }
+        }
+    }
+
+    public void pausePlaybackInProgress(){
+        if(messagesPlaying==null || messagesPlaying.isEmpty()) return;
+        for(MessageVoiceClip m:messagesPlaying){
+            if(m.getMediaPlayer().isPlaying()){
+                int positionInAdapter = getAdapterItemPosition(m.getIdMessage());
+                if(positionInAdapter != -1) pauseVoiceClip(m, positionInAdapter);
                 break;
             }
         }
@@ -8438,6 +8456,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private void removeCallBacks(){
         logDebug("removeCallBacks()");
+
+        ((ChatActivityLollipop) context).stopSpeakerAudioManger();
+
         if(handlerVoiceNotes==null) return;
 
         if (runnableVC != null) {
@@ -8578,5 +8599,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
+    }
+
+
+    private int getAdapterItemPosition(long id) {
+        for (int position = 0; position < messages.size(); position++) {
+            if (messages.get(position).getMessage().getMsgId() == id) {
+                return position + 1;
+            }
+        }
+        return -1;
     }
  }

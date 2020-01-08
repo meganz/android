@@ -50,7 +50,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -98,6 +97,7 @@ import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
+import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -161,7 +161,6 @@ import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -387,6 +386,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private boolean isShareLinkDialogDismissed = false;
 
     private ActionMode actionMode;
+
+    private AppRTCAudioManager rtcAudioManager = null;
+    public boolean isSpeakerOn = true;
 
     // Data being stored when My Chat Files folder does not exist
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
@@ -7006,7 +7008,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     protected void onDestroy() {
         logDebug("onDestroy()");
-
+        stopSpeakerAudioManger();
         cleanBuffers();
         if (handlerEmojiKeyboard != null){
             handlerEmojiKeyboard.removeCallbacksAndMessages(null);
@@ -7651,8 +7653,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     protected void onPause(){
         logDebug("onPause");
         super.onPause();
+        stopSpeakerAudioManger();
         hideKeyboard();
-
         activityVisible = false;
         MegaApplication.setOpenChatId(-1);
     }
@@ -8278,15 +8280,37 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-
-    public void hideFileStorageSection(){
-        logDebug("hideFileStorageSEctocioon");
-        if (fileStorageF != null) {
-            fileStorageF.clearSelections();
-            fileStorageF.hideMultipleSelect();
+    public void createAudioManager(){
+        if (rtcAudioManager == null) {
+            rtcAudioManager = AppRTCAudioManager.create(this, true);
+            rtcAudioManager.start(null);
         }
-        fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
+        rtcAudioManager.updateSpeakerStatus(true);
+
+        rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
+            @Override
+            public void needToUpdate(boolean isNear) {
+                if(isSpeakerOn && isNear){
+                    isSpeakerOn = false;
+                    rtcAudioManager.updateSpeakerStatus(false);
+                }else if(!isSpeakerOn && !isNear){
+                    isSpeakerOn = true;
+                    rtcAudioManager.updateSpeakerStatus(true);
+                    adapter.pausePlaybackInProgress();
+                }
+            }
+        });
+
+    }
+
+    public void stopSpeakerAudioManger() {
+        if (rtcAudioManager == null) return;
+        try {
+            rtcAudioManager.stop();
+            rtcAudioManager = null;
+        } catch (Exception e) {
+            logError("Exception stopping speaker audio manager", e);
+        }
     }
 
 

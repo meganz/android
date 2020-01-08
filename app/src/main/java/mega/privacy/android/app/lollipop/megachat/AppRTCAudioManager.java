@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package mega.privacy.android.app.lollipop.megachat.calls;
+package mega.privacy.android.app.lollipop.megachat;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 /**
@@ -110,14 +112,14 @@ public class AppRTCAudioManager {
         }
     }
 
-    public void registerProximitySensor(Context context) {
+    public void registerProximitySensor(final Context context) {
         // Create and initialize the proximity sensor.
         // Note that, the sensor will not be active until start() has been called.
         //This method will be called each time a state change is detected.
         if (proximitySensor == null) {
             proximitySensor = AppRTCProximitySensor.create(context, new Runnable() {
                 public void run() {
-                    onProximitySensorChangedState();
+                    onProximitySensorChangedState(context);
                 }
             });
         }
@@ -127,31 +129,38 @@ public class AppRTCAudioManager {
      * This method is called when the proximity sensor reports a state change,
      * e.g. from "NEAR to FAR" or from "FAR to NEAR".
      */
-    private void onProximitySensorChangedState() {
+    private void onProximitySensorChangedState(Context context) {
         // The proximity sensor should only be activated when there are exactly two available audio devices.
         if (audioDevices.size() == 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE) && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
             if (proximitySensor.sensorReportsNearState()) {
                 logDebug("Status of proximity sensor is: Near");
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
-                if (isSpeakerOn) {
-                    logDebug("Disabling the speakerphone");
-                    setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
+
+                if(context instanceof ChatCallActivity){
+                    if (isSpeakerOn) {
+                        logDebug("Disabling the speakerphone");
+                        setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
+                    }
                 }
-                logDebug("Updating the video");
-                if (proximitySensorListener != null) proximitySensorListener.needToUpdate(true);
+
+                if (proximitySensorListener != null)
+                    proximitySensorListener.needToUpdate(true);
 
             } else {
 
                 logDebug("Status of proximity sensor is: Far");
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
-                if (isSpeakerOn) {
-                    logDebug("Enabling the speakerphone");
-                    setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
+
+                if(context instanceof ChatCallActivity) {
+                    if (isSpeakerOn) {
+                        logDebug("Enabling the speakerphone");
+                        setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
+                    }
                 }
-                logDebug("Updating the video");
-                if (proximitySensorListener != null) proximitySensorListener.needToUpdate(false);
+                if (proximitySensorListener != null)
+                    proximitySensorListener.needToUpdate(false);
             }
         }
     }
@@ -166,7 +175,7 @@ public class AppRTCAudioManager {
     /**
      * Construction.
      */
-    static AppRTCAudioManager create(Context context, boolean isSpeakerOn) {
+   public static AppRTCAudioManager create(Context context, boolean isSpeakerOn) {
         return new AppRTCAudioManager(context, isSpeakerOn);
     }
 

@@ -57,6 +57,7 @@ import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -979,7 +980,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         super.onResume();
         stopService(new Intent(this, IncomingCallService.class));
         restoreHeightAndWidth();
-        if(rtcAudioManager!=null){
+        if (rtcAudioManager != null) {
             rtcAudioManager.startProximitySensor(this);
         }
         application.createChatAudioManager();
@@ -1960,7 +1961,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void updateLocalSpeakerStatus() {
         boolean speakerStatus = application.getSpeakerStatus(callChat.getChatid());
         if (rtcAudioManager == null) {
-            rtcAudioManager = AppRTCAudioManager.create(getApplicationContext(), speakerStatus);
+            rtcAudioManager = AppRTCAudioManager.create(this, speakerStatus);
         }
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
             @Override
