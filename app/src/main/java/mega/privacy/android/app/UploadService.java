@@ -105,8 +105,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private static int totalFolderUploads = 0;
     private static int totalFolderUploadsCompletedSuccessfully = 0;
 
-    private static int uploadCount;
-    private static int currentUpload;
+    private static int uploadCount = 0;
+    private static int currentUpload = 0;
 
 	//0 - not overquota, not pre-overquota
 	//1 - overquota
@@ -824,7 +824,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					logError("transfer.getPath() is NULL or temporal folder unavailable");
 				}
 
-				if (totalFileUploadsCompleted == totalFileUploads && transfersCount == 0 && totalFileUploadsCompleted == uploadCount) {
+
+                if (totalFileUploadsCompleted == totalFileUploads
+                        && transfersCount == 0
+                        && totalFileUploadsCompleted == currentUpload
+                        && totalFileUploadsCompleted >= uploadCount) {
 					onQueueComplete();
 				} else{
 				    updateProgressNotification(transfer.isFolderTransfer());
@@ -997,6 +1001,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         totalFolderUploadsCompletedSuccessfully = 0;
         childUploadFailed = 0;
         childUploadSucceeded = 0;
+        uploadCount = 0;
+        currentUpload = 0;
     }
 
     class UploadProgress{
