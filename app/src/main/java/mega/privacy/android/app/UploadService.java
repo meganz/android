@@ -156,7 +156,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             megaChatApi.saveCurrentState();
         }
 
-        //resetUploadNumbers();
 		super.onDestroy();
 	}
 
