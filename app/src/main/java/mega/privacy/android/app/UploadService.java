@@ -825,12 +825,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					logError("transfer.getPath() is NULL or temporal folder unavailable");
 				}
 
-				if (totalFileUploadsCompleted == totalFileUploads && transfersCount == 0) {
+				if (totalFileUploadsCompleted == totalFileUploads && transfersCount == 0 && totalFileUploadsCompleted == uploadCount) {
 					onQueueComplete();
 				} else{
-				    if (totalFileUploads != 0 && totalFileUploadsCompleted != 0) {
-                        updateProgressNotification(transfer.isFolderTransfer());
-                    }
+				    updateProgressNotification(transfer.isFolderTransfer());
 				}
 			}
 		}
