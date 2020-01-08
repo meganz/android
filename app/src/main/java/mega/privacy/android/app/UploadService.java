@@ -98,15 +98,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
     private HashMap<Integer, MegaTransfer> mapProgressFileTransfers;
     private HashMap<Integer, MegaTransfer> mapProgressFolderTransfers;
-    private int totalFileUploadsCompleted = 0;
-    private int totalFileUploadsCompletedSuccessfully = 0;
-    private int totalFileUploads = 0;
-    private int totalFolderUploadsCompleted = 0;
-    private int totalFolderUploads = 0;
-    private int totalFolderUploadsCompletedSuccessfully = 0;
+    private static int totalFileUploadsCompleted = 0;
+    private static int totalFileUploadsCompletedSuccessfully = 0;
+    private static int totalFileUploads = 0;
+    private static int totalFolderUploadsCompleted = 0;
+    private static int totalFolderUploads = 0;
+    private static int totalFolderUploadsCompletedSuccessfully = 0;
 
-    int uploadCount;
-    int currentUpload;
+    private static int uploadCount;
+    private static int currentUpload;
 
 	//0 - not overquota, not pre-overquota
 	//1 - overquota
@@ -156,7 +156,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             megaChatApi.saveCurrentState();
         }
 
-        resetUploadNumbers();
+        //resetUploadNumbers();
 		super.onDestroy();
 	}
 
