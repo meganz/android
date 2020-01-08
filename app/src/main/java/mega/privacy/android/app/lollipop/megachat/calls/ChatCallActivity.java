@@ -633,21 +633,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 logDebug("Other status: " + callStatus);
             }
 
-            rtcAudioManager.setOnSpeakerListener(new OnProximitySensorListener() {
-                @Override
-                public void needToUpdate(boolean isNear) {
-                    boolean realStatus = application.getVideoStatus(callChat.getChatid());
-                    if(!realStatus){
-                        inTemporaryState = false;
-                    }else if(isNear){
-                        inTemporaryState = true;
-                        megaChatApi.disableVideo(chatId, ChatCallActivity.this);
-                    }else{
-                        inTemporaryState = false;
-                        megaChatApi.enableVideo(chatId, ChatCallActivity.this);
-                    }
-                }
-            });
+
 
         }
         if (checkPermissions()) {
@@ -1976,6 +1962,21 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (rtcAudioManager == null) {
             rtcAudioManager = AppRTCAudioManager.create(getApplicationContext(), speakerStatus);
         }
+        rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
+            @Override
+            public void needToUpdate(boolean isNear) {
+                boolean realStatus = application.getVideoStatus(callChat.getChatid());
+                if(!realStatus){
+                    inTemporaryState = false;
+                }else if(isNear){
+                    inTemporaryState = true;
+                    megaChatApi.disableVideo(chatId, ChatCallActivity.this);
+                }else{
+                    inTemporaryState = false;
+                    megaChatApi.enableVideo(chatId, ChatCallActivity.this);
+                }
+            }
+        });
         rtcAudioManager.updateSpeakerStatus(speakerStatus);
         speakerFAB.hide();
 

@@ -98,7 +98,7 @@ public class AppRTCAudioManager {
         AppRTCUtils.logDeviceInfo(TAG);
     }
 
-    public void setOnSpeakerListener(OnProximitySensorListener proximitySensorListener) {
+    public void setOnProximitySensorListener(OnProximitySensorListener proximitySensorListener) {
         this.proximitySensorListener = proximitySensorListener;
     }
 
