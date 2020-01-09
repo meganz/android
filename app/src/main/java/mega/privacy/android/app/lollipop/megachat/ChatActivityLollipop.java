@@ -2418,6 +2418,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             MegaNodeList megaNodeList = preservedMessagesSelected.get(i).getMessage().getMegaNodeList();
                             list.add(megaNodeList);
                         }
+
                         chatC.prepareForChatDownload(list);
                         preservedMessagesSelected = null;
                     }
