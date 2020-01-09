@@ -641,6 +641,10 @@
 
     <string name="menu_take_picture" context="menu item">Take picture</string>
 
+    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the \'display over other apps\' permission" >Don’t want to miss MEGA incoming call?</string>
+    <string name="ask_for_display_over_msg" context="Dialog title, to explain why MEGA needs the \'display over other apps\' permission">MEGA needs you to grant the permission to avoid that.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn't want to make MEGA grant the \'display over other apps\' permission for now.">Don\'t worry, you can still manually set up on your device’s settings.</string>
+
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</string>
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or mobile data</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>

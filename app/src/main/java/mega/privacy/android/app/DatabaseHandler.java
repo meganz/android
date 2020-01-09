@@ -33,7 +33,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 48;
+	private static final int DATABASE_VERSION = 49;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -79,6 +79,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = "shouldclearcamsyncrecords";
     private static final String KEY_KEEP_FILE_NAMES = "keepFileNames";
     private static final String KEY_SHOW_INVITE_BANNER = "showinvitebanner";
+    private static final String KEY_ASK_FOR_DISPLAY_OVER = "askfordisplayover";
     private static final String KEY_PIN_LOCK_ENABLED = "pinlockenabled";
     private static final String KEY_PIN_LOCK_TYPE = "pinlocktype";
     private static final String KEY_PIN_LOCK_CODE = "pinlockcode";
@@ -299,7 +300,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //36
                 + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //37
                 + KEY_REMOVE_GPS + " TEXT,"                         //38
-                + KEY_SHOW_INVITE_BANNER + " TEXT" + ")";           //39
+                + KEY_SHOW_INVITE_BANNER + " TEXT,"                 //39
+                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT" + ")";        //40
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -725,6 +727,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SHOW_INVITE_BANNER + " TEXT;");
             db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SHOW_INVITE_BANNER + " = '" + encrypt("true") + "';");
+        }
+
+        if(oldVersion <= 48) {
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_ASK_FOR_DISPLAY_OVER + " TEXT;");
+            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_ASK_FOR_DISPLAY_OVER + " = '" + encrypt("true") + "';");
         }
 	}
 
@@ -1370,6 +1377,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_REMOVE_GPS, encrypt(prefs.getRemoveGPS()));
         db.insert(TABLE_PREFERENCES, null, values);
 	}
+
+	public boolean shouldAskForDisplayOver() {
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        boolean should = true;
+        if (cursor.moveToFirst()){
+            int index = cursor.getColumnIndex(KEY_ASK_FOR_DISPLAY_OVER);
+            String text = decrypt(cursor.getString(index));
+            if(!TextUtils.isEmpty(text)) {
+                should = Boolean.parseBoolean(text);
+            }
+        }
+        cursor.close();
+        return should;
+    }
+
+    public void dontAskForDisplayOver() {
+        db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_ASK_FOR_DISPLAY_OVER + " = '" + encrypt("false") + "';");
+    }
 
 	public MegaPreferences getPreferences(){
         logDebug("getPreferences");

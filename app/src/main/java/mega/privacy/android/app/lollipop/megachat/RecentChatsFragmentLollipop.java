@@ -62,14 +62,14 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
-import mega.privacy.android.app.utils.ChatUtil;
+import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.IncomingCallNotification;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
@@ -151,6 +151,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     private ActionMode actionMode;
 
+    private AskForDisplayOverDialog askForDisplayOverDialog;
+
     public static RecentChatsFragmentLollipop newInstance() {
         logDebug("newInstance");
         RecentChatsFragmentLollipop fragment = new RecentChatsFragmentLollipop();
@@ -197,6 +199,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         grantedContactPermission = hasPermissions(context, Manifest.permission.READ_CONTACTS);
         contactGetter = new MegaContactGetter(context);
         contactGetter.setMegaContactUpdater(this);
+        askForDisplayOverDialog = new AskForDisplayOverDialog(context);
     }
 
     @Override
@@ -409,7 +412,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         } else {
             bannerContainer.setVisibility(View.GONE);
         }
-
+        if(IncomingCallNotification.shouldNotify(context) && dbH.shouldAskForDisplayOver()) {
+            askForDisplayOverDialog.showDialog();
+        }
         return v;
     }
 
@@ -1602,6 +1607,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         logDebug("onPause");
         lastFirstVisiblePosition = ((LinearLayoutManager) listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
         MegaApplication.setRecentChatVisible(false);
+        askForDisplayOverDialog.recycle();
         super.onPause();
     }
 

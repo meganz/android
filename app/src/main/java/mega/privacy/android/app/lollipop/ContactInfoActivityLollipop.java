@@ -81,6 +81,8 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.AskForDisplayOverDialog;
+import mega.privacy.android.app.utils.IncomingCallNotification;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -224,6 +226,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
     private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
 
+    private AskForDisplayOverDialog askForDisplayOverDialog;
+
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
 		AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
@@ -280,6 +284,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		scaleW = getScaleW(outMetrics, density);
 		scaleH = getScaleH(outMetrics, density);
+
+		askForDisplayOverDialog = new AskForDisplayOverDialog(this);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -648,6 +654,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		} else {
 			logWarning("Extras is NULL");
 		}
+        if(IncomingCallNotification.shouldNotify(context) && dbH.shouldAskForDisplayOver()) {
+            askForDisplayOverDialog.showDialog();
+        }
 	}
 
 	public void setContactPresenceStatus(){
@@ -1769,6 +1778,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		drawableDots.setColorFilter(null);
 		drawableSend.setColorFilter(null);
 		drawableShare.setColorFilter(null);
+        askForDisplayOverDialog.recycle();
 	}
 
 	@Override
