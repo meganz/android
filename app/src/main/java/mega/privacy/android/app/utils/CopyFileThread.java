@@ -2,7 +2,7 @@ package mega.privacy.android.app.utils;
 
 import java.io.File;
 
-import static mega.privacy.android.app.utils.FileUtils.copyFile;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CopyFileThread implements Runnable {

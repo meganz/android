@@ -20,7 +20,7 @@ import mega.privacy.android.app.utils.download.DownloadInfo;
 import mega.privacy.android.app.utils.download.DownloadLinkInfo;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SelectDownloadLocationDialog {
 

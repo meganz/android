@@ -10,8 +10,7 @@ import mega.privacy.android.app.utils.download.ChatDownloadInfo;
 import mega.privacy.android.app.utils.download.DownloadInfo;
 import mega.privacy.android.app.utils.download.DownloadLinkInfo;
 
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class DownloadChecker extends SelectDownloadLocationDialog {
 
