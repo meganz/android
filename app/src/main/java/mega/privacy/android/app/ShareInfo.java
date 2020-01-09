@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.provider.MediaStore;
 
 import java.io.BufferedOutputStream;
@@ -20,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,17 +29,18 @@ import java.util.List;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 /*
  * Helper class to process shared files from other activities
  */
-public class ShareInfo {
+public class ShareInfo implements Serializable {
 
 	public String title = null;
 	private long lastModified;
-	public InputStream inputStream = null;
+	public transient InputStream inputStream = null;
 	public long size = -1;
 	private File file = null;
 	public boolean isContact = false;
@@ -85,7 +86,7 @@ public class ShareInfo {
 	 * Process incoming Intent and get list of ShareInfo objects
 	 */
 	public static List<ShareInfo> processIntent(Intent intent, Context context) {
-		log(intent.getAction() + " of action");
+		logDebug(intent.getAction() + " of action");
 		
 		if (intent.getAction() == null || intent.getAction().equals(FileExplorerActivityLollipop.ACTION_PROCESSED)||intent.getAction().equals(FileExplorerActivityLollipop.ACTION_PROCESSED)) {
 			return null;
@@ -95,7 +96,7 @@ public class ShareInfo {
 		}
 		// Process multiple items
 		if (Intent.ACTION_SEND_MULTIPLE.equals(intent.getAction())) {
-			log("multiple!");
+			logDebug("Multiple!");
 			return processIntentMultiple(intent, context);
 		}
 		ShareInfo shareInfo = new ShareInfo();
@@ -103,26 +104,26 @@ public class ShareInfo {
 		Bundle extras = intent.getExtras();
 		// File data in EXTRA_STREAM
 		if (extras != null && extras.containsKey(Intent.EXTRA_STREAM)) {
-			log("extras is not null");
+			logDebug("Extras is not null");
 			Object streamObject = extras.get(Intent.EXTRA_STREAM);
 			if (streamObject instanceof Uri) {
-				log("instance of URI");
-				log(streamObject.toString());
+				logDebug("Instance of URI");
+				logDebug(streamObject.toString());
 				shareInfo.processUri((Uri) streamObject, context);
 			} else if (streamObject == null) {
-				log("stream object is null!");
+				logDebug("Stream object is null!");
 				return null;
 			} else {
-				log("unhandled type " + streamObject.getClass().getName());
+				logDebug("Unhandled type " + streamObject.getClass().getName());
 				for (String key : extras.keySet()) {
-					log("Key " + key);
+					logDebug("Key " + key);
 				}
 				return processIntentMultiple(intent, context);
 			}
 		}
 		else if (intent.getClipData() != null) {
 			if(Intent.ACTION_GET_CONTENT.equals(intent.getAction())) {
-				log("Multiple ACTION_GET_CONTENT");
+				logDebug("Multiple ACTION_GET_CONTENT");
 				return processGetContentMultiple(intent, context);
 			}
 		}
@@ -130,7 +131,7 @@ public class ShareInfo {
 		else {
 			Uri dataUri = intent.getData();
 			if (dataUri == null) {
-				log("data uri is null");
+				logWarning("Data uri is null");
 //
 //				if(Intent.ACTION_GET_CONTENT.equals(intent.getAction())) {
 //					log("Multiple ACTION_GET_CONTENT");
@@ -141,7 +142,7 @@ public class ShareInfo {
 			shareInfo.processUri(dataUri, context);
 		}
 		if (shareInfo.file == null) {
-			log("share info file is null");
+			logWarning("Share info file is null");
 			return null;
 		}
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
@@ -161,7 +162,7 @@ public class ShareInfo {
 	 */
 	@SuppressLint("NewApi")
 	public static List<ShareInfo> processGetContentMultiple(Intent intent,Context context) {
-		log("processIntentMultiple");
+		logDebug("processGetContentMultiple");
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
 		ClipData cD = intent.getClipData();
 		if(cD!=null&&cD.getItemCount()!=0){
@@ -169,10 +170,10 @@ public class ShareInfo {
             for(int i = 0; i < cD.getItemCount(); i++){
             	ClipData.Item item = cD.getItemAt(i);
             	Uri uri = item.getUri();
-            	log("ClipData uri: "+uri);
+				logDebug("ClipData uri: " + uri);
             	if (uri == null)
     				continue;
-    			log("----: "+uri.toString());
+				logDebug("Uri: " + uri.toString());
     			ShareInfo info = new ShareInfo();
     			info.processUri(uri, context);
     			if (info.file == null) {
@@ -182,7 +183,7 @@ public class ShareInfo {
             }
 		}
 		else{
-			log("ClipData NUll or size=0");
+			logWarning("ClipData NUll or size=0");
 			return null;
 		}
 		
@@ -201,26 +202,26 @@ public class ShareInfo {
 	 * Process Multiple files
 	 */
 	public static List<ShareInfo> processIntentMultiple(Intent intent,Context context) {
-		log("processIntentMultiple");
+		logDebug("processIntentMultiple");
 		ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
 		
 		ArrayList<Uri> imageUri = intent.getParcelableArrayListExtra(Intent.EXTRA_ALLOW_MULTIPLE);
 
 		if (imageUris == null || imageUris.size() == 0) {
-			log("imageUris == null || imageUris.size() == 0");
+			logWarning("imageUris == null || imageUris.size() == 0");
 			return null;
 		}
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
 		for (Uri uri : imageUris) {
 			if (uri == null) {
-				log("continue --> uri null");
+				logWarning("continue --> uri null");
 				continue;
 			}
-			log("----: "+uri.toString());
+			logDebug("Uri: " + uri.toString());
 			ShareInfo info = new ShareInfo();
 			info.processUri(uri, context);
 			if (info.file == null) {
-				log("continue -->info.file null");
+				logWarning("continue -->info.file null");
 				continue;
 			}
 			result.add(info);
@@ -235,98 +236,96 @@ public class ShareInfo {
 	 * Get info from Uri
 	 */
 	private void processUri(Uri uri, Context context) {
-		log("processUri: "+uri);
+		logDebug("processUri: " + uri);
 		// getting input stream
 		inputStream = null;
 		try {
 			inputStream = context.getContentResolver().openInputStream(uri);
 		} catch (FileNotFoundException fileNotFound) {
-		    log("FileNotFoundException, can't find uri: " + uri);
+			logError("Can't find uri: " + uri, fileNotFound);
 		    return;
         } catch (Exception e) {
-			log("inputStream EXCEPTION!");
-			log(""+e);
+			logError("inputStream EXCEPTION!", e);
 			String path = uri.getPath();
-			log("processUri-path en la exception: "+path);
+			logDebug("Process Uri path in the exception: " + path);
 		}
 
 		String scheme = uri.getScheme();
 		if(scheme != null)
 		{
 			if (scheme.equals("content")) {
-				log("processUri go to scheme content");
+				logDebug("processUri go to scheme content");
 				processContent(uri, context);
 			} else if (scheme.equals("file")) {
-				log("processUri go to file content");
+				logDebug("processUri go to file content");
 				processFile(uri, context);
 			}
 		}
 		else{
-			log("scheme NULL");
+			logWarning("Scheme NULL");
 		}
 
 		if (inputStream != null) {
-			log("processUri inputStream != null");
+			logDebug("processUri inputStream != null");
 
 			file = null;
 			String path = uri.getPath();
-			log("processUri-path: "+path);
+			logDebug("processUri-path: " + path);
 			try{
 				file = new File(path);
 			}
-			catch(Exception e){
-				log("error when creating File!");
-//					log(e.getMessage());
+			catch(Exception e) {
+				logError("Error when creating File!", e);
 			}
 
 			if((file != null) && file.exists() && file.canRead())
 			{
 				size = file.length();
-				log("The file is accesible!");
+				logDebug("The file is accesible!");
 				return;
 			}
 
 			file = null;
 			path = getRealPathFromURI(context, uri);
 			if(path!=null){
-				log("RealPath: "+path);
+				logDebug("RealPath: " + path);
 				try
 				{
 					file = new File(path);
 				}
-				catch(Exception e){
-					log("EXCEPTION: No real path from URI");
+				catch(Exception e) {
+					logError("EXCEPTION: No real path from URI", e);
 				}
 			}
 			else{
-				log("Real path is NULL");
+				logWarning("Real path is NULL");
 			}
 
 			if((file != null) && file.exists() && file.canRead())
 			{
 				size = file.length();
-				log("Return here");
+				logDebug("Return here");
 				return;
 			}
 
             if (title == null) {
-                log("title is null, return!");
+				logWarning("Title is null, return!");
                 return;
             }
             if (title.contains("../") || title.contains(("..%2F"))) {
-                log("Internal path traversal: " + title);
+				logDebug("Internal path traversal: " + title);
                 return;
             }
-            log("Internal No path traversal: " + title);
+			logDebug("Internal No path traversal: " + title);
             if (context instanceof PdfViewerActivityLollipop) {
-                log("context of PdfViewerActivityLollipop");
+				logDebug("context of PdfViewerActivityLollipop");
                 if (!title.endsWith(".pdf")) {
                     title += ".pdf";
                 }
             }
             file = new File(context.getCacheDir(), title);
 
-			log("Start copy to: "+file.getAbsolutePath());
+			logDebug("Start copy to: " + file.getAbsolutePath());
 
 			try {
 				OutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
@@ -342,10 +341,10 @@ public class ShareInfo {
 
 				inputStream = new FileInputStream(file);
 				size = file.length();
-				log("File size: "+size);
+				logDebug("File size: " + size);
 			}
 			catch (IOException e) {
-				log("Catch IO exception");
+				logError("Catch IO exception", e);
 				inputStream = null;
 				if (file != null) {
 					file.delete();
@@ -353,9 +352,9 @@ public class ShareInfo {
 			}
 		}
 		else{
-			log("inputStream is NULL");
+			logDebug("inputStream is NULL");
 			String path = uri.getPath();
-			log("PATH: " + path);
+			logDebug("PATH: " + path);
 			if (path != null){
 				String [] s = path.split("file://");
 				if (s.length > 1){
@@ -372,35 +371,35 @@ public class ShareInfo {
 					}
 				}
 			}
-			log("REAL PATH: " + path);
+			logDebug("REAL PATH: " + path);
 
 			file = null;
 			try{
 				file = new File(path);
 			}
 			catch(Exception e){
-				log("error when creating File!");
+				logError("Error when creating File!", e);
 //					log(e.getMessage());
 			}
 			if((file != null) && file.exists() && file.canRead()) {
 				size = file.length();
-				log("The file is accesible!");
+				logDebug("The file is accesible!");
 				return;
 			}
 			else{
-				log("The file is not accesible!");
+				logWarning("The file is not accesible!");
 				isContact = true;
 				contactUri = uri;
 			}
 		}
-		log("END processUri");
+		logDebug("END processUri");
 	}
 	
 	/*
 	 * Get info from content provider
 	 */
 	private void processContent(Uri uri, Context context) {
-		log("processContent: "+uri);
+		logDebug("processContent: " + uri);
 		ContentProviderClient client = null;
 
 		client = context.getContentResolver().acquireContentProviderClient(uri);
@@ -408,16 +407,16 @@ public class ShareInfo {
 		try {
 			cursor = client.query(uri, null, null, null, null);
 		} catch (Exception e1) {
-			log("cursor EXCEPTION!!!");
+			logError("cursor EXCEPTION!!!", e1);
 		}
 		if(cursor!=null){
 			if(cursor.getCount()==0){
-				log("RETURN - Cursor get count is 0");
+				logDebug("RETURN - Cursor get count is 0");
 				return;
 			}
 		}
 		else{
-			log("RETURN - Cursor is NULL");
+			logWarning("RETURN - Cursor is NULL");
 			return;
 		}
 		cursor.moveToFirst();
@@ -430,7 +429,7 @@ public class ShareInfo {
 			if(sizeString!=null){
 				long size = Long.valueOf(sizeString);
 				if (size > 0) {
-					log("Size: "+size);
+					logDebug("Size: " + size);
 					this.size = size;
 				}
 			}
@@ -441,12 +440,12 @@ public class ShareInfo {
         }
 
 		if (size == -1 || inputStream == null) {
-			log("Keep going");
+			logDebug("Keep going");
 			int dataIndex = cursor.getColumnIndex("_data");
 			if (dataIndex != -1) {
 				String data = cursor.getString(dataIndex);
 				if (data == null){
-					log("RETURN - data is NULL");
+					logWarning("RETURN - data is NULL");
 					return;
 				}
 				File dataFile = new File(data);
@@ -454,41 +453,41 @@ public class ShareInfo {
 					if (size == -1) {
 						long size = dataFile.length();
 						if (size > 0) {
-							log("Size is: "+size);
+							logDebug("Size is: " + size);
 							this.size = size;
 						}
 					}
 					else{
-						log("Not valid size");
+						logWarning("Not valid size");
 					}
 
 					if (inputStream == null) {
 						try {
 							inputStream = new FileInputStream(dataFile);
 						} catch (FileNotFoundException e) {
-							log("Exception FileNotFoundException");
+							logError("Exception", e);
 						}
 
 					}
 					else{
-						log("inputStream is NULL");
+						logWarning("inputStream is NULL");
 					}
 				}
 			}
 		}
 		else{
-			log("Nothing done!");
+			logWarning("Nothing done!");
 		}
 	
 		client.release();
-		log("---- END process content----");
+		logDebug("---- END process content----");
 	}
 	
 	/*
 	 * Process Uri as File path
 	 */
 	private void processFile(Uri uri, Context context) {
-		log("processing file");
+		logDebug("processing file");
 		File file = null;
 		try {
 			file = new File(new URI(uri.toString()));
@@ -496,22 +495,22 @@ public class ShareInfo {
 			file = new File(uri.toString().replace("file:///", "/"));
 		}
 		if (!file.exists() || !file.canRead()) {
-			log("cantread :( " + file.exists() + " " + file.canRead() + " "
+			logWarning("Can't read :( " + file.exists() + " " + file.canRead() + " "
 					+ uri.toString());
 			return;
 		}
 		if (file.isDirectory()) {
-			log("is folder");
+			logDebug("Is folder");
 			return;
 		}
-		log("continue processing..");
+		logDebug("Continue processing...");
 		size = file.length();
 		title = file.getName();
 		try {
 			inputStream = new FileInputStream(file);
 		} catch (FileNotFoundException e) {
 		}
-		log(title + " " + size);
+		logDebug(title + " " + size);
 	}
 	
 	private String getRealPathFromURI(Context context, Uri contentURI) {
@@ -553,9 +552,4 @@ public class ShareInfo {
     		cursor.close();
 	    return path;
 	}
-	
-	private static void log(String log) {
-		Util.log("ShareInfo", log);
-	}
-	
 }

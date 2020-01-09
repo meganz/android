@@ -1091,13 +1091,12 @@
                             rounded:border_width="2dp"
                             rounded:corner_radius="20dp"/>
 
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_own_message_contact_initial_letter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
-                            android:gravity="center_horizontal|center_vertical"
-                            android:paddingBottom="3dp"/>
+                            android:gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
                     <RelativeLayout
                         android:layout_width="wrap_content"
@@ -1106,7 +1105,7 @@
                         android:layout_centerVertical="true"
                         android:layout_centerInParent="true">
 
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_own_message_contact_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -1119,7 +1118,7 @@
                             android:maxWidth="10dp"
                             android:gravity="left"/>
 
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_own_message_contact_email"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -1215,7 +1214,7 @@
                 android:layout_height="20dp"
                 android:gravity="left|bottom">
 
-                <TextView
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/contact_message_chat_name_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -1307,7 +1306,7 @@
                         rounded:border_width="0dp"
                         rounded:corner_radius="40dp" />
 
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/contact_initial_letter"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -1977,13 +1976,13 @@
                             rounded:border_color="@color/white"
                             rounded:border_width="2dp"
                             rounded:corner_radius="20dp"/>
-                        <TextView
+
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_contact_message_contact_initial_letter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
-                            android:gravity="center_horizontal|center_vertical"
-                            android:paddingBottom="3dp"/>
+                            android:gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -1993,7 +1992,7 @@
                         android:layout_centerVertical="true"
                         android:layout_centerInParent="true">
 
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_contact_message_contact_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -2005,7 +2004,7 @@
                             android:ellipsize="middle"
                             android:maxWidth="10dp"
                             android:gravity="left"/>
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_contact_message_contact_email"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

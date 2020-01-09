@@ -31,14 +31,14 @@ import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
-
 import android.support.v4.app.ActivityCompat;
-
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.telephony.PhoneNumberUtils;
+import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.format.Formatter;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -55,6 +55,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -78,10 +79,10 @@ import javax.crypto.spec.SecretKeySpec;
 import mega.privacy.android.app.AndroidLogger;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -94,6 +95,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 
 public class Util {
@@ -191,6 +194,25 @@ public class Util {
 		showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
 	}
 
+	public static String getCountryCodeByNetwork(Context context) {
+		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		if (tm != null) {
+			return tm.getNetworkCountryIso();
+		}
+		return null;
+	}
+
+	public static boolean isRoaming(Context context) {
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (cm != null) {
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			if(ni != null) {
+                return ni.isRoaming();
+            }
+		}
+		return true;
+	}
+
 	public static int countMatches(Pattern pattern, String string)
 	{
 		Matcher matcher = pattern.matcher(string);
@@ -231,6 +253,7 @@ public class Util {
 //            src = src.replaceAll("]]>", "] ]>");
 //            src = "<![CDATA[" + src + "]]>";
         }
+        src = converterShortCodes(src);
         return src;
     }
 
@@ -244,9 +267,9 @@ public class Util {
         	if (secStore.compareTo("") == 0){
         		return null;
         	}
-	        log("getExternalCardPath secStore: "+secStore);
+			logDebug("secStore: " + secStore);
 	        File path = new File(secStore);
-	        log("getFreeSize: "+path.getUsableSpace());
+			logDebug("getFreeSize: " + path.getUsableSpace());
 	        if(path.getUsableSpace()>0)
 	        {
 	        	return path.getAbsolutePath();
@@ -301,19 +324,20 @@ public class Util {
            default:
                return bitmap;
         }
-	     
-        try {
-            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            if (bitmap != null && !bitmap.isRecycled()) {
-                bitmap.recycle();
-                bitmap = null; 
-            }
-            return bmRotated;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+
+		try {
+			Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+			if (bitmap != null && !bitmap.isRecycled()) {
+				bitmap.recycle();
+				bitmap = null;
+				System.gc();
+			}
+			return bmRotated;
+		} catch (Exception e) {
+			logError("Exception creating rotated bitmap", e);
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -497,6 +521,22 @@ public class Util {
 		
 		return sizeString;
 	}
+
+    public static String getSizeStringGBBased(long gbSize){
+        String sizeString = "";
+        DecimalFormat decf = new DecimalFormat("###.##");
+
+        float TB = 1024;
+
+        if (gbSize < TB){
+            sizeString = decf.format(gbSize) + " " + context.getString(R.string.label_file_size_giga_byte);
+        }
+        else{
+            sizeString = decf.format(gbSize/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
+        }
+
+        return sizeString;
+    }
     
 	public static String getDateString(long date){
 		DateFormat datf = DateFormat.getDateTimeInstance();
@@ -531,58 +571,6 @@ public class Util {
         return fileLoggerKarere;
     }
 
-	/*
-	 * Global log handler
-	 */
-	public static void log(String origin, String message) {
-		MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
-
-//		try {
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//			String currentDateandTime = sdf.format(new Date());
-//
-//			message = "(" + currentDateandTime + ") - " + message;
-//		}
-//		catch (Exception e){}
-
-//		File logFile=null;
-//		if (DEBUG) {
-//			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
-//		}
-
-//		if (fileLogger) {
-//			//Send the log to a file
-//
-//			File dirFile = buildExternalStorageFile(LOG_DIR);
-//			if (!dirFile.exists()) {
-//				dirFile.mkdirs();
-//				logFile = new File(dirFile, "log.txt");
-//				if (!logFile.exists()) {
-//					try {
-//						logFile.createNewFile();
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-//			} else {
-//				logFile = new File(dirFile, "log.txt");
-//				if (!logFile.exists()) {
-//					try {
-//						logFile.createNewFile();
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//
-//			if (logFile != null && logFile.exists()) {
-//				appendStringToFile(origin + ": " + message + "\n", logFile);
-//			}
-//		}
-	}
-	
 	public static void brandAlertDialog(AlertDialog dialog) {
 	    try {
 	        Resources resources = dialog.getContext().getResources();
@@ -611,8 +599,8 @@ public class Util {
 	public static String getProgressSize(Context context, long progress,
 			long size) {
 		return String.format("%s/%s",
-				Formatter.formatFileSize(context, progress),
-				Formatter.formatFileSize(context, size));
+				getSizeString(progress),
+				getSizeString(size));
 	}
 	
 	/*
@@ -732,7 +720,7 @@ public class Util {
 				  }
 			  }
 		  } catch (Exception ex) {
-			  log("Error getting local IP address: " + ex.toString());
+			  logError("Error getting local IP address", ex);
 		  }
 		  return null;
    }
@@ -1145,7 +1133,7 @@ public class Util {
 	}
 	
 	public static boolean checkBitSet(BitSet paymentBitSet, int position){
-		log("checkBitSet");
+		logDebug("checkBitSet");
 		if (paymentBitSet != null){
 			if (paymentBitSet.get(position)){
 				return true;
@@ -1167,7 +1155,7 @@ public class Util {
 				try{
 					long currentTime = System.currentTimeMillis()/1000;
 					long lastPublicHandleTimeStamp = Long.parseLong(attributes.getLastPublicHandleTimeStamp());
-					log("currentTime: " + currentTime + " _ " + lastPublicHandleTimeStamp);
+					logDebug("currentTime: " + currentTime + " _ " + lastPublicHandleTimeStamp);
 					if ((currentTime - lastPublicHandleTimeStamp) < 86400){
 						if (Long.parseLong(attributes.getLastPublicHandle()) != -1){
 							lastPublicHandle = Long.parseLong(attributes.getLastPublicHandle());
@@ -1225,12 +1213,22 @@ public class Util {
 	 * Validate email
 	 */
 	public static String getEmailError(String value, Context context) {
-		log("getEmailError");
+		logDebug("getEmailError");
 		if (value.length() == 0) {
 			return context.getString(R.string.error_enter_email);
 		}
 		if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
 			return context.getString(R.string.error_invalid_email);
+		}
+		return null;
+	}
+
+	/*
+	 * compare the current mail to newly changed email
+	 */
+	public static String comparedToCurrentEmail(String value, Context context) {
+		if (value.equals(dbH.getCredentials().getEmail())) {
+			return context.getString(R.string.mail_same_as_old);
 		}
 		return null;
 	}
@@ -1261,7 +1259,7 @@ public class Util {
 	}
 
 	public static void showAlert(Context context, String message, String title) {
-		log("showAlert");
+		logDebug("showAlert");
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		if(title!=null){
 			builder.setTitle(title);
@@ -1272,7 +1270,7 @@ public class Util {
 	}
 
 	public static long calculateTimestampMinDifference(String timeStamp) {
-		log("calculateTimestampDifference");
+		logDebug("calculateTimestampDifference");
 
 		Long actualTimestamp = System.currentTimeMillis()/1000;
 
@@ -1296,7 +1294,7 @@ public class Util {
 
 	public static long calculateTimestamp(String time)
 	{
-		log("calculateTimestamp: "+time);
+		logDebug("calculateTimestamp: " + time);
 		long unixtime;
 		DateFormat dfm = new SimpleDateFormat("yyyyMMddHHmm");
 		dfm.setTimeZone( TimeZone.getDefault());//Specify your timezone
@@ -1308,21 +1306,21 @@ public class Util {
 		}
 		catch (ParseException e)
 		{
-			log("ParseException!!!");
+			logError("ParseException!!!", e);
 		}
 		return 0;
 	}
 
 	public static Calendar calculateDateFromTimestamp (long timestamp){
-		log("calculateTimestamp: "+timestamp);
+		logDebug("calculateTimestamp: " + timestamp);
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(timestamp*1000);
-		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
+		logDebug("Calendar: " + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.MONTH));
 		return cal;
 	}
 
 	public static boolean isChatEnabled (){
-		log("isChatEnabled");
+		logDebug("isChatEnabled");
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(context);
 		}
@@ -1332,21 +1330,28 @@ public class Util {
 		if(chatSettings!=null){
 			if(chatSettings.getEnabled()!=null){
 				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-				log("A - chatEnabled: " + chatEnabled);
+				logDebug("A - chatEnabled: " + chatEnabled);
 				return chatEnabled;
 			}
 			else{
 				chatEnabled=true;
-				log("B - chatEnabled: " + chatEnabled);
+				logDebug("B - chatEnabled: " + chatEnabled);
 				return chatEnabled;
 			}
 		}
 		else{
 			chatEnabled=true;
-			log("C - chatEnabled: " + chatEnabled);
+			logDebug("C - chatEnabled: " + chatEnabled);
 			return chatEnabled;
 		}
 	}
+
+	public static boolean canVoluntaryVerifyPhoneNumber() {
+        MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
+	    boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;
+	    boolean allowVerify = api.smsAllowedState() == 2;
+	    return hasNotVerified && allowVerify;
+    }
 
 	public static void resetAndroidLogger(){
 
@@ -1415,7 +1420,7 @@ public class Util {
 	//restrict the scale factor to below 1.1 to allow user to have some level of freedom and also prevent ui issues
 	public static void setAppFontSize(Activity activity) {
 		float scale = activity.getResources().getConfiguration().fontScale;
-		log("system font size scale is " + scale);
+		logDebug("System font size scale is " + scale);
 
 		float newScale;
 
@@ -1425,7 +1430,7 @@ public class Util {
 			newScale = (float) 1.1;
 		}
 
-		log("new font size new scale is " + newScale);
+		logDebug("New font size new scale is " + newScale);
 		Configuration configuration = activity.getResources().getConfiguration();
 		configuration.fontScale = newScale;
 
@@ -1463,46 +1468,18 @@ public class Util {
 		return icon;
 	}
 
-	//Notice user that any transfer prior to login will be destroyed
-	public static void checkPendingTransfer(MegaApiAndroid megaApi, Context context, final AbortPendingTransferCallback callback){
-		if(megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0){
-			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-			if(context instanceof ManagerActivityLollipop){
-				log("Show dialog to cancel transfers before logging OUT");
-				builder.setMessage(R.string.logout_warning_abort_transfers);
-				builder.setPositiveButton(R.string.action_logout, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						callback.onAbortConfirm();
-					}
-				});
-			}
-			else{
-				log("Show dialog to cancel transfers before logging IN");
-				builder.setMessage(R.string.login_warning_abort_transfers);
-				builder.setPositiveButton(R.string.login_text, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						callback.onAbortConfirm();
-					}
-				});
-			}
-
-			builder.setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					callback.onAbortCancel();
-				}
-			});
-			builder.show();
-		}else{
-			callback.onAbortConfirm();
-		}
+	/**
+	 *Check if exist ongoing transfers
+	 *
+	 * @param megaApi
+	 * @return true if exist ongoing transfers, false otherwise
+	 */
+	public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {
+		return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
 	}
 
 	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
-		log("changeStatusBarColor");
+		logDebug("changeStatusBarColor");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -1536,8 +1513,22 @@ public class Util {
 		}
 	}
 
+    public static Bitmap createAvatarBackground(String colorString) {
+        Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(circle);
+        Paint paintCircle = new Paint();
+        paintCircle.setAntiAlias(true);
+        int color = (colorString == null) ?
+                ContextCompat.getColor(context, R.color.lollipop_primary_color) :
+                Color.parseColor(colorString);
+        paintCircle.setColor(color);
+        int radius = circle.getWidth() / 2;
+        c.drawCircle(radius, radius, radius, paintCircle);
+        return circle;
+    }
+
 	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
-		log("createDefaultAvatar color: '"+color+"' firstLetter: '"+firstLetter+"'");
+		logDebug("color: '" + color + "' firstLetter: '" + firstLetter + "'");
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
@@ -1555,12 +1546,12 @@ public class Util {
 		paintText.setStyle(Paint.Style.FILL);
 
 		if(color!=null){
-			log("The color to set the avatar is "+color);
+			logDebug("The color to set the avatar is " + color);
 			paintCircle.setColor(Color.parseColor(color));
 			paintCircle.setAntiAlias(true);
 		}
 		else{
-			log("Default color to the avatar");
+			logDebug("Default color to the avatar");
 			paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 			paintCircle.setAntiAlias(true);
 		}
@@ -1574,7 +1565,7 @@ public class Util {
 
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-		log("Draw letter: "+firstLetter);
+		logDebug("Draw letter: " + firstLetter);
 		Rect bounds = new Rect();
 
 		paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
@@ -1583,6 +1574,10 @@ public class Util {
 		c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
 
 		return defaultAvatar;
+	}
+
+	public static MegaPreferences getPreferences (Context context) {
+		return DatabaseHandler.getDbHandler(context).getPreferences();
 	}
 
     public static boolean askMe (Context context) {
@@ -1602,7 +1597,18 @@ public class Util {
 		}
 		return true;
 	}
-    
+
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
     public static void showSnackBar(Context context,int snackbarType,String message,int idChat) {
         if (context instanceof ChatFullScreenImageViewer) {
             ((ChatFullScreenImageViewer)context).showSnackbar(snackbarType,message,idChat);
@@ -1619,13 +1625,13 @@ public class Util {
         } else if (context instanceof BaseActivity) {
             View rootView = getRootViewFromContext(context);
             if (rootView == null) {
-                log("unable to show snack bar, view does not exist");
+				logWarning("Unable to show snack bar, view does not exist");
             } else {
                 ((BaseActivity)context).showSnackbar(snackbarType,rootView,message,idChat);
             }
         }
     }
-    
+
     private static View getRootViewFromContext(Context context) {
         BaseActivity activity = (BaseActivity)context;
         View rootView = null;
@@ -1638,9 +1644,21 @@ public class Util {
                 rootView = ((ViewGroup)((BaseActivity)context).findViewById(android.R.id.content)).getChildAt(0);//get first view
             }
         } catch (Exception e) {
-            log("getRootViewFromContext " + e.getMessage());
+			logError("ERROR", e);
         }
         return rootView;
+    }
+
+    public static String normalizePhoneNumber(String phoneNumber,String countryCode) {
+        return PhoneNumberUtils.formatNumberToE164(phoneNumber, countryCode);
+    }
+
+    public static String normalizePhoneNumberByNetwork(Context context,String phoneNumber) {
+        String countryCode = getCountryCodeByNetwork(context);
+        if(countryCode == null) {
+            return null;
+        }
+        return normalizePhoneNumber(phoneNumber, countryCode.toUpperCase());
     }
 
 	/**
@@ -1688,7 +1706,7 @@ public class Util {
 		try {
 			builder.append(Math.round(Float.parseFloat(degreesSplit[2].replace(",", "."))));
 		} catch (Exception e) {
-			log("Error rounding seconds in coordinates: " + e.toString());
+			logWarning("Error rounding seconds in coordinates", e);
 			builder.append(degreesSplit[2]);
 		}
 
@@ -1717,6 +1735,14 @@ public class Util {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
+	public static boolean isScreenInPortrait(Context context) {
+		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	/**
 	 * This method detects whether the android device is tablet
 	 *
@@ -1744,10 +1770,43 @@ public class Util {
 			}
 		}
 		return false;
+
 	}
 
-	private static void log(String message) {
-		log("Util", message);
+	/**
+	 * This method decodes a url and formats it before its treatment
+	 *
+	 * @param url the passed url to be decoded
+	 */
+	public static void decodeURL(String url) {
+		try {
+			url = URLDecoder.decode(url, "UTF-8");
+		} catch (Exception e) {
+			logDebug("Exception decoding url: "+url);
+			e.printStackTrace();
+		}
+
+		url.replace(' ', '+');
+
+		if (url.startsWith("mega://")) {
+			url = url.replaceFirst("mega://", "https://mega.nz/");
+		} else if (url.startsWith("mega.")) {
+			url = url.replaceFirst("mega.", "https://mega.");
+		}
+
+		if (url.startsWith("https://www.mega.co.nz")) {
+			url = url.replaceFirst("https://www.mega.co.nz", "https://mega.co.nz");
+		}
+
+		if (url.startsWith("https://www.mega.nz")) {
+			url = url.replaceFirst("https://www.mega.nz", "https://mega.nz");
+		}
+
+		if (url.endsWith("/")) {
+			url = url.substring(0, url.length() - 1);
+		}
+
+		logDebug("URL decoded: " + url);
 	}
 
     public static boolean hasPermissions(Context context, String... permissions) {
@@ -1762,7 +1821,7 @@ public class Util {
     }
 
     public static void showKeyboardDelayed(final View view) {
-        log("showKeyboardDelayed");
+		logDebug("showKeyboardDelayed");
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -1772,4 +1831,11 @@ public class Util {
             }
         }, 50);
     }
+
+	public static void resetActionBar(ActionBar aB) {
+		if (aB != null) {
+			aB.setDisplayShowCustomEnabled(false);
+			aB.setDisplayShowTitleEnabled(true);
+		}
+	}
 }

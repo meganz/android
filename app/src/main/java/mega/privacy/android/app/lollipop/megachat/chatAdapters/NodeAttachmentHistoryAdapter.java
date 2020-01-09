@@ -35,16 +35,17 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.TimeUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttachmentHistoryAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener {
 
@@ -124,23 +125,23 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     }
 
     public void toggleAllSelection(int pos) {
-        log("toggleAllSelection: " + pos);
+        logDebug("position: " + pos);
         final int positionToflip = pos;
 
         if (selectedItems.get(pos,false)) {
-            log("delete pos: " + pos);
+            logDebug("Delete pos: " + pos);
             selectedItems.delete(pos);
 
         } else {
-            log("PUT pos: " + pos);
+            logDebug("PUT pos: " + pos);
             selectedItems.put(pos,true);
         }
 
         if (adapterType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
-            log("adapter type is LIST");
+            logDebug("Adapter type is LIST");
             NodeAttachmentHistoryAdapter.ViewHolderBrowserList view = (NodeAttachmentHistoryAdapter.ViewHolderBrowserList)listFragment.findViewHolderForLayoutPosition(pos);
             if (view != null) {
-                log("Start animation: " + pos + " multiselection state: " + isMultipleSelect());
+                logDebug("Start animation: " + pos + " multiselection state: " + isMultipleSelect());
                 Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
                 flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                     @Override
@@ -150,13 +151,13 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        log("onAnimationEnd: " + selectedItems.size());
+                        logDebug("onAnimationEnd: " + selectedItems.size());
                         if (selectedItems.size() <= 0) {
-                            log("toggleAllSelection: hideMultipleSelect");
+                            logDebug("toggleAllSelection: hideMultipleSelect");
 
                             ((NodeAttachmentHistoryActivity)context).hideMultipleSelect();
                         }
-                        log("toggleAllSelection: notified item changed");
+                        logDebug("toggleAllSelection: notified item changed");
                         notifyItemChanged(positionToflip);
                     }
 
@@ -167,11 +168,11 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 });
                 view.imageView.startAnimation(flipAnimation);
             } else {
-                log("NULL view pos: " + positionToflip);
+                logWarning("NULL view pos: " + positionToflip);
                 notifyItemChanged(pos);
             }
         } else {
-            log("adapter type is GRID");
+            logDebug("Adapter type is GRID");
             if (selectedItems.size() <= 0) {
                 ((NodeAttachmentHistoryActivity)context).hideMultipleSelect();
             }
@@ -180,21 +181,21 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     }
 
     public void toggleSelection(int pos) {
-        log("toggleSelection: " + pos);
+        logDebug("position: " + pos);
 
         if (selectedItems.get(pos,false)) {
-            log("delete pos: " + pos);
+            logDebug("Delete pos: " + pos);
             selectedItems.delete(pos);
         } else {
-            log("PUT pos: " + pos);
+            logDebug("PUT pos: " + pos);
             selectedItems.put(pos,true);
         }
         notifyItemChanged(pos);
         if (adapterType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
-            log("adapter type is LIST");
+            logDebug("Adapter type is LIST");
             NodeAttachmentHistoryAdapter.ViewHolderBrowserList view = (NodeAttachmentHistoryAdapter.ViewHolderBrowserList)listFragment.findViewHolderForLayoutPosition(pos);
             if (view != null) {
-                log("Start animation: " + pos);
+                logDebug("Start animation: " + pos);
                 Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
                 flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                     @Override
@@ -218,13 +219,13 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 view.imageView.startAnimation(flipAnimation);
 
             } else {
-                log("view is null - not animation");
+                logWarning("View is null - not animation");
                 if (selectedItems.size() <= 0) {
                     ((NodeAttachmentHistoryActivity)context).hideMultipleSelect();
                 }
             }
         } else {
-            log("adapter type is GRID");
+            logDebug("Adapter type is GRID");
 
             if (selectedItems.size() <= 0) {
                 ((NodeAttachmentHistoryActivity)context).hideMultipleSelect();
@@ -244,7 +245,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     }
 
     public void clearSelections() {
-        log("clearSelections");
+        logDebug("clearSelections");
         for (int i = 0;i < messages.size();i++) {
             if (isItemChecked(i)) {
                 //Exlude placeholder.
@@ -335,13 +336,13 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     }
 
     public NodeAttachmentHistoryAdapter.ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder");
+        logDebug("onCreateViewHolder");
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
         if (viewType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
-            log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_LIST");
+            logDebug("Type: ITEM_VIEW_TYPE_LIST");
 
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list,parent,false);
             ViewHolderBrowserList holderList = new ViewHolderBrowserList(v);
@@ -357,7 +358,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             holderList.textViewMessageInfo.setVisibility(View.VISIBLE);
 
             RelativeLayout.LayoutParams paramsThreeDotsIcon = (RelativeLayout.LayoutParams) holderList.threeDotsImageView.getLayoutParams();
-            paramsThreeDotsIcon.leftMargin = Util.scaleWidthPx(8, outMetrics);
+            paramsThreeDotsIcon.leftMargin = scaleWidthPx(8, outMetrics);
             holderList.threeDotsImageView.setLayoutParams(paramsThreeDotsIcon);
 
             holderList.textViewMessageInfo.setSelected(true);
@@ -382,7 +383,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             v.setTag(holderList);
             return holderList;
         } else if (viewType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_GRID) {
-            log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_GRID");
+            logDebug("Type: ITEM_VIEW_TYPE_GRID");
 
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid_new,parent,false);
             NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid holderGrid = new NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid(v);
@@ -409,15 +410,15 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             holderGrid.fileGridSelected = (ImageView)v.findViewById(R.id.file_grid_selected);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                holderGrid.textViewMessageInfo.setMaxWidth(Util.scaleWidthPx(70,outMetrics));
+                holderGrid.textViewMessageInfo.setMaxWidth(scaleWidthPx(70,outMetrics));
             } else {
-                holderGrid.textViewMessageInfo.setMaxWidth(Util.scaleWidthPx(130,outMetrics));
+                holderGrid.textViewMessageInfo.setMaxWidth(scaleWidthPx(130,outMetrics));
             }
 
             if (holderGrid.textViewMessageInfo != null) {
                 holderGrid.textViewMessageInfo.setVisibility(View.VISIBLE);
             } else {
-                log("textViewMessageInfo is NULL");
+                logWarning("textViewMessageInfo is NULL");
             }
 
             holderGrid.savedOffline.setVisibility(View.INVISIBLE);
@@ -440,7 +441,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     }
 
     public void onBindViewHolder(NodeAttachmentHistoryAdapter.ViewHolderBrowser holder, int position) {
-        log("onBindViewHolder");
+        logDebug("position: " + position);
 
         if (adapterType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
             NodeAttachmentHistoryAdapter.ViewHolderBrowserList holderList = (NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder;
@@ -452,14 +453,14 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     }
 
     public void onBindViewHolderGrid(ViewHolderBrowserGrid holder,int position) {
-        log("onBindViewHolderGrid");
+        logDebug("position: " + position);
         MegaChatMessage m = (MegaChatMessage)getItem(position);
         MegaNode node = m.getMegaNodeList().get(0);
 
         holder.document = node.getHandle();
         Bitmap thumb = null;
 
-        log("Node : " + position + " " + node.getName());
+        logDebug("Node : " + position + " " + node.getName());
 
         holder.textViewFileName.setText(node.getName());
         holder.textViewMessageInfo.setText("");
@@ -475,7 +476,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
         holder.textViewFileNameForFile.setText(node.getName());
         long nodeSize = node.getSize();
-        holder.textViewMessageInfo.setText(Util.getSizeString(nodeSize));
+        holder.textViewMessageInfo.setText(getSizeString(nodeSize));
 
         holder.fileGridIconForFile.setVisibility(View.VISIBLE);
         holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
@@ -495,23 +496,10 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         if (isVideoFile(node.getName())) {
             holder.videoInfoLayout.setVisibility(View.VISIBLE);
             holder.videoDuration.setVisibility(View.GONE);
-            log(node.getName() + " DURATION: " + node.getDuration());
+            logDebug(node.getName() + " DURATION: " + node.getDuration());
             int duration = node.getDuration();
             if (duration > 0) {
-                int hours = duration / 3600;
-                int minutes = (duration % 3600) / 60;
-                int seconds = duration % 60;
-
-                String timeString;
-                if (hours > 0) {
-                    timeString = String.format("%d:%d:%02d",hours,minutes,seconds);
-                } else {
-                    timeString = String.format("%d:%02d",minutes,seconds);
-                }
-
-                log("The duration is: " + hours + " " + minutes + " " + seconds);
-
-                holder.videoDuration.setText(timeString);
+                holder.videoDuration.setText(getVideoDuration(duration));
                 holder.videoDuration.setVisibility(View.VISIBLE);
             }
         }
@@ -526,7 +514,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 //				params.height = ViewGroup.LayoutParams.MATCH_PARENT;
 //				holder.imageView.setLayoutParams(params);
 
-            Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
+            Bitmap temp = getThumbnailFromCache(node);
 
             if (temp != null) {
                 thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
@@ -536,7 +524,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
 
             } else {
-                temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
+                temp = getThumbnailFromFolder(node,context);
 
                 if (temp != null) {
                     thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
@@ -562,9 +550,9 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 }
             }
         } else {
-            Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
+            Bitmap temp = getThumbnailFromCache(node);
 
-//				thumb = ThumbnailUtils.getThumbnailFromCache(node);
+//				thumb = getThumbnailFromCache(node);
             if (temp != null) {
                 thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
                 holder.fileGridIconForFile.setVisibility(View.GONE);
@@ -572,7 +560,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 holder.imageViewThumb.setImageBitmap(thumb);
                 holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
             } else {
-                temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
+                temp = getThumbnailFromFolder(node,context);
 
                 if (temp != null) {
                     thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
@@ -591,7 +579,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     }
 
     public void onBindViewHolderList(ViewHolderBrowserList holder,int position) {
-        log("onBindViewHolderList: " + position);
+        logDebug("position: " + position);
         MegaChatMessage m = (MegaChatMessage)getItem(position);
         MegaNode node = m.getMegaNodeList().get(0);
 
@@ -601,16 +589,16 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         holder.textViewFileName.setText(node.getName());
         holder.textViewMessageInfo.setText("");
 
-        String date = TimeUtils.formatDateAndTime(context,m.getTimestamp(), TimeUtils.DATE_LONG_FORMAT);
+        String date = formatDateAndTime(context,m.getTimestamp(), DATE_LONG_FORMAT);
 
         if (m.getUserHandle() == megaChatApi.getMyUserHandle()) {
-            log("MY message handle!!: " + m.getMsgId());
+            logDebug("MY message handle!!: " + m.getMsgId());
             holder.fullNameTitle = megaChatApi.getMyFullname();
         }
         else{
 
             long userHandle = m.getUserHandle();
-            log("Contact message!!: " + userHandle);
+            logDebug("Contact message!!: " + userHandle);
 
             if (((NodeAttachmentHistoryActivity)context).chatRoom.isGroup()) {
 
@@ -622,17 +610,17 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
                 if (holder.fullNameTitle.trim().length() <= 0) {
 
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    holder.fullNameTitle = "Unknown name";
+                    logWarning("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+                    holder.fullNameTitle = context.getString(R.string.unknown_name_label);
                     if (!(holder.nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + m.getUserHandle());
+                        logDebug("Call for nonContactName: " + m.getUserHandle());
                         holder.nameRequestedAction = true;
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, userHandle, ((NodeAttachmentHistoryActivity)context).chatRoom.isPreview());
                         megaChatApi.getUserFirstname(userHandle, ((NodeAttachmentHistoryActivity)context).chatRoom.getAuthorizationToken(), listener);
                         megaChatApi.getUserLastname(userHandle, ((NodeAttachmentHistoryActivity)context).chatRoom.getAuthorizationToken(), listener);
                         megaChatApi.getUserEmail(userHandle, listener);
                     } else {
-                        log("4-Name already asked and no name received: " + m.getUserHandle());
+                        logWarning("Name already asked and no name received: " + m.getUserHandle());
                     }
                 }
 
@@ -647,7 +635,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         holder.textViewMessageInfo.setVisibility(View.VISIBLE);
 
         if (!multipleSelect) {
-            log("Not multiselect");
+            logDebug("Not multiselect");
             holder.itemLayout.setBackgroundColor(Color.WHITE);
             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
@@ -657,10 +645,10 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             params.setMargins(0,0,0,0);
             holder.imageView.setLayoutParams(params);
 
-            log("Check the thumb");
+            logDebug("Check the thumb");
 
             if (node.hasThumbnail()) {
-                log("Node has thumbnail");
+                logDebug("Node has thumbnail");
                 RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
                 params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
                 params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
@@ -669,14 +657,13 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
                 holder.imageView.setLayoutParams(params1);
 
-                thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                thumb = getThumbnailFromCache(node);
                 if (thumb != null) {
 
                     holder.imageView.setImageBitmap(thumb);
 
                 } else {
-                    thumb = ThumbnailUtils
-                            .getThumbnailFromFolder(node,context);
+                    thumb = getThumbnailFromFolder(node,context);
                     if (thumb != null) {
                         holder.imageView.setImageBitmap(thumb);
 
@@ -692,8 +679,8 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                     }
                 }
             } else {
-                log("Node NOT thumbnail");
-                thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                logWarning("Node NOT thumbnail");
+                thumb = getThumbnailFromCache(node);
                 if (thumb != null) {
                     RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
                     params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
@@ -706,7 +693,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
 
                 } else {
-                    thumb = ThumbnailUtils.getThumbnailFromFolder(node,context);
+                    thumb = getThumbnailFromFolder(node,context);
                     if (thumb != null) {
                         RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
                         params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
@@ -726,7 +713,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 }
             }
         } else {
-            log("Multiselection ON");
+            logDebug("Multiselection ON");
             if (this.isItemChecked(position)) {
                 holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
                 RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -738,10 +725,10 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             } else {
                 holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.white));
 
-                log("Check the thumb");
+                logDebug("Check the thumb");
 
                 if (node.hasThumbnail()) {
-                    log("Node has thumbnail");
+                    logDebug("Node has thumbnail");
                     RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
                     params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
                     params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
@@ -750,14 +737,13 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
                     holder.imageView.setLayoutParams(params1);
 
-                    thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                    thumb = getThumbnailFromCache(node);
                     if (thumb != null) {
 
                         holder.imageView.setImageBitmap(thumb);
 
                     } else {
-                        thumb = ThumbnailUtils
-                                .getThumbnailFromFolder(node,context);
+                        thumb = getThumbnailFromFolder(node,context);
                         if (thumb != null) {
                             holder.imageView.setImageBitmap(thumb);
 
@@ -773,9 +759,9 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                         }
                     }
                 } else {
-                    log("Node NOT thumbnail");
+                    logWarning("Node NOT thumbnail");
 
-                    thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                    thumb = getThumbnailFromCache(node);
                     if (thumb != null) {
                         RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
                         params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
@@ -788,7 +774,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
 
                     } else {
-                        thumb = ThumbnailUtils.getThumbnailFromFolder(node,context);
+                        thumb = getThumbnailFromFolder(node,context);
                         if (thumb != null) {
                             RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
                             params1.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
@@ -800,7 +786,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                             holder.imageView.setImageBitmap(thumb);
 
                         } else {
-                            log("NOT thumbnail");
+                            logWarning("NOT thumbnail");
                             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                             try {
                                 ThumbnailUtilsLollipop.createThumbnailList(context,node,holder,megaApi,this);
@@ -843,16 +829,16 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        logDebug("onClick");
         ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderBrowser holder = (ViewHolderBrowser)v.getTag();
         int currentPosition = holder.getAdapterPosition();
 
-        log("onClick -> Current position: " + currentPosition);
+        logDebug("Current position: " + currentPosition);
 
         if (currentPosition < 0) {
-            log("Current position error - not valid value");
+            logWarning("Current position error - not valid value");
             return;
         }
 
@@ -894,48 +880,46 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     }
 
     public void loadPreviousMessages(ArrayList<MegaChatMessage> messages, int counter) {
-        log("loadPreviousMessages: " + counter);
+        logDebug("counter: " + counter);
         this.messages = messages;
         notifyItemRangeInserted(messages.size()-counter, counter);
     }
 
     public void addMessage(ArrayList<MegaChatMessage> messages, int position) {
-        log("addMessage: " + position);
+        logDebug("position: " + position);
         this.messages = messages;
         notifyItemInserted(position);
         if (position == messages.size()) {
-            log("No need to update more");
+            logDebug("No need to update more");
         } else {
-            log("Update until end");
             int itemCount = messages.size() - position;
-            log("itemCount: " + itemCount);
+            logDebug("Update until end - itemCount: " + itemCount);
             notifyItemRangeChanged(position, itemCount + 1);
         }
     }
 
     public void removeMessage(int position, ArrayList<MegaChatMessage> messages) {
-        log("removeMessage: size: " + messages.size());
+        logDebug("Size: " + messages.size());
         this.messages = messages;
         notifyItemRemoved(position);
 
         if (position == messages.size() - 1) {
-            log("No need to update more");
+            logDebug("No need to update more");
         } else {
-            log("Update until end");
             int itemCount = messages.size() - position;
-            log("itemCount: " + itemCount);
+            logDebug("Update until end - itemCount: " + itemCount);
             notifyItemRangeChanged(position, itemCount);
         }
     }
 
     private void threeDotsClicked(int currentPosition,MegaChatMessage m) {
-        log("onClick: file_list_three_dots: " + currentPosition);
+        logDebug("file_list_three_dots: " + currentPosition);
         ((NodeAttachmentHistoryActivity)context).showNodeAttachmentBottomSheet(m, currentPosition);
     }
 
     @Override
     public boolean onLongClick(View view) {
-        log("OnLongCLick");
+        logDebug("OnLongCLick");
         ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderBrowser holder = (ViewHolderBrowser)view.getTag();
@@ -963,16 +947,12 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     }
 
     public void setMultipleSelect(boolean multipleSelect) {
-        log("setMultipleSelect: " + multipleSelect);
+        logDebug("multipleSelect: " + multipleSelect);
         if (this.multipleSelect != multipleSelect) {
             this.multipleSelect = multipleSelect;
         }
         if (this.multipleSelect) {
             selectedItems = new SparseBooleanArray();
         }
-    }
-
-    private static void log(String log) {
-        Util.log("NodeAttachmentHistoryAdapter",log);
     }
 }

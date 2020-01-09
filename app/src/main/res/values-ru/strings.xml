@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">Ошибка: пожалуйста, попробуйте снова.</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">Вторичная медиа-папка не существует, выберите новую папку.</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Не найден внешний накопитель</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Папка доступна только для чтения. У вас нет прав для загрузки.</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Значки</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Вид списка</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Сохранить ключ восстановления</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Удалить ключ восстановления</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Отменить подписку</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">Ключ восстановления удалён</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Подписка была отменена</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Мы не смогли отменить вашу подписку. Пожалуйста, свяжитесь с support&#64;mega.nz</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Прекратить другие сеансы</string>
@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Активация аккаунта</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Подготовка списка файлов</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Для использования MEGA войдите в систему</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">Ссылка подтверждения более не действительна. Ваш аккаунт может быть уже активирован или вы могли отменить регистрацию.</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -231,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">Удалить все передачи?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Облачный диск</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Недавние</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Загрузки медиа</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Входящие</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Сохранено локально</string>
@@ -247,7 +249,7 @@
     <string name="received_requests_empty" context="the user has not received any contact request from other users">[B]Нет [/B][A]полученных запросов[/A][B].[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Передачи</string>
 
-    <string name="section_account" context="button to the settings of the user\'s account">Моя учётная запись</string>
+    <string name="section_account" context="button to the settings of the user\'s account">Мой аккаунт</string>
     <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Загрузки камеры</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
@@ -611,6 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Предварительное изображение ещё не загружено. Подождите.</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">Не удаётся загрузить превью из-за недостатка доступной памяти. Пожалуйста, повторите попытку позже.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Для новой регистрации выйдите из системы</string>
 
@@ -635,7 +638,7 @@
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">ОК</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Пропустить</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Стоп</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Выполняется загрузка с камеры</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Выполняются загрузки из камеры</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Остановить загрузки из камеры?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -931,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Ошибка. Этот адрес уже используется.</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">Вы уже запрашивали ссылку подтверждения для этого адреса.</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">Старый и новый адреса не должны совпадать</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">Остался один шаг до смены адреса электронной почты. Введите пароль.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Смена эл. почты</string>
 
@@ -1796,7 +1802,7 @@
 
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Загрузка в чат</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Качество медиа в чате</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Качество видео в чате</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Качество видео</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Для загрузок из камеры требуется доступ к фотографиям и другим медиафайлам на устройстве. Пожалуйста, перейдите в настройки и дайте разрешение.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
@@ -2320,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">Звонок начался</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Ошибка ключа SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA не удаётся подключиться в защищённом режиме по SSL. Возможно, вы используете общественный WiFi с дополнительными требованиями.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA не может безопасно подключиться через SSL. Возможно, вы используете общедоступный Wi-Fi с дополнительными требованиями.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Нет [/B][A]уведомлений[/A][B].[/B]</string>
 
@@ -2517,6 +2523,21 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">Файлов в ожидании: %d.</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">Недавние</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">Изображения (1) и видео (1)</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Я</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Невозможно записать голосовые сообщения во время разговора.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Ошибка при загрузке голосового сообщения</string>
 
@@ -2524,4 +2545,7 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Загрузка</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Пожалуйста, подождите&#8230;</string>
+
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Отправлено %s контактам.</string>
 </resources>

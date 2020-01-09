@@ -102,13 +102,12 @@
                             rounded:border_width="3dp"
                             rounded:corner_radius="60dp" />
 
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/initial_letter_big_camera_group_call"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_centerInParent="true"
                             android:gravity="center_horizontal|center_vertical"
-                            android:paddingBottom="3dp"
                             android:textColor="@color/white"
                             android:textSize="50dp"
                             android:visibility="gone" />
@@ -204,13 +203,13 @@
                         rounded:border_width="3dp"
                         rounded:corner_radius="60dp" />
 
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/call_chat_contact_image_initial_letter"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
                         android:gravity="center_horizontal|center_vertical"
-                        android:paddingBottom="3dp"
+                        android:textSize="15sp"
                         android:visibility="gone" />
                 </RelativeLayout>
 
@@ -229,19 +228,20 @@
 
                 <LinearLayout
                     android:id="@+id/toolbar_elements"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
                     android:orientation="vertical">
-
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/title_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="20dp"
-                        android:ellipsize="end"
-                        android:maxLines="1"
                         android:textColor="@color/white"
-                        android:textSize="20sp" />
+                        android:fontFamily="sans-serif-light"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:ellipsize="end"/>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -379,6 +379,27 @@
                 </LinearLayout>
             </RelativeLayout>
 
+            <RelativeLayout
+                android:id="@+id/reconnecting_layout"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_below="@id/call_toolbar"
+                android:background="@color/reconnecting_bar"
+                android:visibility="gone">
+                <TextView
+                    android:id="@+id/reconnecting_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="@string/reconnecting_message"
+                    android:textSize="14sp"
+                    android:textStyle="normal">
+                </TextView>
+            </RelativeLayout>
+
             <TextView
                 android:id="@+id/info_users_bar"
                 android:layout_width="match_parent"
@@ -439,13 +460,13 @@
                         rounded:border_width="3dp"
                         rounded:corner_radius="40dp" />
 
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/call_chat_my_image_initial_letter"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
                         android:gravity="center_horizontal|center_vertical"
-                        android:paddingBottom="3dp" />
+                        android:textSize="15sp" />
                 </RelativeLayout>
             </RelativeLayout>
 

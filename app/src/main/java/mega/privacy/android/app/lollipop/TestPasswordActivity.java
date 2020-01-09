@@ -34,19 +34,17 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.FileUtils.RK_FILE;
-
-/**
- * Created by mega on 3/04/18.
- */
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class TestPasswordActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
 
@@ -88,13 +86,15 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     boolean dismissPasswordReminder = false;
     int numRequests = 0;
 
+    private RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_test_password);
         if (getIntent() == null){
-            log("intent NULL");
+            logWarning("Intent NULL");
             return;
         }
 
@@ -281,7 +281,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     }
 
     void showError (boolean correct) {
-        Util.hideKeyboard(this, 0);
+        hideKeyboard(this, 0);
         if(containerPasswordError.getVisibility() == View.INVISIBLE){
             containerPasswordError.setVisibility(View.VISIBLE);
             Drawable background = password_background.mutate().getConstantState().newDrawable();
@@ -338,15 +338,14 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-        if (requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
-            log("REQUEST_DOWNLOAD_FOLDER");
+        if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
+            logDebug("REQUEST_DOWNLOAD_FOLDER");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (parentPath != null){
-                log("parentPath no NULL");
-                String[] split = RK_FILE.split(File.separator);
-                parentPath = parentPath+"/"+split[split.length-1];
+                logDebug("parentPath no NULL");
+                parentPath = parentPath + File.separator + getRecoveryKeyFileName();
                 AccountController ac = new AccountController(this);
-                ac.exportMK(parentPath, false);
+                ac.exportMK(parentPath);
             }
         }
     }
@@ -357,10 +356,10 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         switch (v.getId()){
             case R.id.password_reminder_checkbox: {
                 if (blockCheckBox.isChecked()) {
-                    log("Block CheckBox checked!");
+                    logDebug("Block CheckBox checked!");
                 }
                 else {
-                    log("Block CheckBox does NOT checked!");
+                    logDebug("Block CheckBox does NOT checked!");
                 }
                 break;
             }
@@ -391,7 +390,9 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             }
             case R.id.password_reminder_recoverykey_button:
             case R.id.test_password_backup_button: {
-                RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
+                if (isBottomSheetDialogShown(recoveryKeyBottomSheetDialogFragment)) break;
+
+                recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
                 recoveryKeyBottomSheetDialogFragment.show(getSupportFragmentManager(), recoveryKeyBottomSheetDialogFragment.getTag());
                 break;
             }
@@ -460,7 +461,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     }
 
     public void showSnackbar(String s){
-        log("showSnackbar");
+        logDebug("showSnackbar");
         showSnackbar(findViewById(R.id.container_layout), s);
     }
 
@@ -468,17 +469,13 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case Constants.REQUEST_WRITE_STORAGE:{
+            case REQUEST_WRITE_STORAGE:{
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    log("REQUEST_WRITE_STORAGE PERMISSIONS GRANTED");
+                    logDebug("REQUEST_WRITE_STORAGE PERMISSIONS GRANTED");
                 }
                 break;
             }
         }
-    }
-
-    public static void log(String message) {
-        Util.log("TestPasswordActivity", message);
     }
 
     @Override
@@ -497,25 +494,25 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             if (request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER) {
                 numRequests--;
                 if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-                    log("New value of attribute USER_ATTR_PWD_REMINDER: " + request.getText());
+                    logDebug("New value of attribute USER_ATTR_PWD_REMINDER: " + request.getText());
                     if (dismissPasswordReminder && isLogout() && numRequests <= 0) {
                         AccountController ac = new AccountController(this);
                         ac.logout(this, megaApi);
                     }
                 }
                 else {
-                    log("Error: MegaRequest.TYPE_SET_ATTR_USER | MegaApiJava.USER_ATTR_PWD_REMINDER " + e.getErrorString());
+                    logError("Error: MegaRequest.TYPE_SET_ATTR_USER | MegaApiJava.USER_ATTR_PWD_REMINDER " + e.getErrorString());
                 }
             }
         }
         else if (request.getType() == MegaRequest.TYPE_LOGOUT){
-            log("logout finished");
+            logDebug("Logout finished");
 
-            if(Util.isChatEnabled()){
-                log("END logout sdk request - wait chat logout");
+            if(isChatEnabled()){
+                logDebug("END logout sdk request - wait chat logout");
             }
             else{
-                log("END logout sdk request - chat disabled");
+                logDebug("END logout sdk request - chat disabled");
                 if (dbH == null){
                     dbH = DatabaseHandler.getDbHandler(getApplicationContext());
                 }

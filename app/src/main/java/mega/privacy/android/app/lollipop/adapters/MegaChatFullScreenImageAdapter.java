@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -25,8 +26,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
@@ -41,10 +43,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
@@ -54,10 +52,16 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
-public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface  {
+public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface {
 
 	private Activity activity;
 	private MegaChatFullScreenImageAdapter megaFullScreenImageAdapter;
@@ -95,14 +99,14 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		@Override
 		protected Integer doInBackground(MegaNode... params){
 			node = params[0];
-			preview = PreviewUtils.getPreviewFromFolder(node, activity);
+			preview = getPreviewFromFolder(node, activity);
 
 			if (preview != null){
 				return 0;
 			}
 			else{
 				if (pendingPreviews.contains(node.getHandle())){
-					log("the preview is already downloaded or added to the list");
+					logDebug("The preview is already downloaded or added to the list");
 					return 1;
 				}
 				else{
@@ -126,7 +130,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				}
 
 				if (holderIsVisible){
-					PreviewUtils.previewCache.put(node.getHandle(), preview);
+					previewCache.put(node.getHandle(), preview);
 					visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
 					visibleImgs.get(position).progressBar.setVisibility(View.GONE);
 					visibleImgs.get(position).downloadProgressBar.setVisibility(View.GONE);
@@ -134,8 +138,8 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			}
 			else if(param == 2){
 				if(megaApi!=null){
-					File previewFile = new File(PreviewUtils.getPreviewFolder(activity), node.getBase64Handle()+".jpg");
-					log("GET PREVIEW OF HANDLE: " + node.getHandle());
+					File previewFile = new File(getPreviewFolder(activity), node.getBase64Handle()+".jpg");
+					logDebug("GET PREVIEW OF HANDLE: " + node.getHandle());
 					pendingPreviews.add(node.getHandle());
 					megaApi.getPreview(node,  previewFile.getAbsolutePath(), megaFullScreenImageAdapter);
 				}
@@ -157,7 +161,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			if (node == null){
 				return 3;
 			}
-			preview = PreviewUtils.getPreviewFromFolder(node, activity);
+			preview = getPreviewFromFolder(node, activity);
 
 			if (preview != null){
 				return 0;
@@ -167,13 +171,13 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 
 				if (isFileAvailable(destination)){
 					if (destination.length() == node.getSize()){
-						File previewDir = PreviewUtils.getPreviewFolder(activity);
+						File previewDir = getPreviewFolder(activity);
 						File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
-						log("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
+						logDebug("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
 						boolean previewCreated = MegaUtilsAndroid.createPreview(destination, previewFile);
 
 						if (previewCreated){
-							preview = PreviewUtils.getBitmapForCache(previewFile, activity);
+							preview = getBitmapForCache(previewFile, activity);
 							destination.delete();
 							return 0;
 						}
@@ -188,11 +192,11 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				}
 
 				if (pendingFullImages.contains(node.getHandle())){
-					log("the image is already downloaded or added to the list - return 1");
+					logDebug("The image is already downloaded or added to the list - return 1");
 					return 1;
 				}
 				else{
-					log("return code 2");
+					logDebug("return code 2");
 					return 2;
 				}
 			}
@@ -222,7 +226,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				}
 			}
 			else if (param == 2){
-				log("There is no preview for this node");
+				logWarning("There is no preview for this node");
 			}
 		}
 	}
@@ -255,7 +259,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	
 	@Override
     public Object instantiateItem(ViewGroup container, int position) {
-        log ("INSTANTIATE POSITION " + position);
+		logDebug ("INSTANTIATE POSITION: " + position);
 
 		MegaNode node = messages.get(position).getMegaNodeList().get(0);
 		
@@ -265,7 +269,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		
 		if (node == null){
 			Intent intent = new Intent(activity, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
+			intent.putExtra("visibleFragment", TOUR_FRAGMENT);
 	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 	        activity.startActivity(intent);
@@ -289,6 +293,8 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		Bitmap preview = null;
 		Bitmap thumb = null;
 
+		final ProgressBar pb = holder.progressBar;
+
 		if (MimeTypeList.typeForName(node.getName()).isGIF()){
 			holder.isGIF = true;
 			holder.imgDisplay.setVisibility(View.GONE);
@@ -306,24 +312,29 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 
 			boolean isOnMegaDownloads = false;
 			String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
-			log("isOnMegaDownloads: "+isOnMegaDownloads+" nodeName: "+node.getName()+" localPath: "+localPath);
+			logDebug("isOnMegaDownloads: " + isOnMegaDownloads + ", Node Handle: " + node.getHandle());
 			if (localPath != null && megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))){
 
-				final ProgressBar pb = holder.progressBar;
 
 				if (drawable != null){
-					Glide.with(context).load(new File(localPath)).listener(new RequestListener<File, GlideDrawable>() {
-						@Override
-						public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
-							return false;
-						}
+					Glide.with(context)
+							.load(new File(localPath))
+							.listener(new RequestListener<Drawable>() {
+								@Override
+								public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+									return false;
+								}
 
-						@Override
-						public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-							pb.setVisibility(View.GONE);
-							return false;
-						}
-					}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+								@Override
+								public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+									pb.setVisibility(View.GONE);
+									return false;
+								}
+							})
+							.placeholder(drawable)
+							.diskCacheStrategy(DiskCacheStrategy.ALL)
+							.transition(withCrossFade())
+							.into(holder.gifImgDisplay);
 				}
 			}
 			else {
@@ -337,45 +348,55 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 				activityManager.getMemoryInfo(mi);
 
-				if(mi.totalMem>Constants.BUFFER_COMP){
-					log("Total mem: "+mi.totalMem+" allocate 32 MB");
-					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+				if(mi.totalMem>BUFFER_COMP){
+					logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
+					megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
 				}
 				else{
-					log("Total mem: "+mi.totalMem+" allocate 16 MB");
-					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
+					megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
 				}
 
 				String url = megaApi.httpServerGetLocalLink(node);
 				if (url != null){
-					final ProgressBar pb = holder.progressBar;
 					if (drawable != null){
-						Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
-							@Override
-							public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
-								return false;
-							}
+						Glide.with(context)
+								.load(Uri.parse(url))
+								.listener(new RequestListener<Drawable>() {
+									@Override
+									public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+										return false;
+									}
 
-							@Override
-							public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-								pb.setVisibility(View.GONE);
-								return false;
-							}
-						}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+									@Override
+									public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+										pb.setVisibility(View.GONE);
+										return false;
+									}
+								})
+								.placeholder(drawable)
+								.diskCacheStrategy(DiskCacheStrategy.ALL)
+								.transition(withCrossFade())
+								.into(holder.gifImgDisplay);
 					}
 					else {
-						Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
-							@Override
-							public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
-								return false;
-							}
+						Glide.with(context)
+								.load(Uri.parse(url))
+								.listener(new RequestListener<Drawable>() {
+									@Override
+									public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+										return false;
+									}
 
-							@Override
-							public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-								pb.setVisibility(View.GONE);
-								return false;
-							}
-						}).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+									@Override
+									public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+										pb.setVisibility(View.GONE);
+										return false;
+									}
+								})
+								.diskCacheStrategy(DiskCacheStrategy.ALL)
+								.transition(withCrossFade())
+								.into(holder.gifImgDisplay);
 					}
 				}
 			}
@@ -386,21 +407,21 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			holder.gifImgDisplay.setVisibility(View.GONE);
 			holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 
-			thumb = ThumbnailUtils.getThumbnailFromCache(node);
+			thumb = getThumbnailFromCache(node);
 			if (thumb != null){
 				holder.imgDisplay.setImageBitmap(thumb);
 			}
 			else{
-				thumb = ThumbnailUtils.getThumbnailFromFolder(node, activity);
+				thumb = getThumbnailFromFolder(node, activity);
 				if (thumb != null){
 					holder.imgDisplay.setImageBitmap(thumb);
 				}
 			}
 
 			if (node.hasPreview()){
-				preview = PreviewUtils.getPreviewFromCache(node);
+				preview = getPreviewFromCache(node);
 				if (preview != null){
-					PreviewUtils.previewCache.put(node.getHandle(), preview);
+					previewCache.put(node.getHandle(), preview);
 					holder.imgDisplay.setImageBitmap(preview);
 				}
 				else{
@@ -409,14 +430,14 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 					}
 					catch(Exception ex){
 						//Too many AsyncTasks
-						log("Too many AsyncTasks");
+						logError("Too many AsyncTasks", ex);
 					}
 				}
 			}
 			else{
-				preview = PreviewUtils.getPreviewFromCache(node);
+				preview = getPreviewFromCache(node);
 				if (preview != null){
-					PreviewUtils.previewCache.put(node.getHandle(), preview);
+					previewCache.put(node.getHandle(), preview);
 					holder.imgDisplay.setImageBitmap(preview);
 				}
 				else{
@@ -425,7 +446,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 					}
 					catch(Exception ex){
 						//Too many AsyncTasks
-						log("Too many AsyncTasks");
+						logError("Too many AsyncTasks", ex);
 					}
 				}
 			}
@@ -439,21 +460,21 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	public Bitmap setImageResource(MegaNode node, ViewHolderFullImage holder){
 
 		Bitmap preview;
-		Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(node);
+		Bitmap thumb = getThumbnailFromCache(node);
 		if (thumb == null){
-			thumb = ThumbnailUtils.getThumbnailFromFolder(node, activity);
+			thumb = getThumbnailFromFolder(node, activity);
 		}
 
 		if (node.hasPreview()){
-			preview = PreviewUtils.getPreviewFromCache(node);
+			preview = getPreviewFromCache(node);
 			if (preview != null){
-				PreviewUtils.previewCache.put(node.getHandle(), preview);
+				previewCache.put(node.getHandle(), preview);
 			}
 		}
 		else{
-			preview = PreviewUtils.getPreviewFromCache(node);
+			preview = getPreviewFromCache(node);
 			if (preview != null){
-				PreviewUtils.previewCache.put(node.getHandle(), preview);
+				previewCache.put(node.getHandle(), preview);
 			}
 		}
 
@@ -473,7 +494,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		visibleImgs.remove(position);
         ((ViewPager) container).removeView((RelativeLayout) object);
         System.gc();
-        log ("DESTROY POSITION " + position + " visibleImgs.size(): " + visibleImgs.size());
+		logDebug ("DESTROY POSITION " + position + " visibleImgs.size(): " + visibleImgs.size());
  
     }
 	
@@ -498,8 +519,8 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			    display.getMetrics(outMetrics);
 			    float density  = activity.getResources().getDisplayMetrics().density;
 				
-			    float scaleW = Util.getScaleW(outMetrics, density);
-			    float scaleH = Util.getScaleH(outMetrics, density);
+			    float scaleW = getScaleW(outMetrics, density);
+			    float scaleH = getScaleH(outMetrics, density);
 
 				((ChatFullScreenImageViewer) context).touchImage();
 
@@ -526,22 +547,18 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	public void setMenuVisible(boolean menuVisible) {
 		this.menuVisible = menuVisible;
 	}
-	
-	private static void log(String log) {
-		Util.log("MegaChatFullScreenImageAdapter", log);
-	}
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getRequestString());
-		log("onRequestStart: Node: " + request.getNodeHandle());
+		logDebug("onRequestStart: " + request.getRequestString());
+		logDebug("Node Handle: " + request.getNodeHandle());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		
-		log("onRequestFinish: " + request.getRequestString());
-		log("onRequestFinish: Node: " + request.getNodeHandle() + "_" + request.getName());
+
+		logDebug("onRequestFinish: " + request.getRequestString());
+		logDebug("Node Handle: " + request.getNodeHandle());
 
 		long handle = request.getNodeHandle();
 		String handleBase64 = MegaApiJava.handleToBase64(handle);
@@ -549,12 +566,12 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		pendingPreviews.remove(handle);
 		
 		if (e.getErrorCode() == MegaError.API_OK){
-			File previewDir = PreviewUtils.getPreviewFolder(activity);
+			File previewDir = getPreviewFolder(activity);
 			File preview = new File(previewDir, handleBase64+".jpg");
 			
 			if (preview.exists()) {
 				if (preview.length() > 0) {
-					log("GET PREVIEW FINISHED. HANDLE: " + handle + " visibleImgs.size(): " + visibleImgs.size());
+					logDebug("GET PREVIEW FINISHED. HANDLE: " + handle + " visibleImgs.size(): " + visibleImgs.size());
 					int position = 0;
 					boolean holderIsVisible = false;
 					for(int i = 0; i < visibleImgs.size(); i++) {
@@ -567,8 +584,8 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 					}
 					
 					if (holderIsVisible){
-						Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, activity);
-						PreviewUtils.previewCache.put(handle, bitmap);						
+						Bitmap bitmap = getBitmapForCache(preview, activity);
+						previewCache.put(handle, bitmap);						
 						visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
 						visibleImgs.get(position).progressBar.setVisibility(View.GONE);
 					}
@@ -576,13 +593,13 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			}
 		}
 		else{
-			log("ERROR FINISH: " + e.getErrorCode() + "_" + e.getErrorString());
+			logError("ERROR FINISH: " + e.getErrorCode() + "_" + e.getErrorString());
 			try{
 //				new PreviewDownloadAsyncTask().execute(node);
 			}
 			catch(Exception ex){
 				//Too many AsyncTasks
-				log("Too many AsyncTasks");
+				logError("Too many AsyncTasks", ex);
 			}
 		}
 	}
@@ -590,9 +607,9 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError: " + request.getRequestString());
-		log("Node: " + request.getNodeHandle() + "_" + request.getName());
-		log("ERROR: " + e.getErrorCode() + "_" + e.getErrorString());
+		logWarning("onRequestTemporaryError: " + request.getRequestString());
+		logWarning("Node Handle: " + request.getNodeHandle());
+		logError("ERROR: " + e.getErrorCode() + "_" + e.getErrorString());
 	}
 
 

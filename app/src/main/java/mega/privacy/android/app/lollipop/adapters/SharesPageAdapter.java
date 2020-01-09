@@ -9,7 +9,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SharesPageAdapter extends FragmentStatePagerAdapter {
 
@@ -23,7 +24,7 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        log("getItem: "+position);
+        logDebug("Position: " + position);
         switch (position){
             case 0: {
                 IncomingSharesFragmentLollipop isF = (IncomingSharesFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.INCOMING_SHARES.getTag());
@@ -57,10 +58,10 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
         // Generate title based on item position
         switch (position){
             case 0: {
-                return context.getString(R.string.tab_incoming_shares).toLowerCase();
+                return context.getString(R.string.tab_incoming_shares);
             }
             case 1:{
-                return context.getString(R.string.tab_outgoing_shares).toLowerCase();
+                return context.getString(R.string.tab_outgoing_shares);
             }
         }
         return null;
@@ -69,9 +70,5 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return PAGE_COUNT;
-    }
-
-    private static void log(String log) {
-        Util.log("SharesPageAdapter", log);
     }
 }

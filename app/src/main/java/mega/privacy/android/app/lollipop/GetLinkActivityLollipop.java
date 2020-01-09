@@ -2,9 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,29 +11,19 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -45,6 +33,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class GetLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface {
@@ -65,7 +57,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	ActionBar aB;
 	Toolbar tB;
 
-	public int visibleFragment= Constants.COPYRIGHT_FRAGMENT;
+	public int visibleFragment= COPYRIGHT_FRAGMENT;
 
 	static GetLinkActivityLollipop getLinkActivity;
 
@@ -84,7 +76,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
+		logDebug("onCreate");
 		super.onCreate(savedInstanceState);
 
 		getLinkActivity = this;
@@ -94,8 +86,8 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		display.getMetrics(outMetrics);
 		density  = getResources().getDisplayMetrics().density;
 
-		scaleW = Util.getScaleW(outMetrics, density);
-		scaleH = Util.getScaleH(outMetrics, density);
+		scaleW = getScaleW(outMetrics, density);
+		scaleH = getScaleH(outMetrics, density);
 
 	    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		if (megaApi == null){
@@ -103,24 +95,24 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
+			logDebug("Refresh session - sdk");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
 			return;
 		}
 
-		if(Util.isChatEnabled()){
+		if(isChatEnabled()){
 			if (megaChatApi == null){
 				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 			}
 
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				log("Refresh session - karere");
+				logDebug("Refresh session - karere");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();
@@ -158,7 +150,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		fragmentContainer = (CoordinatorLayout) findViewById(R.id.get_link_coordinator_layout);
 		tB = (Toolbar) findViewById(R.id.toolbar_get_link);
 		if(tB==null){
-			log("Tb is Null");
+			logWarning("Tb is Null");
 		}
 
 		tB.setVisibility(View.GONE);
@@ -170,34 +162,34 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(selectedNode.isExported()){
 
-			visibleFragment = Constants.GET_LINK_FRAGMENT;
+			visibleFragment = GET_LINK_FRAGMENT;
 		}
 		else{
 
 			ArrayList<MegaNode> nodeLinks = megaApi.getPublicLinks();
 			if(nodeLinks==null){
 				boolean showCopyright = Boolean.parseBoolean(dbH.getShowCopyright());
-				log("No public links: showCopyright = "+showCopyright);
+				logDebug("No public links: showCopyright = " + showCopyright);
 				if(showCopyright){
-					visibleFragment = Constants.COPYRIGHT_FRAGMENT;
+					visibleFragment = COPYRIGHT_FRAGMENT;
 				}
 				else{
-					visibleFragment = Constants.GET_LINK_FRAGMENT;
+					visibleFragment = GET_LINK_FRAGMENT;
 				}
 			}
 			else{
 				if(nodeLinks.size()==0){
 					boolean showCopyright = Boolean.parseBoolean(dbH.getShowCopyright());
-					log("No public links: showCopyright = "+showCopyright);
+					logDebug("No public links: showCopyright = " + showCopyright);
 					if(showCopyright){
-						visibleFragment = Constants.COPYRIGHT_FRAGMENT;
+						visibleFragment = COPYRIGHT_FRAGMENT;
 					}
 					else{
-						visibleFragment = Constants.GET_LINK_FRAGMENT;
+						visibleFragment = GET_LINK_FRAGMENT;
 					}
 				}
 				else{
-					visibleFragment = Constants.GET_LINK_FRAGMENT;
+					visibleFragment = GET_LINK_FRAGMENT;
 				}
 			}
 		}
@@ -218,7 +210,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
     }
 
 	public void sendLink(String link){
-		log("sendLink");
+		logDebug("Link: " + link);
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.setType("text/plain");
 		intent.putExtra(Intent.EXTRA_TEXT, link);
@@ -226,7 +218,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void copyLink(String link){
-		log("copyLink");
+		logDebug("Link: " + link);
 		if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
 			android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 			clipboard.setText(link);
@@ -244,199 +236,34 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 
 	public void showSetPasswordDialog(final String password, final String link){
-		log("showSetPasswordDialog");
-
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.overquota_alert_title));
-		LayoutInflater inflater = getLayoutInflater();
-		View dialoglayout = inflater.inflate(R.layout.dialog_set_password_link, null);
-		builder.setTitle(getString(R.string.set_password_protection_dialog));
-
-		final EditText input1 = (EditText) dialoglayout.findViewById(R.id.first_edit_text);
-		final EditText input2 = (EditText) dialoglayout.findViewById(R.id.second_edit_text);
-
-		if(password!=null){
-			input1.setText(password);
-		}
-
-		input1.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        logDebug("showSetPasswordDialog");
+		SetPasswordDialog.SetPasswordCallback callback = new SetPasswordDialog.SetPasswordCallback() {
 			@Override
-			public void onFocusChange(final View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
+			public void onConfirmed(String password) {
+				if(getLinkFragment != null){
+					getLinkFragment.processingPass();
 				}
+				megaApi.encryptLinkWithPassword(link, password, GetLinkActivityLollipop.this);
 			}
-		});
 
-		final RelativeLayout errorLayout1 = (RelativeLayout) dialoglayout.findViewById(R.id.error_first_edit_layout);
-		final RelativeLayout errorLayout2 = (RelativeLayout) dialoglayout.findViewById(R.id.error_second_edit_layout);
-
-		final TextView textError1 = (TextView) dialoglayout.findViewById(R.id.error_first_edit_text);
-		final TextView textError2 = (TextView) dialoglayout.findViewById(R.id.error_second_edit_text);
-
-		builder.setView(dialoglayout);
-
-
-		builder.setPositiveButton(getString(R.string.button_set), new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-
-			}
-		});
-
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input1.getBackground().clearColorFilter();
-				if(getLinkFragment!=null){
+			public void onCanceled() {
+				if (getLinkFragment != null) {
 					getLinkFragment.enablePassProtection(false);
 				}
 			}
-		});
+		};
 
-		input1.getBackground().mutate().clearColorFilter();
-		input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		input1.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(errorLayout1.getVisibility() == View.VISIBLE){
-					errorLayout1.setVisibility(View.GONE);
-					input1.getBackground().mutate().clearColorFilter();
-					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getLinkActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input2.getBackground().mutate().clearColorFilter();
-		input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		input2.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(errorLayout2.getVisibility() == View.VISIBLE){
-					errorLayout2.setVisibility(View.GONE);
-					input2.getBackground().mutate().clearColorFilter();
-					input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input1.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-										  KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_NEXT) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						errorLayout1.setVisibility(View.VISIBLE);
-						input1.requestFocus();
-						return true;
-					}
-					else{
-						input2.requestFocus();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-		passwordDialog = builder.create();
-		passwordDialog.show();
-		passwordDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				boolean proceedInput1 = false;
-				boolean proceedInput2 = false;
-				String value1 = input1.getText().toString();
-				if (value1.trim().length() != 0) {
-					proceedInput1 = true;
-				}
-
-				String value2 = input2.getText().toString();
-				if (value2.trim().length() != 0) {
-					proceedInput2 = true;
-				}
-
-				if(proceedInput1&&proceedInput2){
-					log("Check are equal");
-					if(value1.equals(value2)){
-						log("Proceed to set pass");
-						getLinkFragment.processingPass();
-						megaApi.encryptLinkWithPassword(link, value2, getLinkActivity);
-						passwordDialog.dismiss();
-					}
-					else{
-						input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						errorLayout2.setVisibility(View.VISIBLE);
-						textError2.setText(getString(R.string.error_passwords_dont_match));
-						input2.requestFocus();
-					}
-				}
-				else if(!proceedInput1&&proceedInput2){
-					log("Error on pass1");
-					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					errorLayout1.setVisibility(View.VISIBLE);
-					input1.requestFocus();
-				}
-				else if(!proceedInput2&&proceedInput1){
-					log("Error on pass2");
-					input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					errorLayout2.setVisibility(View.VISIBLE);
-					input2.requestFocus();
-				}
-				else{
-					log("Error on both");
-					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					errorLayout1.setVisibility(View.VISIBLE);
-					input1.requestFocus();
-
-					input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					errorLayout2.setVisibility(View.VISIBLE);
-				}
-			}
-		});
-	}
-
-	private void showKeyboardDelayed(final View view) {
-		log("showKeyboardDelayed");
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
+		SetPasswordDialog dialog = new SetPasswordDialog(this, callback, megaApi);
+		dialog.show();
 	}
 
 	public void showFragment(int visibleFragment){
-		log("showFragment: "+visibleFragment);
+		logDebug("visibleFragment: " + visibleFragment);
 		this.visibleFragment = visibleFragment;
 		switch (visibleFragment){
-			case Constants.GET_LINK_FRAGMENT:{
-				log("show GET_LINK_FRAGMENT");
+			case GET_LINK_FRAGMENT:{
+				logDebug("Show GET_LINK_FRAGMENT");
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					Window window = this.getWindow();
@@ -467,8 +294,8 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 				break;
 			}
-			case Constants.COPYRIGHT_FRAGMENT:{
-				log("Show COPYRIGHT_FRAGMENT");
+			case COPYRIGHT_FRAGMENT:{
+				logDebug("Show COPYRIGHT_FRAGMENT");
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					Window window = this.getWindow();
@@ -495,7 +322,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onResume() {
-		log("onResume");
+		logDebug("onResume");
 		super.onResume();
 	}
 
@@ -511,10 +338,10 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish");
+		logDebug("onRequestFinish");
 
 		if (e.getErrorCode() == MegaError.API_OK) {
-			log("link: " + request.getLink());
+			logDebug("link: " + request.getLink());
 			
 			//for megaApi.encryptLinkWithPassword() case, request.getNodeHandle() returns -1 and cause selectedNode set to null
 			long handle = request.getNodeHandle();
@@ -530,7 +357,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		} else {
-			log("Error: " + e.getErrorString());
+			logWarning("Error: " + e.getErrorString());
 			showSnackbar(getString(R.string.context_no_link));
 		}
 	}
@@ -539,9 +366,4 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
 	}
-
-	public static void log(String message) {
-		Util.log("GetLinkActivityLollipop", message);
-	}
-
 }

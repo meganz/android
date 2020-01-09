@@ -64,6 +64,8 @@
 
     <string name="error_general_nodes" context="Error getting the root node">ผิดพลาด กรุณาลองใหม่อีกครั้ง</string>
 
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">ไม่มีโฟลเดอร์มีเดียสำรองอยู่ กรุณาเลือกโฟลเดอร์ใหม่</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">ไม่พบที่เก็บข้อมูลภายนอก</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">โฟลเดอร์นี้อ่านอย่างเดียว คุณไม่มีสิทธิ์อัปโหลด</string>
@@ -111,9 +113,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">มุมมองภาพตัวอย่าง</string>
     <string name="action_list" context="Menu item to change from grid view to list view">มุมมองรายการ</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">สำรองคีย์การกู้คืน</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">ลบคีย์การกู้คืน</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">ยกเลิกการสมัครใช้งาน</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">ไฟล์คีย์การกู้คืนถูกนำออกแล้ว</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">การสมัครใช้งานได้ถูกยกเลิกแล้ว</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">เราไม่สามารถยกเลิกการสมัครรับข้อมูลของคุณได้ กรุณาติดต่อ support&#64;mega.nz เพื่อขอความช่วยเหลือ</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">ปิดเซสชั่นอื่นๆ</string>
@@ -191,6 +191,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">เปิดใช้งานบัญชี</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">กำลังเตรียมการรายการไฟล์</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">กรุณาลงชื่อเข้าใช้เพื่อแชร์กับ MEGA</string>
+    <string name="reg_link_expired" context="This toast message is shown on the login page when an email confirm link is no longer valid.">ลิงก์ยืนยันของคุณใช้ไม่ได้อีกต่อไป บัญชีของคุณอาจถูกเปิดใช้งานหรือคุณอาจยกเลิกการลงทะเบียนแล้ว</string>
     <!--
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
@@ -231,6 +232,7 @@
     <string name="cancel_all_transfer_confirmation">ลบการถ่ายโอนทั้งหมดหรือไม่</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">คลาวด์ไดรฟ์</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">เมื่อเร็ว ๆ นี้</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">การอัปโหลดมีเดีย</string>
     <string name="section_inbox" context="title of the screen that show the inbox">กล่องขาเข้า</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">บันทึกออฟไลน์</string>
@@ -611,6 +613,7 @@
     -->
 
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">ยังไม่ได้ดาวน์โหลดตัวอย่าง กรุณารอสักครู่</string>
+    <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">The preview is not able to load due to insufficient memory available. Please try again later.</string>
 
     <string name="log_out_warning" context="alert when clicking a newsignup link being logged">กรุณาออกจากระบบก่อนที่จะสร้างบัญชี</string>
 
@@ -631,7 +634,7 @@
     <string name="menu_take_picture" context="menu item">ถ่ายภาพ</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi เท่านั้น</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลเครือข่ายโทรศัพท์</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลมือถือ</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">ตกลง</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">ข้าม</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">หยุด</string>
@@ -687,7 +690,7 @@
     <string name="settings_empty_folder" context="settings option">เลือกโฟลเดอร์</string>
 
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลเครือข่ายโทรศัพท์</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลมือถือ</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi เท่านั้น</item>
     </string-array>
 
@@ -931,6 +934,9 @@
 
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">ผิดพลาด ชื่อบัญชีนี้ได้ถูกใช้งานไปแล้ว</string>
 
+    <string name="mail_changed_confirm_requested" context="Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address">คุณมีการยืนยันลิงก์คำขอสำหรับอีเมลแล้ว</string>
+
+    <string name="mail_same_as_old" context="Error shown when the user tries to change his mail while the email is the same as the old">อีเมลใหม่และอีเมลเก่าต้องไม่ตรงกัน</string>
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">นี่เป็นขั้นตอนสุดท้ายในการเปลี่ยนอีเมลของคุณ กรุณากรอกรหัสผ่านของคุณด้านล่าง</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">เปลี่ยนอีเมล</string>
 
@@ -2320,7 +2326,7 @@
     <string name="call_started_messages" context="Message shown when a call starts.">เริ่มการโทร</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">ข้อผิดพลาดคีย์ SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA ไม่สามารถเชื่อมต่ออย่างปลอดภัยผ่าน SSL คุณอาจใช้ WiFi สาธารณะร่วมกับข้อกำหนดเพิ่มเติมอย่างอื่น</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public Wi-Fi with additional requirements.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]ไม่มี [/B][A]แจ้งเตือน[/A][B][/B]</string>
 
@@ -2517,6 +2523,21 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">รอไฟล์ %d ไฟล์</item>
 	</plurals>
 
+    <string name="recents_label" context="Label to reference a recents section">เมื่อเร็ว ๆ นี้</string>
+    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">รูปภาพ 1 ภาพและวิดีโอ 1 รายการ</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">ฉัน</string>
+
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 
@@ -2524,4 +2545,7 @@
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">กำลังโหลด</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">กรุณารอสักครู่&#8230;</string>
+
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">ส่งแล้ว %s ผู้ติดต่อ</string>
 </resources>
