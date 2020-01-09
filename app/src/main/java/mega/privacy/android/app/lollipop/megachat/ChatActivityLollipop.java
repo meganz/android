@@ -2413,12 +2413,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 //After storage authorization, resume unfinished download
                 if (checkPermissionWriteStorage(REQUEST_WRITE_STORAGE)) {
                     ArrayList<MegaNodeList> list = new ArrayList<>();
-                    for (int i = 0; i < preservedMessagesSelected.size(); i++) {
-                        MegaNodeList megaNodeList = preservedMessagesSelected.get(i).getMessage().getMegaNodeList();
-                        list.add(megaNodeList);
+                    if(list != null && !list.isEmpty()) {
+                        for (int i = 0; i < preservedMessagesSelected.size(); i++) {
+                            MegaNodeList megaNodeList = preservedMessagesSelected.get(i).getMessage().getMegaNodeList();
+                            list.add(megaNodeList);
+                        }
+                        chatC.prepareForChatDownload(list);
+                        preservedMessagesSelected = null;
                     }
-                    chatC.prepareForChatDownload(list);
-                    preservedMessagesSelected = null;
                 }
                 break;
             }
