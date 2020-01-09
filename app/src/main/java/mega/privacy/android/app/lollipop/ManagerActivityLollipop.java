@@ -144,6 +144,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
+import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
@@ -255,12 +256,13 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 
 public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
-			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
+        NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener {
 
     private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
     public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
@@ -1641,7 +1643,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									REQUEST_WRITE_STORAGE);
 		        		}
 		        		else{
-		        			this.takePicture();
+		        			takePicture(this);
 							typesCameraPermission = -1;
 		        		}
 		        	}
@@ -1689,7 +1691,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
 							}
 							else{
-								this.takePicture();
+								takePicture(this);
 								typesCameraPermission = -1;
 							}
 						}
@@ -1716,7 +1718,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									REQUEST_CAMERA);
 						}
 						else{
-							this.takePicture();
+							takePicture(this);
 							typesCameraPermission = -1;
 						}
 					}
@@ -3886,7 +3888,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     			}
     			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
 					logDebug("Intent take selfie");
-    				takePicture();
+    				takePicture(this);
     			}
 				else if (intent.getAction().equals(SHOW_REPEATED_UPLOAD)){
 					logDebug("Intent SHOW_REPEATED_UPLOAD");
@@ -7884,11 +7886,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 
 					if (hasStoragePermission && hasCameraPermission){
-						this.takePicture();
+						takePicture(this);
 					}
 				}
 		    	else{
-		    		this.takePicture();
+		    		takePicture(this);
 		    	}
 
 		    	return true;
@@ -10257,22 +10259,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void takePicture(){
-		logDebug("takePicture");
-        File newFile = buildTempFile(this, "picture.jpg");
-        try {
-        	newFile.createNewFile();
-        } catch (IOException e) {}
-
-        //This method is in the v4 support library, so can be applied to all devices
-		Uri outputFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, newFile);
-
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-		cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
-	}
-
 	public void checkPermissions(){
 		logDebug("checkPermissionsCall");
 
@@ -10451,16 +10437,41 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	}
 
-	public void showNewFolderDialog(){
+	@Override
+	public void uploadFromDevice() {
+		chooseFromDevice(this);
+	}
+
+	@Override
+	public void uploadFromSystem() {
+		chooseFromSystem(this);
+	}
+
+	@Override
+	public void takePictureAndUpload() {
+		if (!hasPermissions(this, Manifest.permission.CAMERA)) {
+			setTypesCameraPermission(TAKE_PICTURE_OPTION);
+			requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
+			return;
+		}
+		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+			return;
+		}
+		takePicture(this);
+	}
+
+	@Override
+	public void showNewFolderDialog() {
 		logDebug("showNewFolderDialogKitLollipop");
 
 		LinearLayout layout = new LinearLayout(this);
-	    layout.setOrientation(LinearLayout.VERTICAL);
-	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
-	    final EditText input = new EditText(this);
-	    layout.addView(input, params);
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
 
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
@@ -10484,9 +10495,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
 		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
+		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
@@ -10508,7 +10519,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
+				if (error_layout.getVisibility() == View.VISIBLE) {
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
 					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
@@ -10516,15 +10527,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 
-//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_folder_name));
-//		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
@@ -10533,15 +10542,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
 
-					}else{
-						boolean result=matches(regex, value);
-						if(result){
+					} else {
+						boolean result = matches(regex, value);
+						if (result) {
 							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 							textError.setText(getString(R.string.invalid_characters));
 							error_layout.setVisibility(View.VISIBLE);
 							input.requestFocus();
 
-						}else{
+						} else {
 							createFolder(value);
 							newFolderDialog.dismiss();
 						}
@@ -10551,7 +10560,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				return false;
 			}
 		});
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+		input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -10582,33 +10591,29 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
-		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
+		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
+				 if (value.length() == 0) {
 					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
 
-				}else{
-					boolean result=matches(regex, value);
-					if(result){
+				} else {
+					boolean result = matches(regex, value);
+					if (result) {
 						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_characters));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
 
-					}else{
+					} else {
 						createFolder(value);
 						newFolderDialog.dismiss();
 					}
 				}
-
-
 			}
 		});
 	}
@@ -11833,17 +11838,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
-	public void showUploadPanel(){
+	public void showUploadPanel() {
 		logDebug("showUploadPanel");
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			ActivityCompat.requestPermissions(this,
-					new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-					REQUEST_READ_WRITE_STORAGE);
-			return;
+		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+		} else {
+			onGetReadWritePermission();
 		}
-
-		onGetReadWritePermission();
 	}
 
 	private void onGetReadWritePermission(){
@@ -13121,32 +13122,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}catch (Exception e){}
 			}
 		}
-		else if (requestCode == TAKE_PHOTO_CODE){
+		else if (requestCode == TAKE_PHOTO_CODE) {
 			logDebug("TAKE_PHOTO_CODE");
-
-			if(resultCode == Activity.RESULT_OK){
-				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
-				if (!isFileAvailable(imgFile)) {
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error), -1);
-					return;
-				}
-
-				String name = getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-				File newFile = buildTempFile(this, name);
-				imgFile.renameTo(newFile);
-
-				uploadTakePicture(newFile.getAbsolutePath());
-			}
-			else{
-				logError("TAKE_PHOTO_CODE ---> ERROR!");
-			}
-
-	    }
+            if (resultCode == Activity.RESULT_OK) {
+                uploadTakePicture(this, getCurrentParentHandle(), megaApi);
+            } else {
+                logWarning("TAKE_PHOTO_CODE--->ERROR!");
+            }
+		}
 		else if (requestCode == TAKE_PICTURE_PROFILE_CODE){
 			logDebug("TAKE_PICTURE_PROFILE_CODE");
 
 			if(resultCode == Activity.RESULT_OK){
-
 				String myEmail =  megaApi.getMyUser().getEmail();
 				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
 				if (!isFileAvailable(imgFile)) {
@@ -17285,27 +17272,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		catch (Exception ex) {}
 	}
 
-	public void uploadTakePicture(String imagePath){
-
-		MegaNode parentNode = null;
-
-		if (getTabItemCloud() == CLOUD_TAB && isCloudAdded() && parentHandleBrowser != -1) {
-			parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
-		}
-
-		if (parentNode == null) {
-			parentNode = megaApi.getRootNode();
-		}
-
-		Intent intent = new Intent(this, UploadService.class);
-		File selfie = new File(imagePath);
-		intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
-		intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
-		intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-		intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
-		startService(intent);
-	}
-
 	public void changeStatusBarColor(int option) {
 		logDebug("changeStatusBarColor");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -17812,29 +17778,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public boolean checkPermission (String permission) {
-		switch (permission) {
-			case Manifest.permission.WRITE_EXTERNAL_STORAGE: {
-				return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-			}
-			case Manifest.permission.READ_EXTERNAL_STORAGE: {
-				return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-			}
-			case Manifest.permission.CAMERA: {
-				return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
-			}
-			case Manifest.permission.RECORD_AUDIO: {
-				return ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
-			}
-			//case Manifest.permission.WRITE_CALL_LOG: {
-			//	return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED;
-			//}
-			case Manifest.permission.READ_CONTACTS: {
-				return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;
-			}
-			default: {
-				return false;
-			}
+	public boolean checkPermission(String permission) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+			return true;
+		}
+
+		try {
+			return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+		} catch (IllegalArgumentException ex) {
+			logWarning("IllegalArgument Exception is thrown");
+			return false;
 		}
 	}
 
@@ -18102,6 +18055,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			int inProgress = totalTransfers - pendingTransfers + 1;
+
 			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers, totalTransfers, inProgress, totalTransfers);
 			transfersNumberText.setText(progressText);
 		} else {

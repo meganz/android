@@ -39,7 +39,6 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     
     RecyclerView listView;
     Button moreButton;
-    MegaNodeAdapter adapter;
     Stack<Long> parentHandleStack = new Stack<Long>();
     final int MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED = 5;
     private ActionMode actionMode;
@@ -97,7 +96,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(handler != null) {
+        if (handler != null) {
             handler.removeCallbacksAndMessages(null);
         }
     }
@@ -213,7 +212,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         }
     }
     
-    private void updateActionModeTitle() {
+    protected void updateActionModeTitle() {
         if (actionMode == null) {
             return;
         }
