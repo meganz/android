@@ -47,7 +47,7 @@
                 android:textSize="16sp" />
 
             <ImageView
-                android:id="@+id/file_list_taken_down"
+                android:id="@+id/photo_sync_list_taken_down"
                 style="@style/taken_down_icon"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="6dp"

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -18,7 +17,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -31,9 +29,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop.PhotoSyncHolder;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
@@ -43,38 +41,25 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList> implements OnClickListener, SectionTitleProvider, View.OnLongClickListener {
 
-	private class Media {
-		public String filePath;
-		public long timestamp;
-	}
-	public static final int ITEM_VIEW_TYPE_NODE= 0;
-	public static final int ITEM_VIEW_TYPE_MONTH = 1;
+	private static final int ITEM_VIEW_TYPE_NODE= 0;
+	private static final int ITEM_VIEW_TYPE_MONTH = 1;
 
 	private SparseBooleanArray selectedItems = new SparseBooleanArray();;
 	
-	ViewHolderPhotoSyncList holder = null;
+	private ViewHolderPhotoSyncList holder = null;
 
 	Context context;
-	MegaApplication app;
-	MegaApiAndroid megaApi;
+	private MegaApiAndroid megaApi;
 
-	ArrayList<PhotoSyncHolder> nodesArray;
-	ArrayList<MegaNode> nodes;
+	private ArrayList<PhotoSyncHolder> nodesArray;
 	
-	long photosyncHandle = -1;
+	private long photoSyncHandle;
 	
 	RecyclerView listFragment;
-	ImageView emptyImageViewFragment;
-	LinearLayout emptyTextViewFragment;
-	ActionBar aB;
-	
 	boolean multipleSelect;
-
-	
-	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
 	Object fragment;
-	int type = CAMERA_UPLOAD_ADAPTER;
+	private int type;
 	
 	/*public static view holder class*/
     public static class ViewHolderPhotoSyncList extends RecyclerView.ViewHolder {
@@ -93,30 +78,20 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
     	public long document;
     }
 	
-	public MegaPhotoSyncListAdapterLollipop(Context _context, ArrayList<PhotoSyncHolder> _nodesArray, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, Object fragment, int type) {
+	public MegaPhotoSyncListAdapterLollipop(Context _context, ArrayList<PhotoSyncHolder> _nodesArray, long _photosyncHandle, RecyclerView listView, Object fragment, int type) {
 		this.context = _context;
 		this.nodesArray = _nodesArray;
-		this.photosyncHandle = _photosyncHandle;
-		this.nodes = _nodes;
-		
+		this.photoSyncHandle = _photosyncHandle;
 		this.listFragment = listView;
-		this.emptyImageViewFragment = emptyImageView;
-		this.emptyTextViewFragment = emptyTextView;
-		this.aB = aB;
 		this.fragment = fragment;
 		this.type = type;
-		
-		
 		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+			megaApi = MegaApplication.getInstance().getMegaApi();
 		}
-		
-		this.app = ((MegaApplication) ((Activity) context).getApplication());
 	}
 	
 	public void setNodes(ArrayList<PhotoSyncHolder> nodesArray, ArrayList<MegaNode> nodes){
 		this.nodesArray = nodesArray;
-		this.nodes = nodes;
 		notifyDataSetChanged();
 	}
 
@@ -137,7 +112,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	}
 	
 	public void setPhotoSyncHandle(long photoSyncHandle){
-		this.photosyncHandle = photoSyncHandle;
+		this.photoSyncHandle = photoSyncHandle;
 		notifyDataSetChanged();
 	}
 
@@ -183,18 +158,6 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			}
 		}		
 	}
-	
-	/*
-	 * Get document at specified position
-	 */
-	public PhotoSyncHolder getDocumentAt(int position) {
-		try {
-			if(nodesArray != null){
-				return nodesArray.get(position);
-			}
-		} catch (IndexOutOfBoundsException e) {}
-		return null;
-	}
 		
 	public boolean isMultipleSelect() {
 		return multipleSelect;
@@ -205,29 +168,22 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			this.multipleSelect = multipleSelect;
 			notifyDataSetChanged();
 		}
-		
-//		if(this.multipleSelect){
-//			selectedItems = new SparseBooleanArray();
-//		}
-	}
-	
-	public void setOrder(int orderGetChildren){
-		this.orderGetChildren = orderGetChildren;
 	}
 	
 	public long getPhotoSyncHandle(){
-		return photosyncHandle;
+		return photoSyncHandle;
 	}
 	
 	/*
 	 * Get document at specified position
 	 */
-	public PhotoSyncHolder getNodeAt(int position) {
+	private PhotoSyncHolder getNodeAt(int position) {
 		try {
 			if (nodesArray != null) {
 				return nodesArray.get(position);
 			}
 		} catch (IndexOutOfBoundsException e) {
+			logError("Exception happens: " + e.toString());
 		}
 		return null;
 	}
@@ -239,7 +195,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		ArrayList<PhotoSyncHolder> nodes = new ArrayList<PhotoSyncHolder>();
 		
 		for (int i = 0; i < selectedItems.size(); i++) {
-			if (selectedItems.valueAt(i) == true) {
+			if (selectedItems.valueAt(i)) {
 				PhotoSyncHolder document = getNodeAt(selectedItems.keyAt(i));
 				if (document != null){
 					if(document.isNode ){
@@ -252,7 +208,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		return nodes;
 	}
 
-	boolean putOrDeletePosition (int pos) {
+	private boolean putOrDeletePosition (int pos) {
 		if (selectedItems.get(pos, false)) {
 			logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
@@ -349,10 +305,6 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
-		float density = ((Activity) context).getResources().getDisplayMetrics().density;
-
-		float scaleW = getScaleW(outMetrics, density);
-		float scaleH = getScaleH(outMetrics, density);
 
 		holder.currentPosition = position;
 		
@@ -372,7 +324,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		if (psh.isNode){
 			MegaNode node = megaApi.getNodeByHandle(psh.handle);
 			holder.document = node.getHandle();
-			Bitmap thumb = null;
+			Bitmap thumb;
 			
 			holder.textViewFileName.setText(node.getName());
 			holder.monthLayout.setVisibility(View.GONE);
@@ -414,6 +366,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 								try {
 									thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, this);
 								} catch (Exception e) {
+									logError("Exception happens: " + e.toString());
 								} //Too many AsyncTasks
 
 								if (thumb != null) {
@@ -436,6 +389,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 								try {
 									ThumbnailUtilsLollipop.createThumbnailPhotoSyncList(context, node, holder, megaApi, this);
 								} catch (Exception e) {
+									logError("Exception happens: " + e.toString());
 								} //Too many AsyncTasks
 							}
 						}
@@ -460,9 +414,6 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			return ITEM_VIEW_TYPE_MONTH;
 		}
 	}
-//	private MegaNode getItemNode(int position) {
-//		return nodes.get(position);
-//	}
 
 	@Override
 	public String getSectionTitle(int position) {
@@ -481,20 +432,16 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
-		float density = ((Activity) context).getResources().getDisplayMetrics().density;
-
-		float scaleW = getScaleW(outMetrics, density);
-		float scaleH = getScaleH(outMetrics, density);
 
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_photo_sync_list, parent, false);
 		
 		holder = new ViewHolderPhotoSyncList(v);
-		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.photo_sync_list_item_layout);
-		holder.monthLayout = (RelativeLayout) v.findViewById(R.id.photo_sync_list_month_layout);
-		holder.monthTextView = (TextView) v.findViewById(R.id.photo_sync_list_month_name);
-		holder.imageView = (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
-		holder.textViewFileName = (TextView) v.findViewById(R.id.photo_sync_list_filename);
-		holder.textViewFileSize = (TextView) v.findViewById(R.id.photo_sync_list_filesize);
+		holder.itemLayout = v.findViewById(R.id.photo_sync_list_item_layout);
+		holder.monthLayout = v.findViewById(R.id.photo_sync_list_month_layout);
+		holder.monthTextView = v.findViewById(R.id.photo_sync_list_month_name);
+		holder.imageView = v.findViewById(R.id.photo_sync_list_thumbnail);
+		holder.textViewFileName = v.findViewById(R.id.photo_sync_list_filename);
+		holder.textViewFileSize = v.findViewById(R.id.photo_sync_list_filesize);
 		
 		v.setTag(holder);
 		holder.itemLayout.setTag(holder);
