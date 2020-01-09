@@ -2844,19 +2844,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
     public void setSDCardUri (String sdCardUri){
-        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-        ContentValues values = new ContentValues();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()){
-            String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SD_CARD_URI + "= '" + encrypt(sdCardUri) + "' WHERE " + KEY_ID + " = '1'";
-            db.execSQL(UPDATE_PREFERENCES_TABLE);
-            logDebug("KEY_URI_EXTERNAL_SD_CARD URI: " + UPDATE_PREFERENCES_TABLE);
-        }
-        else{
-            values.put(KEY_SD_CARD_URI, encrypt(sdCardUri));
-            db.insert(TABLE_PREFERENCES, null, values);
-        }
-        cursor.close();
+        setStringValue(TABLE_PREFERENCES, KEY_SD_CARD_URI, sdCardUri);
     }
 
 	public void setCameraFolderExternalSDCard (boolean cameraFolderExternalSDCard){
@@ -3795,14 +3783,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public String getSDCardUri(){
-        String selectQuery = "SELECT " + KEY_SD_CARD_URI + " FROM " + TABLE_PREFERENCES + " WHERE " + KEY_ID + " = '1'";
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()){
-            String uri = decrypt(cursor.getString(0));
-            return uri;
-        }
-        cursor.close();
-        return "";
+        return getStringValue(TABLE_PREFERENCES, KEY_SD_CARD_URI, "");
     }
 
     public void setAutoPlayEnabled(String enabled){
