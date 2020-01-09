@@ -1,207 +1,92 @@
- <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    	android:layout_width="match_parent"
-	 	android:layout_height="wrap_content"
-	 	android:descendantFocusability="blocksDescendants"
-	    android:id="@+id/photo_sync_large_layout" >
-	    
-		<RelativeLayout
-		    android:layout_width="match_parent"
-			android:layout_height="72dp"
-		    android:descendantFocusability="blocksDescendants"
-		    android:id="@+id/photo_sync_list_item_layout"
-		    android:background="@drawable/statelist_item_layout">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/photo_sync_large_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants">
 
-			<RelativeLayout
-				android:layout_width="48dp"
-				android:layout_height="48dp"
-				android:layout_marginLeft="12dp"
-				android:layout_marginRight="18dp"
-				android:layout_centerVertical="true"
-				android:id="@+id/container_thumbnail">
+    <RelativeLayout
+        android:id="@+id/photo_sync_list_item_layout"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="@drawable/statelist_item_layout"
+        android:descendantFocusability="blocksDescendants">
 
-				<ImageView
-					android:id="@+id/photo_sync_list_thumbnail"
-					android:layout_width="48dp"
-					android:layout_height="48dp"
-					android:scaleType="fitCenter"
-					android:layout_centerVertical="true"/>
-			</RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/container_thumbnail"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="18dp">
 
-			<LinearLayout
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_toRightOf="@id/container_thumbnail"
-				android:gravity="center_vertical"
-				android:orientation="vertical">
-				<TextView
-					android:id="@+id/photo_sync_list_filename"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_toRightOf="@id/photo_sync_list_thumbnail"
-					android:layout_centerVertical="true"
-					android:layout_marginTop="15dp"
-					android:textColor="@color/file_list_first_row"
-					android:ellipsize="middle"
-					android:maxLines="1"
-					android:singleLine="true"
-					android:textSize="16sp" />
+            <ImageView
+                android:id="@+id/photo_sync_list_thumbnail"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerVertical="true"
+                android:scaleType="fitCenter"
+                tools:ignore="ContentDescription" />
+        </RelativeLayout>
 
-				<TextView
-					android:id="@+id/photo_sync_list_filesize"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_below="@+id/photo_sync_list_filename"
-					android:layout_toRightOf="@id/photo_sync_list_thumbnail"
-					android:layout_centerVertical="true"
-					android:textColor="@color/file_list_second_row"
-					android:textSize="14sp"
-					android:ellipsize="end"
-					android:maxLines="1"/>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/container_thumbnail"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
-			</LinearLayout>
-	    
+            <TextView
+                android:id="@+id/photo_sync_list_filename"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="15dp"
+                android:singleLine="true"
+                android:textColor="@color/file_list_first_row"
+                android:textSize="16sp" />
 
+            <ImageView
+                android:id="@+id/file_list_taken_down"
+                style="@style/taken_down_icon"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_toEndOf="@+id/photo_sync_list_filename"
+                android:src="@drawable/ic_input_warning"
+                tools:ignore="ContentDescription" />
 
-	    
-	   <!-- 
-	    <CheckBox
-	        android:id="@+id/photo_sync_list_checkbox"
-	        android:layout_width="wrap_content"
-	        android:layout_height="match_parent"
-	        android:checked="false"
-	        android:focusable="false"
-	        android:layout_centerVertical="true"
-	        android:button="@drawable/btn_check_holo_light" />
-	    
-	    <ImageView
-	        android:id="@+id/photo_sync_list_thumbnail"
-	        android:layout_width="60dp"
-	        android:layout_height="60dp"
-	        android:layout_marginLeft="5dp" 
-	        android:scaleType="fitCenter"
-	        android:layout_toRightOf="@id/photo_sync_list_checkbox" />
-	    
-	    <TextView
-	        android:id="@+id/photo_sync_list_filename"
-	        android:layout_width="225dp"
-	        android:layout_height="30dp"
-	        android:layout_toRightOf="@id/photo_sync_list_thumbnail"
-	        android:paddingLeft="3dp"
-	        android:paddingTop="7dp"
-	        android:singleLine="false" />
-	    
-	    <TextView
-	        android:id="@+id/photo_sync_list_filesize"
-	        android:layout_width="wrap_content"
-	        android:layout_height="30dp"
-	        android:layout_toRightOf="@id/photo_sync_list_thumbnail"
-	        android:layout_below="@+id/photo_sync_list_filename"
-	        android:paddingLeft="3dp"
-	        android:paddingBottom="7dp"
-	        android:textColor="@color/file_list_second_row" 
-	        android:textSize="12sp"/>
-	    
-	    <ImageButton 
-	        android:id="@+id/photo_sync_list_three_dots"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:src="@drawable/action_selector_ic"
-			android:background="@null" 
-	        android:layout_alignTop="@id/photo_sync_list_filename"
-	        android:layout_alignParentRight="true"
-			android:paddingTop="25dp"
-	        android:paddingRight="15dp" />
-    
-	    <RelativeLayout
-	        android:id="@+id/photo_sync_list_options"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@id/photo_sync_list_three_dots"
-	        android:padding="0dp"
-	        android:background="#222222">
-	        
-	        <TableLayout
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content">
-	            
-	            <TableRow>
-					<ImageView
-			            android:id="@+id/photo_sync_list_option_download"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_download"
-			            android:layout_gravity="center_vertical"
-			            style="@style/dialogActionButton" />
-	
-			        <ImageView
-			            android:id="@+id/photo_sync_list_option_properties"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_properties"
-			            android:layout_gravity="center_vertical"
-			            style="@style/dialogActionButton" />
-			        
-			        <ImageView
-			            android:id="@+id/photo_sync_list_option_rename"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_rename"
-			            android:layout_gravity="center_vertical"
-			            style="@style/dialogActionButton" />
-			        
-			        <ImageView
-			            android:id="@+id/photo_sync_list_option_copy"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_menu_copy"
-			            android:layout_gravity="center_vertical"
-			            style="@style/dialogActionButton" />
-			        
-			        <ImageView
-			            android:id="@+id/photo_sync_list_option_move"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_menu_move"
-			            android:layout_gravity="center_vertical"
-			            style="@style/dialogActionButton" />
-		            
-			        <ImageView
-			            android:id="@+id/photo_sync_list_option_public_link"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_share"
-			            android:layout_gravity="center_vertical" 
-			            style="@style/dialogActionButton" />
-		        
-			        <ImageView
-			            android:id="@+id/photo_sync_list_option_delete"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_rubbish_bin"
-			            android:layout_gravity="center_vertical" 
-			            style="@style/dialogActionButton" />
-		        </TableRow>        
-	        </TableLayout>
-	    </RelativeLayout>
-    -->
+            <TextView
+                android:id="@+id/photo_sync_list_filesize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/photo_sync_list_filename"
+                android:layout_alignParentStart="true"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/file_list_second_row"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
     </RelativeLayout>
 
-	 <RelativeLayout
-		 android:layout_width="match_parent"
-		 android:layout_height="36dp"
-		 android:descendantFocusability="blocksDescendants"
-		 android:id="@+id/photo_sync_list_month_layout">
-		 <TextView
-			 android:id="@+id/photo_sync_list_month_name"
-			 android:layout_width="match_parent"
-			 android:layout_height="wrap_content"
-			 android:layout_marginLeft="16dp"
-			 android:singleLine="false"
-			 android:textColor="@color/name_my_account"
-			 android:fontFamily="roboto"
-			 android:textSize="12sp"
-			 android:layout_centerVertical="true"/>
-	 </RelativeLayout>
-    
+    <RelativeLayout
+        android:id="@+id/photo_sync_list_month_layout"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:descendantFocusability="blocksDescendants">
+
+        <TextView
+            android:id="@+id/photo_sync_list_month_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:fontFamily="roboto"
+            android:singleLine="false"
+            android:textColor="@color/name_my_account"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
 </RelativeLayout>
 

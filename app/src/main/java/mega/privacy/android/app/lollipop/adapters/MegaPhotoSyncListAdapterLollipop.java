@@ -494,12 +494,9 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		holder.monthTextView = (TextView) v.findViewById(R.id.photo_sync_list_month_name);
 		holder.imageView = (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
 		holder.textViewFileName = (TextView) v.findViewById(R.id.photo_sync_list_filename);
-		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = px2dp((225*scaleW), outMetrics);
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.photo_sync_list_filesize);
 		
 		v.setTag(holder);
-		
 		holder.itemLayout.setTag(holder);
 		holder.itemLayout.setOnClickListener(this);
 		holder.itemLayout.setOnLongClickListener(this);

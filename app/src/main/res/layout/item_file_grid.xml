@@ -48,16 +48,12 @@
 
             <ImageView
                 android:id="@+id/file_grid_taken_down"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                style="@style/taken_down_icon"
                 android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
                 android:layout_marginStart="6dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="22dp"
-                android:background="@null"
                 android:src="@drawable/ic_input_warning"
-                android:tint="@color/login_warning"
                 tools:ignore="ContentDescription" />
 
             <ImageButton
@@ -171,16 +167,12 @@
 
             <ImageView
                 android:id="@+id/file_grid_taken_down_for_file"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                style="@style/taken_down_icon"
                 android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
                 android:layout_marginStart="6dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="22dp"
-                android:background="@null"
                 android:src="@drawable/ic_input_warning"
-                android:tint="@color/login_warning"
                 tools:ignore="ContentDescription" />
 
             <ImageButton

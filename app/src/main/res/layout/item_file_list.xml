@@ -89,9 +89,9 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="3dp"
+            android:layout_marginStart="3dp"
             android:layout_marginTop="6dp"
-            android:layout_marginRight="6dp"
+            android:layout_marginEnd="6dp"
             android:layout_toEndOf="@+id/file_list_filename"
             android:alpha="0.35"
             android:background="@null"
@@ -100,17 +100,12 @@
 
         <ImageView
             android:id="@+id/file_list_taken_down"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
+            style="@style/taken_down_icon"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="6dp"
-            android:layout_marginRight="6dp"
+            android:layout_marginEnd="6dp"
             android:layout_toEndOf="@+id/file_list_filename"
-            android:background="@null"
             android:src="@drawable/ic_input_warning"
-            android:tint="@color/login_warning"
-            android:visibility="gone"
             tools:ignore="ContentDescription" />
 
     </RelativeLayout>
