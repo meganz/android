@@ -11984,18 +11984,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	public void selectSortByOffline(int _orderOthers){
+	public void selectSortByOffline(int _orderCloud){
 		logDebug("selectSortByOffline");
 
-		if (_orderOthers == orderOthers) {
+		if (_orderCloud == orderCloud) {
 			return;
 		}
 
-		this.orderOthers = _orderOthers;
-		this.setOrderOthers(orderOthers);
+		this.orderCloud = _orderCloud;
+		this.setOrderCloud(orderCloud);
 		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
 		if (oFLol != null){
-			oFLol.setOrder(orderOthers);
+			oFLol.setOrder(orderCloud);
 		}
 	}
 

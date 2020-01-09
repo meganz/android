@@ -506,7 +506,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		if (pathNavigationOffline != null) {
 			pathNavigation = pathNavigationOffline;
 		}
-		orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
+		orderGetChildren = ((ManagerActivityLollipop)context).orderCloud;
 
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();

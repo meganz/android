@@ -110,10 +110,6 @@ public class SorterContentActivity extends PinActivityLollipop {
 
                     break;
                 }
-                case SAVED_FOR_OFFLINE: {
-                    order = ((ManagerActivityLollipop) context).getOrderOthers();
-                    break;
-                }
                 case SHARED_ITEMS: {
                     int index = ((ManagerActivityLollipop) context).getTabItemShares();
                     if((index==1 && ((ManagerActivityLollipop) context).getParentHandleOutgoing() == -1)
