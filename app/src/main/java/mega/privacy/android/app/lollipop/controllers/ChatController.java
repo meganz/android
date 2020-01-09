@@ -283,7 +283,7 @@ public class ChatController {
     }
 
     public void deleteMessage(MegaChatMessage message, long chatId) {
-        logDebug("Message ID: " + message.getMsgId() + ", Chat ID: " + chatId);
+        logDebug("Message : " + message.getMsgId() + ", Chat ID: " + chatId);
         MegaChatMessage messageToDelete;
         if (message == null) return;
         if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
@@ -295,7 +295,7 @@ public class ChatController {
             return;
         }
 
-        logDebug("Delete normal message");
+        logDebug("Delete normal message with status = "+message.getStatus());
         if(message.getStatus() == MegaChatMessage.STATUS_SENDING){
             messageToDelete = megaChatApi.deleteMessage(chatId, message.getTempId());
         }else{

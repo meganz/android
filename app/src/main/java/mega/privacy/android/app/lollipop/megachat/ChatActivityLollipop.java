@@ -3453,10 +3453,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             if (adapter == null){
-                logWarning("adapter NULL");
                 createAdapter();
             }else{
-                logDebug("adapter is NOT null");
                 adapter.addMessage(messages, index);
                 if(infoToShow== AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL){
                     mLayoutManager.scrollToPositionWithOffset(index, scaleHeightPx(50, outMetrics));
@@ -3595,7 +3593,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     break;
                 }
                 case R.id.chat_cab_menu_delete:{
-                    logDebug("chat_cab_menu_delete ");
                     clearSelections();
                     hideMultipleSelect();
                     //Delete
@@ -3950,7 +3947,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         stopReproductions();
-
                         ChatController cC = new ChatController(chatActivity);
                         cC.deleteAndroidMessages(messages, chat);
                         break;
@@ -4057,7 +4053,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void itemClick(int positionInAdapter, int [] screenPosition) {
-        logDebug("Pposition: " + positionInAdapter);
         int positionInMessages = positionInAdapter-1;
 
         if(positionInMessages < messages.size()){
@@ -4961,9 +4956,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
-        logDebug("onMessageLoaded");
 
         if(msg!=null){
+
             logDebug("STATUS: " + msg.getStatus());
             logDebug("TEMP ID: " + msg.getTempId());
             logDebug("FINAL ID: " + msg.getMsgId());
@@ -5253,6 +5248,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageReceived(MegaChatApiJava api, MegaChatMessage msg) {
+
         logDebug("CHAT CONNECTION STATE: " + api.getChatConnectionState(idChat));
         logDebug("STATUS: " + msg.getStatus());
         logDebug("TEMP ID: " + msg.getTempId());
@@ -5367,17 +5363,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         logDebug("msgID "+ msg.getMsgId());
-
+        logDebug("onMessageUpdate ");
         int resultModify = -1;
         if(msg.isDeleted()){
             if(adapter!=null){
                 adapter.stopPlaying(msg.getMsgId());
             }
-            logDebug("onMessageUpdate: The message has been deleted");
             deleteMessage(msg, false);
             return;
         }
-
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
 
         if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_ACCESS)){
@@ -5544,7 +5538,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void deleteMessage(MegaChatMessage msg, boolean rejected){
-        logDebug("deleteMessage");
         int indexToChange = -1;
 
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
@@ -5563,8 +5556,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
                 else{
-
-                    if ((messageToCheck.getMessage().getMsgId() == msg.getMsgId()) || (messageToCheck.getMessage().getTempId() == msg.getTempId())){
+                    if (messageToCheck.getMessage().getMsgId() == msg.getMsgId() || messageToCheck.getMessage().getTempId() == msg.getTempId()){
                         indexToChange = itr.nextIndex();
                         break;
                     }
@@ -6079,7 +6071,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             createAdapter();
         }else{
 
-            logDebug("Update adapter with last index: "+lastIndex);
             if(lastIndex==0){
                 logDebug("Arrives the first message of the chat");
                 adapter.setMessages(messages);
@@ -6127,7 +6118,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logDebug("Create adapter");
             createAdapter();
         }else{
-            logDebug("Update adapter with last index: "+lastIndex);
             if(lastIndex<0){
                 logDebug("Arrives the first message of the chat");
                 adapter.setMessages(messages);
@@ -6595,12 +6585,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         adapter.removeMessage(selectedPosition, messages);
     }
 
-    public void updatingRemovedMessage(MegaChatMessage message){
-        for(int i=0;i<messages.size();i++){
-            if( messages.get(i).getMessage() != null && messages.get(i).getMessage().getTempId() == message.getTempId() && messages.get(i).getMessage().getMsgId() == message.getMsgId()){
+    public void updatingRemovedMessage(MegaChatMessage message) {
+        for (int i = 0; i < messages.size(); i++) {
+            if (messages.get(i).getMessage() != null && messages.get(i).getMessage().getTempId() == message.getTempId() && messages.get(i).getMessage().getMsgId() == message.getMsgId()) {
                 RemovedMessage msg = new RemovedMessage(messages.get(i).getMessage().getTempId(), messages.get(i).getMessage().getMsgId());
                 removedMessages.add(msg);
-                adapter.notifyItemChanged(i+1);
+                adapter.notifyItemChanged(i + 1);
             }
         }
     }

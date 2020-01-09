@@ -539,7 +539,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
         }
 
-
         listFragment = _listView;
 
         megaChatAdapter = this;
@@ -4064,7 +4063,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
             }
-
             if (message.isEdited()) {
                 logDebug("MY Message is edited");
 
@@ -4079,6 +4077,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageContactLayout.setVisibility(View.GONE);
 
                 int status = message.getStatus();
+
                 if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
                     logDebug("Show triangle retry!");
                     holder.contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
@@ -4091,8 +4090,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.retryAlert.setVisibility(View.GONE);
                 }else{
                     logDebug("Status: "+message.getStatus());
-                    isRemovingTextMessage(holder.contentOwnMessageText, message);
-                    holder.contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
+                    isRemovingTextMessage(position, holder, message);
                     holder.triangleIcon.setVisibility(View.GONE);
                     holder.retryAlert.setVisibility(View.GONE);
                 }
@@ -4150,7 +4148,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
             }else if (message.isDeleted()) {
-                logDebug("Message is deleted");
+                logDebug("MY Message is deleted");
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
                 holder.ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                 holder.ownManagementMessageText.setText(context.getString(R.string.text_deleted_message));
@@ -4190,7 +4188,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 SimpleSpanBuilder ssb = formatText(context, messageContent);
                 int status = message.getStatus();
-
                 if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
                     logDebug("Show triangle retry!");
                     holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.white));
@@ -4206,7 +4203,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 } else {
                     logDebug("Status: " + message.getStatus());
-                    isRemovingTextMessage(holder.contentOwnMessageText, message);
+                    isRemovingTextMessage(position, holder, message);
                     holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.white));
                     holder.triangleIcon.setVisibility(View.GONE);
                     holder.retryAlert.setVisibility(View.GONE);
@@ -8475,21 +8472,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private void isRemovingTextMessage(TextView contentOwnMessageText, MegaChatMessage message){
+    private void isRemovingTextMessage(int pos, ViewHolderMessageChat holder, MegaChatMessage message) {
+        if (isHolderNull(pos, holder)) {
+            return;
+        }
         boolean isRemoved = false;
-        if((removedMessages!=null)&&(removedMessages.size()>0)){
-            for(RemovedMessage removeMsg:removedMessages){
-                if(removeMsg.getMsgId() == message.getMsgId() && removeMsg.getMsgTempId() == message.getTempId()){
+        if (removedMessages != null && removedMessages.size() > 0) {
+            for (RemovedMessage removeMsg : removedMessages) {
+                if (removeMsg.getMsgId() == message.getMsgId() && removeMsg.getMsgTempId() == message.getTempId()) {
                     isRemoved = true;
                     break;
                 }
             }
         }
 
-        if(isRemoved){
-            contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
-        }else{
-            contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
+        if (isRemoved) {
+            holder.contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
+        } else {
+            holder.contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
         }
     }
 
