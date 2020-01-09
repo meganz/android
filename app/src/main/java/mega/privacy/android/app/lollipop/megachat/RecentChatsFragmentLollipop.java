@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
-import android.os.SystemClock;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -63,9 +62,7 @@ import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.IncomingCallNotification;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -336,7 +333,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
         emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
-        emptyTextViewInvite.setWidth(Util.scaleWidthPx(236, outMetrics));
+        emptyTextViewInvite.setWidth(scaleWidthPx(236, outMetrics));
         emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
         emptyImageView = v.findViewById(R.id.empty_image_view_recent);
         emptyImageView.setOnClickListener(this);
@@ -702,7 +699,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     private void addMarginTop() {
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        layoutParams.setMargins(0, Util.scaleHeightPx(60, outMetrics), 0, 0);
+        layoutParams.setMargins(0, scaleHeightPx(60, outMetrics), 0, 0);
         emptyLayoutContainer.setLayoutParams(layoutParams);
     }
 
@@ -823,7 +820,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             case R.id.dismiss_button:
             case R.id.collapse_btn:
                 if(moreContactsTitle.getVisibility() == View.VISIBLE) {
-                    startActivityForResult(new Intent(context, InviteContactActivity.class), Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
+                    startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 } else {
                     if (invitationContainer.getVisibility() == View.VISIBLE) {
                         invitationContainer.setVisibility(View.GONE);
@@ -842,12 +839,12 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 break;
             case R.id.allow_button:
                 logDebug("request contact permission!");
-                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, Constants.REQUEST_READ_CONTACTS);
+                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS);
                 break;
             case R.id.more_contacts_title:
             case R.id.more_contacts:
                 logDebug("to InviteContactActivity");
-                startActivityForResult(new Intent(context, InviteContactActivity.class), Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
+                startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 break;
         }
     }
@@ -1762,7 +1759,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 }
                 break;
             }
-            case Constants.REQUEST_READ_CONTACTS: {
+            case REQUEST_READ_CONTACTS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     logDebug("REQUEST_READ_CONTACTS");
                     grantedContactPermission = true;
@@ -1778,7 +1775,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
             logDebug("onActivityResult REQUEST_INVITE_CONTACT_FROM_DEVICE OK");
         }
         refreshMegaContactsList();
