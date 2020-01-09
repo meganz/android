@@ -104,6 +104,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private String type = "";
 	private boolean isOverquota = false;
 	private long downloadedBytesToOverquota = 0;
+	private MegaNode rootNode;
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -177,7 +178,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
+		rootNode = megaApi.getRootNode();
 	}
 
 	@Override
@@ -198,6 +199,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			megaChatApi.saveCurrentState();
 		}
 
+		rootNode = null;
 		// remove all the generated folders in cache folder on SD card.
         File[] fs = getExternalCacheDirs();
         if (fs.length > 1 && fs[1] != null) {
@@ -260,8 +262,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if (credentials != null) {
 
 			String gSession = credentials.getSession();
-
-			if (megaApi.getRootNode() == null) {
+			if (rootNode == null) {
+				rootNode = megaApi.getRootNode();
 				isLoggingIn = MegaApplication.isLoggingIn();
 				if (!isLoggingIn) {
 					isLoggingIn = true;
@@ -523,7 +525,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
-
+		rootNode = null;
 		int total = megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads();
 		logDebug("onQueueComplete: total of files before reset " + total);
 		if(total <= 0){
@@ -1489,6 +1491,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
+		rootNode = null;
 	}
 
 	@Override
