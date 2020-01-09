@@ -18064,6 +18064,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			int inProgress = totalTransfers - pendingTransfers + 1;
+
 			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers, totalTransfers, inProgress, totalTransfers);
 			transfersNumberText.setText(progressText);
 		} else {
