@@ -1055,11 +1055,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 }
             }
         });
-
-        if (node.isTakenDown()) {
-            optionDownload.setVisibility(View.GONE);
-            optionOffline.setVisibility(View.GONE);
-        }
     }
 
     @Override
