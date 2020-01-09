@@ -77,6 +77,7 @@ import static android.app.Activity.RESULT_OK;
 import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_RECENT;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.IncomingCallNotification.ANDROID_10_Q;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -199,7 +200,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         grantedContactPermission = hasPermissions(context, Manifest.permission.READ_CONTACTS);
         contactGetter = new MegaContactGetter(context);
         contactGetter.setMegaContactUpdater(this);
-        askForDisplayOverDialog = new AskForDisplayOverDialog(context);
+        if(Build.VERSION.SDK_INT >= ANDROID_10_Q) {
+            askForDisplayOverDialog = new AskForDisplayOverDialog(context);
+        }
     }
 
     @Override
@@ -412,7 +415,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         } else {
             bannerContainer.setVisibility(View.GONE);
         }
-        if(IncomingCallNotification.shouldNotify(context) && dbH.shouldAskForDisplayOver()) {
+        if(askForDisplayOverDialog != null && IncomingCallNotification.shouldNotify(context) && dbH.shouldAskForDisplayOver()) {
             askForDisplayOverDialog.showDialog();
         }
         return v;
@@ -1607,7 +1610,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         logDebug("onPause");
         lastFirstVisiblePosition = ((LinearLayoutManager) listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
         MegaApplication.setRecentChatVisible(false);
-        askForDisplayOverDialog.recycle();
+        if (askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.recycle();
+        }
         super.onPause();
     }
 

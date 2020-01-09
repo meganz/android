@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -76,6 +77,7 @@ import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.IncomingCallNotification.ANDROID_10_Q;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -842,7 +844,9 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 			}
 		}
-		askForDisplayOverDialog = new AskForDisplayOverDialog(context);
+        if(Build.VERSION.SDK_INT >= ANDROID_10_Q) {
+            askForDisplayOverDialog = new AskForDisplayOverDialog(context);
+        }
 	}
 
 	public void checkScroll () {
@@ -947,9 +951,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			else if (dialogshown){
 				showAlertDialog(dialogTitleContent, dialogTextContent, success);
 			}
-            if(IncomingCallNotification.shouldNotify(context) && dbH.shouldAskForDisplayOver()) {
-                askForDisplayOverDialog.showDialog();
-            }
+            showAskForDisplayOverDialog();
 			return v;
 		}
 		else{
@@ -1037,17 +1039,23 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			else if (dialogshown){
 				showAlertDialog(dialogTitleContent, dialogTextContent, success);
 			}
-            if(IncomingCallNotification.shouldNotify(context) && dbH.shouldAskForDisplayOver()) {
-                askForDisplayOverDialog.showDialog();
-            }
+            showAskForDisplayOverDialog();
 			return v;
 		}			
 	}
 
+	private void showAskForDisplayOverDialog() {
+        if(askForDisplayOverDialog != null && IncomingCallNotification.shouldNotify(context) && dbH.shouldAskForDisplayOver()) {
+            askForDisplayOverDialog.showDialog();
+        }
+    }
+
     @Override
     public void onPause() {
         super.onPause();
-        askForDisplayOverDialog.recycle();
+        if(askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.recycle();
+        }
     }
 
     public void setContacts(ArrayList<MegaUser> contacts){

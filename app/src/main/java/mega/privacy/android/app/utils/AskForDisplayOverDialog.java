@@ -13,15 +13,12 @@ import android.widget.Toast;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
 
-@TargetApi(IncomingCallNotification.ANDROID_10_Q)
 public class AskForDisplayOverDialog {
-
-    private Context context;
 
     private AlertDialog dialog;
 
+    @TargetApi(IncomingCallNotification.ANDROID_10_Q)
     public AskForDisplayOverDialog(final Context context) {
-        this.context = context;
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
         LayoutInflater inflater = LayoutInflater.from(context);
         final View dialogView = inflater.inflate(R.layout.ask_for_display_over_dialog_layout, null);
@@ -52,6 +49,7 @@ public class AskForDisplayOverDialog {
         }
     }
 
+    @TargetApi(IncomingCallNotification.ANDROID_10_Q)
     public void showDialog() {
         dialog.show();
     }
