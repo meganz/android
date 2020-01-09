@@ -845,7 +845,7 @@
                             android:id="@+id/content_own_message_thumb_landscape"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:maxWidth="350dp"
+                            android:maxWidth="212dp"
                             android:maxHeight="152dp"
                             android:adjustViewBounds="true"
                             android:layout_gravity="center_horizontal|center_vertical"
