@@ -1379,17 +1379,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public boolean shouldAskForDisplayOver() {
-        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-        Cursor cursor = db.rawQuery(selectQuery, null);
         boolean should = true;
-        if (cursor.moveToFirst()){
-            int index = cursor.getColumnIndex(KEY_ASK_FOR_DISPLAY_OVER);
-            String text = decrypt(cursor.getString(index));
-            if(!TextUtils.isEmpty(text)) {
-                should = Boolean.parseBoolean(text);
-            }
+        String text = getStringValue(TABLE_PREFERENCES, KEY_ASK_FOR_DISPLAY_OVER, "");
+        if (!TextUtils.isEmpty(text)) {
+            should = Boolean.parseBoolean(text);
         }
-        cursor.close();
         return should;
     }
 
