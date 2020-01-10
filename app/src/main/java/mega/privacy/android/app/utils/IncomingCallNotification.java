@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
@@ -24,8 +23,8 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static mega.privacy.android.app.utils.Constants.CALL_ID;
-import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.Util.isAndroid10;
 
 public class IncomingCallNotification {
 
@@ -103,7 +102,7 @@ public class IncomingCallNotification {
     }
 
     public static boolean shouldNotify(Context context) {
-        return Build.VERSION.SDK_INT >= ANDROID_10_Q && !Settings.canDrawOverlays(context);
+        return isAndroid10() && !Settings.canDrawOverlays(context);
     }
 
     @Retention(RetentionPolicy.SOURCE)

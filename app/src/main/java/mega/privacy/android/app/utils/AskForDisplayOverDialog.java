@@ -13,13 +13,16 @@ import android.widget.Toast;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
 
+@TargetApi(IncomingCallNotification.ANDROID_10_Q)
 public class AskForDisplayOverDialog {
 
     private AlertDialog dialog;
+    private Context context;
 
-    @TargetApi(IncomingCallNotification.ANDROID_10_Q)
     public AskForDisplayOverDialog(final Context context) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        this.context = context;
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         LayoutInflater inflater = LayoutInflater.from(context);
         final View dialogView = inflater.inflate(R.layout.ask_for_display_over_dialog_layout, null);
         dialogBuilder.setView(dialogView);
@@ -28,8 +31,7 @@ public class AskForDisplayOverDialog {
 
             @Override
             public void onClick(View v) {
-                dialog.cancel();
-                DatabaseHandler.getDbHandler(context).dontAskForDisplayOver();
+                recycle();
                 Toast.makeText(context , R.string.ask_for_display_over_explain, Toast.LENGTH_LONG).show();
             }
         });
@@ -39,7 +41,7 @@ public class AskForDisplayOverDialog {
             public void onClick(View v) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
                 context.startActivity(intent);
-                dialog.cancel();
+                recycle();
             }
         });
         if (dialog == null) {
@@ -49,12 +51,15 @@ public class AskForDisplayOverDialog {
         }
     }
 
-    @TargetApi(IncomingCallNotification.ANDROID_10_Q)
+
     public void showDialog() {
-        dialog.show();
+        if (IncomingCallNotification.shouldNotify(context) && DatabaseHandler.getDbHandler(context).shouldAskForDisplayOver()) {
+            dialog.show();
+        }
     }
 
     public void recycle() {
+        DatabaseHandler.getDbHandler(context).dontAskForDisplayOver();
         dialog.cancel();
     }
 }

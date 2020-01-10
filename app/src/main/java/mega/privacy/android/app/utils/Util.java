@@ -95,6 +95,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.IncomingCallNotification.ANDROID_10_Q;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 
@@ -1837,5 +1838,9 @@ public class Util {
 			aB.setDisplayShowCustomEnabled(false);
 			aB.setDisplayShowTitleEnabled(true);
 		}
+	}
+
+	public static boolean isAndroid10() {
+		return Build.VERSION.SDK_INT >= ANDROID_10_Q;
 	}
 }

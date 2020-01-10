@@ -82,7 +82,6 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
-import mega.privacy.android.app.utils.IncomingCallNotification;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -108,12 +107,10 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.*;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.IncomingCallNotification.ANDROID_10_Q;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -286,9 +283,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		scaleW = getScaleW(outMetrics, density);
 		scaleH = getScaleH(outMetrics, density);
 
-		if(Build.VERSION.SDK_INT >= ANDROID_10_Q) {
-            askForDisplayOverDialog = new AskForDisplayOverDialog(this);
-        }
+		askForDisplayOverDialog = new AskForDisplayOverDialog(this);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -657,7 +652,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		} else {
 			logWarning("Extras is NULL");
 		}
-        if(askForDisplayOverDialog != null && IncomingCallNotification.shouldNotify(context) && dbH.shouldAskForDisplayOver()) {
+        if(askForDisplayOverDialog != null) {
             askForDisplayOverDialog.showDialog();
         }
 	}
@@ -1775,15 +1770,18 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	protected void onDestroy() {
 		super.onDestroy();
 
-		if(drawableArrow == null) return;
-
-		drawableArrow.setColorFilter(null);
-		drawableDots.setColorFilter(null);
-		drawableSend.setColorFilter(null);
-		drawableShare.setColorFilter(null);
-        if (askForDisplayOverDialog != null) {
-            askForDisplayOverDialog.recycle();
-        }
+		if (drawableArrow != null) {
+			drawableArrow.setColorFilter(null);
+		}
+		if (drawableDots != null) {
+			drawableDots.setColorFilter(null);
+		}
+		if (drawableSend != null) {
+			drawableSend.setColorFilter(null);
+		}
+		if (drawableShare != null) {
+			drawableShare.setColorFilter(null);
+		}
 	}
 
 	@Override

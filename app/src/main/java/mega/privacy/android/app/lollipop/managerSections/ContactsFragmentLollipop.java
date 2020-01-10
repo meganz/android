@@ -62,7 +62,6 @@ import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
-import mega.privacy.android.app.utils.IncomingCallNotification;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -77,7 +76,6 @@ import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.IncomingCallNotification.ANDROID_10_Q;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -844,9 +842,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 			}
 		}
-        if(Build.VERSION.SDK_INT >= ANDROID_10_Q) {
-            askForDisplayOverDialog = new AskForDisplayOverDialog(context);
-        }
+
+		askForDisplayOverDialog = new AskForDisplayOverDialog(context);
 	}
 
 	public void checkScroll () {
@@ -1045,7 +1042,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	}
 
 	private void showAskForDisplayOverDialog() {
-        if(askForDisplayOverDialog != null && IncomingCallNotification.shouldNotify(context) && dbH.shouldAskForDisplayOver()) {
+        if(askForDisplayOverDialog != null) {
             askForDisplayOverDialog.showDialog();
         }
     }
@@ -1053,9 +1050,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
     @Override
     public void onPause() {
         super.onPause();
-        if(askForDisplayOverDialog != null) {
-            askForDisplayOverDialog.recycle();
-        }
     }
 
     public void setContacts(ArrayList<MegaUser> contacts){
