@@ -99,7 +99,7 @@ import static mega.privacy.android.app.utils.Util.*;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.2_275";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.2_279";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
