@@ -112,7 +112,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
-import mega.privacy.android.app.interfaces.FileTakenDownListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
@@ -159,13 +158,14 @@ import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLo
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.FileTakenDownNotificationHandler.showTakenDownDialog;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
-        MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener, MegaChatCallListenerInterface, FileTakenDownListener {
+        MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener, MegaChatCallListenerInterface {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
     public static final String IS_PLAYLIST = "IS_PLAYLIST";
@@ -806,11 +806,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 && player != null && player.getPlayWhenReady()) {
             player.setPlayWhenReady(false);
         }
-    }
-
-    @Override
-    public void fileTakenDownNegativeButtonProcess() {
-        finish();
     }
 
     class GetMediaFilesTask extends AsyncTask<Void, Void, Void> {
@@ -3622,7 +3617,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
             }
         } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
-            FileTakenDownNotificationHandler.showTakenDownDialog(this, this);
+            showTakenDownDialog(this);
         }
     }
 

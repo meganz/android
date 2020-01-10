@@ -1,15 +1,17 @@
 package mega.privacy.android.app.utils;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -627,6 +629,48 @@ public class FileUtils {
             e.printStackTrace();
         }
         return result;
+    }
+
+
+    /**
+     * The static class to show taken down notice for mega node
+     */
+    public static class FileTakenDownNotificationHandler {
+        /**
+         * alertDialogTakenDown is the dialog to be shown. It resides inside this static class to prevent multiple definition within the class
+         */
+        private static AlertDialog alertDialogTakenDown = null;
+
+        /**
+         * @param activity the activity is the page where dialog is shown
+         */
+        public static void showTakenDownDialog(final Activity activity) {
+
+            if (activity == null) {
+                return;
+            }
+
+            if (alertDialogTakenDown != null && alertDialogTakenDown.isShowing()) {
+                return;
+            }
+
+            if (activity.isFinishing()) {
+                return;
+            }
+
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+            dialogBuilder.setTitle(activity.getString(R.string.general_error_word))
+                         .setMessage(activity.getString(R.string.video_takendown_error)).setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int i) {
+                    dialog.dismiss();
+                    activity.finish();
+                }
+            });
+            alertDialogTakenDown = dialogBuilder.create();
+
+            alertDialogTakenDown.show();
+        }
     }
 }
 

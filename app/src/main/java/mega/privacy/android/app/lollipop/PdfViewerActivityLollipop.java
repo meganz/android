@@ -124,6 +124,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtils.FileTakenDownNotificationHandler.showTakenDownDialog;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -2982,6 +2983,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     }
                 }
             }
+        } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
+            showTakenDownDialog(this);
         }
     }
 
