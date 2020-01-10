@@ -30,15 +30,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
-import org.webrtc.Camera1Enumerator;
-import org.webrtc.Camera2Enumerator;
-import org.webrtc.CameraEnumerator;
-import org.webrtc.CapturerObserver;
-import org.webrtc.SurfaceTextureHelper;
-import org.webrtc.VideoCapturer;
-
 import org.webrtc.ContextUtils;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -683,78 +675,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			askForPaymentMethods();
 		}
 	}
-
-	static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator, String deviceName) {
-		logDebug("createCameraCapturer: " + deviceName);
-
-		VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, null);
-
-		if (videoCapturer != null) {
-			return videoCapturer;
-		}
-
-		return null;
-	}
-
-	static private String[] deviceList() {
-		logDebug("DeviceList");
-
-		Context context = ContextUtils.getApplicationContext();
-		CameraEnumerator enumerator;
-		boolean useCamera2 = false;
-		boolean captureToTexture = true;
-		if (Camera2Enumerator.isSupported(context) && useCamera2) {
-			enumerator = new Camera2Enumerator(context);
-		} else {
-			enumerator = new Camera1Enumerator(captureToTexture);
-		}
-
-		final String[] deviceNames = enumerator.getDeviceNames();
-		return deviceNames;
-	}
-
-	static VideoCapturer videoCapturer = null;
-
-	static public void stopVideoCapture() {
-		logDebug("stopVideoCapture");
-
-		if (videoCapturer != null) {
-			try {
-				videoCapturer.stopCapture();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			videoCapturer = null;
-		}
-	}
-
-	static public void startVideoCapture(int videoWidth, int videoHeight, int videoFps, SurfaceTextureHelper surfaceTextureHelper, CapturerObserver nativeAndroidVideoTrackSource, String deviceName) {
-		logDebug("startVideoCapture: " + deviceName);
-
-		// Settings
-		boolean useCamera2 = false;
-		boolean captureToTexture = true;
-
-		stopVideoCapture();
-		Context context = ContextUtils.getApplicationContext();
-		if (Camera2Enumerator.isSupported(context) && useCamera2) {
-			videoCapturer = createCameraCapturer(new Camera2Enumerator(context), deviceName);
-		} else {
-			videoCapturer = createCameraCapturer(new Camera1Enumerator(captureToTexture), deviceName);
-		}
-
-		if (videoCapturer == null) {
-			logError("Unable to create video capturer");
-			return;
-		}
-
-		videoCapturer.initialize(surfaceTextureHelper, context, nativeAndroidVideoTrackSource);
-
-		// Start the capture!
-		videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
-		logDebug("Start Capture");
-	}
-
 	
 	public MegaApiAndroid getMegaApiFolder(){
 		if (megaApiFolder == null){
