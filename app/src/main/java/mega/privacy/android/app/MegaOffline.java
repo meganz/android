@@ -7,9 +7,9 @@ import android.content.Context;
 
 import java.io.File;
 
-import static mega.privacy.android.app.utils.FileUtils.getDirSize;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 public class MegaOffline implements Parcelable {
 
@@ -168,23 +168,15 @@ public class MegaOffline implements Parcelable {
 
 	public long getModificationDate(Context context) {
 		File offlineNode = getOfflineFile(context, this);
-		if (offlineNode.exists()) {
-			return offlineNode.lastModified();
-		} else {
-			return 0;
-		}
+		return isFileAvailable(offlineNode) ? offlineNode.lastModified() : 0;
 	}
 
 	public long getSize(Context context) {
 		File offlineNode = getOfflineFile(context, this);
-		if (offlineNode.exists()) {
-			if (offlineNode.isFile()) {
-				return offlineNode.length();
-			} else {
-				return getDirSize(offlineNode);
-			}
-		} else {
-			return 0;
+		if (isFileAvailable(offlineNode)) {
+			return offlineNode.isFile() ? offlineNode.length() : getDirSize(offlineNode);
 		}
+
+		return 0;
 	}
 }

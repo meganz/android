@@ -10,9 +10,8 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.FileUtils.getFileNameWithoutExtension;
-import static mega.privacy.android.app.utils.FileUtils.isFileNameNumeric;
-import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 public class SortUtil {
 
