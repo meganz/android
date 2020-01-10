@@ -217,7 +217,7 @@
                                 android:maxLines="1"
                                 android:textColor="@color/black"
                                 android:textSize="14sp"
-                                app:emojiSize="14sp"/>
+                                app:emojiSize="18sp"/>
 
                         </RelativeLayout>
                     </RelativeLayout>
