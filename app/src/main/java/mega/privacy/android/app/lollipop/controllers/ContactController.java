@@ -24,6 +24,8 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -33,11 +35,13 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class ContactController {
 
     Context context;
     MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi = null;
     DatabaseHandler dbH;
     MegaPreferences prefs = null;
 
@@ -46,6 +50,9 @@ public class ContactController {
         this.context = context;
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+        if(isChatEnabled() && megaChatApi == null){
+            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
 
         if (dbH == null){
@@ -92,6 +99,21 @@ public class ContactController {
             for(int i=0; i<inShares.size();i++){
                 MegaNode removeNode = inShares.get(i);
                 megaApi.remove(removeNode);
+            }
+        }
+
+        if (megaChatApi != null && participatingInACall(megaChatApi)) {
+            MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(c.getHandle());
+            if (chatRoomTo != null) {
+                long chatId = chatRoomTo.getChatId();
+                if (megaChatApi.getChatCall(chatId) != null) {
+                    if(context instanceof ManagerActivityLollipop){
+                        megaChatApi.hangChatCall(chatId, (ManagerActivityLollipop) context);
+                    }
+                    else if(context instanceof ContactInfoActivityLollipop){
+                        megaChatApi.hangChatCall(chatId, (ContactInfoActivityLollipop) context);
+                    }
+                }
             }
         }
 
