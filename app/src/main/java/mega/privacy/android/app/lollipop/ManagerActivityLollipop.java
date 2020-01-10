@@ -204,7 +204,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -12876,7 +12875,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			permissionsDialog.show();
 
 		}
-		else if (requestCode == Constants.REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
+		else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
 			logDebug("onActivityResult REQUEST_CODE_SELECT_CONTACT OK");
 
 			if (intent == null) {

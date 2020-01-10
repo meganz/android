@@ -59,8 +59,6 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -793,9 +791,9 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
         if (intent == null) {
             logWarning("extractUri: result intent is null");
             if (resultCode != Activity.RESULT_OK) {
-                Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+                showSnackBar(this, SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
             } else {
-                Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
+                showSnackBar(this, SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
             }
             return null;
         }

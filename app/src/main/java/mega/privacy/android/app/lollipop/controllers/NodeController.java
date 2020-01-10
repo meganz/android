@@ -44,7 +44,6 @@ import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.CopyFileThread;
 import mega.privacy.android.app.utils.DownloadChecker;
 import mega.privacy.android.app.utils.SDCardOperator;
@@ -344,7 +343,7 @@ public class NodeController {
         if(prompt != null) {
             intent.putExtra(FileStorageActivityLollipop.EXTRA_PROMPT, prompt);
         }
-        intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, downloadInfo.isHighPriority());
+        intent.putExtra(HIGH_PRIORITY_TRANSFER, downloadInfo.isHighPriority());
 
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
@@ -365,7 +364,7 @@ public class NodeController {
             ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
         else if(context instanceof ContactInfoActivityLollipop){
-            ((ContactInfoActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            ((ContactInfoActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
     }
 
@@ -692,9 +691,9 @@ public class NodeController {
                         try {
                             final File file = new File(localPath);
                             if (file.getParent().equals(parentPath)) {
-                                showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                                showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                             } else {
-                                showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
+                                showSnackbar(SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
                                 //copy file.
                                 new Thread(new CopyFileThread(downloadToSDCard,localPath,parentPath,tempNode.getName(),sdCardOperator)).start();
                             }
@@ -1740,9 +1739,9 @@ public class NodeController {
             if(localPath != null){
                 final File file = new File(localPath);
                 if (file.getParent().equals(parentPath)) {
-                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                 } else {
-                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
+                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
                     //copy file.
                     new Thread(new CopyFileThread(downloadToSDCard,localPath,parentPath,tempNode.getName(),sdCardOperator)).start();
                 }

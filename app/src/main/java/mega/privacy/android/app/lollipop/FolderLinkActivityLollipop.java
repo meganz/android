@@ -157,7 +157,6 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 	MegaPreferences prefs = null;
 
 	boolean decryptionIntroduced=false;
-	public final static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	private ActionMode actionMode;
 	
 	boolean downloadCompleteFolder = false;
