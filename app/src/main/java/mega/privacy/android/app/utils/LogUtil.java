@@ -97,7 +97,7 @@ public class LogUtil {
      * @param message  Message for the logging system.
      */
     private static void log(int logLevel, String message) {
-        if (!Util.DEBUG && !Util.getFileLoggerSDK()) {
+        if (!Util.DEBUG && !Util.getFileLoggerSDK() && !Util.getFileLoggerKarere()) {
             return;
         }
 
@@ -121,7 +121,7 @@ public class LogUtil {
      * @param printStackTrace Flag to print the stack trace of the exception.
      */
     private static void log(int logLevel, String message, Throwable exception, boolean printStackTrace) {
-        if (!Util.DEBUG && !Util.getFileLoggerSDK()) {
+        if (!Util.DEBUG && !Util.getFileLoggerSDK() && !Util.getFileLoggerKarere()) {
             return;
         }
 
