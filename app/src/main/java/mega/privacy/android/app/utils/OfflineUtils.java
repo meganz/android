@@ -64,6 +64,11 @@ public class OfflineUtils {
         }
         catch(Exception ex){}
 
+        if (node.isTakenDown()) {
+            showSnackBar(context, SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node), -1);
+            return;
+        }
+
         Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
         if (node.getType() == MegaNode.TYPE_FOLDER) {
             logDebug("Is Folder");

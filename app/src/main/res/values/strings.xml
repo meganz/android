@@ -2280,6 +2280,7 @@
     <string name="video_takendown_error" context="message of video takendown not available notification">
         File no longer accessible
     </string>
+    <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">Not accessible due to ToS/AUP violation</string>
 
     <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
     <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]</string>

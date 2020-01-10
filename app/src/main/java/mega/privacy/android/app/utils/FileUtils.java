@@ -633,7 +633,7 @@ public class FileUtils {
 
 
     /**
-     * The static class to show taken down notice for mega node
+     * The static class to show taken down notice for mega node when the node is taken down and try to be opened
      */
     public static class FileTakenDownNotificationHandler {
         /**
