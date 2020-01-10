@@ -61,7 +61,7 @@ SODIUM=sodium
 SODIUM_VERSION=1.0.16
 SODIUM_SOURCE_FILE=libsodium-${SODIUM_VERSION}.tar.gz
 SODIUM_SOURCE_FOLDER=libsodium-${SODIUM_VERSION}
-SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/${SODIUM_SOURCE_FILE}
+SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/old/${SODIUM_SOURCE_FILE}
 SODIUM_SHA1="c7ea321d7b8534e51c5e3d86055f6c1aa1e48ee9"
 
 LIBUV=libuv
