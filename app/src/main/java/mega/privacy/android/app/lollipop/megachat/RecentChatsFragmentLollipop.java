@@ -1560,9 +1560,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     public void updateCacheForNonContacts(MegaChatRoom chatToCheck) {
         if (chatToCheck != null) {
             long peers = chatToCheck.getPeerCount();
-            for (int i = 0;
-                 i < peers;
-                 i++) {
+            for (int i = 0; i < peers; i++) {
                 String fullName = getParticipantFullName(chatToCheck, i);
                 if (fullName != null) {
                     if (fullName.trim().length() <= 0) {
@@ -1893,9 +1891,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         unselect.setVisible(true);
                     }
 
-                    for (int i = 0;
-                         i < selected.size();
-                         i++) {
+                    for (int i = 0; i < selected.size(); i++) {
                         MegaChatListItem chat = selected.get(i);
                         if (chat != null) {
                             if (chat.isGroup() && (chat.getOwnPrivilege() == MegaChatRoom.PRIV_RO || chat.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD
@@ -1909,9 +1905,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         }
                     }
 
-                    for (int i = 0;
-                         i < selected.size();
-                         i++) {
+                    for (int i = 0; i < selected.size(); i++) {
                         MegaChatListItem chat = selected.get(i);
                         if (chat != null) {
 
@@ -1924,9 +1918,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         }
                     }
 
-                    for (int i = 0;
-                         i < selected.size();
-                         i++) {
+                    for (int i = 0; i < selected.size(); i++) {
                         MegaChatListItem chat = selected.get(i);
                         if (chat != null) {
 

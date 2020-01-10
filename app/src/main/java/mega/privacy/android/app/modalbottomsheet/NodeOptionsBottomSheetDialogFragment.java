@@ -797,7 +797,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                 int dBT = nC.getIncomingLevel(node);
                 if (nC.nodeComesFromIncoming(node)) {
-                    logDebug("dBT: "+dBT);
+                    logDebug("dBT: " + dBT);
                     if (node.isFolder()) {
                         optionInfoText.setText(R.string.general_folder_info);
                         counterShares--;
@@ -806,8 +806,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionInfoText.setText(R.string.general_file_info);
                         if (isChatEnabled()) {
                             optionSendChat.setVisibility(View.VISIBLE);
-                        }
-                        else {
+                        } else {
                             counterShares--;
                             optionSendChat.setVisibility(View.GONE);
                         }
@@ -815,16 +814,16 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                     nodeIconLayout.setVisibility(View.VISIBLE);
 
-                        int accessLevel = megaApi.getAccess(node);
-                        logDebug("Node: " + node.getName() + " " + accessLevel);
-                        optionDownload.setVisibility(View.VISIBLE);
-                        if (availableOffline(context, node)) {
-                            optionOfflineText.setText(getString(R.string.context_delete_offline));
-                        }
-                        else {
-                            optionOfflineText.setText(getString(R.string.save_for_offline));
-                        }
-                        optionInfo.setVisibility(View.VISIBLE);counterRemove--;
+                    int accessLevel = megaApi.getAccess(node);
+                    logDebug("Node: " + node.getName() + " " + accessLevel);
+                    optionDownload.setVisibility(View.VISIBLE);
+                    if (availableOffline(context, node)) {
+                        optionOfflineText.setText(getString(R.string.context_delete_offline));
+                    } else {
+                        optionOfflineText.setText(getString(R.string.save_for_offline));
+                    }
+                    optionInfo.setVisibility(View.VISIBLE);
+                    counterRemove--;
                     optionRemove.setVisibility(View.GONE);
                     counterShares--;
                     optionShare.setVisibility(View.GONE);
@@ -939,8 +938,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             break;
                         }
                     }
-                }
-                else {
+                } else {
                     if (node.isExported()) {
                         //Node has public link
                         nodeIconLayout.setVisibility(View.VISIBLE);
@@ -970,8 +968,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionDownload.setVisibility(View.VISIBLE);
                     if (availableOffline(context, node)) {
                         optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    }
-                    else {
+                    } else {
                         optionOfflineText.setText(getString(R.string.save_for_offline));
                     }
                     optionInfo.setVisibility(View.VISIBLE);

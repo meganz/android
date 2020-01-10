@@ -1493,7 +1493,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         title.setText(R.string.general_error_word);
         text.setText(alertMessageID);
-        openButton.setText(R.string.open_takendown_file);
+        openButton.setText(R.string.context_open_link);
         disputeButton.setText(R.string.dispute_takendown_file);
         cancelButton.setText(R.string.general_cancel);
 
