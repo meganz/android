@@ -103,7 +103,9 @@ public class SorterContentActivity extends PinActivityLollipop {
                 case CONTACTS: {
                     order = ((ManagerActivityLollipop) context).getOrderContacts();
 
-                    sortByDateTV.setText(context.getString(R.string.sortby_date));
+                    sortByDateTV.setVisibility(View.GONE);
+                    newestCheck.setVisibility(View.GONE);
+                    oldestCheck.setVisibility(View.GONE);
                     sortBySizeTV.setVisibility(View.GONE);
                     largestCheck.setVisibility(View.GONE);
                     smallestCheck.setVisibility(View.GONE);
@@ -335,10 +337,6 @@ public class SorterContentActivity extends PinActivityLollipop {
                 switch (finalDrawerItem) {
                     case CONTACTS: {
                         ((ManagerActivityLollipop) context).selectSortByContacts(order);
-                        break;
-                    }
-                    case SAVED_FOR_OFFLINE: {
-                        ((ManagerActivityLollipop) context).selectSortByOffline(order);
                         break;
                     }
                     case SHARED_ITEMS: {

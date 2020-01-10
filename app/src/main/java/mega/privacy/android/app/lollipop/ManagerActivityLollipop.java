@@ -12001,21 +12001,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	public void selectSortByOffline(int _orderCloud){
-		logDebug("selectSortByOffline");
-
-		if (_orderCloud == orderCloud) {
-			return;
-		}
-
-		this.orderCloud = _orderCloud;
-		this.setOrderCloud(orderCloud);
-		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-		if (oFLol != null){
-			oFLol.setOrder(orderCloud);
-		}
-	}
-
 	public void refreshCloudDrive () {
 		if (isCloudAdded()){
 			ArrayList<MegaNode> nodes;
@@ -12044,6 +12029,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if(sharesPageAdapter!=null){
 			sharesPageAdapter.notifyDataSetChanged();
 		}
+
 		iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
 		if (iFLol != null){
 			MegaNode inboxNode = megaApi.getInboxNode();
@@ -12052,6 +12038,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				iFLol.setNodes(nodes);
 				iFLol.getRecyclerView().invalidate();
 			}
+		}
+
+		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+		if (oFLol != null){
+			oFLol.setOrder(orderCloud);
 		}
 	}
 
