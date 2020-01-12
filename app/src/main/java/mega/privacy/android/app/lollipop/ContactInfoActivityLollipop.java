@@ -1782,6 +1782,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		if (drawableShare != null) {
 			drawableShare.setColorFilter(null);
 		}
+        if (askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.recycle();
+        }
 	}
 
 	@Override

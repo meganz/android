@@ -31,7 +31,7 @@ public class AskForDisplayOverDialog {
 
             @Override
             public void onClick(View v) {
-                recycle();
+                dismiss();
                 Toast.makeText(context , R.string.ask_for_display_over_explain, Toast.LENGTH_LONG).show();
             }
         });
@@ -41,7 +41,7 @@ public class AskForDisplayOverDialog {
             public void onClick(View v) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
                 context.startActivity(intent);
-                recycle();
+                dismiss();
             }
         });
         if (dialog == null) {
@@ -49,6 +49,11 @@ public class AskForDisplayOverDialog {
             dialog.setCancelable(false);
             dialog.setCanceledOnTouchOutside(false);
         }
+    }
+
+    private void dismiss() {
+        DatabaseHandler.getDbHandler(context).dontAskForDisplayOver();
+        dialog.cancel();
     }
 
 
@@ -59,7 +64,6 @@ public class AskForDisplayOverDialog {
     }
 
     public void recycle() {
-        DatabaseHandler.getDbHandler(context).dontAskForDisplayOver();
         dialog.cancel();
     }
 }

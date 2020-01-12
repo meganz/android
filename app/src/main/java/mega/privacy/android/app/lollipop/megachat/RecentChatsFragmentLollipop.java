@@ -1608,6 +1608,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.recycle();
+        }
+    }
+
+    @Override
     public void onResume() {
         logDebug("onResume: lastFirstVisiblePosition " + lastFirstVisiblePosition);
         if (lastFirstVisiblePosition > 0) {

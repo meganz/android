@@ -1052,6 +1052,14 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
         super.onPause();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.recycle();
+        }
+	}
+
     public void setContacts(ArrayList<MegaUser> contacts){
 		this.contacts = contacts;
 
