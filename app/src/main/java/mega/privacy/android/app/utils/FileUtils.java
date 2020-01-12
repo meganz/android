@@ -690,6 +690,8 @@ public class FileUtils {
             });
             alertDialogTakenDown = dialogBuilder.create();
 
+            alertDialogTakenDown.setCancelable(false);
+
             alertDialogTakenDown.show();
         }
     }
