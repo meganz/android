@@ -637,7 +637,7 @@ public class FileUtils {
      */
     public static class FileTakenDownNotificationHandler {
         /**
-         * alertDialogTakenDown is the dialog to be shown. It resides inside this static class to prevent multiple definition within the class
+         * alertDialogTakenDown is the dialog to be shown. It resides inside this static class to prevent multiple definition within  activity the class
          */
         private static AlertDialog alertDialogTakenDown = null;
 
@@ -659,8 +659,8 @@ public class FileUtils {
             }
 
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
-            dialogBuilder.setTitle(activity.getString(R.string.general_error_word))
-                         .setMessage(activity.getString(R.string.video_takendown_error)).setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+            dialogBuilder.setTitle(activity.getString(R.string.general_not_available))
+                         .setMessage(activity.getString(R.string.error_download_takendown_node)).setNegativeButton(R.string.general_dismiss, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int i) {
                     dialog.dismiss();

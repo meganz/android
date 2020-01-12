@@ -1342,6 +1342,7 @@
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
+    <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Not available</string>
 
     <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">Invitation accepted</string>
     <string name="context_invitacion_reply_declined" context="Declined request invitacion alert">Invitation declined</string>
@@ -2277,9 +2278,6 @@
     <string name="message_file_takedown_pop_out_notification" context="Popup notification text on mouse-over of taken down file.">This file has been the subject of a takedown notice.</string>
     <string name="message_folder_takedown_pop_out_notification" context="Popup notification text on mouse-over taken down folder.">This folder has been the subject of a takedown notice.</string>
     <string name="dispute_takendown_file" context="option to dispute taken down file or folder">Dispute Takedown</string>
-    <string name="video_takendown_error" context="message of video takendown not available notification">
-        File no longer accessible
-    </string>
     <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">Not accessible due to ToS/AUP violation</string>
 
     <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
