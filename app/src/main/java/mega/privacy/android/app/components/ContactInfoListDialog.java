@@ -5,9 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -17,6 +20,7 @@ import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.InvitationContactInfo;
+import mega.privacy.android.app.utils.Util;
 
 public class ContactInfoListDialog {
 
@@ -34,6 +38,10 @@ public class ContactInfoListDialog {
 
     private List<InvitationContactInfo> selected = new ArrayList<>();
 
+    private static final int DIALOG_WIDTH = 320;
+    private static final int DIALOG_HEIGHT = 420;
+    private static final float CHECKBOX_ALAPHA = 0.3f;
+
     public ContactInfoListDialog(@NonNull Context context, InvitationContactInfo contact, final OnMultipleSelectedListener listener) {
         this.context = context;
         this.current = contact;
@@ -42,8 +50,13 @@ public class ContactInfoListDialog {
         contentView = inflater.inflate(R.layout.dialog_contact_info_list, null);
         listView = contentView.findViewById(R.id.info_list_view);
         listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+        contentView.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
         contentView.findViewById(R.id.btn_ok).setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
@@ -73,6 +86,13 @@ public class ContactInfoListDialog {
                 .create();
         listView.setAdapter(new ContactInfoAdapter(current.getFilteredContactInfos(), added));
         dialog.show();
+        Window window = dialog.getWindow();
+        DisplayMetrics metrics = new DisplayMetrics();
+        if (window != null) {
+            Display display = window.getWindowManager().getDefaultDisplay();
+            display.getMetrics(metrics);
+            window.setLayout(Util.px2dp(DIALOG_WIDTH, metrics), Util.px2dp(DIALOG_HEIGHT, metrics));
+        }
     }
 
     public interface OnMultipleSelectedListener {
@@ -120,8 +140,10 @@ public class ContactInfoListDialog {
             viewHolder.textView.setText(content);
             if (added.contains(content)) {
                 viewHolder.checkBox.setChecked(true);
+                viewHolder.checkBox.setAlpha(1.0f);
             } else {
                 viewHolder.checkBox.setChecked(false);
+                viewHolder.checkBox.setAlpha(CHECKBOX_ALAPHA);
             }
             // set listener after `setChecked`, or the listener will trigger
             viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -139,6 +161,12 @@ public class ContactInfoListDialog {
                     info.setDisplayInfo(content);
                     // ignore `isChecked` the callback will handle.
                     selected.add(info);
+                    //UI update
+                    if (isChecked) {
+                        buttonView.setAlpha(1.0f);
+                    } else {
+                        buttonView.setAlpha(CHECKBOX_ALAPHA);
+                    }
                 }
             });
         }

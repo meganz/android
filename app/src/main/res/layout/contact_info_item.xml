@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/contact_list_item_layout"
     android:layout_width="match_parent"
-    android:layout_height="72dp">
+    android:layout_height="60dp">
 
     <CheckBox
         android:id="@+id/checkbox"
@@ -9,7 +9,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="10dp"/>
+        android:alpha="0.3"
+        android:layout_marginLeft="22dp"/>
 
     <TextView
         android:id="@+id/content"
@@ -17,6 +18,9 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/checkbox"
         android:layout_marginLeft="6dp"
+        android:textColor="@color/name_my_account"
+        android:fontFamily="roboto"
+        android:textSize="16sp"
         android:layout_centerVertical="true"/>
 
 </RelativeLayout>
