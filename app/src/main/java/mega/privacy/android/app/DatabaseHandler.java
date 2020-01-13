@@ -33,7 +33,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 49;
+	private static final int DATABASE_VERSION = 50;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -111,6 +111,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CONTACT_LAST_NAME = "lastname";
 	private static final String KEY_PREFERRED_SORT_CLOUD = "preferredsortcloud";
 	private static final String KEY_PREFERRED_SORT_CONTACTS = "preferredsortcontacts";
+	private static final String KEY_PREFERRED_SORT_CAMERA_UPLOAD = "preferredsortcameraupload";
 	private static final String KEY_PREFERRED_SORT_OTHERS = "preferredsortothers";
 	private static final String KEY_FILE_LOGGER_SDK = "filelogger";
 	private static final String KEY_FILE_LOGGER_KARERE = "fileloggerkarere";
@@ -301,7 +302,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //37
                 + KEY_REMOVE_GPS + " TEXT,"                         //38
                 + KEY_SHOW_INVITE_BANNER + " TEXT,"                 //39
-                + KEY_SD_CARD_URI + " TEXT"                         //40
+                + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       //40
+                + KEY_SD_CARD_URI + " TEXT"                         //41
                 + ")";
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
@@ -730,7 +732,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SHOW_INVITE_BANNER + " = '" + encrypt("true") + "';");
         }
 
-        if (oldVersion <= 48) {
+		if(oldVersion <= 48) {
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT;");
+            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_MODIFICATION_DESC)) + "';");
+        }
+
+        if (oldVersion <= 49) {
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SD_CARD_URI + " TEXT;");
         }
 	}
@@ -1371,6 +1378,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_PIN_LOCK_TYPE, encrypt(prefs.getPinLockType()));
 		values.put(KEY_PREFERRED_SORT_CLOUD, encrypt(prefs.getPreferredSortCloud()));
 		values.put(KEY_PREFERRED_SORT_CONTACTS, encrypt(prefs.getPreferredSortContacts()));
+		values.put(KEY_PREFERRED_SORT_CAMERA_UPLOAD, encrypt(prefs.getPreferredSortCameraUpload()));
 		values.put(KEY_PREFERRED_SORT_OTHERS, encrypt(prefs.getPreferredSortOthers()));
 		values.put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()));
 		values.put(KEY_SMALL_GRID_CAMERA, encrypt(prefs.getSmallGridCamera()));
@@ -1425,13 +1433,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String secVideoSyncTimeStamp = decrypt(cursor.getString(37));
 			String removeGPS = decrypt(cursor.getString(38));
 			String closeInviteBanner = decrypt(cursor.getString(39));
-			String sdCardUri = decrypt(cursor.getString(40));
+			String preferredSortCameraUpload = decrypt(cursor.getString(40));
+			String sdCardUri = decrypt(cursor.getString(41));
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
 					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize,shouldClearCameraSyncRecords,camVideoSyncTimeStamp,
-                    secVideoSyncTimeStamp,isAutoPlayEnabled,removeGPS,closeInviteBanner,sdCardUri);
+                    secVideoSyncTimeStamp,isAutoPlayEnabled,removeGPS,closeInviteBanner,preferredSortCameraUpload,sdCardUri);
 		}
 		cursor.close();
 
@@ -2663,6 +2672,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 	}
+
+    public void setPreferredSortCameraUpload(String order) {
+        logDebug("set sort camera upload order: " + order);
+        setStringValue(TABLE_PREFERENCES, KEY_PREFERRED_SORT_CAMERA_UPLOAD, order);
+    }
 
 	public void setPreferredSortOthers (String order){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
