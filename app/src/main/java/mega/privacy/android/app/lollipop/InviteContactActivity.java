@@ -47,6 +47,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
@@ -114,6 +115,8 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     private String contactLink;
     private DatabaseHandler dbH;
     private ArrayList<String> contactsEmailsSelected, contactsPhoneSelected;
+
+    private ContactInfoListDialog listDialog;
 
     //work around for android bug - https://issuetracker.google.com/issues/37007605#c10
     class LinearLayoutManagerWrapper extends LinearLayoutManager {
@@ -361,6 +364,14 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     public void onBackPressed() {
         logDebug("onBackPressed");
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(listDialog != null) {
+            listDialog.recycle();
+        }
     }
 
     private void setTitleAB() {
@@ -653,7 +664,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     }
 
     @Override
-    public void onSelect(List<InvitationContactInfo> selected) {
+    public void onSelect(Set<InvitationContactInfo> selected) {
         long id = -1;
         for(InvitationContactInfo select : selected) {
             id = select.getId();
@@ -680,7 +691,8 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         InvitationContactInfo invitationContactInfo = invitationContactsAdapter.getItem(position);
         logDebug("on Item click at " + position + " name is " + invitationContactInfo.getName());
         if (invitationContactInfo.hasMultipleContactInfos()) {
-            new ContactInfoListDialog(this,invitationContactInfo, this).showInfo(addedContacts);
+            listDialog = new ContactInfoListDialog(this,invitationContactInfo, this);
+            listDialog .showInfo(addedContacts);
         } else {
             if (isContactAdded(invitationContactInfo)) {
                 addedContacts.remove(invitationContactInfo);

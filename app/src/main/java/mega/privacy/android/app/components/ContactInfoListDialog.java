@@ -1,6 +1,8 @@
 package mega.privacy.android.app.components;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,11 +18,12 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.InvitationContactInfo;
-import mega.privacy.android.app.utils.Util;
 
 public class ContactInfoListDialog {
 
@@ -36,10 +39,12 @@ public class ContactInfoListDialog {
 
     private InvitationContactInfo current;
 
-    private List<InvitationContactInfo> selected = new ArrayList<>();
+    private Set<InvitationContactInfo> selected = new HashSet<>();
 
-    private static final int DIALOG_WIDTH = 320;
-    private static final int DIALOG_HEIGHT = 420;
+    private static final float WIDTH_P = 0.9f;
+    private static final float HEIGHT_P = 0.7f;
+    private static final float WIDTH_L = 0.5f;
+    private static final float HEIGHT_L = 0.9f;
     private static final float CHECKBOX_ALAPHA = 0.3f;
 
     public ContactInfoListDialog(@NonNull Context context, InvitationContactInfo contact, final OnMultipleSelectedListener listener) {
@@ -80,18 +85,42 @@ public class ContactInfoListDialog {
             }
         }
 
+        listView.setAdapter(new ContactInfoAdapter(current.getFilteredContactInfos(), added));
         dialog = new AlertDialog.Builder(context)
                 .setTitle(current.getName())
                 .setView(contentView)
+                .setCancelable(false)
                 .create();
-        listView.setAdapter(new ContactInfoAdapter(current.getFilteredContactInfos(), added));
         dialog.show();
+        // get current device's screen size in pixel
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = displayMetrics.widthPixels;
+        int height = displayMetrics.heightPixels;
+        setDialogSize(width, height);
+    }
+
+    private void setDialogSize(int screenW, int screenH) {
         Window window = dialog.getWindow();
         DisplayMetrics metrics = new DisplayMetrics();
         if (window != null) {
             Display display = window.getWindowManager().getDefaultDisplay();
             display.getMetrics(metrics);
-            window.setLayout(Util.px2dp(DIALOG_WIDTH, metrics), Util.px2dp(DIALOG_HEIGHT, metrics));
+            if (onLandscapeMode()) {
+                window.setLayout((int) (screenW * WIDTH_L), (int) (screenH * HEIGHT_L));
+            } else {
+                window.setLayout((int) (screenW * WIDTH_P), (int) (screenH * HEIGHT_P));
+            }
+        }
+    }
+
+    private boolean onLandscapeMode() {
+        return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    }
+
+    public void recycle() {
+        if(dialog != null) {
+            dialog.dismiss();
         }
     }
 
@@ -100,7 +129,7 @@ public class ContactInfoListDialog {
         /**
          * @param contactInfos The selected/unselected contact infos.
          */
-        void onSelect(List<InvitationContactInfo> contactInfos);
+        void onSelect(Set<InvitationContactInfo> contactInfos);
     }
 
     private class ContactInfoAdapter extends RecyclerView.Adapter<ContactInfoAdapter.ContactInfoViewHolder> {
