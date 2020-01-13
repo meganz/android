@@ -9,37 +9,41 @@
         android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:fontFamily="ROBOTO"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="25dp"
                 android:text="@string/ask_for_display_over_title"
                 android:textColor="@color/name_my_account"
-                android:textAlignment="textStart"
                 android:textStyle="bold"
-                android:textSize="14sp"/>
-            <TextView
+                android:textSize="18sp"/>
+            <ImageView
+                android:id="@+id/image_storage_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:gravity="start"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:src="@drawable/il_call_interface"/>
+            <TextView
+                style="@style/GetFreeXxGbWhen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
                 android:text="@string/ask_for_display_over_msg"
+                android:gravity="start"
                 android:lineSpacingMultiplier="1.27"
-                android:fontFamily="ROBOTO"
                 android:textAlignment="textStart"/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="25dp"
                 android:layout_marginBottom="18dp"
                 android:orientation="horizontal">
                 <Button
@@ -66,7 +70,7 @@
                     android:minHeight="0dp"
                     android:stateListAnimator="@null"
                     android:textAllCaps="true"
-                    android:text="@string/cam_sync_ok"/>
+                    android:text="@string/general_allow"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
