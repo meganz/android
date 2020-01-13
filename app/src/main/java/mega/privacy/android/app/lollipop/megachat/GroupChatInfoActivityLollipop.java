@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -1292,7 +1293,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 if(request.getFlag()){
                     logDebug("Chat archived");
-                    showSnackbar(getString(R.string.success_archive_chat, chatTitle));
+                    Intent intent = new Intent(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP);
+                    intent.putExtra(CHAT_TITLE, chatTitle);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                    finish();
                 }
                 else{
                     logDebug("Chat unarchived");
