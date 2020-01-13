@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l\'utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n\'importe quand, de n\'importe quel appareil, n\'importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement signifie que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l\'accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l\'utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique de conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50 Go à tous les utilisateurs inscrits, avec des primes d\'objectif, et propose des abonnements payants avec des limites beaucoup plus élevées : \n\n\nAbonnement PRO LÉGER : 4,99 € (4,99 USD) par mois ou 49,99 € (49,99 USD) par an vous donne 200 Go d\'espace de stockage et 1 To de quota de transfert par mois.\nAbonnement PRO I : 9,99 € (9,99 USD) par mois ou 99,99 € (99,99 USD) par an vous donne 1 To d\'espace de stockage et 2 To de quota de transfert par mois.\nAbonnement PRO II : 19,99 € (19,99 USD) par mois ou 199,99 € (199,99 USD) par an vous donne 4 To d\'espace de stockage et 8 To de quota de transfert par mois.\nAbonnement PRO III : 29,99 € (29,99 USD) par mois ou 299,99 € (299,99 USD) par an vous donne 8 To d\'espace de stockage et 16 To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d\'abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l\'icône de la logithèque Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n\'est pas déjà fait) et cliquez sur l\'appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l\'appli : \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -> Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -> Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -> Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -> MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur : https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web : \nhttps://mega.nz/terms\n\n\nOrdinateur — https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l\'utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n\'importe quand, de n\'importe quel appareil, n\'importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l\'accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l\'utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50 Go à tous les utilisateurs inscrits, avec des primes d\'objectif, et propose des abonnements payants avec des limites beaucoup plus élevées : \n\n\nAbonnement PRO LÉGER : 4,99 € (4,99 USD) par mois ou 49,99 € (49,99 USD) par an vous donne 400 Go d\'espace de stockage et 1 To de quota de transfert par mois.\nAbonnement PRO I : 9,99 € (9,99 USD) par mois ou 99,99 € (99,99 USD) par an vous donne 2 To d\'espace de stockage et 2 To de quota de transfert par mois.\nAbonnement PRO II : 19,99 € (19,99 USD) par mois ou 199,99 € (199,99 USD) par an vous donne 8 To d\'espace de stockage et 8 To de quota de transfert par mois.\nAbonnement PRO III : 29,99 € (29,99 USD) par mois ou 299,99 € (299,99 USD) par an vous donne 16 To d\'espace de stockage et 16 To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d\'abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l\'icône de la logithèque Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n\'est pas déjà fait) et cliquez sur l\'appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l\'appli : \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -> Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -> Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -> Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -> MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur : https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web : \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
 
     <!--
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -101,7 +101,7 @@
 
     <string name="action_settings" context="Menu item">Paramètres</string>
     <string name="action_search" context="Search button">Recherche</string>
-    <string name="action_search_country" context="Select country page title">Select country</string>
+    <string name="action_search_country" context="Select country page title">Sélectionner un pays</string>
     <string name="action_play" context="Search button">Play</string>
     <string name="action_pause" context="Search button">Mettre en pause</string>
     <string name="action_refresh" context="Menu item">Actualiser</string>
@@ -206,7 +206,7 @@
     <string name="tour_speed_title">La vitesse MEGA</string>
     <string name="tour_privacy_title">La confidentialité MEGA</string>
     <string name="tour_access_title">L\'accès MEGA</string>
-    <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 50 Go* gratuits d\'espace de stockage</string>
+    <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 50 Go* d\'espace de stockage gratuits</string>
     <string name="tour_speed_text">Les téléversements sont rapides. Partagez rapidement des fichiers avec qui vous le souhaitez</string>
     <string name="tour_privacy_text">Assurez la sécurité de tous vos fichiers avec le chiffrement de bout en bout de MEGA</string>
     <string name="tour_access_text">Disposez d\'un accès entièrement chiffré n\'importe où, n\'importe quand.</string>
@@ -239,7 +239,7 @@
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disque nuagique</string>
     <string name="section_recents" context="Label to reference a recents section">Récents</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Téléversement des médias</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Téléversements des médias</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Boîte de réception</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Enregistré Hors ligne</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Hors ligne</string>
@@ -660,7 +660,7 @@
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Espace de stockage</string>
     <string name="settings_pin_lock" context="settings of the pin lock">NIP de verrouillage</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compression vidéo demande beaucoup d\'énergie. MEGA exigera que vous rechargiez activement votre appareil si les vidéos à compresser dépassent %s.</string>
-	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures and videos were taken, so be careful when sharing them.</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Si cette option est activée, vous téléverserez des renseignements sur le lieu où vos photos ont été prises. Veuillez donc faire preuve de prudence en les partageant.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Avancés</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Nettoyer le cache</string>
@@ -675,28 +675,28 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Emplacement de téléchargement par défaut</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Toujours demander l\'emplacement de téléchargement</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Afficher les appareils avancés (SD externe)</string>
-	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
+	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Ajouter un numéro de téléphone</string>
 	<string name="verify_account_title" context="enter verification code page title">Confirmer votre compte</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Votre compte a temporairement été désactivé en raison d\'un abus potentiel. Veuillez confirmer votre numéro de téléphone pour déverrouiller votre compte.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Pays</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Votre numéro de téléphone</string>
     <string name="general_back_button" context="Button label - go to previous page">Retour</string>
-	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
+	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Pas maintenant</string>
     <string name="general_confirm_button" context="Button label - confirm some action">Confirmer</string>
-	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
-    <string name="verify_account_not_loading_country_code" context="error message if the country code cannot be fetched">Country codes could not be fetched.</string>
-	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
-	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Please type the verification code sent to</string>
+	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Veuillez saisir un indicatif de pays</string>
+    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Les indicatifs de pays n\'ont pas pu être récupérés.</string>
+	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Veuillez indiquer un numéro de téléphone valide.</string>
+	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Veuillez saisir le code de confirmation envoyé à</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Confirmer votre compte</string>
-	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
-	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">You didn’t receive a code?</string>
+	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Le code est erroné. Veuillez essayer et envoyer de nouveau.</string>
+	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">N\'avez-vous pas reçu un code ?</string>
     <string name="general_resend_button" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">Renvoyer</string>
-	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This number is already associated with a Mega account.</string>
-	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
-	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">The verification code doesn’t match.</string>
-	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
-	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
-	<string name="verify_account_successfully" context="verify phone number successfully">Your phone number has been verified successfully</string>
+	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">Ce numéro est déjà associé à un compte MEGA.</string>
+	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">Vous avez atteint la limite quotidienne</string>
+	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">Le code de vérification ne correspond pas.</string>
+	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">Le code a été vérifié</string>
+	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">Le code est erroné. Veuillez essayer et envoyer de nouveau.</string>
+	<string name="verify_account_successfully" context="verify phone number successfully">Votre numéro de téléphone a été confirmé avec succès</string>
 
     <string-array name="settings_storage_download_location_array">
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Mémoire interne</item>
@@ -713,8 +713,8 @@
     <string name="settings_camera_upload_off" context="settings option">Désactiver Téléversements de l\'appareil photo</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Comment téléverser</string>
 
-    <string name="settings_secondary_upload_on" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Activer le téléversement des médias secondaires</string>
-    <string name="settings_secondary_upload_off" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization.">Désactiver le téléversement des médias secondaires</string>
+    <string name="settings_secondary_upload_on" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Activer les téléversements des médias secondaires</string>
+    <string name="settings_secondary_upload_off" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization.">Désactiver les téléversements des médias secondaires</string>
 
     <string name="settings_empty_folder" context="Title of shared folder explorer to choose a folder to perform an action">Choisir un dossier</string>
 
@@ -732,14 +732,14 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Pendant la charge seulement</string>
-    <string name="settings_camera_upload_include_gps" context="Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded">Include location tags</string>
+    <string name="settings_camera_upload_include_gps" context="Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded">Inclure des géobalises</string>
     <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Exiger que je charge activement mon appareil</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Conserver les noms de fichier comme sur l\'appareil</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Dossier local de l\'appareil photo</string>
     <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">Dossier MEGA pour Téléversements de l\'appareil photo</string>
 
-    <string name="settings_local_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in the device.">Dossier secondaire local</string>
+    <string name="settings_local_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in the device.">Dossier local secondaire</string>
     <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in MEGA.">Dossier MEGA secondaire</string>
 
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos seulement</string>
@@ -876,15 +876,15 @@
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Ouvrir l\'emplacement</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Ce processus prend plus de temps que prévu. Veuillez patienter.</string>
 
-    <string name="my_account_free" context="Label in My Account section to show user account type">Compte gratuit</string>
+    <string name="my_account_free" context="Label in My Account section to show user account type">Compte Gratuit</string>
     <string name="my_account_prolite" context="Label in My Account section to show user account type">Compte Léger</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Compte PRO I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Compte PRO II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Compte PRO III</string>
 
-    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Compte Pro Léger</string>
+    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Compte PRO Léger</string>
 
-    <string name="backup_title" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication,">Sauvegarder votre clé de récupération</string>
+    <string name="backup_title" context="">Sauvegarder votre clé de récupération</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Votre mot de passe déverrouille votre clé de récupération</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Vos données ne sont lisibles qu\'à la suite d\'une chaîne d\'opérations de déchiffrement qui commence par votre clé maîtresse de chiffrement (clé de récupération), que nous stockons chiffrée avec votre mot de passe. Cela signifie que si vous perdez votre mot de passe, votre clé de récupération ne pourra plus être déchiffrée et que vous ne pourrez plus déchiffrer vos données.</string>
@@ -1255,8 +1255,8 @@
     <!--
     <string name="list_message_deleted" context="Text show in list of chats when the last message has been deleted">Message deleted</string>
     -->
-    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A] to enter with another account</string>
-    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Are you sure that you want to logout current account?</string>
+    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Déconnectez-vous[/A] pour utiliser MEGA avec un autre compte</string>
+    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Souhaitez-vous vraiment vous déconnecter du compte actuel ?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Ce message a été supprimé par %1$s</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">L\'historique de la conversation a été effacé</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">L\'historique de la conversation a été effacé par %1$s</string>
@@ -1371,7 +1371,7 @@
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">Aucun fichier n\'est enregistré Hors ligne</string>
 
     <string name="general_enable" context="Positive confirmation to enable logs">Activer</string>
-    <string name="general_allow" context="Positive confirmation to allow MEGA to read contacts book.">Allow</string>
+    <string name="general_allow" context="Positive confirmation to allow MEGA to read contacts book.">Autoriser</string>
     <string name="enable_log_text_dialog" context="Dialog to confirm the action of enabling logs">Les journaux peuvent contenir des renseignements relatifs à votre compte</string>
 
     <string name="confirmation_to_reconnect" context="Dialog to confirm the reconnect action">La connexion réseau a été restaurée. Se connecter à MEGA ?</string>
@@ -1613,7 +1613,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">Primes de parrainage</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">Installer une appli mobile</string>
-    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">Add mobile phone</string>
+    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">Ajouter un téléphone mobile</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Prime d\'inscription</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Installer l\'appli MEGA pour ordinateur</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Quota de base du compte</string>
@@ -1638,11 +1638,11 @@
 
     <string name="paragraph_info_achievement_install_desktop" context="info paragraph about the achievement install megasync">En installant MEGAsync, vous obtenez %1$s d\'espace de stockage gratuit et %2$s de quota de transfert, tous deux valides pendant 180 jours. L\'appli MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
     <string name="paragraph_info_achievement_install_mobile_app" context="info paragraph about the achievement install mobile app">En installant notre appli MEGA mobile, vous obtenez %1$s d\'espace de stockage gratuit et %2$s de quota de transfert, tous deux valides pendant 180 jours. Nos applis mobiles sont proposées pour iOS, Android et Windows Phone.</string>
-    <string name="paragraph_info_achievement_add_phone" context="info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">When you verify your phone number you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days.</string>
+    <string name="paragraph_info_achievement_add_phone" context="info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">Quand vous confirmez votre numéro de téléphone, vous obtenez %1$s d\'espace de stockage supplémentaire et %2$s de quota de transfert, tous deux valides pendant 180 jours.</string>
 
     <string name="result_paragraph_info_achievement_install_desktop" context="info paragraph about the completed achievement install megasync">Vous avez obtenu %1$s d\'espace de stockage et %2$s de quota de transfert pour avoir installé notre appli MEGA pour ordinateur.</string>
     <string name="result_paragraph_info_achievement_install_mobile_app" context="info paragraph about the completed achievement install mobile app">Vous avez reçu %1$s d\'espace de stockage et %2$s de quota de transfert pour avoir installé notre appli mobile.</string>
-    <string name="result_paragraph_info_achievement_add_phone" context="info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">You have received %1$s storage space and %2$s transfer quota for verifying your phone number.</string>
+    <string name="result_paragraph_info_achievement_add_phone" context="info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">Vous avez reçu %1$s d\'espace de stockage et %2$s de quota de transfert pour avoir confirmé votre numéro de téléphone.</string>
     <string name="result_paragraph_info_achievement_registration" context="info paragraph about the completed achievement registration">Vous avez reçu %1$s d\'espace de stockage comme prime gratuite d\'inscription.</string>
 
     <string name="expiration_date_for_achievements" context="info paragraph about the completed achievement registration">La prime arrivera à expiration dans %1$d jours</string>
@@ -1655,7 +1655,7 @@
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Aucun dossier n\'est partagé</string>
 
     <string name="settings_help" context="Settings category title for Help">Aide</string>
-    <string name="settings_help_preference" context="Settings preference title for send feedback">Envoyer une rétroaction</string>
+    <string name="settings_help_preference" context="Settings preference title for send feedback">Envoyer un commentaire</string>
     <string name="setting_feedback_subject" context="mail subject">Rétroaction Android</string>
     <string name="setting_feedback_body" context="mail body">Veuillez rédiger votre commentaire ici :</string>
     <string name="settings_feedback_body_device_model" context="mail body">Modèle de l\'appareil</string>
@@ -1711,7 +1711,7 @@
 
     <string name="title_evaluate_the_app_panel" context="Title of dialog to evaluate the app">Cette appli vous satisfait-elle ?</string>
     <string name="rate_the_app_panel" context="Label to show rate the app">Oui, évaluer l\'appli</string>
-    <string name="send_feedback_panel" context="Label to show send feedback">Non, envoyer une rétroaction</string>
+    <string name="send_feedback_panel" context="Label to show send feedback">Non, envoyer un commentaire</string>
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Options avancées</string>
 
@@ -1726,7 +1726,7 @@
     <string name="section_my_code" context="Title of QR code section">Mon code</string>
     <string name="section_scan_code" context="Title of QR code scan section">Balayer un code</string>
     <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">Accepter automatiquement</string>
-    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Les contacts qui balayeront votre code QR seront automatiquement ajoutés à votre liste de contacts.</string>
+    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Les utilisateurs de MEGA qui balayeront votre code QR seront automatiquement ajoutés à votre liste de contacts.</string>
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Le code QR précédent ne sera plus valide</string>
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Le lien a été copié dans le presse-papiers</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">Le code QR a été réinitialisé avec succès</string>
@@ -2129,11 +2129,11 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Le code est invalide</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Votre disque nuagique est presque plein. Surclassez votre compte maintenant vers un compte PRO et obtenez jusqu\'à 8 To d\'espace de stockage et 16 To de quota de transfert.</string>
-    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Votre disque nuagique est presque plein. Surclassez votre compte maintenant et obtenez jusqu\'à 8 To d\'espace de stockage et 16 To de quota de transfert.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Votre disque nuagique est presque plein. Passez à un compte PRO et obtenez jusqu\'à %1$s To d\'espace de stockage et %2$s To de quota de transfert.</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Votre disque nuagique est presque plein. Surclassez votre compte maintenant et obtenez jusqu\'à %1$s To d\'espace de stockage et %2$s To de quota de transfert.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Votre disque nuagique est presque plein. Si vous avez besoin de plus d\'espace de stockage, veuillez contacter l\'assistance de MEGA pour obtenir un abonnement personnalisé.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Votre disque nuagique est plein. Passez à un compte PRO et obtenez jusqu\'à 8 To d\'espace de stockage et 16 To de quota de transfert.</string>
-    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Votre disque nuagique est plein. Surclassez votre compte maintenant et obtenez jusqu\'à 8 To d\'espace de stockage et 16 To de quota de transfert.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Votre disque nuagique est plein. Passez à un compte PRO et obtenez jusqu\'à %1$s To d\'espace de stockage et %2$s To de quota de transfert.</string>
+    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Votre disque nuagique est plein. Surclassez votre compte maintenant et obtenez jusqu\'à %1$s To d\'espace de stockage et %2$s To de quota de transfert.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Votre disque nuagique est plein. Si vous avez besoin de plus d\'espace de stockage, veuillez contacter l\'assistance de MEGA pour obtenir un abonnement personnalisé.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">Voir les abonnements</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Abonnement personnalisé</string>
@@ -2158,7 +2158,7 @@
         <item context="Section title to select a file to perform an action, more files" quantity="other">Choisir des fichiers</item>
     </plurals>
 
-    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">Invite %1$s?</string>
+    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">Inviter %1$s ?</string>
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Choisir un dossier</string>
 
@@ -2199,7 +2199,7 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Gérer le lien de conversation</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Activer la rotation de la clé chiffrée</string>
-    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.</string>
+    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les anciens messages.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] a créé un lien de conversation.[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] a supprimé le lien de conversation.[/B]</string>
@@ -2231,9 +2231,9 @@
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Le lien de conversation est invalide</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Rotation de la clé chiffrée</string>
-    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.</string>
+    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les anciens messages.</string>
 
-    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.</string>
+    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les anciens messages.</string>
     <string name="action_open_chat_link" context="Menu item">Ouvrir un lien de conversation</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">L\'invitation pour le contact %s a été envoyée auparavant et peut être consultée dans l\'onglet Demandes envoyées.</string>
@@ -2310,7 +2310,7 @@
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Afficher Vu pour la dernière fois&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Permettre à vos contacts de voir l\'heure de votre dernière activité sur MEGA.</string>
 
-	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Espace de stockage insuffisant</string>
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">L\'espace de stockage est insuffisant</string>
 	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">L\'espace de stockage est insuffisant pour effectuer la compression vidéo.</string>
 	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">La taille de compression vidéo est trop grande</string>
 	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">La taille totale des vidéos à compresser dépasse %s, veuillez brancher votre appareil sur son chargeur pour continuer.</string>
@@ -2371,8 +2371,8 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Activer l\'appareil photo</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Autorisez l\'accès à votre appareil photo pour numériser des documents, prendre des photos et faire des appels vidéo.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Autoriser les appels</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Enable access to contacts</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA needs access to your contacts to help you connect with other people on MEGA.</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Permettre l\'accès aux contacts</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA a besoin d\'accéder à vos contacts pour vous aider à vous connecter à d\'autres personnes sur MEGA.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Autorisez l\'accès à votre microphone pour faire des appels chiffrés.</string>
     <string name="general_enable_access" context="General enable access">Autoriser l\'accès</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Fichiers partagés</string>
@@ -2450,12 +2450,12 @@
     </plurals>
 
     <plurals name="quantity_of_local_contact">
-        <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d Contact found on MEGA</item>
-        <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d Contacts found on MEGA</item>
+        <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d contact a été trouvé sur MEGA</item>
+        <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacts ont été trouvés sur MEGA</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Invite contact now?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
-    <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
+    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Inviter un contact maintenant ?</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Voyez qui se trouve déjà sur MEGA</string>
+    <string name="get_registered_contacts" context="Getting registered contacts">Chargement des contacts sur MEGA&#8230;</string>
 
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">Le contenu n\'a pas été envoyé vers %d conversations</string>
@@ -2483,7 +2483,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Vous n\'avez aucun contact MEGA. Veuillez inviter des amis dans la section Contacts.</string>
-    <string name="invite_more" context="Invite button for chat top cell">Invite more&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">Inviter quelqu\'un d\'autre&#8230;</string>
 
     <string name="title_tour_one" context="Title of first tour screen">Vous détenez les clés</string>
     <string name="content_tour_one" cotext="Content of first tour screen">La sécurité est notre raison d\'être. Avec nous, vos fichiers sont en sécurité, protégés par un système de chiffrement efficace dans lequel vous seul avez accès à vos fichiers.</string>
@@ -2512,7 +2512,7 @@
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">La rotation de la clé chiffrée ne vous permet pas d\'obtenir de lien vers une conversation sans en créer une nouvelle.</string>
     <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Souhaitez-vous créer une nouvelle conversation de groupe et obtenir un lien vers celle-ci ?</string>
 
-    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.</string>
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les anciens messages.</string>
 
     <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">Vous vous êtes joints à la conversation avec succès.</string>
 
@@ -2546,7 +2546,7 @@
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">Invitez des contacts et commencez à dialoguer en toute sécurité avec le dialogue en ligne chiffré de MEGA.</string>
     <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">Commencez à discuter en toute sécurité avec vos contacts grâce au chiffrement de bout en bout</string>
 
-    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hi! Have secure conversations on MEGA with me and get up to 50GB free storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Bonjour. Converse avec moi en toute sécurité sur MEGA et obtiens jusqu\'à 50 Go d\'espace de stockage gratuits. %1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it.">Aucun lien de conversation n\'est disponible.</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Le lien de conversation a été supprimé avec succès.</string>
@@ -2558,14 +2558,14 @@
     <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (RAPPELÉE)</string>
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (EN ATTENTE)</string>
 
-    <string name="version_restored" context="Message shown when it restored successfully a file version">Version restored successfully.</string>
+    <string name="version_restored" context="Message shown when it restored successfully a file version">La version a été restaurée avec succès.</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Touchez et maintenez pour enregistrer, relâchez pour envoyer.</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Faire glisser pour annuler</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">Ce message vocal n\'est pas disponible</string>
 
-    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Invite a friend via</string>
-    <string name="invite_contact_action_button" context="Action button label">Invite a friend via&#8230;</string>
+    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Inviter un ami par</string>
+    <string name="invite_contact_action_button" context="Action button label">Inviter un ami par&#8230;</string>
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d fichier a déjà été téléchargé.&#160;</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d fichiers ont déjà été téléchargés.&#160;</item>
@@ -2591,8 +2591,8 @@
     <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]mis à jour par [/A]%s</string>
     <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Moi</string>
 
-    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get free %1$s when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
-    <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Obtenez %1$s gratuits si vous ajoutez votre numéro de téléphone. Vos contacts vous trouveront plus facilement sur MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Ajoutez votre numéro de téléphone à MEGA. Ainsi, vos contacts peuvent vous trouver plus facilement sur MEGA.</string>
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Il est impossible d\'enregistrer des messages vocaux pendant un appel.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Une erreur est survenue lors de la tentative de téléversement du message vocal.</string>
 
@@ -2601,13 +2601,13 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Chargement</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Veuillez patienter&#8230;</string>
 
-    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">When you logout, files from your Offline section will be deleted from your device.</string>
-    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">When you logout, ongoing transfers will be cancelled.</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">When you logout, files from your Offline section will be deleted from your device and ongoing transfers will be cancelled.</string>
+    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">Quand vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil.</string>
+    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">Quand vous vous déconnectez, les transferts en cours sont annulés.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">Vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil et les transferts en cours sont annulés.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Nom inconnu</string>
 
-    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please, select one or more contacts.</string>
+    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Veuillez sélectionner un ou plusieurs contacts.</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s contacts envoyés.</string>
 </resources>

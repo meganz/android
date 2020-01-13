@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA oferă stocare în cloud criptată, controlată de utilizatori, prin intermediul browserelor web standard, împreună cu aplicații dedicate pentru dispozitivele mobile. Spre deosebire de ceilalți furnizori de stocare în cloud, datele tale sunt criptate și decriptate doar de către dispozitivele client ale tale și niciodată de către noi.\n\nÎncarcă fișierele de pe smartphone sau tabletă, apoi caută, stochează, descarcă, transmite, vezi, partajează, redenumește sau șterge fișierele oricând, de pe orice dispozitiv, oriunde. Partajează folderele cu contactele tale și vezi modificările acestora în timp real. Procesul de criptare înseamnă că nu putem să îți accesăm sau să îți resetăm parola astfel încât TREBUIE să o reții (excepție făcând cazul în care ai cheia de recuperare păstrată ca backup) sau vei pierde accesul la fișierele tale stocate.\n\nChatul video MEGA criptat între utilizatori capăt-la-capăt îți permite confidențialitate totală și a fost disponibil prin browser începând cu 2016. Acesta a fost extins pe aplicația noastră mobilă, cu istoricul chaturilor accesibil pe mai multe dispozitive. De asemenea, utilizatorii pot adăuga cu ușurință într-un chat din unitatea lor cloud MEGA.\n\nMEGA oferă un spațiu de stocare generos de 50 GB gratuit pentru toți utilizatorii înregistrați cu realizările bonus și oferă planuri plătite cu limite mult mai mari:\n\n\nAbonamentul PRO LITE: 4,99€ (4,99$ SUA) pe lună sau 49,99€ (49,99$ SUA) pe an îți oferă 200 GB spațiu de stocare și 1 TB cotă de transfer pe lună.\nAbonamentul PRO I: 9,99€ (9,99$ SUA) pe lună sau 99,99€ (99,99$ SUA) pe an îți oferă 1 TB spațiu de stocare și 2 TB cotă de transfer pe lună.\nAbonamentul PRO II: 19,99€ (19,99$ SUA) pe lună sau 199,99€ (199,99$ SUA) pe an îți oferă 4 TB spațiu de stocare și 8 TB cotă de transfer pe lună.\nAbonamentul PRO III: 29,99€ (29,99$ SUA) pe lună sau 299,99€ (299,99$ SUA) pe an îți oferă 8 TB spațiu de stocare și 16 TB cotă de transfer pe lună.\n\nAbonamentele sunt reînnoite automat pentru perioade de abonare succesive de aceeași durată și la același preț ca și perioada inițială aleasă. Pentru a gestiona abonamentele, clic pe pictograma Magazin Play de pe dispozitivul mobil, autentifică-te cu ID-ul Google (dacă nu ai făcut deja acest lucru), iar apoi clic pe aplicația MEGA. Vei putea gestiona abonamentul de acolo.\n\nPermisiunile aplicației:\nWRITE_EXTERNAL_STORAGE -> Descarcă fișiere de pe MEGA pe dispozitiv și încarcă fișiere de pe dispozitiv pe MEGA\nCAMERA -> Realizează o fotografie și încarcă fotografiile pe MEGA\nREAD_CONTACTS -> Adaugă cu ușurință contacte de pe dispozitiv ca contacte MEGA\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (microfon și cameră) -> MEGA oferă apeluri audio/video criptate capăt-la-capăt\n\n\nPentru a spori încrederea utilizatorilor în sistemul MEGA, tot codul pe partea de client este publicat, astfel încât cercetătorii de securitate interesați pot evalua procesul de criptare. Codul pentru aplicația noastră mobilă se află la adresa: https://github.com/meganz/android\n\nPentru mai multe informații, te rugăm să verifici site-ul nostru web:\nVezi https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA oferă stocare în cloud criptată, controlată de utilizatori, prin intermediul browserelor web standard, împreună cu aplicații dedicate pentru dispozitivele mobile. Spre deosebire de ceilalți furnizori de stocare în cloud, datele tale sunt criptate și decriptate doar de către dispozitivele client ale tale și niciodată de către noi.\n\nÎncarcă fișierele de pe smartphone sau tabletă, apoi caută, stochează, descarcă, transmite, vezi, partajează, redenumește sau șterge fișierele oricând, de pe orice dispozitiv, oriunde. Partajează folderele cu contactele tale și vezi modificările acestora în timp real. Procesul de criptare înseamnă că nu putem să îți accesăm sau să îți resetăm parola astfel încât TREBUIE să o reții (excepție făcând cazul în care ai cheia de recuperare păstrată ca backup) sau vei pierde accesul la fișierele tale stocate.\n\nChatul video MEGA criptat între utilizatori capăt-la-capăt îți permite confidențialitate totală și a fost disponibil prin browser începând cu 2016. Acesta a fost extins pe aplicația noastră mobilă, cu istoricul chaturilor accesibil pe mai multe dispozitive. De asemenea, utilizatorii pot adăuga cu ușurință într-un chat din unitatea lor cloud MEGA.\n\nMEGA oferă un spațiu de stocare generos de 50 GB gratuit pentru toți utilizatorii înregistrați cu realizările bonus și oferă planuri plătite cu limite mult mai mari:\n\n\nAbonamentul PRO LITE: 4,99€ (4,99$ SUA) pe lună sau 49,99€ (49,99$ SUA) pe an îți oferă 400 GB spațiu de stocare și 1 TB cotă de transfer pe lună.\nAbonamentul PRO I: 9,99€ (9,99$ SUA) pe lună sau 99,99€ (99,99$ SUA) pe an îți oferă 2 TB spațiu de stocare și 2 TB cotă de transfer pe lună.\nAbonamentul PRO II: 19,99€ (19,99$ SUA) pe lună sau 199,99€ (199,99$ SUA) pe an îți oferă 8 TB spațiu de stocare și 8 TB cotă de transfer pe lună.\nAbonamentul PRO III: 29,99€ (29,99$ SUA) pe lună sau 299,99€ (299,99$ SUA) pe an îți oferă 16 TB spațiu de stocare și 16 TB cotă de transfer pe lună.\n\nAbonamentele sunt reînnoite automat pentru perioade de abonare succesive de aceeași durată și la același preț ca și perioada inițială aleasă. Pentru a gestiona abonamentele, clic pe pictograma Magazin Play de pe dispozitivul mobil, autentifică-te cu ID-ul Google (dacă nu ai făcut deja acest lucru), iar apoi clic pe aplicația MEGA. Vei putea gestiona abonamentul de acolo.\n\nPermisiunile aplicației:\nWRITE_EXTERNAL_STORAGE -> Descarcă fișiere de pe MEGA pe dispozitiv și încarcă fișiere de pe dispozitiv pe MEGA\nCAMERA -> Realizează o fotografie și încarcă fotografiile pe MEGA\nREAD_CONTACTS -> Adaugă cu ușurință contacte de pe dispozitiv ca contacte MEGA\nRECORD_AUDIO și CAPTURE_VIDEO_OUTPUT (microfon și cameră) -> MEGA oferă apeluri audio/video criptate capăt-la-capăt\n\n\nPentru a spori încrederea utilizatorilor în sistemul MEGA, tot codul pe partea de client este publicat, astfel încât cercetătorii de securitate interesați pot evalua procesul de criptare. Codul pentru aplicația noastră mobilă se află la adresa: https://github.com/meganz/android\n\nPentru mai multe informații, te rugăm să verifici site-ul nostru web:\nVezi https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
 
     <!--
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -101,7 +101,7 @@
 
     <string name="action_settings" context="Menu item">Setări</string>
     <string name="action_search" context="Search button">Caută</string>
-    <string name="action_search_country" context="Select country page title">Select country</string>
+    <string name="action_search_country" context="Select country page title">Selectează țara</string>
     <string name="action_play" context="Search button">Redă</string>
     <string name="action_pause" context="Search button">Pune pe pauză</string>
     <string name="action_refresh" context="Menu item">Reîmprospătează</string>
@@ -133,7 +133,7 @@
 
     <plurals name="num_contacts_selected">
         <item context="chat invitation - tool bar subtitle, when users selected single contact. Placeholder - number of contacts selected" quantity="one">%d contact</item>
-        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d contacts</item>
+        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d contacte</item>
     </plurals>
 
     <plurals name="general_num_folders">
@@ -660,7 +660,7 @@
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Spațiu de stocare</string>
     <string name="settings_pin_lock" context="settings of the pin lock">Blocare prin PIN</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Comprimarea video consumă multă energie, MEGA îți va solicita să încarci în mod activ dispozitivul dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
-	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures and videos were taken, so be careful when sharing them.</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Dacă aceasta este activată, vei încărca informații despre locul în care au fost făcute fotografiile, așa că ai grijă când le împărtășești.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Avansat</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Șterge cache-ul</string>
@@ -675,28 +675,28 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Locația de descărcare implicită</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Întreabă mereu pentru locația de descărcare</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Afișează dispozitivele avansate (SD extern)</string>
-	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
+	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Adaugă un număr de telefon</string>
 	<string name="verify_account_title" context="enter verification code page title">Verifică-ți contul</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Contul tău a fost suspendat temporar din cauza unor posibile abuzuri. Te rugăm să verifici numărul de telefon pentru a-ți debloca contul.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Țară</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Numărul tău de telefon</string>
     <string name="general_back_button" context="Button label - go to previous page">Înapoi</string>
-	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
+	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Nu acum</string>
     <string name="general_confirm_button" context="Button label - confirm some action">Confirmă</string>
-	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
-    <string name="verify_account_not_loading_country_code" context="error message if the country code cannot be fetched">Country codes could not be fetched.</string>
-	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
-	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Please type the verification code sent to</string>
+	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Te rugăm să selectezi un cod al unei țări</string>
+    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Codurile țărilor nu au putut fi obținute.</string>
+	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Te rugăm să furnizezi un număr de telefon valid.</string>
+	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Te rugăm să tastezi codul de verificare trimis către</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Verifică-ți contul</string>
-	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
-	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">You didn’t receive a code?</string>
+	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Cod greșit. Te rugăm să încerci din nou sau să retrimiți.</string>
+	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">Nu ai primit un cod?</string>
     <string name="general_resend_button" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">Retrimite</string>
-	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This number is already associated with a Mega account.</string>
-	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
-	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">The verification code doesn’t match.</string>
-	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
-	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
-	<string name="verify_account_successfully" context="verify phone number successfully">Your phone number has been verified successfully</string>
+	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">Acest număr este asociat deja cu un cont MEGA.</string>
+	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">Ai atins limita zilnică</string>
+	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">Codul de verificare nu coincide.</string>
+	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">Codul a fost verificat</string>
+	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">Cod greșit. Te rugăm să încerci din nou sau să retrimiți.</string>
+	<string name="verify_account_successfully" context="verify phone number successfully">Numărul tău de telefon a fost verificat cu succes</string>
 
     <string-array name="settings_storage_download_location_array">
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Stocare internă</item>
@@ -732,7 +732,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Doar când se încarcă</string>
-    <string name="settings_camera_upload_include_gps" context="Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded">Include location tags</string>
+    <string name="settings_camera_upload_include_gps" context="Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded">Include etichetele locațiilor</string>
     <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">Solicită-mi să încarc în mod activ dispozitivul</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Păstrează numele fișierelor precum în dispozitiv</string>
 
@@ -884,7 +884,7 @@
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Cont PRO Lite</string>
 
-    <string name="backup_title" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication,">Fă backup cheii de recuperare</string>
+    <string name="backup_title" context="">Fă backup cheii de recuperare</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Parola îți deblochează cheia de recuperare</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Datele tale pot fi citite doar printr-un lanț de operații de decriptare, lanț care începe cu cheia principală de criptare, pe care o stocăm criptată cu parola ta. Acest lucru înseamnă că dacă pierzi parola, cheia principală nu mai poate fi decriptată și nu mai poți să-ți decriptezi datele.</string>
@@ -1255,8 +1255,8 @@
     <!--
     <string name="list_message_deleted" context="Text show in list of chats when the last message has been deleted">Message deleted</string>
     -->
-    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A] to enter with another account</string>
-    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Are you sure that you want to logout current account?</string>
+    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Deconectează-te[/A] pentru a folosi MEGA cu un alt cont</string>
+    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Sigur vrei să te deconectezi din contul actual?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Acest mesaj a fost șters de către %1$s</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Istoricul chatului a fost golit</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">Istoricul chatului a fost golit de către %1$s</string>
@@ -1371,7 +1371,7 @@
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">Niciun fișier salvat pentru offline</string>
 
     <string name="general_enable" context="Positive confirmation to enable logs">Activează</string>
-    <string name="general_allow" context="Positive confirmation to allow MEGA to read contacts book.">Allow</string>
+    <string name="general_allow" context="Positive confirmation to allow MEGA to read contacts book.">Permite</string>
     <string name="enable_log_text_dialog" context="Dialog to confirm the action of enabling logs">Autentificările pot conține informații referitoare la contul tău</string>
 
     <string name="confirmation_to_reconnect" context="Dialog to confirm the reconnect action">Conexiunea la rețea recuperată. Te conectezi la MEGA?</string>
@@ -1613,7 +1613,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">Bonusuri pentru recomandări</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">Instalează o aplicație mobilă</string>
-    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">Add mobile phone</string>
+    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">Adaugă nr. de tel. mobil</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Bonus de înregistrare</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Instalează aplicația desktop MEGA</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Cotă de bază a contului</string>
@@ -1726,7 +1726,7 @@
     <string name="section_my_code" context="Title of QR code section">Codul meu</string>
     <string name="section_scan_code" context="Title of QR code scan section">Scanează codul</string>
     <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">Acceptă automat</string>
-    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Contactele care îți scanează codul QR vor fi adăugați automat în lista de contacte.</string>
+    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Utilizatorii MEGA care îți scanează codul QR vor fi adăugați automat în lista de contacte.</string>
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Codul QR anterior nu va mai fi valid</string>
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Link copiat în clipboard</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">Cod QR resetat cu succes</string>
@@ -2109,7 +2109,7 @@
     <string name="error_delete_versions" context="error message when deleting all the versions of the account">A apărut o eroare la încercarea de ștergere a tuturor versiunilor anterioare ale fișierelor, te rugăm să încerci din nou mai târziu.</string>
 
     <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">Versionarea fișierelor</string>
-    <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Activează sau dezactivează versionarea fișierelor pentru întregul cont.\nEste posibil să primești în continuare versiuni ale fișierelor din folderele partajate, dacă contactele tale au această opțiune activată.</string>
+    <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Activează sau dezactivează versionarea fișierelor pentru întregul cont.\nDezactivarea versionării fișierelor nu împiedică contactele tale să creeze noi versiuni în folderele partajate.</string>
     <string name="choose_chat" context="section title to select a chat to send a file">Alege un chat</string>
 
     <string name="type_mail" context="Hint shown to guide user on activity add contacts">Atinge, introdu numele sau e-mailul</string>
@@ -2158,7 +2158,7 @@
         <item context="Section title to select a file to perform an action, more files" quantity="other">Alege fișiere</item>
     </plurals>
 
-    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">Invite %1$s?</string>
+    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">Inviți pe %1$s?</string>
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Alege folderul</string>
 
@@ -2371,7 +2371,7 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Activează camera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permite accesul la cameră pentru a scana documente, a realiza fotografii și a efectua apeluri video.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Activează apelurile</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Enable access to contacts</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Activează accesul la contacte</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA needs access to your contacts to help you connect with other people on MEGA.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permite accesul la microfon pentru a efectua apeluri criptate.</string>
     <string name="general_enable_access" context="General enable access">Activează accesul</string>
@@ -2450,12 +2450,12 @@
     </plurals>
 
     <plurals name="quantity_of_local_contact">
-        <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d Contact found on MEGA</item>
-        <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d Contacts found on MEGA</item>
+        <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d contact găsit pe MEGA</item>
+        <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacte găsite pe MEGA</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Invite contact now?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
-    <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
+    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Inviți contactul acum?</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Vezi cine este deja pe MEGA</string>
+    <string name="get_registered_contacts" context="Getting registered contacts">Se încarcă contactele pe MEGA&#8230;</string>
 
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">Conținutul nu a fost trimis către %d chaturi</string>
@@ -2483,7 +2483,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Nu ai contacte MEGA. Te rugăm să inviți prieteni din secțiunea Contacte.</string>
-    <string name="invite_more" context="Invite button for chat top cell">Invite more&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">Invită mai mulți&#8230;</string>
 
     <string name="title_tour_one" context="Title of first tour screen">Tu deții cheile</string>
     <string name="content_tour_one" cotext="Content of first tour screen">Securitatea este motivul pentru care existăm, fișierele tale sunt în siguranță în spatele unei mașini de criptare bine unsă, loc în care numai tu poți accesa fișierele.</string>
@@ -2558,14 +2558,14 @@
     <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REAMINTITĂ)</string>
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (ÎN AȘTEPTARE)</string>
 
-    <string name="version_restored" context="Message shown when it restored successfully a file version">Version restored successfully.</string>
+    <string name="version_restored" context="Message shown when it restored successfully a file version">Versiune restaurată cu succes.</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Atinge și ține pentru a înregistra, eliberează pentru a trimite</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Glisează pentru a anula</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">Acest mesaj vocal nu este disponibil</string>
 
-    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Invite a friend via</string>
-    <string name="invite_contact_action_button" context="Action button label">Invite a friend via&#8230;</string>
+    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Invită un prieten via</string>
+    <string name="invite_contact_action_button" context="Action button label">Invită un prieten via&#8230;</string>
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d fișier descărcat deja.&#160;</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d fișiere descărcate deja.&#160;</item>
@@ -2579,7 +2579,7 @@
     <string name="recents_label" context="Label to reference a recents section">Recente</string>
     <string name="chats_label" context="Label to reference a chats section">Chaturi</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No file activity to show in [/B][A]Recents[/A][B].[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Nicio activitate privind fișierele pentru a fi afișată în [/B][A]Recente[/A][B].[/B]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s și încă %2$d</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d imagini</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d videoclipuri</string>
@@ -2591,7 +2591,7 @@
     <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]actualizat de [/A]%s</string>
     <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Eu</string>
 
-    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get free %1$s when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get %1$s free when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Nu este posibilă înregistrarea mesajelor vocale în timp ce există un apel în desfășurare.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">A apărut o eroare la încercarea de încărcare a mesajului vocal.</string>
@@ -2602,12 +2602,12 @@
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Te rugăm să astepți&#8230;</string>
 
     <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">When you logout, files from your Offline section will be deleted from your device.</string>
-    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">When you logout, ongoing transfers will be cancelled.</string>
+    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">Când te deconectezi, transferurile în curs vor fi anulate.</string>
     <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">When you logout, files from your Offline section will be deleted from your device and ongoing transfers will be cancelled.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Nume necunoscut</string>
 
-    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please, select one or more contacts.</string>
+    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Te rugăm să selectezi unul sau mai multe contacte.</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s contacte trimise.</string>
 </resources>

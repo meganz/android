@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA menyediakan penyimpanan dan chat cloud terenkripsi yang dikendalikan oleh pengguna melalui browser web standar, bersama dengan aplikasi khusus untuk perangkat seluler. Tidak seperti penyedia penyimpanan cloud lainnya, data Anda dienkripsi dan didekripsi oleh perangkat klien Anda saja dan tidak pernah oleh kami.\n\nUnggah file Anda dari ponsel cerdas atau tablet kemudian cari, simpan, unduh, streaming, lihat, bagikan, ubah nama atau hapus file Anda kapan saja, dari perangkat apa pun, di mana saja. Bagikan folder dengan kontak Anda dan lihat pembaruan mereka secara real time. Proses enkripsi berarti kita tidak dapat mengakses atau mereset kata sandi Anda sehingga Anda HARUS mengingatnya (kecuali Anda telah memulihkan Recovery Key) atau Anda akan kehilangan akses ke file tersimpan Anda.\n\n End-to-end yang dienkripsi pengguna Obrolan video MEGA memungkinkan privasi total, dan telah tersedia melalui peramban sejak 2016. Aplikasi ini telah diperluas ke aplikasi seluler kami, dengan riwayat obrolan dapat diakses di beberapa perangkat. Pengguna juga dapat dengan mudah menambahkan file ke obrolan dari MEGA Cloud Drive mereka.\n\n MEGA menawarkan penyimpanan gratis 50 GB yang murah hati untuk semua pengguna terdaftar dengan pencapaian bonus, dan menawarkan paket berbayar dengan batas yang jauh lebih tinggi:\n\n\n LITE PRO berlangganan: 4,99 € per bulan atau 49,99 € per tahun memberi Anda 200 GB ruang penyimpanan dan 1 TB kuota transfer per bulan.\n PRO I berlangganan: 9,99 € per bulan atau 99,99 € per tahun memberi Anda 1 TB ruang penyimpanan dan 2 TB kuota transfer per bulan.\n Langganan PRO II: 19,99 € per bulan atau 199,99 € per tahun memberi Anda 4 TB ruang penyimpanan dan 8 TB kuota transfer per bulan.\n Langganan PRO III: 29,99 € per bulan atau 299,99 € per tahun memberi Anda 8 TB ruang penyimpanan dan 16 TB kuota transfer per bulan.\n\n Langganan diperbarui secara otomatis untuk periode langganan berturut-turut dengan durasi yang sama dan pada harga yang sama dengan periode awal yang dipilih. Untuk mengelola langganan Anda, cukup klik ikon Play Store di perangkat seluler Anda, masuk dengan Google ID Anda (jika Anda belum melakukannya) lalu klik aplikasi MEGA. Anda akan dapat mengelola langganan Anda di sana.\n\n Izin Aplikasi:\nWRITE_EXTERNAL_STORAGE -> Unduh file Anda dari MEGA ke perangkat Anda dan unggah file dari perangkat Anda ke MEGA\nCAMERA -> Ambil gambar dan unggah foto Anda ke MEGA\nREAD_CONTACTS -> Tambah dengan mudah kontak dari perangkat Anda sebagai kontak MEGA\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mikrofon dan kamera) -> MEGA menyediakan untuk panggilan audio / video terenkripsi end-to-end\n\n\nUntuk meningkatkan kepercayaan pengguna terhadap sistem MEGA, semua kode sisi klien diterbitkan, sehingga peneliti keamanan yang tertarik dapat mengevaluasi proses enkripsi. Kode aplikasi seluler kami berada di: https://github.com/meganz/android\n\nUntuk info lebih lanjut, silakan periksa situs web kami:\n Lihat https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA menyediakan penyimpanan dan chat cloud terenkripsi yang dikendalikan oleh pengguna melalui browser web standar, bersama dengan aplikasi khusus untuk perangkat seluler. Tidak seperti penyedia penyimpanan cloud lainnya, data Anda dienkripsi dan didekripsi oleh perangkat klien Anda saja dan tidak pernah oleh kami.\n\nUnggah file Anda dari ponsel cerdas atau tablet kemudian cari, simpan, unduh, streaming, lihat, bagikan, ubah nama atau hapus file Anda kapan saja, dari perangkat apa pun, di mana saja. Bagikan folder dengan kontak Anda dan lihat pembaruan mereka secara real time. Proses enkripsi berarti kita tidak dapat mengakses atau mereset kata sandi Anda sehingga Anda HARUS mengingatnya (kecuali Anda telah memulihkan Recovery Key) atau Anda akan kehilangan akses ke file tersimpan Anda.\n\nEnd-to-end yang dienkripsi pengguna Obrolan video MEGA memungkinkan privasi total, dan telah tersedia melalui peramban sejak 2016. Aplikasi ini telah diperluas ke aplikasi seluler kami, dengan riwayat obrolan dapat diakses di beberapa perangkat. Pengguna juga dapat dengan mudah menambahkan file ke obrolan dari MEGA Cloud Drive mereka.\n\nMEGA menawarkan penyimpanan gratis 50 GB yang murah hati untuk semua pengguna terdaftar dengan pencapaian bonus, dan menawarkan paket berbayar dengan batas yang jauh lebih tinggi:\n\n\nLangganan PRO LITE: 4,99 € per bulan atau 49,99 € per tahun memberi Anda 200 GB ruang penyimpanan dan 1 TB kuota transfer per bulan.\nLangganan PRO I: 9,99 € per bulan atau 99,99 € per tahun memberi Anda 1 TB ruang penyimpanan dan 2 TB kuota transfer per bulan.\nLangganan PRO II: 19,99 € per bulan atau 199,99 € per tahun memberi Anda 4 TB ruang penyimpanan dan 8 TB kuota transfer per bulan.\nLangganan PRO III: 29,99 € per bulan atau 299,99 € per tahun memberi Anda 8 TB ruang penyimpanan dan 16 TB kuota transfer per bulan.\n\nLangganan diperbarui secara otomatis untuk periode langganan berturut-turut dengan durasi yang sama dan pada harga yang sama dengan periode awal yang dipilih. Untuk mengelola langganan Anda, cukup klik ikon Play Store di perangkat seluler Anda, masuk dengan Google ID Anda (jika Anda belum melakukannya) lalu klik aplikasi MEGA. Anda akan dapat mengelola langganan Anda di sana.\n\nIzin Aplikasi:\nWRITE_EXTERNAL_STORAGE -> Unduh file Anda dari MEGA ke perangkat Anda dan unggah file dari perangkat Anda ke MEGA\nCAMERA -> Ambil gambar dan unggah foto Anda ke MEGA\nREAD_CONTACTS -> Tambah dengan mudah kontak dari perangkat Anda sebagai kontak MEGA\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mikrofon dan kamera) -> MEGA menyediakan untuk panggilan audio / video terenkripsi end-to-end\n\n\nUntuk meningkatkan kepercayaan pengguna terhadap sistem MEGA, semua kode sisi klien diterbitkan, sehingga peneliti keamanan yang tertarik dapat mengevaluasi proses enkripsi. Kode aplikasi seluler kami berada di: https://github.com/meganz/android\n\nUntuk info lebih lanjut, silakan periksa situs web kami:\n Lihat https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
 
     <!--
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -22,7 +22,7 @@
     <!-- This string is commented in FileStorageActivityLollipop.java
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
     -->
-    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Download</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Unduh</string>
     <string name="general_add" context="button">Tambah</string>
     <string name="general_move" context="Item menu option upon right click on one or multiple files.">Pindahkan</string>
     <string name="general_remove" context="Menu option to delete one or multiple selected items.">Hapus</string>
@@ -31,7 +31,7 @@
     <string name="general_confirm" context="button">Confirm</string>
     -->
     <string name="general_leave" context="Item menu option upon right click on one or multiple files.">Tinggalkan</string>
-    <string name="general_decryp" context="button">Decrypt</string>
+    <string name="general_decryp" context="button">Dekripsikan</string>
 
     <string name="general_export" context="button">Ekspor</string>
 
@@ -45,7 +45,7 @@
     <string name="general_forwarding" context="state while importing the file">Meneruskan</string>
     <string name="general_import" context="Menu option to choose to add file or folders to Cloud Drive">Import</string>
     <string name="general_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Gudang</string>
-    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: “8TB Bandwidth”. Can also be translated as data transfer.">Quota Transfer</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: “8TB Bandwidth”. Can also be translated as data transfer.">Kuota Transfer</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Subscribe</string>
     <!--
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>
@@ -263,7 +263,7 @@
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Dibagikan</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Membagikan</string>
 
-    <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Incoming Shares</string>
+    <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Berbagi Masuk</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Berbagi dengan</string>
     <!--
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
@@ -359,7 +359,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Bukan</string>
     <string name="context_renaming" context="while renaming a file or folder">Mengubah nama</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Mempersiapkan file</string>
-    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Download</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Unduh</string>
 
     <!--
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Download folder</string>
@@ -516,7 +516,7 @@
     <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download from MEGA link</string>
     -->
 
-    <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Decryption Key</string>
+    <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Kunci Dekripsi</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Masukkan decryption key untuk link</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">Gambar</string>
@@ -660,7 +660,7 @@
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Gudang</string>
     <string name="settings_pin_lock" context="settings of the pin lock">PIN Lock</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Kompresi video menghabiskan banyak daya; MEGA akan meminta Anda untuk mengisi daya perangkat Anda secara aktif jika video yang dikompres lebih besar dari %s.</string>
-	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures and videos were taken, so be careful when sharing them.</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Lanjutan</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Hapus Cache</string>
@@ -683,15 +683,15 @@
     <string name="general_back_button" context="Button label - go to previous page">Kembali</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
     <string name="general_confirm_button" context="Button label - confirm some action">Konfirm</string>
-	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
-    <string name="verify_account_not_loading_country_code" context="error message if the country code cannot be fetched">Country codes could not be fetched.</string>
-	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
+	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Please select a country code</string>
+    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Country codes could not be fetched.</string>
+	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Harap berikan nomor telfon yang valid.</string>
 	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Please type the verification code sent to</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">verifikasi akun anda</string>
 	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">You didn’t receive a code?</string>
     <string name="general_resend_button" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">Kirim lagi</string>
-	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This number is already associated with a Mega account.</string>
+	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This number is already associated with a MEGA account.</string>
 	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
 	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">The verification code doesn’t match.</string>
 	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
@@ -884,7 +884,7 @@
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Akun PRO Lite</string>
 
-    <string name="backup_title" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication,">Backup Recovery Key anda</string>
+    <string name="backup_title" context="">Backup Recovery Key anda</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Kata sandi Anda membuka Recovery Key Anda</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Data Anda hanya dapat dibaca melalui serangkaian operasi dekripsi yang dimulai dengan kunci enkripsi master Anda, yang kami simpan dienkripsi dengan kata sandi Anda. Ini berarti bahwa jika Anda kehilangan kata sandi Anda, kunci utama Anda tidak dapat didekripsi lagi, dan Anda tidak bisa lagi mendekripsi data Anda.</string>
@@ -1190,7 +1190,7 @@
 
     <string name="confirmation_remove_chat_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">Hapus %s dari chat ini?</string>
 
-    <string name="observer_permission_label_participants_panel" context="Refers to access rights for a file folder.">Read-only</string>
+    <string name="observer_permission_label_participants_panel" context="Refers to access rights for a file folder.">Hanya-baca</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1255,8 +1255,8 @@
     <!--
     <string name="list_message_deleted" context="Text show in list of chats when the last message has been deleted">Message deleted</string>
     -->
-    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A] to enter with another account</string>
-    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Are you sure that you want to logout current account?</string>
+    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A] to use MEGA with another account</string>
+    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Are you sure that you want to log out of the current account?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Pesan ini telah dihapus oleh %1$s</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Riwayat obrolan telah dihapus</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">Riwayat obrolan dihapus oleh %1$s</string>
@@ -1319,12 +1319,12 @@
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">Umum</string>
     <string name="tab_my_account_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Gudang</string>
     <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Gudang</string>
-    <string name="label_transfer_quota_upgrade_account" context="Title of the section about the transfer quota in the storage tab in My Account Section">Transfer quota</string>
-    <string name="label_transfer_quota_achievements" context="Title of the section about the transfer quota in the storage tab in My Account Section">Transfer quota</string>
+    <string name="label_transfer_quota_upgrade_account" context="Title of the section about the transfer quota in the storage tab in My Account Section">Kuota transfer</string>
+    <string name="label_transfer_quota_achievements" context="Title of the section about the transfer quota in the storage tab in My Account Section">Kuota transfer</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Plan</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Tempat penyimpanan</string>
-    <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">Transfer quota</string>
+    <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">Kuota transfer</string>
 
     <string name="available_space" context="Label in section the storage tab in My Account Section">Tersedia</string>
     <string name="not_available" context="Label in section the storage tab in My Account Section when no info info is received">tidak tersedia</string>
@@ -1549,7 +1549,7 @@
     <string name="file_properties_shared_folder_public_link_name">Link</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Akses penuh</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Read-only</string>
+    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Hanya-baca</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">Read &amp; write</string>
 
     <string name="attachment_uploading_state_uploading">Mengupload&#8230;</string>
@@ -1779,7 +1779,7 @@
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Mengirim request</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Request diterima</string>
-    <string name="overquota_alert_title" context="Title dialog overquota error">Quota terlewati</string>
+    <string name="overquota_alert_title" context="Title dialog overquota error">Kuota penyimpanan terlewati</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Link tidak valid, harap minta link baru yang valid</string>
 
@@ -2450,8 +2450,8 @@
     </plurals>
 
     <plurals name="quantity_of_local_contact">
-        <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d Contact found on MEGA</item>
-        <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d Contacts found on MEGA</item>
+        <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d contact found on MEGA</item>
+        <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacts found on MEGA</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Invite contact now?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
@@ -2591,7 +2591,7 @@
     <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]diperbarui oleh [/A]%s</string>
     <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Saya</string>
 
-    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get free %1$s when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get %1$s free when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Tidak mungkin merekam pesan suara saat ada panggilan yang sedang berlangsung.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Terjadi kesalahan saat mencoba mengunggah pesan suara.</string>
@@ -2607,7 +2607,7 @@
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Nama tidak dikenal</string>
 
-    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please, select one or more contacts.</string>
+    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please select one or more contacts.</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s Kontak Terkirim.</string>
 </resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA通过网页浏览器以及移动客户端的应用程序提供由用户控制的加密云储存服务。不同于其他云储存供应商，您的数据仅由用户客户端设备进行加密与解密，而从不是经由我们加解密。\n\n您可以通过智能手机或平板电脑上传您的文件，并且随时随地从任何设备上进行搜索，存储，下载，流动传输，查看，共享，重命名或删除文件。与您的联系人共享文件夹并随时查看其更新。此加密方式也代表我们无法存取或重新设定您的密码，因此您必须牢牢记住它（除非您有备份恢复密钥），否则您将无法存取您所储存的文件。\n\n终端至终端用户加密的MEGA视频聊天是完全隐私的，自2016年起已通过浏览器提供。它已扩展至我们的移动应用程序并可通过多个设备访问聊天历史记录。用户还可以轻松地将文件添加至MEGA云盘的聊天中。\n\n注册用户只要参与奖励计划即可获得50GB免费储存空间，亦可付费获得更多配额：\n\n\nPRO LITE订阅：每月4.99 €或每年49.99 €，为您提供200GB的存储空间和1TB的传输配额。\nPRO I订阅：每月9.99 €或每年99.99 €，为您提供1TB的存储空间和2TB的传输配额。\nPRO II订阅：每月19.99€或每年199.99€，为您提供4TB的存储空间和8TB的传输配额。\nPRO III订阅：每月29.99 €或每年299.99 €，为您提供8TB的存储空间和每月16TB的传输配额。\n\n此订阅将会自动更新续订，续订内容与您一开始选择的订阅时间与价格一致。欲管理您的订阅内容，只需点击您手机上的Play商店图标，以您的Google账号登入（如果您还没有这样做），然后点击MEGA应用程序。您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - >将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA \n CAMERA - >拍照并将照片上传至MEGA \n READ_CONTACTS - >从您的设备中轻松地添加联系人作为MEGA联系人\n RECORD_AUDIO＆CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - > MEGA提供终端至终端加密音频/视频通话\n\n\n为了增强用户对MEGA系统的信心，所有的客户端代码都已发布，因此感兴趣的安全研究人员可以评估加密过程。 我们的移动应用程序的代码位于：https：//github.com/meganz/android\n\n欲了解更多信息，请查看我们的网站：\n请参阅https://mega.nz/terms \n \n \n桌面 - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA通过网页浏览器以及移动客户端的应用程序提供由用户控制的加密云储存服务。不同于其他云储存供应商，您的数据仅由用户客户端设备进行加密与解密，而从不是经由我们加解密。\n\n您可以通过智能手机或平板电脑上传您的文件，并且随时随地从任何设备上进行搜索，存储，下载，流动传输，查看，共享，重命名或删除文件。与您的联系人共享文件夹并随时查看其更新。此加密方式也代表我们无法存取或重新设定您的密码，因此您必须牢牢记住它（除非您有备份恢复密钥），否则您将无法存取您所储存的文件。\n\n终端至终端用户加密的MEGA视频聊天是完全隐私的，自2016年起已通过浏览器提供。它已扩展至我们的移动应用程序并可通过多个设备访问聊天历史记录。用户还可以轻松地将文件添加至MEGA云盘的聊天中。\n\n注册用户只要参与奖励计划即可获得50GB免费储存空间，亦可付费获得更多配额：\n\n\nPRO LITE订阅：每月€4.99 (USD$4.99)或每年€49.99 (USD$49.99)，您会获得每月400GB的存储空间和1TB的传输流量。\nPRO I订阅：每月€9.99 (USD$9.99)或每年€99.99 (USD$99.99)，您会获得每月2TB的存储空间和2TB的传输流量。\nPRO II订阅：每月€19.99 (USD$19.99)或每年€199.99 (USD$199.99)，您会获得每月8TB的存储空间和8TB的传输流量。\nPRO III订阅：每月€29.99 (USD$29.99)或每年€299.99 (USD$299.99)，您会获得每月16TB的存储空间和16TB的传输流量。\n\n此订阅将会自动更新续订，续订内容与您一开始选择的订阅时间与价格一致。欲管理您的订阅内容，只需点击您手机上的Play商店图标，以您的Google账号登入（如果您还没有这样做），然后点击MEGA应用程序。您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - >将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA \n CAMERA - >拍照并将照片上传至MEGA \n READ_CONTACTS - >从您的设备中轻松地添加联系人作为MEGA联系人\n RECORD_AUDIO＆CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - > MEGA提供终端至终端加密音频/视频通话\n\n\n为了增强用户对MEGA系统的信心，所有的客户端代码都已发布，因此感兴趣的安全研究人员可以评估加密过程。 我们的移动应用程序的代码位于：https：//github.com/meganz/android\n\n想要了解更多信息，请查看我们的网站：\n请参阅https://mega.nz/terms \n \n \n桌面 - https://mega.nz/</string>
 
     <!--
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -91,7 +91,7 @@
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
 
-    <string name="action_logout" context="Button where the user can sign off or logout">注销</string>
+    <string name="action_logout" context="Button where the user can sign off or logout">登出</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">上传</string>
     <string name="action_create_folder" context="Menu item">新建文件夹</string>
     <string name="action_open_link" context="Item menu option upon right click on one or multiple files.">打开链接</string>
@@ -101,7 +101,7 @@
 
     <string name="action_settings" context="Menu item">设定</string>
     <string name="action_search" context="Search button">搜索</string>
-    <string name="action_search_country" context="Select country page title">Select country</string>
+    <string name="action_search_country" context="Select country page title">选择国家</string>
     <string name="action_play" context="Search button">播放</string>
     <string name="action_pause" context="Search button">暂停</string>
     <string name="action_refresh" context="Menu item">刷新</string>
@@ -132,8 +132,8 @@
     </plurals>
 
     <plurals name="num_contacts_selected">
-        <item context="chat invitation - tool bar subtitle, when users selected single contact. Placeholder - number of contacts selected" quantity="one">%d contact</item>
-        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d contacts</item>
+        <item context="chat invitation - tool bar subtitle, when users selected single contact. Placeholder - number of contacts selected" quantity="one">%d个联系人</item>
+        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d个联系人</item>
     </plurals>
 
     <plurals name="general_num_folders">
@@ -660,7 +660,7 @@
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">储存空间</string>
     <string name="settings_pin_lock" context="settings of the pin lock">PIN 锁定</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">压缩视频会消耗电池电量，当压缩的视频大于%s时，MEGA会提醒您需为设备充电。</string>
-	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures and videos were taken, so be careful when sharing them.</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">开启后，您的相关照片的拍摄地点信息会被上传，分享前请谨慎选择。</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">高级</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">清除缓存</string>
@@ -675,28 +675,28 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">默认下载位置</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">总是询问下载地址</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">显示高级设备（外置SD）</string>
-	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
+	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">添加手机号</string>
 	<string name="verify_account_title" context="enter verification code page title">验证您的帐户</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">您的帐户由于滥用行为已被暂时停用。请通过验证手机号解锁您的帐户。</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">国家</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">您的手机号码</string>
     <string name="general_back_button" context="Button label - go to previous page">返回</string>
-	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
+	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">不用了</string>
     <string name="general_confirm_button" context="Button label - confirm some action">确认</string>
-	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
-    <string name="verify_account_not_loading_country_code" context="error message if the country code cannot be fetched">Country codes could not be fetched.</string>
-	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
-	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Please type the verification code sent to</string>
+	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">请选择一个国家区号</string>
+    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">无法获取国家区号</string>
+	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">请填写正确的电话号码。</string>
+	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">请输入验证码，已发送至</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">验证您的帐户</string>
-	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
-	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">You didn’t receive a code?</string>
+	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">验证码错误。请再试一次或重新发送。</string>
+	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">收不到验证码？</string>
     <string name="general_resend_button" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">重新发送</string>
-	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This number is already associated with a Mega account.</string>
-	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
-	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">The verification code doesn’t match.</string>
-	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
-	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
-	<string name="verify_account_successfully" context="verify phone number successfully">Your phone number has been verified successfully</string>
+	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">该手机号已关联了一个MEGA帐户</string>
+	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">您已达到每日限额</string>
+	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">验证码不匹配</string>
+	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">该验证码已通过验证</string>
+	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">验证码错误。请再试一次或重新发送。</string>
+	<string name="verify_account_successfully" context="verify phone number successfully">您的手机号已成功验证</string>
 
     <string-array name="settings_storage_download_location_array">
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">计算中</item>
@@ -732,7 +732,7 @@
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">只在充电状态下</string>
-    <string name="settings_camera_upload_include_gps" context="Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded">Include location tags</string>
+    <string name="settings_camera_upload_include_gps" context="Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded">分享位置标签</string>
     <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">仅在设备充电时进行视频压缩</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">以设备中文件的名称保存</string>
 
@@ -884,7 +884,7 @@
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite 账户</string>
 
-    <string name="backup_title" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication,">备份您的恢复密钥</string>
+    <string name="backup_title" context="">备份您的恢复密钥</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">您的密码可以解锁恢复密钥</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">您的数据只能通过您的主加密密钥开始读取、解密，并存储。这意味着如果您丢失密码，您的主密钥将无法被解密，从而无法解密数据。</string>
@@ -1255,8 +1255,8 @@
     <!--
     <string name="list_message_deleted" context="Text show in list of chats when the last message has been deleted">Message deleted</string>
     -->
-    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A] to enter with another account</string>
-    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Are you sure that you want to logout current account?</string>
+    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]登出[/A]，使用其他帐户登录</string>
+    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">确定要退出当前帐户吗？</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">%1$s 删除了信息</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">聊天记录已清空</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">%1$s 清空了聊天记录</string>
@@ -1371,7 +1371,7 @@
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">离线模式中没有储存文件</string>
 
     <string name="general_enable" context="Positive confirmation to enable logs">启用</string>
-    <string name="general_allow" context="Positive confirmation to allow MEGA to read contacts book.">Allow</string>
+    <string name="general_allow" context="Positive confirmation to allow MEGA to read contacts book.">允许</string>
     <string name="enable_log_text_dialog" context="Dialog to confirm the action of enabling logs">日志文件可能会包含一些您帐户的信息。</string>
 
     <string name="confirmation_to_reconnect" context="Dialog to confirm the reconnect action">网络已恢复。马上连接 MEGA 吗？</string>
@@ -1613,7 +1613,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">邀请好友奖励</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">安装手机应用程序</string>
-    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">Add mobile phone</string>
+    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">添加手机号</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">注册奖励</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">安装MEGA桌面应用程序</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">帐户配额</string>
@@ -1638,11 +1638,11 @@
 
     <string name="paragraph_info_achievement_install_desktop" context="info paragraph about the achievement install megasync">当您安装MEGAsync时，您将获得%1$s的免费存储空间以及%2$s的传输配额，两者的有效期为180天。MEGA桌面应用程序可用于Windows，MacOS和大多数Linux发行版。</string>
     <string name="paragraph_info_achievement_install_mobile_app" context="info paragraph about the achievement install mobile app">当您安装我们的手机应用程序时，您可以获得%1$s的存储空间与%2$s的流量配额，两者都有效期为180天。 我们为iOS系统，安卓系统和Windows系统手机提供手机应用。</string>
-    <string name="paragraph_info_achievement_add_phone" context="info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">When you verify your phone number you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days.</string>
+    <string name="paragraph_info_achievement_add_phone" context="info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">验证手机号后，您将获得%1$s的免费存储空间和%2$s的传输流量，有效期为180天。</string>
 
     <string name="result_paragraph_info_achievement_install_desktop" context="info paragraph about the completed achievement install megasync">您已安装我们的MEGA桌面应用程序，并且获得了%1$s的存储空间和%2$s的流量配额。</string>
     <string name="result_paragraph_info_achievement_install_mobile_app" context="info paragraph about the completed achievement install mobile app">您已成功安装我们的移动应用，并且收到了%1$s的存储空间和%2$s的传输配额</string>
-    <string name="result_paragraph_info_achievement_add_phone" context="info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">You have received %1$s storage space and %2$s transfer quota for verifying your phone number.</string>
+    <string name="result_paragraph_info_achievement_add_phone" context="info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">您已通过验证手机号获得%1$s的存储空间和%2$s的传输流量。</string>
     <string name="result_paragraph_info_achievement_registration" context="info paragraph about the completed achievement registration">您已经收到%1$s的存储空间作为免费注册奖励。</string>
 
     <string name="expiration_date_for_achievements" context="info paragraph about the completed achievement registration">奖励还有%1$d天到期</string>
@@ -1726,7 +1726,7 @@
     <string name="section_my_code" context="Title of QR code section">我的二维码</string>
     <string name="section_scan_code" context="Title of QR code scan section">扫码</string>
     <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">自动接受</string>
-    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">扫描二维码码的联系人会自动添加到您的联系人列表中。</string>
+    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">通过扫描二维码添加的用户会自动添加到您的联系人列表</string>
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">之前的QR码将失效</string>
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">链接已复制到剪贴板</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">二维码重置成功</string>
@@ -1891,11 +1891,11 @@
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">检验您的密码</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">密码已确认</string>
     <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">密码错误。\n请尽快备份您的恢复密钥！</string>
-    <string name="recovery_key_exported_dialog_title" context="Title of the dialog ‘Recovery Key exported’">恢复金匙已导出</string>
+    <string name="recovery_key_exported_dialog_title" context="Title of the dialog ‘Recovery Key exported’">恢复秘钥已导出</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog ‘Recovery Key exported’">恢复密钥已导出至离线文件MEGARecoveryKey.txt.\n注意：如果您注销帐号将删除该文件，请将它复制至安全的位置。</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">您即将注销帐号，请测试您是否记得密码。\n如果您忘记密码，您将无法再次访问您在MEGA上的数据。</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">复制到粘贴板</string>
-    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">导出恢复金匙</string>
+    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">导出恢复密钥</string>
     <string name="proceed_to_logout" context="Option that permits user logout">继续登出</string>
     <string name="recovery_key_bottom_sheet" context="Title of the preference Recovery key on Settings section">恢复密钥</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">保存至文件系统</string>
@@ -2129,10 +2129,10 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">该码无效</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">云盘空间几乎已满。 升级至PRO并获得高达8TB的存储空间和16TB的传输配额。</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">云盘空间几乎已满。升级至PRO帐户并获得高达%1$s的存储空间和%2$s的传输流量。</string>
     <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">云盘空间几乎已满。立即升级并获得高达8TB的存储空间和16TB的传输流量。</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">云端空间几乎已满。如果您需要更多存储空间，请联系MEGA技术支持获取定制计划。</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">云盘空间已满。升级至PRO帐户并获得高达8TB的存储空间和16TB的传输流量。</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">云盘空间已满。升级至PRO帐户并获得高达%1$s的存储空间和%2$s的传输流量。</string>
     <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">云盘空间已满。立即升级并获得高达8TB的存储空间和16TB的传输流量。</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">云盘空间已满。如果您需要更多存储空间，请联系MEGA技术支持获取定制计划。</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">参看方案</string>
@@ -2158,7 +2158,7 @@
         <item context="Section title to select a file to perform an action, more files" quantity="other">选择文件</item>
     </plurals>
 
-    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">Invite %1$s?</string>
+    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">是否确定邀请%1$s？</string>
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">选择文件夹</string>
 
@@ -2371,8 +2371,8 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">开启相机功能</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">允许访问您的相机以扫描文档、拍摄照片和视频通话。</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">开启通话功能</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Enable access to contacts</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA needs access to your contacts to help you connect with other people on MEGA.</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">允许访问联系人</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">与其他人建立联系前，MEGA需访问您的联系人</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">允许访问您的麦克风以进行加密通话</string>
     <string name="general_enable_access" context="General enable access">开启访问权限</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">已共享文件</string>
@@ -2450,12 +2450,12 @@
     </plurals>
 
     <plurals name="quantity_of_local_contact">
-        <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d Contact found on MEGA</item>
-        <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d Contacts found on MEGA</item>
+        <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">已找到%d个联系人</item>
+        <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">已找到%d个联系人</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Invite contact now?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
-    <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
+    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">立即邀请联系人？</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">看看谁在用MEGA</string>
+    <string name="get_registered_contacts" context="Getting registered contacts">正在加载MEGA联系人&#8230;&#8230;</string>
 
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">该内容未发送至%d个聊天</string>
@@ -2483,7 +2483,7 @@
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">您还没有MEGA联系人。请在“联系人”选项中邀请好友。</string>
-    <string name="invite_more" context="Invite button for chat top cell">Invite more&#8230;</string>
+    <string name="invite_more" context="Invite button for chat top cell">邀请更多&#8230;&#8230;</string>
 
     <string name="title_tour_one" context="Title of first tour screen">您持有这把密钥</string>
     <string name="content_tour_one" cotext="Content of first tour screen">安全即是我们存在的意义。您的文件会在我们的加密机器下受到安全保护，并且只有您可以访问您的文件。</string>
@@ -2546,7 +2546,7 @@
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">邀请联系人并开始加密聊天。</string>
     <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">开始使用端到端加密安全的与您的联系人进行聊天</string>
 
-    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hi! Have secure conversations on MEGA with me and get up to 50GB free storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">嗨！和我一起使用MEGA，并获得最高50GB的免费存储空间。%1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it.">无聊天链接可用。</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">聊天链接已成功删除</string>
@@ -2558,14 +2558,14 @@
     <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s（已提醒）</string>
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s（待处理）</string>
 
-    <string name="version_restored" context="Message shown when it restored successfully a file version">Version restored successfully.</string>
+    <string name="version_restored" context="Message shown when it restored successfully a file version">版本已成功恢复</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">按住说话，松开发送</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">滑动以取消</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">语音信息不可用</string>
 
-    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Invite a friend via</string>
-    <string name="invite_contact_action_button" context="Action button label">Invite a friend via&#8230;</string>
+    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">邀请好友通过</string>
+    <string name="invite_contact_action_button" context="Action button label">邀请好友通过&#8230;&#8230;</string>
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">已下载%d个文件.&#160;</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">已下载%d个文件.&#160;</item>
@@ -2591,8 +2591,8 @@
     <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">由%s[A]更新[/A]</string>
     <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">我</string>
 
-    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get free %1$s when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
-    <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">添加手机号后即可免费获得%1$s，您的联系人也可轻松在MEGA上找到您。</string>
+    <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">添加手机号到您的MEGA帐户，您的联系人即可轻松在MEGA上找到您。</string>
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">正在进行通话时，无法录制语音留言。</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">上传语音信息时出错。</string>
 
@@ -2601,13 +2601,13 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">读取中</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">请等待&#8230;</string>
 
-    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">When you logout, files from your Offline section will be deleted from your device.</string>
-    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">When you logout, ongoing transfers will be cancelled.</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">When you logout, files from your Offline section will be deleted from your device and ongoing transfers will be cancelled.</string>
+    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">登出帐户后，“离线”中的文件将从您的设备中删除。</string>
+    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">登出帐户后，正在进行的传输将被取消。</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">登出帐户后，“离线”中的文件将从您的设备中删除，传输中的文件将被取消。</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">未知名称</string>
 
-    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please, select one or more contacts.</string>
+    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">请选择一个或多个联系人</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">已传给%s 位联系人。</string>
 </resources>

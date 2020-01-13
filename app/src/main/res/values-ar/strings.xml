@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">يوفر MEGA تخزين سحابي مشفر ومتحكم بها عن طريق المستخدم والمحادثة من خلال متصفحات الويب العادية، جنبا إلى جنب مع تطبيقات مخصصة للهواتف المحمولة. خلافا لغيرها من مقدمي خدمة التخزين السحابي، يتم تشفير البيانات الخاصة بك وفك التشفير بواسطة الأجهزة الخاصة بك فقط ولن يمكن فكها من قبلنا نهائيا.\n\nارفع ملفاتك من جوالك الذكي أو الجهاز اللوحي ثم ابحث أوخزن أو حمل أو شاهد أو بث أو شارك أو أعد التسمية أو احذف ملفاتك بأي وقت ومن أي جهاز وبأي مكان. شارك مجلداتك مع جهات الاتصال خاصتك وشاهد تحديثاتهم فورياً في الوقت الحقيقي. عملية التشفير تعني أننا لا نستطيع الدخول أو إعادة تعيين كلمة السر الخاصة بك لذا عليك تذكرها (مالم يكن لديك مفتاح الاستعادة منسوخ احتياطيا) أو ستفقد إمكانية الولوج أو الدخول لملفاتك المخزنة.\n\nمكالمات فيديو مشفرة من طرف الى طرف تسمح للمستخدم بخصوصية كاملة، وهي متوفرة عن طريق المتصفح منذ 2016. وتم ضم الميزة لتطبيقاتنا على الجوالات مع القدرة على تصفح تاريخ المحادثات عبر الأجهزة المختلفة. يستطيع المستخدمون أيضا وبكل سهولة إضافة ملفات لمحادثة معينة من سحابة التخزين ميغا.\n\nميغا تقدم خمسين جيجابايت كمساحة تخزينية مجانية لجميع المسجلين لديها مع علاوات عن طريق برنامج الانجازات، كما توفر أيضا باقات مدفوعة لتخزين اعلى بكثير:\n\n\nاشتراك برو لايت: 4،99 € في الشهر أو 49.99 € سنويا يمنحك 200 غيغابايت من مساحة التخزين و 1 تيرابايت من حصة نقل في الشهر.\nاشتراك برو 1: 9.99 € في الشهر أو 99.99 € سنويا يمنحك 1 تيرابايت من مساحة التخزين و 2 تيرابايت من حصة نقل شهريا. \nاشتراك برو 2: 19.99 € في الشهر أو 199.99 € سنويا يمنحك 4 تيرابايت من مساحة التخزين و 8 تيرابايت من حصة النقل شهريا.\nاشتراك برو 3: 29.99 € في الشهر أو 299.99 € سنويا يمنحك 8 تيرابايت من مساحة التخزين و 16 تيرابايت من حصة نقل في الشهر. \n\nالاشتراكات تتجدد تلقائيا لفترات الاشتراك المتعاقبة وبنفس المدة وبنفس سعر الاشتراك المدفع في اول الشهر. لإدارة اشتراكاتك، ما عليك سوى الضغط على أيقونة متجر بلاي على جهازك الجوال، سجل دخولك باستخدام معرف غوغل (إذا لم تكن قد فعلت هذا من قبل)، ثم انقر على تطبيق MEGA. ستتمكن من إدارة اشتراكك هناك.\n\nصلاحيات التطبيق:\nالتخزين على الذاكرة الخارجية -> حمل ملفات من MEGA لجهازك وارفع الملفات من جهازك إلى ميغا\nالكاميرا-> التقط صورة وارفع صورك إلى MEGA\nاستخدام_جهات_الاتصال -> أضف بسهولة جهات اتصال من جهازك واجعلهم كجهات اتصال في ميغا\nتسجيل_الصوت و التقاط_فيديو (الكاميرات و المايكروفون) -> MEGA تزود اتصال صوتي أو مرئي بتشفير من النهاية حتى النهاية\n\n\nلتحسين وكثب ثقة المستخدم في نظام MEGA، كامل الرماز للتطبيقات منشور لذا من السهل تقييم عملية التشفير لدينا وبشفافية من خلال أي بحوثات أمنية مهتمة بهذا الشأن. كود تطبيق الجوال موجود على: https://github.com/meganz/android \n\nلمزيد من المعلومات، راجع موقعنا على الانترنت: \nانظر https://mega.nz/terms \n\n\nلسطح المكتب - https://mega.nz</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">تقدم ميغا MEGA تحزين سحابي مشفرة و متحكم به عن طريق المستخدم و المحادثة متاح عبر متصفحات الويب العادية، بالإضافة تطبيقات مخصصة للهواتف المحمولة. خلافاً لباقي مقدمي خدمة التخزين السحابي، يتم تشفير و فك تشفير البيانات الخاصة بك عن طريق الأجهزة الخاصة بك فقط و ليس عن طريقنا نهائياً.\n \nقم بتحميل ملفاتك من هاتفك الذكي أو الجهاز اللوحي ثم ابحث أو خزن أو حمل أو بث أو شاهد أو شارك أو أعد التسمية أو احذف ملفاتك بأي وقت ومن أي جهاز وفي أي مكان. شارك مجلدات مع جهات الاتصال خاصتك و شاهد تحديثاتهم فورياً في الوقت الحقيقي. عملية التشفير تعني أننا لا نستطيع الدخول أو إعادة تعيين كلمة المرور الخاصة بك لذا عليك تذكرها (مالم يكن لديك نسخة احتياطية من مفتاح الاستعادة) أو ستفقد إمكانية الدخول لملفاتك المخزنة.\n\nمكالمات الفيديو في ميغا MEGA المشفرة من طرف الى طرف تُتيح للمستخدم خصوصية كاملة، وهي متوفرة عن طريق المتصفح منذ 2016. وتم ضم الميزة لتطبيقاتنا على الهواتف المحمولة مع إمكانية تصفح تاريخ المحادثات عبر الأجهزة المختلفة. يستطيع المستخدمون أيضاً إضافة ملفات لمحادثة ما من سحابة التخزين ميغا MEGA وبكل سهولة.\n\nتقدم ميغا MEGA  خمسين جيجابايت كمساحة تخزينية واسعة و مجانية لجميع المستخدمين المسجلين لديها مع مكافآت الانجازات، كما توفر أيضا باقات مدفوعة لمساحات تخزين اعلى بكثير:\n\n\nاشتراك برو لايت: 4،99 € في الشهر أو 49.99 € في السنة يمنحك 400 غيغابايت من مساحة التخزين و 1 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك برو 1: 9.99 € في الشهر أو 99.99 € في السنة يمنحك 2 تيرابايت من مساحة التخزين و 2 تيرابايت من حجم التراسل المتاح في الشهر. \nاشتراك برو 2: 19.99 € في الشهر أو 199.99 € في السنة يمنحك 8 تيرابايت من مساحة التخزين و 8 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك برو 3: 29.99 € في الشهر أو 299.99 € في السنة يمنحك 16 تيرابايت من مساحة التخزين و 16 تيرابايت من حجم التراسل المتاح في الشهر.\n\nيتم تجديد الاشتراكات بشكل تلقائي ولنفس مدة الاشتراك وبنفس سعر الاشتراك المدفوع في بداية المدة المختارة. لإدارة اشتراكاتك، ما عليك سوى النقرعلى أيقونة متجر بلاي Play store على جهازك المحمول، ثم سجل دخولك باستخدام حسابك على غوغل (في حال لم تكن قد قمت بتسجيل دخولك سابقاً)، ثم انقر على تطبيق ميغا MEGA. ستتمكن من إدارة اشتراكك هناك.\n\nصلاحيات التطبيق:\nالتخزين_على_الذاكرة_الخارجية -> تحميل ملفات من ميغا MEGA إلى جهازك وترفيع ملفات من جهازك إلى ميغا MEGA\nالكاميرا-> التقاط  صورة و ترفيع صورك إلى ميغا MEGA\nاستخدام_جهات_الاتصال -> إضافة جهات إتصال على ميغا MEGA من جهات الاتصال على جهازك المحمول بكل سهولة\nتسجيل_صوت و التقاط_فيديو_من خلال (الكاميرا و المايكروفون) -> تقوم ميغا MEGA بتقديم اتصال صوت أو فيديو مشفر من طرف إلى طرف\n\n\nلتعزيز ثقة المستخدم في نظام ميغا MEGA، كل الرماز/الكود الخاص بالتطبيقات من طرف المستخدم منشور للعموم، بحيث يمكن للباحثين المهتمين في مجال الأمن تقييم عمليات التشفير. الرماز/كود تطبيق الهاتف المحمول موجود على: https://github.com/meganz/android \n\nلمزيد من المعلومات، يرجى مراجعة موقعنا الإلكتروني:\nانظر https://mega.nz/terms\n\n\nللحاسوب المكتبي - https://mega.nz/</string>
 
     <!--
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -22,7 +22,7 @@
     <!-- This string is commented in FileStorageActivityLollipop.java
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
     -->
-    <string name="general_download" context="Item menu option upon right click on one or multiple files.">تحميل</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">تنزيل</string>
     <string name="general_add" context="button">اضافة</string>
     <string name="general_move" context="Item menu option upon right click on one or multiple files.">نقل</string>
     <string name="general_remove" context="Menu option to delete one or multiple selected items.">حذف</string>
@@ -62,7 +62,7 @@
     -->
     <string name="general_show_info" context="Hint how to cancel the download">شاهد المعلومات</string>
 
-    <string name="error_general_nodes" context="Error getting the root node">خطأ، الرجاء المحاولة ثانية</string>
+    <string name="error_general_nodes" context="Error getting the root node">خطأ، الرجاء المحاولة مرة أخرى.</string>
 
     <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
 
@@ -359,7 +359,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">فتح</string>
     <string name="context_renaming" context="while renaming a file or folder">جاري اعادة التسمية</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">تجهيز الملف</string>
-    <string name="context_download" context="Item menu option upon right click on one or multiple files.">تحميل</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">تنزيل</string>
 
     <!--
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Download folder</string>
@@ -660,7 +660,7 @@
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">التخزين</string>
     <string name="settings_pin_lock" context="settings of the pin lock">كود التعريف الشخصي</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
-	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures and videos were taken, so be careful when sharing them.</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">متقدم</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">مسح التخزين المؤقت</string>
@@ -683,15 +683,15 @@
     <string name="general_back_button" context="Button label - go to previous page">العودة</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
     <string name="general_confirm_button" context="Button label - confirm some action">تأكيد</string>
-	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
-    <string name="verify_account_not_loading_country_code" context="error message if the country code cannot be fetched">Country codes could not be fetched.</string>
-	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
+	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Please select a country code</string>
+    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Country codes could not be fetched.</string>
+	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">يرجى تقديم رقم هاتف صالح.</string>
 	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Please type the verification code sent to</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">تأكيد حسابك</string>
 	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">You didn’t receive a code?</string>
     <string name="general_resend_button" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">إعادة إرسال</string>
-	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This number is already associated with a Mega account.</string>
+	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This number is already associated with a MEGA account.</string>
 	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
 	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">The verification code doesn’t match.</string>
 	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
@@ -884,7 +884,7 @@
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">حساب برو لايت</string>
 
-    <string name="backup_title" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication,">انسخ مفتاح الاستعادة احتياطيا</string>
+    <string name="backup_title" context="">انسخ مفتاح الاستعادة احتياطيا</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">كلمة المرور تفتح مفتاح الاستعادة</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">يتم قراءة البيانات الخاصة بك فقط من خلال سلسلة من عمليات فك التشفير التي تبدأ مع مفتاح التشفير الرئيسي الخاص بك، حيث نقوم بتخزين مشفر مع كلمة المرور الخاصة بك. وهذا يعني أنه إذا فقدت كلمة المرور الخاصة بك، لم يعد يمكن فك المفتاح الرئيسي الخاص بك، ولم يعد بإمكانك فك تشفير البيانات الخاصة بك.</string>
@@ -1038,7 +1038,7 @@
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn’t exist">رابط الملف غير متوفر</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">تم إزالة رابط الملف بسبب انتهاك بنود الخدمة</string>
 
-    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">This URL is corrupt or deformed. The link you are trying to access does not exist.</string>
+    <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">الرابط غير صالح. الرابط الذي تحاول دخوله غير موجود.</string>
 
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">بانتظار تأكيد البريد الإلكتروني</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">يُرجى التحقق من البريد الإلكتروني الخاص بك واضغط على الرابط لتأكيد حسابك.</string>
@@ -1255,8 +1255,8 @@
     <!--
     <string name="list_message_deleted" context="Text show in list of chats when the last message has been deleted">Message deleted</string>
     -->
-    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A] to enter with another account</string>
-    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Are you sure that you want to logout current account?</string>
+    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A] to use MEGA with another account</string>
+    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Are you sure that you want to log out of the current account?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">تم حذف هذه الرسالة من قبل %1$s</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">تاريخ المحادثة تم مسحه</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">تم مسح سجل المحادثات من قبل %1$s</string>
@@ -1593,7 +1593,7 @@
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">نقل الي سلة المهملات؟</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">نقل الي سلة المهملات؟</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">الحذف من MEGA؟</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">إذا تركت المجلد، لن تكون قادرا على الوصول اليه مرة أخرى</string>
+    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">إذا تركت المجلد، لن تكون قادراً على الوصول إليه مرة أخرى.</string>
     <string name="attachment_uploading_state" context="label to indicate the state of an upload in chat">جاري الرفع&#8230;</string>
 
     <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">تنبيهات المحادثة</string>
@@ -1609,7 +1609,7 @@
 
     <string name="unlocked_rewards_title" context="title of the section for unlocked rewards">مكافئات مفعلة</string>
 
-    <string name="unlocked_storage_title" context="title of the section for unlocked storage quota">حصة التخزين</string>
+    <string name="unlocked_storage_title" context="title of the section for unlocked storage quota">مساحة التخزين المتاحة</string>
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">علاوات الدعوات</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">حمل  تطبيق الجوال</string>
@@ -1726,7 +1726,7 @@
     <string name="section_my_code" context="Title of QR code section">الرمز الخاص بي</string>
     <string name="section_scan_code" context="Title of QR code scan section">مسح الرمز</string>
     <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">قبول تلقائي</string>
-    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">سيتم إضافة جهات الاتصال التي تمسح رمز الاستجابة السريعة الخاص بك تلقائيًا إلى قائمة جهات اتصالك.</string>
+    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">مستخدمو ميغا MEGA الذين يقومون بمسح رمز الاستجابة السريعة QR الخاص بك، سيتم إضافتهم إلى قائمة الاتصال الخاصة بك تلقائياً.</string>
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">رمز QR السابق سيصبح غير صالح</string>
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">تم نسخ الرابط الى الحافظة</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">تم اعادة تعيين رمز QR بنجاح</string>
@@ -1767,7 +1767,7 @@
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]إفراغ [/B][A]سلة المهملات[/A][B].[/B]</string>
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]لا توجد ملفات في [/B][A]صندوق الوارد[/A][B].[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]No files in your [/B][A]Cloud Drive[/A][B].[/B]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]لا يوجد ملفات في [/B][A]السواقة السحابية الخاصة بك[/A][B].[/B]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]لا توجد ملفات [/B][A]دوت الاتصال بالإنترنت[/A][B].[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]لا يوجد [/B][A]جهات اتصال[/A][B].[/B]</string>
 
@@ -1867,12 +1867,12 @@
         <item context="Error non existing resource after forwarding one or several messages to several chats, message items" quantity="other">خطأ. المصادر غير متوفرة</item>
     </plurals>
 
-    <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">تفعيل الاخطارات</string>
+    <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">تفعيل الإشعارات</string>
     <string name="turn_on_notifications_subtitle" context="The subtitle of fragment Turn on Notifications">بهذه الطريقة ستتمكن من مشاهدة الرسائل الجديدة فورياً \nعلى جهاز اندرويد خاصتك</string>
     <string name="turn_on_notifications_first_step" context="First step to turn on notifications">افتح [A]اعدادات[/A] جهاز اندرويد</string>
     <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">افتح [A]التطبيقات والاخطارات[/A]</string>
     <string name="turn_on_notifications_third_step" context="Third step to turn on notifications">اختر [A]MEGA[/A]</string>
-    <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">افتح [A]اخطارات التطبيق[/A]</string>
+    <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">افتح [A]إشعارات  التطبيق[/A]</string>
     <string name="turn_on_notifications_fifth_step" context="Fifth step to turn on notifications">قم بالتفعيل ثم اختر تفضيلاتك</string>
 
     <plurals name="files_send_to_chat_success">
@@ -2109,7 +2109,7 @@
     <string name="error_delete_versions" context="error message when deleting all the versions of the account">حدث خطأ خلال عملية حذف النسخ المعدلة القديمة للملفات. يرجى إعادة المحاولة.</string>
 
     <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">النسخ المعدلة للملفات</string>
-    <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">تفعيل او تعطيل الاحتفاظ بنسخ معدلة للملفات لكامل حسابك.\nمن الممكن ان تستقبل ملفات مع نسخها المعدلة في مجلدات مشاركة معك اذا كانت جهة الاتصال مفعلة لهذه الميزة.</string>
+    <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">تفعيل أو تعطيل النسخ المعدلة للملفات لكامل حسابك.\nتعطيل ميزة النسخ المعدلة للملفات لا تمنع جهات الاتصال الخاصة بك من إنشاء نسخ جديدة في الملفات المشاركة.</string>
     <string name="choose_chat" context="section title to select a chat to send a file">إغلاق المحادثة</string>
 
     <string name="type_mail" context="Hint shown to guide user on activity add contacts">انقر على ادخال الاسم او البريد الالكتروني</string>
@@ -2130,11 +2130,11 @@
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">الرمز غير صالح</string>
 
     <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">مساحة التخزين شبه ممتلئة. قم بترقية حسابك الى PRO لتحصل على مساحة تخزين حتى 8 تيرابايت وحجم تراسل حتى 16 تيرابايت.</string>
-    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Cloud Drive is almost full. Upgrade now and get up to 8 TB of storage and 16 TB of transfer quota.</string>
-    <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Cloud Drive is almost full. If you need more storage please contact MEGA support to get a custom plan.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Cloud Drive is full. Upgrade to PRO and get up to 8 TB of storage and 16 TB of transfer quota.</string>
-    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Cloud Drive is full. Upgrade now and get up to 8 TB of storage and 16 TB of transfer quota.</string>
-    <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Cloud Drive is full. If you need more storage please contact MEGA support to get a custom plan.</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">السواقة السحابية ممتلئة تقريباً. قم بالترقية الآن و إحصل على حتى 8 تيرابايت من مساحة التخزين و  16 تيرابايت من حجم التراسل المتاح.</string>
+    <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">السواقة السحابية ممتلئة تقريباً. إذا كنت بحاجة لمساحة أكبر يرجى التواصل مع فريق ميغا MEGA للدعم لتحصل على إشتراك خاص.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">السواقة السحابية ممتلئة. قم بالترقية إلى برو PRO و إحصل على 8 تيرابايت من مساحة التخزين و 16 تيرابايت حجم التراسل المتاح.</string>
+    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">السواقة السحابية ممتلئة. قم بالترقية الآن و إحصل على  حتى 8 تيرابايت من مساحة التخزين و 16 تيرابايت حجم التراسل المتاح.</string>
+    <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">السواقة السحابية ممتلئة. إذا كنت بحاجة لمساحة تخزين أكبر يرجى التواصل مع فريق ميغا MEGA للدعم لتحصل على إشتراك خاص.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">مشاهدة الباقات</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">اشتراك مخصص</string>
     <string name="button_bonus_almost_full_warning" context="Button of the dialog shown when the storage is almost full to get bonus">احصل على علاوة</string>
@@ -2167,7 +2167,7 @@
 
     <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">قراءة فقط</string>
 
-    <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]of %2$s used[/B]</string>
+    <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]من %2$s مستهلك[/B]</string>
 
     <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">التغيير الى مخدم الاختبارات؟</string>
     <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">هل أنت متأكد من رغبتك بالانتقال الى المخدم التجريبي؟ من الممكن ان يتعرض حسابك لمشاكل غير قابلة للإصلاح.</string>
@@ -2198,11 +2198,11 @@
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">استخرج رابط المحادثة</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">إدارة رابط المحادثة</string>
 
-    <string name="make_chat_private_option" context="Title of the option to make a public chat private">Enable Encrypted Key Rotation</string>
-    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+    <string name="make_chat_private_option" context="Title of the option to make a public chat private">تمكين تدوير المفتاح المشفر</string>
+    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">تعد ميزة تدوير المفاتيح أكثر أماناً بقليل، لكنها لا تسمح لك بإنشاء رابط محادثة ولن يرى المشاركون الجدد الرسائل السابقة.</string>
 
-    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] created a chat link.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] deleted the chat link.[/B]</string>
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] أنشأ رابط محادثة.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] حذف رابط الدردشة.[/B]</string>
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">حذف رابط المحادثة</string>
 
@@ -2210,7 +2210,7 @@
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">هذا سيسجل خروجك من كل الجلسات الفعالة الاخرى باستثناء الجلسة الحالية.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">هل تريد اغلاق كل الجلسات الاخرى؟</string>
 
-    <string name="number_of_participants" context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants">%d participants</string>
+    <string name="number_of_participants" context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants">%d المشاركون</string>
 
     <string name="action_join" context="Label of the button to join a chat by a chat link">الانضمام</string>
 
@@ -2218,25 +2218,25 @@
 
     <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">حدث خطأ أثناء تحميل رابط المحادثة</string>
 
-    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the chat link.</string>
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">حدث خطأ عند تحميل رابط المحادثة.</string>
 
-    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">You are trying to preview a chat that you were previously a member of. Do you want to join the chat again?</string>
-    <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">You are already participating in this chat.</string>
+    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">أنت تحاول استعراض محادثة كنت عضواً فيها سابقاً. هل تريد الانضمام إلى المحادثة مرة أخرى؟</string>
+    <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">أنت تشارك بالفعل في هذه المحادثة.</string>
 
-    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is no longer available. If you leave the preview, you won’t be able to reopen it.</string>
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">استعراض هذه المحادثة لم يعد متاحاً. إذا غادرت الاستعراض، فلن تتمكن من إعادة فتحه.</string>
 
-    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] enabled encrypted key rotation.[/B]</string>
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] بتمكين تدوير مفتاح مشفر.[/B]</string>
 
-    <string name="invalid_chat_link" context="error message shown when a chat link is invalid">This conversation is no longer available</string>
-    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid chat link</string>
+    <string name="invalid_chat_link" context="error message shown when a chat link is invalid">هذه المحادثة لم تعد متوفرة.</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">رابط المحادثة غير صالح</string>
 
-    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Encrypted Key Rotation</string>
-    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">تدوير المفتاح المشفر</string>
+    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">تعد ميزة تدوير المفاتيح أكثر أماناً بقليل، لكنها لا تسمح لك بإنشاء رابط محادثة ولن يرى المشاركون الجدد الرسائل السابقة.</string>
 
-    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
-    <string name="action_open_chat_link" context="Menu item">Open chat link</string>
+    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">تعد ميزة تدوير المفاتيح أكثر أماناً بقليل، لكنها لا تسمح لك بإنشاء رابط محادثة ولن يرى المشاركون الجدد الرسائل السابقة.</string>
+    <string name="action_open_chat_link" context="Menu item">افتح رابط المحادثة</string>
 
-    <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
+    <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">تم إرسال الدعوة لجهة الإتصال هذه من قبل %s يمكنك مشاهدتها في تبويبة الدعوات المرسلة.</string>
 
     <string name="save_qr_cloud_drive" context="Label shown to indicate the QR is saving in Cloud Drive">جاري حفظ %s على السواقة السحابية&#8230;</string>
 
@@ -2249,60 +2249,60 @@
     <string name="general_show_more" context="Label that indicates show more items">إظهار المزيد</string>
     <string name="general_show_less" context="Label that indicates show less items">اظهار أقل</string>
 
-    <string name="notification_new_contact_request" context="Subtitle of the historic notification for a new contact request">[A]%s [/A][B]sent you a contact request.[/B]</string>
-    <string name="notification_new_contact" context="Subtitle of the historic notification for a new contact">[A]%s [/A][B]is now a contact.[/B]</string>
-    <string name="notification_new_shared_folder" context="Subtitle of the historic notification for a new shared folder">[B]New shared folder from [/B][A]%s.[/A]</string>
+    <string name="notification_new_contact_request" context="Subtitle of the historic notification for a new contact request">[A]%s [/A][B]أرسل لك طلب تواصل.[/B]</string>
+    <string name="notification_new_contact" context="Subtitle of the historic notification for a new contact">[A]%s [/A][B]أصبح جهة اتصال الآن.[/B]</string>
+    <string name="notification_new_shared_folder" context="Subtitle of the historic notification for a new shared folder">[B]لديك مجلد جديد مشارك من [/B][A]%s.[/A]</string>
 
-    <string name="notification_reminder_contact_request" context="Subtitle of the historic notification for a reminder new contact request">[A]Reminder: [/A][B]%s [/B][C]sent you a contact request.[/C]</string>
+    <string name="notification_reminder_contact_request" context="Subtitle of the historic notification for a reminder new contact request">[A]تذكير: [/A][B]%s [/B][C]أرسل لك طلب تواصل.[/C]</string>
 
     <string name="title_contact_request_notification_cancelled" context="Title of the historic notification for a contact request cancelled">تم الغاء طلب الاتصال</string>
-    <string name="subtitle_contact_request_notification_cancelled" context="Subtitle of the historic notification for contact request cancelled">[A]%s [/A][B]cancelled the contact request.[/B]</string>
+    <string name="subtitle_contact_request_notification_cancelled" context="Subtitle of the historic notification for contact request cancelled">[A]%s [/A][B]تم الغاء طلب التواصل.[/B]</string>
 
     <string name="title_contact_notification_deleted" context="Title of the historic notification when an user deletes you as contact">تم حذف جهة الاتصال</string>
-    <string name="subtitle_contact_notification_deleted" context="Subtitle of the historic notification when an user deletes you as contact">[A]%s [/A][B]deleted you as a contact.[/B]</string>
+    <string name="subtitle_contact_notification_deleted" context="Subtitle of the historic notification when an user deletes you as contact">[A]%s [/A][B]تم حذفك كجهة اتصال.[/B]</string>
 
     <string name="title_contact_notification_blocked" context="Title of the historic notification when an user blocks you as contact">تم حجب جهة الاتصال</string>
-    <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]blocked you as a contact.[/B]</string>
+    <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]تم حظرك كجهة اتصال.[/B]</string>
 
-    <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notifications [A](%1$d)[/A]</string>
+    <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">الإشعارات [A](%1$d)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">تم حذف الحساب</string>
-    <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]The account [/B][A]%s[/A][B] has been deleted.[/B]</string>
+    <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]الحساب [/B][A]%s[/A][B] قد تم حذفه.[/B]</string>
 
-    <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been taken down.[/C]</string>
-    <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been taken down.[/C]</string>
+    <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]ملفك المشارك للعموم [/A][B]%s[/B][C] قد تم إزالته.[/C]</string>
+    <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]ملفك المشارك للعموم [/A][B]%s[/B][C] قد تم إزالته.[/C]</string>
 
-    <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
-    <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]ملفك المشارك للعموم [/A][B]%s[/B][C] قد تم إعادته.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]ملفك المشارك للعموم [/A][B]%s[/B][C] قد تم إعادته.[/C]</string>
 
     <string name="title_outgoing_contact_request" context="Title of the historic notification for outgoing contact requests">طلب صادر</string>
     <string name="title_incoming_contact_request" context="Title of the historic notification for incoming contact requests">طلب وارد</string>
 
-    <string name="subtitle_outgoing_contact_request_denied" context="Subtitle of the historic notification for contact request denied">[A]%s [/A][B]denied your contact request.[/B]</string>
-    <string name="subtitle_outgoing_contact_request_accepted" context="Subtitle of the historic notification for contact request accepted">[A]%s [/A][B]accepted your contact request.[/B]</string>
+    <string name="subtitle_outgoing_contact_request_denied" context="Subtitle of the historic notification for contact request denied">[A]%s [/A][B]رفض طلبك للتواصل.[/B]</string>
+    <string name="subtitle_outgoing_contact_request_accepted" context="Subtitle of the historic notification for contact request accepted">[A]%s [/A][B]قبل طلبك للتواصل.[/B]</string>
 
-    <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for deleted shared folders (one or many)">[B]Access to folders shared by [/B][A]%s[/A][B] were removed.[/B]</string>
-    <string name="notification_left_shared_folder" context="Subtitle of the historic notification when a contact leaves a shared folder">[A]%s[/A][B] has left a shared folder.[/B]</string>
-    <string name="notification_left_shared_folder_with_name" context="Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known">[A]%1$s[/A][B] has left the shared folder [/B][A]%2$s.[/A]</string>
+    <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for deleted shared folders (one or many)">[B]إن صلاحية الدخول إلى المجلدات المشاركة من [/B][A]%s[/A][B] قد تم إلغائها.[/B]</string>
+    <string name="notification_left_shared_folder" context="Subtitle of the historic notification when a contact leaves a shared folder">[A]%s[/A][B] قد ترك المجلد المشارك.[/B]</string>
+    <string name="notification_left_shared_folder_with_name" context="Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known">[A]%1$s[/A][B] قد ترك الملف المشارك [/B][A]%2$s.[/A]</string>
 
-    <string name="subtitle_incoming_contact_request_ignored" context="Subtitle of the historic notification for incoming contact request ignored">[B]Contact request from [/B][A]%s [/A][B]was ignored[/B]</string>
-    <string name="subtitle_incoming_contact_request_accepted" context="Subtitle of the historic notification for incoming contact request accepted">[B]Contact request from [/B][A]%s [/A][B]was accepted[/B]</string>
-    <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Contact request from [/B][A]%s [/A][B]was declined[/B]</string>
+    <string name="subtitle_incoming_contact_request_ignored" context="Subtitle of the historic notification for incoming contact request ignored">[B]طلب تواصل من [/B][A]%s [/A][B]تم رفضه[/B]</string>
+    <string name="subtitle_incoming_contact_request_accepted" context="Subtitle of the historic notification for incoming contact request accepted">[B]طلبك للتواصل من [/B][A]%s [/A][B]قم تم قبوله[/B]</string>
+    <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]طلب التواصل من [/B][A]%s [/A][B]قد تم رفضه[/B]</string>
 
-    <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Your current account is [A]%s[/A]</string>
+    <string name="type_of_my_account" context="Subtitle of the Upgrade account section">حسابك الحالي هو [A]%s[/A]</string>
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* تخضع لمشاركتك في برنامج الإنجازات لدينا</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">اختر طريقة الدفع</string>
 
     <string name="billing_period_title" context="title of billing period">فترة الفاتورة</string>
-    <string name="billed_monthly_text" context="option of billing period, monthly">[A]Billed monthly[/A] %s /month</string>
-    <string name="billed_yearly_text" context="option of billing period, yearly">[A]Billed yearly[/A] %s /year</string>
+    <string name="billed_monthly_text" context="option of billing period, monthly">[A]فوترة شهرية[/A] %s /شهر</string>
+    <string name="billed_yearly_text" context="option of billing period, yearly">[A]فوترة سنوية[/A] %s /سنة</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">الغاء</string>
     <string name="button_continue" context="dialog option continue in alert dialog">استمرار</string>
 
-    <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (subscription)</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
-    <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
+    <string name="payment_method_google_wallet" context="one of the payment methods">[A]دفع عن طريق غوغل[/A] (اشتراك)</string>
+    <string name="payment_method_credit_card" context="one of the payment methods">[A]بطاقة الإئتمان[/A] (اشتراك)</string>
+    <string name="payment_method_fortumo" context="one of the payment methods">[A]مزود خدمات الاتصال[/A] (لمرة واحدة)</string>
+    <string name="payment_method_centili" context="one of the payment methods">[A]مزود خدمات الاتصال[/A] (لمرة واحدة)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">جديد</string>
 
@@ -2329,90 +2329,90 @@
         <item context="on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders" quantity="other">%d مجلدات</item>
     </plurals>
 
-    <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
+    <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B] أضيف %2$s و %3$s[/B]</string>
 
     <plurals name="subtitle_notification_added_files">
-        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Singular of file. 1 file" quantity="one">[A]%1$s [/A][B]added %2$d file.[/B]</item>
-        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files" quantity="other">[A]%1$s [/A][B]added %2$d files.[/B]</item>
+        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Singular of file. 1 file" quantity="one">[A]%1$s [/A][B]أضيف %2$d ملف.[/B]</item>
+        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files" quantity="other">[A]%1$s [/A][B]أضيفت %2$d ملفات.[/B]</item>
     </plurals>
 
     <plurals name="subtitle_notification_deleted_items">
-        <item context="Subtitle of the historic notification for deletions inside an existing shared folder, Singular of item. 1 item" quantity="one">[A]%1$s [/A][B]deleted %2$d item.[/B]</item>
-        <item context="Subtitle of the historic notification for deletions inside an existing shared folder, Plural of item. 2 items" quantity="other">[A]%1$s [/A][B]deleted %2$d items.[/B]</item>
+        <item context="Subtitle of the historic notification for deletions inside an existing shared folder, Singular of item. 1 item" quantity="one">[A]%1$s [/A][B]تم حذف%2$d عنصر.[/B]</item>
+        <item context="Subtitle of the historic notification for deletions inside an existing shared folder, Plural of item. 2 items" quantity="other">[A]%1$s [/A][B]تم حذف %2$d عناصر.[/B]</item>
     </plurals>
 
     <plurals name="subtitle_notification_added_folders">
-        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Singular of folder. 1 folder" quantity="one">[A]%1$s [/A][B]added %2$d folder.[/B]</item>
-        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Plural of folder. 2 folders" quantity="other">[A]%1$s [/A][B]added %2$d folders.[/B]</item>
+        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Singular of folder. 1 folder" quantity="one">[A]%1$s [/A][B]تم إضافة%2$d مجلد.[/B]</item>
+        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Plural of folder. 2 folders" quantity="other">[A]%1$s [/A][B]تم إضافة %2$d مجلدات.[/B]</item>
     </plurals>
 
     <plurals name="subtitle_of_group_chat">
-        <item context="Subtitle chat screen for groups with permissions and not archived, Singular of participant. 1 participant" quantity="one">%d participant</item>
-        <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d participants</item>
+        <item context="Subtitle chat screen for groups with permissions and not archived, Singular of participant. 1 participant" quantity="one">%d المشارك</item>
+        <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d المشاركون</item>
     </plurals>
 
-    <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Before you can generate a link for this chat, you need to set a description:</string>
+    <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">قبل أن تتمكن من إنشاء رابط لهذه المحادثة، تحتاج إلى تعيين وصف:</string>
 
-    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat link copied to the clipboard</string>
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">تم نسخ رابط المحادثة إلى الحافظة</string>
 
-    <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s / [A]month[/A] *</string>
+    <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]من[/A] %s / [A]شهر[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* الاشتراكات المجددة تلقائيا يمكن إلغاؤها في أي وقت قبل وقت التجديد.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">المكالمة بدأت</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">خطأ بمفتاح SSL</string>
-    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public Wi-Fi with additional requirements.</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">ميغا Mega غير قابل على الإتصال بشكل آمن عبر التراسل المشفر SSL. ربما تقوم باستخدام شبكة إتصال بالانترنت Wi-Fi عامة مع متطلبات إضافية.</string>
 
-    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]لا[/B][A]إشعارات[/A][B].[/B]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">اعداد MEGA</string>
-    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA needs access to your photos, media and files so you are able to share them with friends, exchange encrypted messages and make secure calls.</string>
-    <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Allow access to photos, media and files.</string>
-    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">To share photos, media and files MEGA needs your permission.</string>
-    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Allow access to your camera to scan documents, take pictures and make video calls.</string>
-    <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
+    <string name="setup_mega_explanation" context="Permissions screen explanation">تحتاج ميغا MEGA إلى الوصول إلى الصور والوسائط والملفات الخاصة بك حتى تتمكن من مشاركتها مع الأصدقاء وتبادل الرسائل المشفرة و إجراء مكالمات آمنة.</string>
+    <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">السماح بالوصول إلى الصور والوسائط والملفات.</string>
+    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">لمشاركة الصور والوسائط والملفات، تحتاج ميغا MEGA إلى إذنك.</string>
+    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">تمكين الكاميرا</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">السماح بالوصول إلى الكاميرا لمسح مستندات والتقاط صور وإجراء مكالمات فيديو.</string>
+    <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">تمكين المكالمات</string>
     <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Enable access to contacts</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA needs access to your contacts to help you connect with other people on MEGA.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Allow access to your microphone to make encrypted calls.</string>
-    <string name="general_enable_access" context="General enable access">Enable access</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">السماح بالوصول إلى ميكروفونك لإجراء مكالمات مشفرة.</string>
+    <string name="general_enable_access" context="General enable access">تمكين الوصول</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">الملفات المشاركة</string>
 
-    <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
+    <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">تم إرسال المرفق</string>
 
-    <string name="call_ended_message" context="Message shown when a call ends.">[A]Call ended[/A][C]. Duration: [/C]</string>
+    <string name="call_ended_message" context="Message shown when a call ends.">[A]تم إنهاء الاتصال[/A][C]. المدة: [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
-        <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s hour[/B]</item>
-        <item context="Message that shows the hours of a call when it ends, more hours" quantity="other">[B]%1$s hours[/B]</item>
+        <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s ساعة[/B]</item>
+        <item context="Message that shows the hours of a call when it ends, more hours" quantity="other">[B]%1$s ساعات[/B]</item>
     </plurals>
     <plurals name="plural_call_ended_messages_minutes">
-        <item context="Message that shows the minutes of a call when it ends, one minute" quantity="one">[B]%1$s minute[/B]</item>
-        <item context="Message that shows the minutes of a call when it ends, more minutes" quantity="other">[B]%1$s minutes[/B]</item>
+        <item context="Message that shows the minutes of a call when it ends, one minute" quantity="one">[B]%1$s دقيقة[/B]</item>
+        <item context="Message that shows the minutes of a call when it ends, more minutes" quantity="other">[B]%1$s دقائق[/B]</item>
     </plurals>
     <plurals name="plural_call_ended_messages_seconds">
-        <item context="Message that shows the seconds of a call when it ends, one second" quantity="one">[B]%1$d second[/B]</item>
-        <item context="Message that shows the seconds of a call when it ends, more seconds" quantity="other">[B]%1$d seconds[/B]</item>
+        <item context="Message that shows the seconds of a call when it ends, one second" quantity="one">[B]%1$d ثانية[/B]</item>
+        <item context="Message that shows the seconds of a call when it ends, more seconds" quantity="other">[B]%1$d ثواني[/B]</item>
     </plurals>
 
-    <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]Last seen [/A]today %1$s</string>
-    <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user">[A]Last seen [/A]a long time ago</string>
-    <string name="last_seen_general" context="String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m.">[A]Last seen [/A]%1$s %2$s</string>
+    <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]آخر ظهور [/A]اليوم %1$s</string>
+    <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user">[A]آخر ظهور [/A]منذ وقت طويل</string>
+    <string name="last_seen_general" context="String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m.">[A]آخر ظهور [/A]%1$s %2$s</string>
 
     <string name="label_today" context="label today">اليوم</string>
     <string name="label_yesterday" context="label yesterday">الأمس</string>
 
-    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No [/B][A]Shared Files[/A][B].[/B]</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]لا يوجد [/B][A]ملفات مشاركة[/A][B].[/B]</string>
 
-    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s joined the call</string>
-    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s left the call</string>
+    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s انضم إلى المكالمة</string>
+    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s غادر المكالمة</string>
 
-    <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">You are not allowed to join this call as it has reached the maximum number of participants.</string>
-    <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">You are not allowed to enable video as this call has reached the maximum number of participants using video.</string>
+    <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">لا يمكنك الانضمام إلى هذه المكالمة لأنها بلغت الحد الأقصى لعدد المشاركين.</string>
+    <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">لا يمكنك القيام بمكالمة الفيديو لأن هذه المكالمة بلغت الحد الأقصى لعدد المشاركين الذين يستخدمون الفيديو.</string>
 
-    <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
+    <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">خطأ. لا يمكن قتح هذا الملف.</string>
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">مكالمة واردة&#8230;</string>
     <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">جار الاتصال</string>
 
-    <string name="error_meta_message_invalid" context="Content of a invalid meta message">Message contains invalid metadata</string>
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message">تحتوي الرسالة على بيانات وصفية غير صالحة.</string>
 
     <string name="title_activity_maps" context="Title of the activity that sends a location">Send Location</string>
     <string name="current_location_label" context="Label layout on maps activity that permits send current location">Send your current location</string>
@@ -2435,54 +2435,54 @@
     <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">From File System</string>
 
     <plurals name="num_files_not_send">
-        <item context="Alert shown when a num of files have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">%d file was not sent to %d chats</item>
-        <item context="Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files" quantity="other">%d files were not sent to %d chats</item>
+        <item context="Alert shown when a num of files have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">لم يتم إرسال %d ملف إلى %d المحادثات</item>
+        <item context="Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files" quantity="other">لم يتم ارسال %d ملفات إلى %d محادثات</item>
     </plurals>
 
     <plurals name="num_contacts_not_send">
-        <item context="Alert shown when a num of contacts have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">%d contact was not sent to %d chats</item>
-        <item context="Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files" quantity="other">%d contacts were not sent to %d chats</item>
+        <item context="Alert shown when a num of contacts have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">لم يتم ارسال %d جهة اتصال إلى %d محادثات</item>
+        <item context="Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files" quantity="other">لم يتم ارسال %d جهات اتصال إلى %d محادثات</item>
     </plurals>
 
     <plurals name="num_messages_not_send">
-        <item context="Alert shown when a num of messages have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">%d message was not sent to %d chats</item>
+        <item context="Alert shown when a num of messages have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">لم يتم ارسال %d رسالة إلى %d محادثات</item>
         <item context="Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files" quantity="other">%d messages were not sent to %d chats</item>
     </plurals>
 
     <plurals name="quantity_of_local_contact">
-        <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d Contact found on MEGA</item>
-        <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d Contacts found on MEGA</item>
+        <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d contact found on MEGA</item>
+        <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacts found on MEGA</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Invite contact now?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
 
 
-    <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
+    <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">لم يتم ارسال المحتوى إلى %d محادثات</string>
 
-    <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created successfully</string>
+    <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">تم إنشاء محادثة جماعية جديدة بنجاح</string>
     <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">إعداد الملفات</string>
-    <string name="sent_as_message" context="Label indicating some content has been sent as message">Sent as a message.</string>
+    <string name="sent_as_message" context="Label indicating some content has been sent as message">إرسال كرسالة.</string>
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">خطأ. الملف لم يرسل لأي من المحادثات المحددة</string>
-    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]No[/A] [B]Items[/B]</string>
+    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]لا يوجد[/A] [B]عناصر[/B]</string>
 
     <string name="delete_versions" context="Action delete all file versions">حذف النسخ القديمة</string>
-    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete previous versions?</string>
-    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Please note that the current file will not be deleted.</string>
-    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Previous versions deleted.</string>
-    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Previous versions not deleted.</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">حذف الإصدارات السابقة؟</string>
+    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">يرجى الملاحظة أن الملف الحالي لن يتم حذفه.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">تم حذف الإصدارات السابقة.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">الإصدارات السابقة غير محذوفة.</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false">
-        <item context="Confirmation message after deleted file versions, version item" quantity="one">%d version deleted successfully</item>
-        <item context="Confirmation message after deleted file versions, version items" quantity="other">%d versions deleted successfully</item>
+        <item context="Confirmation message after deleted file versions, version item" quantity="one">تم حذف %d إصدار بنجاح</item>
+        <item context="Confirmation message after deleted file versions, version items" quantity="other">تم حذف %d الإصدارات بنجاح</item>
     </plurals>
 
     <plurals name="versions_not_deleted" formatted="false">
-        <item context="Alert shown when some versions are not deleted successfully, version item" quantity="one">%d version not deleted</item>
-        <item context="Alert shown when some versions are not deleted successfully, version items" quantity="other">%d versions not deleted</item>
+        <item context="Alert shown when some versions are not deleted successfully, version item" quantity="one">%d إصدارغير محذوفة</item>
+        <item context="Alert shown when some versions are not deleted successfully, version items" quantity="other">%d إصدارات غير المحذوفة</item>
     </plurals>
 
-    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
+    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">ليس لديك جهات اتصال على ميغا MEGA. يرجى دعوة أصدقاء من قائمة جهات الاتصال.</string>
     <string name="invite_more" context="Invite button for chat top cell">Invite more&#8230;</string>
 
     <string name="title_tour_one" context="Title of first tour screen">انت تحتفظ بالمفتاح</string>
@@ -2495,41 +2495,41 @@
     <string name="content_tour_four" cotext="Content of fourth tour screen">تحميل صور الكاميرا هو ميزة اساسية لأي جهاز موبايل ونحن نقدم لك ذلك. انشئ حسابك الآن.</string>
 
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">أدخل كلمة السر الخاصة بك</string>
-    <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is a password protected PDF document. Please enter the password to open the PDF.</string>
-    <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">You have entered the wrong password, please try again.</string>
-    <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password you have entered is not valid.</string>
+    <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s ملف PDF محمي بكلمة مرور. يرجى إدخال كلمة المرور لفتح هذا الملف.</string>
+    <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">لقد قمت بإدخال كلمة مرور خاطئة، يرجى المحاولة مرة آخرى.</string>
+    <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">كلمة المرور التي أدخلتها غير صالحة.</string>
 
     <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">It is not possible to open the file. It is an unknown file type or it has not been possible to unzip the file successfully.</string>
 
-    <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play media files while there is a call in progress.</string>
+    <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">لا يمكن تشغيل ملفات الوسائط أثناء وجود مكالمة جارية.</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">مكالمة جارية</string>
-    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s started a group call. Tap to join.</string>
+    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">بدأ %s مكالمة جماعية. اضغط للانضمام.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call">انقر للعودة الى المكالمة</string>
 
-    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime.">[A]%1$s[/A][B] joined the group chat.[/B]</string>
+    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime.">[A]%1$s[/A][B]انضم إلى المحادثة الجماعية.[/B]</string>
 
     <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the chat link once it has been removed.</string>
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a chat link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a chat link?</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">هل ترغب في إنشاء محادثة جماعية جديدة والحصول على رابط محادثة؟</string>
 
-    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">تعد ميزة تدوير المفاتيح أكثر أماناً بقليل، لكنها لا تسمح لك بإنشاء رابط محادثة ولن يرى المشاركون الجدد الرسائل السابقة.</string>
 
-    <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">You have joined the chat successfully.</string>
+    <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">لقد انضممت إلى المحادثة بنجاح.</string>
 
-    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d of %2$d</string>
+    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d من %2$d</string>
 
-    <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
+    <string name="hint_action_search" context="Hint of the Search view">بحث&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">إجابة</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">تجاهل</string>
-    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s muted this call</string>
-    <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
+    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s كتم هذه المكالمة</string>
+    <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">تم الكتم</string>
 
     <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File already downloaded. Copied to the selected path.</string>
 
-    <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Join call</string>
-    <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">To join this call you have to end your current call.</string>
+    <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">انضممت إلى المكالمة</string>
+    <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">للانضمام إلى هذه المكالمة يجب عليك إنهاء مكالمتك الحالية.</string>
 
-    <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Enter chat link</string>
+    <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">ادخل رابط المحادثة</string>
 
     <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
     <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
@@ -2539,10 +2539,10 @@
     <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
     <string name="action_open_contact_link" context="Menu item">Open contact link</string>
 
-    <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">People can join your group by using this link.</string>
-    <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">New chat link</string>
+    <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">يمكن للأشخاص الانضمام إلى مجموعتك باستخدام هذا الرابط.</string>
+    <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">رابط محادثة جديد</string>
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">ادخل اسم المجموعة</string>
-    <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">To create a chat link you must name the group.</string>
+    <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">لإنشاء رابط محادثة، يجب عليك تسمية المجموعة.</string>
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
     <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">ابدأ بالمحادثة مع جهات الاتصال خاصتك باستخدام التشفير من طرف الى طرف</string>
 
@@ -2591,7 +2591,7 @@
     <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
     <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">أنا</string>
 
-    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get free %1$s when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get %1$s free when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
@@ -2607,7 +2607,7 @@
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
 
-    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please, select one or more contacts.</string>
+    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please select one or more contacts.</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">أرسل %s جهة اتصال.</string>
 </resources>
