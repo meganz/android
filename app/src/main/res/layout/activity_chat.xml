@@ -360,7 +360,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/toolbar_chat"
-                android:layout_above="@id/writing_container_layout_chat_layout"
                 android:background="@color/background_chat"
                 android:orientation="vertical">
 
