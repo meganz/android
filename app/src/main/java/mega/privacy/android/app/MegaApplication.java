@@ -152,6 +152,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
     private static boolean isVerifySMSShowed = false;
 
+    private static boolean isBlockedDueToWeakAccount = false;
+
 	MegaChatApiAndroid megaChatApi = null;
 
 	private NetworkStateReceiver networkStateReceiver;
@@ -1959,5 +1961,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
     public static boolean isVerifySMSShowed() {
 		return isVerifySMSShowed;
+	}
+
+	public static void setIsBlockedDueToWeakAccount(boolean isBlockedDueToWeakAccount) {
+		MegaApplication.isBlockedDueToWeakAccount = isBlockedDueToWeakAccount;
+	}
+
+	public static boolean isBlockedDueToWeakAccount() {
+		return isBlockedDueToWeakAccount;
 	}
 }

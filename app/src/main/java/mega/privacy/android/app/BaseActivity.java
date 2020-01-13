@@ -479,10 +479,11 @@ public class BaseActivity extends AppCompatActivity {
 
                 break;
             case WEAK_PROTECTION_ACCOUNT_BLOCK:
+                if (app.isBlockedDueToWeakAccount()) {
+                    break;
+                }
                 intent = new Intent(this, WeakAccountProtectionAlertActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
-
                 break;
             default:
                 showErrorAlertDialog(stringError, false, this);

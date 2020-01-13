@@ -26,8 +26,6 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
     private static final String IS_INFO_DIALOG_SHOWN = "IS_INFO_DIALOG_SHOWN";
     private static final String IS_ACCOUNT_BLOCKED = "IS_ACCOUNT_BLOCKED";
 
-    private MegaApiAndroid megaApi;
-
     private ScrollView scrollContentLayout;
     private TextView verifyEmailText;
     private RelativeLayout whyAmISeeingThisLayout;
@@ -41,7 +39,7 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        megaApi = MegaApplication.getInstance().getMegaApi();
+        app.setIsBlockedDueToWeakAccount(true);
 
         setContentView(R.layout.activity_weak_account_protection_alert);
 
@@ -105,6 +103,7 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        app.setIsBlockedDueToWeakAccount(false);
     }
 
     @Override
@@ -127,6 +126,10 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
         }
     }
 
+    /**
+     * Creates and shows an info dialog with possible causes why
+     * the user is blocked
+     */
     private void showInfoDialog() {
         if (infoDialog != null && infoDialog.isShowing()) return;
 
@@ -144,6 +147,13 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
         isInfoDialogShown = true;
     }
 
+    /**
+     * Manages the result of the request whyAmIBlocked().
+     * If the result is due to weak account protection (700), it does nothing.
+     * If not, it starts a new complete login and hide the alert.
+     *
+     * @param result the reason code of why I am blocked
+     */
     public void whyAmIBlockedResult(String result) {
         if (!result.equals(WEAK_PROTECTION_ACCOUNT_BLOCK) && isAccountBlocked) {
             isAccountBlocked = false;
