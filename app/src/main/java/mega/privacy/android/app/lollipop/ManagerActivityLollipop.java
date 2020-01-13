@@ -112,9 +112,11 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -262,7 +264,7 @@ import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
-
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener {
@@ -546,9 +548,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	long lastTimeOnTransferUpdate = Calendar.getInstance().getTimeInMillis();
 
-	public int orderCloud = MegaApiJava.ORDER_DEFAULT_ASC;
-	public int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
-	public int orderOthers = MegaApiJava.ORDER_DEFAULT_ASC;
+	public int orderCloud = ORDER_DEFAULT_ASC;
+	public int orderContacts = ORDER_DEFAULT_ASC;
+	public int orderOthers = ORDER_DEFAULT_ASC;
 	public int orderCamera = MegaApiJava.ORDER_MODIFICATION_DESC;
 //	private int orderOffline = MegaApiJava.ORDER_DEFAULT_ASC;
 //	private int orderOutgoing = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -866,7 +868,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null) {
 				boolean cloudOrder = intent.getBooleanExtra("cloudOrder", true);
-				int order = intent.getIntExtra("order", MegaApiJava.ORDER_DEFAULT_ASC);
+				int order = intent.getIntExtra("order", ORDER_DEFAULT_ASC);
 				if (cloudOrder) {
 					refreshCloudOrder(order);
 				}
@@ -2217,7 +2219,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("The orderCloud preference is: " + orderCloud);
 			}
 			else{
-				orderCloud = megaApi.ORDER_DEFAULT_ASC;
+				orderCloud = ORDER_DEFAULT_ASC;
 				logDebug("Preference orderCloud is NULL -> ORDER_DEFAULT_ASC");
 			}
 			if(prefs.getPreferredSortContacts()!=null){
@@ -2225,23 +2227,29 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("The orderContacts preference is: " + orderContacts);
 			}
 			else{
-				orderContacts = megaApi.ORDER_DEFAULT_ASC;
+				orderContacts = ORDER_DEFAULT_ASC;
 				logDebug("Preference orderContacts is NULL -> ORDER_DEFAULT_ASC");
 			}
+            if (prefs.getPreferredSortCameraUpload() != null) {
+                orderCamera = Integer.parseInt(prefs.getPreferredSortCameraUpload());
+                logDebug("The orderCamera preference is: " + orderCamera);
+            } else {
+                logDebug("Preference orderCamera is NULL -> ORDER_MODIFICATION_DESC");
+            }
 			if(prefs.getPreferredSortOthers()!=null){
 				orderOthers = Integer.parseInt(prefs.getPreferredSortOthers());
 				logDebug("The orderOthers preference is: " + orderOthers);
 			}
 			else{
-				orderOthers = megaApi.ORDER_DEFAULT_ASC;
+				orderOthers = ORDER_DEFAULT_ASC;
 				logDebug("Preference orderOthers is NULL -> ORDER_DEFAULT_ASC");
 			}
 		}
 		else {
 			logDebug("Prefs is NULL -> ORDER_DEFAULT_ASC");
-			orderCloud = megaApi.ORDER_DEFAULT_ASC;
-			orderContacts = megaApi.ORDER_DEFAULT_ASC;
-			orderOthers = megaApi.ORDER_DEFAULT_ASC;
+			orderCloud = ORDER_DEFAULT_ASC;
+			orderContacts = ORDER_DEFAULT_ASC;
+			orderOthers = ORDER_DEFAULT_ASC;
 		}
 		getOverflowMenu();
 
@@ -6738,9 +6746,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}else{
 					searchByDate.setVisible(false);
 				}
+                cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                if (cuFL != null && cuFL.getItemCount() > 0) {
+                    sortByMenuItem.setVisible(true);
+                } else {
+                    sortByMenuItem.setVisible(false);
+                }
 
-				//Hide
-				sortByMenuItem.setVisible(false);
+                //Hide
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
 				createFolderMenuItem.setVisible(false);
@@ -6817,9 +6830,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}else{
 					searchByDate.setVisible(false);
 				}
-
+                muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+                if (muFLol != null && muFLol.getItemCount() > 0) {
+                    sortByMenuItem.setVisible(true);
+                } else {
+                    sortByMenuItem.setVisible(false);
+                }
 				//Hide
-				sortByMenuItem.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
 				createFolderMenuItem.setVisible(false);
@@ -7717,7 +7734,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							long cameraUploadHandle = cuFL.getPhotoSyncHandle();
 							MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 							if (nps != null){
-								ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+								ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 								cuFL.setNodes(nodes);
 								isSearchEnabled=false;
 								setToolbarTitle();
@@ -7731,7 +7748,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							long cameraUploadHandle = muFLol.getPhotoSyncHandle();
 							MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 							if (nps != null){
-								ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+								ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 								muFLol.setNodes(nodes);
 								setToolbarTitle();
 								isSearchEnabled=false;
@@ -11964,21 +11981,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	public void selectSortByOffline(int _orderOthers){
-		logDebug("selectSortByOffline");
-
-		if (orderOthers == orderOthers) {
-			return;
-		}
-
-		this.orderOthers = _orderOthers;
-		this.setOrderOthers(orderOthers);
-		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-		if (oFLol != null){
-			oFLol.setOrder(orderOthers);
-		}
-	}
-
 	public void refreshCloudDrive () {
 		if (isCloudAdded()){
 			ArrayList<MegaNode> nodes;
@@ -12007,6 +12009,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if(sharesPageAdapter!=null){
 			sharesPageAdapter.notifyDataSetChanged();
 		}
+
 		iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
 		if (iFLol != null){
 			MegaNode inboxNode = megaApi.getInboxNode();
@@ -12015,6 +12018,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				iFLol.setNodes(nodes);
 				iFLol.getRecyclerView().invalidate();
 			}
+		}
+
+		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
+		if (oFLol != null){
+			oFLol.setOrder(orderCloud);
 		}
 	}
 
@@ -12035,23 +12043,20 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void selectSortUploads(int orderCamera){
 		logDebug("selectSortUploads");
 
-		if (this.orderCamera == orderCamera) {
-			return;
-		}
-
-		this.orderCamera = orderCamera;
-
+        setOrderCamera(orderCamera);
 		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 		if (cuFL != null){
-			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(cuFL.getPhotoSyncHandle()), MegaApiJava.ORDER_MODIFICATION_DESC);
+			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(cuFL.getPhotoSyncHandle()), orderCamera);
 			cuFL.setNodes(nodes);
+			cuFL.setOrderBy(orderCamera);
 			cuFL.getRecyclerView().invalidate();
 		}
 
 		muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 		if (muFLol != null){
-			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(muFLol.getPhotoSyncHandle()), MegaApiJava.ORDER_MODIFICATION_DESC);
+			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(muFLol.getPhotoSyncHandle()), orderCamera);
 			muFLol.setNodes(nodes);
+            muFLol.setOrderBy(orderCamera);
 			muFLol.getRecyclerView().invalidate();
 		}
 	}
@@ -12792,7 +12797,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				long cameraUploadHandle = cuFL.getPhotoSyncHandle();
 				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 				if (nps != null){
-					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 					if((searchByDate) != null && (searchDate!=null)){
 						ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
 						cuFL.setNodes(nodesSearch);
@@ -12813,7 +12818,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				long cameraUploadHandle = muFLol.getPhotoSyncHandle();
 				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 				if (nps != null){
-					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 					if((searchByDate) != null && (searchDate!=null)){
 						ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
 						muFLol.setNodes(nodesSearch);
@@ -16101,7 +16106,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("Camera Uploads Handle: " + cameraUploadHandle);
 			if (nps != null){
 				logDebug("nps != null");
-				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 
 				if(firstNavigationLevel){
 					cuFL.setNodes(nodes);
@@ -16132,7 +16137,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("Media Uploads Handle: " + cameraUploadHandle);
 			if (nps != null){
 				logDebug("nps != null");
-				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderCamera);
 				if(firstNavigationLevel){
 					muFLol.setNodes(nodes);
 				}else{
@@ -16600,6 +16605,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 		dbH.setPreferredSortContacts(String.valueOf(orderContacts));
 	}
+
+    public void setOrderCamera(int orderCamera) {
+        logDebug("setOrderCamera");
+        this.orderCamera = orderCamera;
+        if (prefs != null) {
+            prefs.setPreferredSortCameraUpload(String.valueOf(orderCamera));
+        }
+        dbH.setPreferredSortCameraUpload(String.valueOf(orderCamera));
+    }
 
 	public int getOrderOthers() {
 		return orderOthers;

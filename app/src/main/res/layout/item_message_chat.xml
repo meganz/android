@@ -701,8 +701,11 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_portrait"
-                            android:layout_width="152dp"
-                            android:layout_height="212dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="152dp"
+                            android:maxHeight="350dp"
+                            android:adjustViewBounds="true"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
 
@@ -750,16 +753,24 @@
                         <!--Transparent coat-->
                         <RelativeLayout
                             android:id="@+id/transparent_coating_portrait"
-                            android:layout_width="152dp"
-                            android:layout_height="212dp"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_alignLeft="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignRight="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignTop="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@drawable/shape_images_chat_transparent"/>
 
                         <!-- Progress bar-->
                         <RelativeLayout
                             android:id="@+id/uploadingProgressBarPort"
-                            android:layout_width="152dp"
-                            android:layout_height="212dp"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_alignLeft="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignRight="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignTop="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
                             android:background="@android:color/transparent">
                             <ProgressBar
                                 android:id="@+id/uploadingProgressBarPort_im"
@@ -833,8 +844,11 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_landscape"
-                            android:layout_width="212dp"
-                            android:layout_height="152dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="212dp"
+                            android:maxHeight="152dp"
+                            android:adjustViewBounds="true"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
 
@@ -883,15 +897,23 @@
                         <!--Transparent coat-->
                         <RelativeLayout
                             android:id="@+id/transparent_coating_landscape"
-                            android:layout_width="212dp"
-                            android:layout_height="152dp"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_alignLeft="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignRight="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignTop="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
                             android:background="@drawable/shape_images_chat_transparent"/>
 
                         <!-- Progress bar-->
                         <RelativeLayout
                             android:id="@+id/uploadingProgressBarLand"
-                            android:layout_width="212dp"
-                            android:layout_height="152dp"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_alignLeft="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignRight="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignTop="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
                             android:background="@android:color/transparent">
 
                             <ProgressBar
@@ -1580,6 +1602,7 @@
                             android:id="@+id/contact_rounded_imageview_location"
                             android:layout_width="256dp"
                             android:layout_height="140dp"
+                            android:adjustViewBounds="true"
                             android:layout_marginTop="1dp"
                             android:layout_marginLeft="1dp"
                             android:layout_marginRight="1dp"
@@ -1675,8 +1698,11 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_portrait"
-                            android:layout_width="152dp"
-                            android:layout_height="212dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="152dp"
+                            android:maxHeight="350dp"
+                            android:adjustViewBounds="true"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
 
@@ -1757,8 +1783,11 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_landscape"
-                            android:layout_width="212dp"
-                            android:layout_height="152dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="212dp"
+                            android:maxHeight="350dp"
+                            android:adjustViewBounds="true"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
 
