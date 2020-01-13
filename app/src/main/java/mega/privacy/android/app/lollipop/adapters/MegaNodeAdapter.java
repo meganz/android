@@ -502,7 +502,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holderList.textViewFileName.setMaxWidth(scaleWidthPx(275, outMetrics));
             } else {
-                holderList.textViewFileName.setMaxWidth(scaleWidthPx(210, outMetrics));
+                holderList.textViewFileName.setMaxWidth(scaleWidthPx(190, outMetrics));
             }
 
             holderList.textViewFileSize = v.findViewById(R.id.file_list_filesize);
