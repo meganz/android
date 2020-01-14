@@ -23,24 +23,23 @@ public class ContextUtils {
 
   /**
    * Stores the application context that will be returned by getApplicationContext. This is called
-   * by PeerConnectionFactory.initializeAndroidGlobals.
+   * by PeerConnectionFactory.initialize. The application context must be set before creating
+   * a PeerConnectionFactory and must not be modified while it is alive.
    */
   public static void initialize(Context applicationContext) {
-    if (ContextUtils.applicationContext != null) {
-      // TODO(sakal): Re-enable after the migration period.
-      // throw new RuntimeException("Multiple ContextUtils.initialize calls.");
-      Logging.e(
-          TAG, "Calling ContextUtils.initialize multiple times, this will crash in the future!");
-    }
     if (applicationContext == null) {
-      throw new RuntimeException("Application context cannot be null for ContextUtils.initialize.");
+      throw new IllegalArgumentException(
+          "Application context cannot be null for ContextUtils.initialize.");
     }
     ContextUtils.applicationContext = applicationContext;
   }
 
   /**
    * Returns the stored application context.
+   *
+   * @deprecated crbug.com/webrtc/8937
    */
+  @Deprecated
   public static Context getApplicationContext() {
     return applicationContext;
   }
