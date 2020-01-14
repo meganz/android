@@ -86,10 +86,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
+import static mega.privacy.android.app.MegaPreferences.*;
+import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.MegaPreferences.*;
-import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -129,6 +129,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	MegaPhotoSyncListAdapterLollipop adapterList;
 	MegaPhotoSyncGridTitleAdapterLollipop adapterGrid;
 	private MegaApiAndroid megaApi;
+	
+	private int orderBy = MegaApiJava.ORDER_MODIFICATION_DESC;
 
 //	long parentHandle = -1;
 //	private boolean firstTimeCam = false;
@@ -212,6 +214,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		return null;
 	}
+
+    public int getItemCount() {
+        if (adapterList != null) {
+            return adapterList.getItemCount();
+        }
+        if (adapterGrid != null) {
+            return adapterGrid.getItemCount();
+        }
+        return 0;
+    }
 
 	public void activateActionMode(){
 		logDebug("activateActionMode");
@@ -697,7 +709,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						}
 					}
 				}
-			}
+                if (prefs.getPreferredSortCameraUpload() != null) {
+                    orderBy = Integer.parseInt(prefs.getPreferredSortCameraUpload());
+                    logDebug("The orderCamera preference is: " + orderBy);
+                } else {
+                    logDebug("Preference orderCamera is NULL -> ORDER_MODIFICATION_DESC");
+                }
+            }
 		}
 
 		logDebug("After recovering bundle type: " + type);
@@ -907,10 +925,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 
 			if(!((ManagerActivityLollipop)context).getIsSearchEnabled()) {
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 			}
 			else{
-				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 				searchByDate = ((ManagerActivityLollipop)context).getTypeOfSearch();
 				nodes = searchDate(searchByDate,searchNodes);
 			}
@@ -969,6 +987,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			if (adapterList == null) {
 				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, CAMERA_UPLOAD_ADAPTER);
+			    adapterList.setOrder(orderBy);
 			} else {
 				if (context != adapterList.getContext()) {
 					logDebug("Attached activity changed");
@@ -1140,10 +1159,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			int countTitles = 0;
 
 			if(!((ManagerActivityLollipop)context).getIsSearchEnabled()) {
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 			}
 			else{
-				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 				searchByDate = ((ManagerActivityLollipop)context).getTypeOfSearch();
 				nodes = searchDate(searchByDate,searchNodes);
 			}
@@ -1244,6 +1263,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (adapterGrid == null) {
 				logDebug("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
 				adapterGrid = new MegaPhotoSyncGridTitleAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, CAMERA_UPLOAD_ADAPTER, itemInformationList.size(), countTitles, itemInformationList, defaultPath);
+				adapterGrid.setOrder(orderBy);
 				adapterGrid.setHasStableIds(true);
 			} else {
 				logDebug("ADAPTERGRID.MONTHPICS = " + monthPics.size());
@@ -1727,7 +1747,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
 
 							}
-							String localPath = findVideoLocalPath(context, psHMegaNode);
+                            String localPath = null;
+                            try {
+                                localPath = findVideoLocalPath(context, psHMegaNode);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                logWarning(e.getMessage());
+                            }
                             if (localPath != null && checkFingerprint(megaApi,psHMegaNode,localPath)) {
 								File mediaFile = new File(localPath);
 
@@ -1951,7 +1977,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			long cameraUploadHandle = getPhotoSyncHandle();
 			MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 			if (nps != null) {
-				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderBy);
 				setNodes(nodes);
 
 				((ManagerActivityLollipop)context).invalidateOptionsMenu();
@@ -2045,6 +2071,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		
 		return photosyncHandle;
 	}
+
+	public void setOrderBy(int orderBy) {
+	    this.orderBy = orderBy;
+	    if (adapterGrid != null) {
+	        adapterGrid.setOrder(orderBy);
+        }
+	    if(adapterList != null) {
+	        adapterList.setOrder(orderBy);
+        }
+    }
 
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;

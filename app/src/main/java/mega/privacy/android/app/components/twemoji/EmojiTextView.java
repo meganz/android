@@ -16,7 +16,6 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
-
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
@@ -25,6 +24,8 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface {
 
@@ -35,6 +36,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     private Display display;
     private DisplayMetrics mOutMetrics = new DisplayMetrics();
     private int textViewMaxWidth;
+    private boolean necessaryShortCode = true;
 
     public EmojiTextView(final Context context) {
         this(context, null);
@@ -84,8 +86,10 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     @Override
     public void setText(CharSequence rawText, BufferType type) {
         CharSequence text = rawText == null ? "" : rawText;
-        String resultText = EmojiUtilsShortcodes.emojify(text.toString());
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(resultText);
+        if(isNeccessaryShortCode()){
+            text = converterShortCodes(text.toString());
+        }
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
         Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
         float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
         EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
@@ -102,6 +106,14 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             super.setText(spannableStringBuilder, type);
         }
 
+    }
+
+    public boolean isNeccessaryShortCode() {
+        return necessaryShortCode;
+    }
+
+    public void setNeccessaryShortCode(boolean neccessaryShortCode) {
+        this.necessaryShortCode = neccessaryShortCode;
     }
 
     @Override

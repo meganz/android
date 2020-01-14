@@ -205,4 +205,6 @@
 
     <color name="black_40_alpha">#66000000</color>
 
+    <color name="reconnecting_bar">#FFF5A623</color>
+
 </resources>
