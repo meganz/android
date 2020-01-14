@@ -27,22 +27,14 @@ public class AskForDisplayOverDialog {
         final View dialogView = inflater.inflate(R.layout.ask_for_display_over_dialog_layout, null);
         dialogBuilder.setView(dialogView);
 
-        dialogView.findViewById(R.id.btn_not_now).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                dismiss();
-                Toast.makeText(context , R.string.ask_for_display_over_explain, Toast.LENGTH_LONG).show();
-            }
+        dialogView.findViewById(R.id.btn_not_now).setOnClickListener(v -> {
+            dismiss();
+            Toast.makeText(context, R.string.ask_for_display_over_explain, Toast.LENGTH_LONG).show();
         });
-        dialogView.findViewById(R.id.btn_ok).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
-                context.startActivity(intent);
-                dismiss();
-            }
+        dialogView.findViewById(R.id.btn_ok).setOnClickListener(v -> {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
+            context.startActivity(intent);
+            dismiss();
         });
         if (dialog == null) {
             dialog = dialogBuilder.create();
