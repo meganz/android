@@ -10,6 +10,7 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
+import com.vdurmont.emoji.EmojiParser;
 
 import java.io.File;
 import java.util.List;
@@ -19,7 +20,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
-import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import nz.mega.sdk.MegaApiAndroid;
@@ -35,19 +35,51 @@ public class AvatarUtil {
 
     /*Method to get the letter or emoji, which will be painted in the default avatar*/
     public static String getFirstLetter(String text) {
-        if(text.isEmpty()) return UNKNOWN_USER_NAME_AVATAR;
+        String resultUnknown = String.valueOf(UNKNOWN_USER_NAME_AVATAR.charAt(0)).toUpperCase(Locale.getDefault());
+        if (text.isEmpty()) {
+            return resultUnknown;
+        }
+
         text = text.trim();
-        if(text.length() == 1) return String.valueOf(text.charAt(0)).toUpperCase(Locale.getDefault());
+        if (text.length() == 1) {
+            return String.valueOf(text.charAt(0)).toUpperCase(Locale.getDefault());
+        }
 
         String resultTitle = EmojiUtilsShortcodes.emojify(text);
         List<EmojiRange> emojis = EmojiManager.getInstance().findAllEmojis(resultTitle);
-        if(emojis.size() > 0 && emojis.get(0).start == 0) return resultTitle.substring(emojis.get(0).start, emojis.get(0).end);
 
-        String result = String.valueOf(resultTitle.charAt(0)).toUpperCase(Locale.getDefault());
-        if(result == null || result.trim().isEmpty() || result.equals("(")){
-            result = UNKNOWN_USER_NAME_AVATAR;
+        if (emojis != null && emojis.size() > 0 && emojis.get(0).start == 0) {
+            String megaEmoji = resultTitle.substring(emojis.get(0).start, emojis.get(0).end);
+            return megaEmoji;
         }
-        return result;
+
+        String resultEmojiCompat = hasEmojiCompatAtFirst(resultTitle);
+        if (resultEmojiCompat != null) {
+            return resultEmojiCompat;
+        }
+
+        String resultChar = String.valueOf(resultTitle.charAt(0)).toUpperCase(Locale.getDefault());
+        if (resultChar == null || resultChar.trim().isEmpty() || resultChar.equals("(") || !isRecognizableCharacter(resultChar.charAt(0))) {
+            return resultUnknown;
+        }
+
+        return resultChar;
+    }
+
+    private static boolean isRecognizableCharacter(char input_char) {
+        return (input_char >= 48 && input_char <= 57) || (input_char >= 65 && input_char <= 90) || (input_char >= 97 && input_char <= 122);
+    }
+
+    private static String hasEmojiCompatAtFirst(String text) {
+        List<String> listEmojis = EmojiParser.extractEmojis(text);
+        if (listEmojis != null && !listEmojis.isEmpty()) {
+            String substring = text.substring(0, listEmojis.get(0).length());
+            List<String> sublistEmojis = EmojiParser.extractEmojis(substring);
+            if (sublistEmojis != null && !sublistEmojis.isEmpty()) {
+                return substring;
+            }
+        }
+        return null;
     }
 
     /*Methods to obtain the color of the avatar*/
