@@ -1579,7 +1579,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 									if (callToLaunch != null) {
 										if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
 											logDebug("One call: open call");
-                                            if (shouldNotify(this)) {
+                                            if (shouldNotify(this) && !isActivityVisible()) {
                                                 PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
                                                 if(pm != null) {
                                                     wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaIncomingCallPowerLock");

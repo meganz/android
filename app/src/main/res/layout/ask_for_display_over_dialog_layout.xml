@@ -1,77 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="346dp"
-    android:layout_height="310dp"
-    android:orientation="vertical">
-    <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
-            android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="25dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:text="@string/ask_for_display_over_title"
+            android:textColor="@color/name_my_account"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"/>
+
+        <ImageView
+            android:id="@+id/image_storage_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/il_call_interface"/>
+
+        <TextView
+            style="@style/GetFreeXxGbWhen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/ask_for_display_over_msg"
+            android:gravity="start"
+            android:lineSpacingMultiplier="1.27"
+            android:textAlignment="textStart"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginTop="50dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_not_now"
+                style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_marginTop="25dp"
-                android:text="@string/ask_for_display_over_title"
-                android:textColor="@color/name_my_account"
-                android:textStyle="bold"
-                android:textSize="18sp"/>
-            <ImageView
-                android:id="@+id/image_storage_status"
+                android:layout_marginRight="20dp"
+                android:background="@android:color/transparent"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:stateListAnimator="@null"
+                android:textAllCaps="true"
+                android:text="@string/verify_account_not_now_button"/>
+
+            <Button
+                android:id="@+id/btn_ok"
+                style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:src="@drawable/il_call_interface"/>
-            <TextView
-                style="@style/GetFreeXxGbWhen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:text="@string/ask_for_display_over_msg"
-                android:gravity="start"
-                android:lineSpacingMultiplier="1.27"
-                android:textAlignment="textStart"/>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="18dp"
-                android:orientation="horizontal">
-                <Button
-                    android:id="@+id/btn_not_now"
-                    style="@style/Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"
-                    android:background="@android:color/transparent"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:stateListAnimator="@null"
-                    android:textAllCaps="true"
-                    android:text="@string/verify_account_not_now_button"/>
-                <Button
-                    android:id="@+id/btn_ok"
-                    style="@style/Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="22dp"
-                    android:layout_marginRight="24dp"
-                    android:background="@android:color/transparent"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:stateListAnimator="@null"
-                    android:textAllCaps="true"
-                    android:text="@string/general_allow"/>
-            </LinearLayout>
+                android:layout_marginLeft="22dp"
+                android:background="@android:color/transparent"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:stateListAnimator="@null"
+                android:textAllCaps="true"
+                android:text="@string/general_allow"/>
+
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
