@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -22,9 +23,9 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -47,13 +48,11 @@ public class ChatUtil {
 
     /*Method to know if i'm participating in any A/V call*/
     public static boolean participatingInACall(MegaChatApiAndroid megaChatApi) {
-        logDebug("participatingInACall");
         if (megaChatApi == null) return false;
         MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
         MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
         MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
         MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
-
         MegaHandleList listCalls = megaChatApi.getChatCalls();
 
         if ((listCalls.size() - listCallsDestroy.size()) == 0) {
@@ -62,7 +61,6 @@ public class ChatUtil {
         }
 
         logDebug("There is some call in progress");
-
         if ((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsRingIn.size())) {
             logDebug("I'm not participating in any of the calls there");
             return false;
@@ -73,35 +71,31 @@ public class ChatUtil {
         }
         logDebug("I'm in a call in progress");
         return true;
-
     }
 
     /*Method to know the chat id which A / V call I am participating in*/
     public static long getChatCallInProgress(MegaChatApiAndroid megaChatApi) {
-        logDebug("getChatCallInProgress()");
-        long chatId = -1;
         if (megaChatApi != null) {
             MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
-            if ((listCallsRequestSent != null) && (listCallsRequestSent.size() > 0)) {
-                logDebug("Request Sent");
-                //Return to request sent
-                chatId = listCallsRequestSent.get(0);
-            } else {
-                logDebug("NOT Request Sent");
-                MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-                if ((listCallsInProgress != null) && (listCallsInProgress.size() > 0)) {
-                    //Return to in progress
-                    logDebug("In progress");
-                    chatId = listCallsInProgress.get(0);
-                }
+            if (listCallsRequestSent != null && listCallsRequestSent.size() > 0) {
+                return listCallsRequestSent.get(0);
+            }
+
+            MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
+            if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
+                return listCallsInProgress.get(0);
+            }
+
+            MegaHandleList listCallsInReconnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RECONNECTING);
+            if (listCallsInReconnecting != null && listCallsInReconnecting.size() > 0) {
+                return listCallsInReconnecting.get(0);
             }
         }
-        return chatId;
+        return -1;
     }
 
     /*Method to return to the call which I am participating*/
     public static void returnCall(Context context, MegaChatApiAndroid megaChatApi) {
-        logDebug("returnCall()");
         if ((megaChatApi == null) || (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)) == null))
             return;
         long chatId = getChatCallInProgress(megaChatApi);
@@ -109,32 +103,48 @@ public class ChatUtil {
         MegaApplication.setShowPinScreen(false);
         Intent intent = new Intent(context, ChatCallActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(Constants.CHAT_ID, chatId);
-        intent.putExtra(Constants.CALL_ID, call.getId());
+        intent.putExtra(CHAT_ID, chatId);
+        intent.putExtra(CALL_ID, call.getId());
         context.startActivity(intent);
 
     }
 
-    /*Method to show or hide the "return the call" layout*/
-    public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono) {
+    /*Method to show or hide the "Tap to return to call" banner*/
+    public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
         if (megaChatApi == null || callInProgressLayout == null) return;
-        logDebug("showCallLayout");
-
-        if (!Util.isChatEnabled() || !(context instanceof ManagerActivityLollipop) || !participatingInACall(megaChatApi)) {
+        if (!isChatEnabled() || !participatingInACall(megaChatApi)) {
             callInProgressLayout.setVisibility(View.GONE);
             activateChrono(false, callInProgressChrono, null);
             return;
         }
-        callInProgressLayout.setVisibility(View.VISIBLE);
 
         long chatId = getChatCallInProgress(megaChatApi);
         if (chatId == -1) return;
+
         MegaChatCall call = megaChatApi.getChatCall(chatId);
-        if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-            activateChrono(true, callInProgressChrono, call);
-            return;
+        if (call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
+            logDebug("Displayed the Reconnecting call layout");
+            activateChrono(false, callInProgressChrono, null);
+            callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.reconnecting_bar));
+            callInProgressText.setText(context.getString(R.string.reconnecting_message));
+
+        } else {
+            logDebug("Displayed the layout to return to the call");
+            callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
+            callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
+
+            if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+                activateChrono(true, callInProgressChrono, call);
+            } else {
+                activateChrono(false, callInProgressChrono, null);
+            }
         }
-        activateChrono(false, callInProgressChrono, null);
+        callInProgressLayout.setVisibility(View.VISIBLE);
+    }
+
+    /*Method to know if I come from a call reconnection to show the layout of returning to the call*/
+    public static boolean isAfterReconnecting(Context context, RelativeLayout layout, final TextView reconnectingText) {
+        return layout != null && layout.getVisibility() == View.VISIBLE && reconnectingText.getText().toString().equals(context.getString(R.string.reconnecting_message));
     }
 
     /*Method to know if a call is established*/
@@ -219,7 +229,7 @@ public class ChatUtil {
                         if (context instanceof GroupChatInfoActivityLollipop) {
                             ((GroupChatInfoActivityLollipop) context).showSnackbar(context.getString(R.string.chat_link_copied_clipboard));
                         } else if (context instanceof ChatActivityLollipop) {
-                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), -1);
+                            ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), -1);
 
                         }
                         dismissShareChatLinkDialog(context, shareLinkDialog);
@@ -318,16 +328,18 @@ public class ChatUtil {
     }
 
     public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall callChat) {
-        if (chronometer == null || callChat == null) return;
-        if (activateChrono) {
+        if (chronometer == null) return;
+        if(!activateChrono){
+            chronometer.stop();
+            chronometer.setVisibility(View.GONE);
+            return;
+        }
+        if (callChat != null) {
             chronometer.setVisibility(View.VISIBLE);
             chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration() * 1000));
             chronometer.start();
             chronometer.setFormat(" %s");
-            return;
         }
-        chronometer.stop();
-        chronometer.setVisibility(View.GONE);
     }
 
     /**
@@ -442,7 +454,7 @@ public class ChatUtil {
             dialog.show();
             brandAlertDialog(dialog);
         }catch(Exception ex){
-            Util.showToast(activity, message);
+            showToast(activity, message);
         }
     }
 
@@ -482,4 +494,24 @@ public class ChatUtil {
                 return  String.valueOf(status);
         }
     }
+
+    public static String converterShortCodes(String text) {
+        if (text == null || text.isEmpty()) return text;
+        return EmojiUtilsShortcodes.emojify(text);
+    }
+
+    public static SimpleSpanBuilder formatText(Context context, String text) {
+
+        SimpleSpanBuilder result;
+
+        try {
+            RTFFormatter formatter = new RTFFormatter(text, context);
+            result = formatter.setRTFFormat();
+        } catch (Exception e) {
+            logError("FORMATTER EXCEPTION!!!", e);
+            result = null;
+        }
+        return result;
+    }
+
 }

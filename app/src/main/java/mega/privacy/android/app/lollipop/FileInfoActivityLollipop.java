@@ -35,7 +35,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
-import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -118,7 +117,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 @SuppressLint("NewApi")
-public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
+public class FileInfoActivityLollipop extends DownloadableActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
 
 	public static int MAX_WIDTH_FILENAME_LAND=400;
 	public static int MAX_WIDTH_FILENAME_LAND_2=400;
@@ -273,7 +272,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	public static int REQUEST_CODE_SELECT_CONTACT = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
-	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 
 	Display display;
 	DisplayMetrics outMetrics;
@@ -1846,7 +1844,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 						if (isFileAvailable(destination) && destination.isDirectory()){
 							File offlineFile = new File(destination, node.getName());
-							if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+							if (isFileAvailable(offlineFile) && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
 								return;
 							}
 						}
@@ -1878,14 +1876,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 						//check the parent
 						long result = -1;
-						result= findIncomingParentHandle(node, megaApi);
+						result = findIncomingParentHandle(node, megaApi);
                         logDebug("IncomingParentHandle: " + result);
 						if(result!=-1){
-							File destination = getOfflineParentFile(this, INCOMING_REQUEST_ADAPTER, node, megaApi);
+							File destination = getOfflineParentFile(this, FROM_INCOMING_SHARES, node, megaApi);
 
 							if (isFileAvailable(destination) && destination.isDirectory()){
 								File offlineFile = new File(destination, node.getName());
-								if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+								if (isFileAvailable(offlineFile) && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
 									return;
 								}
 							}
@@ -2562,8 +2560,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             if(nC==null){
                 nC = new NodeController(this);
             }
-            nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
-		}
+            nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
+        }
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
 			if(!isOnline(this)){
@@ -2714,7 +2714,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
             long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-            long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+            long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 
             if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
                 if (contactHandles != null && contactHandles.length > 0) {

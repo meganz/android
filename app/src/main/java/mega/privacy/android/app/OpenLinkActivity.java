@@ -8,9 +8,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -28,10 +25,10 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.Constants.*;
-
 
 public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
 
@@ -69,28 +66,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		containerOkButton.setVisibility(View.GONE);
 		containerOkButton.setOnClickListener(this);
 
-		try {
-			url = URLDecoder.decode(url, "UTF-8");
-		}
-		catch (UnsupportedEncodingException e) {}
-		url.replace(' ', '+');
-		if(url.startsWith("mega://")){
-			url = url.replace("mega://", "https://mega.nz/");
-		}
-
-		if (url.startsWith("https://www.mega.co.nz")){
-			url = url.replace("https://www.mega.co.nz", "https://mega.co.nz");
-		}
-
-		if (url.startsWith("https://www.mega.nz")){
-			url = url.replace("https://www.mega.nz", "https://mega.nz");
-		}
-
-		if (url.endsWith("/")) {
-			url = url.substring(0, url.length()-1);
-		}
-
-		logDebug("Url " + url);
+		decodeURL(url);
 
 		// File link
 		if (matchRegexs(url, FILE_LINK_REGEXS)) {
@@ -119,7 +95,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Folder Download link
-        if (matchRegexs(url, FOLDER_DOWNLOAD_LINK_REGEXS)) {
+        if (matchRegexs(url, FOLDER_LINK_REGEXS)) {
 			logDebug("Folder link url");
 
 			Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
@@ -264,7 +240,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					if (rootNode == null) {
 						logDebug("Go to Login to fetch nodes");
 						Intent cancelAccountIntent = new Intent(this, LoginActivityLollipop.class);
-						cancelAccountIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						cancelAccountIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 						cancelAccountIntent.setAction(ACTION_CANCEL_ACCOUNT);
 						cancelAccountIntent.setData(Uri.parse(url));
 						startActivity(cancelAccountIntent);
@@ -295,7 +271,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					if (rootNode == null) {
 						logDebug("Go to Login to fetch nodes");
 						Intent changeMailIntent = new Intent(this, LoginActivityLollipop.class);
-						changeMailIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						changeMailIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 						changeMailIntent.setAction(ACTION_CHANGE_MAIL);
 						changeMailIntent.setData(Uri.parse(url));
 						startActivity(changeMailIntent);
@@ -320,6 +296,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		// Reset password - two options: logged IN or OUT
 		if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
 			logDebug("Reset pass url");
+
 			//Check if link with MK or not
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -330,7 +307,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					if (rootNode == null) {
 						logDebug("Go to Login to fetch nodes");
 						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-						resetPassIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						resetPassIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 						resetPassIntent.setAction(ACTION_RESET_PASS);
 						resetPassIntent.setData(Uri.parse(url));
 						startActivity(resetPassIntent);
@@ -365,7 +342,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					if (rootNode == null) {
 						logDebug("Go to Login to fetch nodes");
 						Intent ipcIntent = new Intent(this, LoginActivityLollipop.class);
-						ipcIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						ipcIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 						ipcIntent.setAction(ACTION_IPC);
 						startActivity(ipcIntent);
 						finish();
@@ -388,6 +365,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		if (matchRegexs(url, REVERT_CHANGE_PASSWORD_LINK_REGEXS)
 				|| matchRegexs(url, MEGA_BLOG_LINK_REGEXS)) {
 			logDebug("Open revert password change link: " + url);
+
 			Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
 			openIntent.setData(Uri.parse(url));
 			startActivity(openIntent);
@@ -462,6 +440,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				String url = request.getLink();
 				if (matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEXS)) {
 					logDebug("Cancel account url");
+
 					String myEmail = request.getEmail();
 					if(myEmail!=null){
 						if(myEmail.equals(megaApi.getMyEmail())){
@@ -486,12 +465,13 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				else if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
 					logDebug("Reset pass url");
 					logDebug("The recovery link has been sent");
+
 					boolean mk = request.getFlag();
 					if(mk){
 						logDebug("Link with master key");
 						if(url!=null){
 							Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-							resetPassIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+							resetPassIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 							resetPassIntent.setAction(ACTION_RESET_PASS);
 							resetPassIntent.setData(Uri.parse(url));
 							startActivity(resetPassIntent);
@@ -506,7 +486,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					else{
 						logDebug("Link without master key - park account");
 						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-						resetPassIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						resetPassIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 						resetPassIntent.setAction(ACTION_PARK_ACCOUNT);
 						resetPassIntent.setData(Uri.parse(url));
 						startActivity(resetPassIntent);
@@ -550,7 +530,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					aC.logoutConfirmed(this);
 
 					Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-					confirmIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+					confirmIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 					confirmIntent.putExtra(EXTRA_CONFIRMATION, urlConfirmationLink);
 					confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					confirmIntent.setAction(ACTION_CONFIRM);
@@ -572,7 +552,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				aC.logoutConfirmed(this);
 
 				Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-				confirmIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+				confirmIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
 				confirmIntent.putExtra(EXTRA_CONFIRMATION, urlConfirmationLink);
 				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				confirmIntent.setAction(ACTION_CONFIRM);

@@ -35,13 +35,13 @@ SQLITE_DOWNLOAD_URL=http://www.sqlite.org/${SQLITE_YEAR}/${SQLITE_SOURCE_FILE}
 SQLITE_SHA1="22632bf0cfacedbeddde9f92695f71cab8d8c0a5"
 
 CURL=curl
-CURL_VERSION=7.48.0
+CURL_VERSION=7.67.0
 C_ARES_VERSION=1.15.0
 CURL_EXTRA="--disable-smb --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smtp --disable-gopher --disable-sspi"
 CURL_SOURCE_FILE=curl-${CURL_VERSION}.tar.gz
 CURL_SOURCE_FOLDER=curl-${CURL_VERSION}
 CURL_DOWNLOAD_URL=http://curl.haxx.se/download/${CURL_SOURCE_FILE}
-CURL_SHA1="eac95625b849408362cf6edb0bc9489da317ba30"
+CURL_SHA1="a91652f1eaa810866dce55b2d177c5b20f4aa7a7"
 
 ARES_SOURCE_FILE=c-ares-${C_ARES_VERSION}.tar.gz
 ARES_SOURCE_FOLDER=c-ares-${C_ARES_VERSION}
@@ -61,7 +61,7 @@ SODIUM=sodium
 SODIUM_VERSION=1.0.16
 SODIUM_SOURCE_FILE=libsodium-${SODIUM_VERSION}.tar.gz
 SODIUM_SOURCE_FOLDER=libsodium-${SODIUM_VERSION}
-SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/${SODIUM_SOURCE_FILE}
+SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/old/${SODIUM_SOURCE_FILE}
 SODIUM_SHA1="c7ea321d7b8534e51c5e3d86055f6c1aa1e48ee9"
 
 LIBUV=libuv
@@ -86,11 +86,11 @@ ZENLIB_DOWNLOAD_URL=https://github.com/MediaArea/ZenLib/archive/${ZENLIB_SOURCE_
 ZENLIB_SHA1="1af04654c9618f54ece624a0bad881a3cfef3692"
 
 LIBWEBSOCKETS=libwebsockets
-LIBWEBSOCKETS_VERSION=91de9a4a69b9b4af38b662c8bd9adbd1b4370ae0
+LIBWEBSOCKETS_VERSION=33a1e905113f05c3c1eec3b75e0727ca81a551b1
 LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-${LIBWEBSOCKETS_VERSION}.zip
 LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
 LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/${LIBWEBSOCKETS_VERSION}.zip
-LIBWEBSOCKETS_SHA1="ec7b329dfa37452d08d873afd5aaec4ac61e16db"
+LIBWEBSOCKETS_SHA1="cb99f397f586ce7333a1dc8b3e4a831cfb854dbc"
 
 PDFVIEWER=pdfviewer
 PDFVIEWER_VERSION=1.8.2
@@ -383,8 +383,9 @@ echo "* libwebsockets is ready"
 
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
-    if [ ! -d megachat/webrtc/include ] || [ ! -f megachat/webrtc/libwebrtc_x86_64.a ] || [ ! -f megachat/webrtc/libwebrtc_arm64.a ]; then
-        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#F!BzwF0Qba!-KXBHgwonRUnSptmVJr4qg"
+    WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm.a | cut -d " " -f 1`
+    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "2d0e9cff4e691d9da4747315f0775be25d62b0bd" ]; then
+        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#!wixgSaZZ!6zRMV_d8ogouBaEidHzGws1KvLrBwBiKEm0VIVgXEPk"
         echo "and uncompress it in megachat/webrtc"
         exit 1
     else
@@ -415,6 +416,7 @@ echo "* PdfViewer is ready"
 
 echo "* All dependencies are prepared!"
 
+
 rm -rf ../tmpLibs
 mkdir ../tmpLibs
 echo "* Running ndk-build x86"
@@ -439,4 +441,3 @@ mv ../tmpLibs/* ../libs/
 rmdir ../tmpLibs/
 
 echo "* Task finished OK"
-

@@ -106,7 +106,6 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.*;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -118,7 +117,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 
 
 @SuppressLint("NewApi")
-public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
+public class ContactInfoActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
 
 	ContactController cC;
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
@@ -1016,7 +1015,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER_TO_SHARE);
 			ArrayList<String> contacts = new ArrayList<String>();
 			contacts.add(email);
-			intent.putExtra("SELECTED_CONTACTS", contacts);
+			intent.putExtra(SELECTED_CONTACTS, contacts);
 			startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
 		}
 		else{
@@ -1232,17 +1231,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_send_message_layout:{
 				logDebug("Send message option");
-				if(!isOnline(this)){
-
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-					return;
-				}
+				if(!checkConnection()) return;
 
 				sendMessageToChat();
 				break;
 			}
 			case R.id.chat_contact_properties_chat_call_layout:{
 				logDebug("Start audio call option");
+				if(!checkConnection()) return;
+
 				if(megaChatApi!=null){
 					if(!participatingInACall(megaChatApi)){
 						logDebug("I'm not in a call");
@@ -1256,6 +1253,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_video_layout:{
 				logDebug("Star video call option");
+				if(!checkConnection()) return;
+
 				if(megaChatApi!=null) {
 					if (!participatingInACall(megaChatApi)) {
 						logDebug("I'm not in a call");
@@ -1328,6 +1327,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
+	private boolean checkConnection() {
+		if (!isOnline(this)) {
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
@@ -1340,7 +1347,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
-			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
@@ -1400,7 +1407,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
 				alertTitle.setTextColor(ContextCompat.getColor(this, R.color.black));
 			}
-		}
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
+        }
 		else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			logDebug("requestCode == REQUEST_CODE_SELECT_FILE");
 			if (intent == null) {
@@ -1408,26 +1417,49 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
-			long fileHandle = intent.getLongExtra("SELECT", 0);
+			long fileHandles[] = intent.getLongArrayExtra(NODE_HANDLES);
+
+			if (fileHandles == null) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error), -1);
+				return;
+			}
 
 			MegaChatRoom chatRoomToSend = megaChatApi.getChatRoomByUser(user.getHandle());
 			if(chatRoomToSend!=null){
-				MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatRoomToSend.getChatId(), false, 1);
-				megaChatApi.attachNode(chatRoomToSend.getChatId(), fileHandle, listener);
+				checkIfNodesAreMineBeforeAttach(fileHandles, chatRoomToSend.getChatId());
 			}
 			else{
 				//Create first the chat
 				ArrayList<MegaChatRoom> chats = new ArrayList<>();
 				ArrayList<MegaUser> usersNoChat = new ArrayList<>();
 				usersNoChat.add(user);
-				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandle, this, CreateChatToPerformActionListener.SEND_FILE);
+				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandles, this, CreateChatToPerformActionListener.SEND_FILES, -1);
 				MegaChatPeerList peers = MegaChatPeerList.createInstance();
 				peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 				megaChatApi.createChat(false, peers, listener);
 			}
 		}
+        else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+            logDebug("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
+            if (intent == null) {
+                logDebug("Return.....");
+                return;
+            }
+
+            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
+            logDebug("url: "+url);
+            long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
+            logDebug("size: "+size);
+            long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
+            logDebug("hashes size: "+hashes.length);
+
+            boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
+
+            nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
+        }
 		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-			logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
+            logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
 			logDebug("Send to " + chatHandles.length + " chats");
@@ -1492,6 +1524,17 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         }
 
 		super.onActivityResult(requestCode, resultCode, intent);
+	}
+
+	public void checkIfNodesAreMineBeforeAttach(long[] fileHandles, long chatId) {
+		new ChatController(this).checkIfNodesAreMineAndAttachNodes(fileHandles, chatId);
+	}
+
+	public void sendFilesToChat(long[] fileHandles, long chatId) {
+		MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatId, fileHandles.length);
+		for (long fileHandle : fileHandles) {
+			megaChatApi.attachNode(chatId, fileHandle, listener);
+		}
 	}
 
 	/*
@@ -1740,12 +1783,18 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	protected void onDestroy() {
 		super.onDestroy();
 
-		if(drawableArrow == null) return;
-
-		drawableArrow.setColorFilter(null);
-		drawableDots.setColorFilter(null);
-		drawableSend.setColorFilter(null);
-		drawableShare.setColorFilter(null);
+		if(drawableArrow != null) {
+            drawableArrow.setColorFilter(null);
+        }
+        if(drawableDots != null) {
+            drawableDots.setColorFilter(null);
+        }
+        if(drawableSend != null) {
+            drawableSend.setColorFilter(null);
+        }
+        if(drawableShare != null) {
+            drawableShare.setColorFilter(null);
+        }
 	}
 
 	@Override
@@ -2309,7 +2358,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     }
     
     public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
-		logDebug("askSizeConfirmationBeforeDownload");
+        logDebug("askSizeConfirmationBeforeDownload");
         
         final String parentPathC = parentPath;
         final String urlC = url;
@@ -2356,7 +2405,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     }
     
     public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
-		logDebug("askConfirmationNoAppInstaledBeforeDownload");
+        logDebug("askConfirmationNoAppInstaledBeforeDownload");
         
         final String parentPathC = parentPath;
         final String urlC = url;

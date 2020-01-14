@@ -67,8 +67,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -964,7 +964,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 }
                 if (url != null) {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    logDebug("URL: " + url + ", Seed: " + seed);
+                    logDebug("URL: "+url+" seed: " + seed);
                     if (isIntentAvailable(this, intent)) {
                         startActivity(intent);
                     }

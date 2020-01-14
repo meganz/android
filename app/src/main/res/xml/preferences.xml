@@ -59,9 +59,9 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
         <android.support.v7.preference.SwitchPreferenceCompat
-            android:key="settings_camera_upload_remove_gps"
-            android:title="@string/settings_camera_upload_remove_gps"
-            android:defaultValue="true"
+            android:key="settings_camera_upload_include_gps"
+            android:title="@string/settings_camera_upload_include_gps"
+            android:defaultValue="false"
             app:allowDividerAbove="true"
             app:allowDividerBelow="true"
             app:iconSpaceReserved="false" />
