@@ -77,11 +77,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="@color/name_my_account"
                     android:text="email@domain.com"
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:fontFamily="roboto"/>
+
+				<TextView
+					android:id="@+id/business_label"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textSize="12sp"
+					android:textAllCaps="true"
+					android:text="@string/business_label"
+					android:textColor="@color/business_color"
+					android:layout_below="@id/navigation_drawer_account_information"
+					android:layout_marginTop="7dp"/>
 
             </LinearLayout>
 

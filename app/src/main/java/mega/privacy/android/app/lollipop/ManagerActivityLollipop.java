@@ -498,6 +498,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     RelativeLayout accountInfoFrame;
 	private EmojiTextView nVDisplayName;
 	TextView nVEmail;
+	TextView businessLabel;
 	RoundedImageView nVPictureProfile;
 	TextView spaceTV;
 	ProgressBar usedSpacePB;
@@ -2462,6 +2463,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		nVEmail = (TextView) findViewById(R.id.navigation_drawer_account_information_email);
         nVPictureProfile = (RoundedImageView) findViewById(R.id.navigation_drawer_user_account_picture_profile);
+
+		businessLabel = findViewById(R.id.business_label);
+		businessLabel.setVisibility(View.GONE);
 
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
         spaceTV = (TextView) findViewById(R.id.navigation_drawer_space);
@@ -12054,7 +12058,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (settingsSeparator != null) {
 					settingsSeparator.setVisibility(View.GONE);
 				}
+				if (megaApi.isBusinessAccount()) {
+					businessLabel.setVisibility(View.VISIBLE);
+				}
+
 			} else {
+				businessLabel.setVisibility(View.GONE);
 				upgradeAccount.setVisibility(View.VISIBLE);
 				if (settingsSeparator != null) {
 					settingsSeparator.setVisibility(View.GONE);
