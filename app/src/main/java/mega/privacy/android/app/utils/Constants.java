@@ -520,6 +520,11 @@ public class Constants {
             "^https://mega\\.nz/.*pwr.+$"
     };
 
+    public static final String[] EMAIL_VERIFY_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/#emailverify.+$",
+            "^https://mega\\.nz/#emailverify.+$"
+    };
+
     //Types of blocked accounts
     public static final String ACCOUNT_NOT_BLOCKED = "0";
     public static final String COPYRIGHT_ACCOUNT_BLOCK = "200";

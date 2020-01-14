@@ -479,7 +479,7 @@ public class BaseActivity extends AppCompatActivity {
 
                 break;
             case WEAK_PROTECTION_ACCOUNT_BLOCK:
-                if (app.isBlockedDueToWeakAccount()) {
+                if (app.isBlockedDueToWeakAccount() || app.isWebOpenDueToEmailVerification()) {
                     break;
                 }
                 intent = new Intent(this, WeakAccountProtectionAlertActivity.class);

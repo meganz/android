@@ -32,9 +32,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
 
-	private MegaApplication app;
-	private MegaApiAndroid megaApi;
-	private MegaChatApiAndroid megaChatApi;
 	private DatabaseHandler dbH = null;
 
 	private String urlConfirmationLink = null;
@@ -47,10 +44,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-
-		app = (MegaApplication) getApplication();
-		megaApi = app.getMegaApi();
-		megaChatApi = app.getMegaChatApi();
 
 		Intent intent = getIntent();
 		String url = intent.getDataString();
@@ -67,6 +60,14 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		containerOkButton.setOnClickListener(this);
 
 		decodeURL(url);
+
+		// Email verification link
+		if (matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
+			logDebug("Open email verification link");
+			app.setIsWebOpenDueToEmailVerification(true);
+			openWebLink(url);
+			return;
+		}
 
 		// File link
 		if (matchRegexs(url, FILE_LINK_REGEXS)) {
@@ -366,10 +367,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				|| matchRegexs(url, MEGA_BLOG_LINK_REGEXS)) {
 			logDebug("Open revert password change link: " + url);
 
-			Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
-			openIntent.setData(Uri.parse(url));
-			startActivity(openIntent);
-			finish();
+			openWebLink(url);
 			return;
 		}
 
@@ -414,6 +412,10 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		// Browser open the link which does not require app to handle
 		logDebug("Browser open link: " + url);
+		openWebLink(url);
+	}
+
+	private void openWebLink(String url) {
 		Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
 		openIntent.setData(Uri.parse(url));
 		startActivity(openIntent);
