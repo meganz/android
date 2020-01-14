@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -46,6 +47,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -84,6 +86,10 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     private static final String KEY_TOTAL_CONTACTS = "KEY_TOTAL_CONTACTS";
     private static final String KEY_IS_PERMISSION_GRANTED = "KEY_IS_PERMISSION_GRANTED";
     private static final String KEY_IS_GET_CONTACT_COMPLETED = "KEY_IS_GET_CONTACT_COMPLETED";
+    private static final String CURRENT_SELECTED_CONTACT = "CURRENT_SELECTED_CONTACT";
+    private static final String CHECKED_INDEX = "CHECKED_INDEX";
+    private static final String SELECTED_CONTACT_INFO = "SELECTED_CONTACT_INFO";
+    private static final String UNSELECTED = "UNSELECTED";
     private static final int ID_MEGA_CONTACTS_HEADER = -2;
     private static final int ID_PHONE_CONTACTS_HEADER = -1;
     private static final int PHONE_NUMBER_MIN_LENGTH = 5;
@@ -117,6 +123,8 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     private ArrayList<String> contactsEmailsSelected, contactsPhoneSelected;
 
     private ContactInfoListDialog listDialog;
+
+    private InvitationContactInfo currentSelected;
 
     //work around for android bug - https://issuetracker.google.com/issues/37007605#c10
     class LinearLayoutManagerWrapper extends LinearLayoutManager {
@@ -254,6 +262,20 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
                 emptyImageView.setVisibility(View.VISIBLE);
                 noPermissionHeader.setVisibility(View.VISIBLE);
             }
+            currentSelected = savedInstanceState.getParcelable(CURRENT_SELECTED_CONTACT);
+            if(currentSelected != null) {
+                listDialog = new ContactInfoListDialog(this, currentSelected, this);
+                listDialog.setCheckedIndex(savedInstanceState.getIntegerArrayList(CHECKED_INDEX));
+                ArrayList<InvitationContactInfo> selectedList = savedInstanceState.getParcelableArrayList(SELECTED_CONTACT_INFO);
+                if(selectedList != null) {
+                    listDialog.setSelected(new HashSet<>(selectedList));
+                }
+                ArrayList<InvitationContactInfo> unSelectedList = savedInstanceState.getParcelableArrayList(UNSELECTED);
+                if(unSelectedList != null) {
+                    listDialog.setUnSelected(new HashSet<>(unSelectedList));
+                }
+                listDialog.showInfo(addedContacts, true);
+            }
         } else {
             queryIfHasReadContactsPermissions();
         }
@@ -358,6 +380,12 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         outState.putParcelableArrayList(KEY_TOTAL_CONTACTS, totalContacts);
         outState.putBoolean(KEY_IS_PERMISSION_GRANTED, isPermissionGranted);
         outState.putBoolean(KEY_IS_GET_CONTACT_COMPLETED, isGetContactCompleted);
+        outState.putParcelable(CURRENT_SELECTED_CONTACT, currentSelected);
+        if(listDialog != null) {
+            outState.putIntegerArrayList(CHECKED_INDEX, listDialog.getCheckedIndex());
+            outState.putParcelableArrayList(SELECTED_CONTACT_INFO, new ArrayList<Parcelable>(listDialog.getSelected()));
+            outState.putParcelableArrayList(UNSELECTED, new ArrayList<Parcelable>(listDialog.getUnSelected()));
+        }
     }
 
     @Override
@@ -664,18 +692,26 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     }
 
     @Override
-    public void onSelect(Set<InvitationContactInfo> selected) {
+    public void onSelect(Set<InvitationContactInfo> selected,Set<InvitationContactInfo> toRemove) {
         long id = -1;
+        cancel();
         for(InvitationContactInfo select : selected) {
             id = select.getId();
-            if (isContactAdded(select)) {
-                addedContacts.remove(select);
-            } else {
+            if (!isContactAdded(select)) {
                 addedContacts.add(select);
             }
         }
+        for(InvitationContactInfo select : toRemove) {
+            id = select.getId();
+            addedContacts.remove(select);
+        }
         controlHighlited(id);
         refreshComponents();
+    }
+
+    @Override
+    public void cancel() {
+        currentSelected = null;
     }
 
     private void refreshComponents() {
@@ -691,8 +727,9 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         InvitationContactInfo invitationContactInfo = invitationContactsAdapter.getItem(position);
         logDebug("on Item click at " + position + " name is " + invitationContactInfo.getName());
         if (invitationContactInfo.hasMultipleContactInfos()) {
-            listDialog = new ContactInfoListDialog(this,invitationContactInfo, this);
-            listDialog .showInfo(addedContacts);
+            this.currentSelected = invitationContactInfo;
+            listDialog = new ContactInfoListDialog(this, invitationContactInfo, this);
+            listDialog.showInfo(addedContacts, false);
         } else {
             if (isContactAdded(invitationContactInfo)) {
                 addedContacts.remove(invitationContactInfo);

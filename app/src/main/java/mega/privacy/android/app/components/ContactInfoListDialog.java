@@ -41,9 +41,27 @@ public class ContactInfoListDialog {
 
     private Set<InvitationContactInfo> selected = new HashSet<>();
 
+    private Set<InvitationContactInfo> unSelected = new HashSet<>();
+
+    private ArrayList<Integer> checkedIndex = new ArrayList<>();
+
+    private boolean isResumed;
+
+    /**
+     * proportion of screen width under portrait mode
+     */
     private static final float WIDTH_P = 0.9f;
-    private static final float HEIGHT_P = 0.7f;
+    /**
+     * proportion of screen height under portrait mode
+     */
+    private static final float HEIGHT_P = 0.6f;
+    /**
+     * proportion of screen width under landscape mode
+     */
     private static final float WIDTH_L = 0.5f;
+    /**
+     * proportion of screen height under portrait mode
+     */
     private static final float HEIGHT_L = 0.9f;
     private static final float CHECKBOX_ALAPHA = 0.3f;
 
@@ -59,13 +77,14 @@ public class ContactInfoListDialog {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
+                listener.cancel();
             }
         });
         contentView.findViewById(R.id.btn_ok).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
-                listener.onSelect(selected);
+                listener.onSelect(selected, unSelected);
             }
         });
     }
@@ -73,8 +92,8 @@ public class ContactInfoListDialog {
     /**
      * @param addedContacts The contact info which are already added to the EditText.
      */
-    public void showInfo(ArrayList<InvitationContactInfo> addedContacts) {
-        selected.clear();
+    public void showInfo(ArrayList<InvitationContactInfo> addedContacts, boolean isResumed) {
+        this.isResumed = isResumed;
         List<String> added = new ArrayList<>();
         if (addedContacts != null && addedContacts.size() != 0) {
             for (InvitationContactInfo info : addedContacts) {
@@ -119,7 +138,7 @@ public class ContactInfoListDialog {
     }
 
     public void recycle() {
-        if(dialog != null) {
+        if (dialog != null) {
             dialog.dismiss();
         }
     }
@@ -129,7 +148,9 @@ public class ContactInfoListDialog {
         /**
          * @param contactInfos The selected/unselected contact infos.
          */
-        void onSelect(Set<InvitationContactInfo> contactInfos);
+        void onSelect(Set<InvitationContactInfo> contactInfos, Set<InvitationContactInfo> toRemove);
+
+        void cancel();
     }
 
     private class ContactInfoAdapter extends RecyclerView.Adapter<ContactInfoAdapter.ContactInfoViewHolder> {
@@ -167,33 +188,51 @@ public class ContactInfoListDialog {
         public void onBindViewHolder(@NonNull final ContactInfoAdapter.ContactInfoViewHolder viewHolder, int i) {
             String content = contents.get(i);
             viewHolder.textView.setText(content);
-            if (added.contains(content)) {
-                viewHolder.checkBox.setChecked(true);
-                viewHolder.checkBox.setAlpha(1.0f);
+            if(isResumed) {
+                if (checkedIndex.contains(i)) {
+                    viewHolder.checkBox.setChecked(true);
+                    viewHolder.checkBox.setAlpha(1.0f);
+                } else {
+                    viewHolder.checkBox.setChecked(false);
+                    viewHolder.checkBox.setAlpha(CHECKBOX_ALAPHA);
+                }
             } else {
-                viewHolder.checkBox.setChecked(false);
-                viewHolder.checkBox.setAlpha(CHECKBOX_ALAPHA);
+                if (added.contains(content)) {
+                    checkedIndex.add(i);
+                    viewHolder.checkBox.setChecked(true);
+                    viewHolder.checkBox.setAlpha(1.0f);
+                } else {
+                    viewHolder.checkBox.setChecked(false);
+                    viewHolder.checkBox.setAlpha(CHECKBOX_ALAPHA);
+                }
             }
+
             // set listener after `setChecked`, or the listener will trigger
             viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    String content = contents.get(viewHolder.getAdapterPosition());
+                    int position = viewHolder.getAdapterPosition();
+                    String content = contents.get(position);
                     InvitationContactInfo info = null;
                     try {
                         info = (InvitationContactInfo) current.clone();
                     } catch (CloneNotSupportedException e) {
                         e.printStackTrace();
                     }
-                    // In fact the `CloneNotSupportedException` would never happen, so `info` would never be `null`.
+                    // In fact the `CloneNotSupportedException` would never happen as long as InvitationContactInfo implements Cloneable,
+                    // so `info` would never be `null`.
                     info.setDisplayInfo(content);
-                    // ignore `isChecked` the callback will handle.
-                    selected.add(info);
-                    //UI update
+
                     if (isChecked) {
+                        checkedIndex.add(position);
+                        selected.add(info);
+                        unSelected.remove(info);
                         buttonView.setAlpha(1.0f);
                     } else {
+                        checkedIndex.remove(Integer.valueOf(position));
+                        selected.remove(info);
+                        unSelected.add(info);
                         buttonView.setAlpha(CHECKBOX_ALAPHA);
                     }
                 }
@@ -211,6 +250,36 @@ public class ContactInfoListDialog {
                 checkBox = itemView.findViewById(R.id.checkbox);
                 textView = itemView.findViewById(R.id.content);
             }
+        }
+    }
+
+    public ArrayList<Integer> getCheckedIndex() {
+        return checkedIndex;
+    }
+
+    public void setCheckedIndex(ArrayList<Integer> checkedIndex) {
+        if (checkedIndex != null) {
+            this.checkedIndex = checkedIndex;
+        }
+    }
+
+    public Set<InvitationContactInfo> getSelected() {
+        return selected;
+    }
+
+    public void setSelected(Set<InvitationContactInfo> selected) {
+        if (selected != null) {
+            this.selected = selected;
+        }
+    }
+
+    public Set<InvitationContactInfo> getUnSelected() {
+        return unSelected;
+    }
+
+    public void setUnSelected(Set<InvitationContactInfo> unSelected) {
+        if (unSelected != null) {
+            this.unSelected = unSelected;
         }
     }
 }
