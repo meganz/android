@@ -118,7 +118,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 
 
 @SuppressLint("NewApi")
-public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
+public class ContactInfoActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
 
 	ContactController cC;
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
@@ -1415,7 +1415,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
 				alertTitle.setTextColor(ContextCompat.getColor(this, R.color.black));
 			}
-		}
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
+        }
 		else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			logDebug("requestCode == REQUEST_CODE_SELECT_FILE");
 			if (intent == null) {
@@ -1445,8 +1447,27 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				megaChatApi.createChat(false, peers, listener);
 			}
 		}
+        else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+            logDebug("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
+            if (intent == null) {
+                logDebug("Return.....");
+                return;
+            }
+
+            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
+            logDebug("url: "+url);
+            long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
+            logDebug("size: "+size);
+            long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
+            logDebug("hashes size: "+hashes.length);
+
+            boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
+
+            nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
+        }
 		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-			logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
+            logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
 			logDebug("Send to " + chatHandles.length + " chats");
@@ -2348,7 +2369,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     }
     
     public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
-		logDebug("askSizeConfirmationBeforeDownload");
+        logDebug("askSizeConfirmationBeforeDownload");
         
         final String parentPathC = parentPath;
         final String urlC = url;
@@ -2395,7 +2416,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     }
     
     public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
-		logDebug("askConfirmationNoAppInstaledBeforeDownload");
+        logDebug("askConfirmationNoAppInstaledBeforeDownload");
         
         final String parentPathC = parentPath;
         final String urlC = url;
