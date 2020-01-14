@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -54,7 +53,7 @@ public class ContactInfoListDialog {
     /**
      * proportion of screen height under portrait mode
      */
-    private static final float HEIGHT_P = 0.6f;
+    private static final float HEIGHT_P = 0.5f;
     /**
      * proportion of screen width under landscape mode
      */
@@ -73,19 +72,14 @@ public class ContactInfoListDialog {
         contentView = inflater.inflate(R.layout.dialog_contact_info_list, null);
         listView = contentView.findViewById(R.id.info_list_view);
         listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-        contentView.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                listener.cancel();
-            }
+        contentView.findViewById(R.id.btn_cancel).setOnClickListener(v -> {
+            dialog.dismiss();
+            listener.cancel();
+
         });
-        contentView.findViewById(R.id.btn_ok).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                listener.onSelect(selected, unSelected);
-            }
+        contentView.findViewById(R.id.btn_ok).setOnClickListener(v -> {
+            dialog.dismiss();
+            listener.onSelect(selected, unSelected);
         });
     }
 
@@ -188,7 +182,7 @@ public class ContactInfoListDialog {
         public void onBindViewHolder(@NonNull final ContactInfoAdapter.ContactInfoViewHolder viewHolder, int i) {
             String content = contents.get(i);
             viewHolder.textView.setText(content);
-            if(isResumed) {
+            if (isResumed) {
                 if (checkedIndex.contains(i)) {
                     viewHolder.checkBox.setChecked(true);
                     viewHolder.checkBox.setAlpha(1.0f);
@@ -208,33 +202,32 @@ public class ContactInfoListDialog {
             }
 
             // set listener after `setChecked`, or the listener will trigger
-            viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            viewHolder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                int position = viewHolder.getAdapterPosition();
+                InvitationContactInfo info = null;
+                try {
+                    info = (InvitationContactInfo) current.clone();
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+                /*
+                 * In fact the `CloneNotSupportedException` would never happen,
+                 * as long as `InvitationContactInfo` implements `Cloneable`,
+                 * so `info` would never be `null`.
+                 */
+                assert info != null;
+                info.setDisplayInfo(content);
 
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    int position = viewHolder.getAdapterPosition();
-                    String content = contents.get(position);
-                    InvitationContactInfo info = null;
-                    try {
-                        info = (InvitationContactInfo) current.clone();
-                    } catch (CloneNotSupportedException e) {
-                        e.printStackTrace();
-                    }
-                    // In fact the `CloneNotSupportedException` would never happen as long as InvitationContactInfo implements Cloneable,
-                    // so `info` would never be `null`.
-                    info.setDisplayInfo(content);
-
-                    if (isChecked) {
-                        checkedIndex.add(position);
-                        selected.add(info);
-                        unSelected.remove(info);
-                        buttonView.setAlpha(1.0f);
-                    } else {
-                        checkedIndex.remove(Integer.valueOf(position));
-                        selected.remove(info);
-                        unSelected.add(info);
-                        buttonView.setAlpha(CHECKBOX_ALAPHA);
-                    }
+                if (isChecked) {
+                    checkedIndex.add(position);
+                    selected.add(info);
+                    unSelected.remove(info);
+                    buttonView.setAlpha(1.0f);
+                } else {
+                    checkedIndex.remove(Integer.valueOf(position));
+                    selected.remove(info);
+                    unSelected.add(info);
+                    buttonView.setAlpha(CHECKBOX_ALAPHA);
                 }
             });
         }
