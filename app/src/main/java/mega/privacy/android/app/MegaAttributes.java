@@ -21,9 +21,13 @@ public class MegaAttributes {
 	private String staging = "false";
 	private String lastPublicHandle = "";
 	private String lastPublicHandleTimeStamp = "";
+	private int lastPublicHandleType = MegaApiJava.AFFILIATE_TYPE_INVALID;
 	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN;
 
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String showCopyright, String showNotifOff, String staging, String lastPublicHandle, String lastPublicHandleTimeStamp, int storageState) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger,
+						  String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp,
+						  String invalidateSdkCache, String fileLoggerKarere, String showCopyright, String showNotifOff, String staging,
+						  String lastPublicHandle, String lastPublicHandleTimeStamp, int lastPublicHandleType, int storageState) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -41,10 +45,14 @@ public class MegaAttributes {
         this.staging = staging;
 		this.lastPublicHandle = lastPublicHandle;
 		this.lastPublicHandleTimeStamp = lastPublicHandleTimeStamp;
+		this.lastPublicHandleType = lastPublicHandleType;
 		this.storageState = storageState;
 	}
 
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly, String showCopyright, String showNotifOff, String staging, String lastPublicHandle, String lastPublicHandleTimeStamp, int storageState) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger,
+						  String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp,
+						  String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly, String showCopyright, String showNotifOff, String staging,
+						  String lastPublicHandle, String lastPublicHandleTimeStamp, int lastPublicHandleType, int storageState) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -62,6 +70,7 @@ public class MegaAttributes {
         this.staging = staging;
 		this.lastPublicHandle = lastPublicHandle;
 		this.lastPublicHandleTimeStamp = lastPublicHandleTimeStamp;
+		this.lastPublicHandleType = lastPublicHandleType;
 		this.storageState = storageState;
 	}
 	
@@ -199,6 +208,14 @@ public class MegaAttributes {
 
 	public void setLastPublicHandleTimeStamp(String lastPublicHandleTimeStamp){
 		this.lastPublicHandleTimeStamp = lastPublicHandleTimeStamp;
+	}
+
+	public int getLastPublicHandleType(){
+		return lastPublicHandleType;
+	}
+
+	public void setLastPublicHandleType(int lastPublicHandleType){
+		this.lastPublicHandleType = lastPublicHandleType;
 	}
 
 	public int getStorageState(){
