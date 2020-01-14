@@ -840,6 +840,10 @@
     <string name="sortby_size_largest_first" context="sort files by size largest first">Largest</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">Smallest</string>
 
+    <string name="sortby_type" context="title of sort by media type options">Media type</string>
+    <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Photos</string>
+    <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Videos</string>
+
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
 
@@ -1717,6 +1721,9 @@
     <string name="send_feedback_panel" context="Label to show send feedback">No, send feedback</string>
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Advanced options</string>
+    <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">To download files MEGA needs your permission.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Choose download location</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">No contact permissions granted</string>
 
@@ -2616,4 +2623,8 @@
 
     <string name="my_chat_files_folder" context="Name by default to the folder where the files sent to the chat are strored in the cloud">My chat files</string>
     <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Error. The folder %1$s was not created</string>
+
+    <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
+
 </resources>

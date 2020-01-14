@@ -51,11 +51,11 @@ import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
@@ -84,7 +84,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
+import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -92,7 +92,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface, StoreDataBeforeForward<ArrayList<MegaChatMessage>> {
+public class NodeAttachmentHistoryActivity extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface, StoreDataBeforeForward<ArrayList<MegaChatMessage>> {
 
 	public static int NUMBER_MESSAGES_TO_LOAD = 20;
 	public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -1156,6 +1156,9 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			chatC.prepareForDownload(intent, parentPath);
 		}
+        if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, true, null);
+        }
 	}
 
 	public void showProgressForwarding(){

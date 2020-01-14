@@ -25,7 +25,7 @@ git clone --recursive https://github.com/meganz/android.git
 
 * Configure the variable `NDK_ROOT32` to point to your Android NDK 14 installation path and the variable `NDK_ROOT64` to point to your Android NDK 16 installation path at `app/src/main/jni/build.sh`.
 
-* Download the link https://mega.nz/#!1wERDaYD!B66nc57HnZL6w9ArVuwOh80ZoVLprXrrSsuAE6CGfXc, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
+* Download the link https://mega.nz/#!wixgSaZZ!6zRMV_d8ogouBaEidHzGws1KvLrBwBiKEm0VIVgXEPk, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
 
 * Go to `app/src/main/jni/` and execute: `./build.sh clean` and `./build.sh all`.
 
