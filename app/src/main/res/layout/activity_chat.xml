@@ -32,15 +32,15 @@
                 tools:context=".lollipop.megachat.ChatActivityLollipop">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical|left"
                     android:orientation="vertical">
-
                     <RelativeLayout
                         android:id="@+id/toolbar_elements_inside"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:orientation="horizontal"
                         android:gravity="center_vertical|left"
                         android:layout_gravity="center_vertical|left">
 
@@ -51,51 +51,46 @@
                             android:layout_gravity="left"
                             android:fontFamily="sans-serif-light"
                             android:gravity="center_vertical|left"
-                            android:textSize="20sp"
+                            android:textSize="17sp"
+                            app:emojiSize="17sp"
                             android:textColor="@color/white"
                             android:textStyle="bold"
                             android:singleLine="true"
                             android:maxLines="1"
-                            android:layout_alignParentLeft="true"
-                            android:ellipsize="end"/>
+                            android:layout_alignParentLeft="true"/>
                         <LinearLayout
                             android:id="@+id/icons_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_toRightOf="@+id/title_toolbar"
+                            android:layout_alignParentTop="true"
+                            android:layout_toRightOf="@id/title_toolbar"
                             android:orientation="horizontal"
-                            android:layout_gravity="center_vertical"
-                            android:gravity="center_vertical">
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginRight="8dp">
                             <ImageView
                                 android:id="@+id/state_icon_toolbar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginLeft="3dp"
                                 android:layout_marginTop="2dp"
-                                android:layout_marginRight="1.5dp"
+                                android:layout_marginRight="4dp"
                                 android:background="@null"
                                 android:visibility="gone" />
-
                             <ImageView
                                 android:id="@+id/private_icon_toolbar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginLeft="1.5dp"
                                 android:layout_marginTop="2dp"
-                                android:layout_marginRight="1.5dp"
                                 android:background="@null"
                                 android:src="@drawable/ic_private_chat"
                                 android:tint="@color/white"
                                 android:visibility="gone" />
                         </LinearLayout>
-
                     </RelativeLayout>
 
                     <mega.privacy.android.app.components.MarqueeTextView
                         android:id="@+id/individual_subtitle_toolbar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="0dp"
                         android:ellipsize="none"
                         android:singleLine="true"
                         android:textColor="@color/white"
@@ -106,7 +101,6 @@
                         android:id="@+id/groupal_subtitle_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="0dp"
                         android:ellipsize="marquee"
                         android:focusable="true"
                         android:focusableInTouchMode="true"
@@ -115,6 +109,7 @@
                         android:singleLine="true"
                         android:textColor="@color/white"
                         android:textSize="12sp"
+                        app:emojiSize="10sp"
                         android:visibility="gone" />
 
                     <LinearLayout
@@ -221,7 +216,8 @@
                                 android:inputType="textMultiLine|textCapSentences"
                                 android:maxLines="1"
                                 android:textColor="@color/black"
-                                android:textSize="14sp" />
+                                android:textSize="14sp"
+                                app:emojiSize="18sp"/>
 
                         </RelativeLayout>
                     </RelativeLayout>
@@ -360,7 +356,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/toolbar_chat"
-                android:layout_above="@id/writing_container_layout_chat_layout"
                 android:background="@color/background_chat"
                 android:orientation="vertical">
 
