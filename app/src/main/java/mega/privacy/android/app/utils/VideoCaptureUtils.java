@@ -7,12 +7,13 @@ import org.webrtc.CameraEnumerator;
 import org.webrtc.CapturerObserver;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
-
 import mega.privacy.android.app.MegaApplication;
+import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class VideoCaptureUtils {
+
     static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator, String deviceName) {
         logDebug("createCameraCapturer: " + deviceName);
         return enumerator.createCapturer(deviceName, null);
@@ -22,6 +23,20 @@ public class VideoCaptureUtils {
         logDebug("DeviceList");
         CameraEnumerator enumerator = new Camera1Enumerator(true);
         return enumerator.getDeviceNames();
+    }
+
+    public static void changeCamera(MegaChatApiAndroid megaChatApi){
+        String currentCamera = megaChatApi.getVideoDeviceSelected();
+
+        String frontCamera;
+        if(isFrontCamera(currentCamera)){
+            frontCamera = VideoCaptureUtils.getBackCamera();
+        }else {
+            frontCamera = VideoCaptureUtils.getFrontCamera();
+        }
+        if (frontCamera != null) {
+            megaChatApi.setChatVideoInDevice(frontCamera, null);
+        }
     }
 
     /**
