@@ -899,7 +899,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">An external attacker cannot gain access to your account with just your key. A password reset requires both the key and access to your email.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copy the Recovery Key to clipboard or save it as text file</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">Save</string>
+    <string name="save_action" context="Action of a button to save something">Save</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
 
     <string name="change_pass" context="Button to change the password">Change</string>
