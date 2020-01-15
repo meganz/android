@@ -54,15 +54,12 @@ public class Emoji implements Serializable {
     return unicode;
   }
 
-//  /* deprecated Please migrate to getDrawable(). May return -1 in the future for providers that don't use resources*/
-//  @Deprecated @DrawableRes public int getResource() {
-//    log("***** getResource()");
-//    return resource;
-//  }
+  @NonNull public Bitmap getBitmap(final Context context) {
+    return BitmapFactory.decodeResource(context.getResources(), resource);
+
+  }
 
   @NonNull public Drawable getDrawable(final Context context) {
-
-//    Drawable drawableInitial = AppCompatResources.getDrawable(context, resource);
     Bitmap bitmapInitial = BitmapFactory.decodeResource(context.getResources(), resource);
     Bitmap bitmapFinal = Bitmap.createBitmap(80, 80, Bitmap.Config.ARGB_8888);
     Canvas c = new Canvas(bitmapFinal);

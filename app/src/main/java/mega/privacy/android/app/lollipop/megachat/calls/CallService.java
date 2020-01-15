@@ -41,6 +41,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class CallService extends Service implements MegaChatCallListenerInterface {
 
@@ -321,65 +322,14 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         return output;
     }
 
-    public Bitmap createDefaultAvatar(long userHandle, String fullName) {
-        logDebug("createDefaultAvatar()");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint paintText = new Paint();
-        Paint paintCircle = new Paint();
-
+    private Bitmap createDefaultAvatar(long userHandle, String fullName) {
+        int color;
         if (userHandle != -1) {
-            String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
-            if (color != null) {
-                logDebug("The color to set the avatar is " + color);
-                paintCircle.setColor(Color.parseColor(color));
-            } else {
-                logDebug("Default color to the avatar");
-                paintCircle.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-            }
+            color = getColorAvatar(this, megaApi, userHandle);
         } else {
-            paintCircle.setColor(ContextCompat.getColor(getApplicationContext(), R.color.divider_upgrade_account));
+            color = ContextCompat.getColor(this, R.color.divider_upgrade_account);
         }
-
-        paintText.setColor(Color.WHITE);
-        paintText.setTextSize(150);
-        paintCircle.setAntiAlias(true);
-        paintText.setAntiAlias(true);
-        paintText.setTextAlign(Paint.Align.CENTER);
-        Typeface face = Typeface.SANS_SERIF;
-        paintText.setTypeface(face);
-        paintText.setAntiAlias(true);
-        paintText.setSubpixelText(true);
-        paintText.setStyle(Paint.Style.FILL);
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth() / 2;
-        else
-            radius = defaultAvatar.getHeight() / 2;
-
-        c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, paintCircle);
-
-        if (fullName != null) {
-            if (!fullName.isEmpty()) {
-                char title = fullName.charAt(0);
-                String firstLetter = new String(title + "");
-
-                if (!firstLetter.equals("(")) {
-
-                    logDebug("Draw letter: " + firstLetter);
-                    Rect bounds = new Rect();
-
-                    paintText.getTextBounds(firstLetter, 0, firstLetter.length(), bounds);
-                    int xPos = (c.getWidth() / 2);
-                    int yPos = (int) ((c.getHeight() / 2) - ((paintText.descent() + paintText.ascent() / 2)) + 20);
-                    c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-                }
-
-            }
-        }
-        return defaultAvatar;
+        return getDefaultAvatar(this, color, fullName, AVATAR_SIZE, true);
     }
 
     @Override
