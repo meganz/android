@@ -242,6 +242,8 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ORDER = "INTENT_UPDATE_ORDER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_VIEW = "INTENT_UPDATE_VIEW";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
+    public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED = "INTENT_CHAT_ARCHIVED";
+    public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP = "INTENT_CHAT_ARCHIVED_GROUP";
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
@@ -383,6 +385,9 @@ public class Constants {
     public static final int MESSAGE_SNACKBAR_TYPE = 1;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
 
+    public static final int INFO_ANIMATION = 3000;
+    public static final int QUICK_INFO_ANIMATION = 500;
+
     public static final int HEADER_VIEW_TYPE = 0;
     public static final int ITEM_VIEW_TYPE = 1;
     public static final int ITEM_PROGRESS = 2;
@@ -401,20 +406,23 @@ public class Constants {
     public static final String SECOND_CALL = "SECOND_CALL";
     public static final String PEER_ID = "peerId";
     public static final String CLIENT_ID = "clientId";
-
+    public static final String CHAT_TITLE = "CHAT_TITLE";
     public static final String SELECTED_CONTACTS = "SELECTED_CONTACTS";
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String HANDLE = "handle";
+    public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
 
-    public static final int EMOJI_SIZE_EXTRA_SMALL = 10;
-    public static final int EMOJI_SIZE_SMALL = 15;
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;
-    public static final int EMOJI_AVATAR_SIZE = 30;
+    public static final int EMOJI_SIZE_HIGH = 30;
     public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
     public static final int EMOJI_AVATAR_CALL_SMALL = 40;
-    public static final int EMOJI_AVATAR_CALL_HIGH = 60;
     public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
+    public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND = 350;
+    public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT = 200;
+    public static final int MAX_WIDTH_ADD_CONTACTS = 60;
+    public static final int AVATAR_SIZE = 150;
+    public static final int AVATAR_SIZE_GRID = 75;
 
     public static final String SEPARATOR = File.separator;
 

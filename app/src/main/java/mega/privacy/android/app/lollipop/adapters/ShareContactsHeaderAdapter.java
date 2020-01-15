@@ -2,14 +2,8 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -25,7 +19,6 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -36,9 +29,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListenerShare;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -48,6 +38,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop> implements View.OnClickListener, SectionTitleProvider {
 
@@ -57,9 +48,6 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     private Context mContext;
     OnItemClickListener mItemClickListener;
     private List<ShareContactInfo> shareContacts;
-
-
-
 
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
@@ -168,15 +156,14 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         holder.itemLayout = rowView.findViewById(R.id.item_content);
         holder.contactNameTextView = rowView.findViewById(R.id.contact_name);
 
-        if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+        if(!isScreenInPortrait(mContext)){
             float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, mContext.getResources().getDisplayMetrics());
-            holder.contactNameTextView.setMaxWidth((int) width);
+            holder.contactNameTextView.setMaxWidthEmojis((int) width);
         }
         else{
             float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics());
-            holder.contactNameTextView.setMaxWidth((int) width);
+            holder.contactNameTextView.setMaxWidthEmojis((int) width);
         }
-        holder.contactNameTextView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
 
         holder.emailTextView = rowView.findViewById(R.id.contact_mail);
         holder.avatar = rowView.findViewById(R.id.contact_avatar);
@@ -255,8 +242,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                     holder.contactStateIcon.setVisibility(View.GONE);
                 }
 
-                holder.avatar.setImageBitmap(setUserAvatar(contact));
-
+                holder.avatar.setImageBitmap(getAvatarShareContact(mContext, megaApi, contact));
                 UserAvatarListenerShare listener = new UserAvatarListenerShare(mContext, holder);
 
                 File avatar = buildAvatarFile(mContext,mail + ".jpg");
@@ -297,8 +283,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
                 holder.contactNameTextView.setText(contact.getPhoneContactInfo().getName());
                 holder.emailTextView.setText(contact.getPhoneContactInfo().getEmail());
-
-                holder.avatar.setImageBitmap(createDefaultAvatar(holder.emailTextView.getText().toString(), contact));
+                holder.avatar.setImageBitmap(getAvatarShareContact(mContext, megaApi, contact));
             }
         } else if (contact.isProgress()) {
             holder.itemLayout.setVisibility(View.GONE);
@@ -306,122 +291,6 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
             holder.itemProgress.setVisibility(View.VISIBLE);
         }
     }
-
-    public Bitmap setUserAvatar(ShareContactInfo contact){
-        logDebug("setUserAvatar");
-
-        String mail = null;
-
-        mail = ((AddContactActivityLollipop) mContext).getShareContactMail(contact);
-
-        if (!contact.isPhoneContact() && !contact.isMegaContact()) {
-            return createDefaultAvatar(mail, contact);
-        }
-
-        File avatar = buildAvatarFile(mContext,mail + ".jpg");
-        Bitmap bitmap = null;
-        if (isFileAvailable(avatar)){
-            if (avatar.length() > 0){
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    return createDefaultAvatar(mail, contact);
-                }
-                else{
-                    return getCircleBitmap(bitmap);
-                }
-            }
-            else{
-                return createDefaultAvatar(mail, contact);
-            }
-        }
-        else{
-            return createDefaultAvatar(mail, contact);
-        }
-    }
-
-    public Bitmap createDefaultAvatar(String mail, ShareContactInfo contact){
-        logDebug("createDefaultAvatar()");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint paintText = new Paint();
-        Paint paintCircle = new Paint();
-
-        paintText.setColor(Color.WHITE);
-        paintText.setTextSize(150);
-        paintText.setAntiAlias(true);
-        paintText.setTextAlign(Paint.Align.CENTER);
-        Typeface face = Typeface.SANS_SERIF;
-        paintText.setTypeface(face);
-        paintText.setAntiAlias(true);
-        paintText.setSubpixelText(true);
-        paintText.setStyle(Paint.Style.FILL);
-
-        String color = null;
-        if (contact.isMegaContact() && contact.getMegaContactAdapter().getMegaUser() != null) {
-            color = megaApi.getUserAvatarColor(contact.getMegaContactAdapter().getMegaUser());
-        }
-        if(color!=null){
-            logDebug("The color to set the avatar is " + color);
-            paintCircle.setColor(Color.parseColor(color));
-            paintCircle.setAntiAlias(true);
-        }
-        else{
-            logDebug("Default color to the avatar");
-            if (contact.isPhoneContact()){
-                paintCircle.setColor(ContextCompat.getColor(mContext, R.color.color_default_avatar_phone));
-            }
-            else {
-                paintCircle.setColor(ContextCompat.getColor(mContext, R.color.lollipop_primary_color));
-            }
-            paintCircle.setAntiAlias(true);
-        }
-
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-
-        String fullName = null;
-        if(contact.isPhoneContact()){
-            fullName = contact.getPhoneContactInfo().getName();
-            if (fullName == null) {
-                fullName = mail;
-            }
-        }
-        else if (contact.isMegaContact()) {
-            fullName = contact.getMegaContactAdapter().getFullName();
-            if (fullName == null) {
-                fullName = mail;
-            }
-        }
-        else{
-            //No name, ask for it and later refresh!!
-            fullName = mail;
-        }
-        String firstLetter = ChatUtil.getFirstLetter(fullName);
-        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-            firstLetter = " ";
-        }
-
-        logDebug("Draw letter: " + firstLetter);
-        Rect bounds = new Rect();
-
-        paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-        int xPos = (c.getWidth()/2);
-        int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-        c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-
-        return defaultAvatar;
-    }
-
     @Override
     public int getItemCount() {
         if (shareContacts == null) {

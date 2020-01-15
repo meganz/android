@@ -22,20 +22,23 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
+
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
+import android.support.v4.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -53,6 +56,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URLDecoder;
@@ -67,6 +71,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
@@ -94,9 +99,11 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
-import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.Constants.*;
+import static android.content.Context.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-
+import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class Util {
 
@@ -252,6 +259,7 @@ public class Util {
 //            src = src.replaceAll("]]>", "] ]>");
 //            src = "<![CDATA[" + src + "]]>";
         }
+        src = converterShortCodes(src);
         return src;
     }
 
@@ -519,7 +527,23 @@ public class Util {
 		
 		return sizeString;
 	}
-    
+
+    public static String getSizeStringGBBased(long gbSize){
+        String sizeString = "";
+        DecimalFormat decf = new DecimalFormat("###.##");
+
+        float TB = 1024;
+
+        if (gbSize < TB){
+            sizeString = decf.format(gbSize) + " " + context.getString(R.string.label_file_size_giga_byte);
+        }
+        else{
+            sizeString = decf.format(gbSize/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
+        }
+
+        return sizeString;
+    }
+
 	public static String getDateString(long date){
 		DateFormat datf = DateFormat.getDateTimeInstance();
 		String dateString = "";
@@ -1215,31 +1239,6 @@ public class Util {
 		return null;
 	}
 
-	public static int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
-		}
-
-		return (int)textSize;
-	}
-
 	public static void showAlert(Context context, String message, String title) {
 		logDebug("showAlert");
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -1494,7 +1493,6 @@ public class Util {
 			}
 		}
 	}
-
     public static Bitmap createAvatarBackground(String colorString) {
         Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(circle);
@@ -1508,55 +1506,6 @@ public class Util {
         c.drawCircle(radius, radius, radius, paintCircle);
         return circle;
     }
-
-	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
-		logDebug("color: '" + color + "' firstLetter: '" + firstLetter + "'");
-
-		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint paintText = new Paint();
-		Paint paintCircle = new Paint();
-
-		paintText.setColor(Color.WHITE);
-		paintText.setTextSize(150);
-		paintText.setAntiAlias(true);
-		paintText.setTextAlign(Paint.Align.CENTER);
-		Typeface face = Typeface.SANS_SERIF;
-		paintText.setTypeface(face);
-		paintText.setAntiAlias(true);
-		paintText.setSubpixelText(true);
-		paintText.setStyle(Paint.Style.FILL);
-
-		if(color!=null){
-			logDebug("The color to set the avatar is " + color);
-			paintCircle.setColor(Color.parseColor(color));
-			paintCircle.setAntiAlias(true);
-		}
-		else{
-			logDebug("Default color to the avatar");
-			paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-			paintCircle.setAntiAlias(true);
-		}
-
-
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-
-		logDebug("Draw letter: " + firstLetter);
-		Rect bounds = new Rect();
-
-		paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-		int xPos = (c.getWidth()/2);
-		int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-		c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-
-		return defaultAvatar;
-	}
 
 	public static MegaPreferences getPreferences (Context context) {
 		return DatabaseHandler.getDbHandler(context).getPreferences();
@@ -1792,15 +1741,26 @@ public class Util {
 	}
 
     public static boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+			return true;
+		}
+
+		if (context != null && permissions != null) {
             for (String permission : permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                     return false;
                 }
             }
         }
+
         return true;
     }
+
+	public static void requestPermission(Activity activity, int requestCode, String... permission) {
+		ActivityCompat.requestPermissions(activity,
+				permission,
+				requestCode);
+	}
 
     public static void showKeyboardDelayed(final View view) {
 		logDebug("showKeyboardDelayed");
@@ -1813,6 +1773,27 @@ public class Util {
             }
         }, 50);
     }
+
+	/**
+	 * This method is to start camera from Activity
+	 *
+	 * @param activity the activity the camera would start from
+	 */
+	public static void takePicture(Activity activity) {
+		logDebug("takePicture");
+		File newFile = buildTempFile(activity, "picture.jpg");
+		try {
+			newFile.createNewFile();
+		} catch (IOException e) {}
+
+		//This method is in the v4 support library, so can be applied to all devices
+		Uri outputFileUri = FileProvider.getUriForFile(activity, AUTHORITY_STRING_FILE_PROVIDER, newFile);
+
+		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+		cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+		activity.startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+	}
 
 	public static void resetActionBar(ActionBar aB) {
 		if (aB != null) {
