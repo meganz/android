@@ -24,7 +24,6 @@ public class CreateFolderListener extends BaseListener {
 
     public CreateFolderListener(Context context, boolean isMyChatFiles) {
         super(context);
-
         this.isMyChatFiles = isMyChatFiles;
     }
 

@@ -49,7 +49,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         this.idChat = idChat;
 
         if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
         cC = new ChatController(context);

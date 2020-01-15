@@ -57,7 +57,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
         this.context = context;
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            megaApi = MegaApplication.getInstance().getMegaApi();
         }
 
         counter = 0;
@@ -85,12 +85,10 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
     }
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
     }
 
     @Override
