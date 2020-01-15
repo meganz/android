@@ -18,8 +18,6 @@ import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.Locale;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -184,18 +182,6 @@ public class ChatUtil {
         return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
     }
 
-    public static String getFirstLetter(String title) {
-        String resultTitle = EmojiUtilsShortcodes.emojify(title);
-        resultTitle = resultTitle.trim();
-        if (resultTitle.isEmpty()) return "";
-        if (resultTitle.length() == 1) return resultTitle;
-        String lastEmoji = resultTitle.substring(0, 2);
-        int numEmojis = EmojiManager.getInstance().getNumEmojis(lastEmoji);
-        if (numEmojis > 0) return lastEmoji;
-        String result = String.valueOf(resultTitle.charAt(0)).toUpperCase(Locale.getDefault());
-
-        return result;
-    }
 
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {

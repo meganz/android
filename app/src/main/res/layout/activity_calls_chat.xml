@@ -109,7 +109,8 @@
                             android:layout_centerInParent="true"
                             android:gravity="center_horizontal|center_vertical"
                             android:textColor="@color/white"
-                            android:textSize="50dp"
+                            android:textSize="50sp"
+                            app:emojiSize="50sp"
                             android:visibility="gone" />
                     </RelativeLayout>
                     <!--Micro Avatar-->
@@ -202,15 +203,6 @@
                         rounded:border_color="#4DFFFFFF"
                         rounded:border_width="3dp"
                         rounded:corner_radius="60dp" />
-
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
-                        android:id="@+id/call_chat_contact_image_initial_letter"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:gravity="center_horizontal|center_vertical"
-                        android:textSize="15sp"
-                        android:visibility="gone" />
                 </RelativeLayout>
 
 
@@ -239,6 +231,7 @@
                         android:fontFamily="sans-serif-light"
                         android:textStyle="bold"
                         android:textSize="20sp"
+                        app:emojiSize="18sp"
                         android:maxLines="1"
                         android:singleLine="true"
                         android:ellipsize="end"/>
@@ -361,7 +354,7 @@
                         android:gravity="center"
                         android:src="@drawable/ic_mutate_layout" />
 
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/text_mutate_contact_call"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -374,6 +367,7 @@
                         android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="14sp"
+                        app:emojiSize="12sp"
                         android:textStyle="normal" />
 
                 </LinearLayout>
@@ -400,7 +394,7 @@
                 </TextView>
             </RelativeLayout>
 
-            <TextView
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/info_users_bar"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
@@ -410,6 +404,7 @@
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="14sp"
+                app:emojiSize="12sp"
                 android:textStyle="normal"
                 android:visibility="gone" />
 
@@ -459,14 +454,6 @@
                         rounded:border_color="#4DFFFFFF"
                         rounded:border_width="3dp"
                         rounded:corner_radius="40dp" />
-
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
-                        android:id="@+id/call_chat_my_image_initial_letter"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:gravity="center_horizontal|center_vertical"
-                        android:textSize="15sp" />
                 </RelativeLayout>
             </RelativeLayout>
 

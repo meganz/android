@@ -52,7 +52,6 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
                         if (bitmap == null) {
                             avatar.delete();
                         } else {
-//								holder.imageView.setImageBitmap(bitmap);
                             if (holder instanceof MegaContactsLollipopAdapter.ViewHolderContactsGrid) {
                                 bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,bitmap,3);
                                 ((MegaContactsLollipopAdapter.ViewHolderContactsGrid)holder).imageView.setImageBitmap(bitmap);
@@ -63,9 +62,6 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
                             } else if (holder instanceof ContactsHorizontalAdapter.ContactViewHolder) {
                                 ((ContactsHorizontalAdapter.ContactViewHolder) holder).avatar.setImageBitmap(bitmap);
                                 ((ContactsHorizontalAdapter.ContactViewHolder) holder).textViewInitialLetter.setVisibility(View.INVISIBLE);
-                            }
-                            if(holder.contactInitialLetter != null) {
-                                holder.contactInitialLetter.setVisibility(View.GONE);
                             }
                         }
                     }
