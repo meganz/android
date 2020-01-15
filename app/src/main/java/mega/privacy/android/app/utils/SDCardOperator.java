@@ -28,12 +28,14 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SDCardOperator {
 
-    public static final String TEST = "test";
+    public final static String TEST = "test";
+    public final static String TEMP = "temp";
+    public final static String DATA_PATH = "/data";
+
     private Context context;
 
     private String downloadRoot;
 
-    public final static String TEMP = "temp";
 
     private String sdCardRoot;
 
@@ -101,7 +103,7 @@ public class SDCardOperator {
     }
 
     public static boolean isSDCardPath(String path) {
-        return !path.startsWith(Environment.getExternalStorageDirectory().toString());
+        return !path.startsWith(Environment.getExternalStorageDirectory().toString()) && !path.startsWith(DATA_PATH);
     }
 
     public boolean canWriteWithFile(String target) {
