@@ -70,7 +70,6 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -80,6 +79,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener {
 	
@@ -228,11 +228,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 
 		nameView = v.findViewById(R.id.my_account_name);
-		nameView.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
 		nameView.setOnClickListener(this);
 
-
-		editImageView = v.findViewById(R.id.my_account_edit_icon);
+		editImageView = (ImageView) v.findViewById(R.id.my_account_edit_icon);
 
 		infoEmail = v.findViewById(R.id.my_account_email);
 		infoEmail.setText(megaApi.getMyEmail());
@@ -261,11 +259,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		changePassButton.setOnClickListener(this);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			nameView.setMaxWidth(scaleWidthPx(250, outMetrics));
+			nameView.setMaxWidthEmojis(scaleWidthPx(250, outMetrics));
 			infoEmail.setMaxWidth(scaleWidthPx(250, outMetrics));
 		}
 		else{
-			nameView.setMaxWidth(scaleWidthPx(180, outMetrics));
+			nameView.setMaxWidthEmojis(scaleWidthPx(180, outMetrics));
 			infoEmail.setMaxWidth(scaleWidthPx(200, outMetrics));
 		}
 
@@ -847,14 +845,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 	}
 
-	public void setDefaultAvatar(){
-		logDebug("setDefaultAvatar");
-		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		String firstLetter = getFirstLetter(myAccountInfo.getFullName());
-		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-			firstLetter = " ";
-		}
-		myAccountImage.setImageBitmap(createDefaultAvatar(color, firstLetter));
+	private void setDefaultAvatar(){
+		myAccountImage.setImageBitmap(getDefaultAvatar(context, getColorAvatar(context,megaApi, megaApi.getMyUser()), myAccountInfo.getFullName(), AVATAR_SIZE, true));
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){

@@ -38,6 +38,7 @@ import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -91,7 +92,9 @@ import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
@@ -184,7 +187,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private final static int ROTATION_LANDSCAPE = 1;
     private final static int ROTATION_REVERSE_PORTRAIT = 2;
     private final static int ROTATION_REVERSE_LANDSCAPE = 3;
-
+    private final static int TITLE_TOOLBAR_PORT = 140;
+    private final static int TITLE_TOOLBAR_LAND = 250;
+    private final static int TITLE_TOOLBAR_IND_PORT = 100;
 
     public static int MEGA_FILE_LINK = 1;
     public static int MEGA_FOLDER_LINK = 2;
@@ -276,7 +281,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     RelativeLayout toolbarElementsInside;
 
     private EmojiTextView titleToolbar;
-    MarqueeTextView individualSubtitleToobar;
+    private MarqueeTextView individualSubtitleToobar;
     private EmojiTextView groupalSubtitleToolbar;
     LinearLayout subtitleCall;
     Chronometer subtitleChronoCall;
@@ -596,7 +601,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         textChat = findViewById(R.id.edit_text_chat);
         textChat.setVisibility(View.VISIBLE);
-        textChat.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
         textChat.setEnabled(true);
 
         emptyLayout = findViewById(R.id.empty_messages_layout);
@@ -607,11 +611,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
 
         titleToolbar.setText("");
-        titleToolbar.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
         individualSubtitleToobar.setText("");
         individualSubtitleToobar.setVisibility(View.GONE);
         groupalSubtitleToolbar.setText("");
-        groupalSubtitleToolbar.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_SMALL, outMetrics));
         groupalSubtitleToolbar.setVisibility(View.GONE);
         subtitleCall.setVisibility(View.GONE);
         subtitleChronoCall.setVisibility(View.GONE);
@@ -619,7 +621,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         iconStateToolbar.setVisibility(View.GONE);
         privateIconToolbar.setVisibility(View.GONE);
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
-
         updateNavigationToolbarIcon();
 
         joinChatLinkLayout = findViewById(R.id.join_chat_layout_chat_layout);
@@ -1128,6 +1129,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         refreshTextInput();
     }
 
+    private SpannableStringBuilder transformEmojis(String textToTransform, float sizeText){
+        CharSequence text = textToTransform == null ? "" : textToTransform;
+        String resultText = EmojiUtilsShortcodes.emojify(text.toString());
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(resultText);
+        EmojiManager.getInstance().replaceWithImages(this, spannableStringBuilder, sizeText, sizeText);
+        return spannableStringBuilder;
+    }
+
     private void refreshTextInput() {
         recordButtonStates(RECORD_BUTTON_DEACTIVATED);
         sendIcon.setVisibility(View.GONE);
@@ -1135,12 +1144,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
         if (chatRoom != null) {
             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
-
+            String title;
             if (chatRoom.hasCustomTitle()) {
-                textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
+                title = getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle());
             } else {
-                textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
+                title = getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle());
             }
+            textChat.setHint(transformEmojis(title, textChat.getTextSize()));
         }
 
         textChat.setMinLines(1);
@@ -1360,6 +1370,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if(chatRoom==null){
             return;
         }
+        int width;
+        if(isScreenInPortrait(this)){
+            if(isGroup()) {
+                width = scaleWidthPx(TITLE_TOOLBAR_PORT, outMetrics);
+            }else {
+                width = scaleWidthPx(TITLE_TOOLBAR_IND_PORT, outMetrics);
+            }
+        }else{
+            width = scaleWidthPx(TITLE_TOOLBAR_LAND, outMetrics);
+        }
+        titleToolbar.setMaxWidthEmojis(width);
+        titleToolbar.setTypeEllipsize(TextUtils.TruncateAt.END);
 
         setSubtitleVisibility();
 
@@ -3107,19 +3129,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     @Override
     public void onBackPressed() {
-        logDebug("onBackPressed");
         retryConnectionsAndSignalPresence();
 
-        if(emojiKeyboard!=null && (emojiKeyboard.getLetterKeyboardShown() || emojiKeyboard.getEmojiKeyboardShown())){
+        if (emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
             emojiKeyboard.hideBothKeyboard(this);
-        }else{
-            if(fileStorageLayout.isShown()){
+        } else {
+            if (fileStorageLayout.isShown()) {
                 hideFileStorage();
-            }else{
-                if (handlerEmojiKeyboard != null){
+            } else {
+                if (handlerEmojiKeyboard != null) {
                     handlerEmojiKeyboard.removeCallbacksAndMessages(null);
                 }
-                if (handlerKeyboard != null){
+                if (handlerKeyboard != null) {
                     handlerKeyboard.removeCallbacksAndMessages(null);
                 }
                 closeChat(true);

@@ -416,10 +416,6 @@ public class MyAccountInfo {
         this.fullName = fullName;
     }
 
-    public String getFirstLetter() {
-        return firstLetter;
-    }
-
     public String getFormattedUsedCloud() {
         return formattedUsedCloud;
     }

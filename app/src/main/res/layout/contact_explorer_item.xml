@@ -22,18 +22,6 @@
             rounded:border_color="@color/border_file_properties"
             rounded:border_width="0dp"
             rounded:corner_radius="20dp" />
-
-    	<TextView
-	        android:id="@+id/contact_explorer_initial_letter"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-			android:layout_centerInParent="true"
-			android:gravity="center_horizontal|center_vertical"
-            android:textColor="@color/white"
-            android:textSize="24sp"
-            android:visibility="gone"
-			android:paddingBottom="3dp"/>
-	    
     </RelativeLayout>
 
     <TextView
@@ -45,10 +33,10 @@
         android:layout_marginLeft="13dp"
 		android:layout_marginRight="16dp"
         android:textColor="@color/file_list_first_row"
-        android:ellipsize="middle"
 		android:singleLine="true"
-		android:maxLines="1"
-        android:textSize="16sp"/>
+		android:ellipsize="middle"
+		android:textSize="16sp"/>
+
     
     <TextView 
         android:id="@+id/contact_explorer_phone_mail"
