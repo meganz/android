@@ -2,6 +2,8 @@ package mega.privacy.android.app;
 
 import nz.mega.sdk.MegaApiJava;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+
 public class MegaAttributes {
 	
 	private String online = "";
@@ -194,20 +196,20 @@ public class MegaAttributes {
         this.staging = staging;
     }
 
-	public String getLastPublicHandle(){
-		return lastPublicHandle;
+	public long getLastPublicHandle() {
+		return getLongValueFromStringAttribute(lastPublicHandle, "Last public handle", -1);
 	}
 
-	public void setLastPublicHandle(String lastPublicHandle){
-		this.lastPublicHandle = lastPublicHandle;
+	public void setLastPublicHandle(long lastPublicHandle){
+		this.lastPublicHandle = Long.toString(lastPublicHandle);
 	}
 
-	public String getLastPublicHandleTimeStamp(){
-		return lastPublicHandleTimeStamp;
+	public long getLastPublicHandleTimeStamp(){
+		return getLongValueFromStringAttribute(lastPublicHandleTimeStamp, "Last public handle time stamp", -1);
 	}
 
-	public void setLastPublicHandleTimeStamp(String lastPublicHandleTimeStamp){
-		this.lastPublicHandleTimeStamp = lastPublicHandleTimeStamp;
+	public void setLastPublicHandleTimeStamp(long lastPublicHandleTimeStamp){
+		this.lastPublicHandleTimeStamp = Long.toString(lastPublicHandleTimeStamp);
 	}
 
 	public int getLastPublicHandleType(){
@@ -224,5 +226,29 @@ public class MegaAttributes {
 
 	public void setStorageState(int storageState){
 		this.storageState = storageState;
+	}
+
+	/**
+	 * Get an attribute stored as String as a long value.
+	 *
+	 * @param attribute    Attribute to get value.
+	 * @param attrName     Descriptive name of the attribute.
+	 * @param defaultValue Default value to get in case of error.
+	 * @return Long value of the attribute.
+	 */
+	private long getLongValueFromStringAttribute(String attribute, String attrName, long defaultValue) {
+		long value = defaultValue;
+
+		if (attribute != null) {
+			try {
+				value = Long.parseLong(attribute);
+			} catch (Exception e) {
+				logWarning("Exception getting " + attrName + ".", e);
+				value = defaultValue;
+			}
+		}
+
+		logDebug(attrName + ": " + value);
+		return value;
 	}
 }

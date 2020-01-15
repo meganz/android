@@ -255,7 +255,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -354,7 +353,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	boolean isFabOpen=false;
 	//
 
-	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
 	ChatSettings chatSettings = null;
 	MegaAttributes attr = null;
@@ -1306,12 +1304,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				MegaAttributes attributes = dbH.getAttributes();
 
-				long lastPublicHandle = getLastPublicHandle(attributes);
-				if (lastPublicHandle == -1){
+				long lastPublicHandle = attributes.getLastPublicHandle();
+				if (lastPublicHandle == INVALID_HANDLE){
 					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), managerActivity);
 				}
 				else{
-					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle, managerActivity);
+					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle,
+							attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), managerActivity);
 				}
             }
             else{
@@ -1319,12 +1318,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (dbH != null){
 					MegaAttributes attributes = dbH.getAttributes();
 
-					long lastPublicHandle = getLastPublicHandle(attributes);
-					if (lastPublicHandle == -1){
+					long lastPublicHandle = attributes.getLastPublicHandle();
+					if (lastPublicHandle == INVALID_HANDLE){
 						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson());
 					}
 					else{
-						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle);
+						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle,
+								attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp());
 					}
 				}
 				else{
@@ -1502,12 +1502,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 						MegaAttributes attributes = dbH.getAttributes();
 
-						long lastPublicHandle = getLastPublicHandle(attributes);
-						if (lastPublicHandle == -1){
+						long lastPublicHandle = attributes.getLastPublicHandle();
+						if (lastPublicHandle == INVALID_HANDLE){
 							megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), managerActivity);
 						}
 						else{
-							megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle, managerActivity);
+							megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle,
+									attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), managerActivity);
 						}
 					}
 				}
@@ -11955,12 +11956,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 					MegaAttributes attributes = dbH.getAttributes();
 
-					long lastPublicHandle = getLastPublicHandle(attributes);
-					if (lastPublicHandle == -1){
+					long lastPublicHandle = attributes.getLastPublicHandle();
+					if (lastPublicHandle == INVALID_HANDLE){
 						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), this);
 					}
 					else{
-						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle, this);
+						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle,
+								attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), this);
 					}
 				}
 			}

@@ -1821,8 +1821,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_SHOW_COPYRIGHT, encrypt(attr.getShowCopyright()));
 		values.put(KEY_SHOW_NOTIF_OFF, encrypt(attr.getShowNotifOff()));
 		values.put(KEY_STAGING, encrypt(attr.getStaging()));
-		values.put(KEY_LAST_PUBLIC_HANDLE, encrypt(attr.getLastPublicHandle()));
-		values.put(KEY_LAST_PUBLIC_HANDLE_TIMESTAMP, encrypt(attr.getLastPublicHandleTimeStamp()));
+		values.put(KEY_LAST_PUBLIC_HANDLE, encrypt(Long.toString(attr.getLastPublicHandle())));
+		values.put(KEY_LAST_PUBLIC_HANDLE_TIMESTAMP, encrypt(Long.toString(attr.getLastPublicHandleTimeStamp())));
 		values.put(KEY_STORAGE_STATE, encrypt(Integer.toString(attr.getStorageState())));
 		values.put(KEY_LAST_PUBLIC_HANDLE_TYPE, encrypt(Integer.toString(attr.getLastPublicHandleType())));
 		db.insert(TABLE_ATTRIBUTES, null, values);
@@ -3574,22 +3574,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //	}
 
 	public void clearAttributes(){
-        long lastPublicHandle = -1;
+        long lastPublicHandle;
         long lastPublicHandleTimeStamp = -1;
+        int lastPublicHandleType = MegaApiJava.AFFILIATE_TYPE_INVALID;
         try {
             MegaAttributes attributes = getAttributes();
-            lastPublicHandle = Long.parseLong(attributes.getLastPublicHandle());
-            lastPublicHandleTimeStamp = Long.parseLong(attributes.getLastPublicHandleTimeStamp());
+            lastPublicHandle = attributes.getLastPublicHandle();
+            lastPublicHandleTimeStamp = attributes.getLastPublicHandleTimeStamp();
+            lastPublicHandleType = attributes.getLastPublicHandleType();
         }
         catch(Exception e){
-            lastPublicHandle = -1;
+            lastPublicHandle = MegaApiJava.INVALID_HANDLE;
         }
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
 		onCreate(db);
-		if ((lastPublicHandle != -1) && (lastPublicHandleTimeStamp != -1)){
+		if (lastPublicHandle != MegaApiJava.INVALID_HANDLE) {
 		    try{
 		        setLastPublicHandle(lastPublicHandle);
 		        setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp);
+				setLastPublicHandleType(lastPublicHandleType);
             }
             catch (Exception e){}
         }

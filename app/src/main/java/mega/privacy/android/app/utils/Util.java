@@ -132,10 +132,9 @@ public class Util {
 	public static String base64EncodedPublicKey_4 = "wL6PWE8ZGGeeJmU0eAJeRJMsNEwMrW2LATnIoJ4/qLYU4gKDINPMRaIE6/4pQnbd2NurWm8ZQT7XSMQZcisTqwRLS";
 	public static String base64EncodedPublicKey_5 = "YgjYKCXtjloP8QnKu0IGOoo79Cfs3Z9eC3sQ1fcLQsMM2wExlbnYI2KPTs0EGCmcMXrrO5MimGjYeW8GQlrKsbiZ0UwIDAQAB";
 	*/
-	public static DatabaseHandler dbH;
 	public static boolean fileLoggerSDK = false;
 	public static boolean fileLoggerKarere = false;
-	public static Context context;
+	public static Context context = MegaApplication.getInstance().getApplicationContext();
 
 	public static HashMap<String, String> countryCodeDisplay;
 
@@ -552,14 +551,6 @@ public class Util {
 		dateString = datf.format(new Date(date*1000));
 		
 		return dateString;
-	}
-
-	public static void setContext(Context c){
-		context = c;
-	}
-
-	public static void setDBH(DatabaseHandler d){
-		dbH = d;
 	}
 
 	public static void setFileLoggerSDK(boolean fL){
@@ -1153,30 +1144,6 @@ public class Util {
 			return false;
 		}
 	}
-
-	public static long getLastPublicHandle(MegaAttributes attributes){
-		long lastPublicHandle = -1;
-
-		if (attributes != null){
-			if (attributes.getLastPublicHandle() != null){
-				try{
-					long currentTime = System.currentTimeMillis()/1000;
-					long lastPublicHandleTimeStamp = Long.parseLong(attributes.getLastPublicHandleTimeStamp());
-					logDebug("currentTime: " + currentTime + " _ " + lastPublicHandleTimeStamp);
-					if ((currentTime - lastPublicHandleTimeStamp) < 86400){
-						if (Long.parseLong(attributes.getLastPublicHandle()) != -1){
-							lastPublicHandle = Long.parseLong(attributes.getLastPublicHandle());
-						}
-					}
-				}
-				catch (Exception e){
-					lastPublicHandle = -1;
-				}
-			}
-		}
-
-		return lastPublicHandle;
-	}
 	
 	public static boolean isPaymentMethod(BitSet paymentBitSet, int plan){
 		
@@ -1234,6 +1201,7 @@ public class Util {
 	 * compare the current mail to newly changed email
 	 */
 	public static String comparedToCurrentEmail(String value, Context context) {
+		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
 		if (value.equals(dbH.getCredentials().getEmail())) {
 			return context.getString(R.string.mail_same_as_old);
 		}
@@ -1328,9 +1296,7 @@ public class Util {
 
 	public static boolean isChatEnabled (){
 		logDebug("isChatEnabled");
-		if (dbH == null){
-			dbH = DatabaseHandler.getDbHandler(context);
-		}
+		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
 		ChatSettings chatSettings = dbH.getChatSettings();
 		boolean chatEnabled;
 
@@ -1367,9 +1333,7 @@ public class Util {
 
 		boolean fileLogger = false;
 
-		if (dbH == null){
-			dbH = DatabaseHandler.getDbHandler(context);
-		}
+		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
 
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();

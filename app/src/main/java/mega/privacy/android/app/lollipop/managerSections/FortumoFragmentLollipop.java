@@ -134,14 +134,15 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 			Product account = p.get(i);
 			if ((account.getLevel()==4) && (account.getMonths()==1)){
 				long planHandle = account.getHandle();
-				long lastPublicHandle = getLastPublicHandle(attributes);
-				if (lastPublicHandle == -1){
+				long lastPublicHandle = attributes.getLastPublicHandle();
+				if (lastPublicHandle == MegaApiJava.INVALID_HANDLE){
 					megaApi.getPaymentId(planHandle, this);
 				}
 				else{
-					megaApi.getPaymentId(planHandle, lastPublicHandle, this);
+					megaApi.getPaymentId(planHandle, lastPublicHandle, attributes.getLastPublicHandleType(),
+							attributes.getLastPublicHandleTimeStamp(), this);
 				}
-				logDebug("megaApi.getPaymentId(" + planHandle + ", " + lastPublicHandle + ")");
+				logDebug("Plan handle: " + planHandle + ", Last public handle: " + lastPublicHandle);
 			}
 		}
 	}

@@ -460,7 +460,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
         storageState = dbH.getStorageState();
 
-		setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		boolean staging = false;
 		if (dbH != null) {
@@ -748,7 +747,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			megaChatApi = getMegaChatApi();
 		}
 	}
-	
+
 	public MegaApiAndroid getMegaApi()
 	{
 		if(megaApi == null)
@@ -806,6 +805,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 		
 		return megaApi;
+	}
+
+	public DatabaseHandler getDbH() {
+		if (dbH == null) {
+			DatabaseHandler.getDbHandler(getApplicationContext());
+		}
+
+		return dbH;
 	}
 
 	public static boolean isActivityVisible() {

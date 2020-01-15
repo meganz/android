@@ -1239,8 +1239,11 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
 
-				dbH.setLastPublicHandle(request.getNodeHandle());
-				dbH.setLastPublicHandleTimeStamp();
+				if (request.getNodeHandle() != MegaApiJava.INVALID_HANDLE) {
+					dbH.setLastPublicHandle(request.getNodeHandle());
+					dbH.setLastPublicHandleTimeStamp();
+					dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
+				}
 
 				MegaNode rootNode = megaApiFolder.getRootNode();
 				if (rootNode != null){

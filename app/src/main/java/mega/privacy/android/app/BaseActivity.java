@@ -46,6 +46,8 @@ public class BaseActivity extends AppCompatActivity {
     protected MegaApiAndroid megaApiFolder;
     protected MegaChatApiAndroid megaChatApi;
 
+    protected DatabaseHandler dbH;
+
     private AlertDialog sslErrorDialog;
 
     private boolean delaySignalPresence = false;
@@ -58,6 +60,8 @@ public class BaseActivity extends AppCompatActivity {
         if(isChatEnabled()) {
             megaChatApi = app.getMegaChatApi();
         }
+
+        dbH = app.getDbH();
     }
 
     @Override
@@ -126,6 +130,10 @@ public class BaseActivity extends AppCompatActivity {
             if (megaChatApi == null){
                 megaChatApi = app.getMegaChatApi();
             }
+        }
+
+        if (dbH == null) {
+            dbH = app.getDbH();
         }
     }
 

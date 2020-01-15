@@ -475,8 +475,11 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
 
-				dbH.setLastPublicHandle(document.getHandle());
-				dbH.setLastPublicHandleTimeStamp();
+				if (document.getHandle() != MegaApiJava.INVALID_HANDLE) {
+					dbH.setLastPublicHandle(document.getHandle());
+					dbH.setLastPublicHandleTimeStamp();
+					dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
+				}
 
 //				nameView.setText(document.getName());
 				collapsingToolbar.setTitle(document.getName());
