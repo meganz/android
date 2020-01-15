@@ -10,25 +10,27 @@
 
 package org.webrtc;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /** Java wrapper for a C++ MediaStreamInterface. */
 public class MediaStream {
-  public final LinkedList<AudioTrack> audioTracks;
-  public final LinkedList<VideoTrack> videoTracks;
-  public final LinkedList<VideoTrack> preservedVideoTracks;
-  // Package-protected for PeerConnection.
-  final long nativeStream;
+  private static final String TAG = "MediaStream";
 
+  public final List<AudioTrack> audioTracks = new ArrayList<>();
+  public final List<VideoTrack> videoTracks = new ArrayList<>();
+  public final List<VideoTrack> preservedVideoTracks = new ArrayList<>();
+  private long nativeStream;
+
+  @CalledByNative
   public MediaStream(long nativeStream) {
-    audioTracks = new LinkedList<AudioTrack>();
-    videoTracks = new LinkedList<VideoTrack>();
-    preservedVideoTracks = new LinkedList<VideoTrack>();
     this.nativeStream = nativeStream;
   }
 
   public boolean addTrack(AudioTrack track) {
-    if (nativeAddAudioTrack(nativeStream, track.nativeTrack)) {
+    checkMediaStreamExists();
+    if (nativeAddAudioTrackToNativeStream(nativeStream, track.getNativeAudioTrack())) {
       audioTracks.add(track);
       return true;
     }
@@ -36,7 +38,8 @@ public class MediaStream {
   }
 
   public boolean addTrack(VideoTrack track) {
-    if (nativeAddVideoTrack(nativeStream, track.nativeTrack)) {
+    checkMediaStreamExists();
+    if (nativeAddVideoTrackToNativeStream(nativeStream, track.getNativeVideoTrack())) {
       videoTracks.add(track);
       return true;
     }
@@ -47,7 +50,8 @@ public class MediaStream {
   // is called. If video track need to be preserved after MediaStream is destroyed it
   // should be added to MediaStream using addPreservedTrack() call.
   public boolean addPreservedTrack(VideoTrack track) {
-    if (nativeAddVideoTrack(nativeStream, track.nativeTrack)) {
+    checkMediaStreamExists();
+    if (nativeAddVideoTrackToNativeStream(nativeStream, track.getNativeVideoTrack())) {
       preservedVideoTracks.add(track);
       return true;
     }
@@ -55,52 +59,101 @@ public class MediaStream {
   }
 
   public boolean removeTrack(AudioTrack track) {
+    checkMediaStreamExists();
     audioTracks.remove(track);
-    return nativeRemoveAudioTrack(nativeStream, track.nativeTrack);
+    return nativeRemoveAudioTrack(nativeStream, track.getNativeAudioTrack());
   }
 
   public boolean removeTrack(VideoTrack track) {
+    checkMediaStreamExists();
     videoTracks.remove(track);
     preservedVideoTracks.remove(track);
-    return nativeRemoveVideoTrack(nativeStream, track.nativeTrack);
+    return nativeRemoveVideoTrack(nativeStream, track.getNativeVideoTrack());
   }
 
+  @CalledByNative
   public void dispose() {
+    checkMediaStreamExists();
     // Remove and release previously added audio and video tracks.
     while (!audioTracks.isEmpty()) {
-      AudioTrack track = audioTracks.getFirst();
+      AudioTrack track = audioTracks.get(0 /* index */);
       removeTrack(track);
       track.dispose();
     }
     while (!videoTracks.isEmpty()) {
-      VideoTrack track = videoTracks.getFirst();
+      VideoTrack track = videoTracks.get(0 /* index */);
       removeTrack(track);
       track.dispose();
     }
     // Remove, but do not release preserved video tracks.
     while (!preservedVideoTracks.isEmpty()) {
-      removeTrack(preservedVideoTracks.getFirst());
+      removeTrack(preservedVideoTracks.get(0 /* index */));
     }
-    free(nativeStream);
+    JniCommon.nativeReleaseRef(nativeStream);
+    nativeStream = 0;
   }
 
-  public String label() {
-    return nativeLabel(nativeStream);
+  public String getId() {
+    checkMediaStreamExists();
+    return nativeGetId(nativeStream);
   }
 
+  @Override
   public String toString() {
-    return "[" + label() + ":A=" + audioTracks.size() + ":V=" + videoTracks.size() + "]";
+    return "[" + getId() + ":A=" + audioTracks.size() + ":V=" + videoTracks.size() + "]";
   }
 
-  private static native boolean nativeAddAudioTrack(long nativeStream, long nativeAudioTrack);
+  @CalledByNative
+  void addNativeAudioTrack(long nativeTrack) {
+    audioTracks.add(new AudioTrack(nativeTrack));
+  }
 
-  private static native boolean nativeAddVideoTrack(long nativeStream, long nativeVideoTrack);
+  @CalledByNative
+  void addNativeVideoTrack(long nativeTrack) {
+    videoTracks.add(new VideoTrack(nativeTrack));
+  }
 
-  private static native boolean nativeRemoveAudioTrack(long nativeStream, long nativeAudioTrack);
+  @CalledByNative
+  void removeAudioTrack(long nativeTrack) {
+    removeMediaStreamTrack(audioTracks, nativeTrack);
+  }
 
-  private static native boolean nativeRemoveVideoTrack(long nativeStream, long nativeVideoTrack);
+  @CalledByNative
+  void removeVideoTrack(long nativeTrack) {
+    removeMediaStreamTrack(videoTracks, nativeTrack);
+  }
 
-  private static native String nativeLabel(long nativeStream);
+  /** Returns a pointer to webrtc::MediaStreamInterface. */
+  long getNativeMediaStream() {
+    checkMediaStreamExists();
+    return nativeStream;
+  }
 
-  private static native void free(long nativeStream);
+  private void checkMediaStreamExists() {
+    if (nativeStream == 0) {
+      throw new IllegalStateException("MediaStream has been disposed.");
+    }
+  }
+
+  private static void removeMediaStreamTrack(
+      List<? extends MediaStreamTrack> tracks, long nativeTrack) {
+    final Iterator<? extends MediaStreamTrack> it = tracks.iterator();
+    while (it.hasNext()) {
+      MediaStreamTrack track = it.next();
+      if (track.getNativeMediaStreamTrack() == nativeTrack) {
+        track.dispose();
+        it.remove();
+        return;
+      }
+    }
+    Logging.e(TAG, "Couldn't not find track");
+  }
+
+  private static native boolean nativeAddAudioTrackToNativeStream(
+      long stream, long nativeAudioTrack);
+  private static native boolean nativeAddVideoTrackToNativeStream(
+      long stream, long nativeVideoTrack);
+  private static native boolean nativeRemoveAudioTrack(long stream, long nativeAudioTrack);
+  private static native boolean nativeRemoveVideoTrack(long stream, long nativeVideoTrack);
+  private static native String nativeGetId(long stream);
 }
