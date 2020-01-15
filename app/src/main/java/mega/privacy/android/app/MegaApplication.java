@@ -659,17 +659,17 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	public void refreshAccountInfo(){
 		//Check if the call is recently
-		if(callToAccountDetails(context) || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
+		if(callToAccountDetails() || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
 			logDebug("megaApi.getAccountDetails SEND");
 			askForAccountDetails();
 		}
 
-		if(callToExtendedAccountDetails(context)){
+		if(callToExtendedAccountDetails()){
 			logDebug("megaApi.getExtendedAccountDetails SEND");
 			askForExtendedAccountDetails();
 		}
 
-		if(callToPaymentMethods(context)){
+		if(callToPaymentMethods()){
 			logDebug("megaApi.getPaymentMethods SEND");
 			askForPaymentMethods();
 		}

@@ -134,7 +134,6 @@ public class Util {
 	*/
 	public static boolean fileLoggerSDK = false;
 	public static boolean fileLoggerKarere = false;
-	public static Context context = MegaApplication.getInstance().getApplicationContext();
 
 	public static HashMap<String, String> countryCodeDisplay;
 
@@ -292,6 +291,7 @@ public class Util {
 			count =  list.length;
 		}
 
+		Context context = MegaApplication.getInstance().getApplicationContext();
 		String numChilden = count + " " + context.getResources().getQuantityString(R.plurals.general_num_items, count);
 
 		return numChilden;
@@ -508,7 +508,8 @@ public class Util {
 		float MB = KB * 1024;
 		float GB = MB * 1024;
 		float TB = GB * 1024;
-		
+
+		Context context = MegaApplication.getInstance().getApplicationContext();
 		if (size < KB){
 			sizeString = size + " " + context.getString(R.string.label_file_size_byte);
 		}
@@ -534,6 +535,7 @@ public class Util {
 
         float TB = 1024;
 
+		Context context = MegaApplication.getInstance().getApplicationContext();
         if (gbSize < TB){
             sizeString = decf.format(gbSize) + " " + context.getString(R.string.label_file_size_giga_byte);
         }
@@ -733,7 +735,7 @@ public class Util {
 		} else {
 			return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS;
 		}
-		
+
 	}
 	
 	/** Returns the consumer friendly device name */
@@ -1088,6 +1090,8 @@ public class Util {
 		int numFolders = 0;
 		int numFiles = 0;
 
+		Context context = MegaApplication.getInstance().getApplicationContext();
+
 		for (int i=0;i<nodes.size();i++){
 			MegaNode c = nodes.get(i);
 			if (c.isFolder()){
@@ -1413,6 +1417,7 @@ public class Util {
     
     //reduce font size for scale mode to prevent title and subtitle overlap
     public static SpannableString adjustForLargeFont(String original) {
+		Context context = MegaApplication.getInstance().getApplicationContext();
         float scale = context.getResources().getConfiguration().fontScale;
         if(scale > 1){
             scale = (float)0.9;
@@ -1490,7 +1495,7 @@ public class Util {
         Paint paintCircle = new Paint();
         paintCircle.setAntiAlias(true);
         int color = (colorString == null) ?
-                ContextCompat.getColor(context, R.color.lollipop_primary_color) :
+                ContextCompat.getColor(MegaApplication.getInstance().getApplicationContext(), R.color.lollipop_primary_color) :
                 Color.parseColor(colorString);
         paintCircle.setColor(color);
         int radius = circle.getWidth() / 2;
@@ -1523,7 +1528,8 @@ public class Util {
 		}
 		else{
 			logDebug("Default color to the avatar");
-			paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+			paintCircle.setColor(ContextCompat.getColor(MegaApplication.getInstance().getApplicationContext(),
+					R.color.lollipop_primary_color));
 			paintCircle.setAntiAlias(true);
 		}
 
@@ -1808,7 +1814,8 @@ public class Util {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm =
+						(InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
             }
         }, 50);

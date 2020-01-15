@@ -108,7 +108,7 @@ WebView myWebView;
 //        WebSettings webSettings = myWebView.getSettings();
 //        webSettings.setJavaScriptEnabled(true);
 
-		if(callToPricing(context)){
+		if(callToPricing()){
 			logDebug("megaApi.getPricing SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}else{

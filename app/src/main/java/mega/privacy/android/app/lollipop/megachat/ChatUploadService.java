@@ -314,7 +314,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}
 
 			if (pendingMsg!=null) {
-				sendOriginalAttachments = isSendOriginalAttachments(this);
+				sendOriginalAttachments = isSendOriginalAttachments();
 				logDebug("sendOriginalAttachments is " + sendOriginalAttachments);
 
 				if(chatId!=-1){

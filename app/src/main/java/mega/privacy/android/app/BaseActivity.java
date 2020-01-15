@@ -414,7 +414,7 @@ public class BaseActivity extends AppCompatActivity {
 
         //Check if the call is recently
         logDebug("Check the last call to getAccountDetails");
-        if(callToAccountDetails(getApplicationContext())){
+        if(callToAccountDetails()){
             logDebug("megaApi.getAccountDetails SEND");
             app.askForAccountDetails();
         }
