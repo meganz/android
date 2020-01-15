@@ -87,7 +87,6 @@
                 android:layout_marginRight="2dp"
                 android:src="@drawable/ic_input_warning"
                 android:tint="@color/dark_primary_color"
-                android:paddingBottom="5dp"
                 android:layout_alignBottom="@+id/confirm_email_new_email_layout"/>
 
         </RelativeLayout>

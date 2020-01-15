@@ -264,7 +264,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginTitle = (TextView) v.findViewById(R.id.login_text_view);
 
-        loginTitle.setText(R.string.sign_up_mega);
+        loginTitle.setText(R.string.login_to_mega);
         loginTitle.setOnClickListener(this);
 
         et_userLayout = v.findViewById(R.id.login_email_text_layout);
@@ -2466,7 +2466,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     bForgotPass.setVisibility(View.VISIBLE);
                     loginProgressBar.setVisibility(View.GONE);
 
-                    loginTitle.setText(R.string.sign_up_mega);
+                    loginTitle.setText(R.string.login_to_mega);
                     bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
                     confirmLink = null;
                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.account_confirmed));

@@ -537,7 +537,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		
 	    loginTitle = (TextView) findViewById(R.id.login_text_view);
 
-		loginTitle.setText(R.string.sign_up_mega);
+		loginTitle.setText(R.string.login_to_mega);
 		
 		et_user = findViewById(R.id.login_email_text);
 

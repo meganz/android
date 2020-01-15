@@ -2590,7 +2590,7 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
 	</plurals>
 
-    <string name="sign_up_mega" context="Title of the login screen">Sign up for MEGA</string>
+    <string name="login_to_mega" context="Title of the login screen">Login to MEGA</string>
     <string name="create_account_title" context="Title of the create account screen">Create your MEGA account</string>
 
     <string name="recents_label" context="Label to reference a recents section">Recents</string>

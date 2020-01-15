@@ -76,7 +76,6 @@
                             android:layout_marginRight="2dp"
                             android:src="@drawable/ic_input_warning"
                             android:tint="@color/dark_primary_color"
-                            android:paddingBottom="5dp"
                             android:layout_alignBottom="@+id/create_account_name_text_layout"/>
 
                     </RelativeLayout>
@@ -89,6 +88,7 @@
                             android:id="@+id/create_account_last_name_text_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
@@ -112,7 +112,6 @@
                             android:layout_marginRight="2dp"
                             android:src="@drawable/ic_input_warning"
                             android:tint="@color/dark_primary_color"
-                            android:paddingBottom="5dp"
                             android:layout_alignBottom="@+id/create_account_last_name_text_layout"/>
 
                     </RelativeLayout>
@@ -125,6 +124,7 @@
                             android:id="@+id/create_account_email_text_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
@@ -148,7 +148,6 @@
                             android:layout_marginRight="2dp"
                             android:src="@drawable/ic_input_warning"
                             android:tint="@color/dark_primary_color"
-                            android:paddingBottom="5dp"
                             android:layout_alignBottom="@+id/create_account_email_text_layout"/>
 
                     </RelativeLayout>
@@ -161,6 +160,7 @@
                             android:id="@+id/create_account_password_text_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
@@ -183,7 +183,6 @@
                             android:layout_alignParentRight="true"
                             android:layout_alignTop="@+id/login_password_text_layout"
                             android:layout_marginTop="15dp"
-                            android:padding="5dp"
                             android:src="@drawable/ic_b_shared_read"
                             android:visibility="gone"/>
 
@@ -214,36 +213,41 @@
 
                                 <ImageView
                                     android:id="@+id/shape_passwd_first"
-                                    android:layout_width="@dimen/width_passwd_shape"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:layout_weight="1"
                                     android:layout_marginLeft="5dp"
                                     android:layout_marginRight="5dp"
                                     android:background="@drawable/passwd_very_weak"/>
                                 <ImageView
                                     android:id="@+id/shape_passwd_second"
-                                    android:layout_width="@dimen/width_passwd_shape"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:layout_weight="1"
                                     android:layout_marginLeft="5dp"
                                     android:layout_marginRight="5dp"
                                     android:background="@drawable/shape_password"/>
                                 <ImageView
                                     android:id="@+id/shape_passwd_third"
-                                    android:layout_width="@dimen/width_passwd_shape"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:layout_weight="1"
                                     android:layout_marginLeft="5dp"
                                     android:layout_marginRight="5dp"
                                     android:background="@drawable/shape_password"/>
                                 <ImageView
                                     android:id="@+id/shape_passwd_fourth"
-                                    android:layout_width="@dimen/width_passwd_shape"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:layout_weight="1"
                                     android:layout_marginLeft="5dp"
                                     android:layout_marginRight="5dp"
                                     android:background="@drawable/shape_password"/>
                                 <ImageView
                                     android:id="@+id/shape_passwd_fifth"
-                                    android:layout_width="@dimen/width_passwd_shape"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:layout_weight="1"
                                     android:layout_marginLeft="5dp"
                                     android:layout_marginRight="5dp"
                                     android:background="@drawable/shape_password"/>
@@ -282,6 +286,7 @@
                             android:id="@+id/create_account_password_text_confirm_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
@@ -316,7 +321,6 @@
                             android:layout_marginRight="2dp"
                             android:src="@drawable/ic_input_warning"
                             android:tint="@color/dark_primary_color"
-                            android:paddingBottom="5dp"
                             android:layout_alignBottom="@+id/create_account_password_text_confirm_layout"/>
 
                     </RelativeLayout>
