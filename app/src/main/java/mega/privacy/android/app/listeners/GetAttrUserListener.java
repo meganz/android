@@ -33,6 +33,9 @@ public class GetAttrUserListener extends BaseListener {
 
                 if (e.getErrorCode() == MegaError.API_OK) {
                     myChatFolderNode = api.getNodeByHandle(request.getNodeHandle());
+                    if (myChatFolderNode == null) {
+                        myChatFolderNode = api.getNodeByPath(CHAT_FOLDER, api.getRootNode());
+                    }
                 } else if (e.getErrorCode() == MegaError.API_ENOENT) {
                     myChatFolderNode = api.getNodeByPath(CHAT_FOLDER, api.getRootNode());
 
