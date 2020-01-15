@@ -46,7 +46,7 @@ public class GetAttrUserListener extends BaseListener {
                     }
                 }
 
-                if (myChatFolderNode != null) {
+                if (myChatFolderNode != null && !api.isInRubbish(myChatFolderNode)) {
                     myChatFolderFound = true;
                 } else {
                     api.createFolder(context.getString(R.string.my_chat_files_folder), api.getRootNode(), new CreateFolderListener(context, true));
