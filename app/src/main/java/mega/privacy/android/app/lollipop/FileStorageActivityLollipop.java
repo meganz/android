@@ -68,6 +68,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
+import mega.privacy.android.app.utils.SDCardOperator;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -87,7 +88,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static final String EXTRA_SD_ROOT = "sd_root";
 	public static final String EXTRA_PATH = "filepath";
 	public static final String EXTRA_FILES = "fileslist";
-	
+    public static final String EXTRA_PROMPT = "prompt";
+
 	// Pick modes
 	public enum Mode {
 		// Select single folder
@@ -136,6 +138,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private Boolean cameraFolderSettings;
 	private String sdRoot;
 	private boolean hasSDCard;
+    private String prompt;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -302,13 +305,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		newFolderMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
 		
 		if (mode == Mode.PICK_FOLDER) {
-			boolean writable = path.canWrite();
-			button.setEnabled(writable);
-			if (writable) {				
-				newFolderMenuItem.setVisible(true);
-			} else {
-				newFolderMenuItem.setVisible(false);
-			}
+            newFolderMenuItem.setVisible(true);
 		}
 		else{
 			newFolderMenuItem.setVisible(false);
@@ -323,13 +320,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		if (mode == Mode.PICK_FOLDER) {
 			menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-			boolean writable = path.canWrite();
-			button.setEnabled(writable);
-			if (writable) {				
-				newFolderMenuItem.setVisible(true);
-			} else {
-				newFolderMenuItem.setVisible(false);
-			}
+            newFolderMenuItem.setVisible(true);
 		}else{
 			newFolderMenuItem.setVisible(false);
 			menu.findItem(R.id.cab_menu_select_all).setVisible(true);
@@ -383,6 +374,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		
 		Intent intent = getIntent();
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
+		prompt = intent.getStringExtra(EXTRA_PROMPT);
+		if(prompt != null) {
+            showSnackBar(this, SNACKBAR_TYPE, prompt, -1);
+        }
 		cameraFolderSettings = intent.getBooleanExtra(EXTRA_CAMERA_FOLDER, false);
 		sdRoot = intent.getStringExtra(EXTRA_SD_ROOT);
 		hasSDCard = (sdRoot != null);
@@ -552,11 +547,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		contentText.setText(makeBold(path.getAbsolutePath(), path.getName()));
 //		windowTitle.setText(makeBold(path.getAbsolutePath(), path.getName()));
 		invalidateOptionsMenu();
-		if (mode == Mode.PICK_FOLDER) {
-			boolean writable = newPath.canWrite();
-			button.setEnabled(writable);
-		}
-		else if (mode == Mode.PICK_FILE) {
+        if (mode == Mode.PICK_FILE) {
 			clearSelections();
 		}
 	}
@@ -714,7 +705,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 							}
 							return null;	
 						}
-						
+
 						@Override
 						public void onPostExecute(Void a)
 						{
@@ -1016,12 +1007,34 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 */
 	private void createFolder(String value) {
 		logDebug(value + " Of value");
-		File newFolder = new File(path, value);
-		newFolder.mkdir();
-		newFolder.setReadable(true, false);
-		newFolder.setExecutable(true, false);
-		setFiles(path);
-	}
+        SDCardOperator sdCardOperator = null;
+        try {
+            sdCardOperator = new SDCardOperator(this);
+        } catch (SDCardOperator.SDCardException e) {
+            e.printStackTrace();
+            logError("Initialize SDCardOperator failed", e);
+        }
+        if (sdCardOperator != null && SDCardOperator.isSDCardPath(path.getAbsolutePath()) && !path.canWrite()) {
+            try {
+                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                sdCardOperator.createFolder(path.getAbsolutePath(), value);
+            } catch (SDCardOperator.SDCardException e) {
+                e.printStackTrace();
+                logError("SDCardOperator initDocumentFileRoot failed", e);
+                showErrorAlertDialog(getString(R.string.error_io_problem), true, this);
+            }
+        } else {
+            createFolderWithFile(value);
+        }
+        setFiles(path);
+    }
+
+    private void createFolderWithFile(String value) {
+        File newFolder = new File(path, value);
+        newFolder.mkdir();
+        newFolder.setReadable(true, false);
+        newFolder.setExecutable(true, false);
+    }
 
 	public static boolean matches(String regex, CharSequence input) {
 		Pattern p = Pattern.compile(regex);

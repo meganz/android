@@ -64,10 +64,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    rounded:emojiSize="14sp"
                     android:textColor="@color/name_my_account"
                     android:text="User Name"
                     android:singleLine="true"
-                    android:ellipsize="end"
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"/>
 
