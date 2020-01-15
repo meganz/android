@@ -26,14 +26,14 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 
-import static mega.privacy.android.app.utils.Constants.PIN_4;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 49;
+	private static final int DATABASE_VERSION = 50;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -103,6 +103,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PREFERRED_VIEW_LIST = "preferredviewlist";
     private static final String KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera";
     private static final String KEY_URI_EXTERNAL_SD_CARD = "uriexternalsdcard";
+    private static final String KEY_SD_CARD_URI = "sdcarduri";
     private static final String KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD = "camerafolderexternalsdcard";
     private static final String KEY_CONTACT_HANDLE = "handle";
     private static final String KEY_CONTACT_MAIL = "mail";
@@ -301,7 +302,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //37
                 + KEY_REMOVE_GPS + " TEXT,"                         //38
                 + KEY_SHOW_INVITE_BANNER + " TEXT,"                 //39
-                + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT"                  //40
+                + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       //40
+                + KEY_SD_CARD_URI + " TEXT"                         //41
                 + ")";
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
@@ -733,6 +735,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if(oldVersion <= 48) {
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT;");
             db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_MODIFICATION_DESC)) + "';");
+        }
+
+        if (oldVersion <= 49) {
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SD_CARD_URI + " TEXT;");
         }
 	}
 
@@ -1428,12 +1434,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String removeGPS = decrypt(cursor.getString(38));
 			String closeInviteBanner = decrypt(cursor.getString(39));
 			String preferredSortCameraUpload = decrypt(cursor.getString(40));
+			String sdCardUri = decrypt(cursor.getString(41));
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
 					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize,shouldClearCameraSyncRecords,camVideoSyncTimeStamp,
-                    secVideoSyncTimeStamp,isAutoPlayEnabled,removeGPS,closeInviteBanner,preferredSortCameraUpload);
+                    secVideoSyncTimeStamp,isAutoPlayEnabled,removeGPS,closeInviteBanner,preferredSortCameraUpload,sdCardUri);
 		}
 		cursor.close();
 
@@ -2850,6 +2857,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
+    public void setSDCardUri (String sdCardUri){
+        setStringValue(TABLE_PREFERENCES, KEY_SD_CARD_URI, sdCardUri);
+    }
+
 	public void setCameraFolderExternalSDCard (boolean cameraFolderExternalSDCard){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
@@ -3783,6 +3794,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
 
         return "false";
+    }
+
+    public String getSDCardUri(){
+        return getStringValue(TABLE_PREFERENCES, KEY_SD_CARD_URI, "");
     }
 
     public void setAutoPlayEnabled(String enabled){

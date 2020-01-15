@@ -614,6 +614,20 @@ public class FileUtils {
         }
     }
 
+    public static String getSDCardRoot(String path) {
+        int i = 0,x = 0;
+        for(; x < path.toCharArray().length;x++) {
+            char c = path.toCharArray()[x];
+            if(c == '/') {
+                i++;
+            }
+            if(i == 3) {
+                break;
+            }
+        }
+        return path.substring(0,x);
+    }
+
     public static boolean appendStringToFile(final String appendContents, final File file) {
         boolean result = false;
         try {

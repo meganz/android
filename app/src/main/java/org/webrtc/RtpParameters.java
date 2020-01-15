@@ -10,7 +10,13 @@
 
 package org.webrtc;
 
-import java.util.LinkedList;
+import android.support.annotation.Nullable;
+import java.lang.Double;
+import java.lang.String;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.webrtc.MediaStreamTrack;
 
 /**
  * The parameters for an {@code RtpSender}, as defined in
@@ -23,16 +29,94 @@ import java.util.LinkedList;
  */
 public class RtpParameters {
   public static class Encoding {
+    // If non-null, this represents the RID that identifies this encoding layer.
+    // RIDs are used to identify layers in simulcast.
+    @Nullable public String rid;
     // Set to true to cause this encoding to be sent, and false for it not to
     // be sent.
     public boolean active = true;
     // If non-null, this represents the Transport Independent Application
     // Specific maximum bandwidth defined in RFC3890. If null, there is no
     // maximum bitrate.
-    public Integer maxBitrateBps;
+    @Nullable public Integer maxBitrateBps;
+    // The minimum bitrate in bps for video.
+    @Nullable public Integer minBitrateBps;
+    // The max framerate in fps for video.
+    @Nullable public Integer maxFramerate;
+    // The number of temporal layers for video.
+    @Nullable public Integer numTemporalLayers;
+    // If non-null, scale the width and height down by this factor for video. If null,
+    // implementation default scaling factor will be used.
+    @Nullable public Double scaleResolutionDownBy;
     // SSRC to be used by this encoding.
     // Can't be changed between getParameters/setParameters.
     public Long ssrc;
+
+    // This constructor is useful for creating simulcast layers.
+    Encoding(String rid, boolean active, Double scaleResolutionDownBy) {
+      this.rid = rid;
+      this.active = active;
+      this.scaleResolutionDownBy = scaleResolutionDownBy;
+    }
+
+    @CalledByNative("Encoding")
+    Encoding(String rid, boolean active, Integer maxBitrateBps, Integer minBitrateBps,
+        Integer maxFramerate, Integer numTemporalLayers, Double scaleResolutionDownBy, Long ssrc) {
+      this.rid = rid;
+      this.active = active;
+      this.maxBitrateBps = maxBitrateBps;
+      this.minBitrateBps = minBitrateBps;
+      this.maxFramerate = maxFramerate;
+      this.numTemporalLayers = numTemporalLayers;
+      this.scaleResolutionDownBy = scaleResolutionDownBy;
+      this.ssrc = ssrc;
+    }
+
+    @Nullable
+    @CalledByNative("Encoding")
+    String getRid() {
+      return rid;
+    }
+
+    @CalledByNative("Encoding")
+    boolean getActive() {
+      return active;
+    }
+
+    @Nullable
+    @CalledByNative("Encoding")
+    Integer getMaxBitrateBps() {
+      return maxBitrateBps;
+    }
+
+    @Nullable
+    @CalledByNative("Encoding")
+    Integer getMinBitrateBps() {
+      return minBitrateBps;
+    }
+
+    @Nullable
+    @CalledByNative("Encoding")
+    Integer getMaxFramerate() {
+      return maxFramerate;
+    }
+
+    @Nullable
+    @CalledByNative("Encoding")
+    Integer getNumTemporalLayers() {
+      return numTemporalLayers;
+    }
+
+    @Nullable
+    @CalledByNative("Encoding")
+    Double getScaleResolutionDownBy() {
+      return scaleResolutionDownBy;
+    }
+
+    @CalledByNative("Encoding")
+    Long getSsrc() {
+      return ssrc;
+    }
   }
 
   public static class Codec {
@@ -46,16 +130,149 @@ public class RtpParameters {
     public Integer clockRate;
     // The number of audio channels used. Set to null for video codecs.
     public Integer numChannels;
+    // The "format specific parameters" field from the "a=fmtp" line in the SDP
+    public Map<String, String> parameters;
+
+    @CalledByNative("Codec")
+    Codec(int payloadType, String name, MediaStreamTrack.MediaType kind, Integer clockRate,
+        Integer numChannels, Map<String, String> parameters) {
+      this.payloadType = payloadType;
+      this.name = name;
+      this.kind = kind;
+      this.clockRate = clockRate;
+      this.numChannels = numChannels;
+      this.parameters = parameters;
+    }
+
+    @CalledByNative("Codec")
+    int getPayloadType() {
+      return payloadType;
+    }
+
+    @CalledByNative("Codec")
+    String getName() {
+      return name;
+    }
+
+    @CalledByNative("Codec")
+    MediaStreamTrack.MediaType getKind() {
+      return kind;
+    }
+
+    @CalledByNative("Codec")
+    Integer getClockRate() {
+      return clockRate;
+    }
+
+    @CalledByNative("Codec")
+    Integer getNumChannels() {
+      return numChannels;
+    }
+
+    @CalledByNative("Codec")
+    Map getParameters() {
+      return parameters;
+    }
   }
 
-  public final LinkedList<Encoding> encodings;
+  public static class Rtcp {
+    /** The Canonical Name used by RTCP */
+    private final String cname;
+    /** Whether reduced size RTCP is configured or compound RTCP */
+    private final boolean reducedSize;
+
+    @CalledByNative("Rtcp")
+    Rtcp(String cname, boolean reducedSize) {
+      this.cname = cname;
+      this.reducedSize = reducedSize;
+    }
+
+    @CalledByNative("Rtcp")
+    public String getCname() {
+      return cname;
+    }
+
+    @CalledByNative("Rtcp")
+    public boolean getReducedSize() {
+      return reducedSize;
+    }
+  }
+
+  public static class HeaderExtension {
+    /** The URI of the RTP header extension, as defined in RFC5285. */
+    private final String uri;
+    /** The value put in the RTP packet to identify the header extension. */
+    private final int id;
+    /** Whether the header extension is encrypted or not. */
+    private final boolean encrypted;
+
+    @CalledByNative("HeaderExtension")
+    HeaderExtension(String uri, int id, boolean encrypted) {
+      this.uri = uri;
+      this.id = id;
+      this.encrypted = encrypted;
+    }
+
+    @CalledByNative("HeaderExtension")
+    public String getUri() {
+      return uri;
+    }
+
+    @CalledByNative("HeaderExtension")
+    public int getId() {
+      return id;
+    }
+
+    @CalledByNative("HeaderExtension")
+    public boolean getEncrypted() {
+      return encrypted;
+    }
+  }
+
+  public final String transactionId;
+
+  private final Rtcp rtcp;
+
+  private final List<HeaderExtension> headerExtensions;
+
+  public final List<Encoding> encodings;
   // Codec parameters can't currently be changed between getParameters and
   // setParameters. Though in the future it will be possible to reorder them or
   // remove them.
-  public final LinkedList<Codec> codecs;
+  public final List<Codec> codecs;
 
-  public RtpParameters() {
-    encodings = new LinkedList<Encoding>();
-    codecs = new LinkedList<Codec>();
+  @CalledByNative
+  RtpParameters(String transactionId, Rtcp rtcp, List<HeaderExtension> headerExtensions,
+      List<Encoding> encodings, List<Codec> codecs) {
+    this.transactionId = transactionId;
+    this.rtcp = rtcp;
+    this.headerExtensions = headerExtensions;
+    this.encodings = encodings;
+    this.codecs = codecs;
+  }
+
+  @CalledByNative
+  String getTransactionId() {
+    return transactionId;
+  }
+
+  @CalledByNative
+  public Rtcp getRtcp() {
+    return rtcp;
+  }
+
+  @CalledByNative
+  public List<HeaderExtension> getHeaderExtensions() {
+    return headerExtensions;
+  }
+
+  @CalledByNative
+  List<Encoding> getEncodings() {
+    return encodings;
+  }
+
+  @CalledByNative
+  List<Codec> getCodecs() {
+    return codecs;
   }
 }
