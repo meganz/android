@@ -340,7 +340,7 @@ public class RecordView extends RelativeLayout {
         logDebug("playSound");
         if (player == null) player = new MediaPlayer();
 
-        if (player == null || audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT || audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) == 0 || updateSound(type) == null) {
+        if (player == null || audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT || audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE|| audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) == 0 ||updateSound(type) == null) {
             typeStart(type);
             return;
         }
