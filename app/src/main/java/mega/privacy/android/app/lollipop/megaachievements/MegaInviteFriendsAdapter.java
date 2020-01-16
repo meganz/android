@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -55,11 +56,9 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 			super(v);
 		}
 
-
         TextView textViewName;
 		ImageView deleteIcon;
         RelativeLayout itemLayout;
-
     }
 
 	ViewHolderChips holderList = null;
@@ -77,7 +76,7 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 		holderList = new ViewHolderChips(v);
 		holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
 
-		holderList.textViewName = (TextView) v.findViewById(R.id.name_chip);
+		holderList.textViewName = v.findViewById(R.id.name_chip);
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			logDebug("Landscape");
 			holderList.textViewName.setMaxWidth(scaleWidthPx(260, outMetrics));
@@ -128,31 +127,6 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 		else{
 			logWarning("Error. Holder is Null");
 		}
-	}
-
-	private int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
-		}
-
-		return (int)textSize;
 	}
 
 	@Override

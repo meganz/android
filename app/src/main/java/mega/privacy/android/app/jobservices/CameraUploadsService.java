@@ -2082,7 +2082,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private MegaNode getPossibleNodeFromCloud(String localFingerPrint, MegaNode uploadNode) {
         logDebug("getPossibleNodeFromCloud");
-        long targetFolderHanlde = uploadNode.getHandle();
         MegaNode preferNode = null;
 
         MegaNodeList possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, uploadNode);
@@ -2096,18 +2095,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if(possibleNodeListFPO != null && possibleNodeListFPO.size() > 0) {
             // node with same fingerprint but in different folder, copy.
             preferNode =  getFirstNodeFromList(possibleNodeListFPO);
-        }
-
-        MegaNode nodeFP = megaApi.getNodeByFingerprint(localFingerPrint, uploadNode);
-        if (nodeFP != null) {
-            if(nodeFP.getParentHandle() == targetFolderHanlde) {
-                // the desired node, do nothing.
-                logDebug("Found node with same fingerprint in the same folder!");
-                return nodeFP;
-            } else {
-                // node with same fingerprint but in different folder, copy.
-                preferNode = nodeFP;
-            }
         }
 
         logDebug("No possibile node found");
