@@ -29,12 +29,11 @@ public class SDCardOperator {
 
     public final static String TEST = "test";
     public final static String TEMP = "temp";
-    public final static String SD_PATH_REGEX = "^/storage/\\w{4}-\\w{4}/.*$";
+    public final static String SD_PATH_REGEX = "^/storage/\\w{4}-\\w{4}/?.*$";
 
     private Context context;
 
     private String downloadRoot;
-
 
     private String sdCardRoot;
 
@@ -65,7 +64,7 @@ public class SDCardOperator {
         } else {
             throw new SDCardException("No sd card installed!");
         }
-        sdCardRoot = FileUtils.getSDCardRoot(downloadRoot);
+        sdCardRoot = SDCardUtils.getSDCardRoot(downloadRoot);
     }
 
     public void initDocumentFileRoot(String uriString) throws SDCardException {
