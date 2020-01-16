@@ -1293,7 +1293,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
             case R.id.file_list_item_layout:
             case R.id.file_grid_item_layout: {
-                if (n.isTakenDown()) {
+                if (n.isTakenDown() && !isMultipleSelect()) {
                     showTakendownDialog(n.isFolder(), v, currentPosition);
                 } else {
                     fileClicked(currentPosition, v);
