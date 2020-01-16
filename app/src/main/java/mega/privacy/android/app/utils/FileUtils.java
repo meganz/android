@@ -2,16 +2,20 @@ package mega.privacy.android.app.utils;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -676,10 +680,26 @@ public class FileUtils {
          */
         private static AlertDialog alertDialogTakenDown = null;
 
+        public static class TakendownDialogFragment extends DialogFragment {
+            @Override
+            public Dialog onCreateDialog(Bundle savedInstanceState) {
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+                dialogBuilder.setTitle(getActivity().getString(R.string.general_not_available))
+                             .setMessage(getActivity().getString(R.string.error_download_takendown_node)).setNegativeButton(R.string.general_dismiss, (dialog, i) -> {
+                                 dialog.dismiss();
+                                 getActivity().finish();
+                             });
+                alertDialogTakenDown = dialogBuilder.create();
+
+                setCancelable(false);
+
+                return alertDialogTakenDown;
+            }
+        }
         /**
          * @param activity the activity is the page where dialog is shown
          */
-        public static void showTakenDownDialog(final Activity activity) {
+        public static void showTakenDownDialog(final AppCompatActivity activity) {
 
             if (activity == null) {
                 return;
@@ -693,20 +713,7 @@ public class FileUtils {
                 return;
             }
 
-            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
-            dialogBuilder.setTitle(activity.getString(R.string.general_not_available))
-                         .setMessage(activity.getString(R.string.error_download_takendown_node)).setNegativeButton(R.string.general_dismiss, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int i) {
-                    dialog.dismiss();
-                    activity.finish();
-                }
-            });
-            alertDialogTakenDown = dialogBuilder.create();
-
-            alertDialogTakenDown.setCancelable(false);
-
-            alertDialogTakenDown.show();
+            new TakendownDialogFragment().show(activity.getSupportFragmentManager(), "taken_down");
         }
     }
 }
