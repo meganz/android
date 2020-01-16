@@ -395,6 +395,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public boolean newCreationAccount;
 
 	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
+	private int storageStateFromBroadcast = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
+    private boolean showStorageAlertWithDelay;
+
 	private boolean isStorageStatusDialogShown = false;
 
 	private boolean userNameChanged;
@@ -771,10 +774,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null){
-				if (intent.getAction() == ACTION_STORAGE_STATE_CHANGED) {
-                    int newStorageState =
-                            intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
-                    checkStorageStatus(newStorageState, false);
+                if (ACTION_STORAGE_STATE_CHANGED.equals(intent.getAction())) {
+                    storageStateFromBroadcast = intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
+                    if (!showStorageAlertWithDelay) {
+                        checkStorageStatus(storageStateFromBroadcast, false);
+                    }
                     updateAccountDetailsVisibleInfo();
                     return;
 				}
@@ -3383,8 +3387,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void askForSMSVerification() {
+        showStorageAlertWithDelay = true;
         //If mobile device, only portrait mode is allowed
-        if (!isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (!isTablet(this)) {
             logDebug("mobile only portrait mode");
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
@@ -3413,12 +3418,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     }
 
 	public void askForAccess () {
+        showStorageAlertWithDelay = true;
     	//If mobile device, only portrait mode is allowed
-		if (!isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+		if (!isTablet(this)) {
 			logDebug("Mobile only portrait mode");
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		}
-
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
     	boolean writeStorageGranted = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		boolean readStorageGranted = checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
     	boolean cameraGranted = checkPermission(Manifest.permission.CAMERA);
@@ -3446,7 +3451,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void destroySMSVerificationFragment() {
-        //In mobile, allow all orientation after permission screen
         if (!isTablet(this)) {
             logDebug("mobile, all orientation");
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
@@ -4410,7 +4414,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		inputFirstName.setOnEditorActionListener(editorActionListener);
-		inputFirstName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
+		inputFirstName.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
 
 		inputLastName.setSingleLine();
 		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
@@ -4439,7 +4443,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		inputLastName.setOnEditorActionListener(editorActionListener);
-		inputLastName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
+		inputLastName.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
 
 		inputMail.getBackground().mutate().clearColorFilter();
 		inputMail.setSingleLine();
@@ -4471,12 +4475,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		inputMail.setOnEditorActionListener(editorActionListener);
-		inputMail.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
+		inputMail.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.title_edit_profile_info));
 
-		builder.setPositiveButton(getString(R.string.title_edit_profile_info), new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(getString(R.string.save_action), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 
 					}
@@ -4651,7 +4655,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void selectDrawerItemCloudDrive(){
 		logDebug("selectDrawerItemCloudDrive");
-
+        if (showStorageAlertWithDelay) {
+            showStorageAlertWithDelay = false;
+            checkStorageStatus(storageStateFromBroadcast, false);
+        }
 		tB.setVisibility(View.VISIBLE);
 
 		if (cloudPageAdapter == null){
@@ -18018,7 +18025,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void setTransfersWidget() {
 		logDebug("setTransfersWidget");
 
-		if (!isOnline(this)) return;
+		if (!isOnline(this) || transfersOverViewLayout == null) return;
 
 		if (drawerItem != DrawerItem.CLOUD_DRIVE) {
 			transfersOverViewLayout.setVisibility(View.GONE);

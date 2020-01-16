@@ -2007,6 +2007,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     public void readyToManager(){
         closeCancelDialog();
+
+        LoginActivityLollipop loginActivityLollipop = ((LoginActivityLollipop) context);
+
         if(confirmLink==null && !accountConfirmed){
             logDebug("confirmLink==null");
 
@@ -2022,24 +2025,24 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     Intent changeMailIntent = new Intent(context, ManagerActivityLollipop.class);
                     changeMailIntent.setAction(ACTION_CHANGE_MAIL);
                     changeMailIntent.setData(Uri.parse(url));
-                    startActivity(changeMailIntent);
-                    ((LoginActivityLollipop) context).finish();
+                    loginActivityLollipop.startActivity(changeMailIntent);
+                    loginActivityLollipop.finish();
                 }
                 else if(action.equals(ACTION_RESET_PASS)) {
                     logDebug("Action reset pass after fetch nodes");
                     Intent resetPassIntent = new Intent(context, ManagerActivityLollipop.class);
                     resetPassIntent.setAction(ACTION_RESET_PASS);
                     resetPassIntent.setData(Uri.parse(url));
-                    startActivity(resetPassIntent);
-                    ((LoginActivityLollipop) context).finish();
+                    loginActivityLollipop.startActivity(resetPassIntent);
+                    loginActivityLollipop.finish();
                 }
                 else if(action.equals(ACTION_CANCEL_ACCOUNT)) {
                     logDebug("Action cancel Account after fetch nodes");
                     Intent cancelAccountIntent = new Intent(context, ManagerActivityLollipop.class);
                     cancelAccountIntent.setAction(ACTION_CANCEL_ACCOUNT);
                     cancelAccountIntent.setData(Uri.parse(url));
-                    startActivity(cancelAccountIntent);
-                    ((LoginActivityLollipop) context).finish();
+                    loginActivityLollipop.startActivity(cancelAccountIntent);
+                    loginActivityLollipop.finish();
                 }
             }
 
@@ -2048,8 +2051,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (parentHandle != -1){
                     Intent intent = new Intent();
                     intent.putExtra("PARENT_HANDLE", parentHandle);
-                    ((LoginActivityLollipop) context).setResult(RESULT_OK, intent);
-                    ((LoginActivityLollipop) context).finish();
+                    loginActivityLollipop.setResult(RESULT_OK, intent);
+                    loginActivityLollipop.finish();
                 }
                 else{
                     Intent intent = null;
@@ -2079,13 +2082,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             if (prefs.getCamSyncEnabled() != null){
                                 if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
                                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                        ((LoginActivityLollipop) context).startCameraUploadService(false, 30 * 1000);
+                                        loginActivityLollipop.startCameraUploadService(false, 30 * 1000);
                                     }
                                 }
                             }
                             else{
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    ((LoginActivityLollipop) context).startCameraUploadService(true, 30 * 1000);
+                                    loginActivityLollipop.startCameraUploadService(true, 30 * 1000);
                                 }
                                 initialCam = true;
                             }
@@ -2167,20 +2170,20 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         intent.setAction(ACTION_REFRESH_STAGING);
                         twoFA = false;
                     }
-
+                    
                     if (action != null && action.equals(ACTION_REFRESH_AFTER_BLOCKED)) {
                         intent.setAction(ACTION_REFRESH_AFTER_BLOCKED);
                     }
 
-                    startActivity(intent);
-                    ((LoginActivityLollipop)context).finish();
+                    loginActivityLollipop.startActivity(intent);
+                    loginActivityLollipop.finish();
                 }
             }
         }
         else{
             logDebug("Go to ChooseAccountFragment");
             accountConfirmed = false;
-            ((LoginActivityLollipop)context).showFragment(CHOOSE_ACCOUNT_FRAGMENT);
+            loginActivityLollipop.showFragment(CHOOSE_ACCOUNT_FRAGMENT);
         }
     }
 
