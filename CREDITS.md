@@ -314,16 +314,14 @@ License: Crypto++ Library is copyrighted as a compilation and (as of version 5.6
 licensed under the Boost Software License 1.0, while the individual files in 
 the compilation are all public domain.
 
-#### OpenSSL
-Copyright (c) 1998-2016 The OpenSSL Project.  All rights reserved.
+#### BoringSSL
+BoringSSL is a fork of OpenSSL that is designed to meet Google's needs.
 
-A toolkit implementing SSL v2/v3 and TLS protocols with full-strength cryptography world-wide.
+https://boringssl.googlesource.com/boringssl/
 
-https://www.openssl.org/
+License: BoringSSL License
 
-License: OpenSSL License
-
-https://github.com/openssl/openssl/blob/master/LICENSE
+https://github.com/google/boringssl/blob/master/LICENSE
 
 #### libuv
 Copyright Joyent, Inc. and other Node contributors. All rights reserved.

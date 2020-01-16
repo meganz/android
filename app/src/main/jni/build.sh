@@ -49,14 +49,6 @@ ARES_CONFIGURED=${CURL}/${ARES_SOURCE_FOLDER}/Makefile.inc
 ARES_DOWNLOAD_URL=http://c-ares.haxx.se/download/${ARES_SOURCE_FILE}
 ARES_SHA1="74a50c02b7f051c4fb66c0f60f187350f196d908"
 
-OPENSSL=openssl
-OPENSSL_VERSION=1.0.2h
-OPENSSL_SOURCE_FILE=openssl-${OPENSSL_VERSION}.tar.gz
-OPENSSL_SOURCE_FOLDER=${OPENSSL}-${OPENSSL_VERSION}
-OPENSSL_DOWNLOAD_URL=http://www.openssl.org/source/${OPENSSL_SOURCE_FILE}
-OPENSSL_PREFIX=${JNI_PATH}/${OPENSSL}/${OPENSSL_SOURCE_FOLDER}
-OPENSSL_SHA1="577585f5f5d299c44dd3c993d3c0ac7a219e4949"
-
 SODIUM=sodium
 SODIUM_VERSION=1.0.18
 SODIUM_SOURCE_FILE=libsodium-${SODIUM_VERSION}.tar.gz
@@ -206,8 +198,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${CURL}/${CURL}
     rm -rf ${CURL}/${ARES_SOURCE_FOLDER}
     rm -rf ${CURL}/ares
-    rm -rf ${OPENSSL}/${OPENSSL_SOURCE_FOLDER}
-    rm -rf ${OPENSSL}/${OPENSSL}
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FOLDER}
     rm -rf ${SODIUM}/${SODIUM}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
@@ -228,8 +218,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${CURL}/${CURL_SOURCE_FILE}
     rm -rf ${CURL}/${ARES_SOURCE_FILE}
     rm -rf ${CURL}/${CURL_SOURCE_FILE}.ready
-    rm -rf ${OPENSSL}/${OPENSSL_SOURCE_FILE}
-    rm -rf ${OPENSSL}/${OPENSSL_SOURCE_FILE}.ready
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}
@@ -343,18 +331,6 @@ if [ ! -f ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE}.ready ]; then
     touch ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE}.ready
 fi
 echo "* MediaInfo is ready"
-
-echo "* Setting up OpenSSL"
-if [ ! -f ${OPENSSL}/${OPENSSL_SOURCE_FILE}.ready ]; then
-    downloadCheckAndUnpack ${OPENSSL_DOWNLOAD_URL} ${OPENSSL}/${OPENSSL_SOURCE_FILE} ${OPENSSL_SHA1} ${OPENSSL}
-    ln -sf ${OPENSSL_SOURCE_FOLDER} ${OPENSSL}/${OPENSSL}
-    ln -sf ${LIBDIR} ${OPENSSL}/${OPENSSL_SOURCE_FOLDER}/lib
-    pushd ${OPENSSL}/${OPENSSL} &>> ${LOG_FILE}
-    ./Configure android &>> ${LOG_FILE}
-    popd &>> ${LOG_FILE}
-    touch ${OPENSSL}/${OPENSSL_SOURCE_FILE}.ready
-fi
-echo "* OpenSSL is ready"
 
 echo "* Setting up cURL with c-ares"
 if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
