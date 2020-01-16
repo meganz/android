@@ -1951,6 +1951,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home: {
+                if (emojiKeyboard != null) {
+                    emojiKeyboard.hideBothKeyboard(this);
+                }
+                if (fileStorageLayout.isShown()) {
+                    hideFileStorage();
+                }
+                if (handlerEmojiKeyboard != null) {
+                    handlerEmojiKeyboard.removeCallbacksAndMessages(null);
+                }
+                if (handlerKeyboard != null) {
+                    handlerKeyboard.removeCallbacksAndMessages(null);
+                }
                 closeChat(true);
                 ifAnonymousModeLogin(false);
                 break;
@@ -3130,22 +3142,19 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     @Override
     public void onBackPressed() {
         retryConnectionsAndSignalPresence();
-
         if (emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
             emojiKeyboard.hideBothKeyboard(this);
+        } else if (fileStorageLayout.isShown()) {
+            hideFileStorage();
         } else {
-            if (fileStorageLayout.isShown()) {
-                hideFileStorage();
-            } else {
-                if (handlerEmojiKeyboard != null) {
-                    handlerEmojiKeyboard.removeCallbacksAndMessages(null);
-                }
-                if (handlerKeyboard != null) {
-                    handlerKeyboard.removeCallbacksAndMessages(null);
-                }
-                closeChat(true);
-                ifAnonymousModeLogin(false);
+            if (handlerEmojiKeyboard != null) {
+                handlerEmojiKeyboard.removeCallbacksAndMessages(null);
             }
+            if (handlerKeyboard != null) {
+                handlerKeyboard.removeCallbacksAndMessages(null);
+            }
+            closeChat(true);
+            ifAnonymousModeLogin(false);
         }
     }
 
