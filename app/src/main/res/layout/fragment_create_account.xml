@@ -181,8 +181,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"
-                            android:layout_alignTop="@+id/login_password_text_layout"
+                            android:layout_alignTop="@+id/create_account_password_text_layout"
                             android:layout_marginTop="15dp"
+                            android:padding="5dp"
                             android:src="@drawable/ic_b_shared_read"
                             android:visibility="gone"/>
 
@@ -194,7 +195,6 @@
                             android:layout_marginRight="2dp"
                             android:src="@drawable/ic_input_warning"
                             android:tint="@color/dark_primary_color"
-                            android:paddingBottom="5dp"
                             android:layout_alignBottom="@+id/create_account_password_text_layout"/>
 
                         <LinearLayout
@@ -307,7 +307,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"
-                            android:layout_alignTop="@+id/login_password_text_layout"
+                            android:layout_alignTop="@+id/create_account_password_text_confirm_layout"
                             android:layout_marginTop="15dp"
                             android:padding="5dp"
                             android:src="@drawable/ic_b_shared_read"
