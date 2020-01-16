@@ -139,7 +139,7 @@ public class EmojiKeyboard extends LinearLayout {
         if (imm == null) return;
         imm.showSoftInput(view, 0, null);
         isLetterKeyboardShown = true;
-        emojiIcon.setImageResource(R.drawable.ic_emojicon);
+        emojiIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_emojicon));
         needToReplace();
     }
 
@@ -149,7 +149,7 @@ public class EmojiKeyboard extends LinearLayout {
         hideLetterKeyboard();
         setVisibility(VISIBLE);
         isEmojiKeyboardShown = true;
-        emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
+        emojiIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_white));
         if (editInterface instanceof View) {
             View view = (View) editInterface;
             view.setFocusableInTouchMode(true);
@@ -164,7 +164,7 @@ public class EmojiKeyboard extends LinearLayout {
         logDebug("hideBothKeyboard()");
         hideEmojiKeyboard();
         hideLetterKeyboard();
-        emojiIcon.setImageResource(R.drawable.ic_emojicon);
+        emojiIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_emojicon));
     }
 
     public void hideLetterKeyboard() {

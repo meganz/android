@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -1005,6 +1006,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         inputTextLayout.setVisibility(View.GONE);
         separatorOptions.setVisibility(View.VISIBLE);
         voiceClipLayout.setVisibility(View.GONE);
+        emojiKeyboard.hideEmojiKeyboard();
+        emojiKeyboard.hideLetterKeyboard();
+        keyboardTwemojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_white));
     }
 
     /*
@@ -3213,25 +3217,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             case R.id.rl_keyboard_twemoji_chat:{
                 logDebug("keyboard_icon_chat");
                 hideFileStorage();
-
                 if(emojiKeyboard==null) break;
-
-                    if(emojiKeyboard.getLetterKeyboardShown()){
-                        emojiKeyboard.hideLetterKeyboard();
-                        handlerKeyboard.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                emojiKeyboard.showEmojiKeyboard();
-                            }
-                        },250);
-
-                    }
-                    else if(emojiKeyboard.getEmojiKeyboardShown()){
-                        emojiKeyboard.showLetterKeyboard();
-                    }
-                    else{
-                        emojiKeyboard.showEmojiKeyboard();
-                    }
+                changeKeyboard(keyboardTwemojiButton);
                 break;
             }
 
@@ -3329,6 +3316,28 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
         else{
             showSendLocationDialog();
+        }
+    }
+
+    private void changeKeyboard(ImageButton btn){
+        Drawable currentDrawable = btn.getDrawable();
+        Drawable emojiDrawable = getResources().getDrawable(R.drawable.ic_emojicon);
+        Drawable keyboardDrawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
+
+        if(areDrawablesIdentical(currentDrawable, emojiDrawable) && !emojiKeyboard.getEmojiKeyboardShown()){
+            if(emojiKeyboard.getLetterKeyboardShown()){
+                emojiKeyboard.hideLetterKeyboard();
+                handlerKeyboard.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        emojiKeyboard.showEmojiKeyboard();
+                    }
+                },250);
+            }else{
+                emojiKeyboard.showEmojiKeyboard();
+            }
+        }else if(areDrawablesIdentical(currentDrawable, keyboardDrawable) && !emojiKeyboard.getLetterKeyboardShown()){
+            emojiKeyboard.showLetterKeyboard();
         }
     }
 
