@@ -1,10 +1,8 @@
 package mega.privacy.android.app.utils;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -16,6 +14,13 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -39,11 +44,13 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.DISPUTE_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class FileUtils {
@@ -672,15 +679,15 @@ public class FileUtils {
 
 
     /**
-     * The static class to show taken down notice for mega node when the node is taken down and try to be opened
+     * The static class to show taken down notice for mega node when the node is taken down and try to be opened in the preview
      */
-    public static class FileTakenDownNotificationHandler {
+    public static class FileTakenDownAlertHandler {
         /**
-         * alertDialogTakenDown is the dialog to be shown. It resides inside this static class to prevent multiple definition within  activity the class
+         * alertTakenDown is the dialog to be shown. It resides inside this static class to prevent multiple definition within the activity class
          */
-        private static AlertDialog alertDialogTakenDown = null;
+        private static AlertDialog alertTakenDown = null;
 
-        public static class TakendownDialogFragment extends DialogFragment {
+        public static class TakenDownAlertFragment extends DialogFragment {
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
@@ -689,23 +696,23 @@ public class FileUtils {
                                  dialog.dismiss();
                                  getActivity().finish();
                              });
-                alertDialogTakenDown = dialogBuilder.create();
+                alertTakenDown = dialogBuilder.create();
 
                 setCancelable(false);
 
-                return alertDialogTakenDown;
+                return alertTakenDown;
             }
         }
         /**
          * @param activity the activity is the page where dialog is shown
          */
-        public static void showTakenDownDialog(final AppCompatActivity activity) {
+        public static void showTakenDownAlert(final AppCompatActivity activity) {
 
             if (activity == null) {
                 return;
             }
 
-            if (alertDialogTakenDown != null && alertDialogTakenDown.isShowing()) {
+            if (alertTakenDown != null && alertTakenDown.isShowing()) {
                 return;
             }
 
@@ -713,7 +720,121 @@ public class FileUtils {
                 return;
             }
 
-            new TakendownDialogFragment().show(activity.getSupportFragmentManager(), "taken_down");
+            new TakenDownAlertFragment().show(activity.getSupportFragmentManager(), "taken_down");
+        }
+    }
+
+    /**
+     * The static class to show taken down notice for mega node when the node is taken down and try to be opened in the adapter
+     */
+    public static class FileTakenDownDialogHandler {
+        private static String KEY_CURRENT_POSITION = "KEY_CURRENT_POSITION";
+        private static String KEY_IS_FOLDER = "KEY_IS_FOLDER";
+        public interface FileTakenDownDialogListener {
+            void onOpenClicked(int currentPosition);
+        }
+
+        /**
+         * dialogTakenDown is the dialog to be shown. It resides inside this static class to prevent multiple definition within the activity class
+         */
+        private static AlertDialog dialogTakenDown = null;
+
+        public static class TakenDownDialogFragment extends DialogFragment {
+            private FileTakenDownDialogListener listener;
+
+            public void setListener(FileTakenDownDialogListener listener) {
+                this.listener = listener;
+            }
+
+            @Override
+            public void onDestroyView() {
+                Dialog dialog = getDialog();
+                // handles https://code.google.com/p/android/issues/detail?id=17423
+                if (dialog != null && getRetainInstance()) {
+                    dialog.setDismissMessage(null);
+                }
+                super.onDestroyView();
+            }
+
+            @Override
+            public Dialog onCreateDialog(Bundle savedInstanceState) {
+                boolean isFolder = false;
+
+                Bundle bundle = getArguments();
+                if (bundle != null){
+                    isFolder = bundle.getBoolean(KEY_IS_FOLDER, false);
+                }
+                int alertMessageID = isFolder ? R.string.message_folder_takedown_pop_out_notification : R.string.message_file_takedown_pop_out_notification;
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                LayoutInflater inflater = LayoutInflater.from(getActivity());
+                View v = inflater.inflate(R.layout.dialog_three_vertical_buttons, null);
+                builder.setView(v);
+
+                TextView title = v.findViewById(R.id.dialog_title);
+                TextView text = v.findViewById(R.id.dialog_text);
+
+                Button openButton = v.findViewById(R.id.dialog_first_button);
+                Button disputeButton = v.findViewById(R.id.dialog_second_button);
+                Button cancelButton = v.findViewById(R.id.dialog_third_button);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.gravity = Gravity.RIGHT;
+
+                title.setText(R.string.general_error_word);
+                text.setText(alertMessageID);
+                openButton.setText(R.string.context_open_link);
+                disputeButton.setText(R.string.dispute_takendown_file);
+                cancelButton.setText(R.string.general_cancel);
+
+                dialogTakenDown = builder.create();
+                dialogTakenDown.setCancelable(false);
+                dialogTakenDown.setCanceledOnTouchOutside(false);
+
+                openButton.setOnClickListener(view -> {
+                    if (listener != null && bundle != null) {
+                        listener.onOpenClicked(bundle.getInt(KEY_CURRENT_POSITION, -1));
+                    }
+                    dialogTakenDown.dismiss();
+                });
+
+                disputeButton.setOnClickListener(view -> {
+                    dialogTakenDown.dismiss();
+                    Intent openTermsIntent = new Intent(getActivity(), WebViewActivityLollipop.class);
+                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    openTermsIntent.setData(Uri.parse(DISPUTE_URL));
+                    getActivity().startActivity(openTermsIntent);
+                });
+
+                cancelButton.setOnClickListener(v1 -> dialogTakenDown.dismiss());
+
+                setCancelable(false);
+
+                return dialogTakenDown;
+            }
+        }
+
+        public static void showTakenDownDialog(final AppCompatActivity activity, boolean isFolder, int currentPosition, FileTakenDownDialogListener listener) {
+            if (activity == null) {
+                return;
+            }
+
+            if (dialogTakenDown != null && dialogTakenDown.isShowing()) {
+                return;
+            }
+
+            if (activity.isFinishing()) {
+                return;
+            }
+            Bundle bundle = new Bundle();
+            bundle.putInt(KEY_CURRENT_POSITION, currentPosition);
+            bundle.putBoolean(KEY_IS_FOLDER, isFolder);
+
+            TakenDownDialogFragment takenDownDialogFragment = new TakenDownDialogFragment();
+            takenDownDialogFragment.setListener(listener);
+            takenDownDialogFragment.setArguments(bundle);
+            takenDownDialogFragment.show(activity.getSupportFragmentManager(), "taken_down_dialog");
         }
     }
 }
