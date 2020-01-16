@@ -10,7 +10,6 @@
 
 package org.webrtc.voiceengine;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
@@ -18,6 +17,7 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.webrtc.ContextUtils;
@@ -37,17 +37,23 @@ public class WebRtcAudioManager {
 
   private static final String TAG = "WebRtcAudioManager";
 
-  // Use mono as default for both audio directions.
-  private static boolean useStereoOutput = false;
-  private static boolean useStereoInput = false;
+  // TODO(bugs.webrtc.org/8914): disabled by default until AAudio support has
+  // been completed. Goal is to always return false on Android O MR1 and higher.
+  private static final boolean blacklistDeviceForAAudioUsage = true;
 
-  private static boolean blacklistDeviceForOpenSLESUsage = false;
-  private static boolean blacklistDeviceForOpenSLESUsageIsOverridden = false;
+  // Use mono as default for both audio directions.
+  private static boolean useStereoOutput;
+  private static boolean useStereoInput;
+
+  private static boolean blacklistDeviceForOpenSLESUsage;
+  private static boolean blacklistDeviceForOpenSLESUsageIsOverridden;
 
   // Call this method to override the default list of blacklisted devices
   // specified in WebRtcAudioUtils.BLACKLISTED_OPEN_SL_ES_MODELS.
   // Allows an app to take control over which devices to exclude from using
   // the OpenSL ES audio output path
+  // TODO(bugs.webrtc.org/8491): Remove NoSynchronizedMethodCheck suppression.
+  @SuppressWarnings("NoSynchronizedMethodCheck")
   public static synchronized void setBlacklistDeviceForOpenSLESUsage(boolean enable) {
     blacklistDeviceForOpenSLESUsageIsOverridden = true;
     blacklistDeviceForOpenSLESUsage = enable;
@@ -55,18 +61,28 @@ public class WebRtcAudioManager {
 
   // Call these methods to override the default mono audio modes for the specified direction(s)
   // (input and/or output).
+  // TODO(bugs.webrtc.org/8491): Remove NoSynchronizedMethodCheck suppression.
+  @SuppressWarnings("NoSynchronizedMethodCheck")
   public static synchronized void setStereoOutput(boolean enable) {
     Logging.w(TAG, "Overriding default output behavior: setStereoOutput(" + enable + ')');
     useStereoOutput = enable;
   }
+
+  // TODO(bugs.webrtc.org/8491): Remove NoSynchronizedMethodCheck suppression.
+  @SuppressWarnings("NoSynchronizedMethodCheck")
   public static synchronized void setStereoInput(boolean enable) {
     Logging.w(TAG, "Overriding default input behavior: setStereoInput(" + enable + ')');
     useStereoInput = enable;
   }
 
+  // TODO(bugs.webrtc.org/8491): Remove NoSynchronizedMethodCheck suppression.
+  @SuppressWarnings("NoSynchronizedMethodCheck")
   public static synchronized boolean getStereoOutput() {
     return useStereoOutput;
   }
+
+  // TODO(bugs.webrtc.org/8491): Remove NoSynchronizedMethodCheck suppression.
+  @SuppressWarnings("NoSynchronizedMethodCheck")
   public static synchronized boolean getStereoInput() {
     return useStereoInput;
   }
@@ -77,11 +93,6 @@ public class WebRtcAudioManager {
 
   private static final int DEFAULT_FRAME_PER_BUFFER = 256;
 
-  // List of possible audio modes.
-  private static final String[] AUDIO_MODES = new String[] {
-      "MODE_NORMAL", "MODE_RINGTONE", "MODE_IN_CALL", "MODE_IN_COMMUNICATION",
-  };
-
   // Private utility class that periodically checks and logs the volume level
   // of the audio stream that is currently controlled by the volume control.
   // A timer triggers logs once every 30 seconds and the timer's associated
@@ -91,7 +102,7 @@ public class WebRtcAudioManager {
     private static final int TIMER_PERIOD_IN_SECONDS = 30;
 
     private final AudioManager audioManager;
-    private Timer timer;
+    private @Nullable Timer timer;
 
     public VolumeLogger(AudioManager audioManager) {
       this.audioManager = audioManager;
@@ -113,6 +124,7 @@ public class WebRtcAudioManager {
         this.maxVoiceCallVolume = maxVoiceCallVolume;
       }
 
+      @Override
       public void run() {
         final int mode = audioManager.getMode();
         if (mode == AudioManager.MODE_RINGTONE) {
@@ -138,7 +150,7 @@ public class WebRtcAudioManager {
   private final long nativeAudioManager;
   private final AudioManager audioManager;
 
-  private boolean initialized = false;
+  private boolean initialized;
   private int nativeSampleRate;
   private int nativeChannels;
 
@@ -148,6 +160,7 @@ public class WebRtcAudioManager {
   private boolean lowLatencyOutput;
   private boolean lowLatencyInput;
   private boolean proAudio;
+  private boolean aAudio;
   private int sampleRate;
   private int outputChannels;
   private int inputChannels;
@@ -167,8 +180,9 @@ public class WebRtcAudioManager {
     volumeLogger = new VolumeLogger(audioManager);
     storeAudioParameters();
     nativeCacheAudioParameters(sampleRate, outputChannels, inputChannels, hardwareAEC, hardwareAGC,
-        hardwareNS, lowLatencyOutput, lowLatencyInput, proAudio, outputBufferSize, inputBufferSize,
-        nativeAudioManager);
+        hardwareNS, lowLatencyOutput, lowLatencyInput, proAudio, aAudio, outputBufferSize,
+        inputBufferSize, nativeAudioManager);
+    WebRtcAudioUtils.logAudioState(TAG);
   }
 
   private boolean init() {
@@ -176,7 +190,8 @@ public class WebRtcAudioManager {
     if (initialized) {
       return true;
     }
-    Logging.d(TAG, "audio mode is: " + AUDIO_MODES[audioManager.getMode()]);
+    Logging.d(TAG, "audio mode is: "
+        + WebRtcAudioUtils.modeToString(audioManager.getMode()));
     initialized = true;
     volumeLogger.start();
     return true;
@@ -199,7 +214,7 @@ public class WebRtcAudioManager {
         ? blacklistDeviceForOpenSLESUsage
         : WebRtcAudioUtils.deviceIsBlacklistedForOpenSLESUsage();
     if (blacklisted) {
-      Logging.e(TAG, Build.MODEL + " is blacklisted for OpenSL ES usage!");
+      Logging.d(TAG, Build.MODEL + " is blacklisted for OpenSL ES usage!");
     }
     return blacklisted;
   }
@@ -216,6 +231,7 @@ public class WebRtcAudioManager {
     lowLatencyOutput = isLowLatencyOutputSupported();
     lowLatencyInput = isLowLatencyInputSupported();
     proAudio = isProAudioSupported();
+    aAudio = isAAudioSupported();
     outputBufferSize = lowLatencyOutput ? getLowLatencyOutputFramesPerBuffer()
                                         : getMinOutputFrameSize(sampleRate, outputChannels);
     inputBufferSize = lowLatencyInput ? getLowLatencyInputFramesPerBuffer()
@@ -242,16 +258,24 @@ public class WebRtcAudioManager {
     // as well. The NDK doc states that: "As of API level 21, lower latency
     // audio input is supported on select devices. To take advantage of this
     // feature, first confirm that lower latency output is available".
-    return WebRtcAudioUtils.runningOnLollipopOrHigher() && isLowLatencyOutputSupported();
+    return Build.VERSION.SDK_INT >= 21 && isLowLatencyOutputSupported();
   }
 
   // Returns true if the device has professional audio level of functionality
   // and therefore supports the lowest possible round-trip latency.
-  @TargetApi(23)
   private boolean isProAudioSupported() {
-    return WebRtcAudioUtils.runningOnMarshmallowOrHigher()
+    return Build.VERSION.SDK_INT >= 23
         && ContextUtils.getApplicationContext().getPackageManager().hasSystemFeature(
                PackageManager.FEATURE_AUDIO_PRO);
+  }
+
+  // AAudio is supported on Androio Oreo MR1 (API 27) and higher.
+  // TODO(bugs.webrtc.org/8914): currently disabled by default.
+  private boolean isAAudioSupported() {
+    if (blacklistDeviceForAAudioUsage) {
+      Logging.w(TAG, "AAudio support is currently disabled on all devices!");
+    }
+    return !blacklistDeviceForAAudioUsage && Build.VERSION.SDK_INT >= 27;
   }
 
   // Returns the native output sample rate for this device's output stream.
@@ -271,28 +295,24 @@ public class WebRtcAudioManager {
     }
     // No overrides available. Deliver best possible estimate based on default
     // Android AudioManager APIs.
-    final int sampleRateHz;
-    if (WebRtcAudioUtils.runningOnJellyBeanMR1OrHigher()) {
-      sampleRateHz = getSampleRateOnJellyBeanMR10OrHigher();
-    } else {
-      sampleRateHz = WebRtcAudioUtils.getDefaultSampleRateHz();
-    }
+    final int sampleRateHz = getSampleRateForApiLevel();
     Logging.d(TAG, "Sample rate is set to " + sampleRateHz + " Hz");
     return sampleRateHz;
   }
 
-  @TargetApi(17)
-  private int getSampleRateOnJellyBeanMR10OrHigher() {
+  private int getSampleRateForApiLevel() {
+    if (Build.VERSION.SDK_INT < 17) {
+      return WebRtcAudioUtils.getDefaultSampleRateHz();
+    }
     String sampleRateString = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
     return (sampleRateString == null) ? WebRtcAudioUtils.getDefaultSampleRateHz()
                                       : Integer.parseInt(sampleRateString);
   }
 
   // Returns the native output buffer size for low-latency output streams.
-  @TargetApi(17)
   private int getLowLatencyOutputFramesPerBuffer() {
     assertTrue(isLowLatencyOutputSupported());
-    if (!WebRtcAudioUtils.runningOnJellyBeanMR1OrHigher()) {
+    if (Build.VERSION.SDK_INT < 17) {
       return DEFAULT_FRAME_PER_BUFFER;
     }
     String framesPerBuffer =
@@ -352,6 +372,6 @@ public class WebRtcAudioManager {
 
   private native void nativeCacheAudioParameters(int sampleRate, int outputChannels,
       int inputChannels, boolean hardwareAEC, boolean hardwareAGC, boolean hardwareNS,
-      boolean lowLatencyOutput, boolean lowLatencyInput, boolean proAudio, int outputBufferSize,
-      int inputBufferSize, long nativeAudioManager);
+      boolean lowLatencyOutput, boolean lowLatencyInput, boolean proAudio, boolean aAudio,
+      int outputBufferSize, int inputBufferSize, long nativeAudioManager);
 }

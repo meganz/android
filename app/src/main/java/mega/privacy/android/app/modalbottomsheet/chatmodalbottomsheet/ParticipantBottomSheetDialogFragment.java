@@ -5,12 +5,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -23,8 +19,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.util.Locale;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -34,9 +28,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -47,7 +38,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -65,7 +56,6 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     public ImageView permissionsIcon;
     public TextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
-    public EmojiTextView contactInitialLetter;
     public LinearLayout contactLayout;
     public LinearLayout optionContactInfoChat;
     public LinearLayout optionStartConversationChat;
@@ -74,7 +64,6 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     public LinearLayout optionChangePermissionsChat;
     public LinearLayout optionRemoveParticipantChat;
     public LinearLayout optionInvite;
-    ////
 
     DisplayMetrics outMetrics;
 
@@ -144,9 +133,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.group_participants_chat_mail_text);
         contactLayout = (LinearLayout) contentView.findViewById(R.id.group_participants_chat);
-        contactImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
-        contactInitialLetter = contentView.findViewById(R.id.sliding_group_participants_chat_list_initial_letter);
-
+        contactImageView = contentView.findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
         optionContactInfoChat = (LinearLayout) contentView.findViewById(R.id.contact_info_group_participants_chat_layout);
         optionStartConversationChat = (LinearLayout) contentView.findViewById(R.id.start_chat_group_participants_chat_layout);
         optionEditProfileChat = (LinearLayout) contentView.findViewById(R.id.edit_profile_group_participants_chat_layout);
@@ -166,21 +153,14 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
         LinearLayout separatorOptions = (LinearLayout) contentView.findViewById(R.id.separator_options);
         LinearLayout separatorLeave = (LinearLayout) contentView.findViewById(R.id.separator_leave);
-        //////
 
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            logDebug("Landscape configuration");
-            titleNameContactChatPanel.setMaxWidth(scaleWidthPx(270, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(scaleWidthPx(270, outMetrics));
+        if(isScreenInPortrait(context)){
+            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+        }else{
+            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
-        else{
-            titleNameContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
-        }
-
-        titleNameContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE, outMetrics));
-        contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_MEDIUM, outMetrics));
-
 
         if(selectedChat==null){
             logWarning("Error. Selected chat is NULL");
@@ -360,9 +340,13 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    public void addAvatarParticipantPanel(long handle, String email, String name){
+    private void addAvatarParticipantPanel(long handle, String email, String name){
 
         File avatar = null;
+        /*Default avatar*/
+        contactImageView.setImageBitmap(getDefaultAvatar(context, getColorAvatar(context, megaApi, handle), name, AVATAR_SIZE, true));
+
+        /*Avatar*/
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
 
         if(handle == megaChatApi.getMyUserHandle()){
@@ -397,64 +381,11 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
                     avatar.delete();
                 }
                 else{
-                    contactInitialLetter.setVisibility(View.GONE);
                     contactImageView.setImageBitmap(bitmap);
                     return;
                 }
             }
         }
-
-        logDebug("Set default avatar");
-        ////DEfault AVATAR
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        String color = megaApi.getUserAvatarColor(userHandleEncoded);
-        if(color!=null){
-            logDebug("The color to set the avatar is " + color);
-            p.setColor(Color.parseColor(color));
-        }
-        else{
-            logDebug("Default color to the avatar");
-            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-        }
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-        contactImageView.setImageBitmap(defaultAvatar);
-
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
-        display.getMetrics(outMetrics);
-        float density  = getResources().getDisplayMetrics().density;
-
-        if(name!=null){
-            if(!(name.trim().isEmpty())){
-                String firstLetter = ChatUtil.getFirstLetter(name);
-                if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-                    contactInitialLetter.setVisibility(View.INVISIBLE);
-                }else {
-                    contactInitialLetter.setText(firstLetter);
-                    contactInitialLetter.setTextColor(Color.WHITE);
-                    contactInitialLetter.setVisibility(View.VISIBLE);
-                }
-                contactInitialLetter.setTextSize(24);
-            }
-            else{
-                contactInitialLetter.setVisibility(View.GONE);
-            }
-        }
-        else{
-            contactInitialLetter.setVisibility(View.GONE);
-        }
-
-        ////
     }
 
     @Override
