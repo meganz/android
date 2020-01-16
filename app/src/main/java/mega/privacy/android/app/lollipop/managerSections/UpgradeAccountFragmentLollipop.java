@@ -122,9 +122,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	Context context;
 
-	private final static int TYPE_TERA_BYTE = 0;
-	private final static int TYPE_GIGA_BYTE = 1;
-
 	private final static int TYPE_STORAGE_LABEL = 0;
 	private final static int TYPE_TRANSFER_LABEL = 1;
 
@@ -297,7 +294,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	public void setPricing() {
 		logDebug("setPricing");
 
-		DecimalFormat df = new DecimalFormat("#.##");
+		DecimalFormat df = new DecimalFormat("0.00");
 
 		if (myAccountInfo == null) {
 			myAccountInfo = ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo();
@@ -346,9 +343,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionPro1.setText(resultA);
 
-					storageSectionPro1.setText(generateByteString(account.getStorage(), TYPE_TERA_BYTE, TYPE_STORAGE_LABEL));
+					storageSectionPro1.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
 
-					bandwidthSectionPro1.setText(generateByteString(account.getTransfer(), TYPE_TERA_BYTE, TYPE_TRANSFER_LABEL));
+					bandwidthSectionPro1.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
 
 				} else if (account.getLevel() == PRO_II && account.getMonths() == 1) {
 					logDebug("PRO2: " + account.getStorage());
@@ -384,10 +381,10 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionPro2.setText(resultA);
 
-					storageSectionPro2.setText(generateByteString(account.getStorage(), TYPE_TERA_BYTE, TYPE_STORAGE_LABEL));
+					storageSectionPro2.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
 
 
-					bandwidthSectionPro2.setText(generateByteString(account.getTransfer(), TYPE_TERA_BYTE, TYPE_TRANSFER_LABEL));
+					bandwidthSectionPro2.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
 
 				} else if (account.getLevel() == PRO_III && account.getMonths() == 1) {
 					logDebug("PRO3: " + account.getStorage());
@@ -423,9 +420,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionPro3.setText(resultA);
 
-					storageSectionPro3.setText(generateByteString(account.getStorage(), TYPE_TERA_BYTE, TYPE_STORAGE_LABEL));
+					storageSectionPro3.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
 
-					bandwidthSectionPro3.setText(generateByteString(account.getTransfer(), TYPE_TERA_BYTE, TYPE_TRANSFER_LABEL));
+					bandwidthSectionPro3.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
 
 				} else if (account.getLevel() == PRO_LITE && account.getMonths() == 1) {
 					logDebug("Lite: " + account.getStorage());
@@ -460,9 +457,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionLite.setText(resultA);
 
-					storageSectionLite.setText(generateByteString(account.getStorage(), TYPE_GIGA_BYTE, TYPE_STORAGE_LABEL));
+					storageSectionLite.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
 
-					bandwidthSectionLite.setText(generateByteString(account.getTransfer(), TYPE_TERA_BYTE, TYPE_TRANSFER_LABEL));
+					bandwidthSectionLite.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
 
 				}
 			}
@@ -779,11 +776,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		pro3Layout.setClickable(false);
 	}
 
-	private Spanned generateByteString(long bytes, int type, int labelType) {
+	private Spanned generateByteString(long gb, int labelType) {
 		String textToShow = new StringBuilder().append("[A] ")
-											   .append(sizeTranslation(bytes, type))
-											   .append(" ")
-											   .append(sizeUnit(type))
+											   .append(getSizeStringGBBased(gb))
 											   .append(" [/A] ")
 											   .append(storageOrTransferLabel(labelType))
 											   .toString();
@@ -804,16 +799,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		return result;
 	}
 
-	private String sizeTranslation(long size, int type) {
-		logDebug("size: " + size + ", type: " + type);
-
-		if (type == TYPE_TERA_BYTE) {
-			size = size / 1024;
-		}
-		String value = new DecimalFormat("#").format(size);
-		return value;
-	}
-
 	private String storageOrTransferLabel(int labelType) {
 		switch (labelType) {
 			case TYPE_STORAGE_LABEL:
@@ -823,10 +808,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			default:
 				return "";
 		}
-	}
-
-	private String sizeUnit(int type) {
-		return type == 0 ? getString(R.string.label_file_size_tera_byte) : getString(R.string.label_file_size_giga_byte);
 	}
 
 	@Override
@@ -1489,7 +1470,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		String priceYearlyInteger = "";
 		String priceYearlyDecimal = "";
 
-		DecimalFormat df = new DecimalFormat("#.##");
+		DecimalFormat df = new DecimalFormat("0.00");
 
 		if(myAccountInfo==null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
