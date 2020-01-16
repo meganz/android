@@ -641,6 +641,10 @@
 
     <string name="menu_take_picture" context="menu item">Take picture</string>
 
+    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the \'display over other apps\' permission" >Allow notifications of incoming MEGA calls</string>
+    <string name="ask_for_display_over_msg" context="Dialog title, to explain why MEGA needs the \'display over other apps\' permission">MEGA needs your authorization to allow call interface to pop up from background.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn't want to make MEGA grant the \'display over other apps\' permission for now.">Don\'t worry, you can still manually set up on your device’s settings.</string>
+
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</string>
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or mobile data</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
@@ -1916,6 +1920,8 @@
 
 
     <string name="notification_subtitle_incoming" context="notification subtitle of incoming calls">Incoming call</string>
+    <string name="notification_incoming_action" context="notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_enable_display" context="text explains why needs to go to system setting to enable allow display over other apps">MEGA background pop-ups are disabled.\nTap to change the settings.</string>
 
     <plurals name="number_unread_messages" context="Subtitle to show the number of unread messages on a chat">
         <item context="unread message" quantity="one">%1$s unread message</item>

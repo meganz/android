@@ -100,9 +100,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static android.content.Context.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class Util {
@@ -1800,5 +1801,9 @@ public class Util {
 			aB.setDisplayShowCustomEnabled(false);
 			aB.setDisplayShowTitleEnabled(true);
 		}
+	}
+
+	public static boolean isAndroid10() {
+		return Build.VERSION.SDK_INT >= ANDROID_10_Q;
 	}
 }

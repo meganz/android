@@ -45,7 +45,6 @@ public class PinActivityLollipop extends BaseActivity {
 		}
 		PinUtil.pause(this);
 		lastStart = System.currentTimeMillis();
-		MegaApplication.activityPaused();
 		super.onPause();
 	}
 	
@@ -55,7 +54,6 @@ public class PinActivityLollipop extends BaseActivity {
 
 		super.onResume();
         setAppFontSize(this);
-		MegaApplication.activityResumed();
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();

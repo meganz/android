@@ -61,6 +61,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
+import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -146,6 +147,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     private ActionMode actionMode;
 
+    private AskForDisplayOverDialog askForDisplayOverDialog;
+
     public static RecentChatsFragmentLollipop newInstance() {
         logDebug("newInstance");
         RecentChatsFragmentLollipop fragment = new RecentChatsFragmentLollipop();
@@ -192,6 +195,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         grantedContactPermission = hasPermissions(context, Manifest.permission.READ_CONTACTS);
         contactGetter = new MegaContactGetter(context);
         contactGetter.setMegaContactUpdater(this);
+
+        askForDisplayOverDialog = new AskForDisplayOverDialog(context);
     }
 
     @Override
@@ -404,7 +409,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         } else {
             bannerContainer.setVisibility(View.GONE);
         }
-
+        if(askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.showDialog();
+        }
         return v;
     }
 
@@ -1598,6 +1605,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         lastFirstVisiblePosition = ((LinearLayoutManager) listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
         MegaApplication.setRecentChatVisible(false);
         super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.recycle();
+        }
     }
 
     @Override

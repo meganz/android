@@ -79,6 +79,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -220,6 +221,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
     private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
 
+    private AskForDisplayOverDialog askForDisplayOverDialog;
+
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
 		AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
@@ -275,6 +278,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		scaleW = getScaleW(outMetrics, density);
 		scaleH = getScaleH(outMetrics, density);
+
+		askForDisplayOverDialog = new AskForDisplayOverDialog(this);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -612,6 +617,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		} else {
 			logWarning("Extras is NULL");
 		}
+        if(askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.showDialog();
+        }
 	}
 
 	private void visibilityStateIcon() {
@@ -1730,17 +1738,20 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	protected void onDestroy() {
 		super.onDestroy();
 
-		if(drawableArrow != null) {
-            drawableArrow.setColorFilter(null);
-        }
-        if(drawableDots != null) {
-            drawableDots.setColorFilter(null);
-        }
-        if(drawableSend != null) {
-            drawableSend.setColorFilter(null);
-        }
-        if(drawableShare != null) {
-            drawableShare.setColorFilter(null);
+		if (drawableArrow != null) {
+			drawableArrow.setColorFilter(null);
+		}
+		if (drawableDots != null) {
+			drawableDots.setColorFilter(null);
+		}
+		if (drawableSend != null) {
+			drawableSend.setColorFilter(null);
+		}
+		if (drawableShare != null) {
+			drawableShare.setColorFilter(null);
+		}
+        if (askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.recycle();
         }
 	}
 
