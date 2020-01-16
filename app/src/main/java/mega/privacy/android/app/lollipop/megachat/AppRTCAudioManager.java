@@ -137,11 +137,9 @@ public class AppRTCAudioManager {
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
 
-                if(context instanceof ChatCallActivity){
-                    if (isSpeakerOn) {
-                        logDebug("Disabling the speakerphone");
-                        setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
-                    }
+                if(context instanceof ChatCallActivity && isSpeakerOn){
+                    logDebug("Disabling the speakerphone");
+                    setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
                 }
 
                 if (proximitySensorListener != null)
@@ -153,11 +151,9 @@ public class AppRTCAudioManager {
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
 
-                if(context instanceof ChatCallActivity) {
-                    if (isSpeakerOn) {
-                        logDebug("Enabling the speakerphone");
-                        setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
-                    }
+                if(context instanceof ChatCallActivity && isSpeakerOn) {
+                    logDebug("Enabling the speakerphone");
+                    setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
                 }
                 if (proximitySensorListener != null)
                     proximitySensorListener.needToUpdate(false);
