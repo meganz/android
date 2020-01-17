@@ -2970,11 +2970,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private void setSizeInputText(boolean isEmpty){
         textChat.setMinLines(1);
-
         if(isEmpty){
             textChat.setMaxLines(1);
         }else if(textChat.getMaxLines() < MAX_LINES_INPUT_TEXT && textChat.getLineCount() == textChat.getMaxLines()){
             textChat.setMaxLines(textChat.getLineCount() + 1);
+        }else{
+            textChat.setMaxLines(MAX_LINES_INPUT_TEXT);
         }
     }
     private void endCall(long chatHang){

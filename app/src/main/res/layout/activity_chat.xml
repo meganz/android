@@ -214,7 +214,7 @@
                                 android:background="@android:color/transparent"
                                 android:gravity="center_vertical|left"
                                 android:inputType="textMultiLine|textCapSentences"
-                                android:maxLines="1"
+                                android:maxLines="5"
                                 android:textColor="@color/black"
                                 android:textSize="14sp"
                                 app:emojiSize="18sp"/>
