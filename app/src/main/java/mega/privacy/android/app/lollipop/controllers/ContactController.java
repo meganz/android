@@ -91,12 +91,23 @@ public class ContactController {
         }
     }
 
-    public void removeContact(MegaUser c){
+    public void removeContact(MegaUser c) {
         logDebug("removeContact");
-        final ArrayList<MegaNode> inShares = megaApi.getInShares(c);
-        if(inShares.size() != 0)
-        {
-            for(int i=0; i<inShares.size();i++){
+
+        checkRemoveContact(c);
+
+        if (context instanceof ManagerActivityLollipop) {
+            megaApi.removeContact(c, (ManagerActivityLollipop) context);
+        } else if (context instanceof ContactInfoActivityLollipop) {
+            megaApi.removeContact(c, (ContactInfoActivityLollipop) context);
+        }
+    }
+
+    private void checkRemoveContact(MegaUser c) {
+        ArrayList<MegaNode> inShares = megaApi.getInShares(c);
+
+        if (inShares.size() != 0) {
+            for (int i = 0; i < inShares.size(); i++) {
                 MegaNode removeNode = inShares.get(i);
                 megaApi.remove(removeNode);
             }
@@ -107,60 +118,27 @@ public class ContactController {
             if (chatRoomTo != null) {
                 long chatId = chatRoomTo.getChatId();
                 if (megaChatApi.getChatCall(chatId) != null) {
-                    if(context instanceof ManagerActivityLollipop){
+                    if (context instanceof ManagerActivityLollipop) {
                         megaChatApi.hangChatCall(chatId, (ManagerActivityLollipop) context);
-                    }
-                    else if(context instanceof ContactInfoActivityLollipop){
+                    } else if (context instanceof ContactInfoActivityLollipop) {
                         megaChatApi.hangChatCall(chatId, (ContactInfoActivityLollipop) context);
                     }
                 }
             }
         }
-
-        if(context instanceof ManagerActivityLollipop){
-            megaApi.removeContact(c, (ManagerActivityLollipop) context);
-        }
-        else if(context instanceof ContactInfoActivityLollipop){
-            megaApi.removeContact(c, (ContactInfoActivityLollipop) context);
-        }
-
     }
 
 
-    public void removeMultipleContacts(final ArrayList<MegaUser> contacts){
-        MultipleRequestListener removeMultipleListener = null;
-        if(contacts.size()>1){
-            logDebug("Remove multiple contacts");
-            removeMultipleListener = new MultipleRequestListener(-1, context);
-            for(int j=0; j<contacts.size();j++){
+    public void removeMultipleContacts(final ArrayList<MegaUser> contacts) {
+        if (contacts.size() > 1) {
+            MultipleRequestListener removeMultipleListener = new MultipleRequestListener(-1, context);
 
-                final MegaUser c= contacts.get(j);
-
-                final ArrayList<MegaNode> inShares = megaApi.getInShares(c);
-
-                if(inShares.size() != 0){
-                    for(int i=0; i<inShares.size();i++){
-                        MegaNode removeNode = inShares.get(i);
-                        megaApi.remove(removeNode);
-                    }
-                }
+            for (MegaUser c : contacts) {
+                checkRemoveContact(c);
                 megaApi.removeContact(c, removeMultipleListener);
             }
-        }
-        else{
-            logDebug("Remove one contact");
-
-            final MegaUser c= contacts.get(0);
-
-            final ArrayList<MegaNode> inShares = megaApi.getInShares(c);
-
-            if(inShares.size() != 0){
-                for(int i=0; i<inShares.size();i++){
-                    MegaNode removeNode = inShares.get(i);
-                    megaApi.remove(removeNode);
-                }
-            }
-            megaApi.removeContact(c, (ManagerActivityLollipop) context);
+        } else {
+            removeContact(contacts.get(0));
         }
     }
 
