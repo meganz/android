@@ -197,4 +197,5 @@
     <color name="statusbar_tour_4">#FF00948C</color>
 
     <color name="black_40_alpha">#66000000</color>
+    <color name="reconnecting_bar">#FFF5A623</color>
 </resources>

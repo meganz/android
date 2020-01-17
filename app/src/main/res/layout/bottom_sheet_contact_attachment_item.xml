@@ -31,13 +31,6 @@
                 rounded:border_color="@color/border_file_properties"
                 rounded:border_width="0dp"
                 rounded:corner_radius="20dp" />
-
-            <mega.privacy.android.app.components.twemoji.EmojiTextView
-            android:id="@+id/contact_attachment_initial_letter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:gravity="center_horizontal|center_vertical" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -54,7 +47,7 @@
                 android:gravity="center_vertical"
                 android:textColor="@color/name_my_account"
                 android:textSize="16sp"
-                android:ellipsize="end"
+                rounded:emojiSize="14sp"
                 android:maxLines="1"
                 android:singleLine="true"/>
 
@@ -77,7 +70,7 @@
                 android:layout_below="@id/contact_attachment_chat_name_text"
                 android:gravity="center_vertical"
                 android:textSize="14sp"
-                android:ellipsize="end"
+                rounded:emojiSize="12sp"
                 android:maxLines="1"
                 android:singleLine="true"/>
 
