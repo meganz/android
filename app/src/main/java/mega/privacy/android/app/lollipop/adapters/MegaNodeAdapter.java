@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -55,6 +56,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtils.FileTakenDownDialogHandler.KEY_TAKEN_DOWN_DIALOG;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -414,14 +416,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         dbH = DatabaseHandler.getDbHandler(context);
 
         switch (type) {
-            case FILE_BROWSER_ADAPTER: {
-                break;
-            }
             case CONTACT_FILE_ADAPTER: {
                 ((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
-                break;
-            }
-            case RUBBISH_BIN_ADAPTER: {
                 break;
             }
             case FOLDER_LINK_ADAPTER: {
@@ -430,12 +426,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
             case SEARCH_ADAPTER: {
                 ((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
-                break;
-            }
-            case OUTGOING_SHARES_ADAPTER: {
-                break;
-            }
-            case INCOMING_SHARES_ADAPTER: {
                 break;
             }
             case INBOX_ADAPTER: {
@@ -455,12 +445,29 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             megaApi = ((MegaApplication)((Activity)context).getApplication())
                     .getMegaApi();
         }
+
+        // Rebind the shown dialog to new adapter as listener
+        if (context instanceof AppCompatActivity) {
+            AppCompatActivity activity = (AppCompatActivity)context;
+            Fragment fragmentTakenDownDialog = activity.getSupportFragmentManager().findFragmentByTag(KEY_TAKEN_DOWN_DIALOG);
+            if (fragmentTakenDownDialog instanceof FileTakenDownDialogHandler.TakenDownDialogFragment) {
+                ((FileTakenDownDialogHandler.TakenDownDialogFragment) fragmentTakenDownDialog).setListener(this);
+            }
+        }
     }
 
     public void setNodes(ArrayList<MegaNode> nodes) {
         this.nodes = insertPlaceHolderNode(nodes);
         logDebug("setNodes size: " + this.nodes.size());
         notifyDataSetChanged();
+        // Rebind the shown dialog to new adapter as listener
+        if (context instanceof AppCompatActivity) {
+            AppCompatActivity activity = (AppCompatActivity)context;
+            Fragment fragmentTakenDownDialog = activity.getSupportFragmentManager().findFragmentByTag(KEY_TAKEN_DOWN_DIALOG);
+            if (fragmentTakenDownDialog instanceof FileTakenDownDialogHandler.TakenDownDialogFragment) {
+                ((FileTakenDownDialogHandler.TakenDownDialogFragment) fragmentTakenDownDialog).setCurrentPlaceHolderCount(getPlaceholderCount());
+            }
+        }
     }
 
     public void setAdapterType(int adapterType) {
@@ -1286,8 +1293,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             case R.id.file_list_item_layout:
             case R.id.file_grid_item_layout: {
                 if (n.isTakenDown() && !isMultipleSelect()) {
-                    if (context instanceof AppCompatActivity)
-                    showTakenDownDialog((AppCompatActivity)context, n.isFolder(), currentPosition, this);
+                    if (context instanceof AppCompatActivity) {
+                        boolean isListMode = adapterType == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
+                        int currentPlaceHolderCount = getPlaceholderCount();
+                        showTakenDownDialog((AppCompatActivity) context, n.isFolder(), currentPosition, this, isListMode, currentPlaceHolderCount);
+                    }
                 } else {
                     fileClicked(currentPosition, v);
                 }

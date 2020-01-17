@@ -3,6 +3,7 @@ package mega.privacy.android.app.utils;
 import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -52,6 +53,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.DISPUTE_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
 public class FileUtils {
 
@@ -728,6 +730,7 @@ public class FileUtils {
      * The static class to show taken down notice for mega node when the node is taken down and try to be opened in the adapter
      */
     public static class FileTakenDownDialogHandler {
+        public static String KEY_TAKEN_DOWN_DIALOG = "taken_down_dialog";
         private static String KEY_CURRENT_POSITION = "KEY_CURRENT_POSITION";
         private static String KEY_IS_FOLDER = "KEY_IS_FOLDER";
         public interface FileTakenDownDialogListener {
@@ -742,18 +745,38 @@ public class FileUtils {
         public static class TakenDownDialogFragment extends DialogFragment {
             private FileTakenDownDialogListener listener;
 
+            private boolean isListMode;
+
+            private int lastPlaceHolderCount = -1;
+
+            private int currentPlaceHolderCount = -1;
+
             public void setListener(FileTakenDownDialogListener listener) {
                 this.listener = listener;
             }
 
-            @Override
-            public void onDestroyView() {
-                Dialog dialog = getDialog();
-                // handles https://code.google.com/p/android/issues/detail?id=17423
-                if (dialog != null && getRetainInstance()) {
-                    dialog.setDismissMessage(null);
+            public void setListMode(boolean isListMode) {
+                this.isListMode = isListMode;
+            }
+
+            public void setCurrentPlaceHolderCount(int newPlaceHolderCount) {
+                lastPlaceHolderCount = currentPlaceHolderCount;
+                currentPlaceHolderCount = newPlaceHolderCount;
+            }
+
+            public int transferPosition(int lastPosition) {
+
+                if (lastPlaceHolderCount == -1 || currentPlaceHolderCount == -1 ) {
+                    return lastPosition;
                 }
-                super.onDestroyView();
+
+                if (isListMode|| currentPlaceHolderCount == 0) {
+                    return lastPosition;
+                } else if (isScreenInPortrait(getContext())){
+                    return  lastPosition - (lastPlaceHolderCount - currentPlaceHolderCount);
+                } else {
+                    return lastPosition + (currentPlaceHolderCount - lastPlaceHolderCount);
+                }
             }
 
             @Override
@@ -794,7 +817,9 @@ public class FileUtils {
 
                 openButton.setOnClickListener(view -> {
                     if (listener != null && bundle != null) {
-                        listener.onOpenClicked(bundle.getInt(KEY_CURRENT_POSITION, -1));
+                        int lastPosition = bundle.getInt(KEY_CURRENT_POSITION, -1);
+                        int transferredPosition = transferPosition(lastPosition);
+                        listener.onOpenClicked(transferredPosition);
                     }
                     dialogTakenDown.dismiss();
                 });
@@ -815,7 +840,7 @@ public class FileUtils {
             }
         }
 
-        public static void showTakenDownDialog(final AppCompatActivity activity, boolean isFolder, int currentPosition, FileTakenDownDialogListener listener) {
+        public static void showTakenDownDialog(final AppCompatActivity activity, boolean isFolder, int currentPosition, FileTakenDownDialogListener listener, boolean isListMode, int currentPlaceHolderCount) {
             if (activity == null) {
                 return;
             }
@@ -833,6 +858,8 @@ public class FileUtils {
 
             TakenDownDialogFragment takenDownDialogFragment = new TakenDownDialogFragment();
             takenDownDialogFragment.setListener(listener);
+            takenDownDialogFragment.setListMode(isListMode);
+            takenDownDialogFragment.setCurrentPlaceHolderCount(currentPlaceHolderCount);
             takenDownDialogFragment.setArguments(bundle);
             takenDownDialogFragment.show(activity.getSupportFragmentManager(), "taken_down_dialog");
         }
