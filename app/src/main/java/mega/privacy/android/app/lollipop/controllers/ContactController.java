@@ -49,10 +49,10 @@ public class ContactController {
         logDebug("ContactController created");
         this.context = context;
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            megaApi = MegaApplication.getInstance().getMegaApi();
         }
         if(isChatEnabled() && megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
         if (dbH == null){
