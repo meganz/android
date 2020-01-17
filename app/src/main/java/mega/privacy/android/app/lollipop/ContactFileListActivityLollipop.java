@@ -87,7 +87,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 
 
-public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight, UploadBottomSheetDialogActionListener {
+public class ContactFileListActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight, UploadBottomSheetDialogActionListener {
 
 	FrameLayout fragmentContainer;
 
@@ -117,8 +117,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	long parentHandle = -1;
 
-	DatabaseHandler dbH = null;
-	MegaPreferences prefs = null;
+	DatabaseHandler dbH;
+	MegaPreferences prefs;
 
 	MenuItem createFolderMenuItem;
 	MenuItem startConversation;
@@ -529,6 +529,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 
 		handler = new Handler();
+		dbH = DatabaseHandler.getDbHandler(this);
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
@@ -1048,7 +1049,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				nC = new NodeController(this);
 			}
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
-		} else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
+        } else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
 			}
@@ -1666,8 +1669,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long[] hashes, final boolean highPriority) {
-		logDebug("askSizeConfirmationBeforeDownload");
-
 		final String parentPathC = parentPath;
 		final String urlC = url;
 		final long[] hashesC = hashes;
@@ -1697,7 +1698,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 						if (nC == null) {
 							nC = new NodeController(contactPropertiesMainActivity);
 						}
-						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+						nC.checkInstalledAppBeforeDownload(parentPathC,urlC, sizeC, hashesC, highPriority);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -1713,8 +1714,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void askConfirmationNoAppInstaledBeforeDownload(String parentPath, String url, long size, long[] hashes, String nodeToDownload, final boolean highPriority) {
-		logDebug("askConfirmationNoAppInstaledBeforeDownload");
-
 		final String parentPathC = parentPath;
 		final String urlC = url;
 		final long[] hashesC = hashes;
@@ -1744,7 +1743,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 						if (nC == null) {
 							nC = new NodeController(contactPropertiesMainActivity);
 						}
-						nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
+						nC.download(parentPathC,urlC, sizeC, hashesC, highPriority);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
