@@ -1019,7 +1019,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         inputTextLayout.setVisibility(View.VISIBLE);
         separatorOptions.setVisibility(View.GONE);
         voiceClipLayout.setVisibility(View.VISIBLE);
-
+        keyboardTwemojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_emojicon));
     }
 
 
