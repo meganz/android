@@ -85,11 +85,11 @@ LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/${LI
 LIBWEBSOCKETS_SHA1="cb99f397f586ce7333a1dc8b3e4a831cfb854dbc"
 
 PDFVIEWER=pdfviewer
-PDFVIEWER_VERSION=1.8.2
+PDFVIEWER_VERSION=1.9.0
 PDFVIEWER_SOURCE_FILE=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}.zip
 PDFVIEWER_SOURCE_FOLDER=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}
 PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-android-${PDFVIEWER_VERSION}.zip
-PDFVIEWER_SHA1="93205f9cff143d864c138534f3205351e3d6c42e"
+PDFVIEWER_SHA1="9c346de2fcf328c65c7047f03357a049dc55b403"
 
 function downloadCheckAndUnpack()
 {
