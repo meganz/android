@@ -18,8 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -34,9 +32,6 @@ import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.InfoPeerGroupCall;
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
@@ -46,6 +41,8 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.ViewHolderGroupCall> implements MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener {
 
@@ -588,7 +585,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 paramsAvatarImage.height = scaleWidthPx(88, outMetrics);
                 holder.avatarImage.setLayoutParams(paramsAvatarImage);
                 holder.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f);
-                holder.avatarInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_CALL_SMALL, outMetrics));
+                holder.avatarInitialLetter.setEmojiSize(px2dp(EMOJI_AVATAR_CALL_SMALL, outMetrics));
             }else{
                 RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holder.microAvatar.getLayoutParams());
                 paramsMicroAvatar.height = scaleWidthPx(15, outMetrics);
@@ -603,7 +600,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 paramsAvatarImage.height = scaleWidthPx(60, outMetrics);
                 holder.avatarImage.setLayoutParams(paramsAvatarImage);
                 holder.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f);
-                holder.avatarInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_HIGH, outMetrics));
+                holder.avatarInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_HIGH, outMetrics));
 
             }
             if(peer.isAudioOn()){
@@ -676,14 +673,10 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             if (peerId == megaChatApi.getMyUserHandle()) {
                 //My peer, other client
                 peerEmail = megaChatApi.getMyEmail();
-            } else {
-
-                //Contact
-                if((peerEmail == null) || (peerId != holder.peerId)){
-                    peerEmail = megaChatApi.getContactEmail(peerId);
-                    if (peerEmail == null) {
-                        megaChatApi.getUserEmail(peerId, listener);
-                    }
+            } else if((peerEmail == null) || (peerId != holder.peerId)){
+                peerEmail = megaChatApi.getContactEmail(peerId);
+                if (peerEmail == null) {
+                    megaChatApi.getUserEmail(peerId, listener);
                 }
             }
 
@@ -730,51 +723,18 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }else{
             notifyItemChanged(position);
         }
-
     }
 
     //Group call: default my avatar
     private void createDefaultAvatar(ViewHolderGroupCall holder, long peerId, String peerName, String peerEmail){
-        logDebug("createDefaultAvatar");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        p.setColor(Color.TRANSPARENT);
-        String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(peerId));
-        if (color != null) {
-            p.setColor(Color.parseColor(color));
-        } else {
-            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+        int color = getColorAvatar(context,megaApi, peerId);
+        String name = null;
+        if(peerName != null && peerName.trim().length() > 0){
+            name = peerName;
+        }else if(peerEmail != null && peerEmail.length() > 0) {
+            name = peerEmail;
         }
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
-            radius = defaultAvatar.getWidth() / 2;
-        } else {
-            radius = defaultAvatar.getHeight() / 2;
-        }
-        c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, p);
-
-        holder.avatarImage.setVisibility(View.VISIBLE);
-        holder.avatarImage.setImageBitmap(defaultAvatar);
-
-        if((peerName != null) && (peerName.trim().length() > 0)){
-            String firstLetter = ChatUtil.getFirstLetter(peerName);
-            holder.avatarInitialLetter.setText(firstLetter);
-            holder.avatarInitialLetter.setTextColor(Color.WHITE);
-            holder.avatarInitialLetter.setVisibility(View.VISIBLE);
-
-        }else{
-            if((peerEmail != null) && (peerEmail.length() > 0)){
-                String firstLetter = peerEmail.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                holder.avatarInitialLetter.setText(firstLetter);
-                holder.avatarInitialLetter.setTextColor(Color.WHITE);
-                holder.avatarInitialLetter.setVisibility(View.VISIBLE);
-            }
-        }
+        holder.avatarImage.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, true));
     }
 
     public RecyclerView getListFragment() {
@@ -863,7 +823,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                         paramsAvatarImage.height = scaleWidthPx(88, outMetrics);
                         holder.avatarImage.setLayoutParams(paramsAvatarImage);
                         holder.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f);
-                        holder.avatarInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_CALL_SMALL, outMetrics));
+                        holder.avatarInitialLetter.setEmojiSize(px2dp(EMOJI_AVATAR_CALL_SMALL, outMetrics));
 
                     }else{
                         RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holder.microAvatar.getLayoutParams());
@@ -879,7 +839,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                         paramsAvatarImage.height = scaleWidthPx(60, outMetrics);
                         holder.avatarImage.setLayoutParams(paramsAvatarImage);
                         holder.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f);
-                        holder.avatarInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_HIGH, outMetrics));
+                        holder.avatarInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_HIGH, outMetrics));
                     }
 
                 }else{

@@ -383,8 +383,9 @@ echo "* libwebsockets is ready"
 
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
-    if [ ! -d megachat/webrtc/include ] || [ ! -f megachat/webrtc/libwebrtc_x86_64.a ] || [ ! -f megachat/webrtc/libwebrtc_arm64.a ]; then
-        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#F!BzwF0Qba!-KXBHgwonRUnSptmVJr4qg"
+    WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm.a | cut -d " " -f 1`
+    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "2d0e9cff4e691d9da4747315f0775be25d62b0bd" ]; then
+        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#!wixgSaZZ!6zRMV_d8ogouBaEidHzGws1KvLrBwBiKEm0VIVgXEPk"
         echo "and uncompress it in megachat/webrtc"
         exit 1
     else
@@ -415,6 +416,7 @@ echo "* PdfViewer is ready"
 
 echo "* All dependencies are prepared!"
 
+
 rm -rf ../tmpLibs
 mkdir ../tmpLibs
 echo "* Running ndk-build x86"
@@ -439,4 +441,3 @@ mv ../tmpLibs/* ../libs/
 rmdir ../tmpLibs/
 
 echo "* Task finished OK"
-
