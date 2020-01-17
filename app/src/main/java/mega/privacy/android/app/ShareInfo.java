@@ -29,6 +29,7 @@ import java.util.List;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 
@@ -312,9 +313,7 @@ public class ShareInfo implements Serializable {
             }
 			logDebug("Internal No path traversal: " + title);
             if (context instanceof PdfViewerActivityLollipop || mIntent.getType().equals("application/pdf")) {
-				if (!title.endsWith(".pdf")) {
-					title += ".pdf";
-				}
+				title = addPdfFileExtension(title);
             }
             file = new File(context.getCacheDir(), title);
 

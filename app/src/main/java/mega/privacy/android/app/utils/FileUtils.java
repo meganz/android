@@ -662,5 +662,12 @@ public class FileUtils {
     public static boolean isFileNameNumeric(String filename) {
         return getFileNameWithoutExtension(filename).matches("-?\\d+(\\.\\d+)?");
     }
+
+    public static String addPdfFileExtension(String title) {
+        if (!title.endsWith(".pdf")) {
+            title += ".pdf";
+        }
+        return title;
+    }
 }
 
