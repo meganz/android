@@ -246,6 +246,36 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 --------------------------------------------------------------------
 
+###### Pdfium Android binding with Bitmap rendering
+https://github.com/barteksc/PdfiumAndroid
+
+Uses pdfium library from AOSP. Forked for use with AndroidPdfViewer project.
+
+Original work Copyright 2015 Bekket McClane
+Modified work Copyright 2016 Bartosz Schiller
+
+###### License:
+Apache License, Version 2.0
+
+https://github.com/barteksc/PdfiumAndroid/blob/master/LICENSE
+
+--------------------------------------------------------------------
+
+#### Android PdfViewer
+https://github.com/barteksc/AndroidPdfViewer
+
+Library for displaying PDF documents on Android, with animations, gestures, zoom and double tap support.
+It is based on PdfiumAndroid for decoding PDF files. Works on API 11 (Android 3.0) and higher.
+
+Copyright 2017 Bartosz Schiller
+
+###### License:
+Apache License, Version 2.0
+
+https://github.com/barteksc/AndroidPdfViewer/blob/master/LICENSE
+
+--------------------------------------------------------------------
+
 #### MEGA C++ SDK
 https://github.com/meganz/sdk
 
