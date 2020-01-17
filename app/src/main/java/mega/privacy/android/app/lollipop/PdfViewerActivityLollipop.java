@@ -2238,7 +2238,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     logDebug("Use provider to share");
-                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+                    share.putExtra(Intent.EXTRA_STREAM, uri);
                     share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
                 else{

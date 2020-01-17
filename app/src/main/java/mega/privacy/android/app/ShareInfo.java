@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
@@ -45,6 +44,8 @@ public class ShareInfo implements Serializable {
 	private File file = null;
 	public boolean isContact = false;
 	public Uri contactUri = null;
+
+	private static Intent mIntent;
 	
 	/*
 	 * Get ShareInfo from File
@@ -94,6 +95,9 @@ public class ShareInfo implements Serializable {
 		if (context == null) {
 			return null;
 		}
+
+		mIntent = intent;
+
 		// Process multiple items
 		if (Intent.ACTION_SEND_MULTIPLE.equals(intent.getAction())) {
 			logDebug("Multiple!");
@@ -145,12 +149,7 @@ public class ShareInfo implements Serializable {
 			logWarning("Share info file is null");
 			return null;
 		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
-		else{
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
 		
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
 		result.add(shareInfo);
@@ -187,12 +186,7 @@ public class ShareInfo implements Serializable {
 			return null;
 		}
 		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
-		else{
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
 		
 		return result;
 	}
@@ -317,11 +311,10 @@ public class ShareInfo implements Serializable {
                 return;
             }
 			logDebug("Internal No path traversal: " + title);
-            if (context instanceof PdfViewerActivityLollipop) {
-				logDebug("context of PdfViewerActivityLollipop");
-                if (!title.endsWith(".pdf")) {
-                    title += ".pdf";
-                }
+            if (context instanceof PdfViewerActivityLollipop || mIntent.getType().equals("application/pdf")) {
+				if (!title.endsWith(".pdf")) {
+					title += ".pdf";
+				}
             }
             file = new File(context.getCacheDir(), title);
 
