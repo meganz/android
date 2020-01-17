@@ -95,7 +95,11 @@ public class AppRTCAudioManager {
         }
 
         start(null);
-        startProximitySensor(context);
+        if(context instanceof ChatCallActivity) {
+            startProximitySensor(context);
+        }else{
+            registerProximitySensor(context);
+        }
         Log.d(TAG, "defaultAudioDevice: " + defaultAudioDevice);
         AppRTCUtils.logDeviceInfo(TAG);
     }
@@ -104,25 +108,21 @@ public class AppRTCAudioManager {
         this.proximitySensorListener = proximitySensorListener;
     }
 
-
-    public void startProximitySensor(Context context) {
-        registerProximitySensor(context);
-        if (proximitySensor != null) {
-            proximitySensor.start();
-        }
-    }
-
     public void registerProximitySensor(final Context context) {
         // Create and initialize the proximity sensor.
         // Note that, the sensor will not be active until start() has been called.
         //This method will be called each time a state change is detected.
-        if (proximitySensor == null) {
-            proximitySensor = AppRTCProximitySensor.create(context, new Runnable() {
-                public void run() {
-                    onProximitySensorChangedState(context);
-                }
-            });
-        }
+        if (proximitySensor != null) return;
+        proximitySensor = AppRTCProximitySensor.create(context, new Runnable() {
+            public void run() {
+                onProximitySensorChangedState(context);
+            }
+        });
+    }
+
+    public void startProximitySensor(Context context) {
+        registerProximitySensor(context);
+        proximitySensor.start();
     }
 
     /**
@@ -137,7 +137,7 @@ public class AppRTCAudioManager {
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
 
-                if(context instanceof ChatCallActivity && isSpeakerOn){
+                if (context instanceof ChatCallActivity && isSpeakerOn) {
                     logDebug("Disabling the speakerphone");
                     setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
                 }
@@ -150,8 +150,7 @@ public class AppRTCAudioManager {
                 logDebug("Status of proximity sensor is: Far");
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
-
-                if(context instanceof ChatCallActivity && isSpeakerOn) {
+                if (context instanceof ChatCallActivity && isSpeakerOn) {
                     logDebug("Enabling the speakerphone");
                     setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
                 }
@@ -161,11 +160,15 @@ public class AppRTCAudioManager {
         }
     }
 
+    public void stopProximitySensor() {
+        if (proximitySensor == null) return;
+        proximitySensor.stop();
+    }
+
     public void unregisterProximitySensor() {
-        if (proximitySensor != null) {
-            proximitySensor.stop();
-            proximitySensor = null;
-        }
+        if (proximitySensor == null) return;
+        proximitySensor.stop();
+        proximitySensor = null;
     }
 
     /**

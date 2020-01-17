@@ -570,7 +570,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         LocalBroadcastManager.getInstance(this).registerReceiver(dialogConnectReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
         LocalBroadcastManager.getInstance(this).registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
         LocalBroadcastManager.getInstance(this).registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
-
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
         setContentView(R.layout.activity_chat);
@@ -589,7 +588,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         aB.setTitle(null);
         aB.setSubtitle(null);
         tB.setOnClickListener(this);
-
         toolbarElementsInside = tB.findViewById(R.id.toolbar_elements_inside);
         titleToolbar = tB.findViewById(R.id.title_toolbar);
         iconStateToolbar = tB.findViewById(R.id.state_icon_toolbar);
@@ -7042,7 +7040,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     @Override
     protected void onDestroy() {
         logDebug("onDestroy()");
-        stopSpeakerAudioManger();
+        destroySpeakerAudioManger();
         cleanBuffers();
         if (handlerEmojiKeyboard != null){
             handlerEmojiKeyboard.removeCallbacksAndMessages(null);
@@ -7525,6 +7523,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             MegaApplication.setOpenChatId(idChat);
 
             supportInvalidateOptionsMenu();
+            createSpeakerAudioManger();
 
             int chatConnection = megaChatApi.getChatConnectionState(idChat);
             logDebug("Chat connection (" + idChat+ ") is: " + chatConnection);
@@ -7689,7 +7688,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     protected void onPause(){
         logDebug("onPause");
         super.onPause();
-        stopSpeakerAudioManger();
+        if (rtcAudioManager != null)
+            rtcAudioManager.stopProximitySensor();
         hideKeyboard();
         activityVisible = false;
         MegaApplication.setOpenChatId(-1);
@@ -8343,11 +8343,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void createAudioManager(){
-        if (rtcAudioManager == null) {
-            rtcAudioManager = AppRTCAudioManager.create(this, true);
-            rtcAudioManager.start(null);
-        }
+    private void createSpeakerAudioManger(){
+        if(rtcAudioManager != null) return;
+        rtcAudioManager = AppRTCAudioManager.create(this, true);
+        rtcAudioManager.start(null);
         rtcAudioManager.updateSpeakerStatus(true);
 
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
@@ -8359,14 +8358,23 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }else if(!isSpeakerOn && !isNear){
                     isSpeakerOn = true;
                     rtcAudioManager.updateSpeakerStatus(true);
+                    stopProximitySensor();
                     adapter.pausePlaybackInProgress();
                 }
             }
         });
-
     }
 
-    public void stopSpeakerAudioManger() {
+    public void startProximitySensor(){
+        createSpeakerAudioManger();
+        rtcAudioManager.startProximitySensor(this);
+    }
+
+    public void stopProximitySensor(){
+        rtcAudioManager.stopProximitySensor();
+    }
+
+    private void destroySpeakerAudioManger(){
         if (rtcAudioManager == null) return;
         try {
             rtcAudioManager.stop();
