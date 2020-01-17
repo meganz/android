@@ -302,7 +302,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                 ((ContactAttachmentActivityLollipop) context).showSnackbar(message);
             }
             else if(context instanceof AchievementsActivity){
-                ((AchievementsActivity) context).showInviteConfirmationDialog();
+                ((AchievementsActivity) context).showInviteConfirmationDialog(context.getString(R.string.invite_sent_text_multi));
             }
             else if(context instanceof AddContactActivityLollipop){
                 ((AddContactActivityLollipop) context).showSnackbar(message);

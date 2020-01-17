@@ -68,6 +68,7 @@ import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -115,6 +116,9 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public final static int INCOMING_FRAGMENT = 1;
 	public final static int CHAT_FRAGMENT = 3;
 	public final static int IMPORT_FRAGMENT = 4;
+    public static final String EXTRA_SHARE_INFOS = "share_infos";
+    public static final String EXTRA_SHARE_ACTION = "share_action";
+    public static final String EXTRA_SHARE_TYPE = "share_type";
 
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
@@ -240,6 +244,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private SearchView searchView;
 
+    private boolean needLogin;
+
 	private FileExplorerActivityLollipop fileExplorerActivityLollipop;
 
 	private String querySearch = "";
@@ -324,12 +330,31 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		@Override
 		protected List<ShareInfo> doInBackground(Intent... params) {
 			logDebug("OwnFilePrepareTask: doInBackground");
-			return ShareInfo.processIntent(params[0], context);
+            Intent intent = params[0];
+            List<ShareInfo> shareInfos = (List<ShareInfo>) intent.getSerializableExtra(EXTRA_SHARE_INFOS);
+            if(shareInfos != null) {
+                return  shareInfos;
+            }
+            return ShareInfo.processIntent(intent, context);
 		}
 
 		@Override
 		protected void onPostExecute(List<ShareInfo> info) {
 			filePreparedInfos = info;
+			if(needLogin) {
+                Intent loginIntent = new Intent(FileExplorerActivityLollipop.this, LoginActivityLollipop.class);
+                loginIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+                loginIntent.putExtra(EXTRA_SHARE_ACTION, getIntent().getAction());
+                loginIntent.putExtra(EXTRA_SHARE_TYPE, getIntent().getType());
+                loginIntent.putExtra(EXTRA_SHARE_INFOS,new ArrayList<>(info));
+                // close previous login page
+                loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                loginIntent.setAction(ACTION_FILE_EXPLORER_UPLOAD);
+                needLogin = false;
+                startActivity(loginIntent);
+                finish();
+                return;
+            }
 			if (action != null && getIntent() != null) {
 				getIntent().setAction(action);
 			}
@@ -425,11 +450,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		
 		if (credentials == null){
 			logWarning("User credentials NULL");
-			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-			loginIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
-			loginIntent.setAction(ACTION_FILE_EXPLORER_UPLOAD);
-			startActivity(loginIntent);
-			finish();
+            needLogin = true;
+            OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
+            ownFilePrepareTask.execute(getIntent());
+            createAndShowProgressDialog(false, R.string.upload_prepare);
 			return;
 		}
 		else{
@@ -773,7 +797,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						if (!multiselect) {
 							return;
 						}
-						
+
 						if (isSearchExpanded && !pendingToOpenSearchView) {
 							clearQuerySearch();
 							collapseSearchView();
@@ -878,7 +902,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 		return false;
 	}
-	
+
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		logDebug("onCreateOptionsMenuLollipop");
@@ -1044,7 +1068,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
-//						searchMenuItem.setVisible(true);
+						searchMenuItem.setVisible(true);
 					}
 				}
 
@@ -1085,7 +1109,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
-//						searchMenuItem.setVisible(true);
+						searchMenuItem.setVisible(true);
 					}
 				}
 			}

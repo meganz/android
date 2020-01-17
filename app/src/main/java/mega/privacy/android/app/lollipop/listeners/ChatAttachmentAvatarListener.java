@@ -41,12 +41,12 @@ public class ChatAttachmentAvatarListener implements MegaRequestListenerInterfac
         logDebug("onRequestFinish()");
         if (e.getErrorCode() == MegaError.API_OK){
 
-            String mail = "";
+            String mail;
             if(myOwnMsg){
-                mail = (String) holder.contentOwnMessageContactEmail.getText().toString();
+                mail = holder.contentOwnMessageContactEmail.getText().toString();
             }
             else{
-                mail = (String) holder.contentContactMessageContactEmail.getText().toString();
+                mail = holder.contentContactMessageContactEmail.getText().toString();
             }
 
             if (mail.compareTo(request.getEmail()) == 0){

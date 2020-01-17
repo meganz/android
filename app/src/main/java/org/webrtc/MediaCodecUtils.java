@@ -10,12 +10,18 @@
 
 package org.webrtc;
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
-import android.media.MediaCodec;
+import android.os.Build;
+import android.support.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Container class for static constants and helpers used with MediaCodec. */
+// We are forced to use the old API because we want to support API level < 21.
+@SuppressWarnings("deprecation")
 class MediaCodecUtils {
   private static final String TAG = "MediaCodecUtils";
 
@@ -24,6 +30,7 @@ class MediaCodecUtils {
   static final String INTEL_PREFIX = "OMX.Intel.";
   static final String NVIDIA_PREFIX = "OMX.Nvidia.";
   static final String QCOM_PREFIX = "OMX.qcom.";
+  static final String[] SOFTWARE_IMPLEMENTATION_PREFIXES = {"OMX.google.", "OMX.SEC."};
 
   // NV12 color format supported by QCOM codec, but not declared in MediaCodec -
   // see /hardware/qcom/media/mm-core/inc/OMX_QCOMExtns.h
@@ -48,7 +55,19 @@ class MediaCodecUtils {
       MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar,
       MediaCodecUtils.COLOR_QCOM_FORMATYUV420PackedSemiPlanar32m};
 
-  static Integer selectColorFormat(int[] supportedColorFormats, CodecCapabilities capabilities) {
+  // Color formats supported by texture mode encoding - in order of preference.
+  static final int[] TEXTURE_COLOR_FORMATS = getTextureColorFormats();
+
+  private static int[] getTextureColorFormats() {
+    if (Build.VERSION.SDK_INT >= 18) {
+      return new int[] {MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface};
+    } else {
+      return new int[] {};
+    }
+  }
+
+  static @Nullable Integer selectColorFormat(
+      int[] supportedColorFormats, CodecCapabilities capabilities) {
     for (int supportedColorFormat : supportedColorFormats) {
       for (int codecColorFormat : capabilities.colorFormats) {
         if (codecColorFormat == supportedColorFormat) {
@@ -66,6 +85,18 @@ class MediaCodecUtils {
       }
     }
     return false;
+  }
+
+  static Map<String, String> getCodecProperties(VideoCodecType type, boolean highProfile) {
+    switch (type) {
+      case VP8:
+      case VP9:
+        return new HashMap<String, String>();
+      case H264:
+        return H264Utils.getDefaultH264Params(highProfile);
+      default:
+        throw new IllegalArgumentException("Unsupported codec: " + type);
+    }
   }
 
   private MediaCodecUtils() {

@@ -1569,7 +1569,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	@Override
 	protected void onPause() {
 		logDebug("onPause");
-		MegaApplication.activityPaused();
 		super.onPause();
 	}
 
@@ -1578,8 +1577,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		logDebug("onResume");
 		Util.setAppFontSize(this);
 		super.onResume();
-
-		MegaApplication.activityResumed();
 	}
 
 	@Override

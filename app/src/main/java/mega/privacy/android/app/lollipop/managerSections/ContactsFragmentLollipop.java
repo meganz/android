@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -60,6 +61,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -144,6 +146,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	private boolean success;
 
 	private MegaUser userQuery;
+
+	private AskForDisplayOverDialog askForDisplayOverDialog;
 
 	public void activateActionMode(){
 		logDebug("activateActionMode");
@@ -838,6 +842,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 			}
 		}
+
+		askForDisplayOverDialog = new AskForDisplayOverDialog(context);
 	}
 
 	public void checkScroll () {
@@ -940,7 +946,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			else if (dialogshown){
 				showAlertDialog(dialogTitleContent, dialogTextContent, success);
 			}
-
+            showAskForDisplayOverDialog();
 			return v;
 		}
 		else{
@@ -1027,12 +1033,31 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			else if (dialogshown){
 				showAlertDialog(dialogTitleContent, dialogTextContent, success);
 			}
-
+            showAskForDisplayOverDialog();
 			return v;
 		}			
 	}
 
-	public void setContacts(ArrayList<MegaUser> contacts){
+	private void showAskForDisplayOverDialog() {
+        if(askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.showDialog();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.recycle();
+        }
+	}
+
+    public void setContacts(ArrayList<MegaUser> contacts){
 		this.contacts = contacts;
 
 		visibleContacts.clear();

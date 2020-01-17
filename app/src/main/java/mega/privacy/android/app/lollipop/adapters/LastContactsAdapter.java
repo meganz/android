@@ -4,10 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -15,12 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
@@ -29,9 +23,6 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -40,6 +31,8 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 
 public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapter.ViewHolder> {
     
@@ -80,8 +73,6 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         
         View main = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_last_contacts,parent,false);
         ViewHolder holder = new ViewHolder(main);
-        holder.contactInitialLetter = main.findViewById(R.id.contact_list_initial_letter);
-        holder.contactInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
         holder.avatarImage = (ImageView)main.findViewById(R.id.item_last_contacts_avatar);
         holder.avatarImage.setOnClickListener(new View.OnClickListener() {
             
@@ -106,7 +97,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
             toContactInfo(contact);
         } else {
             Intent intentOpenChat = new Intent(context,ChatActivityLollipop.class);
-            intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+            intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
             intentOpenChat.putExtra("CHAT_ID",chat.getChatId());
             intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intentOpenChat);
@@ -144,7 +135,6 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
                     avatar.delete();
                     megaApi.getUserAvatar(contact,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
                 } else {
-                    holder.contactInitialLetter.setVisibility(View.GONE);
                     holder.avatarImage.setImageBitmap(bitmap);
                 }
             } else {
@@ -155,49 +145,15 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         }
         
     }
-    
-    public void setDefaultAvatar(MegaUser contact,ViewHolder holder) {
-        //Draw circle with color filled.
-        drawCircle(contact,holder);
-        //Set the first letter.
-        displayFirstLetter(contact,holder);
-    }
-    
-    private void drawCircle(MegaUser contact,ViewHolder holder) {
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        String color = megaApi.getUserAvatarColor(contact);
-        if (color != null) {
-            p.setColor(Color.parseColor(color));
-        } else {
-            p.setColor(ContextCompat.getColor(context,R.color.lollipop_primary_color));
-        }
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
-            radius = defaultAvatar.getWidth() / 2;
-        } else {
-            radius = defaultAvatar.getHeight() / 2;
-        }
-        c.drawCircle(defaultAvatar.getWidth() / 2,defaultAvatar.getHeight() / 2,radius,p);
-        holder.avatarImage.setImageBitmap(defaultAvatar);
-    }
-    
-    private void displayFirstLetter(MegaUser contact,ViewHolder holder) {
+
+    private void setDefaultAvatar(MegaUser contact,ViewHolder holder) {
+        int color = getColorAvatar(context, megaApi, contact);
         String fullName = getMegaUserNameDB(megaApi, context, contact);
-        String firstLetter = ChatUtil.getFirstLetter(fullName);
-        if(firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-            holder.contactInitialLetter.setVisibility(View.INVISIBLE);
-        }else {
-            holder.contactInitialLetter.setText(firstLetter);
-            holder.contactInitialLetter.setTextColor(Color.WHITE);
-            holder.contactInitialLetter.setVisibility(View.VISIBLE);
-            holder.contactInitialLetter.setTextSize(12);
-        }
-
+        Bitmap bitmap = getDefaultAvatar(context, color, fullName, AVATAR_SIZE, true);
+        holder.avatarImage.setImageBitmap(bitmap);
     }
 
+    
     @Override
     public int getItemCount() {
         return lastContacts.size();
