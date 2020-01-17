@@ -3706,6 +3706,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             changeStatusBarColorActionMode(chatActivity, getWindow(), handler, 0);
         }
 
+        private boolean hasMessagesRemoved(MegaChatMessage messageSelected){
+            if(removedMessages != null && !removedMessages.isEmpty()){
+                for(int i=0; i<removedMessages.size(); i++){
+                    if(messageSelected.getMsgId() == removedMessages.get(i).msgId){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             logDebug("onPrepareActionMode");
@@ -3713,7 +3724,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if (selected.size() !=0) {
 //                MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
                 if((chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RM||chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RO) && !chatRoom.isPreview()){
-
                     logDebug("Chat without permissions || without preview");
 
                     boolean showCopy = true;
@@ -3740,7 +3750,16 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     }
 
                     if (selected.size() == 1) {
-                        if(selected.get(0).isUploading()){
+                        if(hasMessagesRemoved(selected.get(0).getMessage())){
+                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
+                            importIcon.setVisible(false);
+
+                        }else if(selected.get(0).isUploading()){
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
@@ -3884,8 +3903,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         boolean showCopy = true;
                         boolean showForward = true;
                         boolean allNodeAttachments = true;
+                        boolean isRemoved = false;
 
                         for(int i=0; i<selected.size();i++) {
+
+                            if(hasMessagesRemoved(selected.get(i).getMessage())){
+                                isRemoved = true;
+                                break;
+                            }
 
                             if (!isUploading) {
                                 if (selected.get(i).isUploading()) {
@@ -3912,7 +3937,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                             }
                         }
 
-                        if (isUploading) {
+                        if (isUploading || isRemoved) {
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
