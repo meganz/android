@@ -296,7 +296,8 @@ public class ChatController {
         }
 
         logDebug("Delete normal message with status = "+message.getStatus());
-        if(message.getStatus() == MegaChatMessage.STATUS_SENDING){
+        if(message.getStatus() == MegaChatMessage.STATUS_SENDING && message.getMsgId() == megaApi.INVALID_HANDLE){
+
             messageToDelete = megaChatApi.deleteMessage(chatId, message.getTempId());
         }else{
             messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
