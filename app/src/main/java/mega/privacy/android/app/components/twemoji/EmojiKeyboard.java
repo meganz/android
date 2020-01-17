@@ -178,6 +178,15 @@ public class EmojiKeyboard extends LinearLayout {
         isLetterKeyboardShown = false;
         needToReplace();
     }
+    public void hideKeyboardFromFileStorage(){
+        hideEmojiKeyboard();
+        hideLetterKeyboard();
+        emojiIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_white));
+    }
+
+    public void showKeyboardFromFileStorage(){
+        emojiIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_emojicon));
+    }
 
     public void hideEmojiKeyboard() {
         if (!isEmojiKeyboardShown) return;

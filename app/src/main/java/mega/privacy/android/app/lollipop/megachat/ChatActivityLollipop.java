@@ -1006,9 +1006,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         inputTextLayout.setVisibility(View.GONE);
         separatorOptions.setVisibility(View.VISIBLE);
         voiceClipLayout.setVisibility(View.GONE);
-        emojiKeyboard.hideEmojiKeyboard();
-        emojiKeyboard.hideLetterKeyboard();
-        keyboardTwemojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_white));
+        emojiKeyboard.hideKeyboardFromFileStorage();
     }
 
     /*
@@ -1019,9 +1017,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         inputTextLayout.setVisibility(View.VISIBLE);
         separatorOptions.setVisibility(View.GONE);
         voiceClipLayout.setVisibility(View.VISIBLE);
-        keyboardTwemojiButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_emojicon));
+        if(emojiKeyboard != null)
+        emojiKeyboard.showKeyboardFromFileStorage();
     }
-
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){
         logDebug("initAfterIntent");
@@ -3323,6 +3321,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         Drawable currentDrawable = btn.getDrawable();
         Drawable emojiDrawable = getResources().getDrawable(R.drawable.ic_emojicon);
         Drawable keyboardDrawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
+
+
 
         if(areDrawablesIdentical(currentDrawable, emojiDrawable) && !emojiKeyboard.getEmojiKeyboardShown()){
             if(emojiKeyboard.getLetterKeyboardShown()){
