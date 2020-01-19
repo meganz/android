@@ -248,7 +248,7 @@ public final class EmojiManager {
     int num = emojis.size();
     return num;
   }
-  @NonNull List<EmojiRange> findAllEmojis(@Nullable final CharSequence text) {
+  public @NonNull List<EmojiRange> findAllEmojis(@Nullable final CharSequence text) {
     logDebug("findAllEmojis");
     final List<EmojiRange> result = new ArrayList<>();
     try {
@@ -275,6 +275,12 @@ public final class EmojiManager {
 
       Emoji emojiFounded = emojiMap.get(candidate.toString());
     return emojiFounded;
+  }
+  public Emoji getFirstEmoji(@NonNull final CharSequence candidate){
+    List<EmojiRange> emojis = findAllEmojis(candidate);
+    if(emojis.size() > 0) return emojis.get(0).emoji;
+    return null;
+
   }
   void verifyInstalled() {
     if (categories == null) {

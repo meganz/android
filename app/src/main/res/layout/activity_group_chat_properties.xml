@@ -66,12 +66,6 @@
                                 rounded:border_color="@color/border_file_properties"
                                 rounded:border_width="0dp"
                                 rounded:corner_radius="30dp" />
-
-                            <mega.privacy.android.app.components.twemoji.EmojiTextView
-                                android:id="@+id/chat_group_properties_initial_letter"
-                                android:layout_width="fill_parent"
-                                android:layout_height="fill_parent"
-                                android:gravity="center_horizontal|center_vertical"/>
                         </RelativeLayout>
 
                     </RelativeLayout>
@@ -82,31 +76,36 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="16dp">
-
-                        <mega.privacy.android.app.components.twemoji.EmojiTextView
-                            android:id="@+id/chat_group_contact_properties_info_title"
+                        <LinearLayout
+                            android:id="@+id/chat_group_contact_properties_info_title_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="left|center_vertical"
-                            android:textColor="@color/name_my_account"
-                            android:singleLine="true"
-                            android:maxLines="1"
-                            android:ellipsize="end"
-                            android:textSize="20sp" />
-
-                        <ImageView
-                            android:id="@+id/chat_group_contact_properties_edit_icon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_toRightOf="@+id/chat_group_contact_properties_info_title"
-                            android:src="@drawable/ic_rename_title" />
+                            android:layout_gravity="left"
+                            android:gravity="left|center_vertical"
+                            android:orientation="horizontal">
+                            <mega.privacy.android.app.components.twemoji.EmojiTextView
+                                android:id="@+id/chat_group_contact_properties_info_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/name_my_account"
+                                android:singleLine="true"
+                                android:maxLines="1"
+                                android:textSize="15sp"
+                                app:emojiSize="18sp"
+                                android:layout_marginRight="8dp"/>
+                            <ImageView
+                                android:id="@+id/chat_group_contact_properties_edit_icon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_rename_title" />
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/chat_group_contact_properties_info_participants"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="left|center_vertical"
-                            android:layout_below="@+id/chat_group_contact_properties_info_title"
+                            android:layout_below="@+id/chat_group_contact_properties_info_title_layout"
                             android:textColor="@color/mail_my_account"
                             android:textSize="14sp" />
 

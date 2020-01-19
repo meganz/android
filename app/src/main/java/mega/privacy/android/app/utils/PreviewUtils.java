@@ -156,20 +156,20 @@ public class PreviewUtils {
     }
 
     public static Bitmap getPreviewFromFolderFullImage(MegaNode node, Context context){
+		if (node == null) return null;
+
         Bitmap bmp = previewCache.get(node.getHandle());
         if(bmp == null) {
             File previewDir = getPreviewFolder(context);
             File preview = new File(previewDir, node.getBase64Handle()+".jpg");
-            if (preview.exists()){
-                if (preview.length() > 0){
-                    bmp = getBitmapForCacheFullImage(preview, context);
-                    if (bmp == null) {
-                        preview.delete();
-                    }
-                    else{
-                        previewCache.put(node.getHandle(), bmp);
-                    }
-                }
+            if (preview.exists() && preview.length() > 0){
+				bmp = getBitmapForCacheFullImage(preview, context);
+				if (bmp == null) {
+					preview.delete();
+				}
+				else{
+					previewCache.put(node.getHandle(), bmp);
+				}
             }
         }
         return bmp;

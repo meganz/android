@@ -14,14 +14,12 @@ import static org.webrtc.MediaCodecUtils.EXYNOS_PREFIX;
 import static org.webrtc.MediaCodecUtils.INTEL_PREFIX;
 import static org.webrtc.MediaCodecUtils.QCOM_PREFIX;
 
-import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
-import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecList;
 import android.os.Build;
-import java.util.Arrays;
+import android.support.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -41,48 +39,103 @@ public class HardwareVideoEncoderFactory implements VideoEncoderFactory {
   private static final List<String> H264_HW_EXCEPTION_MODELS =
       Arrays.asList("SAMSUNG-SGH-I337", "Nexus 7", "Nexus 4");
 
-  // Keys for H264 VideoCodecInfo properties.
-  private static final String H264_FMTP_PROFILE_LEVEL_ID = "profile-level-id";
-  private static final String H264_FMTP_LEVEL_ASYMMETRY_ALLOWED = "level-asymmetry-allowed";
-  private static final String H264_FMTP_PACKETIZATION_MODE = "packetization-mode";
-
-  // Supported H264 profile ids and levels.
-  private static final String H264_PROFILE_CONSTRAINED_BASELINE = "4200";
-  private static final String H264_PROFILE_CONSTRAINED_HIGH = "640c";
-  private static final String H264_LEVEL_3_1 = "1f"; // 31 in hex.
-  private static final String H264_CONSTRAINED_BASELINE_3_1 =
-      H264_PROFILE_CONSTRAINED_BASELINE + H264_LEVEL_3_1;
-  private static final String H264_CONSTRAINED_HIGH_3_1 =
-      H264_PROFILE_CONSTRAINED_HIGH + H264_LEVEL_3_1;
-
+  @Nullable private final EglBase14.Context sharedContext;
   private final boolean enableIntelVp8Encoder;
   private final boolean enableH264HighProfile;
+  @Nullable private final Predicate<MediaCodecInfo> codecAllowedPredicate;
 
-  public HardwareVideoEncoderFactory(boolean enableIntelVp8Encoder, boolean enableH264HighProfile) {
-    this.enableIntelVp8Encoder = enableIntelVp8Encoder;
-    this.enableH264HighProfile = enableH264HighProfile;
+  /**
+   * Creates a HardwareVideoEncoderFactory that supports surface texture encoding.
+   *
+   * @param sharedContext The textures generated will be accessible from this context. May be null,
+   *                      this disables texture support.
+   * @param enableIntelVp8Encoder true if Intel's VP8 encoder enabled.
+   * @param enableH264HighProfile true if H264 High Profile enabled.
+   */
+  public HardwareVideoEncoderFactory(
+      EglBase.Context sharedContext, boolean enableIntelVp8Encoder, boolean enableH264HighProfile) {
+    this(sharedContext, enableIntelVp8Encoder, enableH264HighProfile,
+        /* codecAllowedPredicate= */ null);
   }
 
+  /**
+   * Creates a HardwareVideoEncoderFactory that supports surface texture encoding.
+   *
+   * @param sharedContext The textures generated will be accessible from this context. May be null,
+   *                      this disables texture support.
+   * @param enableIntelVp8Encoder true if Intel's VP8 encoder enabled.
+   * @param enableH264HighProfile true if H264 High Profile enabled.
+   * @param codecAllowedPredicate optional predicate to filter codecs. All codecs are allowed
+   *                              when predicate is not provided.
+   */
+  public HardwareVideoEncoderFactory(EglBase.Context sharedContext, boolean enableIntelVp8Encoder,
+      boolean enableH264HighProfile, @Nullable Predicate<MediaCodecInfo> codecAllowedPredicate) {
+    // Texture mode requires EglBase14.
+    if (sharedContext instanceof EglBase14.Context) {
+      this.sharedContext = (EglBase14.Context) sharedContext;
+    } else {
+      Logging.w(TAG, "No shared EglBase.Context.  Encoders will not use texture mode.");
+      this.sharedContext = null;
+    }
+    this.enableIntelVp8Encoder = enableIntelVp8Encoder;
+    this.enableH264HighProfile = enableH264HighProfile;
+    this.codecAllowedPredicate = codecAllowedPredicate;
+  }
+
+  @Deprecated
+  public HardwareVideoEncoderFactory(boolean enableIntelVp8Encoder, boolean enableH264HighProfile) {
+    this(null, enableIntelVp8Encoder, enableH264HighProfile);
+  }
+
+  @Nullable
   @Override
   public VideoEncoder createEncoder(VideoCodecInfo input) {
+    // HW encoding is not supported below Android Kitkat.
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+      return null;
+    }
+
     VideoCodecType type = VideoCodecType.valueOf(input.name);
     MediaCodecInfo info = findCodecForType(type);
 
     if (info == null) {
-      return null; // No support for this type.
+      return null;
     }
 
     String codecName = info.getName();
     String mime = type.mimeType();
-    int colorFormat = MediaCodecUtils.selectColorFormat(
+    Integer surfaceColorFormat = MediaCodecUtils.selectColorFormat(
+        MediaCodecUtils.TEXTURE_COLOR_FORMATS, info.getCapabilitiesForType(mime));
+    Integer yuvColorFormat = MediaCodecUtils.selectColorFormat(
         MediaCodecUtils.ENCODER_COLOR_FORMATS, info.getCapabilitiesForType(mime));
 
-    return new HardwareVideoEncoder(codecName, type, colorFormat, getKeyFrameIntervalSec(type),
-        getForcedKeyFrameIntervalMs(type, codecName), createBitrateAdjuster(type, codecName));
+    if (type == VideoCodecType.H264) {
+      boolean isHighProfile = H264Utils.isSameH264Profile(
+          input.params, MediaCodecUtils.getCodecProperties(type, /* highProfile= */ true));
+      boolean isBaselineProfile = H264Utils.isSameH264Profile(
+          input.params, MediaCodecUtils.getCodecProperties(type, /* highProfile= */ false));
+
+      if (!isHighProfile && !isBaselineProfile) {
+        return null;
+      }
+      if (isHighProfile && !isH264HighProfileSupported(info)) {
+        return null;
+      }
+    }
+
+    return new HardwareVideoEncoder(new MediaCodecWrapperFactoryImpl(), codecName, type,
+        surfaceColorFormat, yuvColorFormat, input.params, getKeyFrameIntervalSec(type),
+        getForcedKeyFrameIntervalMs(type, codecName), createBitrateAdjuster(type, codecName),
+        sharedContext);
   }
 
   @Override
   public VideoCodecInfo[] getSupportedCodecs() {
+    // HW encoding is not supported below Android Kitkat.
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+      return new VideoCodecInfo[0];
+    }
+
     List<VideoCodecInfo> supportedCodecInfos = new ArrayList<VideoCodecInfo>();
     // Generate a list of supported codecs in order of preference:
     // VP8, VP9, H264 (high profile), and H264 (baseline profile).
@@ -91,17 +144,22 @@ public class HardwareVideoEncoderFactory implements VideoEncoderFactory {
       MediaCodecInfo codec = findCodecForType(type);
       if (codec != null) {
         String name = type.name();
+        // TODO(sakal): Always add H264 HP once WebRTC correctly removes codecs that are not
+        // supported by the decoder.
         if (type == VideoCodecType.H264 && isH264HighProfileSupported(codec)) {
-          supportedCodecInfos.add(new VideoCodecInfo(0, name, getCodecProperties(type, true)));
+          supportedCodecInfos.add(new VideoCodecInfo(
+              name, MediaCodecUtils.getCodecProperties(type, /* highProfile= */ true)));
         }
 
-        supportedCodecInfos.add(new VideoCodecInfo(0, name, getCodecProperties(type, false)));
+        supportedCodecInfos.add(new VideoCodecInfo(
+            name, MediaCodecUtils.getCodecProperties(type, /* highProfile= */ false)));
       }
     }
+
     return supportedCodecInfos.toArray(new VideoCodecInfo[supportedCodecInfos.size()]);
   }
 
-  private MediaCodecInfo findCodecForType(VideoCodecType type) {
+  private @Nullable MediaCodecInfo findCodecForType(VideoCodecType type) {
     for (int i = 0; i < MediaCodecList.getCodecCount(); ++i) {
       MediaCodecInfo info = null;
       try {
@@ -132,7 +190,7 @@ public class HardwareVideoEncoderFactory implements VideoEncoderFactory {
         == null) {
       return false;
     }
-    return isHardwareSupportedInCurrentSdk(info, type);
+    return isHardwareSupportedInCurrentSdk(info, type) && isMediaCodecAllowed(info);
   }
 
   // Returns true if the given MediaCodecInfo indicates a hardware module that is supported on the
@@ -180,6 +238,13 @@ public class HardwareVideoEncoderFactory implements VideoEncoderFactory {
                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
   }
 
+  private boolean isMediaCodecAllowed(MediaCodecInfo info) {
+    if (codecAllowedPredicate == null) {
+      return true;
+    }
+    return codecAllowedPredicate.test(info);
+  }
+
   private int getKeyFrameIntervalSec(VideoCodecType type) {
     switch (type) {
       case VP8: // Fallthrough intended.
@@ -221,23 +286,7 @@ public class HardwareVideoEncoderFactory implements VideoEncoderFactory {
   }
 
   private boolean isH264HighProfileSupported(MediaCodecInfo info) {
-    return enableH264HighProfile && info.getName().startsWith(QCOM_PREFIX);
-  }
-
-  private Map<String, String> getCodecProperties(VideoCodecType type, boolean highProfile) {
-    switch (type) {
-      case VP8:
-      case VP9:
-        return new HashMap<String, String>();
-      case H264:
-        Map<String, String> properties = new HashMap<>();
-        properties.put(H264_FMTP_LEVEL_ASYMMETRY_ALLOWED, "1");
-        properties.put(H264_FMTP_PACKETIZATION_MODE, "1");
-        properties.put(H264_FMTP_PROFILE_LEVEL_ID,
-            highProfile ? H264_CONSTRAINED_HIGH_3_1 : H264_CONSTRAINED_BASELINE_3_1);
-        return properties;
-      default:
-        throw new IllegalArgumentException("Unsupported codec: " + type);
-    }
+    return enableH264HighProfile && Build.VERSION.SDK_INT > Build.VERSION_CODES.M
+        && info.getName().startsWith(EXYNOS_PREFIX);
   }
 }
