@@ -5,7 +5,8 @@ local_c_includes := \
         $(LOCAL_PATH)/sdk/src/rtcModule/ \
         $(LOCAL_PATH)/sdk/src/strongvelope/ \
         $(LOCAL_PATH)/sdk/third-party/ \
-        $(LOCAL_PATH)/include
+        $(LOCAL_PATH)/include \
+        $(LOCAL_PATH)/webrtc/include/third_party/abseil-cpp
 
 ifneq ($(DISABLE_WEBRTC),true)
   LOCAL_PATH := $(call my-dir)

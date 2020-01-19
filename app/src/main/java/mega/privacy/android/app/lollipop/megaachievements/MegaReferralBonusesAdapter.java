@@ -36,11 +36,11 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 
 public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferralBonusesAdapter.ViewHolderReferralBonuses>{
 
@@ -89,10 +89,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 							}
 							else{
 								avatarExists = true;
-//								holder.imageView.setImageBitmap(bitmap);
 								holder.imageView.setImageBitmap(bitmap);
-
-								holder.contactInitialLetter.setVisibility(View.GONE);
 							}
 						}
 					}
@@ -134,8 +131,6 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 			super(v);
 		}
 
-    	TextView contactInitialLetter;
-//        ImageView imageView;
         TextView textViewContactName;
         TextView textViewStorage;
 		TextView textViewTransfer;
@@ -165,7 +160,6 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		holderList = new ViewHolderReferralBonusesList(v);
 		holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.referral_bonus_item_layout);
 		holderList.imageView = (RoundedImageView) v.findViewById(R.id.referral_bonus_thumbnail);
-		holderList.contactInitialLetter = (TextView) v.findViewById(R.id.referral_bonus_initial_letter);
 		holderList.textViewContactName = (TextView) v.findViewById(R.id.referral_bonus_name);
 		holderList.textViewStorage = (TextView) v.findViewById(R.id.referral_bonus_storage);
 		holderList.textViewTransfer = (TextView) v.findViewById(R.id.referral_bonus_transfer);
@@ -191,7 +185,6 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 	public void onBindViewHolder(ViewHolderReferralBonuses holder, int position) {
 		logDebug("onBindViewHolderList");
 		((ViewHolderReferralBonusesList)holder).imageView.setImageBitmap(null);
-		holder.contactInitialLetter.setText("");
 
 		ReferralBonus referralBonus = (ReferralBonus) getItem(position);
 		holder.contactMail = referralBonus.getEmails().get(0);
@@ -223,7 +216,8 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 
 		holder.itemLayout.setBackgroundColor(Color.WHITE);
 
-		createDefaultAvatar(holder, contact, fullName);
+		Bitmap defaultAvatar = getDefaultAvatar(context, getColorAvatar(context, megaApi, contact), fullName, AVATAR_SIZE, true);
+		((ViewHolderReferralBonusesList)holder).imageView.setImageBitmap(defaultAvatar);
 
 		UserAvatarListenerList listener = new UserAvatarListenerList(context, ((ViewHolderReferralBonusesList)holder), this);
 
@@ -241,7 +235,6 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
                 }
 				else{
 					logDebug("Do not ask for user avatar - its in cache: " + avatar.getAbsolutePath());
-					holder.contactInitialLetter.setVisibility(View.GONE);
 					((ViewHolderReferralBonusesList)holder).imageView.setImageBitmap(bitmap);
 				}
 			}
@@ -270,74 +263,6 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		}
 
 //		holder.imageButtonThreeDots.setTag(holder);
-	}
-
-	public void createDefaultAvatar(ViewHolderReferralBonuses holder, MegaUser contact, String fullName){
-		logDebug("createDefaultAvatar()");
-
-		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		String color = megaApi.getUserAvatarColor(contact);
-		if(color!=null){
-			logDebug("The color to set the avatar is " + color);
-			p.setColor(Color.parseColor(color));
-		}
-		else{
-			logDebug("Default color to the avatar");
-			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-		}
-
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		((ViewHolderReferralBonusesList)holder).imageView.setImageBitmap(defaultAvatar);
-
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-		display.getMetrics(outMetrics);
-		float density  = context.getResources().getDisplayMetrics().density;
-
-		int avatarTextSize = getAvatarTextSize(density);
-		logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
-
-		String firstLetter = fullName.charAt(0) + "";
-		firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-		holder.contactInitialLetter.setText(firstLetter);
-		holder.contactInitialLetter.setTextColor(Color.WHITE);
-		holder.contactInitialLetter.setVisibility(View.VISIBLE);
-
-		holder.contactInitialLetter.setTextSize(24);
-	}
-
-	private int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
-		}
-
-		return (int)textSize;
 	}
 
 	@Override

@@ -23,15 +23,6 @@
             rounded:border_color="@color/border_file_properties"
             rounded:border_width="0dp"
             rounded:corner_radius="30dp" />
-
-        <mega.privacy.android.app.components.twemoji.EmojiTextView
-            android:id="@+id/recent_chat_list_initial_letter"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:gravity="center_horizontal|center_vertical"
-            android:textSize="22sp" />
-
     </RelativeLayout>
 
     <RelativeLayout
@@ -68,6 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
+                rounded:emojiSize="14sp"
                 android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="13dp"
@@ -137,6 +129,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:textSize="14sp"
+                rounded:emojiSize="12sp"
                 android:singleLine="true"
                 android:maxLines="1"
                 android:textColor="@color/accentColor"

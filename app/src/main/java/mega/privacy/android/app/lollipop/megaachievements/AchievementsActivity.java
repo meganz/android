@@ -15,7 +15,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -308,13 +310,22 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         }
     }
 
-    public void showInviteConfirmationDialog(){
+    public void showInviteConfirmationDialog(String contentText){
         logDebug("showInviteConfirmationDialog");
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        View dialoglayout = inflater.inflate(R.layout.dialog_invite_friends_achievement, null);
-        builder.setView(dialoglayout);
+        View dialogLayout = inflater.inflate(R.layout.dialog_invite_friends_achievement, null);
+        TextView content = dialogLayout.findViewById(R.id.invite_content);
+        content.setText(contentText);
+        Button closeButton = dialogLayout.findViewById(R.id.close_btn);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                successDialog.dismiss();
+            }
+        });
+        builder.setView(dialogLayout);
         successDialog = builder.create();
         successDialog.show();
     }
@@ -331,10 +342,13 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_GET_CONTACTS && resultCode == RESULT_OK && data != null) {
-            //TODO for future use, after PR 1081 been merged.
             String email = data.getStringExtra(InviteContactActivity.KEY_SENT_EMAIL);
             int sentNumber = data.getIntExtra(InviteContactActivity.KEY_SENT_NUMBER, 1);
-            showInviteConfirmationDialog();
+            if(sentNumber > 1) {
+                showInviteConfirmationDialog(getString(R.string.invite_sent_text_multi));
+            } else {
+                showInviteConfirmationDialog(getString(R.string.invite_sent_text, email));
+            }
         }
     }
 }
