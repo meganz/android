@@ -649,9 +649,9 @@ public class NodeController {
             checker.setNodeController(this);
             checker.setDownloadInfo(downloadInfo);
             if (checker.check()) {
-                downloadToSDCard = true;
                 downloadRoot = checker.getDownloadRoot();
                 sdCardOperator = checker.getSdCardOperator();
+                downloadToSDCard = (downloadRoot != null);
             } else {
                 return;
             }
@@ -1718,9 +1718,9 @@ public class NodeController {
             checker.setDocument(currentDocument);
             checker.setUrl(url);
             if (checker.check()) {
-                downloadToSDCard = true;
                 downloadRoot = checker.getDownloadRoot();
                 sdCardOperator = checker.getSdCardOperator();
+                downloadToSDCard = (downloadRoot != null);
             } else {
                 return;
             }
