@@ -8656,10 +8656,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (!isOnline(this)){
 				showOfflineMode();
 			}
-			else{
-				backToDrawerItem(bottomNavigationCurrentItem);
-			}
-
+			backToDrawerItem(bottomNavigationCurrentItem);
 			return;
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
