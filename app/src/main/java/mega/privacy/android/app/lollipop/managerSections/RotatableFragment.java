@@ -56,7 +56,7 @@ public abstract class RotatableFragment extends Fragment {
         updateActionModeTitle();
     }
 
-    private void reSelectUnhandeldItem() {
+    public void reSelectUnhandeldItem() {
         if (unHandledItem == -1) {
             return;
         }
@@ -65,6 +65,7 @@ public abstract class RotatableFragment extends Fragment {
             return;
         }
         reselectUnHandled(transferPosition(unHandledItem, adapter));
+        unHandledItem = -1;
     }
 
     private int transferPosition(int originalPosition, RotatableAdapter adapter) {
