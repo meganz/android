@@ -1006,6 +1006,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 							}
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(ANIMATION_DURATION).start();
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -1017,6 +1018,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
 				bottomLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
 
 		}
