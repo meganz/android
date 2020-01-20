@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--Samsung white-->
-<resources>
-    <dimen name="width_passwd_shape">52dp</dimen>
-
-    <!--<dimen name="width_qr">48dp</dimen>
-    <dimen name="start_avatar_qr">177px</dimen>
-    <dimen name="end_avatar_qr">323px</dimen>-->
-</resources>

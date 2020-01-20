@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,13 +21,14 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -37,8 +39,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SMSVerificationActivity;
-import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -52,7 +53,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
-import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.*;
 
 
 public class LoginActivityLollipop extends BaseActivity implements MegaRequestListenerInterface {
@@ -269,12 +269,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-                getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
-
-//				getFragmentManager()
-//						.beginTransaction()
-//						.attach(loginFragment)
-//						.commit();
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
             }
             case CHOOSE_ACCOUNT_FRAGMENT: {
@@ -287,12 +282,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, chooseAccountFragment);
                 ft.commitNowAllowingStateLoss();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-                }
+
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
             }
             case CREATE_ACCOUNT_FRAGMENT: {
@@ -305,12 +296,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, createAccountFragment);
                 ft.commitNowAllowingStateLoss();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
-                }
+
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
 
             }
@@ -327,26 +314,14 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 break;
             }
             case CONFIRM_EMAIL_FRAGMENT: {
-
                 if (confirmEmailFragment == null) {
                     confirmEmailFragment = new ConfirmEmailFragmentLollipop();
-                    if ((passwdTemp != null) && (emailTemp != null)) {
-                        confirmEmailFragment.setEmailTemp(emailTemp);
-                        confirmEmailFragment.setPasswdTemp(passwdTemp);
-                        confirmEmailFragment.setFirstNameTemp(firstNameTemp);
-//						emailTemp = null;
-//						passwdTemp = null;
-//						nameTemp = null;
-                    }
-                } else {
-                    if ((passwdTemp != null) && (emailTemp != null)) {
-                        confirmEmailFragment.setEmailTemp(emailTemp);
-                        confirmEmailFragment.setPasswdTemp(passwdTemp);
-                        confirmEmailFragment.setFirstNameTemp(firstNameTemp);
-//						emailTemp = null;
-//						passwdTemp = null;
-//						nameTemp = null;
-                    }
+                }
+
+                if (passwdTemp != null && emailTemp != null) {
+                    confirmEmailFragment.setEmailTemp(emailTemp);
+                    confirmEmailFragment.setPasswdTemp(passwdTemp);
+                    confirmEmailFragment.setFirstNameTemp(firstNameTemp);
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -354,13 +329,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.commitNowAllowingStateLoss();
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
-                }
 
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
             }
         }
@@ -670,12 +640,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         };
 
         android.support.v7.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        } else {
-            builder = new android.support.v7.app.AlertDialog.Builder(this);
-        }
-
+        builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
     }
@@ -718,12 +683,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         };
 
         android.support.v7.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        } else {
-            builder = new android.support.v7.app.AlertDialog.Builder(this);
-        }
-
+        builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
     }
@@ -894,25 +854,41 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            if (visibleFragment == LOGIN_FRAGMENT) {
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
-            }
+        if (visibleFragment == LOGIN_FRAGMENT) {
+            changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color_secondary);
         }
+    }
+
+    public void setKeyboardVisibilityListener(final OnKeyboardVisibilityListener onKeyboardVisibilityListener) {
+        final View parentView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+        parentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            private boolean alreadyOpen;
+            private final int defaultKeyboardHeightDP = 100;
+            private final int EstimatedKeyboardDP = defaultKeyboardHeightDP + (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 48 : 0);
+            private final Rect rect = new Rect();
+
+            @Override
+            public void onGlobalLayout() {
+                int estimatedKeyboardHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, EstimatedKeyboardDP, parentView.getResources().getDisplayMetrics());
+                parentView.getWindowVisibleDisplayFrame(rect);
+                int heightDiff = parentView.getRootView().getHeight() - (rect.bottom - rect.top);
+                boolean isShown = heightDiff >= estimatedKeyboardHeight;
+
+                if (isShown == alreadyOpen) {
+                    return;
+                }
+                alreadyOpen = isShown;
+                onKeyboardVisibilityListener.onVisibilityChanged(isShown);
+            }
+        });
     }
 
     public void hideAB(){
         if (aB != null){
             aB.hide();
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
-        }
+
+        changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
     }
 }

@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
@@ -448,9 +449,11 @@ public class BaseActivity extends AppCompatActivity {
                 break;
             case COPYRIGHT_ACCOUNT_BLOCK:
                 showErrorAlertDialog(getString(R.string.account_suspended_breache_ToS), false, this);
+                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
                 break;
             case MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK:
                 showErrorAlertDialog(getString(R.string.account_suspended_multiple_breaches_ToS), false, this);
+                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
                 break;
             case SMS_VERIFICATION_ACCOUNT_BLOCK:
                 if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed()) return;

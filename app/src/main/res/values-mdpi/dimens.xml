@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="width_passwd_shape">52dp</dimen>
-
-    <!--<dimen name="width_qr">72dp</dimen>
-    <dimen name="start_avatar_qr">88dp</dimen>
-    <dimen name="end_avatar_qr">162dp</dimen>-->
-</resources>

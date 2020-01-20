@@ -4,17 +4,21 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,25 +32,26 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class ConfirmEmailFragmentLollipop extends Fragment implements MegaRequestListenerInterface, View.OnClickListener {
 
-	Context context;
+	private Context context;
 
-	MegaApiAndroid megaApi;
+	private MegaApiAndroid megaApi;
 
-	String emailTemp = null;
-	String passwdTemp = null;
-	String firstNameTemp = null;
+	private String emailTemp = null;
+	private String passwdTemp = null;
+	private String firstNameTemp = null;
 
-	ImageView icon;
-	EditText et_newEmail;
-	Button resendButton;
-	Button cancelButton;
-	TextView awaiting;
-	TextView explanation;
-	TextView mispelled;
+	private TextInputLayout newEmailLayout;
+	private TextInputEditText newEmail;
+	private ImageView errorNewEmail;
+	private TextView misspelt;
+	private Button resendButton;
+	private Button cancelButton;
 
 	@Override
 	public void onAttach(Activity context) {
@@ -78,21 +83,35 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
-//		megaApi.sendSignupLink("signuplink3@yopmail.com", nameTemp, passwdTemp, this);
-
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 
 		View v = inflater.inflate(R.layout.fragment_confirm_email, container, false);
 
-		icon = (ImageView) v.findViewById(R.id.confirm_email_icon);
-		awaiting = (TextView) v.findViewById(R.id.confirm_email_awaiting);
-		explanation = (TextView) v.findViewById(R.id.confirm_email_explanation);
-		et_newEmail = (EditText) v.findViewById(R.id.confirm_email_new_email);
-		mispelled = (TextView) v.findViewById(R.id.confirm_email_misspelled);
-		resendButton = (Button) v.findViewById(R.id.confirm_email_new_email_resend);
-		cancelButton = (Button) v.findViewById(R.id.confirm_email_cancel);
+		newEmailLayout = v.findViewById(R.id.confirm_email_new_email_layout);
+		newEmail = v.findViewById(R.id.confirm_email_new_email);
+		newEmail.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				quitEmailError();
+			}
+		});
+		errorNewEmail = v.findViewById(R.id.confirm_email_new_email_error_icon);
+		errorNewEmail.setVisibility(View.GONE);
+		misspelt = v.findViewById(R.id.confirm_email_misspelled);
+		resendButton = v.findViewById(R.id.confirm_email_new_email_resend);
+		cancelButton = v.findViewById(R.id.confirm_email_cancel);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			resendButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
@@ -112,11 +131,11 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 		} else {
 			result = Html.fromHtml(textMispelled);
 		}
-		mispelled.setText(result);
+		misspelt.setText(result);
 
-		et_newEmail.setCursorVisible(true);
-		et_newEmail.setText(emailTemp);
-		et_newEmail.requestFocus();
+		newEmail.setCursorVisible(true);
+		newEmail.setText(emailTemp);
+		newEmail.requestFocus();
 
 		resendButton.setOnClickListener(this);
 		cancelButton.setOnClickListener(this);
@@ -186,8 +205,7 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 
 		switch (v.getId()){
 			case R.id.confirm_email_new_email_resend:{
-				((LoginActivityLollipop)context).setEmailTemp(et_newEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
-				megaApi.sendSignupLink(et_newEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim(), firstNameTemp, passwdTemp, this);
+				submitForm();
 				break;
 			}
 			case R.id.confirm_email_cancel:{
@@ -196,5 +214,53 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 				break;
 			}
 		}
+	}
+
+	private void submitForm() {
+		if (!validateForm()) {
+			return;
+		}
+
+		InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(newEmail.getWindowToken(), 0);
+
+		if (!isOnline(context)) {
+			((LoginActivityLollipop) context).showSnackbar(getString(R.string.error_server_connection_problem));
+			return;
+		}
+
+		String email = newEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim();
+		((LoginActivityLollipop) context).setEmailTemp(email);
+		megaApi.sendSignupLink(email, firstNameTemp, passwdTemp, this);
+	}
+
+	private boolean validateForm() {
+		String emailError = getEmailError();
+
+		if (emailError != null && !emailError.isEmpty()) {
+			newEmailLayout.setError(emailError);
+			newEmailLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+			errorNewEmail.setVisibility(View.VISIBLE);
+			return false;
+		}
+
+		return true;
+	}
+
+	private String getEmailError() {
+		String value = newEmail.getText().toString();
+		if (value.length() == 0) {
+			return getString(R.string.error_enter_email);
+		}
+		if (!EMAIL_ADDRESS.matcher(value).matches()) {
+			return getString(R.string.error_invalid_email);
+		}
+		return null;
+	}
+
+	private void quitEmailError() {
+		newEmailLayout.setError(null);
+		newEmailLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
+		errorNewEmail.setVisibility(View.GONE);
 	}
 }
