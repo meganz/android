@@ -604,20 +604,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             MegaNodeAdapter.ViewHolderBrowserGrid holderGrid = (MegaNodeAdapter.ViewHolderBrowserGrid)holder;
             onBindViewHolderGrid(holderGrid,position);
         }
-        listFragment.post(
-                () -> {
-                    try {
-                        if (takenDownDialog != null && takenDownDialog.isShowing()) {
-                            return;
-                        }
-                        if (unHandledItem != -1) {
-                            listFragment.findViewHolderForAdapterPosition(unHandledItem).itemView.performClick();
-                        }
-                    } catch (Exception ex) {
-                        logError("Exception happens: " + ex.toString());
-                    }
-                }
-        );
+        reSelectUnhandledNode();
     }
 
     public void onBindViewHolderGrid(ViewHolderBrowserGrid holder,int position) {
@@ -1538,6 +1525,26 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         takenDownDialog = dialog;
 
         dialog.show();
+    }
+
+    private void reSelectUnhandledNode() {
+        if (unHandledItem == -1) {
+            return;
+        }
+
+        listFragment.postDelayed(
+                () -> {
+                    if (takenDownDialog != null && takenDownDialog.isShowing()) {
+                        return;
+                    }
+
+                    try {
+                        listFragment.findViewHolderForAdapterPosition(unHandledItem).itemView.performClick();
+                    } catch (Exception ex) {
+                        logError("Exception happens: " + ex.toString());
+                    }
+                }, 100
+        );
     }
 
     public void clearTakenDownDialog() {
