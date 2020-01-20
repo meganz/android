@@ -1494,14 +1494,11 @@ public class Util {
 			}
 		}
 	}
-    public static Bitmap createAvatarBackground(String colorString) {
+    public static Bitmap createAvatarBackground(int color) {
         Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(circle);
         Paint paintCircle = new Paint();
         paintCircle.setAntiAlias(true);
-        int color = (colorString == null) ?
-                ContextCompat.getColor(context, R.color.lollipop_primary_color) :
-                Color.parseColor(colorString);
         paintCircle.setColor(color);
         int radius = circle.getWidth() / 2;
         c.drawCircle(radius, radius, radius, paintCircle);
