@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -375,6 +376,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private AlertDialog locationDialog;
     private boolean isLocationDialogShown = false;
+    private RelativeLayout inputTextLayout;
+    private LinearLayout separatorOptions;
 
     /*Voice clips*/
     private String outputFileVoiceNotes = null;
@@ -387,6 +390,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private TextView bubbleText;
     private RecordView recordView;
     private FrameLayout fragmentVoiceClip;
+    private RelativeLayout voiceClipLayout;
 
     private boolean isShareLinkDialogDismissed = false;
 
@@ -610,6 +614,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         fragmentContainer = findViewById(R.id.fragment_container_chat);
         writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
+        inputTextLayout = findViewById(R.id.write_layout);
+        separatorOptions = findViewById(R.id.separator_layout_options);
 
         titleToolbar.setText("");
         individualSubtitleToobar.setText("");
@@ -673,6 +679,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         sendIcon.setEnabled(true);
 
         //Voice clip elements
+        voiceClipLayout =  findViewById(R.id.voice_clip_layout);
         fragmentVoiceClip = findViewById(R.id.fragment_voice_clip);
         recordLayout = findViewById(R.id.layout_button_layout);
         recordButtonLayout = findViewById(R.id.record_button_layout);
@@ -692,12 +699,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         bubbleText.setMaxWidth(px2dp(MAX_WIDTH_BUBBLE, outMetrics));
         recordButton.setRecordView(recordView);
         myAudioRecorder = new MediaRecorder();
+        showInputText();
 
         //Input text:
         handlerKeyboard = new Handler();
         handlerEmojiKeyboard = new Handler();
-
-
 
         emojiKeyboard = findViewById(R.id.emojiView);
         emojiKeyboard.init(this, textChat, keyboardTwemojiButton);
@@ -888,10 +894,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         });
 
         messageJumpLayout.setOnClickListener(this);
-        fragmentContainerFileStorage = findViewById(R.id.fragment_container_file_storage);
-        fileStorageLayout = findViewById(R.id.relative_layout_file_storage);
-        fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
 
         listView = findViewById(R.id.messages_chat_list_view);
         listView.setClipToPadding(false);
@@ -988,12 +990,36 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private void hideFileStorage() {
         if ((!fileStorageLayout.isShown())) return;
+        showInputText();
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
         placeRecordButton(RECORD_BUTTON_DEACTIVATED);
         if (fileStorageF == null) return;
         fileStorageF.clearSelections();
         fileStorageF.hideMultipleSelect();
+    }
+
+    /*
+     * Hide input text when file storage is shown
+     */
+
+    private void hideInputText(){
+        inputTextLayout.setVisibility(View.GONE);
+        separatorOptions.setVisibility(View.VISIBLE);
+        voiceClipLayout.setVisibility(View.GONE);
+       if(emojiKeyboard!=null)
+        emojiKeyboard.hideKeyboardFromFileStorage();
+    }
+
+    /*
+     * Show input text when file storage is hidden
+     */
+
+    private void showInputText(){
+        inputTextLayout.setVisibility(View.VISIBLE);
+        separatorOptions.setVisibility(View.GONE);
+        voiceClipLayout.setVisibility(View.VISIBLE);
+
     }
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){
@@ -3191,25 +3217,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             case R.id.rl_keyboard_twemoji_chat:{
                 logDebug("keyboard_icon_chat");
                 hideFileStorage();
-
                 if(emojiKeyboard==null) break;
-
-                    if(emojiKeyboard.getLetterKeyboardShown()){
-                        emojiKeyboard.hideLetterKeyboard();
-                        handlerKeyboard.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                emojiKeyboard.showEmojiKeyboard();
-                            }
-                        },250);
-
-                    }
-                    else if(emojiKeyboard.getEmojiKeyboardShown()){
-                        emojiKeyboard.showLetterKeyboard();
-                    }
-                    else{
-                        emojiKeyboard.showEmojiKeyboard();
-                    }
+                changeKeyboard(keyboardTwemojiButton);
                 break;
             }
 
@@ -3231,6 +3240,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 logDebug("file storage icon ");
                 if (fileStorageLayout.isShown()) {
                     hideFileStorage();
+                    if(emojiKeyboard != null) emojiKeyboard.changeKeyboardIcon(false);
                 } else {
                     if ((emojiKeyboard != null) && (emojiKeyboard.getLetterKeyboardShown())) {
                         emojiKeyboard.hideBothKeyboard(this);
@@ -3310,6 +3320,27 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
+    private void changeKeyboard(ImageButton btn){
+        Drawable currentDrawable = btn.getDrawable();
+        Drawable emojiDrawable = getResources().getDrawable(R.drawable.ic_emojicon);
+        Drawable keyboardDrawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
+        if(areDrawablesIdentical(currentDrawable, emojiDrawable) && !emojiKeyboard.getEmojiKeyboardShown()){
+            if(emojiKeyboard.getLetterKeyboardShown()){
+                emojiKeyboard.hideLetterKeyboard();
+                handlerKeyboard.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        emojiKeyboard.showEmojiKeyboard();
+                    }
+                },250);
+            }else{
+                emojiKeyboard.showEmojiKeyboard();
+            }
+        }else if(areDrawablesIdentical(currentDrawable, keyboardDrawable) && !emojiKeyboard.getLetterKeyboardShown()){
+            emojiKeyboard.showLetterKeyboard();
+        }
+    }
+
     public void sendFromCloud(){
         attachFromCloud();
     }
@@ -3365,6 +3396,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         logDebug("attachFromFileStorage");
         fileStorageF = ChatFileStorageFragment.newInstance();
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF").commitNowAllowingStateLoss();
+        hideInputText();
         fileStorageLayout.setVisibility(View.VISIBLE);
         pickFileStorageButton.setImageResource(R.drawable.ic_g_select_image);
         placeRecordButton(RECORD_BUTTON_DEACTIVATED);
@@ -8353,19 +8385,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         }
     }
-
-
-    public void hideFileStorageSection(){
-        logDebug("hideFileStorageSEctocioon");
-        if (fileStorageF != null) {
-            fileStorageF.clearSelections();
-            fileStorageF.hideMultipleSelect();
-        }
-        fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
-    }
-
-
 
     public void setShareLinkDialogDismissed (boolean dismissed) {
         isShareLinkDialogDismissed = dismissed;
