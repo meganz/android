@@ -142,14 +142,6 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //orientation changes
-        if (savedInstanceState != null) {
-            isGetContactCompleted = savedInstanceState.getBoolean(KEY_IS_GET_CONTACT_COMPLETED, false);
-            fromAchievement = savedInstanceState.getBoolean(KEY_FROM, false);
-        } else {
-            fromAchievement = getIntent().getBooleanExtra(KEY_FROM, false);
-        }
-        logDebug("Request by Achievement: " + fromAchievement);
         dbH = DatabaseHandler.getDbHandler(this);
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
         Display display = getWindowManager().getDefaultDisplay();
@@ -236,7 +228,14 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         progressBar = findViewById(R.id.add_contact_progress_bar);
         progressBar = findViewById(R.id.invite_contact_progress_bar);
         refreshInviteContactButton();
-
+        //orientation changes
+        if (savedInstanceState != null) {
+            isGetContactCompleted = savedInstanceState.getBoolean(KEY_IS_GET_CONTACT_COMPLETED, false);
+            fromAchievement = savedInstanceState.getBoolean(KEY_FROM, false);
+        } else {
+            fromAchievement = getIntent().getBooleanExtra(KEY_FROM, false);
+        }
+        logDebug("Request by Achievement: " + fromAchievement);
         if (isGetContactCompleted) {
             phoneContacts = savedInstanceState.getParcelableArrayList(KEY_PHONE_CONTACTS);
             megaContacts = savedInstanceState.getParcelableArrayList(KEY_MEGA_CONTACTS);
@@ -796,6 +795,8 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
             // no need to invite the contacts that has already been on MEGA to get invitation bonus.
             if (!fromAchievement) {
                 getMegaContact();
+            } else {
+                isGetContactCompleted = true;
             }
         }
     }

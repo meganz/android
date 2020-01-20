@@ -30,7 +30,8 @@
                 android:textAllCaps="true"
                 android:layout_marginRight="21dp"
                 android:layout_centerHorizontal="true"
-                android:textSize="16dp"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
                 android:textColor="@color/copyright_text"/>
 
             <TableLayout
@@ -162,15 +163,8 @@
 
                             <TextView
                                 android:id="@+id/title_referral_bonuses"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentTop="true"
                                 android:text="@string/title_referral_bonuses"
-                                android:layout_marginRight="21dp"
-                                android:layout_marginBottom="14dp"
-                                android:textSize="16dp"
-                                android:singleLine="false"
-                                android:textColor="@color/name_my_account"/>
+                                style="@style/achievements_subtitle"/>
 
                             <TextView
                                 android:id="@+id/zero_figures_referral_bonuses_text"
@@ -259,7 +253,7 @@
                                 android:minWidth="0dp"
                                 android:minHeight="0dp"
                                 android:stateListAnimator="@null"
-                                android:text="@string/button_invite_friends"
+                                android:text="@string/contact_invite"
                                 android:textColor="@color/accentColor" />
                         </RelativeLayout>
                     </LinearLayout>
@@ -429,16 +423,8 @@
 
                             <TextView
                                 android:id="@+id/title_install_app"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentTop="true"
                                 android:text="@string/title_install_app"
-                                 android:layout_marginBottom="14dp"
-                                android:textSize="16dp"
-                                android:singleLine="false"
-                                android:maxLines="2"
-                                android:ellipsize="end"
-                                android:textColor="@color/name_my_account"/>
+                                style="@style/achievements_subtitle"/>
 
                             <TextView
                                 android:id="@+id/zero_figures_install_app_text"
@@ -569,16 +555,8 @@
                             android:layout_marginBottom="16dp">
                             <TextView
                                 android:id="@+id/title_add_phone"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentTop="true"
-                                android:layout_marginBottom="14dp"
-                                android:ellipsize="end"
-                                android:maxLines="2"
-                                android:singleLine="false"
                                 android:text="@string/title_add_phone"
-                                android:textColor="@color/name_my_account"
-                                android:textSize="16dp"/>
+                                style="@style/achievements_subtitle"/>
                             <TextView
                                 android:id="@+id/zero_figures_add_phone_text"
                                 android:layout_width="wrap_content"
@@ -692,17 +670,8 @@
 
                             <TextView
                                 android:id="@+id/title_registration"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentTop="true"
                                 android:text="@string/title_regitration"
-                                android:layout_marginRight="21dp"
-                                android:layout_marginBottom="14dp"
-                                android:singleLine="false"
-                                android:maxLines="2"
-                                android:ellipsize="end"
-                                android:textSize="16dp"
-                                android:textColor="@color/name_my_account"/>
+                                style="@style/achievements_subtitle"/>
 
                             <LinearLayout
                                 android:id="@+id/figures_registration_layout"
@@ -830,17 +799,8 @@
 
                             <TextView
                                 android:id="@+id/title_install_desktop"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentTop="true"
                                 android:text="@string/title_install_desktop"
-                                android:layout_marginRight="21dp"
-                                android:layout_marginBottom="14dp"
-                                android:textSize="16dp"
-                                android:singleLine="false"
-                                android:maxLines="2"
-                                android:ellipsize="end"
-                                android:textColor="@color/name_my_account"/>
+                                style="@style/achievements_subtitle"/>
 
                             <TextView
                                 android:id="@+id/zero_figures_install_desktop_text"

@@ -185,7 +185,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         }
         else if(visibleFragment==INVITE_FRIENDS_FRAGMENT){
 
-            aB.setTitle(getString(R.string.button_invite_friends));
+            aB.setTitle(getString(R.string.title_referral_bonuses));
             if(inviteFriendsFragment==null){
                 inviteFriendsFragment = new InviteFriendsFragment();
             }

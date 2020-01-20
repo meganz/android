@@ -343,4 +343,17 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/mail_my_account</item>
     </style>
+
+    <style name="achievements_subtitle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">#DE000000</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:layout_marginRight">21dp</item>
+        <item name="android:layout_marginBottom">14dp</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:ellipsize">end</item>
+    </style>
 </resources>

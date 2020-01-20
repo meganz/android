@@ -1612,8 +1612,6 @@
     <string name="achievements_title" context="title of the section for achievements">Achievements</string>
     <string name="achievements_subtitle" context="subtitle of the section for achievements">Invite friends and get rewards</string>
 
-    <string name="button_invite_friends" context="button to invite friends for getting achievements">Invite</string>
-
     <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">Get %1$s of storage and %2$s of transfers for each referral</string>
 
     <string name="figures_achievements_text" context="sentence to detail the figures of storage and transfer quota related to each achievement">Get %1$s of storage and %2$s of transfers</string>
