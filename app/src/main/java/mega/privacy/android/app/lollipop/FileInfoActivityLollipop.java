@@ -35,7 +35,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
-import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -77,6 +76,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.adapters.MegaFileInfoSharedContactLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -107,6 +107,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -118,7 +119,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 @SuppressLint("NewApi")
-public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
+public class FileInfoActivityLollipop extends DownloadableActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
 
 	public static int MAX_WIDTH_FILENAME_LAND=400;
 	public static int MAX_WIDTH_FILENAME_LAND_2=400;
@@ -231,11 +232,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	RelativeLayout ownerLayout;
 	LinearLayout ownerLinear;
-	TextView ownerLabel;
+	EmojiTextView ownerLabel;
 	TextView ownerLabelowner;
 	TextView ownerInfo;
 	ImageView ownerRoundeImage;
-	TextView ownerLetter;
 	ImageView ownerState;
 
 	MenuItem downloadMenuItem;
@@ -273,7 +273,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	public static int REQUEST_CODE_SELECT_CONTACT = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
-	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 
 	Display display;
 	DisplayMetrics outMetrics;
@@ -626,34 +625,20 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         //Owner Layout
         ownerLayout = (RelativeLayout) findViewById(R.id.file_properties_owner_layout);
         ownerRoundeImage= (RoundedImageView) findViewById(R.id.contact_list_thumbnail);
-        ownerLetter = (TextView) findViewById(R.id.contact_list_initial_letter);
-
         ownerLinear = (LinearLayout) findViewById(R.id.file_properties_owner_linear);
-        ownerLabel =  (TextView) findViewById(R.id.file_properties_owner_label);
+        ownerLabel =  findViewById(R.id.file_properties_owner_label);
         ownerLabelowner = (TextView) findViewById(R.id.file_properties_owner_label_owner);
         String ownerString = "("+getString(R.string.file_properties_owner)+")";
         ownerLabelowner.setText(ownerString);
         ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
         ownerState = (ImageView) findViewById(R.id.file_properties_owner_state_icon);
-
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            logDebug("Landscape configuration");
-            float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
-            float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND_2, getResources().getDisplayMetrics());
-
-            ownerLabel.setMaxWidth((int) width1);
-            ownerInfo.setMaxWidth((int) width2);
-
+        if(!isScreenInPortrait(this)){
+            ownerLabel.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_LAND, outMetrics));
+            ownerInfo.setMaxWidth(px2dp(MAX_WIDTH_FILENAME_LAND_2, outMetrics));
+        }else{
+            ownerLabel.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_PORT, outMetrics));
+            ownerInfo.setMaxWidth(px2dp(MAX_WIDTH_FILENAME_PORT_2, outMetrics));
         }
-        else{
-            logDebug("Portrait configuration");
-            float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
-            float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT_2, getResources().getDisplayMetrics());
-
-            ownerLabel.setMaxWidth((int) width1);
-            ownerInfo.setMaxWidth((int) width2);
-        }
-
         ownerLayout.setVisibility(View.GONE);
 
         //Info Layout
@@ -1543,8 +1528,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			if(from==FROM_INCOMING_SHARES){
 				//Show who is the owner
 				ownerRoundeImage.setImageBitmap(null);
-				ownerLetter.setText("");
-
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
 				for(int j=0; j<sharesIncoming.size();j++){
 					MegaShare mS = sharesIncoming.get(j);
@@ -1597,7 +1580,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                                     megaApi.getUserAvatar(user,buildAvatarFile(this, contactMail + ".jpg").getAbsolutePath(), this);
                                 }
 								else{
-									ownerLetter.setVisibility(View.GONE);
 									ownerRoundeImage.setImageBitmap(bitmap);
 								}
 							}
@@ -1699,74 +1681,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         offlineSwitch.setChecked(false);
 	}
 
-	public void createDefaultAvatar(ImageView ownerRoundeImage, MegaUser user, String name){
-        logDebug("createDefaultAvatar()");
-
-		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		String color = megaApi.getUserAvatarColor(user);
-		if(color!=null){
-            logDebug("The color to set the avatar is " + color);
-			p.setColor(Color.parseColor(color));
-		}
-		else{
-            logDebug("Default color to the avatar");
-			p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-		}
-
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		ownerRoundeImage.setImageBitmap(defaultAvatar);
-
-		Display display = this.getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-		display.getMetrics(outMetrics);
-		float density  = this.getResources().getDisplayMetrics().density;
-
-
-		int avatarTextSize = getAvatarTextSize(density);
-        logDebug("DENSITY: " + density + ":::: " + avatarTextSize);
-
-		String firstLetter = name.charAt(0) + "";
-		firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-		ownerLetter.setText(firstLetter);
-		ownerLetter.setTextColor(Color.WHITE);
-		ownerLetter.setVisibility(View.VISIBLE);
-		ownerLetter.setTextSize(24);
-
+	private void createDefaultAvatar(ImageView ownerRoundeImage, MegaUser user, String name){
+        int color = getColorAvatar(this, megaApi, user);
+		ownerRoundeImage.setImageBitmap(getDefaultAvatar(this, color, name, AVATAR_SIZE, true));
 	}
 
-	private int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
-		}
-
-		return (int)textSize;
-	}
 
     private void sharedContactClicked() {
         FrameLayout sharedContactLayout = (FrameLayout)findViewById(R.id.shared_contact_list_container);
@@ -2521,7 +2440,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 								avatarExists = true;
 								ownerRoundeImage.setImageBitmap(bitmap);
 								ownerRoundeImage.setVisibility(View.VISIBLE);
-								ownerLetter.setVisibility(View.GONE);
 							}
 						}
 					}
@@ -2562,8 +2480,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             if(nC==null){
                 nC = new NodeController(this);
             }
-            nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
-		}
+            nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
+        }
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
 			if(!isOnline(this)){
@@ -3311,7 +3231,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
     public void changePermissions(){
         logDebug("changePermissions");
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
         final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
         dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), new DialogInterface.OnClickListener() {

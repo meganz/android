@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -627,6 +626,27 @@ public class FileUtils {
             e.printStackTrace();
         }
         return result;
+    }
+
+    /**
+     * @param fileName The original file name
+     * @return the file name without extension. For example, 1.jpg would return 1
+     */
+    public static String getFileNameWithoutExtension(String fileName) {
+        int index = fileName.lastIndexOf(".");
+        if ((index != -1) && ((index + 1) < fileName.length())) {
+            return fileName.substring(0, fileName.lastIndexOf("."));
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * @param filename The original file name
+     * @return whether the file name is purely number
+     */
+    public static boolean isFileNameNumeric(String filename) {
+        return getFileNameWithoutExtension(filename).matches("-?\\d+(\\.\\d+)?");
     }
 }
 

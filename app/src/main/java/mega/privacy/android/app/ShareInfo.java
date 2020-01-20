@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,11 +36,11 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 /*
  * Helper class to process shared files from other activities
  */
-public class ShareInfo {
+public class ShareInfo implements Serializable {
 
 	public String title = null;
 	private long lastModified;
-	public InputStream inputStream = null;
+	public transient InputStream inputStream = null;
 	public long size = -1;
 	private File file = null;
 	public boolean isContact = false;
@@ -400,24 +401,25 @@ public class ShareInfo {
 	private void processContent(Uri uri, Context context) {
 		logDebug("processContent: " + uri);
 		ContentProviderClient client = null;
-
-		client = context.getContentResolver().acquireContentProviderClient(uri);
 		Cursor cursor = null;
 		try {
+            client = context.getContentResolver().acquireContentProviderClient(uri);
 			cursor = client.query(uri, null, null, null, null);
-		} catch (Exception e1) {
-			logError("cursor EXCEPTION!!!", e1);
-		}
-		if(cursor!=null){
-			if(cursor.getCount()==0){
-				logDebug("RETURN - Cursor get count is 0");
+		} catch (Exception e) {
+			logError("cursor EXCEPTION!!!", e);
+		} finally {
+			if (cursor == null || cursor.getCount() == 0) {
+				logWarning("Error with cursor");
+				if (cursor != null) {
+					cursor.close();
+				}
+				if (client != null) {
+					client.close();
+				}
 				return;
 			}
 		}
-		else{
-			logWarning("RETURN - Cursor is NULL");
-			return;
-		}
+
 		cursor.moveToFirst();
 		int displayIndex = cursor.getColumnIndex("_display_name");
 		if(displayIndex != -1)
@@ -477,8 +479,14 @@ public class ShareInfo {
 		else{
 			logWarning("Nothing done!");
 		}
-	
-		client.release();
+
+		if (cursor != null) {
+			cursor.close();
+		}
+
+		if (client != null) {
+			client.close();
+		}
 		logDebug("---- END process content----");
 	}
 	

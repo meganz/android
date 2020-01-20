@@ -46,6 +46,11 @@ android {
         jumboMode = true
     }
 
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
 //    task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
 //        workingDir 'src/main/jni'
 //        commandLine './build.sh', 'all'

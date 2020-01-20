@@ -3,7 +3,13 @@ package mega.privacy.android.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import android.content.Context;
+
+import java.io.File;
+
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 public class MegaOffline implements Parcelable {
 
@@ -158,5 +164,19 @@ public class MegaOffline implements Parcelable {
 		dest.writeString(type);
 		dest.writeInt(origin);
 		dest.writeString(handleIncoming);
+	}
+
+	public long getModificationDate(Context context) {
+		File offlineNode = getOfflineFile(context, this);
+		return isFileAvailable(offlineNode) ? offlineNode.lastModified() : 0;
+	}
+
+	public long getSize(Context context) {
+		File offlineNode = getOfflineFile(context, this);
+		if (isFileAvailable(offlineNode)) {
+			return offlineNode.isFile() ? offlineNode.length() : getDirSize(offlineNode);
+		}
+
+		return 0;
 	}
 }
