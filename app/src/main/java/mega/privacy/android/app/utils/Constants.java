@@ -353,6 +353,9 @@ public class Constants {
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
 
+    //link for introduction end to end encryption
+    public static final String URL_E2EE = "https://mega.nz/security";
+
     public static final int MIN_ITEMS_SCROLLBAR = 30;
     public static final int MIN_ITEMS_SCROLLBAR_GRID = 200;
     public static final int MIN_ITEMS_SCROLLBAR_CHAT = 20;
