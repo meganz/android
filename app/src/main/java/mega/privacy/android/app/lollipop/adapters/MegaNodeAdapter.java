@@ -1539,6 +1539,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
 
                     try {
+                        listFragment.scrollToPosition(unHandledItem);
                         listFragment.findViewHolderForAdapterPosition(unHandledItem).itemView.performClick();
                     } catch (Exception ex) {
                         logError("Exception happens: " + ex.toString());
