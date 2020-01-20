@@ -46,9 +46,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SearchNodesTask;
@@ -686,11 +684,11 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		this.context = context;
 	}
 
-	private void serializeNodes(Intent intent) {
+	private void manageNodes(Intent intent) {
 		ArrayList<String> serialized = new ArrayList<>();
 		for (MegaNode node : nodes) {
 			if (node != null) {
-				serialized.add(node.serialize());
+				serialized.add(String.valueOf(node.getHandle()));
 			}
 		}
 		intent.putExtra(ARRAY_SEARCH, serialized);
@@ -756,7 +754,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
-					serializeNodes(intent);
+					manageNodes(intent);
 					startActivity(intent);
 					getActivity().overridePendingTransition(0,0);
 					imageDrag = imageView;
@@ -794,7 +792,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					}
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					mediaIntent.putExtra("screenPosition", screenPosition);
-					serializeNodes(mediaIntent);
+					manageNodes(mediaIntent);
 
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());

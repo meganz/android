@@ -2474,12 +2474,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 //After storage authorization, resume unfinished download
                 if (checkPermissionWriteStorage(REQUEST_WRITE_STORAGE)) {
                     ArrayList<MegaNodeList> list = new ArrayList<>();
-                    for (int i = 0; i < preservedMessagesSelected.size(); i++) {
-                        MegaNodeList megaNodeList = preservedMessagesSelected.get(i).getMessage().getMegaNodeList();
-                        list.add(megaNodeList);
+                    if(preservedMessagesSelected != null && !preservedMessagesSelected.isEmpty()) {
+                        for (int i = 0; i < preservedMessagesSelected.size(); i++) {
+                            MegaNodeList megaNodeList = preservedMessagesSelected.get(i).getMessage().getMegaNodeList();
+                            list.add(megaNodeList);
+                        }
+
+                        chatC.prepareForChatDownload(list);
+                        preservedMessagesSelected = null;
                     }
-                    chatC.prepareForChatDownload(list);
-                    preservedMessagesSelected = null;
                 }
                 break;
             }
@@ -5051,8 +5054,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     @Override
     public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
 
-        if(msg!=null){
-
+        if (msg != null) {
             logDebug("STATUS: " + msg.getStatus());
             logDebug("TEMP ID: " + msg.getTempId());
             logDebug("FINAL ID: " + msg.getMsgId());
