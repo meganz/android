@@ -2953,7 +2953,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             break;
                         }
                     }
-                    if (!peerContained) {
+
+                    if (!peerContained && (peersOnCall.get(i).getPeerId() != megaChatApi.getMyUserHandle() || peersOnCall.get(i).getClientId() != megaChatApi.getMyClientidHandle(chatId))) {
                         logDebug("Participant: Peer id " + peersOnCall.get(i).getPeerId() + "and Client id " + peersOnCall.get(i).getClientId() + " removed from the array of peers when I'm in the call");
                         peersOnCall.remove(i);
                         changes = true;
