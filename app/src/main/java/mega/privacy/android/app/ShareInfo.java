@@ -401,24 +401,25 @@ public class ShareInfo implements Serializable {
 	private void processContent(Uri uri, Context context) {
 		logDebug("processContent: " + uri);
 		ContentProviderClient client = null;
-
-		client = context.getContentResolver().acquireContentProviderClient(uri);
 		Cursor cursor = null;
 		try {
+            client = context.getContentResolver().acquireContentProviderClient(uri);
 			cursor = client.query(uri, null, null, null, null);
-		} catch (Exception e1) {
-			logError("cursor EXCEPTION!!!", e1);
-		}
-		if(cursor!=null){
-			if(cursor.getCount()==0){
-				logDebug("RETURN - Cursor get count is 0");
+		} catch (Exception e) {
+			logError("cursor EXCEPTION!!!", e);
+		} finally {
+			if (cursor == null || cursor.getCount() == 0) {
+				logWarning("Error with cursor");
+				if (cursor != null) {
+					cursor.close();
+				}
+				if (client != null) {
+					client.close();
+				}
 				return;
 			}
 		}
-		else{
-			logWarning("RETURN - Cursor is NULL");
-			return;
-		}
+
 		cursor.moveToFirst();
 		int displayIndex = cursor.getColumnIndex("_display_name");
 		if(displayIndex != -1)
@@ -478,8 +479,14 @@ public class ShareInfo implements Serializable {
 		else{
 			logWarning("Nothing done!");
 		}
-	
-		client.release();
+
+		if (cursor != null) {
+			cursor.close();
+		}
+
+		if (client != null) {
+			client.close();
+		}
 		logDebug("---- END process content----");
 	}
 	

@@ -4,12 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -18,11 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
@@ -30,9 +22,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -40,6 +29,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAddContactsLollipopAdapter.ViewHolderChips> implements View.OnClickListener{
 
@@ -83,19 +73,16 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chip_avatar, parent, false);
 
         holder = new ViewHolderChips(v);
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
+        holder.itemLayout = v.findViewById(R.id.item_layout_chip);
         holder.itemLayout.setOnClickListener(this);
 
         holder.textViewName = v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
-        holder.textViewName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
-        holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
-        holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
+        holder.textViewName.setMaxWidthEmojis(px2dp(MAX_WIDTH_ADD_CONTACTS, outMetrics));
 
+        holder.avatar = v.findViewById(R.id.rounded_avatar);
+        holder.deleteIcon = v.findViewById(R.id.delete_icon_chip);
         holder.itemLayout.setTag(holder);
-
         v.setTag(holder);
-
 
         return holder;
     }
@@ -128,7 +115,6 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
                 }
             }
         }
-
         holder.avatar.setImageBitmap(setUserAvatar(contact));
     }
 
@@ -189,7 +175,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
         return contacts.get(position);
     }
 
-    public Bitmap setUserAvatar(MegaContactAdapter contact){
+    private Bitmap setUserAvatar(MegaContactAdapter contact){
         logDebug("setUserAvatar");
 
         File avatar = null;
@@ -205,96 +191,34 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
             mail = contact.getFullName();
         }
 
+        int color = getColorAvatar(context, megaApi, contact.getMegaUser());
+
         if (contact.getMegaUser() == null && contact.getMegaContactDB() == null) {
-            return createDefaultAvatar(contact.getFullName(), contact);
+            return getDefaultAvatar(context, color, contact.getFullName(), AVATAR_SIZE,true);
         }
 
+        /*Avatar*/
         avatar = buildAvatarFile(context, mail + ".jpg");
         Bitmap bitmap = null;
-        if (isFileAvailable(avatar)){
-            if (avatar.length() > 0){
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    return createDefaultAvatar(mail, contact);
-                }
-                else{
-                    return getCircleBitmap(bitmap);
-                }
-            }
-            else{
-                return createDefaultAvatar(mail, contact);
+        if (isFileAvailable(avatar) && avatar.length() > 0){
+            BitmapFactory.Options bOpts = new BitmapFactory.Options();
+            bOpts.inPurgeable = true;
+            bOpts.inInputShareable = true;
+            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+            if (bitmap != null) {
+            return getCircleBitmap(bitmap);
             }
         }
-        else{
-            return createDefaultAvatar(mail, contact);
-        }
-    }
 
-    public Bitmap createDefaultAvatar(String mail, MegaContactAdapter contact){
-        logDebug("createDefaultAvatar()");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint paintText = new Paint();
-        Paint paintCircle = new Paint();
-
-        paintText.setColor(Color.WHITE);
-        paintText.setTextSize(150);
-        paintText.setAntiAlias(true);
-        paintText.setTextAlign(Paint.Align.CENTER);
-        Typeface face = Typeface.SANS_SERIF;
-        paintText.setTypeface(face);
-        paintText.setAntiAlias(true);
-        paintText.setSubpixelText(true);
-        paintText.setStyle(Paint.Style.FILL);
-
-        String color = null;
-        if (contact.getMegaUser() != null) {
-            color = megaApi.getUserAvatarColor(contact.getMegaUser());
-        }
-        if(color!=null){
-            logDebug("The color to set the avatar is " + color);
-            paintCircle.setColor(Color.parseColor(color));
-            paintCircle.setAntiAlias(true);
-        }
-        else{
-            logDebug("Default color to the avatar");
-            paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-            paintCircle.setAntiAlias(true);
-        }
-
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-
-        String fullName = null;
-        if(contact.getFullName()!=null){
+        /*Default Avatar*/
+        String fullName;
+        if (contact.getFullName() != null) {
             fullName = contact.getFullName();
-        }
-        else{
-            //No name, ask for it and later refresh!!
+        } else {
             fullName = mail;
         }
-        String firstLetter = ChatUtil.getFirstLetter(fullName);
-        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-            firstLetter = " ";
-        }
-
-        Rect bounds = new Rect();
-
-        paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-        int xPos = (c.getWidth()/2);
-        int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-        c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-
-        return defaultAvatar;
+        return getDefaultAvatar(context, color, fullName, AVATAR_SIZE,true);
     }
-}
+
+
+    }
