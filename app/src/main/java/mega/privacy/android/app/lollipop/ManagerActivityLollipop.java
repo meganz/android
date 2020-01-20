@@ -54,7 +54,6 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.provider.DocumentFile;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -136,7 +135,6 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -257,16 +255,18 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
-public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
-			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener {
+public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+        NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener {
 
     private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
     public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
@@ -395,6 +395,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public boolean newCreationAccount;
 
 	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
+	private int storageStateFromBroadcast = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
+    private boolean showStorageAlertWithDelay;
+
 	private boolean isStorageStatusDialogShown = false;
 
 	private boolean userNameChanged;
@@ -771,10 +774,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null){
-				if (intent.getAction() == ACTION_STORAGE_STATE_CHANGED) {
-                    int newStorageState =
-                            intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
-                    checkStorageStatus(newStorageState, false);
+                if (ACTION_STORAGE_STATE_CHANGED.equals(intent.getAction())) {
+                    storageStateFromBroadcast = intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
+                    if (!showStorageAlertWithDelay) {
+                        checkStorageStatus(storageStateFromBroadcast, false);
+                    }
                     updateAccountDetailsVisibleInfo();
                     return;
 				}
@@ -2453,7 +2457,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         accountInfoFrame.setOnClickListener(this);
 
         nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
-		nVDisplayName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+        nVDisplayName.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
 
 		nVEmail = (TextView) findViewById(R.id.navigation_drawer_account_information_email);
         nVPictureProfile = (RoundedImageView) findViewById(R.id.navigation_drawer_user_account_picture_profile);
@@ -3380,8 +3384,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void askForSMSVerification() {
+        showStorageAlertWithDelay = true;
         //If mobile device, only portrait mode is allowed
-        if (!isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (!isTablet(this)) {
             logDebug("mobile only portrait mode");
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
@@ -3410,12 +3415,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     }
 
 	public void askForAccess () {
+        showStorageAlertWithDelay = true;
     	//If mobile device, only portrait mode is allowed
-		if (!isTablet(this) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+		if (!isTablet(this)) {
 			logDebug("Mobile only portrait mode");
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		}
-
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
     	boolean writeStorageGranted = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		boolean readStorageGranted = checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
     	boolean cameraGranted = checkPermission(Manifest.permission.CAMERA);
@@ -3443,7 +3448,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void destroySMSVerificationFragment() {
-        //In mobile, allow all orientation after permission screen
         if (!isTablet(this)) {
             logDebug("mobile, all orientation");
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
@@ -4168,17 +4172,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void setDefaultAvatar(){
 		logDebug("setDefaultAvatar");
-
-		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		String firstLetter = getFirstLetter(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-			firstLetter = " ";
-		}
-
-		nVPictureProfile.setImageBitmap(createDefaultAvatar(color, firstLetter));
+		nVPictureProfile.setImageBitmap(getDefaultAvatar(this, getColorAvatar(this, megaApi, megaApi.getMyUser()), MegaApplication.getInstance().getMyAccountInfo().getFullName(), AVATAR_SIZE, true));
 	}
 
-	public void setOfflineAvatar(String email, long myHandle, String firstLetter){
+	public void setOfflineAvatar(String email, long myHandle, String name){
 		logDebug("setOfflineAvatar");
 
 		File avatar = buildAvatarFile(this, email + ".jpg");
@@ -4219,19 +4216,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		}
 
-		String myHandleEncoded = "";
-		if(megaApi.getMyUser()!=null){
-			myHandle = megaApi.getMyUser().getHandle();
-			myHandleEncoded = MegaApiAndroid.userHandleToBase64(myHandle);
-		}
-		else{
-			myHandleEncoded = MegaApiAndroid.userHandleToBase64(myHandle);
-		}
-
-		String color = megaApi.getUserAvatarColor(myHandleEncoded);
-
 		if (nVPictureProfile != null){
-			nVPictureProfile.setImageBitmap(createDefaultAvatar(color, firstLetter));
+			nVPictureProfile.setImageBitmap(getDefaultAvatar(this, getColorAvatar(this, megaApi, myHandle), name, AVATAR_SIZE, true));
 		}
 	}
 
@@ -4256,7 +4242,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
 		final EmojiEditText inputFirstName = new EmojiEditText(this);
-		inputFirstName.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
+		inputFirstName.setEmojiSize(px2dp(14, outMetrics));
 
 		inputFirstName.getBackground().mutate().clearColorFilter();
 		inputFirstName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
@@ -4425,7 +4411,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		});
 		inputFirstName.setOnEditorActionListener(editorActionListener);
-		inputFirstName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
+		inputFirstName.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
 
 		inputLastName.setSingleLine();
 		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
@@ -4454,7 +4440,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		});
 		inputLastName.setOnEditorActionListener(editorActionListener);
-		inputLastName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
+		inputLastName.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
 
 		inputMail.getBackground().mutate().clearColorFilter();
 		inputMail.setSingleLine();
@@ -4486,12 +4472,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		});
 		inputMail.setOnEditorActionListener(editorActionListener);
-		inputMail.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
+		inputMail.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.title_edit_profile_info));
 
-		builder.setPositiveButton(getString(R.string.title_edit_profile_info), new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(getString(R.string.save_action), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 
 					}
@@ -4666,7 +4652,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void selectDrawerItemCloudDrive(){
 		logDebug("selectDrawerItemCloudDrive");
-
+        if (showStorageAlertWithDelay) {
+            showStorageAlertWithDelay = false;
+            checkStorageStatus(storageStateFromBroadcast, false);
+        }
 		tB.setVisibility(View.VISIBLE);
 
 		if (cloudPageAdapter == null){
@@ -5202,10 +5191,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					nVDisplayName.setText(fullName);
 				}
 
-				String firstLetter = fullName.charAt(0) + "";
-				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-
-				setOfflineAvatar(emailCredentials, myHandle, firstLetter);
+				setOfflineAvatar(emailCredentials, myHandle, fullName);
 			}
 
 			sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
@@ -8670,10 +8656,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (!isOnline(this)){
 				showOfflineMode();
 			}
-			else{
-				backToDrawerItem(bottomNavigationCurrentItem);
-			}
-
+			backToDrawerItem(bottomNavigationCurrentItem);
 			return;
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
@@ -8958,7 +8941,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
-		logDebug("askConfirmationNoAppInstaledBeforeDownload");
+        logDebug("askConfirmationNoAppInstaledBeforeDownload");
 
 		final String parentPathC = parentPath;
 		final String urlC = url;
@@ -9002,8 +8985,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 
-	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
-		logDebug("askSizeConfirmationBeforeDownload");
+	public void askSizeConfirmationBeforeDownload(String parentPath,String url, long size, long [] hashes, final boolean highPriority){
+        logDebug("askSizeConfirmationBeforeDownload");
 
 		final String parentPathC = parentPath;
 		final String urlC = url;
@@ -12589,16 +12572,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
 		}
 
-		if (requestCode == REQUEST_CODE_TREE && resultCode == RESULT_OK){
-			if (intent == null){
-				logWarning("Intent NULL");
-				return;
-			}
-
-			Uri treeUri = intent.getData();
-	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
-		}
-		else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
 			if (intent == null) {
 				logWarning("Intent NULL");
 				return;
@@ -12748,7 +12722,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				service.putExtra(DownloadService.EXTRA_PATH, tempFolder.getAbsolutePath());
 				startService(service);
 			}
-		}
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
+        }
 		else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			logDebug("requestCode == REQUEST_CODE_SELECT_FILE");
 
@@ -13054,7 +13030,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-			logDebug("URL: " + url);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			logDebug("Size: " + size);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
@@ -13062,7 +13037,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
 
-			nC.checkSizeBeforeDownload(parentPath, url, size, hashes, highPriority);
+			nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
 		}
 		else if (requestCode == REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
 			logDebug("Resfresh DONE");
@@ -18044,7 +18019,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void setTransfersWidget() {
 		logDebug("setTransfersWidget");
 
-		if (!isOnline(this)) return;
+		if (!isOnline(this) || transfersOverViewLayout == null) return;
 
 		if (drawerItem != DrawerItem.CLOUD_DRIVE) {
 			transfersOverViewLayout.setVisibility(View.GONE);

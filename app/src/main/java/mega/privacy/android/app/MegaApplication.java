@@ -17,6 +17,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.multidex.MultiDexApplication;
 import android.support.text.emoji.EmojiCompat;
@@ -83,6 +84,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
+import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -149,6 +151,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private BroadcastReceiver logoutReceiver;
 	private ChatAudioManager chatAudioManager = null;
 	private static MegaApplication singleApplicationInstance;
+
+	private PowerManager.WakeLock wakeLock;
 
 	@Override
 	public void networkAvailable() {
@@ -1575,7 +1579,18 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 									if (callToLaunch != null) {
 										if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
 											logDebug("One call: open call");
-											launchCallActivity(callToLaunch);
+                                            if (shouldNotify(this) && !isActivityVisible()) {
+                                                PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                                                if(pm != null) {
+                                                    wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaIncomingCallPowerLock");
+                                                }
+                                                if(!wakeLock.isHeld()) {
+                                                    wakeLock.acquire(10 * 1000);
+                                                }
+                                                toIncomingCall(this, callToLaunch, megaChatApi);
+                                            } else {
+                                                launchCallActivity(callToLaunch);
+                                            }
 										} else {
 											logWarning("Launch not in correct status");
 										}
@@ -1660,6 +1675,13 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				}
 
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
+				    if(shouldNotify(this)) {
+                        toSystemSettingNotification(this);
+                    }
+                    cancelIncomingCallNotification(this);
+				    if(wakeLock != null && wakeLock.isHeld()) {
+				        wakeLock.release();
+                    }
 					hashMapSpeaker.remove(call.getChatid());
 					clearIncomingCallNotification(call.getId());
 					removeChatAudioManager();

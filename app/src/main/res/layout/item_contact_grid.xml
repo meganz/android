@@ -1,11 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:id="@+id/contact_grid_item_layout"
 	android:background="@drawable/background_item_grid_new"
 	android:layout_margin="2dp"
 	android:padding="1dp"
-	android:descendantFocusability="blocksDescendants" >
+	android:descendantFocusability="blocksDescendants">
 
 	<RelativeLayout
 		android:id="@+id/contact_grid_relative_layout_avatar"
@@ -28,13 +29,6 @@
 			android:layout_alignParentTop="true"
 			android:layout_marginLeft="7dp"
 			android:layout_marginTop="7dp"/>
-
-		<mega.privacy.android.app.components.twemoji.EmojiTextView
-			android:id="@+id/contact_grid_initial_letter"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:gravity="center_horizontal|center_vertical" />
-
 	</RelativeLayout>
 
 	<View
@@ -75,8 +69,8 @@
 				android:layout_height="wrap_content"
 				android:layout_marginLeft="6dp"
 				android:textColor="@color/name_my_account"
-				android:ellipsize="end"
 				android:textSize="15sp"
+				app:emojiSize="13sp"
 				android:maxLines="1"
 				android:singleLine="true"/>
 

@@ -8,8 +8,6 @@ import android.text.TextUtils;
 import java.util.List;
 import java.util.Objects;
 
-import mega.privacy.android.app.utils.ChatUtil;
-
 public class InvitationContactInfo implements Parcelable, Cloneable {
 
     public static final int TYPE_MEGA_CONTACT_HEADER = 0;
@@ -34,14 +32,15 @@ public class InvitationContactInfo implements Parcelable, Cloneable {
     private boolean isHighlighted;
     private int type;
     private Bitmap bitmap;
-    private String name, displayInfo, handle, avatarColor;
+    private String name, displayInfo, handle;
+    private int avatarColor;
 
     /**
      * Phone numbers and emails which don't exist on MEGA.
      */
     private List<String> filteredContactInfos;
 
-    public InvitationContactInfo(long id, String name, int type, List<String> filteredContactInfos, String displayInfo, String avatarColor) {
+    public InvitationContactInfo(long id, String name, int type, List<String> filteredContactInfos, String displayInfo, int avatarColor) {
         this.id = id;
         this.type = type;
         this.filteredContactInfos = filteredContactInfos;
@@ -62,11 +61,11 @@ public class InvitationContactInfo implements Parcelable, Cloneable {
         this.displayInfo = displayInfo;
     }
 
-    public static InvitationContactInfo createManualInputEmail(String inputString, String avatarColor) {
+    public static InvitationContactInfo createManualInputEmail(String inputString, int avatarColor) {
         return new InvitationContactInfo(inputString.hashCode(), "", TYPE_MANUAL_INPUT_EMAIL, null, inputString, avatarColor);
     }
 
-    public static InvitationContactInfo createManualInputPhone(String inputString, String avatarColor) {
+    public static InvitationContactInfo createManualInputPhone(String inputString, int avatarColor) {
         return new InvitationContactInfo(inputString.hashCode(), "", TYPE_MANUAL_INPUT_PHONE, null, inputString, avatarColor);
     }
 
@@ -161,11 +160,7 @@ public class InvitationContactInfo implements Parcelable, Cloneable {
         return getDisplayInfo().contains(AT_SIGN);
     }
 
-    public String getInitial() {
-        return ChatUtil.getFirstLetter(getName());
-    }
-
-    public String getAvatarColor() {
+    public int getAvatarColor() {
         return avatarColor;
     }
 
@@ -182,7 +177,7 @@ public class InvitationContactInfo implements Parcelable, Cloneable {
         dest.writeString(name);
         dest.writeString(displayInfo);
         dest.writeString(handle);
-        dest.writeString(avatarColor);
+        dest.writeInt(avatarColor);
     }
 
     public InvitationContactInfo(Parcel in) {
@@ -192,7 +187,7 @@ public class InvitationContactInfo implements Parcelable, Cloneable {
         name = in.readString();
         displayInfo = in.readString();
         handle = in.readString();
-        avatarColor = in.readString();
+        avatarColor = in.readInt();
     }
 
     @Override

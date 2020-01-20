@@ -58,6 +58,7 @@ import mega.privacy.android.app.components.ContactsDividerDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
+import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.ContactsFilter;
@@ -73,6 +74,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 
 public class InviteContactActivity extends PinActivityLollipop implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
@@ -104,7 +106,8 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     private ImageView emptyImageView;
     private TextView emptyTextView, emptySubTextView, noPermissionHeader;
     private ProgressBar progressBar;
-    private String inputString, defaultLocalContactAvatarColor;
+    private String inputString;
+    private int defaultLocalContactAvatarColor;
     private InvitationContactsAdapter invitationContactsAdapter;
     private ArrayList<InvitationContactInfo> phoneContacts, megaContacts, addedContacts, filteredContacts, totalContacts;
     private FilterContactsTask filterContactsTask;
@@ -158,7 +161,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(R.layout.activity_invite_contact);
         Context context = getApplicationContext();
-        defaultLocalContactAvatarColor = "#" + Integer.toHexString(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
+        defaultLocalContactAvatarColor = ContextCompat.getColor(context, R.color.color_default_avatar_phone);
 
         phoneContacts = new ArrayList<>();
         addedContacts = new ArrayList<>();
@@ -764,7 +767,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
             String name = contact.getLocalName();
             String email = contact.getEmail();
             String handle = contact.getId();
-            String color = megaApi.getUserAvatarColor(handle);
+            int color = getColorAvatar(this, megaApi, handle);
             InvitationContactInfo info = new InvitationContactInfo(id, name, TYPE_MEGA_CONTACT, null, email, color);
             info.setHandle(handle);
             result.add(info);

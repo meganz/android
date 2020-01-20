@@ -4,44 +4,44 @@
     android:gravity="center_horizontal"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAllCaps="true"
-        android:textColor="@color/copyright_text"
-        android:layout_marginLeft="17dp"
-        android:layout_marginRight="17dp"
-        android:text="@string/title_confirmation_invite_friends"
-        android:layout_marginTop="25dp"
-        android:textSize="14sp"/>
-
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="34dp"
         android:src="@drawable/ic_success_invite"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:layout_marginLeft="17dp"
         android:layout_marginRight="17dp"
+        android:textStyle="bold"
         android:textColor="@color/mail_my_account"
-        android:text="@string/subtitle_confirmation_invite_friends"
-        android:textSize="16sp"/>
+        android:text="@string/subtitle_confirmation_invite_friends" />
 
     <TextView
+        android:id="@+id/invite_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="50dp"
         android:layout_marginLeft="17dp"
         android:layout_marginRight="17dp"
         android:textColor="@color/grey_achievements_invite_friends"
-        android:text="@string/paragraph_confirmation_invite_friends"
+        android:text="@string/invite_sent_text"
         android:textSize="14sp"
-        android:gravity="center_horizontal"
-        android:lineSpacingMultiplier="1.5"/>
+        android:gravity="center_horizontal"/>
+
+    <Button
+        android:id="@+id/close_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/general_close"
+        android:layout_marginLeft="26dp"
+        android:layout_marginRight="26dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/background_accent_button"
+        android:textColor="@color/white"/>
 
 </LinearLayout>
