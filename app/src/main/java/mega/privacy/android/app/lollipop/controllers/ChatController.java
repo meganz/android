@@ -1924,8 +1924,8 @@ public class ChatController {
                 checker.setNodeList(nodeList);
                 checker.setSerializedNodes(serializedNodes);
                 if (checker.check()) {
-                    downloadToSDCard = true;
                     downloadRoot = checker.getDownloadRoot();
+                    downloadToSDCard = (downloadRoot != null);
                 } else {
                     return;
                 }

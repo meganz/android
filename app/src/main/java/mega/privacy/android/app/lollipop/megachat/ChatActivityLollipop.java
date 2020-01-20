@@ -712,7 +712,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s != null && !s.toString().isEmpty()) {
+
+
+                if (s != null && !s.toString().trim().isEmpty()) {
                     sendIcon.setEnabled(true);
                     sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
                     textChat.setHint(" ");
@@ -3184,16 +3186,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 logDebug("send_message_icon_chat");
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
-                if(text.isEmpty()) break;
-
+                if(text.trim().isEmpty()) break;
                 if (editingMessage) {
-                    logDebug("send_message_icon_chat:editingMessage");
                     editMessage(text);
                     clearSelections();
                     hideMultipleSelect();
                     actionMode.invalidate();
                 } else {
-                    logDebug("send_message_icon_chat:sendindMessage");
                     sendMessage(text);
                 }
                 textChat.setText("", TextView.BufferType.EDITABLE);
@@ -3460,8 +3459,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if(androidMsgSent!=null){
             if(androidMsgSent.isUploading()){
                 logDebug("Is uploading: ");
-            }
-            else{
+
+            }else if(androidMsgSent.getMessage() != null) {
                 logDebug("Sent message with id temp: " + androidMsgSent.getMessage().getTempId());
                 logDebug("State of the message: " + androidMsgSent.getMessage().getStatus());
             }
