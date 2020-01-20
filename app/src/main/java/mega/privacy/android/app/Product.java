@@ -5,13 +5,13 @@ import android.os.Parcelable;
 
 public class Product implements Parcelable{
 
-	long handle;
-	int level;
-	int months;
-	int storage;
-	int amount;
-	int transfer;
-	boolean isBusiness;
+	private long handle;
+	private int level;
+	private int months;
+	private int storage;
+	private int amount;
+	private int transfer;
+	private boolean isBusiness;
 
 	public Product (long _handle, int _level, int _months, int _storage, int _amount, int _transfer, boolean _isBusiness){
 		this.handle=_handle;

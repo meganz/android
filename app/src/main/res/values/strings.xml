@@ -1228,8 +1228,6 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] left the group chat[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Message not sent. Tap for options</string>
-
-    <string name="chat_status_title" context="settings of the chat to choose the status">Status</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -2616,9 +2614,9 @@
 
     <string name="account_label" context="Head label to show the business account type">Account type</string>
     <string name="business_label" context="Label in My Account section to show user account type">Business</string>
-    <string name="admin_label" context="">Admin</string>
-    <string name="user_label" context="">User</string>
-    <string name="status_label" context="Head label to show the business status type">Status</string>
+    <string name="admin_label" context="Business user role">Admin</string>
+    <string name="user_label" context="Business user role">User</string>
+    <string name="status_label" context="General label to show the status of something or someone">Status</string>
     <string name="inactive_label" context="State to indicate something is inactive (business status account for instance)">Inactive</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">Active</string>
     <string name="grace_label" context="State to indicate a business account is in grace period">Grace</string>

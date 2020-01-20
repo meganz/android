@@ -847,8 +847,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							upAFL.showAvailableAccount();
 						}
 
-						sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-						if(sttFLol!=null){
+						if(getSettingsFragment() != null){
 							sttFLol.setRubbishInfo();
 						}
 
@@ -872,8 +871,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (intent != null) {
 				boolean enabled = intent.getBooleanExtra("enabled", false);
 				is2FAEnabled = enabled;
-				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-				if (sttFLol != null) {
+				if (getSettingsFragment() != null) {
 					sttFLol.update2FAPreference(enabled);
 				}
 			}
@@ -3477,8 +3475,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     private void enableCU() {
         if (businessCUF.equals(BUSINESS_CU_FRAGMENT_SETTINGS)) {
-            sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-            if (sttFLol != null) {
+            if (getSettingsFragment() != null) {
                 sttFLol.enableCameraUpload();
             }
         } else if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
@@ -5184,8 +5181,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					clickDrawerItemLollipop(drawerItem);
 
-					sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-					if (sttFLol != null) {
+					if (getSettingsFragment() != null) {
 						sttFLol.setOnlineOptions(true);
 					}
 
@@ -5316,8 +5312,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				setOfflineAvatar(emailCredentials, myHandle, fullName);
 			}
 
-			sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-			if (sttFLol != null) {
+			if (getSettingsFragment() != null) {
 				sttFLol.setOnlineOptions(false);
 			}
 			rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
@@ -6032,8 +6027,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     			supportInvalidateOptionsMenu();
 
-				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-    			if (sttFLol != null){
+    			if (getSettingsFragment() != null){
 					if (openSettingsStorage){
 						sttFLol.goToCategoryStorage();
 					}
@@ -6228,8 +6222,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                 break;
             }
             case SETTINGS: {
-				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-                if (sttFLol != null) {
+                if (getSettingsFragment() != null) {
                     sttFLol.checkScroll();
                 }
                 break;
@@ -10535,7 +10528,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 		});
-		dialogBuilder.setTitle(getString(R.string.chat_status_title));
+		dialogBuilder.setTitle(getString(R.string.status_label));
 		presenceStatusDialog = dialogBuilder.create();
 //		presenceStatusDialog.se
 		presenceStatusDialog.show();
@@ -10904,11 +10897,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				if(isEnabling){
-					sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-					if(sttFLol!=null){
-						sttFLol.updateRBScheduler(0);
-					}
+				if(isEnabling && getSettingsFragment() != null){
+					sttFLol.updateRBScheduler(0);
 				}
 			}
 		});
@@ -11076,8 +11066,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void setAutoAwayValue(String value, boolean cancelled){
 		logDebug("Value: " + value);
 		if(cancelled){
-			sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-			if(sttFLol!=null){
+			if(getSettingsFragment() != null){
 				sttFLol.updatePresenceConfigChat(true, null);
 			}
 		}
@@ -11256,7 +11245,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 		final CharSequence[] items = {getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
 
-		sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
+		getSettingsFragment();
 
 		dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
@@ -12024,7 +12013,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			return;
 		}
 
-		MyAccountInfo info = ((MegaApplication) getApplication()).getMyAccountInfo();
+		MyAccountInfo info = app.getMyAccountInfo();
 		View settingsSeparator = null;
 
 		if (nV != null) {
@@ -12056,24 +12045,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				} catch (Exception e) {
+					logWarning("Exception formatting string", e);
 				}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				spaceTV.setText(result);
+				spaceTV.setText(getSpannedHtmlText(textToShow));
 				int progress = info.getUsedPerc();
 				long usedSpace = info.getUsedStorage();
 				logDebug("Progress: " + progress + ", Used space: " + usedSpace);
 				usedSpacePB.setProgress(progress);
 				if (progress >= 0 && usedSpace >= 0) {
 					usedSpaceLayout.setVisibility(View.VISIBLE);
-					logDebug("usedSpaceLayout is VISIBLE");
 				} else {
 					usedSpaceLayout.setVisibility(View.GONE);
-					logDebug("usedSpaceLayout is GONE");
 				}
 			}
 		}
@@ -12081,7 +12063,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			logWarning("usedSpaceLayout is NULL");
 		}
 
-		if (((MegaApplication) getApplication()).getMyAccountInfo().isInventoryFinished()){
+		if (app.getMyAccountInfo().isInventoryFinished()){
 			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() < info.getLevelInventory()){
 				if (maxP != null){
 					logDebug("ORIGINAL JSON:" + maxP.getOriginalJson());
@@ -12544,8 +12526,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 						onNodesSharedUpdate();
 
-						sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-                        if (sttFLol != null) {
+                        if (getSettingsFragment() != null) {
                         	sttFLol.taskGetSizeOffline();
                         }
 						break;
@@ -12584,8 +12565,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							nC.deleteOffline(documents.get(i));
 						}
 						updateOfflineView(documents.get(0));
-						sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-						if (sttFLol != null) {
+						if (getSettingsFragment() != null) {
 							sttFLol.taskGetSizeOffline();
 						}
 						break;
@@ -12608,8 +12588,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void showConfirmationEnableLogsSDK(){
 		logDebug("showConfirmationEnableLogsSDK");
 
-		sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-		if(sttFLol!=null){
+		if(getSettingsFragment() != null){
 			sttFLol.numberOfClicksSDK = 0;
 		}
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -12636,8 +12615,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void showConfirmationEnableLogsKarere(){
 		logDebug("showConfirmationEnableLogsKarere");
 
-		sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-		if(sttFLol!=null){
+		if(getSettingsFragment() != null){
 			sttFLol.numberOfClicksKarere = 0;
 		}
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -12708,8 +12686,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void update2FASetting(){
 		logDebug("update2FAVisibility");
-		sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-		if (sttFLol != null) {
+		if (getSettingsFragment() != null) {
 			try {
 				sttFLol.update2FAVisibility();
 			}catch (Exception e){}
@@ -13258,8 +13235,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				refreshIncomingShares();
 			}
 
-			sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-			if (sttFLol != null) {
+			if (getSettingsFragment() != null) {
 				try {
 					sttFLol.update2FAVisibility();
 				}catch (Exception e){}
@@ -14633,8 +14609,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (e.getErrorCode() != MegaError.API_OK){
 				logError("MegaChatRequest.TYPE_LOGOUT:ERROR");
 			}
-			sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-			if(sttFLol!=null){
+
+			if(getSettingsFragment() != null){
 				sttFLol.hidePreferencesChat();
 			}
 
@@ -14938,8 +14914,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("change isRickLinkEnabled - USER_ATTR_RICH_PREVIEWS finished");
 				if (e.getErrorCode() != MegaError.API_OK){
 					logError("ERROR:USER_ATTR_RICH_PREVIEWS");
-					sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-					if(sttFLol!=null){
+					if(getSettingsFragment() != null){
 						sttFLol.updateEnabledRichLinks();
 					}
 				}
@@ -14948,8 +14923,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("change QR autoaccept - USER_ATTR_CONTACT_LINK_VERIFICATION finished");
 				if (e.getErrorCode() == MegaError.API_OK) {
 					logDebug("OK setContactLinkOption: " + request.getText());
-					sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-					if (sttFLol != null) {
+					if (getSettingsFragment() != null) {
 						sttFLol.setSetAutoaccept(false);
 						if (sttFLol.getAutoacceptSetting()) {
 							sttFLol.setAutoacceptSetting(false);
@@ -14968,8 +14942,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				if (e.getErrorCode() != MegaError.API_OK) {
 					logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
-					sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-					if(sttFLol!=null){
+					if(getSettingsFragment() != null){
 						sttFLol.updateEnabledFileVersions();
 					}
 
@@ -14984,8 +14957,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
 				logDebug("change RB scheduler - USER_ATTR_RUBBISH_TIME finished");
-				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-				if(sttFLol!=null){
+				if(getSettingsFragment() != null){
 					if (e.getErrorCode() != MegaError.API_OK){
 						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
 					}
@@ -15120,8 +15092,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 					MegaApplication.setEnabledRichLinks(request.getFlag());
 
-					sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-                    if(sttFLol!=null){
+                    if(getSettingsFragment() != null){
 						sttFLol.updateEnabledRichLinks();
                     }
 				}
@@ -15140,8 +15111,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
 				logDebug("Type: GET_ATTR_USER ParamType: USER_ATTR_CONTACT_LINK_VERIFICATION --> getContactLinkOption");
 				if (e.getErrorCode() == MegaError.API_OK) {
-					sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-					if (sttFLol != null) {
+					if (getSettingsFragment() != null) {
 						sttFLol.setAutoacceptSetting(request.getFlag());
 						logDebug("OK getContactLinkOption: " + request.getFlag());
 //						If user request to set QR autoaccept
@@ -15162,8 +15132,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 				} else if (e.getErrorCode() == MegaError.API_ENOENT) {
 					logError("Error MegaError.API_ENOENT getContactLinkOption: " + request.getFlag());
-					sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-					if (sttFLol != null) {
+					if (getSettingsFragment() != null) {
 						sttFLol.setAutoacceptSetting(request.getFlag());
 					}
 					megaApi.setContactLinksOption(false, this);
@@ -15173,8 +15142,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
-				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-				if(sttFLol!=null){
+				if(getSettingsFragment() != null){
 					sttFLol.updateEnabledFileVersions();
 				}
 
@@ -15184,8 +15152,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
-				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-				if(sttFLol!=null){
+				if(getSettingsFragment() != null){
 					if (e.getErrorCode() == MegaError.API_ENOENT){
 						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
 							sttFLol.updateRBScheduler(30);
@@ -15743,8 +15710,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_emptied), -1);
 				resetAccountDetailsTimeStamp(getApplicationContext());
-				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-				if (sttFLol != null) {
+				if (getSettingsFragment() != null) {
 					sttFLol.resetRubbishInfo();
 				}
 			}
@@ -15757,8 +15723,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("OK MegaRequest.TYPE_REMOVE_VERSIONS");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.success_delete_versions), -1);
 
-				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-				if(sttFLol!=null) {
+				if(getSettingsFragment() != null) {
 					sttFLol.resetVersionsInfo();
 				}
 				//Get info of the version again (after 10 seconds)
@@ -15798,8 +15763,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				} else {
 					is2FAEnabled = false;
 				}
-				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-				if (sttFLol != null) {
+				if (getSettingsFragment() != null) {
 					sttFLol.update2FAPreference(is2FAEnabled);
 				}
 			}
@@ -15812,8 +15776,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (!request.getFlag() && e.getErrorCode() == MegaError.API_OK){
 				logDebug("Pin correct: Two-Factor Authentication disabled");
 				is2FAEnabled = false;
-				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-				if (sttFLol != null) {
+				if (getSettingsFragment() != null) {
 					sttFLol.update2FAPreference(false);
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.label_2fa_disabled), -1);
 				}
@@ -15861,8 +15824,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			//Refresh Settings if it is shown
-			sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-			if(sttFLol!=null) {
+			if(getSettingsFragment() != null) {
 				sttFLol.setVersionsInfo();
 			}
 		}
@@ -17179,7 +17141,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public SettingsFragmentLollipop getSettingsFragment() {
-		return sttFLol;
+		return sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
 	}
 
 	public void setSettingsFragment(SettingsFragmentLollipop sttFLol) {
@@ -17382,8 +17344,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("Config is pending - do not update UI");
 			}
 			else{
-				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-				if(sttFLol!=null){
+				if(getSettingsFragment() != null){
 					sttFLol.updatePresenceConfigChat(false, config);
 				}
 				else{

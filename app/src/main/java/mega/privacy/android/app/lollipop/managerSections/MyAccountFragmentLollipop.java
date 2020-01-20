@@ -455,19 +455,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setAccountDetails() {
 
-		if ((getActivity() == null) || (!isAdded())) {
+		if (getActivity() == null || !isAdded()) {
 			logWarning("Fragment MyAccount NOT Attached!");
 			return;
 		}
 
-		if (myAccountInfo.getLastSessionFormattedDate() != null) {
-			if (myAccountInfo.getLastSessionFormattedDate().trim().length() <= 0) {
-				lastSession.setText(getString(R.string.recovering_info));
-			} else {
-				lastSession.setText(myAccountInfo.getLastSessionFormattedDate());
-			}
-		} else {
+		if (myAccountInfo.getLastSessionFormattedDate() == null
+				|| myAccountInfo.getLastSessionFormattedDate().trim().length() <= 0) {
 			lastSession.setText(getString(R.string.recovering_info));
+		} else {
+			lastSession.setText(myAccountInfo.getLastSessionFormattedDate());
 		}
 
 		//Set account details
