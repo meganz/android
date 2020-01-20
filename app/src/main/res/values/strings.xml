@@ -1784,7 +1784,7 @@
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]No files in your [/B][A]Inbox[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive ">[B]No files in your [/B][A]Cloud Drive[/A][B].[/B]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]Offline[/A][B].[/B]</string>
-    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]No [/B][A]Contacts[/A][B].[/B]</string>
+    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]No [/B][A]Contacts[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]No[/A] [B]Conversations[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Loading[/A] [B]Conversations&#8230;[/B]</string>
