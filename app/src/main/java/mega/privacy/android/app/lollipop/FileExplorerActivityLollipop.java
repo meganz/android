@@ -450,7 +450,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		
 		if (credentials == null){
 			logWarning("User credentials NULL");
-
             needLogin = true;
             OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
             ownFilePrepareTask.execute(getIntent());

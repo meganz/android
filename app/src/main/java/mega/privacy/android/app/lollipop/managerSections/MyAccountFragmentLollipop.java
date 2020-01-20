@@ -602,7 +602,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 										Intent intent = new Intent(context, LoginActivityLollipop.class);
 										intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 										intent.setAction(ACTION_REFRESH_STAGING);
-
 										startActivityForResult(intent, REQUEST_CODE_REFRESH_STAGING);
 										break;
 

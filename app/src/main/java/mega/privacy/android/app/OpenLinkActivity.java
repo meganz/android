@@ -88,7 +88,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			urlConfirmationLink = url;
 
 			AccountController aC = new AccountController(this);
-			MegaApplication.setUrlConfirmationLink(urlConfirmationLink);
+			app.setUrlConfirmationLink(urlConfirmationLink);
 
 			aC.logout(this, megaApi);
 
@@ -519,7 +519,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			if(isChatEnabled()){
 				logDebug("END logout sdk request - wait chat logout");
 
-				if(MegaApplication.getUrlConfirmationLink()!=null){
+				if(app.getUrlConfirmationLink()!=null){
 					logDebug("Confirmation link - show confirmation screen");
 					if (dbH == null){
 						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -537,7 +537,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					confirmIntent.setAction(ACTION_CONFIRM);
 					startActivity(confirmIntent);
-					MegaApplication.setUrlConfirmationLink(null);
+					app.setUrlConfirmationLink(null);
 					finish();
 				}
 			}
@@ -559,7 +559,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				confirmIntent.setAction(ACTION_CONFIRM);
 				startActivity(confirmIntent);
-				MegaApplication.setUrlConfirmationLink(null);
+				app.setUrlConfirmationLink(null);
 				finish();
 			}
 		}
@@ -568,7 +568,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 			if(e.getErrorCode() == MegaError.API_OK){
 				AccountController aC = new AccountController(this);
-				MegaApplication.setUrlConfirmationLink(request.getLink());
+				app.setUrlConfirmationLink(request.getLink());
 
 				aC.logout(this, megaApi);
 			}
