@@ -8,4 +8,6 @@ public interface RotatableAdapter {
     int getFolderCount();
 
     int getPlaceholderCount();
+
+    int getUnhandledItem();
 }

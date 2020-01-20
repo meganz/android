@@ -806,6 +806,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		return 0;
 	}
 
+	@Override
+	public int getUnhandledItem() {
+		return -1;
+	}
+
 	/*
 	 * Get request at specified position
 	 */

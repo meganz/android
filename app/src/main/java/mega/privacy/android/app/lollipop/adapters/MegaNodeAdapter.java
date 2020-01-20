@@ -2,27 +2,31 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v4.app.Fragment;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -42,6 +46,7 @@ import mega.privacy.android.app.lollipop.ContactFileListFragmentLollipop;
 import mega.privacy.android.app.lollipop.ContactSharedFolderFragment;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -56,7 +61,6 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.FileUtils.FileTakenDownDialogHandler.KEY_TAKEN_DOWN_DIALOG;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -64,9 +68,8 @@ import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.FileUtils.FileTakenDownDialogHandler.showTakenDownDialog;
 
-public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter, FileTakenDownDialogHandler.FileTakenDownDialogListener {
+public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -83,6 +86,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private int placeholderCount;
 
     private SparseBooleanArray selectedItems;
+
+    private int unHandledItem = -1;
+
+    private AlertDialog takenDownDialog;
 
     private RecyclerView listFragment;
     private DatabaseHandler dbH = null;
@@ -144,6 +151,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public int getPlaceholderCount() {
         return placeholderCount;
+    }
+
+    @Override
+    public int getUnhandledItem() {
+        return unHandledItem;
     }
 
     public void toggleAllSelection(int pos) {
@@ -445,29 +457,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             megaApi = ((MegaApplication)((Activity)context).getApplication())
                     .getMegaApi();
         }
-
-        // Rebind the shown dialog to new adapter as listener
-        if (context instanceof AppCompatActivity) {
-            AppCompatActivity activity = (AppCompatActivity)context;
-            Fragment fragmentTakenDownDialog = activity.getSupportFragmentManager().findFragmentByTag(KEY_TAKEN_DOWN_DIALOG);
-            if (fragmentTakenDownDialog instanceof FileTakenDownDialogHandler.TakenDownDialogFragment) {
-                ((FileTakenDownDialogHandler.TakenDownDialogFragment) fragmentTakenDownDialog).setListener(this);
-            }
-        }
     }
 
     public void setNodes(ArrayList<MegaNode> nodes) {
         this.nodes = insertPlaceHolderNode(nodes);
         logDebug("setNodes size: " + this.nodes.size());
         notifyDataSetChanged();
-        // Rebind the shown dialog to new adapter as listener
-        if (context instanceof AppCompatActivity) {
-            AppCompatActivity activity = (AppCompatActivity)context;
-            Fragment fragmentTakenDownDialog = activity.getSupportFragmentManager().findFragmentByTag(KEY_TAKEN_DOWN_DIALOG);
-            if (fragmentTakenDownDialog instanceof FileTakenDownDialogHandler.TakenDownDialogFragment) {
-                ((FileTakenDownDialogHandler.TakenDownDialogFragment) fragmentTakenDownDialog).setCurrentPlaceHolderCount(getPlaceholderCount());
-            }
-        }
     }
 
     public void setAdapterType(int adapterType) {
@@ -609,6 +604,20 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             MegaNodeAdapter.ViewHolderBrowserGrid holderGrid = (MegaNodeAdapter.ViewHolderBrowserGrid)holder;
             onBindViewHolderGrid(holderGrid,position);
         }
+        listFragment.post(
+                () -> {
+                    try {
+                        if (takenDownDialog != null && takenDownDialog.isShowing()) {
+                            return;
+                        }
+                        if (unHandledItem != -1) {
+                            listFragment.findViewHolderForAdapterPosition(unHandledItem).itemView.performClick();
+                        }
+                    } catch (Exception ex) {
+                        logError("Exception happens: " + ex.toString());
+                    }
+                }
+        );
     }
 
     public void onBindViewHolderGrid(ViewHolderBrowserGrid holder,int position) {
@@ -1293,17 +1302,19 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             case R.id.file_list_item_layout:
             case R.id.file_grid_item_layout: {
                 if (n.isTakenDown() && !isMultipleSelect()) {
-                    if (context instanceof AppCompatActivity) {
-                        boolean isListMode = adapterType == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
-                        int currentPlaceHolderCount = getPlaceholderCount();
-                        showTakenDownDialog((AppCompatActivity) context, n.isFolder(), currentPosition, this, isListMode, currentPlaceHolderCount);
-                    }
+                    showTakenDownDialog(n.isFolder(), v, currentPosition);
+                    unHandledItem = currentPosition;
                 } else {
                     fileClicked(currentPosition, v);
                 }
                 break;
             }
         }
+    }
+
+    public void filClicked(int currentPosition) {
+        notifyItemChanged(currentPosition);
+        unHandledItem = currentPosition;
     }
 
     private void fileClicked(int currentPosition, View view) {
@@ -1474,12 +1485,64 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         this.listFragment = listFragment;
     }
 
-    @Override
-    public void onOpenClicked(int currentPosition) {
-        try {
-            fileClicked(currentPosition, listFragment.findViewHolderForAdapterPosition(currentPosition).itemView);
-        } catch(Exception ex) {
-            logError("Exception happens: " + ex.toString());
+    private void showTakenDownDialog(boolean isFolder, final View view, final int currentPosition) {
+        int alertMessageID = isFolder ? R.string.message_folder_takedown_pop_out_notification : R.string.message_file_takedown_pop_out_notification;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View v = inflater.inflate(R.layout.dialog_three_vertical_buttons, null);
+        builder.setView(v);
+
+        TextView title = v.findViewById(R.id.dialog_title);
+        TextView text = v.findViewById(R.id.dialog_text);
+
+        Button openButton = v.findViewById(R.id.dialog_first_button);
+        Button disputeButton = v.findViewById(R.id.dialog_second_button);
+        Button cancelButton = v.findViewById(R.id.dialog_third_button);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.RIGHT;
+
+        title.setText(R.string.general_error_word);
+        text.setText(alertMessageID);
+        openButton.setText(R.string.context_open_link);
+        disputeButton.setText(R.string.dispute_takendown_file);
+        cancelButton.setText(R.string.general_cancel);
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+
+        openButton.setOnClickListener(button -> {
+            unHandledItem = -1;
+            dialog.dismiss();
+            fileClicked(currentPosition, view);
+        });
+
+        disputeButton.setOnClickListener(button -> {
+            unHandledItem = -1;
+            dialog.dismiss();
+            Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+            openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            openTermsIntent.setData(Uri.parse(DISPUTE_URL));
+            context.startActivity(openTermsIntent);
+        });
+
+        cancelButton.setOnClickListener(button -> {
+            unHandledItem = -1;
+            dialog.dismiss();
+        });
+
+        takenDownDialog = dialog;
+
+        dialog.show();
+    }
+
+    public void clearTakenDownDialog() {
+        if (takenDownDialog != null) {
+            takenDownDialog.dismiss();
         }
     }
 }

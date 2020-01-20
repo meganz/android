@@ -128,6 +128,10 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 		adapter.toggleSelection(position);
 	}
 
+	@Override
+	public void reselectUnHandled(int position) {
+	}
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override

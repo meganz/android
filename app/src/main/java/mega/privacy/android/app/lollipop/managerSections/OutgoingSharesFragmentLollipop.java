@@ -1449,6 +1449,11 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		adapter.toggleSelection(position);
 	}
 
+	@Override
+	public void reselectUnHandled(int position) {
+
+	}
+
 	public void selectAll(){
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){

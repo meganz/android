@@ -848,7 +848,12 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		adapter.toggleSelection(position);
 	}
 
-    public void openFile (File currentFile){
+	@Override
+	public void reselectUnHandled(int position) {
+
+	}
+
+	public void openFile (File currentFile){
 		logDebug("openFile");
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 

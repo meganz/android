@@ -137,6 +137,11 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		adapter.toggleSelection(position);
 	}
 
+	@Override
+	public void reselectUnHandled(int position) {
+
+	}
+
 	public void updateScrollPosition(int position) {
 		logDebug("Position: " + position);
 		if (adapter != null) {

@@ -671,6 +671,11 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         return placeholderCount;
     }
 
+    @Override
+    public int getUnhandledItem() {
+        return -1;
+    }
+
     /*
 	 * Get list of all selected nodes
 	 */

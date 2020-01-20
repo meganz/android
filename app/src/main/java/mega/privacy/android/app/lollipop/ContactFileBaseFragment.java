@@ -168,6 +168,11 @@ public class ContactFileBaseFragment extends RotatableFragment {
     }
 
     @Override
+    public void reselectUnHandled(int position) {
+
+    }
+
+    @Override
     protected void updateActionModeTitle() {
     }
 }

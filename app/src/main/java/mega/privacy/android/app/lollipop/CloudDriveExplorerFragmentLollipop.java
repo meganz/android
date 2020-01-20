@@ -128,6 +128,11 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		adapter.toggleSelection(position);
 	}
 
+	@Override
+	public void reselectUnHandled(int position) {
+
+	}
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
