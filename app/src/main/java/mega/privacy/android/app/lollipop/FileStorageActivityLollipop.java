@@ -83,6 +83,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static final String EXTRA_SERIALIZED_NODES = "serialized_nodes";
 	public static final String EXTRA_DOCUMENT_HASHES = "document_hash";
 	public static final String EXTRA_FROM_SETTINGS = "from_settings";
+	public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
 	public static final String EXTRA_CAMERA_FOLDER = "camera_folder";
 	public static final String EXTRA_BUTTON_PREFIX = "button_prefix";
 	public static final String EXTRA_SD_ROOT = "sd_root";
@@ -134,7 +135,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	
-	private Boolean fromSettings;
+	private Boolean fromSettings, fromSaveRecoveryKey;
 	private Boolean cameraFolderSettings;
 	private String sdRoot;
 	private boolean hasSDCard;
@@ -373,11 +374,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		aB.setDisplayShowHomeEnabled(true);
 		
 		Intent intent = getIntent();
-		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
 		prompt = intent.getStringExtra(EXTRA_PROMPT);
-		if(prompt != null) {
-            showSnackBar(this, SNACKBAR_TYPE, prompt, -1);
-        }
+		if (prompt != null) {
+			showSnackBar(this, SNACKBAR_TYPE, prompt, -1);
+		}
+		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
+		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
 		cameraFolderSettings = intent.getBooleanExtra(EXTRA_CAMERA_FOLDER, false);
 		sdRoot = intent.getStringExtra(EXTRA_SD_ROOT);
 		hasSDCard = (sdRoot != null);
@@ -398,6 +400,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			if (savedInstanceState.containsKey("path")) {
 				path = new File(savedInstanceState.getString("path"));
 			}
+
+			fromSaveRecoveryKey = savedInstanceState.getBoolean(EXTRA_SAVE_RECOVERY_KEY, false);
 		}
 		
         viewContainer = (RelativeLayout) findViewById(R.id.file_storage_container);
@@ -411,17 +415,17 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		button = (Button) findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
 
-		if(fromSettings){
+		if (fromSaveRecoveryKey) {
+			button.setText(getString(R.string.save_action).toUpperCase(Locale.getDefault()));
+		} else if (fromSettings) {
 			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-		}
-		else{
+		} else {
 			if (mode == Mode.PICK_FOLDER) {
 				button.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
-			}
-			else{
+			} else {
 				button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 			}
-		}		
+		}
 		emptyImageView = (ImageView) findViewById(R.id.file_storage_empty_image);
 		emptyTextView = (TextView) findViewById(R.id.file_storage_empty_text);
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -531,6 +535,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onSaveInstanceState(Bundle state) {
 		state.putString("path", path.getAbsolutePath());
+		state.putBoolean(EXTRA_SAVE_RECOVERY_KEY, fromSaveRecoveryKey);
 		super.onSaveInstanceState(state);
 	}
 	

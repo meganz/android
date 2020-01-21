@@ -223,7 +223,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 				String decryptedLink = request.getText();
 
 				// Folder Download link
-				if (decryptedLink != null && (url.matches("^https://mega.co.nz/#F!.+$") || decryptedLink.matches("^https://mega.nz/#F!.+$"))) {
+				if (decryptedLink != null && matchRegexs(decryptedLink, FOLDER_LINK_REGEXS)) {
 					logDebug("Folder link url");
 
 					Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
@@ -234,7 +234,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 					finish();
 				}
 
-				else if (decryptedLink != null && (decryptedLink.matches("^https://mega.co.nz/#!.+$") || decryptedLink.matches("^https://mega.nz/#!.+$"))) {
+				else if (decryptedLink != null && matchRegexs(decryptedLink, FILE_LINK_REGEXS)) {
 					logDebug("Open link url");
 
 					Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);

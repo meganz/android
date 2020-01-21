@@ -59,7 +59,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		containerOkButton.setVisibility(View.GONE);
 		containerOkButton.setOnClickListener(this);
 
-		decodeURL(url);
+		url = decodeURL(url);
 
 		// Email verification link
 		if (matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
