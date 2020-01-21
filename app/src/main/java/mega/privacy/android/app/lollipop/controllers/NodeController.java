@@ -106,7 +106,13 @@ public class NodeController {
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
         long[] longArray = new long[handleList.size()];
         for (int i=0; i<handleList.size(); i++){
-            longArray[i] = handleList.get(i);
+            Long handle = handleList.get(i);
+            MegaNode node = megaApi.getNodeByHandle(handle);
+            if (node != null && node.isTakenDown()) {
+                showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node));
+                return;
+            }
+            longArray[i] = handle;
         }
         intent.putExtra("COPY_FROM", longArray);
         ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);

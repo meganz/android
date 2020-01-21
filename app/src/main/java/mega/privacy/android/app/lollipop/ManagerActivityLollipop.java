@@ -9284,6 +9284,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void showGetLinkActivity(long handle){
 		logDebug("Handle: " + handle);
+		MegaNode node = megaApi.getNodeByHandle(handle);
+		if (node != null && node.isTakenDown()) {
+			showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node), -1);
+			return;
+		}
+
 		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
 		linkIntent.putExtra("handle", handle);
 		startActivity(linkIntent);
@@ -11526,6 +11532,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void showConfirmationRemovePublicLink (final MegaNode n){
 		logDebug("showConfirmationRemovePublicLink");
+
+        if (n != null && n.isTakenDown()) {
+            showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node), -1);
+            return;
+        }
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
