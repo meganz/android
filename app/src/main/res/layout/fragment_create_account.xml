@@ -1,363 +1,432 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scroll_view_account"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_create_account"
+    android:background="@color/white"
     tools:context=".CreateAccountActivityLollipop">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:background="@color/white"
-        android:orientation="vertical" >
+        android:layout_height="match_parent"
+        android:layout_above="@+id/create_account_and_accept_layout">
 
         <LinearLayout
-            android:id="@+id/create_account_create_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:gravity="left"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/create_account_create_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginRight="24dp"
+                    android:layout_marginBottom="46dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/create_account_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:text="@string/create_account_title"
+                        android:layout_marginTop="17dp"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"
+                        android:textAllCaps="true"
+                        android:fontFamily="sans-serif-light"
+                        android:textStyle="bold" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/create_account_name_text_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="7dp"
+                            app:errorEnabled="true"
+                            app:errorTextAppearance="@style/InputTextAppearanceError">
+
+                            <android.support.design.widget.TextInputEditText
+                                android:id="@+id/create_account_name_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:imeOptions="actionNext"
+                                android:inputType="text|textCapWords"
+                                android:hint="@string/first_name_text"
+                                android:theme="@style/ColorControlStyle"/>
+
+                        </android.support.design.widget.TextInputLayout>
+
+                        <ImageView
+                            android:id="@+id/create_account_name_text_error_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="2dp"
+                            android:src="@drawable/ic_input_warning"
+                            android:tint="@color/dark_primary_color"
+                            android:layout_alignBottom="@+id/create_account_name_text_layout"/>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/create_account_last_name_text_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:errorEnabled="true"
+                            app:errorTextAppearance="@style/InputTextAppearanceError">
+
+                            <android.support.design.widget.TextInputEditText
+                                android:id="@+id/create_account_last_name_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:imeOptions="actionNext"
+                                android:inputType="text|textCapWords"
+                                android:hint="@string/lastname_text"
+                                android:theme="@style/ColorControlStyle"/>
+
+                        </android.support.design.widget.TextInputLayout>
+
+                        <ImageView
+                            android:id="@+id/create_account_last_name_text_error_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="2dp"
+                            android:src="@drawable/ic_input_warning"
+                            android:tint="@color/dark_primary_color"
+                            android:layout_alignBottom="@+id/create_account_last_name_text_layout"/>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/create_account_email_text_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:errorEnabled="true"
+                            app:errorTextAppearance="@style/InputTextAppearanceError">
+
+                            <android.support.design.widget.TextInputEditText
+                                android:id="@+id/create_account_email_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:imeOptions="actionNext"
+                                android:inputType="textEmailAddress"
+                                android:hint="@string/email_text"
+                                android:theme="@style/ColorControlStyle"/>
+
+                        </android.support.design.widget.TextInputLayout>
+
+                        <ImageView
+                            android:id="@+id/create_account_email_text_error_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="2dp"
+                            android:src="@drawable/ic_input_warning"
+                            android:tint="@color/dark_primary_color"
+                            android:layout_alignBottom="@+id/create_account_email_text_layout"/>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/create_account_password_text_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:errorEnabled="true"
+                            app:errorTextAppearance="@style/InputTextAppearanceError">
+
+                            <android.support.design.widget.TextInputEditText
+                                android:id="@+id/create_account_password_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:imeOptions="actionNext"
+                                android:inputType="textPassword"
+                                android:hint="@string/password_text"
+                                android:theme="@style/ColorControlStyle"/>
+
+                        </android.support.design.widget.TextInputLayout>
+
+                        <ImageView
+                            android:id="@+id/toggle_button_passwd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignTop="@+id/create_account_password_text_layout"
+                            android:layout_marginTop="15dp"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_b_shared_read"
+                            android:visibility="gone"/>
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/create_account_password_text_error_icon"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="2dp"
+                            android:src="@drawable/ic_input_warning"
+                            android:tint="@color/dark_primary_color"
+                            android:layout_alignBottom="@+id/create_account_password_text_layout"/>
+
+                        <LinearLayout
+                            android:id="@+id/container_passwd_elements"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginTop="55dp"
+                            android:paddingBottom="20dp"
+                            android:layout_alignTop="@+id/create_account_password_text_layout"
+                            android:visibility="gone">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <ImageView
+                                    android:id="@+id/shape_passwd_first"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_marginRight="5dp"
+                                    android:background="@drawable/passwd_very_weak"/>
+                                <ImageView
+                                    android:id="@+id/shape_passwd_second"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_marginRight="5dp"
+                                    android:background="@drawable/shape_password"/>
+                                <ImageView
+                                    android:id="@+id/shape_passwd_third"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_marginRight="5dp"
+                                    android:background="@drawable/shape_password"/>
+                                <ImageView
+                                    android:id="@+id/shape_passwd_fourth"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_marginRight="5dp"
+                                    android:background="@drawable/shape_password"/>
+                                <ImageView
+                                    android:id="@+id/shape_passwd_fifth"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_marginRight="5dp"
+                                    android:background="@drawable/shape_password"/>
+
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/password_type"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="14sp"
+                                android:textColor="@color/login_warning"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginLeft="5dp"
+                                android:text="@string/pass_very_weak"/>
+
+                            <TextView
+                                android:id="@+id/password_advice_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="14sp"
+                                android:layout_marginTop="6dp"
+                                android:layout_marginLeft="5dp"
+                                android:textColor="@color/name_my_account"
+                                android:text="@string/passwd_weak"/>
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/create_account_password_text_confirm_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:errorEnabled="true"
+                            app:errorTextAppearance="@style/InputTextAppearanceError">
+
+                            <android.support.design.widget.TextInputEditText
+                                android:id="@+id/create_account_password_text_confirm"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:imeOptions="actionDone"
+                                android:inputType="textPassword"
+                                android:hint="@string/confirm_password_text"
+                                android:theme="@style/ColorControlStyle"/>
+
+                        </android.support.design.widget.TextInputLayout>
+
+                        <ImageView
+                            android:id="@+id/toggle_button_confirm_passwd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignTop="@+id/create_account_password_text_confirm_layout"
+                            android:layout_marginTop="15dp"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_b_shared_read"
+                            android:visibility="gone"/>
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/create_account_password_text_confirm_error_icon"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="2dp"
+                            android:src="@drawable/ic_input_warning"
+                            android:tint="@color/dark_primary_color"
+                            android:layout_alignBottom="@+id/create_account_password_text_confirm_layout"/>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/create_account_creating_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:gravity="center_horizontal|center_vertical"
+                android:orientation="vertical" >
+
+                <ImageView
+                    android:id="@+id/create_account_mega_logo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="60dp"
+                    android:src="@drawable/mega_ic" />
+
+                <TextView
+                    android:id="@+id/create_account_generating_keys_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:text="@string/login_generating_key" />
+
+                <TextView
+                    android:id="@+id/create_account_creating_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/create_account_creating_account" />
+
+                <ProgressBar
+                    android:id="@+id/create_account_progress_bar"
+                    style="@style/UsedSpaceProgressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="30dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/create_account_and_accept_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background_create_account"
             android:orientation="vertical" >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:layout_marginLeft="24dp"
-                android:layout_marginRight="26dp"
-                android:orientation="vertical">
+                android:layout_gravity="left"
+                android:layout_marginTop="18dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="24dp"
+                android:orientation="horizontal" >
+
+                <CheckBox
+                    android:id="@+id/create_account_chkTOS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:theme="@style/ColorControlStyle"/>
 
                 <TextView
-                    android:id="@+id/create_account_text_view"
+                    android:id="@+id/tos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginBottom="24dp"
-                    android:text="@string/create_account_text"
-                    android:textColor="@color/login_title"
-                    android:textSize="20sp" />
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/text_login"
+                    android:layout_marginRight="16dp"
+                    android:singleLine="false"
+                    android:textSize="12sp" />
 
-                <EditText
-                    android:id="@+id/create_account_name_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="left"
-                    android:hint="@string/name_text"
-                    android:textSize="16sp"
-                    android:imeOptions="actionNext"
-                    android:inputType="text|textCapWords"
-                    android:theme="@style/ColorControlStyle" />
+            </LinearLayout>
 
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/create_account_name_error">
+            <include
+                layout="@layout/checkbox_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginTop="8dp"/>
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/create_account_name_error_icon"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="2dp"
-                        android:src="@drawable/ic_input_warning"
-                        android:tint="@color/login_warning"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/create_account_name_error_text"
-                        android:textColor="@color/login_warning"
-                        android:layout_toLeftOf="@id/create_account_name_error_icon"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="3dp"/>
-
-                </RelativeLayout>
-                <EditText
-                    android:id="@+id/create_account_last_name_text"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="left"
-                    android:hint="@string/lastname_text"
-                    android:imeOptions="actionNext"
-                    android:inputType="text|textCapWords"
-                    android:textSize="16sp"
-                    android:theme="@style/ColorControlStyle"/>
-                <RelativeLayout
-                    android:id="@+id/create_account_last_name_error"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:id="@+id/create_account_last_name_error_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="2dp"
-                        android:src="@drawable/ic_input_warning"
-                        android:tint="@color/login_warning"
-                    />
-                    <TextView
-                        android:id="@+id/create_account_last_name_error_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="3dp"
-                        android:layout_toLeftOf="@id/create_account_last_name_error_icon"
-                        android:textColor="@color/login_warning"/>
-                </RelativeLayout>
-
-                <EditText
-                    android:id="@+id/create_account_email_text"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="left"
-                    android:hint="@string/email_text"
-                    android:textSize="16sp"
-                    android:imeOptions="actionNext"
-                    android:inputType="textEmailAddress"
-                    android:theme="@style/ColorControlStyle" />
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/create_account_email_error">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/create_account_email_error_icon"
-                        android:layout_alignParentRight="true"
-                        android:src="@drawable/ic_input_warning"
-                        android:layout_marginRight="2dp"
-                        android:tint="@color/login_warning"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/create_account_email_error_text"
-                        android:textColor="@color/login_warning"
-                        android:layout_toLeftOf="@id/create_account_email_error_icon"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="3dp"
-                        android:layout_centerVertical="true"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/create_account_password_text"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_gravity="left"
-                        android:hint="@string/password_text"
-                        android:imeOptions="actionNext"
-                        android:textSize="16sp"
-                        android:fontFamily="sans-serif"
-                        android:inputType="textPassword"
-                        android:theme="@style/ColorControlStyle" />
-
-                    <ImageView
-                        android:id="@+id/toggle_button_passwd"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignRight="@+id/create_account_password_text"
-                        android:layout_alignBottom="@+id/create_account_password_text"
-                        android:paddingBottom="10dp"
-                        android:paddingRight="5dp"
-                        android:visibility="gone"
-                        android:src="@drawable/ic_b_shared_read"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/create_account_password_error">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/create_account_password_error_icon"
-                        android:layout_alignParentRight="true"
-                        android:src="@drawable/ic_input_warning"
-                        android:layout_marginRight="2dp"
-                        android:tint="@color/login_warning"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/create_account_password_error_text"
-                        android:textColor="@color/login_warning"
-                        android:layout_toLeftOf="@id/create_account_password_error_icon"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="3dp"
-                        android:layout_centerVertical="true"/>
-
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:id="@+id/container_passwd_elements"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="7dp"
-                    android:visibility="gone">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <ImageView
-                            android:id="@+id/shape_passwd_first"
-                            android:layout_width="@dimen/width_passwd_shape"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"
-                            android:background="@drawable/passwd_very_weak"/>
-                        <ImageView
-                            android:id="@+id/shape_passwd_second"
-                            android:layout_width="@dimen/width_passwd_shape"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"
-                            android:background="@drawable/shape_password"/>
-                        <ImageView
-                            android:id="@+id/shape_passwd_third"
-                            android:layout_width="@dimen/width_passwd_shape"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"
-                            android:background="@drawable/shape_password"/>
-                        <ImageView
-                            android:id="@+id/shape_passwd_fourth"
-                            android:layout_width="@dimen/width_passwd_shape"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"
-                            android:background="@drawable/shape_password"/>
-                        <ImageView
-                            android:id="@+id/shape_passwd_fifth"
-                            android:layout_width="@dimen/width_passwd_shape"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="5dp"
-                            android:background="@drawable/shape_password"/>
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/password_type"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="14sp"
-                        android:textColor="@color/login_warning"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginLeft="5dp"
-                        android:text="@string/pass_very_weak"/>
-
-                    <TextView
-                        android:id="@+id/password_advice_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="14sp"
-                        android:layout_marginTop="6dp"
-                        android:layout_marginLeft="5dp"
-                        android:textColor="@color/name_my_account"
-                        android:text="@string/passwd_weak"/>
-
-                </LinearLayout>
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/create_account_password_text_confirm"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_gravity="left"
-                        android:hint="@string/confirm_password_text"
-                        android:imeOptions="actionDone"
-                        android:textSize="16sp"
-                        android:fontFamily="sans-serif"
-                        android:inputType="textPassword"
-                        android:theme="@style/ColorControlStyle" />
-
-                    <ImageView
-                        android:id="@+id/toggle_button_confirm_passwd"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignRight="@+id/create_account_password_text_confirm"
-                        android:layout_alignBottom="@+id/create_account_password_text_confirm"
-                        android:paddingBottom="10dp"
-                        android:paddingRight="5dp"
-                        android:visibility="gone"
-                        android:src="@drawable/ic_b_shared_read"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/create_account_password_confirm_error">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/create_account_password_confirm_error_icon"
-                        android:layout_alignParentRight="true"
-                        android:src="@drawable/ic_input_warning"
-                        android:layout_marginRight="2dp"
-                        android:tint="@color/login_warning"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/create_account_password_confirm_error_text"
-                        android:textColor="@color/login_warning"
-                        android:layout_toLeftOf="@id/create_account_password_confirm_error_icon"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="3dp"
-                        android:layout_centerVertical="true"/>
-
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:layout_marginBottom="31dp"
-                    android:layout_marginTop="36dp"
-                    android:layout_marginLeft="-4dp"
-                    android:orientation="horizontal" >
-
-                    <CheckBox
-                        android:id="@+id/create_account_chkTOS"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"/>
-
-                    <TextView
-                        android:id="@+id/tos"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:textColor="@color/text_login"
-                        android:layout_marginRight="16dp"
-                        android:singleLine="false"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="left"
+                android:layout_marginTop="18dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginBottom="17dp">
 
                 <Button
                     android:id="@+id/button_create_account_create"
@@ -369,32 +438,11 @@
                     android:paddingBottom="10dp"
                     android:paddingRight="16dp"
                     android:paddingLeft="16dp"
-                    android:layout_marginBottom="30dp"
-                    android:layout_marginLeft="3dp"
-                    android:layout_gravity="left"
                     android:minHeight="0dp"
                     android:minWidth="0dp"
                     android:elevation="6dp"
-                    android:stateListAnimator="@null"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                android:background="@color/background_create_account"
-                android:orientation="vertical" >
-
-                <TextView
-                    android:id="@+id/text_already_account"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/already_account"
-                    android:textColor="@color/text_login"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginBottom="23dp"
-                    android:textSize="20sp" />
+                    android:stateListAnimator="@null"
+                    android:layout_gravity="center_vertical"/>
 
                 <Button
                     android:id="@+id/button_login_create"
@@ -402,54 +450,20 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/accentColor"
                     android:background="@android:color/transparent"
-                    android:layout_gravity="center"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingRight="16dp"
+                    android:paddingLeft="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
                     android:minHeight="0dp"
                     android:minWidth="0dp"
-                    android:layout_marginBottom="30dp"
                     android:stateListAnimator="@null" />
+
             </LinearLayout>
 
-
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/create_account_creating_layout"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:background="@color/white"
-            android:gravity="center_horizontal|center_vertical"
-            android:orientation="vertical" >
+    </RelativeLayout>
 
-            <ImageView
-                android:id="@+id/create_account_mega_logo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="60dp"
-                android:src="@drawable/mega_ic" />
-
-            <TextView
-                android:id="@+id/create_account_generating_keys_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:text="@string/login_generating_key" />
-
-            <TextView
-                android:id="@+id/create_account_creating_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="@string/create_account_creating_account" />
-
-            <ProgressBar
-                android:id="@+id/create_account_progress_bar"
-                style="@style/UsedSpaceProgressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="30dp"
-                android:layout_marginBottom="30dp"/>
-        </LinearLayout>
-    </LinearLayout>
-
-</ScrollView>
+</RelativeLayout>

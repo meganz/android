@@ -869,9 +869,9 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
             checker.setSize(size);
             checker.setHashes(hashes);
             if (checker.check()) {
-                downloadToSDCard = true;
                 downloadRoot = checker.getDownloadRoot();
                 sdCardOperator = checker.getSdCardOperator();
+                downloadToSDCard = (downloadRoot != null);
             } else {
                 return;
             }

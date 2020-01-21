@@ -33,7 +33,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 50;
+	private static final int DATABASE_VERSION = 51;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -79,6 +79,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = "shouldclearcamsyncrecords";
     private static final String KEY_KEEP_FILE_NAMES = "keepFileNames";
     private static final String KEY_SHOW_INVITE_BANNER = "showinvitebanner";
+    private static final String KEY_ASK_FOR_DISPLAY_OVER = "askfordisplayover";
     private static final String KEY_PIN_LOCK_ENABLED = "pinlockenabled";
     private static final String KEY_PIN_LOCK_TYPE = "pinlocktype";
     private static final String KEY_PIN_LOCK_CODE = "pinlockcode";
@@ -303,8 +304,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_REMOVE_GPS + " TEXT,"                         //38
                 + KEY_SHOW_INVITE_BANNER + " TEXT,"                 //39
                 + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       //40
-                + KEY_SD_CARD_URI + " TEXT"                         //41
-                + ")";
+				+ KEY_SD_CARD_URI + " TEXT,"                        //41
+                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT" + ")";        //42
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -737,9 +738,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_MODIFICATION_DESC)) + "';");
         }
 
-        if (oldVersion <= 49) {
-            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SD_CARD_URI + " TEXT;");
-        }
+		if (oldVersion <= 49) {
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SD_CARD_URI + " TEXT;");
+		}
+
+        if(oldVersion <= 50) {
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_ASK_FOR_DISPLAY_OVER + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_ASK_FOR_DISPLAY_OVER + " = '" + encrypt("true") + "';");
+		}
 	}
 
 //	public MegaOffline encrypt(MegaOffline off){
@@ -1385,6 +1391,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_REMOVE_GPS, encrypt(prefs.getRemoveGPS()));
         db.insert(TABLE_PREFERENCES, null, values);
 	}
+
+	public boolean shouldAskForDisplayOver() {
+        boolean should = true;
+        String text = getStringValue(TABLE_PREFERENCES, KEY_ASK_FOR_DISPLAY_OVER, "");
+        if (!TextUtils.isEmpty(text)) {
+            should = Boolean.parseBoolean(text);
+        }
+        return should;
+    }
+
+    public void dontAskForDisplayOver() {
+        db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_ASK_FOR_DISPLAY_OVER + " = '" + encrypt("false") + "';");
+    }
 
 	public MegaPreferences getPreferences(){
         logDebug("getPreferences");

@@ -154,7 +154,7 @@ public class ContactsUtil {
 
             @Override
             public int compare(LocalContact o1, LocalContact o2) {
-                return o1.name.compareTo(o2.name);
+                return o1.name.compareToIgnoreCase(o2.name);
             }
         });
         return localContacts;

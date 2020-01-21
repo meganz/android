@@ -102,7 +102,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         logDebug("onPause");
-
+        app.activityPaused();
         checkMegaObjects();
         isPaused = true;
         super.onPause();
@@ -111,7 +111,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         logDebug("onResume");
-
+        app.activityResumed();
         super.onResume();
         setAppFontSize(this);
 
