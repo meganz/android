@@ -3173,6 +3173,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     @Override
     public void onBackPressed() {
+        logDebug("onBackPressed");
         retryConnectionsAndSignalPresence();
         if (emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
             emojiKeyboard.hideBothKeyboard(this);
