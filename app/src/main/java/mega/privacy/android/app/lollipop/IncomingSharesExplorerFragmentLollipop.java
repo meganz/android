@@ -129,7 +129,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 	}
 
 	@Override
-	public void reselectUnHandled(int position) {
+	public void reselectUnHandledSingleItem(int position) {
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {

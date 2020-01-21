@@ -46,9 +46,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SearchNodesTask;
@@ -138,7 +136,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	}
 
 	@Override
-	public void reselectUnHandled(int position) {
+	public void reselectUnHandledSingleItem(int position) {
 		adapter.filClicked(position);
 	}
 
@@ -1284,7 +1282,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 		if (isWaitingForSearchedNodes()) {
 			reDoTheSelectionAfterRotation();
-			reSelectUnhandeldItem();
+			reSelectUnhandledItem();
 		}
 	}
 

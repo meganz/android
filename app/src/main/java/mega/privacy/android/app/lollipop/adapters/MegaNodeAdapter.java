@@ -87,8 +87,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     private SparseBooleanArray selectedItems;
 
+    /** the flag to store the node position where still remained unhandled*/
     private int unHandledItem = -1;
 
+    /** the dialog to show taken down message */
     private AlertDialog takenDownDialog;
 
     private RecyclerView listFragment;
@@ -1527,7 +1529,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         dialog.show();
     }
 
+    /**
+     * This is the method to click unhandled taken down dialog again,
+     * after the recycler view finish binding adapter
+     */
     private void reSelectUnhandledNode() {
+        // if there is no un handled item
         if (unHandledItem == -1) {
             return;
         }
@@ -1548,6 +1555,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         );
     }
 
+    /**
+     * This is the method to clear existence dialog to prevent window leak,
+     * after the rotation of the screen
+     */
     public void clearTakenDownDialog() {
         if (takenDownDialog != null) {
             takenDownDialog.dismiss();

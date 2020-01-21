@@ -1205,8 +1205,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	@Override
-	public void reselectUnHandled(int position) {
-
+	public void reselectUnHandledSingleItem(int position) {
 	}
 
 	public void findNodes(){

@@ -128,8 +128,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	}
 
 	@Override
-	public void reselectUnHandled(int position) {
-
+	public void reselectUnHandledSingleItem(int position) {
 	}
 
 	public void updateScrollPosition(int position) {

@@ -476,6 +476,9 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		((CameraUploadFragmentLollipop) fragment).itemClick(currentPosition, imageView, screenPosition);
 	}
 
+	/**
+	 * This is the method to click unhandled taken down dialog again,
+	 */
 	public void reSelectUnhandledNode() {
 		if (unHandledItem == -1) {
 			return;
@@ -551,6 +554,10 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		dialog.show();
 	}
 
+	/**
+	 * This is the method to clear existence dialog to prevent window leak,
+	 * after the rotation of the screen
+	 */
 	public void clearTakenDownDialog() {
 		if (takenDownDialog != null) {
 			takenDownDialog.dismiss();

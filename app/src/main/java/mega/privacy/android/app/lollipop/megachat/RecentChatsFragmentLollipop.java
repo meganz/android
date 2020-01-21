@@ -171,8 +171,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     @Override
-    public void reselectUnHandled(int position) {
-
+    public void reselectUnHandledSingleItem(int position) {
     }
 
     @Override

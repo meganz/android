@@ -24,7 +24,10 @@ public abstract class RotatableFragment extends Fragment {
 
     public abstract void multipleItemClick(int position);
 
-    public abstract void reselectUnHandled(int position);
+    /** Reselect the unhandled item after rotation
+     * @param position the index of unhandled item
+     */
+    public abstract void reselectUnHandledSingleItem(int position);
 
     protected abstract void updateActionModeTitle();
 
@@ -36,7 +39,7 @@ public abstract class RotatableFragment extends Fragment {
 
     private boolean waitingForSearchedNodes;
 
-    public void reDoTheSelectionAfterRotation() {
+    protected void reDoTheSelectionAfterRotation() {
         logDebug("Reselect items");
         setWaitingForSearchedNodes(false);
 
@@ -56,7 +59,7 @@ public abstract class RotatableFragment extends Fragment {
         updateActionModeTitle();
     }
 
-    public void reSelectUnhandeldItem() {
+    protected void reSelectUnhandledItem() {
         if (unHandledItem == -1) {
             return;
         }
@@ -64,10 +67,15 @@ public abstract class RotatableFragment extends Fragment {
         if (adapter == null) {
             return;
         }
-        reselectUnHandled(transferPosition(unHandledItem, adapter));
+        reselectUnHandledSingleItem(transferPosition(unHandledItem, adapter));
         unHandledItem = -1;
     }
 
+    /**
+     * @param originalPosition original position before rotation
+     * @param adapter the adapter where rotation happens
+     * @return the list position after rotation of adapter
+     */
     private int transferPosition(int originalPosition, RotatableAdapter adapter) {
         int position;
 
@@ -123,7 +131,7 @@ public abstract class RotatableFragment extends Fragment {
         if (!isWaitingForSearchedNodes()) {
             reDoTheSelectionAfterRotation();
             selectedItems = null;
-            reSelectUnhandeldItem();
+            reSelectUnhandledItem();
             unHandledItem = -1;
         }
     }

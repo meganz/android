@@ -129,8 +129,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	}
 
 	@Override
-	public void reselectUnHandled(int position) {
-
+	public void reselectUnHandledSingleItem(int position) {
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -235,14 +234,14 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		logDebug("onCreate");
-		
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 		if (megaApi.getRootNode() == null){
 			return;
 		}
-		
+
 		parentHandle = -1;
 		dbH = DatabaseHandler.getDbHandler(context);
 		lastPositionStack = new Stack<>();
@@ -270,10 +269,10 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		logDebug("onCreateView");
-				
+
 		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
-		
+
 		metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
 
@@ -281,7 +280,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		searchProgressBar = v.findViewById(R.id.progressbar);
 
 		separator = v.findViewById(R.id.separator);
-		
+
 		optionsBar = v.findViewById(R.id.options_explorer_layout);
 		optionButton = v.findViewById(R.id.action_text);
 		optionButton.setOnClickListener(this);
@@ -311,7 +310,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				checkScroll();
 			}
 		});
-		
+
 		contentText = v.findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
 
@@ -323,7 +322,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
 
 		parentHandle = ((FileExplorerActivityLollipop)context).getParentHandleCloud();
-		
+
 		if(modeCloud==FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			setParentHandle(-1);
 		}
@@ -649,7 +648,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		}
 
 		shouldResetNodes = true;
-	}	
+	}
 
 	public int onBackPressed(){
 		logDebug("onBackPressed");
@@ -722,7 +721,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			return 0;
 		}
 	}
-	
+
 	/*
 	 * Disable nodes from the list
 	 */
@@ -739,7 +738,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	public long getParentHandle() {
 		return parentHandle;
 	}
-	
+
 	public void setParentHandle(long parentHandle){
 		logDebug("Parent handle: " + parentHandle);
 		this.parentHandle = parentHandle;
@@ -749,7 +748,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		((FileExplorerActivityLollipop)context).setParentHandleCloud(parentHandle);
 		((FileExplorerActivityLollipop) context).changeTitle();
 	}
-	
+
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		if (adapter != null){
