@@ -404,7 +404,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private ArrayList<MegaChatMessage> preservedMsgToImport;
     private boolean isForwardingFromNC;
 
-    private Intent preservedIntent;
+    private ArrayList<Intent> preservedIntents = new ArrayList<>();
+    private boolean isWaitingForMoreFiles;
+    private boolean isAskingForMyChatFiles;
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
 
@@ -7901,17 +7903,19 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         File selfie;
         if(isVoiceClip(path)) {
             selfie = buildVoiceClipFile(this, outputFileName);
+            if (!isFileAvailable(selfie)) return;
         }else{
             selfie = new File(path);
+            if (!MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage()) return;
         }
-
-        if(!isVoiceClip(selfie.getAbsolutePath()) && !MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage()) return;
-        if(isVoiceClip(selfie.getAbsolutePath()) && !isFileAvailable(selfie)) return;
 
         Intent intent = new Intent(this, ChatUploadService.class);
         PendingMessageSingle pMsgSingle = new PendingMessageSingle();
         pMsgSingle.setChatId(idChat);
-        if(isVoiceClip(selfie.getAbsolutePath())) pMsgSingle.setType(TYPE_VOICE_CLIP);
+        if(isVoiceClip(selfie.getAbsolutePath())){
+            pMsgSingle.setType(TYPE_VOICE_CLIP);
+            intent.putExtra(EXTRA_TRANSFER_TYPE, EXTRA_VOICE_CLIP);
+        }
 
         long timestamp = System.currentTimeMillis()/1000;
         pMsgSingle.setUploadTimestamp(timestamp);
@@ -7933,9 +7937,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             sendMessageToUI(newNodeAttachmentMsg);
         }
         intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
-        if(isVoiceClip(selfie.getAbsolutePath())) {
-            intent.putExtra(EXTRA_TRANSFER_TYPE, EXTRA_VOICE_CLIP);
-        }
 
         checkIfServiceCanStart(intent);
     }
@@ -8422,13 +8423,22 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void checkIfServiceCanStart(Intent intent) {
-        preservedIntent = intent;
-        megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
+        preservedIntents.add(intent);
+        if (!isAskingForMyChatFiles) {
+            isAskingForMyChatFiles = true;
+            megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
+        }
     }
 
     public void startUploadService() {
-        preservedIntent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesFolder.serialize());
-        startService(preservedIntent);
+        if (!isWaitingForMoreFiles && !preservedIntents.isEmpty()) {
+            for (Intent intent : preservedIntents) {
+                intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesFolder.serialize());
+                startService(intent);
+            }
+            preservedIntents.clear();
+            isAskingForMyChatFiles = false;
+        }
     }
 
     public void setMyChatFilesFolder(MegaNode myChatFilesFolder) {
@@ -8445,5 +8455,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         closeChat(true);
         finish();
+    }
+
+    public void setIsWaitingForMoreFiles (boolean isWaitingForMoreFiles) {
+        this.isWaitingForMoreFiles = isWaitingForMoreFiles;
     }
 }
