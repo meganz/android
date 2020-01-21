@@ -66,8 +66,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		containerOkButton.setVisibility(View.GONE);
 		containerOkButton.setOnClickListener(this);
 
-		decodeURL(url);
-
+		url = decodeURL(url);
 		// File link
 		if (matchRegexs(url, FILE_LINK_REGEXS)) {
 			logDebug("Open link url");

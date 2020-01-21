@@ -187,7 +187,7 @@
                         <RelativeLayout
                             android:id="@+id/writing_linear_layout_chat"
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
+                            android:layout_height="wrap_content"
                             android:background="@android:color/transparent"
                             android:gravity="center_vertical"
                             android:visibility="visible">
@@ -207,14 +207,14 @@
                                 android:id="@+id/edit_text_chat"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:minHeight="48dp"
                                 android:layout_centerVertical="true"
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginRight="58dp"
                                 android:background="@android:color/transparent"
-                                android:ellipsize="end"
-                                android:gravity="center_vertical"
+                                android:gravity="center_vertical|left"
                                 android:inputType="textMultiLine|textCapSentences"
-                                android:maxLines="1"
+                                android:maxLines="5"
                                 android:textColor="@color/black"
                                 android:textSize="14sp"
                                 app:emojiSize="18sp"/>
