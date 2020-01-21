@@ -7990,9 +7990,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         logDebug("playVoiceClip");
         stopAllReproductionsInProgress();
         final long mId = m.getIdMessage();
-        ((ChatActivityLollipop) context).startProximitySensor();
 
         if(voiceClipPath == null){
+            ((ChatActivityLollipop) context).startProximitySensor();
             m.getMediaPlayer().seekTo(m.getProgress());
             m.getMediaPlayer().start();
             m.setPaused(false);
@@ -8024,6 +8024,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
                 logDebug("mediaPlayerVoiceNotes:onPrepared");
+                ((ChatActivityLollipop) context).startProximitySensor();
                 mediaPlayer.start();
                 prepareMediaPlayer(mId);
 
@@ -8115,8 +8116,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     public void stopAllReproductionsInProgress(){
 
+        if (messagesPlaying == null || messagesPlaying.isEmpty()) return;
         removeCallBacks();
-        if(messagesPlaying==null || messagesPlaying.isEmpty()) return;
 
         for(MessageVoiceClip m:messagesPlaying){
             if(m.getMediaPlayer().isPlaying()){

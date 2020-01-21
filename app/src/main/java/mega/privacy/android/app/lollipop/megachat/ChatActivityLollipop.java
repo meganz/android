@@ -8404,7 +8404,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if(rtcAudioManager != null) return;
         rtcAudioManager = AppRTCAudioManager.create(this, true);
         rtcAudioManager.start(null);
-        rtcAudioManager.updateSpeakerStatus(true);
+        isSpeakerOn = true;
 
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
             @Override
@@ -8413,8 +8413,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     isSpeakerOn = false;
                     rtcAudioManager.updateSpeakerStatus(false);
                 }else if(!isSpeakerOn && !isNear){
-                    isSpeakerOn = true;
-                    rtcAudioManager.updateSpeakerStatus(true);
                     stopProximitySensor();
                     adapter.pausePlaybackInProgress();
                 }
@@ -8424,11 +8422,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     public void startProximitySensor(){
         createSpeakerAudioManger();
-        isSpeakerOn = true;
         rtcAudioManager.startProximitySensor(this);
+    }
+    private void activateSpeaker(){
+        if(!isSpeakerOn) {
+            isSpeakerOn = true;
+            rtcAudioManager.updateSpeakerStatus(true);
+        }
     }
 
     public void stopProximitySensor(){
+        activateSpeaker();
         rtcAudioManager.stopProximitySensor();
     }
 
