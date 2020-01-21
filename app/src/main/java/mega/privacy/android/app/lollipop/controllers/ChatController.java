@@ -284,10 +284,9 @@ public class ChatController {
     }
 
     public void deleteMessage(MegaChatMessage message, long chatId) {
-        logDebug("Message ID: " + message.getMsgId() + ", Chat ID: " + chatId);
+        logDebug("Message : " + message.getMsgId() + ", Chat ID: " + chatId);
         MegaChatMessage messageToDelete;
         if (message == null) return;
-
         if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
             logDebug("Delete node attachment message or voice clip message");
             if (message.getType() == MegaChatMessage.TYPE_VOICE_CLIP && message.getMegaNodeList() != null && message.getMegaNodeList().size() > 0 && message.getMegaNodeList().get(0) != null) {
@@ -297,10 +296,19 @@ public class ChatController {
             return;
         }
 
-        logDebug("Delete normal message");
-        messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
+        logDebug("Delete normal message with status = "+message.getStatus());
+        if(message.getStatus() == MegaChatMessage.STATUS_SENDING && message.getMsgId() == megaApi.INVALID_HANDLE){
+
+            messageToDelete = megaChatApi.deleteMessage(chatId, message.getTempId());
+        }else{
+            messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
+        }
+
         if (messageToDelete == null) {
-            logWarning("The message cannot be deleted");
+            logDebug("The message cannot be deleted");
+        }else{
+            logDebug("The message has been deleted");
+            ((ChatActivityLollipop) context).updatingRemovedMessage(message);
         }
     }
 
@@ -1925,8 +1933,8 @@ public class ChatController {
                 checker.setNodeList(nodeList);
                 checker.setSerializedNodes(serializedNodes);
                 if (checker.check()) {
-                    downloadToSDCard = true;
                     downloadRoot = checker.getDownloadRoot();
+                    downloadToSDCard = (downloadRoot != null);
                 } else {
                     return;
                 }

@@ -353,6 +353,9 @@ public class Constants {
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
 
+    //link for introduction end to end encryption
+    public static final String URL_E2EE = "https://mega.nz/security";
+
     public static final int MIN_ITEMS_SCROLLBAR = 30;
     public static final int MIN_ITEMS_SCROLLBAR_GRID = 200;
     public static final int MIN_ITEMS_SCROLLBAR_CHAT = 20;
@@ -409,16 +412,19 @@ public class Constants {
     public static final String SELECTED_CONTACTS = "SELECTED_CONTACTS";
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String HANDLE = "handle";
+    public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
 
-    public static final int EMOJI_SIZE_EXTRA_SMALL = 10;
-    public static final int EMOJI_SIZE_SMALL = 15;
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;
-    public static final int EMOJI_AVATAR_SIZE = 30;
+    public static final int EMOJI_SIZE_HIGH = 30;
     public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
     public static final int EMOJI_AVATAR_CALL_SMALL = 40;
-    public static final int EMOJI_AVATAR_CALL_HIGH = 60;
     public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
+    public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND = 350;
+    public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT = 200;
+    public static final int MAX_WIDTH_ADD_CONTACTS = 60;
+    public static final int AVATAR_SIZE = 150;
+    public static final int AVATAR_SIZE_GRID = 75;
 
     public static final String SEPARATOR = File.separator;
 

@@ -243,7 +243,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
         ArrayList<PendingMessageSingle> pendingMessageSingles = new ArrayList<>();
         parentNode = MegaNode.unserialize(intent.getStringExtra(EXTRA_PARENT_NODE));
 
-        if (intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
+        if (intent != null  && intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
             HashMap<String, String> fileFingerprints = (HashMap<String, String>) intent.getSerializableExtra(EXTRA_UPLOAD_FILES_FINGERPRINTS);
             long[] idPendMsgs = intent.getLongArrayExtra(EXTRA_PEND_MSG_IDS);
             long[] attachFiles = intent.getLongArrayExtra(EXTRA_ATTACH_FILES);

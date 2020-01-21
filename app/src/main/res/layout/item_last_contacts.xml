@@ -14,11 +14,4 @@
 		android:layout_centerInParent="true"
 		rounded:corner_radius="10dp"
 		android:scaleType="fitCenter"/>
-
-	 <mega.privacy.android.app.components.twemoji.EmojiTextView
-		android:id="@+id/contact_list_initial_letter"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_centerInParent="true"
-		android:gravity="center_horizontal|center_vertical"/>
 </RelativeLayout>

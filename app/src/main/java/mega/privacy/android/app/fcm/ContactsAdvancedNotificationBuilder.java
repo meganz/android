@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -42,6 +41,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public final class ContactsAdvancedNotificationBuilder implements MegaRequestListenerInterface {
 
@@ -448,67 +448,10 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         }
     }
 
-    public Bitmap createDefaultAvatar(String email){
-        logDebug("createDefaultAvatar()");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint paintText = new Paint();
-        Paint paintCircle = new Paint();
-
+    private Bitmap createDefaultAvatar(String email){
         MegaUser contact = megaApi.getContact(email);
-        if(contact!=null){
-            String color = megaApi.getUserAvatarColor(contact);
-            if(color!=null){
-                logDebug("The color to set the avatar is " + color);
-                paintCircle.setColor(Color.parseColor(color));
-            }
-            else{
-                logDebug("Default color to the avatar");
-                paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-            }
-        }
-        else{
-            paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-        }
-        paintText.setColor(Color.WHITE);
-        paintText.setTextSize(150);
-        paintCircle.setAntiAlias(true);
-        paintText.setAntiAlias(true);
-        paintText.setTextAlign(Paint.Align.CENTER);
-        Typeface face = Typeface.SANS_SERIF;
-        paintText.setTypeface(face);
-        paintText.setAntiAlias(true);
-        paintText.setSubpixelText(true);
-        paintText.setStyle(Paint.Style.FILL);
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, paintCircle);
-
-        if(email!=null){
-            if(!email.isEmpty()){
-                char title = email.charAt(0);
-                String firstLetter = new String(title+"");
-
-                if(!firstLetter.equals("(")){
-
-                    logDebug("Draw letter: " + firstLetter);
-                    Rect bounds = new Rect();
-
-                    paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-                    int xPos = (c.getWidth()/2);
-                    int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-                    c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-                }
-
-            }
-        }
-        return defaultAvatar;
+        int color = getColorAvatar(context, megaApi, contact);
+        return getDefaultAvatar(context, color, email, AVATAR_SIZE, true, false);
     }
 
     public Bitmap setUserAvatar(String contactMail){

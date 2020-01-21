@@ -849,8 +849,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
             else if(adapterType == SEARCH_ADAPTER){
                 mediaHandles = new ArrayList<>();
-                ArrayList<String> serialized = getIntent().getStringArrayListExtra(ARRAY_SEARCH);
-                getMediaHandles(getSearchedNodes(serialized));
+                ArrayList<String> handles = getIntent().getStringArrayListExtra(ARRAY_SEARCH);
+                getMediaHandles(getSearchedNodes(handles));
             }
             else if(adapterType == FILE_LINK_ADAPTER){
                 if (currentDocument != null) {
@@ -1317,7 +1317,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         numErrors++;
         player.stop();
         if (numErrors <= 6) {
-            if (isPlayList && size > 1 && playListCreated) {
+            if (isPlayList && size > 1 && playListCreated && concatenatingMediaSource != null) {
 //                player.prepare(finalLoopingMediaSource);
                 player.prepare(concatenatingMediaSource);
             }
@@ -4151,6 +4151,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     }
 
     void initPlaylist (int index, long time) {
+        if (concatenatingMediaSource == null) return;
+
         creatingPlaylist = false;
         player.prepare(concatenatingMediaSource);
         player.seekTo(index, time);
