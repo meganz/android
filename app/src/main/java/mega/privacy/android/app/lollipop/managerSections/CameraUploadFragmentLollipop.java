@@ -1315,6 +1315,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public void onResume() {
 		super.onResume();
 		reDoTheSelectionAfterRotation();
+		reSelectUnhandledItem();
 	}
 
 	private void reDoTheSelectionAfterRotation() {
@@ -1330,7 +1331,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				adapterGrid.refreshActionModeTitle();
 			}
 		}
+	}
 
+	private void reSelectUnhandledItem() {
+		if (((ManagerActivityLollipop) context).isListCameraUploads() && adapterList != null) {
+			adapterList.reSelectUnhandledNode();
+		}
 	}
 
 	public void selectAll(){
@@ -2431,8 +2437,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (handler != null) {
 			handler.removeCallbacksAndMessages(null);
 		}
-		
 		super.onDestroy();
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		if (((ManagerActivityLollipop) context).isListCameraUploads() && adapterList != null) {
+			adapterList.clearTakenDownDialog();
+		}
 	}
 
 	@Override

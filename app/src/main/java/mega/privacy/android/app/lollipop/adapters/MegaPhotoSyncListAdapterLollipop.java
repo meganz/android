@@ -2,21 +2,27 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -27,6 +33,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop.PhotoSyncHolder;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -43,7 +50,11 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	private static final int ITEM_VIEW_TYPE_NODE= 0;
 	private static final int ITEM_VIEW_TYPE_MONTH = 1;
 
-	private SparseBooleanArray selectedItems = new SparseBooleanArray();;
+	private SparseBooleanArray selectedItems = new SparseBooleanArray();
+
+	private int unHandledItem = -1;
+
+	private AlertDialog takenDownDialog;
 
 	private ViewHolderPhotoSyncList holder = null;
 
@@ -141,21 +152,11 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			return;
 		}
 
-		switch (v.getId()){
-			case R.id.photo_sync_list_item_layout:{
-				if (type == CAMERA_UPLOAD_ADAPTER){
-					ImageView imageView = v.findViewById(R.id.photo_sync_list_thumbnail);
-					int[] positionIV = new int[2];
-					imageView.getLocationOnScreen(positionIV);
-					int[] screenPosition = new int[4];
-					screenPosition[0] = positionIV[0];
-					screenPosition[1] = positionIV[1];
-					screenPosition[2] = imageView.getWidth();
-					screenPosition[3] = imageView.getHeight();
-					((CameraUploadFragmentLollipop) fragment).itemClick(currentPosition, imageView, screenPosition);
-				}
-				break;
-			}
+		if (n.isTakenDown() && !isMultipleSelect()) {
+			showTakenDownDialog(v, currentPosition);
+			unHandledItem = currentPosition;
+		} else {
+			fileClicked(currentPosition, v);
 		}
 	}
 
@@ -399,6 +400,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
             holder.monthLayout.setVisibility(View.VISIBLE);
 
         }
+        reSelectUnhandledNode();
     }
 
 	@Override
@@ -461,4 +463,97 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 
         return true;
     }
+
+    private void fileClicked(int currentPosition, View view) {
+		ImageView imageView = view.findViewById(R.id.photo_sync_list_thumbnail);
+		int[] positionIV = new int[2];
+		imageView.getLocationOnScreen(positionIV);
+		int[] screenPosition = new int[4];
+		screenPosition[0] = positionIV[0];
+		screenPosition[1] = positionIV[1];
+		screenPosition[2] = imageView.getWidth();
+		screenPosition[3] = imageView.getHeight();
+		((CameraUploadFragmentLollipop) fragment).itemClick(currentPosition, imageView, screenPosition);
+	}
+
+	public void reSelectUnhandledNode() {
+		if (unHandledItem == -1) {
+			return;
+		}
+		listFragment.postDelayed(
+				() -> {
+					if (takenDownDialog != null && takenDownDialog.isShowing()) {
+						return;
+					}
+
+					try {
+						listFragment.scrollToPosition(unHandledItem);
+						onClick(listFragment.findViewHolderForAdapterPosition(unHandledItem).itemView);
+					} catch (Exception ex) {
+						logError("Exception happens: " + ex.toString());
+					}
+				}, 100
+		);
+	}
+
+	private void showTakenDownDialog(final View view, final int currentPosition) {
+		int alertMessageID = R.string.message_file_takedown_pop_out_notification;
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		LayoutInflater inflater = LayoutInflater.from(context);
+		View v = inflater.inflate(R.layout.dialog_three_vertical_buttons, null);
+		builder.setView(v);
+
+		TextView title = v.findViewById(R.id.dialog_title);
+		TextView text = v.findViewById(R.id.dialog_text);
+
+		Button openButton = v.findViewById(R.id.dialog_first_button);
+		Button disputeButton = v.findViewById(R.id.dialog_second_button);
+		Button cancelButton = v.findViewById(R.id.dialog_third_button);
+
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		params.gravity = Gravity.RIGHT;
+
+		title.setText(R.string.general_error_word);
+		text.setText(alertMessageID);
+		openButton.setText(R.string.context_open_link);
+		disputeButton.setText(R.string.dispute_takendown_file);
+		cancelButton.setText(R.string.general_cancel);
+
+		final AlertDialog dialog = builder.create();
+		dialog.setCancelable(false);
+		dialog.setCanceledOnTouchOutside(false);
+
+		openButton.setOnClickListener(button -> {
+			unHandledItem = -1;
+			dialog.dismiss();
+			fileClicked(currentPosition, view);
+		});
+
+		disputeButton.setOnClickListener(button -> {
+			unHandledItem = -1;
+			dialog.dismiss();
+			Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+			openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openTermsIntent.setData(Uri.parse(DISPUTE_URL));
+			context.startActivity(openTermsIntent);
+		});
+
+		cancelButton.setOnClickListener(button -> {
+			unHandledItem = -1;
+			dialog.dismiss();
+		});
+
+		takenDownDialog = dialog;
+
+		dialog.show();
+	}
+
+	public void clearTakenDownDialog() {
+		if (takenDownDialog != null) {
+			takenDownDialog.dismiss();
+		}
+	}
 }
