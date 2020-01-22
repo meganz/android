@@ -2154,7 +2154,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	    if (dbH.getEphemeral() != null){
             Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -2182,7 +2182,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //				AccountController aC = new AccountController(this);
 //				aC.logout(this, megaApi, megaChatApi, false);
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment",  TOUR_FRAGMENT);
+				intent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					startActivity(intent);
@@ -2629,7 +2629,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (getIntent().getAction() != null){
 					if (getIntent().getAction().equals(ACTION_IMPORT_LINK_FETCH_NODES)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_IMPORT_LINK_FETCH_NODES);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -2639,7 +2639,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_MEGA_LINK)){
 						Intent intent = new Intent(managerActivity, FileLinkActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_IMPORT_LINK_FETCH_NODES);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -2649,7 +2649,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -2659,7 +2659,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if(getIntent().getAction().equals(ACTION_OPEN_CHAT_LINK)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OPEN_CHAT_LINK);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -2674,7 +2674,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(getIntent().getAction());
 						startActivity(intent);
@@ -2683,7 +2683,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_SHOW_TRANSFERS)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_SHOW_TRANSFERS);
 						startActivity(intent);
@@ -2692,7 +2692,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_IPC)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_IPC);
 						startActivity(intent);
@@ -2701,7 +2701,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
 						startActivity(intent);
@@ -2710,7 +2710,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
                     else if(getIntent().getAction().equals(ACTION_CHAT_SUMMARY)) {
                         Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-                        intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                        intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.setAction(ACTION_CHAT_SUMMARY);
                         startActivity(intent);
@@ -2719,7 +2719,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                     }
 					else if (getIntent().getAction().equals(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
 						startActivity(intent);
@@ -2728,7 +2728,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_HANDLE_NODE)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OPEN_HANDLE_NODE);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -2738,7 +2738,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_OVERQUOTA_TRANSFER)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OVERQUOTA_TRANSFER);
 						startActivity(intent);
@@ -2747,7 +2747,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_OVERQUOTA_STORAGE)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OVERQUOTA_STORAGE);
 						startActivity(intent);
@@ -2758,7 +2758,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						logDebug("Login");
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.putExtra(CONTACT_HANDLE, getIntent().getLongExtra(CONTACT_HANDLE, -1));
-						intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OPEN_CONTACTS_SECTION);
 						startActivity(intent);
@@ -2767,7 +2767,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE);
 						startActivity(intent);
@@ -2777,7 +2777,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 			Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+			intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
@@ -3325,7 +3325,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        			if (intentRec.getAction().equals(ACTION_SHOW_TRANSFERS)){
 	        				drawerItem = DrawerItem.TRANSFERS;
 							setIntent(null);
-	        			}
+	        			} else if (intentRec.getAction().equals(ACTION_REFRESH_AFTER_BLOCKED)) {
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+	        				setIntent(null);
+						}
 	        		}
 	        	}
 				drawerLayout.closeDrawer(Gravity.LEFT);
@@ -3862,7 +3865,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     					if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)){
     						Intent exportIntent = new Intent(managerActivity, LoginActivityLollipop.class);
-							intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+							intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 							exportIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     						exportIntent.setAction(getIntent().getAction());
     						startActivity(exportIntent);
@@ -3914,7 +3917,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					logDebug("ACTION_IMPORT_LINK_FETCH_NODES");
 
 					Intent loginIntent = new Intent(managerActivity, LoginActivityLollipop.class);
-					intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+					intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					loginIntent.setAction(ACTION_IMPORT_LINK_FETCH_NODES);
 					loginIntent.setData(Uri.parse(getIntent().getDataString()));
@@ -5250,7 +5253,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void startConnection(){
 		logDebug("startConnection");
 		Intent intent = new Intent(this, LoginActivityLollipop.class);
-		intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+		intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 		finish();
@@ -8440,7 +8443,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		        	case ACCOUNT:{
 						//Refresh all the info of My Account
 		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 			    		intent.setAction(ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
 			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
@@ -17247,7 +17250,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		((MegaApplication) getApplication()).enableChat();
 
 		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-		intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+		intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 		intent.setAction(ACTION_ENABLE_CHAT);
 		startActivity(intent);
 		finish();

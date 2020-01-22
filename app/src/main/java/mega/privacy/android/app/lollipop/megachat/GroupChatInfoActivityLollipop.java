@@ -178,7 +178,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
             logDebug("Refresh session - karere");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -1028,22 +1028,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    String title = input.getText().toString();
-                    if(title.equals("")||title.isEmpty()){
-                        logWarning("Input is empty");
-                        input.setError(getString(R.string.invalid_string));
-                        input.requestFocus();
-                    }
-                    else if(title.trim().isEmpty()){
-                        logWarning("Title trim is empty");
-                        input.setError(getString(R.string.invalid_string));
-                        input.requestFocus();
-                    }
-                    else {
-                        logDebug("Action DONE ime - change title");
-                        changeTitle(title);
-                        changeTitleDialog.dismiss();
-                    }
+                    changeTitle(input);
                 }
                 else{
                     logDebug("Other IME" + actionId);
@@ -1056,22 +1041,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        String title = input.getText().toString();
-                        if(title.equals("")||title.isEmpty()){
-                            logWarning("Input is empty");
-                            input.setError(getString(R.string.invalid_string));
-                            input.requestFocus();
-                        }
-                        else if(title.trim().isEmpty()){
-                            logWarning("Title trim is empty");
-                            input.setError(getString(R.string.invalid_string));
-                            input.requestFocus();
-                        }
-                        else {
-                            logDebug("Positive button pressed - change title");
-                            changeTitle(title);
-                            changeTitleDialog.dismiss();
-                        }
+                        changeTitle(input);
                     }
                 });
 
@@ -1092,27 +1062,31 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             @Override
             public void onClick(View v) {
                 logDebug("OK BTTN CHANGE");
-                String title = input.getText().toString();
-                if(title.equals("")||title.isEmpty()){
-                    logWarning("Input is empty");
-                    input.setError(getString(R.string.invalid_string));
-                    input.requestFocus();
-                }
-                else if(title.trim().isEmpty()){
-                    logWarning("Title trim is empty");
-                    input.setError(getString(R.string.invalid_string));
-                    input.requestFocus();
-                }
-                else {
-                    logDebug("Positive button pressed - change title");
-                    changeTitle(title);
-                    changeTitleDialog.dismiss();
-
-                }
+                changeTitle(input);
             }
         });
 
     }
+
+    private void changeTitle(EmojiEditText input){
+        String title = input.getText().toString();
+        if (title.equals("") || title.isEmpty() || title.trim().isEmpty()) {
+            logWarning("Input is empty");
+            input.setError(getString(R.string.invalid_string));
+            input.requestFocus();
+        }
+        else if(!isAllowedTitle(title)){
+            logWarning("Title is too long");
+            input.setError(getString(R.string.title_long));
+            input.requestFocus();
+        }
+        else {
+            logDebug("Positive button pressed - change title");
+            changeTitle(title);
+            changeTitleDialog.dismiss();
+        }
+    }
+
 
     public void showConfirmationClearChat(){
         logDebug("showConfirmationClearChat");

@@ -702,9 +702,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 										}
 
 										Intent intent = new Intent(context, LoginActivityLollipop.class);
-										intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+										intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 										intent.setAction(ACTION_REFRESH_STAGING);
-
 										startActivityForResult(intent, REQUEST_CODE_REFRESH_STAGING);
 										break;
 
@@ -730,7 +729,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 							dbH.setStaging(false);
 						}
 						Intent intent = new Intent(context, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setAction(ACTION_REFRESH_STAGING);
 
 						startActivityForResult(intent, REQUEST_CODE_REFRESH_STAGING);

@@ -2653,7 +2653,17 @@
     <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">When you logout, ongoing transfers will be cancelled.</string>
     <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">When you logout, files from your Offline section will be deleted from your device and ongoing transfers will be cancelled.</string>
 
-    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please, select one or more contacts.</string>
+    <string name="title_long" context="Error when renaming a chat title and it is too long">Title too long</string>
+    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please select one or more contacts.</string>
+
+    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Verify your email</string>
+    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily suspended for your safety.</string>
+    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">Please [A]verify your email[/A] and follow its steps to unlock your account.</string>
+    <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Why am I seeing this?</string>
+    <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
+    <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Locked Accounts</string>
+    <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">It is possible that you are using the same password for your MEGA account as for other services, and that at least one of these other services has suffered a data breach.</string>
+    <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Your password leaked and is now being used by bad actors to log into your accounts, including, but not limited to, your MEGA account.</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
