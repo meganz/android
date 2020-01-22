@@ -112,7 +112,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 		if(megaApi==null||megaApi.getRootNode()==null){
 			logDebug("Refresh session - sdk");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+			intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
@@ -127,7 +127,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
 				logDebug("Refresh session - karere");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+				intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();

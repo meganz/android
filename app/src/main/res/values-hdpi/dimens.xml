@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--Moto red, moto a4-->
-<resources>
-    <dimen name="width_passwd_shape">43dp</dimen>
-
-    <!--<dimen name="width_qr">96dp</dimen>
-    <dimen name="start_avatar_qr">118dp</dimen>
-    <dimen name="end_avatar_qr">215dp</dimen>-->
-</resources>

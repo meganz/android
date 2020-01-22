@@ -80,7 +80,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 public class InviteContactActivity extends PinActivityLollipop implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
 
     public static final int SCAN_QR_FOR_INVITE_CONTACTS = 1111;
-    public static final String INVITE_CONTACT_SCAN_QR = "inviteContacts";
+    public static final String INVITE_CONTACT_SCAN_QR = "INVITE_CONTACT_SCAN_QR";
     private static final String KEY_PHONE_CONTACTS = "KEY_PHONE_CONTACTS";
     private static final String KEY_MEGA_CONTACTS = "KEY_MEGA_CONTACTS";
     private static final String KEY_ADDED_CONTACTS = "KEY_ADDED_CONTACTS";

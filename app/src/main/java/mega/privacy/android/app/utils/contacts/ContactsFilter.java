@@ -92,6 +92,10 @@ public class ContactsFilter {
     }
 
     public static boolean isMySelf(MegaApiJava api, String email) {
-        return api.getMyUser().getEmail().equals(email);
+        MegaUser user = api.getMyUser();
+        if(user == null) {
+            return false;
+        }
+        return user.getEmail().equals(email);
     }
 }
