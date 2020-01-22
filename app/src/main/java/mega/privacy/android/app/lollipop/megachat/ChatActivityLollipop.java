@@ -576,7 +576,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR || megaChatApi.getInitState() == MegaChatApi.INIT_NOT_DONE) {
             logDebug("Refresh session - karere");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -1975,7 +1975,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     void ifAnonymousModeLogin(boolean pendingJoin) {
         if(chatC.isInAnonymousMode()){
             Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-            loginIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+            loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
             if (pendingJoin && getIntent() != null && getIntent().getDataString() != null) {
                 loginIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
                 loginIntent.setData(Uri.parse(getIntent().getDataString()));

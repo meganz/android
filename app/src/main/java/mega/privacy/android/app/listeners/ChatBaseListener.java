@@ -11,7 +11,7 @@ public class ChatBaseListener implements MegaChatRequestListenerInterface {
 
     Context context;
 
-    public ChatBaseListener (Context context) {
+    public ChatBaseListener(Context context) {
         this.context = context;
     }
 
