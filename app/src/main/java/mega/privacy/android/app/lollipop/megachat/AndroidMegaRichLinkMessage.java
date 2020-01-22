@@ -107,7 +107,7 @@ public class AndroidMegaRichLinkMessage {
 
     public static String extractMegaLink(String urlIn) {
 
-        decodeURL(urlIn);
+        urlIn = decodeURL(urlIn);
 
         Matcher m = Patterns.WEB_URL.matcher(urlIn);
         while (m.find()) {

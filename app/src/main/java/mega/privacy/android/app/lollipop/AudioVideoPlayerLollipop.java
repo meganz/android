@@ -574,7 +574,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 if(megaApi==null){
                     logDebug("Refresh session - sdk");
                     Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                    intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                    intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                     intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intentLogin);
                     finish();
@@ -585,7 +585,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                         if(megaApi.getRootNode()==null){
                             logDebug("Refresh session logged in but no fetch - sdk");
                             Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                            intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                            intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                             intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intentLogin);
                             finish();
@@ -602,7 +602,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
                         logDebug("Refresh session - karere");
                         Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                        intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                        intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                         intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intentLogin);
                         finish();
@@ -849,8 +849,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
             else if(adapterType == SEARCH_ADAPTER){
                 mediaHandles = new ArrayList<>();
-                ArrayList<String> serialized = getIntent().getStringArrayListExtra(ARRAY_SEARCH);
-                getMediaHandles(getSearchedNodes(serialized));
+                ArrayList<String> handles = getIntent().getStringArrayListExtra(ARRAY_SEARCH);
+                getMediaHandles(getSearchedNodes(handles));
             }
             else if(adapterType == FILE_LINK_ADAPTER){
                 if (currentDocument != null) {

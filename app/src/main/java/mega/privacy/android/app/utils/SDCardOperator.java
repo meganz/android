@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.support.v4.app.Fragment;
@@ -28,12 +27,13 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SDCardOperator {
 
-    public static final String TEST = "test";
+    public final static String TEST = "test";
+    public final static String TEMP = "temp";
+    public final static String SD_PATH_REGEX = "^/storage/\\w{4}-\\w{4}/?.*$";
+
     private Context context;
 
     private String downloadRoot;
-
-    public final static String TEMP = "temp";
 
     private String sdCardRoot;
 
@@ -64,7 +64,7 @@ public class SDCardOperator {
         } else {
             throw new SDCardException("No sd card installed!");
         }
-        sdCardRoot = FileUtils.getSDCardRoot(downloadRoot);
+        sdCardRoot = SDCardUtils.getSDCardRoot(downloadRoot);
     }
 
     public void initDocumentFileRoot(String uriString) throws SDCardException {
@@ -101,7 +101,7 @@ public class SDCardOperator {
     }
 
     public static boolean isSDCardPath(String path) {
-        return !path.startsWith(Environment.getExternalStorageDirectory().toString());
+        return path.matches(SD_PATH_REGEX);
     }
 
     public boolean canWriteWithFile(String target) {
@@ -110,11 +110,16 @@ public class SDCardOperator {
             return false;
         }
         // test if really can write on this path.
-        canWrite = new File(target, TEST).mkdir();
+        File test = new File(target, TEST);
+        try {
+            canWrite = test.createNewFile();
+        } catch (IOException e) {
+            return false;
+        }
         if (!canWrite) {
             return false;
         } else {
-            return new File(target, TEST).delete();
+            return test.delete();
         }
     }
 

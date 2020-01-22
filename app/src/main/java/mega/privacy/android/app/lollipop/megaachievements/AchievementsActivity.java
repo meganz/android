@@ -80,7 +80,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         if(megaApi==null||megaApi.getRootNode()==null){
             logDebug("Refresh session - sdk");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -94,7 +94,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
                 logDebug("Refresh session - karere");
                 Intent intent = new Intent(this, LoginActivityLollipop.class);
-                intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
@@ -136,7 +136,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         megaApi.getAccountAchievements(this);
 
         if (savedInstanceState != null) {
-            visibleFragment = savedInstanceState.getInt("visibleFragment", ACHIEVEMENTS_FRAGMENT);
+            visibleFragment = savedInstanceState.getInt(VISIBLE_FRAGMENT, ACHIEVEMENTS_FRAGMENT);
             achievementType = savedInstanceState.getInt("achievementType", -1);
             mails = savedInstanceState.getStringArrayList("mails");
             pendingContacts = savedInstanceState.getStringArrayList("pendingContacts");
@@ -148,7 +148,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt("visibleFragment", visibleFragment);
+        outState.putInt(VISIBLE_FRAGMENT, visibleFragment);
         outState.putInt("achievementType", achievementType);
         outState.putStringArrayList("mails", mails);
         outState.putStringArrayList("pendingContacts", pendingContacts);
