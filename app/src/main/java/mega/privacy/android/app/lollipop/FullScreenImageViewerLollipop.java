@@ -688,7 +688,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-					if (showTakenDownDialog(node, context)) {
+					if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
 						return false;
 					}
 					shareIt = false;
@@ -727,7 +727,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 			case R.id.full_image_viewer_remove_link: {
 				shareIt = false;
-				if (showTakenDownDialog(node, context)) {
+				if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
 					return false;
 				}
 				android.support.v7.app.AlertDialog removeLinkDialog;
@@ -898,7 +898,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				break;
 			}
 			case R.id.full_image_viewer_copy: {
-				if (showTakenDownDialog(node, context)) {
+				if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
 					return false;
 				}
 				showCopy();

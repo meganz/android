@@ -109,7 +109,7 @@ public class NodeController {
         for (int i=0; i<handleList.size(); i++){
             Long handle = handleList.get(i);
             MegaNode node = megaApi.getNodeByHandle(handle);
-            if (showTakenDownDialog(node, context)) {
+            if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
                 return;
             }
             longArray[i] = handle;

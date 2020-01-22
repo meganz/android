@@ -1,27 +1,14 @@
 package mega.privacy.android.app.utils;
 
 import android.app.ActivityManager;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -45,15 +32,12 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.DISPUTE_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
 public class FileUtils {
 
@@ -677,47 +661,6 @@ public class FileUtils {
      */
     public static boolean isFileNameNumeric(String filename) {
         return getFileNameWithoutExtension(filename).matches("-?\\d+(\\.\\d+)?");
-    }
-
-
-    /**
-     * The static class to show taken down notice for mega node when the node is taken down and try to be opened in the preview
-     */
-    public static class FileTakenDownAlertHandler {
-        /**
-         * alertTakenDown is the dialog to be shown. It resides inside this static class to prevent multiple definition within the activity class
-         */
-        private static AlertDialog alertTakenDown = null;
-
-        public static class TakenDownAlertFragment extends DialogFragment {
-            @Override
-            public Dialog onCreateDialog(Bundle savedInstanceState) {
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-                dialogBuilder.setTitle(getActivity().getString(R.string.general_not_available))
-                             .setMessage(getActivity().getString(R.string.error_download_takendown_node)).setNegativeButton(R.string.general_dismiss, (dialog, i) -> {
-                                 dialog.dismiss();
-                                 getActivity().finish();
-                             });
-                alertTakenDown = dialogBuilder.create();
-
-                setCancelable(false);
-
-                return alertTakenDown;
-            }
-        }
-        /**
-         * @param activity the activity is the page where dialog is shown
-         */
-        public static void showTakenDownAlert(final AppCompatActivity activity) {
-
-            if (activity == null
-                    || activity.isFinishing()
-                    || (alertTakenDown != null && alertTakenDown.isShowing())) {
-                return;
-            }
-
-            new TakenDownAlertFragment().show(activity.getSupportFragmentManager(), "taken_down");
-        }
     }
 }
 

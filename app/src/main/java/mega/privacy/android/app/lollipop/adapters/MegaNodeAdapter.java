@@ -2,12 +2,10 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -16,17 +14,14 @@ import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -46,7 +41,6 @@ import mega.privacy.android.app.lollipop.ContactFileListFragmentLollipop;
 import mega.privacy.android.app.lollipop.ContactSharedFolderFragment;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -68,8 +62,9 @@ import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownDialogHandler.*;
 
-public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
+public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter, nodeTakenDownDialogListener {
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -1291,7 +1286,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             case R.id.file_list_item_layout:
             case R.id.file_grid_item_layout: {
                 if (n.isTakenDown() && !isMultipleSelect()) {
-                    showTakenDownDialog(n.isFolder(), v, currentPosition);
+                    takenDownDialog = showTakenDownDialog(n.isFolder(), v, currentPosition, this, context);
                     unHandledItem = currentPosition;
                 } else {
                     fileClicked(currentPosition, v);
@@ -1474,61 +1469,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         this.listFragment = listFragment;
     }
 
-    private void showTakenDownDialog(boolean isFolder, final View view, final int currentPosition) {
-        int alertMessageID = isFolder ? R.string.message_folder_takedown_pop_out_notification : R.string.message_file_takedown_pop_out_notification;
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View v = inflater.inflate(R.layout.dialog_three_vertical_buttons, null);
-        builder.setView(v);
-
-        TextView title = v.findViewById(R.id.dialog_title);
-        TextView text = v.findViewById(R.id.dialog_text);
-
-        Button openButton = v.findViewById(R.id.dialog_first_button);
-        Button disputeButton = v.findViewById(R.id.dialog_second_button);
-        Button cancelButton = v.findViewById(R.id.dialog_third_button);
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.gravity = Gravity.RIGHT;
-
-        title.setText(R.string.general_error_word);
-        text.setText(alertMessageID);
-        openButton.setText(R.string.context_open_link);
-        disputeButton.setText(R.string.dispute_takendown_file);
-        cancelButton.setText(R.string.general_cancel);
-
-        final AlertDialog dialog = builder.create();
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
-
-        openButton.setOnClickListener(button -> {
-            unHandledItem = -1;
-            dialog.dismiss();
-            fileClicked(currentPosition, view);
-        });
-
-        disputeButton.setOnClickListener(button -> {
-            unHandledItem = -1;
-            dialog.dismiss();
-            Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
-            openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            openTermsIntent.setData(Uri.parse(DISPUTE_URL));
-            context.startActivity(openTermsIntent);
-        });
-
-        cancelButton.setOnClickListener(button -> {
-            unHandledItem = -1;
-            dialog.dismiss();
-        });
-
-        takenDownDialog = dialog;
-
-        dialog.show();
-    }
-
     /**
      * This is the method to click unhandled taken down dialog again,
      * after the recycler view finish binding adapter
@@ -1563,5 +1503,21 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (takenDownDialog != null) {
             takenDownDialog.dismiss();
         }
+    }
+
+    @Override
+    public void onOpenClicked(int currentPosition, View view) {
+        unHandledItem = -1;
+        fileClicked(currentPosition, view);
+    }
+
+    @Override
+    public void onDisputeClicked() {
+        unHandledItem = -1;
+    }
+
+    @Override
+    public void onCancelClicked() {
+        unHandledItem = -1;
     }
 }
