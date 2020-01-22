@@ -22,11 +22,15 @@ import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.List;
+import java.util.Locale;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -177,16 +181,36 @@ public class ChatUtil {
         return actionBarHeight;
     }
 
-    public static int getMaxAllowed(@Nullable final CharSequence text) {
-        int numEmojis = EmojiManager.getInstance().getNumEmojis(text);
-        if (numEmojis > 0) {
-            int realLenght = text.length() + (numEmojis * 2);
-            if (realLenght >= MAX_ALLOWED_CHARACTERS_AND_EMOJIS) return text.length();
+    private static int getRealLength(CharSequence text){
+        int length = text.length();
+
+        List<EmojiRange> emojisFound = EmojiManager.getInstance().findAllEmojis(text);
+        int count = 0;
+        if(emojisFound.size() > 0){
+            for (int i=0; i<emojisFound.size();i++) {
+                count = count + (emojisFound.get(i).end - emojisFound.get(i).start);
+            }
+            return length + count;
+
+        }
+        return -1;
+    }
+
+    public static int getMaxAllowed(@Nullable CharSequence text) {
+
+        int realLength = getRealLength(text);
+        if (realLength > MAX_ALLOWED_CHARACTERS_AND_EMOJIS){
+            return text.length();
         }
         return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
     }
 
-
+    public static boolean isAllowedTitle(String text) {
+        if (getMaxAllowed(text) == text.length() && text.length() != MAX_ALLOWED_CHARACTERS_AND_EMOJIS) {
+            return false;
+        }
+        return true;
+    }
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
 

@@ -421,7 +421,7 @@ public class Constants {
     public static final int EMOJI_SIZE_HIGH = 30;
     public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
     public static final int EMOJI_AVATAR_CALL_SMALL = 40;
-    public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
+    public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 28;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND = 350;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT = 200;
     public static final int MAX_WIDTH_ADD_CONTACTS = 60;
