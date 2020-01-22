@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/my_account_complete_relative_layout"
     android:layout_width="match_parent"
-    android:background="@color/white"
+    android:background="@color/grey_my_account_background"
     android:layout_height="match_parent" >
 
     <LinearLayout
         android:id="@+id/main_linear_layout_achievements"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/grey_my_account_background"
         android:orientation="vertical">
         <RelativeLayout
             android:id="@+id/unlocked_rewards_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="12dp"
+            android:paddingTop="18dp"
+            android:paddingBottom="18dp"
+            android:background="@color/white"
             android:gravity="center_horizontal">
 
             <TextView
@@ -60,24 +60,36 @@
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
                             android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/unlocked_storage_text"
+                            <RelativeLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="1 GB"
-                                android:textSize="28dp"
-                                android:textColor="@color/blue_unlocked_rewards"
-                                android:layout_gravity="center_horizontal"
-                                android:layout_column="0"/>
-
+                                android:layout_gravity="center_horizontal">
+                                <TextView
+                                    android:id="@+id/unlocked_storage_text"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="28sp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/blue_unlocked_rewards"/>
+                                <TextView
+                                    android:id="@+id/unlocked_storage_unit"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="14sp"
+                                    android:layout_marginLeft="2dp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/blue_unlocked_rewards"
+                                    android:layout_alignBaseline="@+id/unlocked_storage_text"
+                                    android:layout_toRightOf="@+id/unlocked_storage_text"/>
+                            </RelativeLayout>
                             <TextView
                                 android:id="@+id/unlocked_storage_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="14dp"
+                                android:textSize="12sp"
                                 android:text="@string/unlocked_storage_title"
                                 android:textColor="@color/grey_achievements_title"
+                                android:fontFamily="sans-serif-medium"
                                 android:layout_column="0"/>
                         </LinearLayout>
 
@@ -93,22 +105,35 @@
                             android:layout_centerHorizontal="true"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/unlocked_transfer_text"
+                            <RelativeLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="0 GB"
-                                android:textSize="28dp"
-                                android:layout_gravity="center_horizontal"
-                                android:textColor="@color/green_unlocked_rewards"
-                                android:layout_column="0"/>
-
+                                android:layout_gravity="center_horizontal">
+                                <TextView
+                                    android:id="@+id/unlocked_transfer_text"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="28sp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/green_unlocked_rewards"/>
+                                <TextView
+                                    android:id="@+id/unlocked_transfer_unit"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="14sp"
+                                    android:layout_marginLeft="2dp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/green_unlocked_rewards"
+                                    android:layout_alignBaseline="@+id/unlocked_transfer_text"
+                                    android:layout_toRightOf="@+id/unlocked_transfer_text"/>
+                            </RelativeLayout>
                             <TextView
                                 android:id="@+id/unlocked_transfer_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="14dp"
+                                android:textSize="12sp"
                                 android:text="@string/label_transfer_quota_achievements"
+                                android:fontFamily="sans-serif-medium"
                                 android:textColor="@color/grey_achievements_title"
                                 android:layout_column="0"/>
                         </LinearLayout>
@@ -119,16 +144,13 @@
             </TableLayout>
         </RelativeLayout>
 
-        <android.support.v7.widget.CardView
+        <RelativeLayout
             android:id="@+id/card_view_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            card_view:cardCornerRadius="0dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginRight="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginBottom="0dp">
+            android:layout_marginTop="6dp"
+            android:background="@color/white">
 
             <RelativeLayout
                 android:id="@+id/card_view_relative_layout"
@@ -167,14 +189,11 @@
                                 style="@style/achievements_subtitle"/>
 
                             <TextView
+                                style="@style/figures_text_style"
                                 android:id="@+id/zero_figures_referral_bonuses_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
                                 android:layout_below="@+id/title_referral_bonuses"
-                                android:layout_marginRight="24dp"
-                                android:singleLine="false"
-                                android:maxWidth="200dp"
-                                android:textSize="12sp"/>
+                                android:layout_marginRight="2dp"
+                                android:maxWidth="200dp"/>
 
                             <LinearLayout
                                 android:id="@+id/figures_referral_bonuses_layout"
@@ -249,10 +268,10 @@
                                 android:background="@android:color/transparent"
                                 android:layout_centerVertical="true"
                                 android:layout_alignParentRight="true"
-                                android:layout_marginRight="12dp"
-                                android:minWidth="0dp"
-                                android:minHeight="0dp"
+                                android:padding="12dp"
                                 android:stateListAnimator="@null"
+                                android:ellipsize="end"
+                                android:maxLines="1"
                                 android:text="@string/contact_invite"
                                 android:textColor="@color/accentColor" />
                         </RelativeLayout>
@@ -427,12 +446,9 @@
                                 style="@style/achievements_subtitle"/>
 
                             <TextView
+                                style="@style/figures_text_style"
                                 android:id="@+id/zero_figures_install_app_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/title_install_app"
-                                android:layout_marginRight="24dp"
-                                android:textSize="12sp"/>
+                                android:layout_below="@+id/title_install_app"/>
 
                             <LinearLayout
                                 android:id="@+id/figures_install_app_layout"
@@ -558,12 +574,9 @@
                                 android:text="@string/title_add_phone"
                                 style="@style/achievements_subtitle"/>
                             <TextView
+                                style="@style/figures_text_style"
                                 android:id="@+id/zero_figures_add_phone_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/title_add_phone"
-                                android:layout_marginRight="24dp"
-                                android:textSize="12sp"/>
+                                android:layout_below="@+id/title_add_phone"/>
                             <LinearLayout
                                 android:id="@+id/figures_add_phone_layout"
                                 android:layout_width="wrap_content"
@@ -803,12 +816,9 @@
                                 style="@style/achievements_subtitle"/>
 
                             <TextView
+                                style="@style/figures_text_style"
                                 android:id="@+id/zero_figures_install_desktop_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/title_install_desktop"
-                                android:layout_marginRight="24dp"
-                                android:textSize="12sp"/>
+                                android:layout_below="@+id/title_install_desktop"/>
 
                             <LinearLayout
                                 android:id="@+id/figures_install_desktop_layout"
@@ -898,7 +908,7 @@
                 </RelativeLayout>
 
             </RelativeLayout>
-        </android.support.v7.widget.CardView>
+        </RelativeLayout>
 
     </LinearLayout>
 </ScrollView>

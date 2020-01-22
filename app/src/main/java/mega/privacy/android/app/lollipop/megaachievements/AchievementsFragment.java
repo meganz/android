@@ -78,9 +78,9 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	private ImageView addPhoneIcon;
 	private ImageView referralBonusIcon;
 
-	private TextView figureUnlockedRewardStorage;
+	private TextView figureUnlockedRewardStorage, figureUnlockedRewardStorageUnit;
 	private long storageQuota = 0;
-	private TextView figureUnlockedRewardTransfer;
+	private TextView figureUnlockedRewardTransfer, figureUnlockedRewardTransferUnit;
 
 	private TextView titleReferralBonuses;
 	private TextView figureReferralBonusesStorage;
@@ -265,7 +265,9 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		storageQuotaString = storageQuotaString.toLowerCase(Locale.getDefault());
 
 		figureUnlockedRewardStorage = (TextView) v.findViewById(R.id.unlocked_storage_text);
+		figureUnlockedRewardStorageUnit = v.findViewById(R.id.unlocked_storage_unit);
 		figureUnlockedRewardTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_text);
+        figureUnlockedRewardTransferUnit = v.findViewById(R.id.unlocked_transfer_unit);
 
 		figureUnlockedRewardStorage.setText(getSizeString(0));
 		figureUnlockedRewardTransfer.setText(getSizeString(0));
@@ -737,11 +739,21 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		storageQuota = ((AchievementsActivity)context).megaAchievements.currentStorage();
 
 		logDebug("My calculated totalTransfer: " + totalStorage);
-		figureUnlockedRewardStorage.setText(getSizeString(storageQuota));
+		String sizeString = getSizeString(storageQuota);
+		figureUnlockedRewardStorage.setText(getNumberAndUnit(sizeString)[0]);
+		figureUnlockedRewardStorageUnit.setText(getNumberAndUnit(sizeString)[1]);
 
 		transferQuota = ((AchievementsActivity)context).megaAchievements.currentTransfer();
-
+        sizeString = getSizeString(transferQuota);
 		logDebug("My calculated totalTransfer: " + totalTransfer);
-		figureUnlockedRewardTransfer.setText(getSizeString(transferQuota));
+        figureUnlockedRewardTransfer.setText(getNumberAndUnit(sizeString)[0]);
+        figureUnlockedRewardTransferUnit.setText(getNumberAndUnit(sizeString)[1]);
 	}
+
+    private String[] getNumberAndUnit(String sizeString) {
+        if (sizeString == null || !sizeString.contains(" ")) {
+            return new String[]{"", ""};
+        }
+        return sizeString.split(" ");
+    }
 }
