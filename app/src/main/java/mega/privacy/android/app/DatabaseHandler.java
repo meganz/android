@@ -2478,7 +2478,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public MegaOffline findbyPathAndName(String path, String name){
 
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE  ;
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + encrypt(path) + "'" + "AND " + KEY_OFF_NAME + " = '" + encrypt(name) + "'"  ;
 
 		MegaOffline mOffline = null;
 		Cursor cursor = db.rawQuery(selectQuery, null);
