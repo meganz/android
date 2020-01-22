@@ -18,13 +18,13 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -156,8 +156,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	DisplayMetrics outMetrics;
     float scaleText;
 	Display display;
-	TextInputEditText et_user;
-	TextInputEditText et_password;
+	AppCompatEditText et_user;
+	AppCompatEditText et_password;
 	TextView bRegisterLol;
 	Button bLoginLol;
 

@@ -10,11 +10,11 @@ import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
@@ -73,10 +73,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	boolean changePassword = true;
 	
 	private TextInputLayout newPassword1Layout;
-	private TextInputEditText newPassword1;
+	private AppCompatEditText newPassword1;
 	private ImageView newPassword1Error;
 	private TextInputLayout newPassword2Layout;
-	private TextInputEditText newPassword2;
+	private AppCompatEditText newPassword2;
 	private ImageView newPassword2Error;
 	private Button changePasswordButton;
     private RelativeLayout fragmentContainer;

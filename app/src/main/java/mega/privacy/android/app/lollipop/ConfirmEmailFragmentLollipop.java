@@ -4,10 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
@@ -47,7 +47,7 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 	private String firstNameTemp = null;
 
 	private TextInputLayout newEmailLayout;
-	private TextInputEditText newEmail;
+	private AppCompatEditText newEmail;
 	private ImageView errorNewEmail;
 	private TextView misspelt;
 	private Button resendButton;
