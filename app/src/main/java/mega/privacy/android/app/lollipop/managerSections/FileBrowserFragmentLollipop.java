@@ -1,19 +1,15 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -30,13 +26,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,21 +60,19 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.ChatUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FileBrowserFragmentLollipop extends RotatableFragment implements OnClickListener{
+public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 	public static ImageView imageDrag;
 
@@ -126,9 +116,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 	String downloadLocationDefaultPath;
     
     private int placeholderCount;
-
-	RelativeLayout callInProgressLayout;
-	Chronometer callInProgressChrono;
 
 	@Override
 	protected MegaNodeAdapter getAdapter() {
@@ -619,12 +606,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 			emptyTextView = v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
 
-			callInProgressLayout = v.findViewById(R.id.call_in_progress_layout);
-			callInProgressLayout.setOnClickListener(this);
-			callInProgressChrono = v.findViewById(R.id.call_in_progress_chrono);
-			callInProgressLayout.setVisibility(View.GONE);
-			callInProgressChrono.setVisibility(View.GONE);
-
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleBrowser(), recyclerView, aB, FILE_BROWSER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -652,9 +633,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
             }
-
-			showCallLayout();
-			return v;
+            return v;
 
         } else {
 			logDebug("Grid View");
@@ -681,13 +660,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
             emptyTextView = v.findViewById(R.id.file_grid_empty_text);
             emptyTextViewFirst = v.findViewById(R.id.file_grid_empty_text_first);
 
-			callInProgressLayout = v.findViewById(R.id.call_in_progress_layout);
-			callInProgressLayout.setOnClickListener(this);
-			callInProgressChrono = v.findViewById(R.id.call_in_progress_chrono);
-			callInProgressLayout.setVisibility(View.GONE);
-			callInProgressChrono.setVisibility(View.GONE);
-
-
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context,this,nodes,((ManagerActivityLollipop)context).getParentHandleBrowser(),recyclerView,aB,FILE_BROWSER_ADAPTER,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
             } else {
@@ -711,9 +683,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
             }
-
-			showCallLayout();
-
 			return v;
         }
     }
@@ -733,20 +702,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
         super.onAttach(context);
         this.context = context;
         aB = ((AppCompatActivity)context).getSupportActionBar();
-    }
-    
-    @Override
-    public void onClick(View v) {
-		logDebug("onClick");
-        switch (v.getId()) {
-			case R.id.call_in_progress_layout:{
-				logDebug("Call_in_progress_layout");
-				if(checkPermissionsCall()){
-					returnCall(context, megaChatApi);
-				}
-				break;
-			}
-        }
     }
 
 	public void openFile(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
@@ -1551,59 +1506,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
             }
         }
     }
-	public boolean checkPermissionsCall(){
-		logDebug("checkPermissionsCall()");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-			if (!hasCameraPermission) {
-				ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
-				return false;
-			}
-
-			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
-			if (!hasRecordAudioPermission) {
-				ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
-				return false;
-			}
-
-			return true;
-		}
-		return true;
-	}
-
-	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		logDebug("onRequestPermissionsResult");
-		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		switch (requestCode) {
-			case REQUEST_CAMERA: {
-				logDebug("REQUEST_CAMERA");
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					if(checkPermissionsCall()){
-						logDebug("REQUEST_CAMERA -> returnCall");
-						returnCall(context, megaChatApi);
-					}
-				}
-				break;
-			}
-			case RECORD_AUDIO: {
-				logDebug("RECORD_AUDIO");
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					if(checkPermissionsCall()){
-						logDebug("RECORD_AUDIO -> returnCall");
-						returnCall(context, megaChatApi);
-					}
-				}
-				break;
-			}
-
-		}
-	}
-
-	public void showCallLayout() {
-		ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
-	}
 
 	//refresh list when item updated
 	public void refresh(long handle) {

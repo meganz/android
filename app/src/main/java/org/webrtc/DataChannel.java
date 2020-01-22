@@ -22,21 +22,38 @@ public class DataChannel {
     // Optional unsigned short in WebIDL, -1 means unspecified.
     public int maxRetransmits = -1;
     public String protocol = "";
-    public boolean negotiated = false;
+    public boolean negotiated;
     // Optional unsigned short in WebIDL, -1 means unspecified.
     public int id = -1;
 
-    public Init() {}
+    @CalledByNative("Init")
+    boolean getOrdered() {
+      return ordered;
+    }
 
-    // Called only by native code.
-    private Init(boolean ordered, int maxRetransmitTimeMs, int maxRetransmits, String protocol,
-        boolean negotiated, int id) {
-      this.ordered = ordered;
-      this.maxRetransmitTimeMs = maxRetransmitTimeMs;
-      this.maxRetransmits = maxRetransmits;
-      this.protocol = protocol;
-      this.negotiated = negotiated;
-      this.id = id;
+    @CalledByNative("Init")
+    int getMaxRetransmitTimeMs() {
+      return maxRetransmitTimeMs;
+    }
+
+    @CalledByNative("Init")
+    int getMaxRetransmits() {
+      return maxRetransmits;
+    }
+
+    @CalledByNative("Init")
+    String getProtocol() {
+      return protocol;
+    }
+
+    @CalledByNative("Init")
+    boolean getNegotiated() {
+      return negotiated;
+    }
+
+    @CalledByNative("Init")
+    int getId() {
+      return id;
     }
   }
 
@@ -51,6 +68,7 @@ public class DataChannel {
      */
     public final boolean binary;
 
+    @CalledByNative("Buffer")
     public Buffer(ByteBuffer data, boolean binary) {
       this.data = data;
       this.binary = binary;
@@ -60,68 +78,118 @@ public class DataChannel {
   /** Java version of C++ DataChannelObserver. */
   public interface Observer {
     /** The data channel's bufferedAmount has changed. */
-    public void onBufferedAmountChange(long previousAmount);
+    @CalledByNative("Observer") public void onBufferedAmountChange(long previousAmount);
     /** The data channel state has changed. */
-    public void onStateChange();
+    @CalledByNative("Observer") public void onStateChange();
     /**
      * A data buffer was successfully received.  NOTE: |buffer.data| will be
      * freed once this function returns so callers who want to use the data
      * asynchronously must make sure to copy it first.
      */
-    public void onMessage(Buffer buffer);
+    @CalledByNative("Observer") public void onMessage(Buffer buffer);
   }
 
   /** Keep in sync with DataChannelInterface::DataState. */
-  public enum State { CONNECTING, OPEN, CLOSING, CLOSED }
+  public enum State {
+    CONNECTING,
+    OPEN,
+    CLOSING,
+    CLOSED;
 
-  private final long nativeDataChannel;
+    @CalledByNative("State")
+    static State fromNativeIndex(int nativeIndex) {
+      return values()[nativeIndex];
+    }
+  }
+
+  private long nativeDataChannel;
   private long nativeObserver;
 
+  @CalledByNative
   public DataChannel(long nativeDataChannel) {
     this.nativeDataChannel = nativeDataChannel;
   }
 
   /** Register |observer|, replacing any previously-registered observer. */
   public void registerObserver(Observer observer) {
+    checkDataChannelExists();
     if (nativeObserver != 0) {
-      unregisterObserverNative(nativeObserver);
+      nativeUnregisterObserver(nativeObserver);
     }
-    nativeObserver = registerObserverNative(observer);
+    nativeObserver = nativeRegisterObserver(observer);
   }
-  private native long registerObserverNative(Observer observer);
 
   /** Unregister the (only) observer. */
   public void unregisterObserver() {
-    unregisterObserverNative(nativeObserver);
+    checkDataChannelExists();
+    nativeUnregisterObserver(nativeObserver);
   }
-  private native void unregisterObserverNative(long nativeObserver);
 
-  public native String label();
+  public String label() {
+    checkDataChannelExists();
+    return nativeLabel();
+  }
 
-  public native int id();
+  public int id() {
+    checkDataChannelExists();
+    return nativeId();
+  }
 
-  public native State state();
+  public State state() {
+    checkDataChannelExists();
+    return nativeState();
+  }
 
   /**
    * Return the number of bytes of application data (UTF-8 text and binary data)
    * that have been queued using SendBuffer but have not yet been transmitted
    * to the network.
    */
-  public native long bufferedAmount();
+  public long bufferedAmount() {
+    checkDataChannelExists();
+    return nativeBufferedAmount();
+  }
 
   /** Close the channel. */
-  public native void close();
+  public void close() {
+    checkDataChannelExists();
+    nativeClose();
+  }
 
   /** Send |data| to the remote peer; return success. */
   public boolean send(Buffer buffer) {
+    checkDataChannelExists();
     // TODO(fischman): this could be cleverer about avoiding copies if the
     // ByteBuffer is direct and/or is backed by an array.
     byte[] data = new byte[buffer.data.remaining()];
     buffer.data.get(data);
-    return sendNative(data, buffer.binary);
+    return nativeSend(data, buffer.binary);
   }
-  private native boolean sendNative(byte[] data, boolean binary);
 
   /** Dispose of native resources attached to this channel. */
-  public native void dispose();
+  public void dispose() {
+    checkDataChannelExists();
+    JniCommon.nativeReleaseRef(nativeDataChannel);
+    nativeDataChannel = 0;
+  }
+
+  @CalledByNative
+  long getNativeDataChannel() {
+    return nativeDataChannel;
+  }
+
+  private void checkDataChannelExists() {
+    if (nativeDataChannel == 0) {
+      throw new IllegalStateException("DataChannel has been disposed.");
+    }
+  }
+
+  private native long nativeRegisterObserver(Observer observer);
+  private native void nativeUnregisterObserver(long observer);
+  private native String nativeLabel();
+  private native int nativeId();
+  private native State nativeState();
+  private native long nativeBufferedAmount();
+  private native void nativeClose();
+  private native boolean nativeSend(byte[] data, boolean binary);
 };

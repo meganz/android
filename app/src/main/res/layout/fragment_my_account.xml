@@ -25,7 +25,7 @@
 			<LinearLayout
 				android:id="@+id/my_account_email_layout"
 				android:layout_width="match_parent"
-				android:layout_height="72dp"
+				android:layout_height="wrap_content"
 				android:layout_marginBottom="8dp"
 				android:layout_marginTop="16dp"
 				android:background="@color/white"
@@ -54,7 +54,8 @@
 							android:maxLines="1"
 							android:singleLine="true"
 							android:textColor="@color/name_my_account"
-							android:textSize="16sp"/>
+							android:textSize="16sp"
+							rounded:emojiSize="14sp"/>
 
 						<ImageView
 							android:id="@+id/my_account_edit_icon"
@@ -69,10 +70,21 @@
 						android:id="@+id/my_account_email"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
+						android:layout_marginBottom="7dp"
 						android:ellipsize="end"
 						android:maxLines="1"
 						android:singleLine="true"
 						android:textColor="@color/mail_my_account"
+						android:textSize="14sp" />
+					<TextView
+						android:id="@+id/add_phone_number"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginBottom="7dp"
+						android:ellipsize="end"
+						android:maxLines="1"
+						android:singleLine="true"
+						android:textColor="@color/accentColor"
 						android:textSize="14sp"/>
 
 				</LinearLayout>

@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,7 +20,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -40,7 +38,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.Locale;
@@ -50,7 +47,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import nz.mega.sdk.MegaApiAndroid;
@@ -68,7 +64,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FileLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener {
+public class FileLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener {
 	
 	FileLinkActivityLollipop fileLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -303,12 +299,22 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					if (value.length() == 0) {
 						return true;
 					}
-					if(value.startsWith("!")){
-						logDebug("Decryption key with exclamation!");
-						url=url+value;
-					}
-					else{
-						url=url+"!"+value;
+					if (url.contains("#!")) {
+						// old folder link format
+						if (value.startsWith("!")) {
+							logDebug("Decryption key with exclamation!");
+							url = url + value;
+						} else {
+							url = url + "!" + value;
+						}
+					} else if (url.contains(SEPARATOR + "file" + SEPARATOR)) {
+						// new folder link format
+						if (value.startsWith("#")) {
+							logDebug("Decryption key with hash!");
+							url = url + value;
+						} else {
+							url = url + "#" + value;
+						}
 					}
 					logDebug("File link to import: " + url);
 					decryptionIntroduced=true;
@@ -343,12 +349,22 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 							askForDecryptionKeyDialog();
 							return;
 						}else{
-							if(value.startsWith("!")){
-								logDebug("Decryption key with exclamation!");
-								url=url+value;
-							}
-							else{
-								url=url+"!"+value;
+							if (url.contains("#!")) {
+								// old folder link format
+								if (value.startsWith("!")) {
+									logDebug("Decryption key with exclamation!");
+									url = url + value;
+								} else {
+									url = url + "!" + value;
+								}
+							} else if (url.contains(SEPARATOR + "file" + SEPARATOR)) {
+								// new folder link format
+								if (value.startsWith("#")) {
+									logDebug("Decryption key with hash!");
+									url = url + value;
+								} else {
+									url = url + "#" + value;
+								}
 							}
 							logDebug("File link to import: " + url);
 							decryptionIntroduced=true;
@@ -859,14 +875,15 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 			NodeController nC = new NodeController(this);
 			nC.downloadTo(document, parentPath, url);
-		}
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, false, null);
+        }
 		else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if (!isOnline(this)) {
 				try {
 					statusDialog.dismiss();
 				} catch (Exception ex) {
 				}
-				;
 
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
@@ -912,144 +929,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	
 	@SuppressLint("NewApi") 
 	public void downloadWithPermissions(){
-		logDebug("downloadWithPermissions");
-		if (dbH == null){
-			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		}
-
-		if (document == null) {
-			return;
-		}
-		
-		if (dbH.getCredentials() == null || dbH.getPreferences() == null){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				File[] fs = getExternalFilesDirs(null);
-				if (fs.length > 1){
-					if (fs[1] == null){
-						intentPickFolder();
-					}
-					else{
-						Dialog downloadLocationDialog;
-						String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-				        AlertDialog.Builder b=new AlertDialog.Builder(this);
-	
-						b.setTitle(getResources().getString(R.string.settings_storage_download_location));
-						b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								switch(which){
-									case 0:{
-										intentPickFolder();
-										break;
-									}
-									case 1:{
-										File[] fs = getExternalFilesDirs(null);
-										if (fs.length > 1){
-											String path = fs[1].getAbsolutePath();
-											File defaultPathF = new File(path);
-											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
-											NodeController nC = new NodeController(fileLinkActivity);
-											nC.downloadFileLink(document, url);
-										}
-										break;
-									}
-								}
-							}
-						});
-						b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-							}
-						});
-						downloadLocationDialog = b.create();
-						downloadLocationDialog.show();
-					}
-				}
-				else{
-					intentPickFolder();
-				}
-			}
-			else{
-				intentPickFolder();
-			}	
-			return;
-		}
-		
-		boolean askMe = askMe(this);
-		
-		if (askMe){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				File[] fs = getExternalFilesDirs(null);
-				if (fs.length > 1){
-					if (fs[1] == null){
-						intentPickFolder();
-					}
-					else{
-						Dialog downloadLocationDialog;
-						String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-				        AlertDialog.Builder b=new AlertDialog.Builder(this);
-	
-						b.setTitle(getResources().getString(R.string.settings_storage_download_location));
-						b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								switch(which){
-									case 0:{
-										intentPickFolder();
-										break;
-									}
-									case 1:{
-										File[] fs = getExternalFilesDirs(null);
-										if (fs.length > 1){
-											String path = fs[1].getAbsolutePath();
-											File defaultPathF = new File(path);
-											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
-											NodeController nC = new NodeController(getApplicationContext());
-											nC.downloadFileLink(document, url);
-										}
-										break;
-									}
-								}
-							}
-						});
-						b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-							}
-						});
-						downloadLocationDialog = b.create();
-						downloadLocationDialog.show();
-					}
-				}
-				else{
-					intentPickFolder();
-				}
-			}
-			else{
-				intentPickFolder();
-			}
-		}
-		else{
-			NodeController nC = new NodeController(this);
-			nC.downloadFileLink(document, url);
-		}
-	}
-
-	void intentPickFolder () {
-		Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-		intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-		intent.setClass(this, FileStorageActivityLollipop.class);
-		intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
-		intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-		startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+	    logDebug("downloadWithPermissions");
+        NodeController nC = new NodeController(this);
+        nC.downloadFileLink(document, url);
 	}
 
 	public void successfulCopy(){

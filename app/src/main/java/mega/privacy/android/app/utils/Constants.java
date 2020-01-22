@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import java.io.File;
 import java.util.regex.Pattern;
 
 public class Constants {
@@ -43,6 +44,9 @@ public class Constants {
     public static final int REQUEST_CODE_REFRESH_STAGING = 1028;
     public static final int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
     public static final int REQUEST_CODE_SEND_LOCATION = 1030;
+    public static final int REQUEST_CODE_COUNTRY_PICKER = 1031;
+    public static final int REQUEST_CODE_VERIFY_CODE = 1032;
+    public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
 
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
     public static final String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
@@ -50,7 +54,6 @@ public class Constants {
     public static final String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
-
     public static final String ACTION_FORWARD_MESSAGES = "ACTION_FORWARD_MESSAGES";
 
     public static final String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
@@ -141,7 +144,7 @@ public class Constants {
     public static final int REQUEST_CAMERA_UPLOAD = 10;
     public static final int REQUEST_CAMERA_ON_OFF = 11;
     public static final int REQUEST_CAMERA_ON_OFF_FIRST_TIME = 12;
-	public static final int WRITE_LOG = 13;
+    public static final int WRITE_LOG = 13;
 
     public static final int RECORD_VOICE_CLIP = 11;
     public static final int REQUEST_STORAGE_VOICE_CLIP = 12;
@@ -164,7 +167,10 @@ public class Constants {
     public static final int COLOR_STATUS_BAR_ACCENT = 1;
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
     public static final int COLOR_STATUS_BAR_ZERO = 3;
+    public static final int COLOR_STATUS_BAR_SEARCH_DELAY = 4;
+    public static final int COLOR_STATUS_BAR_SMS_VERIFICATION = 5;
 
+    public static final String CONTACT_LINK_BASE_URL = "https://mega.nz/C!";
     public static final String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
     public static final String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
@@ -236,6 +242,9 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ORDER = "INTENT_UPDATE_ORDER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_VIEW = "INTENT_UPDATE_VIEW";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
+    public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED = "INTENT_CHAT_ARCHIVED";
+    public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP = "INTENT_CHAT_ARCHIVED_GROUP";
+    public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -337,9 +346,15 @@ public class Constants {
 
     public static final int TAKE_PICTURE_OPTION = 0;
     public static final int TAKE_PROFILE_PICTURE = 1;
+    public static final int START_CALL_PERMISSIONS = 2;
+
+
 
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
+
+    //link for introduction end to end encryption
+    public static final String URL_E2EE = "https://mega.nz/security";
 
     public static final int MIN_ITEMS_SCROLLBAR = 30;
     public static final int MIN_ITEMS_SCROLLBAR_GRID = 200;
@@ -373,6 +388,9 @@ public class Constants {
     public static final int MESSAGE_SNACKBAR_TYPE = 1;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
 
+    public static final int INFO_ANIMATION = 3000;
+    public static final int QUICK_INFO_ANIMATION = 500;
+
     public static final int HEADER_VIEW_TYPE = 0;
     public static final int ITEM_VIEW_TYPE = 1;
 
@@ -390,109 +408,118 @@ public class Constants {
     public static final String SECOND_CALL = "SECOND_CALL";
     public static final String PEER_ID = "peerId";
     public static final String CLIENT_ID = "clientId";
-
-
+    public static final String CHAT_TITLE = "CHAT_TITLE";
+    public static final String SELECTED_CONTACTS = "SELECTED_CONTACTS";
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String HANDLE = "handle";
+    public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
 
-    public static final int EMOJI_SIZE_EXTRA_SMALL = 10;
-    public static final int EMOJI_SIZE_SMALL = 15;
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;
-    public static final int EMOJI_AVATAR_SIZE = 30;
+    public static final int EMOJI_SIZE_HIGH = 30;
     public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
     public static final int EMOJI_AVATAR_CALL_SMALL = 40;
-    public static final int EMOJI_AVATAR_CALL_HIGH = 60;
     public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
+    public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND = 350;
+    public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT = 200;
+    public static final int MAX_WIDTH_ADD_CONTACTS = 60;
+    public static final int AVATAR_SIZE = 150;
+    public static final int AVATAR_SIZE_GRID = 75;
 
+    public static final String SEPARATOR = File.separator;
 
     public static final String[] FILE_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#!.+$",
-			"^https://mega\\.nz/#!.+$"
-	};
+            "^https://mega\\.co\\.nz/.*#!.+$",
+            "^https://mega\\.nz/.*#!.+$",
+            "^https://mega\\.co\\.nz/file/.+$",
+            "^https://mega\\.nz/file/.+$",
+    };
 
-	public static final String[] CONFIRMATION_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#confirm.+$",
-			"^https://mega\\.nz/#confirm.+$"
-	};
+    public static final String[] CONFIRMATION_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#confirm.+$",
+            "^https://mega\\.nz/.*#confirm.+$"
+    };
 
-	public static final String[] FOLDER_DOWNLOAD_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#F!.+$",
-			"^https://mega\\.nz/#F!.+$"
-	};
+    public static final String[] FOLDER_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#F!.+$",
+            "^https://mega\\.nz/.*#F!.+$",
+            "^https://mega\\.co\\.nz/folder/.+$",
+            "^https://mega\\.nz/folder/.+$"
+    };
 
-	public static final String[] CHAT_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/chat/.+$",
-			"^https://mega\\.nz/chat/.+$"
-	};
+    public static final String[] CHAT_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*chat/.+$",
+            "^https://mega\\.nz/.*chat/.+$"
+    };
 
-	public static final String[] PASSWORD_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#P!.+$",
-			"^https://mega\\.nz/#P!.+$"
-	};
+    public static final String[] PASSWORD_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#P!.+$",
+            "^https://mega\\.nz/.*#P!.+$"
+    };
 
-	public static final String[] ACCOUNT_INVITATION_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#newsignup.+$",
-			"^https://mega\\.nz/#newsignup.+$"
-	};
+    public static final String[] ACCOUNT_INVITATION_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#newsignup.+$",
+            "^https://mega\\.nz/.*#newsignup.+$"
+    };
 
-	public static final String[] EXPORT_MASTER_KEY_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#backup",
-			"^https://mega\\.nz/#backup"
-	};
+    public static final String[] EXPORT_MASTER_KEY_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#backup",
+            "^https://mega\\.nz/.*#backup"
+    };
 
-	public static final String[] NEW_MESSAGE_CHAT_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#fm/chat",
-			"^https://mega\\.nz/#fm/chat"
-	};
+    public static final String[] NEW_MESSAGE_CHAT_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#fm/chat",
+            "^https://mega\\.nz/.*#fm/chat"
+    };
 
-	public static final String[] CANCEL_ACCOUNT_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#cancel.+$",
-			"^https://mega\\.nz/#cancel.+$"
-	};
+    public static final String[] CANCEL_ACCOUNT_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#cancel.+$",
+            "^https://mega\\.nz/.*#cancel.+$"
+    };
 
-	public static final String[] VERIFY_CHANGE_MAIL_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#verify.+$",
-			"^https://mega\\.nz/#verify.+$"
-	};
+    public static final String[] VERIFY_CHANGE_MAIL_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#verify.+$",
+            "^https://mega\\.nz/.*#verify.+$"
+    };
 
-	public static final String[] RESET_PASSWORD_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#recover.+$",
-			"^https://mega\\.nz/#recover.+$"
-	};
+    public static final String[] RESET_PASSWORD_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#recover.+$",
+            "^https://mega\\.nz/.*#recover.+$"
+    };
 
-	public static final String[] PENDING_CONTACTS_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#fm/ipc",
-			"^https://mega\\.nz/#fm/ipc"
-	};
+    public static final String[] PENDING_CONTACTS_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#fm/ipc",
+            "^https://mega\\.nz/.*#fm/ipc"
+    };
 
-	public static final String[] HANDLE_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#.+$",
-			"^https://mega\\.nz/#.+$"
-	};
+    public static final String[] HANDLE_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#.+$",
+            "^https://mega\\.nz/.*#.+$"
+    };
 
-	public static final String[] CONTACT_LINK_REGEXS = {
-			"^https://mega\\.nz/C!.+$"
-	};
+    public static final String[] CONTACT_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/C!.+$",
+            "^https://mega\\.nz/.*C!.+$"
+    };
 
-	public static final String[] MEGA_DROP_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/megadrop/.+$",
-			"^https://mega\\.nz/megadrop/.+$"
-	};
+    public static final String[] MEGA_DROP_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*megadrop/.+$",
+            "^https://mega\\.nz/.*megadrop/.+$"
+    };
 
-	public static final String[] MEGA_BLOG_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#blog",
-			"^https://mega\\.nz/#blog",
-			"^https://mega\\.nz/blog",
-			"^https://mega\\.co\\.nz/#blog.+$",
-			"^https://mega\\.nz/#blog.+$",
-			"^https://mega\\.nz/blog.+$"
-	};
+    public static final String[] MEGA_BLOG_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#blog",
+            "^https://mega\\.nz/.*#blog",
+            "^https://mega\\.nz/.*blog",
+            "^https://mega\\.co\\.nz/.*#blog.+$",
+            "^https://mega\\.nz/.*#blog.+$",
+            "^https://mega\\.nz/.*blog.+$"
+    };
 
-	public static final String[] REVERT_CHANGE_PASSWORD_LINK_REGEXS = {
-			"^https://mega\\.co\\.nz/#pwr.+$",
-			"^https://mega\\.co\\.nz/pwr.+$",
-			"^https://mega\\.nz/#pwr.+$",
-			"^https://mega\\.nz/pwr.+$"
-	};
+    public static final String[] REVERT_CHANGE_PASSWORD_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/.*#pwr.+$",
+            "^https://mega\\.co\\.nz/.*pwr.+$",
+            "^https://mega\\.nz/.*#pwr.+$",
+            "^https://mega\\.nz/.*pwr.+$"
+    };
 }

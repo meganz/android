@@ -14,6 +14,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -47,6 +48,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -58,9 +60,6 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -76,6 +75,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+
 
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener {
 	
@@ -96,6 +97,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	TextView usedSpace;
 	TextView lastSession;
 	TextView connections;
+	TextView addPhoneNumber;
 
 	ImageView editImageView;
 
@@ -218,9 +220,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 
 		nameView = v.findViewById(R.id.my_account_name);
-		nameView.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
 		nameView.setOnClickListener(this);
-
 
 		editImageView = (ImageView) v.findViewById(R.id.my_account_edit_icon);
 		editImageView.setOnClickListener(this);
@@ -228,7 +228,20 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		infoEmail.setText(megaApi.getMyEmail());
 		infoEmail.setOnClickListener(this);
-		
+
+        String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
+		addPhoneNumber = v.findViewById(R.id.add_phone_number);
+		if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
+            addPhoneNumber.setText(registeredPhoneNumber);
+        } else {
+		    if(canVoluntaryVerifyPhoneNumber()) {
+                addPhoneNumber.setText(R.string.add_phone_number_label);
+                addPhoneNumber.setOnClickListener(this);
+            } else {
+		        addPhoneNumber.setVisibility(View.GONE);
+            }
+        }
+
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
 
 		mkButton = (Button) v.findViewById(R.id.MK_button);
@@ -253,11 +266,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			logDebug("Landscape configuration");
-			nameView.setMaxWidth(scaleWidthPx(250, outMetrics));
+			nameView.setMaxWidthEmojis(scaleWidthPx(250, outMetrics));
 			infoEmail.setMaxWidth(scaleWidthPx(250, outMetrics));
 		}
 		else{
-			nameView.setMaxWidth(scaleWidthPx(180, outMetrics));
+			nameView.setMaxWidthEmojis(scaleWidthPx(180, outMetrics));
 			infoEmail.setMaxWidth(scaleWidthPx(200, outMetrics));
 		}
 
@@ -487,32 +500,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		else{
 			lastSession.setText(getString(R.string.recovering_info));
 		}
-		///////////
-	}
-
-	private int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-		
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
-		}
-		
-		return (int)textSize;
 	}
 
 	@Override
@@ -636,7 +623,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					}
 					else{
 						staging = false;
-						megaApi.changeApiUrl("https://g.api.mega.co.nz/");
+                        megaApi.changeApiUrl("https://g.api.mega.co.nz/");
 						if (dbH != null){
 							dbH.setStaging(false);
 						}
@@ -649,6 +636,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				}
 				break;
 			}
+            case R.id.add_phone_number:{
+                Intent intent = new Intent(context,SMSVerificationActivity.class) ;
+                startActivity(intent);
+                break;
+            }
+
 		}
 	}
 
@@ -747,14 +740,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 	}
 
-	public void setDefaultAvatar(){
-		logDebug("setDefaultAvatar");
-		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		String firstLetter = ChatUtil.getFirstLetter(myAccountInfo.getFullName());
-		if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-			firstLetter = " ";
-		}
-		myAccountImage.setImageBitmap(Util.createDefaultAvatar(color, firstLetter));
+	private void setDefaultAvatar(){
+		myAccountImage.setImageBitmap(getDefaultAvatar(context, getColorAvatar(context,megaApi, megaApi.getMyUser()), myAccountInfo.getFullName(), AVATAR_SIZE, true));
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){
@@ -954,4 +941,26 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			logoutWarning.setText(newText);
 		}
 	}
+
+	public void updateAddPhoneNumberLabel(){
+        logDebug("updateAddPhoneNumberLabel");
+        addPhoneNumber.setVisibility(View.GONE);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                //work around - it takes time for megaApi.smsVerifiedPhoneNumber() to return value
+                String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
+                logDebug("updateAddPhoneNumberLabel " + registeredPhoneNumber);
+
+                if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
+                    addPhoneNumber.setText(registeredPhoneNumber);
+                    addPhoneNumber.setOnClickListener(null);
+                    addPhoneNumber.setVisibility(View.VISIBLE);
+                }
+            }
+        }, 3000);
+
+    }
 }

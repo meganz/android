@@ -62,7 +62,6 @@ import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OFFLINE_SEARCH_QUERY;
@@ -73,6 +72,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class OfflineFragmentLollipop extends RotatableFragment{
 
@@ -506,7 +506,7 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		if (pathNavigationOffline != null) {
 			pathNavigation = pathNavigationOffline;
 		}
-		orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
+		orderGetChildren = ((ManagerActivityLollipop)context).orderCloud;
 
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1156,11 +1156,34 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	}
 
 	private void orderNodes(ArrayList<MegaOffline> offlineNodes) {
-		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-			sortOfflineByNameDescending(offlineNodes);
-		}
-		else{
-			sortOfflineByNameAscending(offlineNodes);
+		switch (orderGetChildren) {
+			case ORDER_DEFAULT_DESC : {
+				sortOfflineByNameDescending(offlineNodes);
+				break;
+			}
+			case ORDER_DEFAULT_ASC : {
+				sortOfflineByNameAscending(offlineNodes);
+				break;
+			}
+			case ORDER_MODIFICATION_ASC : {
+				sortOfflineByModificationDateAscending(offlineNodes);
+				break;
+			}
+			case ORDER_MODIFICATION_DESC : {
+				sortOfflineByModificationDateDescending(offlineNodes);
+				break;
+			}
+			case ORDER_SIZE_ASC : {
+				sortOfflineBySizeAscending(offlineNodes);
+				break;
+			}
+			case ORDER_SIZE_DESC : {
+				sortOfflineBySizeDescending(offlineNodes);
+				break;
+			}
+			default: {
+				break;
+			}
 		}
 	}
 

@@ -127,7 +127,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
+public class PdfViewerActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
 
     int[] screenPosition;
     int mLeftDelta;
@@ -2338,7 +2338,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
             long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
-            long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+            long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 
             if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
                 if (contactHandles != null && contactHandles.length > 0) {
@@ -2380,6 +2380,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     }
                 }
             }
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, (type == FROM_CHAT), nC);
         }
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
@@ -2389,7 +2391,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     nC = new NodeController(this);
                 }
                 nC.downloadTo(currentDocument, parentPath, uri.toString());
-            } else if (type == FROM_CHAT) {
+            }
+            else if (type == FROM_CHAT) {
                 chatC.prepareForDownload(intent, parentPath);
             }
             else {
@@ -2401,7 +2404,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 if(nC==null){
                     nC = new NodeController(this, isFolderLink);
                 }
-                nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
+                nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
@@ -2563,11 +2566,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     public String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            Cursor cursor = null;
             try {
+                cursor = getContentResolver().query(uri, null, null, null, null);
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
+            } catch (Exception e) {
+                logError("Exception getting pdf name", e);
             } finally {
                 if (cursor != null) {
                     cursor.close();
@@ -3117,7 +3123,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         if(nC==null){
                             nC = new NodeController(pdfViewerActivityLollipop, isFolderLink);
                         }
-                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
+                        nC.checkInstalledAppBeforeDownload(parentPathC,urlC, sizeC, hashesC, highPriority);
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {

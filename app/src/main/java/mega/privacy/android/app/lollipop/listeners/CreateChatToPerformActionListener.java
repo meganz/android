@@ -224,12 +224,16 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                         message = context.getResources().getQuantityString(R.plurals.num_files_not_send, handles.length, totalCounter);
                         if(context instanceof ManagerActivityLollipop) {
                             ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
+                        } else if (context instanceof ContactInfoActivityLollipop) {
+                            ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
                         }
                     }
                     else {
 //                        Send files
                         if(context instanceof ManagerActivityLollipop){
-                            ((ManagerActivityLollipop) context).sendFilesToChats(chats, null, handles);
+                            ((ManagerActivityLollipop) context).checkIfNodesAreMineBeforeAttach(chats, null, handles);
+                        } else if (context instanceof ContactInfoActivityLollipop) {
+                            ((ContactInfoActivityLollipop) context).checkIfNodesAreMineBeforeAttach(handles, chats.get(0).getChatId());
                         }
                     }
                 }

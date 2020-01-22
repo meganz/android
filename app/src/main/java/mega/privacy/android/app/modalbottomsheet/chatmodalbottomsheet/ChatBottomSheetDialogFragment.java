@@ -37,9 +37,6 @@ import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -54,15 +51,13 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     private Context context;
     private MegaChatListItem chat = null;
     private long chatId;
-
-    private final static int MAX_WIDTH = 200;
-    private final static int ICON_STATE_SIZE = 6;
 
     private BottomSheetBehavior mBehavior;
     private LinearLayout items_layout;
@@ -72,7 +67,6 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     private ImageView iconStateChatPanel;
     private TextView titleMailContactChatPanel;
     private RoundedImageView chatImageView;
-    private EmojiTextView chatInitialLetter;
     private TextView infoChatText;
     private LinearLayout optionInfoChat;
     private LinearLayout optionLeaveChat;
@@ -153,8 +147,6 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         titleNameContactChatPanel = contentView.findViewById(R.id.chat_list_chat_name_text);
         titleMailContactChatPanel = contentView.findViewById(R.id.chat_list_chat_mail_text);
         chatImageView = contentView.findViewById(R.id.sliding_chat_list_thumbnail);
-        chatInitialLetter = contentView.findViewById(R.id.sliding_chat_list_initial_letter);
-        chatInitialLetter.setEmojiSize(Util.px2dp(Constants.EMOJI_AVATAR_SIZE, outMetrics));
         infoChatText = contentView.findViewById(R.id.chat_list_info_chat_text);
         optionInfoChat = contentView.findViewById(R.id.chat_list_info_chat_layout);
         optionLeaveChat = contentView.findViewById(R.id.chat_list_leave_chat_layout);
@@ -167,9 +159,13 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         archiveChatText = contentView.findViewById(R.id.chat_list_archive_chat_text);
         archiveChatIcon = contentView.findViewById(R.id.file_archive_chat_image);
 
-        titleNameContactChatPanel.setMaxWidth(Util.px2dp(MAX_WIDTH, outMetrics));
-        titleNameContactChatPanel.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_SMALL, outMetrics));
-        titleMailContactChatPanel.setMaxWidth(Util.px2dp(MAX_WIDTH, outMetrics));
+        if(isScreenInPortrait(context)){
+            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+        }else{
+            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+        }
 
         optionInfoChat.setOnClickListener(this);
         optionMuteChat.setOnClickListener(this);
@@ -353,92 +349,38 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
-    public void addAvatarChatPanel(String contactMail, MegaChatListItem chat){
-
-        File avatar = buildAvatarFile(getActivity(), contactMail + ".jpg");
-        Bitmap bitmap = null;
-        if (isFileAvailable(avatar)){
-            if (avatar.length() > 0){
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    avatar.delete();
-                }
-                else{
-                    chatInitialLetter.setVisibility(View.GONE);
-                    chatImageView.setImageBitmap(bitmap);
-                    return;
-                }
-            }
+    private void addAvatarChatPanel(String contactMail, MegaChatListItem chat){
+        int color;
+        String name = null;
+        if (chat.getTitle() != null && chat.getTitle().trim().length() > 0) {
+            name = chat.getTitle();
+        } else if (contactMail != null && contactMail.length() > 0) {
+            name = contactMail;
         }
-
-        ////DEfault AVATAR
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
 
         if(chat.isGroup()){
-            p.setColor(ContextCompat.getColor(context, R.color.divider_upgrade_account));
-        }
-        else{
+            color = ContextCompat.getColor(context, R.color.divider_upgrade_account);
+        }else{
             MegaUser contact = megaApi.getContact(contactMail);
-            if (contact != null) {
-                String color = megaApi.getUserAvatarColor(contact);
-                if (color != null) {
-                    logDebug("The color to set the avatar is " + color);
-                    p.setColor(Color.parseColor(color));
-                } else {
-                    logDebug("Default color to the avatar");
-                    p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-                }
-            } else {
-                logWarning("Contact is NULL");
-                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-            }
+            color = getColorAvatar(context, megaApi, contact);
         }
 
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth() / 2;
-        else
-            radius = defaultAvatar.getHeight() / 2;
+        chatImageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, false));
 
-        c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, p);
-        chatImageView.setImageBitmap(defaultAvatar);
-
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-        boolean setInitialByMail = false;
-
-        if (chat.getTitle() != null) {
-            if (chat.getTitle().trim().length() > 0) {
-                String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
-                chatInitialLetter.setText(firstLetter);
-                chatInitialLetter.setTextColor(Color.WHITE);
-                chatInitialLetter.setVisibility(View.VISIBLE);
-            } else {
-                setInitialByMail = true;
+        /*Avatar*/
+        File avatar = buildAvatarFile(getActivity(), contactMail + ".jpg");
+        Bitmap bitmap = null;
+        if (isFileAvailable(avatar) && avatar.length() > 0){
+            BitmapFactory.Options bOpts = new BitmapFactory.Options();
+            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+            if (bitmap == null) {
+                avatar.delete();
             }
-        } else {
-            setInitialByMail = true;
-        }
-        if (setInitialByMail) {
-            if (contactMail != null) {
-                if (contactMail.length() > 0) {
-                    String firstLetter = contactMail.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                    chatInitialLetter.setText(firstLetter);
-                    chatInitialLetter.setTextColor(Color.WHITE);
-                    chatInitialLetter.setVisibility(View.VISIBLE);
-                }
+            else{
+                chatImageView.setImageBitmap(bitmap);
+                return;
             }
         }
-        chatInitialLetter.setTextSize(22);
-
     }
 
     @Override

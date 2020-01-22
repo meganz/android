@@ -96,10 +96,14 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -107,7 +111,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface {
+public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaGlobalListenerInterface {
 
     private static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
     public static final String EXTRA_MEGA_CONTACTS = "mega_contacts";
@@ -190,6 +194,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private MenuItem inviteContactMenuItem;
 
     private boolean comesFromChat;
+
+    private boolean comesFromRecent;
+    public static final String FROM_RECENT = "comesFromRecent";
 
     private RelativeLayout headerContacts;
     private TextView textHeader;
@@ -1370,6 +1377,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         outState.putBoolean("onNewGroup", onNewGroup);
         outState.putBoolean("isConfirmDeleteShown", isConfirmDeleteShown);
         outState.putString("confirmDeleteMail", confirmDeleteMail);
+        outState.putBoolean(FROM_RECENT, comesFromRecent);
         if (queryIfContactSouldBeAddedTask != null && queryIfContactSouldBeAddedTask.getStatus() == AsyncTask.Status.RUNNING){
             isConfirmAddShown = true;
             queryIfContactSouldBeAddedTask.cancel(true);
@@ -1461,6 +1469,14 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(megaApi != null) {
+            megaApi.removeGlobalListener(this);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
 
@@ -1470,6 +1486,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             contactType = getIntent().getIntExtra("contactType", CONTACT_TYPE_MEGA);
             chatId = getIntent().getLongExtra("chatId", -1);
             newGroup = getIntent().getBooleanExtra("newGroup", false);
+            comesFromRecent = getIntent().getBooleanExtra(FROM_RECENT, false);
             if (newGroup) {
                 createNewGroup = true;
                 contactsNewGroup = getIntent().getStringArrayListExtra("contactsNewGroup");
@@ -1503,6 +1520,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
+        megaApi.addGlobalListener(this);
         if(megaApi==null||megaApi.getRootNode()==null){
             logDebug("Refresh session - sdk");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
@@ -1560,7 +1578,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         mailError.setVisibility(View.GONE);
         typeContactLayout = (RelativeLayout) findViewById(R.id.layout_type_mail);
         typeContactLayout.setVisibility(View.GONE);
-        typeContactEditText = (EditText) findViewById(R.id.type_mail_edittext);
+        typeContactEditText = (EditText) findViewById(R.id.type_mail_edit_text);
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, px2dp(40, outMetrics));
             typeContactLayout.setLayoutParams(params1);
@@ -1607,7 +1625,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         containerAddedContactsRecyclerView.setVisibility(View.GONE);
         fabImageGroup = (FloatingActionButton) findViewById(R.id.image_group_floating_button);
         nameGroup = findViewById(R.id.name_group_edittext);
-        nameGroup.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
         nameGroup.setFilters(new InputFilter[]{new InputFilter.LengthFilter(MAX_ALLOWED_CHARACTERS_AND_EMOJIS)});
 
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -1718,6 +1735,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             onNewGroup = savedInstanceState.getBoolean("onNewGroup", onNewGroup);
             isConfirmDeleteShown = savedInstanceState.getBoolean("isConfirmDeleteShown", false);
             confirmDeleteMail = savedInstanceState.getString("confirmDeleteMail");
+            comesFromRecent = savedInstanceState.getBoolean(FROM_RECENT, false);
             searchExpand = savedInstanceState.getBoolean("searchExpand", false);
             savedInputString = savedInstanceState.getString("inputString");
             isConfirmAddShown = savedInstanceState.getBoolean("isConfirmAddShown", false);
@@ -1821,6 +1839,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
 
         setGetChatLinkVisibility();
+        if (comesFromRecent && !onNewGroup) {
+            if (getContactsTask != null && getContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
+                getContactsTask.cancel(true);
+            }
+            createNewChatLink = true;
+            newGroup();
+        }
     }
 
     private void setEmptyStateVisibility (boolean visible) {
@@ -2916,7 +2941,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     private void toInviteContact() {
-        Intent in = new Intent(this, AddContactActivityLollipop.class);
+        Intent in = new Intent(this, InviteContactActivity.class);
         in.putExtra("contactType", CONTACT_TYPE_DEVICE);
         startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
     }
@@ -3029,8 +3054,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             if (addedContactsMEGA.contains(myContact)) {
                 addedContactsMEGA.remove(myContact);
             }
-            returnToAddContacts();
-            createMyContact();
+            if (comesFromRecent) {
+                finish();
+            } else {
+                returnToAddContacts();
+                createMyContact();
+            }
         } else if (createNewGroup && (newGroup || onlyCreateGroup)) {
             finish();
         } else if ((createNewGroup || createNewChatLink) && (!newGroup || !onlyCreateGroup)) {
@@ -3408,6 +3437,52 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
         }
+    }
+
+    @Override
+    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+
+    }
+
+    @Override
+    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+
+    }
+
+    @Override
+    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
+
+    }
+
+    @Override
+    public void onReloadNeeded(MegaApiJava api) {
+
+    }
+
+    @Override
+    public void onAccountUpdate(MegaApiJava api) {
+
+    }
+
+    @Override
+    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+        if (requests != null) {
+            for (int i = 0; i < requests.size(); i++) {
+                MegaContactRequest cr = requests.get(i);
+                if (cr != null) {
+                    if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
+                        logDebug("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+                        getContactsTask = new GetContactsTask();
+                        getContactsTask.execute();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onEvent(MegaApiJava api, MegaEvent event) {
+
     }
 
     @Override

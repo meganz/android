@@ -77,7 +77,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         logDebug("onPause");
-
+        app.activityPaused();
         checkMegaObjects();
         super.onPause();
     }
@@ -85,7 +85,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         logDebug("onResume");
-
+        app.activityResumed();
         super.onResume();
         setAppFontSize(this);
 
@@ -387,11 +387,11 @@ public class BaseActivity extends AppCompatActivity {
         MultipleAttachChatListener listener = null;
 
         if(chats.size()==1){
-            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), false, chats.size());
+            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), chats.size());
             megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
         }
         else{
-            listener = new MultipleAttachChatListener(context, -1, false, chats.size());
+            listener = new MultipleAttachChatListener(context, -1, chats.size());
             for(int i=0;i<chats.size();i++){
                 megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
             }

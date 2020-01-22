@@ -30,9 +30,9 @@ import nz.mega.sdk.MegaTransfer;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.getNodePath;
+import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineUtils {
 
@@ -45,7 +45,6 @@ public class OfflineUtils {
     private static final String DB_FOLDER = "1";
 
     public static void saveOffline (File destination, MegaNode node, Context context, Activity activity, MegaApiAndroid megaApi){
-        logDebug("saveOffline");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -57,8 +56,6 @@ public class OfflineUtils {
         }
 
         destination.mkdirs();
-
-        logDebug("DESTINATION: " + destination.getAbsolutePath());
 
         double availableFreeSpace = Double.MAX_VALUE;
         try{
@@ -291,6 +288,10 @@ public class OfflineUtils {
         }
 
         return new File(path + File.separator + MegaApiUtils.createStringTree(node, context));
+    }
+
+    public static File getOfflineParentFileName(Context context, MegaNode node) {
+        return new File(File.separator + MegaApiUtils.createStringTree(node, context));
     }
 
     public static String getOfflineSize(Context context) {
@@ -639,5 +640,4 @@ public class OfflineUtils {
 
         return false;
     }
-
 }

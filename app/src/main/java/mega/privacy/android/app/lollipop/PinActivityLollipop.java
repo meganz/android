@@ -6,8 +6,6 @@ import android.os.Handler;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.PinUtil;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -15,9 +13,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 
 public class PinActivityLollipop extends BaseActivity {
-	
-	private MegaApiAndroid megaApi;
-	private MegaChatApiAndroid megaChatApi;
 
     private static long lastStart;
 	
@@ -50,7 +45,6 @@ public class PinActivityLollipop extends BaseActivity {
 		}
 		PinUtil.pause(this);
 		lastStart = System.currentTimeMillis();
-		MegaApplication.activityPaused();
 		super.onPause();
 	}
 	
@@ -60,7 +54,6 @@ public class PinActivityLollipop extends BaseActivity {
 
 		super.onResume();
         setAppFontSize(this);
-		MegaApplication.activityResumed();
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();

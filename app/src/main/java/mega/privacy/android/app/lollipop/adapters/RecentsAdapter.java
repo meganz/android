@@ -378,7 +378,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     @Override
     public String getSectionTitle(int position) {
-        if (recentsItems == null || recentsItems.isEmpty()) return null;
+        if (recentsItems == null || recentsItems.isEmpty()
+                || position < 0 || position >= recentsItems.size()) return "";
 
         return recentsItems.get(position).getDate();
     }

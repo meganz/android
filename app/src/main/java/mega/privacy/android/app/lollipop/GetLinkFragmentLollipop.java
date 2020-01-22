@@ -336,12 +336,22 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                     switchButtonExpiry.setEnabled(true);
                     switchButtonProtection.setEnabled(true);
                 }
-                if(link!=null){
-                    String urlString="";
-                    String [] s = link.split("!");
-                    if (s.length == 3){
-                        urlString = s[0] + "!" + s[1];
+                if (link != null) {
+                    String urlString = "";
+                    if (link.contains("#!") || link.contains("#F!")) {
+                        //old file or folder link format
+                        String[] s = link.split("!");
+                        if (s.length == 3) {
+                            urlString = s[0] + "!" + s[1];
+                        }
+                    } else {
+                        // new file or folder link format
+                        String[] s = link.split("#");
+                        if (s.length == 2) {
+                            urlString = s[0];
+                        }
                     }
+
                     linkText.setText(urlString);
                     copyButton.setEnabled(true);
                     sendButton.setEnabled(true);
@@ -359,12 +369,22 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 linkWithoutKeyCheck.setChecked(false);
 				linkDecryptionKeyCheck.setChecked(true);
 				linkWithKeyCheck.setChecked(false);
-                if(link!=null){
-                    String keyString="";
-                    String [] s = link.split("!");
-                    if (s.length == 3){
-                        keyString = s[2];
+                if (link != null) {
+                    String keyString = "";
+                    if (link.contains("#!") || link.contains("#F!")) {
+                        //old file or folder link format
+                        String[] s = link.split("!");
+                        if (s.length == 3) {
+                            keyString = s[2];
+                        }
+                    } else {
+                        // new file or folder link format
+                        String[] s = link.split("#");
+                        if (s.length == 2) {
+                            keyString = s[1];
+                        }
                     }
+
                     linkText.setText(keyString);
                     copyButton.setEnabled(true);
                     sendButton.setEnabled(true);
