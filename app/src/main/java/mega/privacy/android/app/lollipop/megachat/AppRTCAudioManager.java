@@ -88,10 +88,10 @@ public class AppRTCAudioManager {
         amState = AudioManagerState.UNINITIALIZED;
         if (statusSpeaker) {
             useSpeakerphone = SPEAKERPHONE_AUTO;
-            defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
+            defaultAudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE;
         } else {
             useSpeakerphone = SPEAKERPHONE_FALSE;
-            defaultAudioDevice = AudioDevice.EARPIECE;
+            defaultAudioDevice = AppRTCAudioManager.AudioDevice.EARPIECE;
         }
 
         start(null);
@@ -132,33 +132,31 @@ public class AppRTCAudioManager {
     private void onProximitySensorChangedState(Context context) {
         // The proximity sensor should only be activated when there are exactly two available audio devices.
         if (audioDevices.size() >= 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE) && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
+            boolean isNear;
             if (proximitySensor.sensorReportsNearState()) {
                 logDebug("Status of proximity sensor is: Near");
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
 
-                if (context instanceof ChatCallActivity && isSpeakerOn) {
+                if ((context instanceof ChatCallActivity && isSpeakerOn) || context instanceof ChatActivityLollipop) {
                     logDebug("Disabling the speakerphone");
                     defaultAudioDevice = AppRTCAudioManager.AudioDevice.EARPIECE;
-                    updateAudioDeviceState();
                 }
-
-                if (proximitySensorListener != null)
-                    proximitySensorListener.needToUpdate(true);
-
+                isNear = true;
             } else {
-
                 logDebug("Status of proximity sensor is: Far");
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
-                if (context instanceof ChatCallActivity && isSpeakerOn) {
+                if ((context instanceof ChatCallActivity && isSpeakerOn) || context instanceof ChatActivityLollipop) {
                     logDebug("Enabling the speakerphone");
                     defaultAudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE;
                     updateAudioDeviceState();
                 }
-                if (proximitySensorListener != null)
-                    proximitySensorListener.needToUpdate(false);
+                isNear = false;
             }
+
+            if(defaultAudioDevice !=  selectedAudioDevice) updateAudioDeviceState();
+            if (proximitySensorListener != null) proximitySensorListener.needToUpdate(isNear);
         }
     }
 
@@ -186,14 +184,16 @@ public class AppRTCAudioManager {
             if (speakerStatus) {
                 isSpeakerOn = true;
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
-                defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
+                defaultAudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE;
             } else {
                 isSpeakerOn = false;
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
-                defaultAudioDevice = AudioDevice.EARPIECE;
+                defaultAudioDevice = AppRTCAudioManager.AudioDevice.EARPIECE;
+            }
+            if(selectedAudioDevice != defaultAudioDevice){
+                updateAudioDeviceState();
             }
         }
-        updateAudioDeviceState();
     }
 
     public void start(AudioManagerEvents audioManagerEvents) {
@@ -479,7 +479,6 @@ public class AppRTCAudioManager {
      */
     public void updateAudioDeviceState() {
         Log.d(TAG, "updateAudioDeviceState()");
-
         ThreadUtils.checkIsOnMainThread();
         Log.d(TAG, "--- updateAudioDeviceState: "
                 + "wired headset=" + hasWiredHeadset + ", "
@@ -518,10 +517,17 @@ public class AppRTCAudioManager {
                 newAudioDevices.add(AudioDevice.EARPIECE);
             }
         }
+        boolean audioDeviceSetUpdated;
         // Store state which is set to true if the device list has changed.
-        boolean audioDeviceSetUpdated = !audioDevices.equals(newAudioDevices);
-        // Update the existing audio device set.
-        audioDevices = newAudioDevices;
+        if(audioDevices.equals(newAudioDevices)){
+            //Equals
+            audioDeviceSetUpdated = false;
+        }else{
+            audioDevices.clear();
+            // Update the existing audio device set.
+            audioDevices = newAudioDevices;
+            audioDeviceSetUpdated = true;
+        }
         // Correct user selected audio devices if needed.
         if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE && userSelectedAudioDevice == AudioDevice.BLUETOOTH) {
             // If BT is not available, it can't be the user selection.
@@ -579,7 +585,6 @@ public class AppRTCAudioManager {
 
         // Update selected audio device.
         AudioDevice newAudioDevice = selectedAudioDevice;
-
         if (bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED) {
             // If a Bluetooth is connected, then it should be used as output audio
             // device. Note that it is not sufficient that a headset is available;
@@ -595,7 +600,6 @@ public class AppRTCAudioManager {
             // |defaultAudioDevice| contains either AudioDevice.SPEAKER_PHONE or AudioDevice.EARPIECE
             // depending on the user's selection.
             logDebug(" The new audio device connected is "+defaultAudioDevice);
-
             newAudioDevice = defaultAudioDevice;
         }
         // Switch to new device but only if there has been any changes.

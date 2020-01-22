@@ -1,5 +1,5 @@
 package mega.privacy.android.app.interfaces;
 
 public interface OnProximitySensorListener {
-    void needToUpdate(boolean statusSpeaker);
+    void needToUpdate(boolean isNear);
 }

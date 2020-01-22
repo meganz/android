@@ -399,7 +399,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private ActionMode actionMode;
 
     private AppRTCAudioManager rtcAudioManager = null;
-    public boolean isSpeakerOn = true;
+    private boolean lastStatusSpeakerOn = true;
 
     // Data being stored when My Chat Files folder does not exist
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
@@ -8404,17 +8404,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if(rtcAudioManager != null) return;
         rtcAudioManager = AppRTCAudioManager.create(this, true);
         rtcAudioManager.start(null);
-        isSpeakerOn = true;
-
+        lastStatusSpeakerOn = true;
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
             @Override
             public void needToUpdate(boolean isNear) {
-                if(isSpeakerOn && isNear){
-                    isSpeakerOn = false;
-                    rtcAudioManager.updateSpeakerStatus(false);
-                }else if(!isSpeakerOn && !isNear){
-                    stopProximitySensor();
+                if(!lastStatusSpeakerOn && !isNear){
                     adapter.pausePlaybackInProgress();
+                    stopProximitySensor();
+                }else if(lastStatusSpeakerOn && isNear){
+                    lastStatusSpeakerOn = false;
                 }
             }
         });
@@ -8425,13 +8423,16 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         rtcAudioManager.startProximitySensor(this);
     }
     private void activateSpeaker(){
-        if(!isSpeakerOn) {
-            isSpeakerOn = true;
+        if(!lastStatusSpeakerOn){
+            lastStatusSpeakerOn = true;
+        }
+        if(rtcAudioManager != null){
             rtcAudioManager.updateSpeakerStatus(true);
         }
     }
 
     public void stopProximitySensor(){
+        if(rtcAudioManager == null) return;
         activateSpeaker();
         rtcAudioManager.stopProximitySensor();
     }
