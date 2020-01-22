@@ -142,7 +142,7 @@ public class ContactInfoListDialog {
         /**
          * @param contactInfos The selected/unselected contact infos.
          */
-        void onSelect(Set<InvitationContactInfo> contactInfos, Set<InvitationContactInfo> toRemove);
+        void onSelect(@NonNull Set<InvitationContactInfo> contactInfos,@NonNull Set<InvitationContactInfo> toRemove);
 
         void cancel();
     }
@@ -182,6 +182,9 @@ public class ContactInfoListDialog {
         public void onBindViewHolder(@NonNull final ContactInfoAdapter.ContactInfoViewHolder viewHolder, int i) {
             String content = contents.get(i);
             viewHolder.textView.setText(content);
+            viewHolder.textView.setOnClickListener(v ->
+                    viewHolder.checkBox.setChecked(!viewHolder.checkBox.isChecked())
+            );
             if (isResumed) {
                 if (checkedIndex.contains(i)) {
                     viewHolder.checkBox.setChecked(true);

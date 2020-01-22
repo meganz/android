@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -58,7 +59,6 @@ import mega.privacy.android.app.components.ContactsDividerDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
-import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.ContactsFilter;
@@ -251,7 +251,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
             filteredContacts = savedInstanceState.getParcelableArrayList(KEY_FILTERED_CONTACTS);
             totalContacts = savedInstanceState.getParcelableArrayList(KEY_TOTAL_CONTACTS);
             isPermissionGranted = savedInstanceState.getBoolean(KEY_IS_PERMISSION_GRANTED, false);
-            refreshAddedContactsView();
+            refreshAddedContactsView(true);
             setRecyclersVisibility();
             setTitleAB();
             if (totalContacts.size() > 0) {
@@ -695,7 +695,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     }
 
     @Override
-    public void onSelect(Set<InvitationContactInfo> selected,Set<InvitationContactInfo> toRemove) {
+    public void onSelect(@NonNull Set<InvitationContactInfo> selected, @NonNull Set<InvitationContactInfo> toRemove) {
         long id = -1;
         cancel();
         for(InvitationContactInfo select : selected) {
@@ -709,7 +709,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
             addedContacts.remove(select);
         }
         controlHighlited(id);
-        refreshComponents();
+        refreshComponents(selected.size() > toRemove.size());
     }
 
     @Override
@@ -717,8 +717,8 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         currentSelected = null;
     }
 
-    private void refreshComponents() {
-        refreshAddedContactsView();
+    private void refreshComponents(boolean shouldScroll) {
+        refreshAddedContactsView(shouldScroll);
         refreshInviteContactButton();
         //clear input text view after selection
         typeContactEditText.setText("");
@@ -734,22 +734,20 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
             listDialog = new ContactInfoListDialog(this, invitationContactInfo, this);
             listDialog.showInfo(addedContacts, false);
         } else {
+            boolean shouldScroll;
             if (isContactAdded(invitationContactInfo)) {
                 addedContacts.remove(invitationContactInfo);
+                shouldScroll = false;
             } else {
                 addedContacts.add(invitationContactInfo);
+                shouldScroll = true;
             }
-            refreshComponents();
+            refreshComponents(shouldScroll);
         }
     }
 
     private void refreshHorizontalScrollView() {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                scrollView.fullScroll(android.view.View.FOCUS_RIGHT);
-            }
-        }, 100);
+        handler.postDelayed(() -> scrollView.fullScroll(android.view.View.FOCUS_RIGHT), 100);
     }
 
     private ArrayList<InvitationContactInfo> megaContactToContactInfo(List<MegaContactGetter.MegaContact> megaContacts) {
@@ -790,12 +788,19 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
             long id = contact.getId();
             String name = contact.getName();
             List<String> phoneNumberList = contact.getPhoneNumberList();
+            int phoneCount = phoneNumberList.size();
             List<String> emailList = contact.getEmailList();
+            int emailCount = emailList.size();
+            ContactsFilter.filterOutMegaUsers(this, megaContacts, phoneNumberList);
+            ContactsFilter.filterOutMegaUsers(this, megaContacts, emailList);
+            // if the local contact has any phone number or email found on MEGA, ignore it.
+            if(phoneNumberList.size() < phoneCount || emailList.size() < emailCount) {
+                continue;
+            }
+
             ContactsFilter.filterOutMyself(megaApi, emailList);
             ContactsFilter.filterOutContacts(megaApi, emailList);
             ContactsFilter.filterOutPendingContacts(megaApi, emailList);
-            ContactsFilter.filterOutMegaUsers(this, megaContacts, phoneNumberList);
-            ContactsFilter.filterOutMegaUsers(this, megaContacts, emailList);
             phoneNumberList.addAll(emailList);
             if(phoneNumberList.size() > 0) {
                 InvitationContactInfo info = new InvitationContactInfo(id, name, TYPE_PHONE_CONTACT, phoneNumberList, phoneNumberList.get(0), defaultLocalContactAvatarColor);
@@ -938,7 +943,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
                 } else {
                     invitationContactInfo.setHighlighted(false);
                 }
-                refreshAddedContactsView();
+                refreshAddedContactsView(false);
                 refreshInviteContactButton();
                 refreshList();
                 setTitleAB();
@@ -965,7 +970,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         }
     }
 
-    private void refreshAddedContactsView() {
+    private void refreshAddedContactsView(boolean shouldScroll) {
         logDebug("refreshAddedContactsView");
         itemContainer.removeAllViews();
         for (int i = 0; i < addedContacts.size(); i++) {
@@ -980,7 +985,11 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
             itemContainer.addView(createContactTextView(displayedLabel, i));
         }
         itemContainer.invalidate();
-        refreshHorizontalScrollView();
+        if (shouldScroll) {
+            refreshHorizontalScrollView();
+        } else {
+            scrollView.clearFocus();
+        }
     }
 
     private void refreshInviteContactButton() {
@@ -1140,7 +1149,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
                 holder.itemView.performClick();
             } else if (!isContactAdded(info)) {
                 addedContacts.add(info);
-                refreshAddedContactsView();
+                refreshAddedContactsView(true);
             }
         }
         setTitleAB();
