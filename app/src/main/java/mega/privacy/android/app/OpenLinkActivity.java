@@ -32,9 +32,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
 
-	private MegaApplication app;
-	private MegaApiAndroid megaApi;
-	private MegaChatApiAndroid megaChatApi;
 	private DatabaseHandler dbH = null;
 
 	private String urlConfirmationLink = null;
@@ -47,10 +44,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-
-		app = (MegaApplication) getApplication();
-		megaApi = app.getMegaApi();
-		megaChatApi = app.getMegaChatApi();
 
 		Intent intent = getIntent();
 		String url = intent.getDataString();
@@ -67,6 +60,15 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		containerOkButton.setOnClickListener(this);
 
 		url = decodeURL(url);
+
+		// Email verification link
+		if (matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
+			logDebug("Open email verification link");
+			app.setIsWebOpenDueToEmailVerification(true);
+			openWebLink(url);
+			return;
+		}
+
 		// File link
 		if (matchRegexs(url, FILE_LINK_REGEXS)) {
 			logDebug("Open link url");
@@ -86,7 +88,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			urlConfirmationLink = url;
 
 			AccountController aC = new AccountController(this);
-			MegaApplication.setUrlConfirmationLink(urlConfirmationLink);
+			app.setUrlConfirmationLink(urlConfirmationLink);
 
 			aC.logout(this, megaApi);
 
@@ -174,7 +176,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				else{
 					logDebug("Not logged");
 					Intent createAccountIntent = new Intent(this, LoginActivityLollipop.class);
-					createAccountIntent.putExtra("visibleFragment", CREATE_ACCOUNT_FRAGMENT);
+					createAccountIntent.putExtra(VISIBLE_FRAGMENT, CREATE_ACCOUNT_FRAGMENT);
 					startActivity(createAccountIntent);
 					finish();
 				}
@@ -239,7 +241,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					if (rootNode == null) {
 						logDebug("Go to Login to fetch nodes");
 						Intent cancelAccountIntent = new Intent(this, LoginActivityLollipop.class);
-						cancelAccountIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						cancelAccountIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						cancelAccountIntent.setAction(ACTION_CANCEL_ACCOUNT);
 						cancelAccountIntent.setData(Uri.parse(url));
 						startActivity(cancelAccountIntent);
@@ -270,7 +272,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					if (rootNode == null) {
 						logDebug("Go to Login to fetch nodes");
 						Intent changeMailIntent = new Intent(this, LoginActivityLollipop.class);
-						changeMailIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						changeMailIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						changeMailIntent.setAction(ACTION_CHANGE_MAIL);
 						changeMailIntent.setData(Uri.parse(url));
 						startActivity(changeMailIntent);
@@ -306,7 +308,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					if (rootNode == null) {
 						logDebug("Go to Login to fetch nodes");
 						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-						resetPassIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						resetPassIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						resetPassIntent.setAction(ACTION_RESET_PASS);
 						resetPassIntent.setData(Uri.parse(url));
 						startActivity(resetPassIntent);
@@ -341,7 +343,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					if (rootNode == null) {
 						logDebug("Go to Login to fetch nodes");
 						Intent ipcIntent = new Intent(this, LoginActivityLollipop.class);
-						ipcIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						ipcIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						ipcIntent.setAction(ACTION_IPC);
 						startActivity(ipcIntent);
 						finish();
@@ -365,10 +367,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				|| matchRegexs(url, MEGA_BLOG_LINK_REGEXS)) {
 			logDebug("Open revert password change link: " + url);
 
-			Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
-			openIntent.setData(Uri.parse(url));
-			startActivity(openIntent);
-			finish();
+			openWebLink(url);
 			return;
 		}
 
@@ -413,6 +412,10 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		// Browser open the link which does not require app to handle
 		logDebug("Browser open link: " + url);
+		openWebLink(url);
+	}
+
+	private void openWebLink(String url) {
 		Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
 		openIntent.setData(Uri.parse(url));
 		startActivity(openIntent);
@@ -470,7 +473,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 						logDebug("Link with master key");
 						if(url!=null){
 							Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-							resetPassIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+							resetPassIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 							resetPassIntent.setAction(ACTION_RESET_PASS);
 							resetPassIntent.setData(Uri.parse(url));
 							startActivity(resetPassIntent);
@@ -485,7 +488,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					else{
 						logDebug("Link without master key - park account");
 						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
-						resetPassIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						resetPassIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						resetPassIntent.setAction(ACTION_PARK_ACCOUNT);
 						resetPassIntent.setData(Uri.parse(url));
 						startActivity(resetPassIntent);
@@ -516,7 +519,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			if(isChatEnabled()){
 				logDebug("END logout sdk request - wait chat logout");
 
-				if(MegaApplication.getUrlConfirmationLink()!=null){
+				if(app.getUrlConfirmationLink()!=null){
 					logDebug("Confirmation link - show confirmation screen");
 					if (dbH == null){
 						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -529,12 +532,12 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					aC.logoutConfirmed(this);
 
 					Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-					confirmIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+					confirmIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 					confirmIntent.putExtra(EXTRA_CONFIRMATION, urlConfirmationLink);
 					confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					confirmIntent.setAction(ACTION_CONFIRM);
 					startActivity(confirmIntent);
-					MegaApplication.setUrlConfirmationLink(null);
+					app.setUrlConfirmationLink(null);
 					finish();
 				}
 			}
@@ -551,12 +554,12 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				aC.logoutConfirmed(this);
 
 				Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-				confirmIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+				confirmIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 				confirmIntent.putExtra(EXTRA_CONFIRMATION, urlConfirmationLink);
 				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				confirmIntent.setAction(ACTION_CONFIRM);
 				startActivity(confirmIntent);
-				MegaApplication.setUrlConfirmationLink(null);
+				app.setUrlConfirmationLink(null);
 				finish();
 			}
 		}
@@ -565,7 +568,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 			if(e.getErrorCode() == MegaError.API_OK){
 				AccountController aC = new AccountController(this);
-				MegaApplication.setUrlConfirmationLink(request.getLink());
+				app.setUrlConfirmationLink(request.getLink());
 
 				aC.logout(this, megaApi);
 			}

@@ -57,6 +57,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
@@ -86,7 +87,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
+public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
     private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
@@ -391,17 +392,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
-//		loginLogin.setVisibility(View.GONE);
-//		loginCreateAccount.setVisibility(View.GONE);
-//		loginDelimiter.setVisibility(View.GONE);
-//		loginLoggingIn.setVisibility(View.VISIBLE);
-//		generatingKeysText.setVisibility(View.VISIBLE);
-//		loggingInText.setVisibility(View.VISIBLE);
-//		fetchingNodesText.setVisibility(View.VISIBLE);
-//		prepareNodesText.setVisibility(View.VISIBLE);
-//		loginProgressBar.setVisibility(View.VISIBLE);
-//		queryingSignupLinkText.setVisibility(View.VISIBLE);
-//		confirmingAccountText.setVisibility(View.VISIBLE);
 
         forgotPassLayout = (RelativeLayout) v.findViewById(R.id.forgot_pass_full_layout);
         forgotPassTitle = (TextView) v.findViewById(R.id.title_forgot_pass_layout);
@@ -871,8 +861,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startFastLogin();
                     return v;
-                }
-                else if (action.equals(ACTION_ENABLE_CHAT)){
+                } else if (action.equals(ACTION_REFRESH_AFTER_BLOCKED)) {
+                    startFastLogin();
+                    return v;
+                } else if (action.equals(ACTION_ENABLE_CHAT)){
                     logDebug("With credentials -> intentReceived ACTION_ENABLE_CHAT");
                     enableChat();
                     return v;
@@ -1282,7 +1274,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             logWarning("ERROR----> Switch OFF chat");
                             dbH.setEnabledChat(false + "");
                         }
-                        megaChatApi.logout(this);
+                        megaChatApi.logout(new ChatLogoutListener(getContext()));
                     }
                     else{
                         logDebug("enableChat: condition ret == OK -- chat correctly initialized");
@@ -1361,7 +1353,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             logWarning("ERROR----> Switch OFF chat");
                             dbH.setEnabledChat(false + "");
                         }
-                        megaChatApi.logout(this);
+                        megaChatApi.logout(new ChatLogoutListener(getContext()));
                     }
                     else{
                         logDebug("condition ret == OK -- chat correctly initialized");
@@ -1591,7 +1583,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else{
                     logWarning("ERROR INIT CHAT: " + ret);
-                    megaChatApi.logout(this);
+                    megaChatApi.logout(new ChatLogoutListener(getContext()));
 
                     if(chatSettings==null) {
                         logWarning("ERROR ----> Switch OFF chat");
@@ -2067,10 +2059,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else{
                         boolean initialCam = false;
-//								DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-                        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                         MegaPreferences prefs = dbH.getPreferences();
-                        prefs = dbH.getPreferences();
                         if (prefs != null){
                             if (prefs.getCamSyncEnabled() != null){
                                 if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
@@ -2162,6 +2151,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (twoFA){
                         intent.setAction(ACTION_REFRESH_STAGING);
                         twoFA = false;
+                    }
+                    
+                    if (action != null && action.equals(ACTION_REFRESH_AFTER_BLOCKED)) {
+                        intent.setAction(ACTION_REFRESH_AFTER_BLOCKED);
                     }
 
                     loginActivityLollipop.startActivity(intent);
@@ -2277,7 +2270,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                     if (isChatEnabled()) {
                         if (megaChatApi != null) {
-                            megaChatApi.logout(this);
+                            megaChatApi.logout(new ChatLogoutListener(getContext()));
                         }
                     }
 
@@ -2314,8 +2307,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 fetchingNodesText.setVisibility(View.VISIBLE);
                 prepareNodesText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
-
-                gSession = megaApi.dumpSession();
+                saveCredentials();
 
                 logDebug("Logged in with session");
 
@@ -2356,22 +2348,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             MegaApplication.setLoggingIn(false);
 
             if (error.getErrorCode() == MegaError.API_OK){
-                logDebug("Ok fetch nodes");
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-
-                gSession = megaApi.dumpSession();
-                MegaUser myUser = megaApi.getMyUser();
-                String myUserHandle = "";
-                if(myUser!=null){
-                    lastEmail = megaApi.getMyUser().getEmail();
-                    myUserHandle = megaApi.getMyUser().getHandle()+"";
-                }
-
-                UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
-
-                dbH.saveCredentials(credentials);
-
-                logDebug("readyToManager");
                 receivedIntent = ((LoginActivityLollipop) context).getIntentReceived();
                 if (receivedIntent != null) {
                     shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivityLollipop.EXTRA_SHARE_INFOS);
@@ -2385,8 +2361,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return;
                     }
                 }
+
                 readyToManager();
-            }else{
+            } else {
                 if(confirmLogoutDialog != null) {
                     confirmLogoutDialog.dismiss();
                 }
@@ -2548,6 +2525,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
+    private void saveCredentials() {
+        gSession = megaApi.dumpSession();
+        MegaUser myUser = megaApi.getMyUser();
+        String myUserHandle = "";
+        if (myUser != null) {
+            lastEmail = megaApi.getMyUser().getEmail();
+            myUserHandle = megaApi.getMyUser().getHandle() + "";
+        }
+
+        UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
+        dbH.saveCredentials(credentials);
+    }
+
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e)
     {
@@ -2607,33 +2597,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             logError("EXCEPTION when starting count", exception);
         }
     }
-
-    @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-        logDebug("Type:" + request.getType());
-    }
-
-    @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-        logDebug("Type: " + request.getType());
-    }
-
-    @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        logDebug("onRequestFinish(CHAT)");
-
-        if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
-
-            ((MegaApplication) ((Activity)context).getApplication()).disableMegaChatApi();
-            resetAndroidLogger();
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        logWarning("Type: " + request.getType() + ", Error: " + e.getErrorCode());
-    }
-
 
     public void showDialogInsertMail(final boolean reset){
         logDebug("reset: " + reset);
@@ -3000,7 +2963,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         if (megaChatApi == null){
                             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                         }
-                        megaChatApi.logout(LoginFragmentLollipop.this);
+                        megaChatApi.logout(new ChatLogoutListener(getContext()));
                         megaApi.localLogout(LoginFragmentLollipop.this);
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
