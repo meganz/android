@@ -9286,8 +9286,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void showGetLinkActivity(long handle){
 		logDebug("Handle: " + handle);
 		MegaNode node = megaApi.getNodeByHandle(handle);
-		if (isNodeTakenDown(node)) {
-			showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node), -1);
+		if (showTakenDownDialog(node, this)) {
 			return;
 		}
 

@@ -688,8 +688,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-					if (isNodeTakenDown(node)) {
-						showSnackbar(SNACKBAR_TYPE, this.getString(R.string.error_download_takendown_node), -1);
+					if (showTakenDownDialog(node, context)) {
 						return false;
 					}
 					shareIt = false;
@@ -728,8 +727,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 			case R.id.full_image_viewer_remove_link: {
 				shareIt = false;
-				if (isNodeTakenDown(node)) {
-					showSnackbar(SNACKBAR_TYPE, this.getString(R.string.error_download_takendown_node), -1);
+				if (showTakenDownDialog(node, context)) {
 					return false;
 				}
 				android.support.v7.app.AlertDialog removeLinkDialog;
@@ -900,8 +898,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				break;
 			}
 			case R.id.full_image_viewer_copy: {
-				if (isNodeTakenDown(node)) {
-					showSnackbar(SNACKBAR_TYPE, this.getString(R.string.error_download_takendown_node), -1);
+				if (showTakenDownDialog(node, context)) {
 					return false;
 				}
 				showCopy();

@@ -87,8 +87,7 @@ public class UtilsModalBottomSheet {
     public static void openWith (MegaApiAndroid megaApi, Context context, MegaNode node) {
         logDebug("openWith");
 
-        if (isNodeTakenDown(node)) {
-            showSnackBar(context, SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node), -1);
+        if (showTakenDownDialog(node, context)) {
             return;
         }
 

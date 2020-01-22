@@ -109,8 +109,7 @@ public class NodeController {
         for (int i=0; i<handleList.size(); i++){
             Long handle = handleList.get(i);
             MegaNode node = megaApi.getNodeByHandle(handle);
-            if (isNodeTakenDown(node)) {
-                showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node));
+            if (showTakenDownDialog(node, context)) {
                 return;
             }
             longArray[i] = handle;
