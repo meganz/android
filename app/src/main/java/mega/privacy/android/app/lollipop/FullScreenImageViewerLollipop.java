@@ -114,6 +114,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
@@ -687,7 +688,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-					if (node != null && node.isTakenDown()) {
+					if (isNodeTakenDown(node)) {
 						showSnackbar(SNACKBAR_TYPE, this.getString(R.string.error_download_takendown_node), -1);
 						return false;
 					}
@@ -727,7 +728,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 			case R.id.full_image_viewer_remove_link: {
 				shareIt = false;
-				if (node != null && node.isTakenDown()) {
+				if (isNodeTakenDown(node)) {
 					showSnackbar(SNACKBAR_TYPE, this.getString(R.string.error_download_takendown_node), -1);
 					return false;
 				}
@@ -899,7 +900,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				break;
 			}
 			case R.id.full_image_viewer_copy: {
-				if (node != null && node.isTakenDown()) {
+				if (isNodeTakenDown(node)) {
 					showSnackbar(SNACKBAR_TYPE, this.getString(R.string.error_download_takendown_node), -1);
 					return false;
 				}

@@ -255,6 +255,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
@@ -9285,7 +9286,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void showGetLinkActivity(long handle){
 		logDebug("Handle: " + handle);
 		MegaNode node = megaApi.getNodeByHandle(handle);
-		if (node != null && node.isTakenDown()) {
+		if (isNodeTakenDown(node)) {
 			showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node), -1);
 			return;
 		}
@@ -11533,7 +11534,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void showConfirmationRemovePublicLink (final MegaNode n){
 		logDebug("showConfirmationRemovePublicLink");
 
-        if (n != null && n.isTakenDown()) {
+        if (isNodeTakenDown(n)) {
             showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node), -1);
             return;
         }

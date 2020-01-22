@@ -126,6 +126,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.FileUtils.FileTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class PdfViewerActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
@@ -502,7 +503,9 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         defaultScrollHandle = new DefaultScrollHandle(PdfViewerActivityLollipop.this);
 
         loading = true;
-        if (uri.toString().contains("http://")){
+        if (megaApi != null && isNodeTakenDown(megaApi.getNodeByHandle(handle))) {
+            showTakenDownAlert(this);
+        } else if (uri.toString().contains("http://")){
             isUrl = true;
             loadStreamPDF();
         }

@@ -29,4 +29,8 @@ public class MegaNodeUtil {
         nodes = new ArrayList<>(safeList);
         return folderCount;
     }
+
+    public static boolean isNodeTakenDown(MegaNode node) {
+        return node != null && node.isTakenDown();
+    }
 }

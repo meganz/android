@@ -710,15 +710,9 @@ public class FileUtils {
          */
         public static void showTakenDownAlert(final AppCompatActivity activity) {
 
-            if (activity == null) {
-                return;
-            }
-
-            if (alertTakenDown != null && alertTakenDown.isShowing()) {
-                return;
-            }
-
-            if (activity.isFinishing()) {
+            if (activity == null
+                    || activity.isFinishing()
+                    || (alertTakenDown != null && alertTakenDown.isShowing())) {
                 return;
             }
 

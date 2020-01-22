@@ -23,6 +23,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class UtilsModalBottomSheet {
@@ -86,7 +87,7 @@ public class UtilsModalBottomSheet {
     public static void openWith (MegaApiAndroid megaApi, Context context, MegaNode node) {
         logDebug("openWith");
 
-        if (node != null && node.isTakenDown()) {
+        if (isNodeTakenDown(node)) {
             showSnackBar(context, SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node), -1);
             return;
         }

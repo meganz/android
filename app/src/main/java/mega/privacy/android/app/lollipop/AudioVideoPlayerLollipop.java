@@ -158,6 +158,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.FileTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -744,7 +745,9 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             hideActionStatusBar(0);
         }
 
-        if (isPlayList) {
+        if (!isOffline && !isZip && isNodeTakenDown(megaApi.getNodeByHandle(handle))) {
+            showTakenDownAlert(this);
+        } else if (isPlayList) {
             getMediaFilesTask = new GetMediaFilesTask();
             getMediaFilesTask.execute();
         }
@@ -981,6 +984,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             if (nodes != null) {
                 for (int i = 0; i < nodes.size(); i++) {
                     MegaNode n = nodes.get(i);
+                    if (isNodeTakenDown(n)) continue;
+
                     if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
                             || (MimeTypeList.typeForName(n.getName()).isAudio() && !MimeTypeList.typeForName(n.getName()).isAudioNotSupported())) {
                         mediaHandles.add(n.getHandle());
