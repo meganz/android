@@ -496,6 +496,10 @@ public class FileUtils {
         return file != null && file.exists();
     }
 
+    public static boolean isFileDownloadedLatest(File downloadedFile, MegaNode node) {
+        return downloadedFile.lastModified() - node.getModificationTime() * 1000 >= 0;
+    }
+
     public static void copyFolder(File source, File destination) throws IOException {
 
         if (source.isDirectory()) {
