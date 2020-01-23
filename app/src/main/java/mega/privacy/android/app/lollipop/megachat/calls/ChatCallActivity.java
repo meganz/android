@@ -575,7 +575,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             } else {
                 this.startService(intentService);
             }
-
             application.createChatAudioManager();
 
             int callStatus = callChat.getStatus();
@@ -1947,11 +1946,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    private void updateLocalSpeakerStatus() {
-        boolean speakerStatus = application.getSpeakerStatus(callChat.getChatid());
-        if (rtcAudioManager == null) {
-            rtcAudioManager = AppRTCAudioManager.create(this, speakerStatus);
-        }
+    private void createAppRTCAudioManager(boolean isSpeakerOn){
+        rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn);
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
             @Override
             public void needToUpdate(boolean isNear) {
@@ -1967,10 +1963,18 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         });
-        rtcAudioManager.updateSpeakerStatus(speakerStatus);
-        speakerFAB.hide();
+    }
 
-        if (speakerStatus) {
+    private void updateLocalSpeakerStatus() {
+        boolean isSpeakerOn = application.getSpeakerStatus(callChat.getChatid());
+        if(rtcAudioManager == null){
+            createAppRTCAudioManager(isSpeakerOn);
+        }else{
+            rtcAudioManager.updateSpeakerStatus(isSpeakerOn);
+        }
+
+        speakerFAB.hide();
+        if (isSpeakerOn) {
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
             speakerFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_speaker_on));
         } else {

@@ -33,12 +33,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
  */
 public class AppRTCAudioManager {
     private static final String TAG = "AppRTCAudioManager";
-    private static final String SPEAKERPHONE_AUTO = "auto";
-    private static final String SPEAKERPHONE_TRUE = "true";
-    private static final String SPEAKERPHONE_FALSE = "false";
     private final Context apprtcContext;
-    // Contains speakerphone setting: auto, true or false
-    private final String useSpeakerphone;
     // Handles all tasks related to Bluetooth headset devices.
     private final AppRTCBluetoothManager bluetoothManager;
     private AudioManager audioManager;
@@ -87,13 +82,10 @@ public class AppRTCAudioManager {
         wiredHeadsetReceiver = new WiredHeadsetReceiver();
         amState = AudioManagerState.UNINITIALIZED;
         if (statusSpeaker) {
-            useSpeakerphone = SPEAKERPHONE_AUTO;
-            defaultAudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE;
+            speakerElements(true);
         } else {
-            useSpeakerphone = SPEAKERPHONE_FALSE;
-            defaultAudioDevice = AppRTCAudioManager.AudioDevice.EARPIECE;
+            speakerElements(false);
         }
-
         start(null);
         if(context instanceof ChatCallActivity) {
             startProximitySensor(context);
@@ -131,7 +123,7 @@ public class AppRTCAudioManager {
      */
     private void onProximitySensorChangedState(Context context) {
         // The proximity sensor should only be activated when there are exactly two available audio devices.
-        if (audioDevices.size() >= 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE) && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
+        if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
             boolean isNear;
             if (proximitySensor.sensorReportsNearState()) {
                 logDebug("Status of proximity sensor is: Near");
@@ -140,7 +132,7 @@ public class AppRTCAudioManager {
 
                 if ((context instanceof ChatCallActivity && isSpeakerOn) || context instanceof ChatActivityLollipop) {
                     logDebug("Disabling the speakerphone");
-                    defaultAudioDevice = AppRTCAudioManager.AudioDevice.EARPIECE;
+                    defaultAudioDevice = AudioDevice.EARPIECE;
                 }
                 isNear = true;
             } else {
@@ -149,8 +141,7 @@ public class AppRTCAudioManager {
                 proximitySensor.turnOnScreen();
                 if ((context instanceof ChatCallActivity && isSpeakerOn) || context instanceof ChatActivityLollipop) {
                     logDebug("Enabling the speakerphone");
-                    defaultAudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE;
-                    updateAudioDeviceState();
+                    defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
                 }
                 isNear = false;
             }
@@ -170,6 +161,14 @@ public class AppRTCAudioManager {
         proximitySensor.stop();
         proximitySensor = null;
     }
+    private void speakerElements(boolean isOn){
+        if(isOn){
+            defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
+        }else{
+            defaultAudioDevice = AudioDevice.EARPIECE;
+        }
+        isSpeakerOn = isOn;
+    }
 
     /**
      * Construction.
@@ -180,17 +179,9 @@ public class AppRTCAudioManager {
 
     public void updateSpeakerStatus(boolean speakerStatus) {
         logDebug("The speaker status is "+speakerStatus);
-        if (audioDevices.size() >= 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE) && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
-            if (speakerStatus) {
-                isSpeakerOn = true;
-                // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
-                defaultAudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE;
-            } else {
-                isSpeakerOn = false;
-                // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
-                defaultAudioDevice = AppRTCAudioManager.AudioDevice.EARPIECE;
-            }
-            if(selectedAudioDevice != defaultAudioDevice){
+        if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
+            speakerElements(speakerStatus);
+            if(defaultAudioDevice != selectedAudioDevice){
                 updateAudioDeviceState();
             }
         }
@@ -256,8 +247,7 @@ public class AppRTCAudioManager {
         };
 
         // Request audio playout focus (without ducking) and install listener for changes in focus.
-        int result = audioManager.requestAudioFocus(audioFocusChangeListener,
-                AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+        int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             Log.d(TAG, "Audio focus request granted for VOICE_CALL streams");
         } else {
@@ -348,6 +338,7 @@ public class AppRTCAudioManager {
                 break;
         }
         selectedAudioDevice = device;
+        logDebug("The currently selected device is "+selectedAudioDevice);
     }
 
     /**

@@ -399,7 +399,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private ActionMode actionMode;
 
     private AppRTCAudioManager rtcAudioManager = null;
-    private boolean lastStatusSpeakerOn = true;
+    private boolean speakerWasActivated = true;
 
     // Data being stored when My Chat Files folder does not exist
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
@@ -8402,17 +8402,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private void createSpeakerAudioManger(){
         if(rtcAudioManager != null) return;
-        rtcAudioManager = AppRTCAudioManager.create(this, true);
-        rtcAudioManager.start(null);
-        lastStatusSpeakerOn = true;
+        speakerWasActivated = true;
+        rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated);
         rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
             @Override
             public void needToUpdate(boolean isNear) {
-                if(!lastStatusSpeakerOn && !isNear){
+                if(!speakerWasActivated && !isNear){
                     adapter.pausePlaybackInProgress();
-                    stopProximitySensor();
-                }else if(lastStatusSpeakerOn && isNear){
-                    lastStatusSpeakerOn = false;
+                }else if(speakerWasActivated && isNear){
+                    speakerWasActivated = false;
                 }
             }
         });
@@ -8423,8 +8421,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         rtcAudioManager.startProximitySensor(this);
     }
     private void activateSpeaker(){
-        if(!lastStatusSpeakerOn){
-            lastStatusSpeakerOn = true;
+        if(!speakerWasActivated){
+            speakerWasActivated = true;
         }
         if(rtcAudioManager != null){
             rtcAudioManager.updateSpeakerStatus(true);

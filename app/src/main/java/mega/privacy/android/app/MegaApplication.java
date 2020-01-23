@@ -1564,10 +1564,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
 					if (megaChatApi != null) {
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
-						if(callStatus == MegaChatCall.CALL_STATUS_RING_IN || callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+						if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
 							setAudioManagerValues(call);
 						}
-						if(callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING){
+						if(callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){
 							removeChatAudioManager();
 							clearIncomingCallNotification(call.getId());
 						}
@@ -1668,13 +1668,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					}
 					break;
 				}
-
 				case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION: {
 					removeStatusVideoAndSpeaker(call.getChatid());
 					removeChatAudioManager();
 					break;
 				}
-
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
 					removeStatusVideoAndSpeaker(call.getChatid());
 					removeChatAudioManager();
