@@ -2656,6 +2656,9 @@
     <string name="title_long" context="Error when renaming a chat title and it is too long">Title too long</string>
     <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please select one or more contacts.</string>
 
+    <string name="my_chat_files_folder" context="Name by default of the folder where the files sent to the chat are stored in the cloud">My chat files</string>
+    <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Error. The folder %1$s was not created</string>
+
     <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Verify your email</string>
     <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily suspended for your safety.</string>
     <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">Please [A]verify your email[/A] and follow its steps to unlock your account.</string>
