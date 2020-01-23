@@ -383,8 +383,7 @@ public class NodeController {
             hashes[i] = handleList.get(i);
             MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
 
-            if (nodeTemp.isTakenDown()) {
-                showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node));
+            if (showTakenDownNodeActionNotAvailableDialog(nodeTemp, context)) {
                 return;
             }
 

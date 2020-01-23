@@ -38,9 +38,7 @@ public class MegaNodeUtil {
 
         int folderCount = 0;
 
-        if (nodes == null) {
-            return folderCount;
-        }
+        if (nodes == null) return folderCount;
 
         CopyOnWriteArrayList<MegaNode> safeList = new CopyOnWriteArrayList(nodes);
 
@@ -201,6 +199,5 @@ public class MegaNodeUtil {
 
             return dialog;
         }
-
     }
 }
