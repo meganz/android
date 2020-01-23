@@ -7,11 +7,19 @@ LOCAL_MODULE := aospPdfium
 
 ARCH_PATH = $(TARGET_ARCH_ABI)
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
-    ARCH_PATH = armeabi
+    ARCH_PATH = armeabi-v7a
 endif
 
 ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
-    ARCH_PATH = arm64
+    ARCH_PATH = arm64-v8a
+endif
+
+ifeq ($(TARGET_ARCH_ABI), x86)
+    ARCH_PATH = x86
+endif
+
+ifeq ($(TARGET_ARCH_ABI), x86_64)
+    ARCH_PATH = x86_64
 endif
 
 LOCAL_SRC_FILES := $(LOCAL_PATH)/$(PDFVIEWER)/lib/$(ARCH_PATH)/libmodpdfium.so
