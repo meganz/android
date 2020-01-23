@@ -206,6 +206,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
@@ -15365,6 +15366,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (e.getErrorCode() == MegaError.API_OK) {
 
 				if(drawerItem == DrawerItem.CLOUD_DRIVE){
+					//force update the pause notification to prevent missed onTransferUpdate
+					LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 					updateTransferButton();
 				}
 
