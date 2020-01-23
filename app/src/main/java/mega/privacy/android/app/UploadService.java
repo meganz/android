@@ -7,20 +7,24 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
@@ -113,6 +117,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	//2 - pre-overquota
     private int isOverquota = 0;
 
+    /** the receiver and manager for the broadcast to listen to the pause event */
+    private BroadcastReceiver pauseBroadcastReceiver;
+    private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
+
     @SuppressLint("NewApi")
 	@Override
 	public void onCreate() {
@@ -139,6 +147,22 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mBuilder = new Notification.Builder(UploadService.this);
 		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, null);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // delay 1 second to refresh the pause notification to prevent update is missed
+        pauseBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                new Handler().postDelayed(() -> {
+                    if (totalFileUploads > 0) {
+                        updateProgressNotification(false);
+                    }
+                    if (totalFolderUploads > 0) {
+                        updateProgressNotification(true);
+                    }
+                }, 1000);
+            }
+        };
+        pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 	}
 
 	@Override
@@ -154,6 +178,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             megaChatApi.saveCurrentState();
         }
 
+        pauseBroadcastManager.unregisterReceiver(pauseBroadcastReceiver);
 		super.onDestroy();
 	}
 
@@ -526,12 +551,20 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             message = getString(R.string.download_preparing_files);
         } else {
             int filesProgress;
-            if(isFolderUpload){
+            if (isFolderUpload) {
                 filesProgress = totalFolderUploadsCompleted + 1 > totalFolderUploads ? totalFolderUploads : totalFolderUploadsCompleted + 1;
-                message = getResources().getQuantityString(R.plurals.folder_upload_service_notification,totalFolderUploads,filesProgress,totalFolderUploads);
-            }else{
+                if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+                    message = getResources().getQuantityString(R.plurals.folder_upload_service_paused_notification, totalFolderUploads, filesProgress, totalFolderUploads);
+                } else {
+                    message = getResources().getQuantityString(R.plurals.folder_upload_service_notification, totalFolderUploads, filesProgress, totalFolderUploads);
+                }
+            } else {
                 filesProgress = totalFileUploadsCompleted + 1 > totalFileUploads ? totalFileUploads : totalFileUploadsCompleted + 1;
-                message = getResources().getQuantityString(R.plurals.upload_service_notification,totalFileUploads,filesProgress,totalFileUploads);
+                if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+                    message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalFileUploads, filesProgress, totalFileUploads);
+                } else {
+                    message = getResources().getQuantityString(R.plurals.upload_service_notification, totalFileUploads, filesProgress, totalFileUploads);
+                }
             }
         }
 
