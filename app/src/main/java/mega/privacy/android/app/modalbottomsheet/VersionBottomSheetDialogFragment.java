@@ -28,11 +28,11 @@ import mega.privacy.android.app.lollipop.VersionsFileActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaShare.*;
 
 public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -155,14 +155,14 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
             boolean isRevertVisible;
 
             switch (((VersionsFileActivity) context).getAccessLevel()) {
-                case MegaShare.ACCESS_READWRITE:
+                case ACCESS_READWRITE:
                     isRevertVisible = true;
                     optionDelete.setVisibility(View.GONE);
                     separatorDelete.setVisibility(View.GONE);
                     break;
 
-                case MegaShare.ACCESS_FULL:
-                case MegaShare.ACCESS_OWNER:
+                case ACCESS_FULL:
+                case ACCESS_OWNER:
                     isRevertVisible = true;
                     optionDelete.setVisibility(View.VISIBLE);
                     separatorDelete.setVisibility(View.VISIBLE);
@@ -217,7 +217,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
                     logWarning("The selected node is NULL");
                     return;
                 }
-                ((VersionsFileActivity) context).revertVersion();
+                ((VersionsFileActivity) context).checkRevertVersion();
                 dismissAllowingStateLoss();
                 break;
             }
