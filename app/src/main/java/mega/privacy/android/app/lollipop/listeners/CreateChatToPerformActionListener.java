@@ -53,6 +53,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
     long idChat;
 
     MegaChatApiAndroid megaChatApi;
+    MegaApplication application;
 
     public CreateChatToPerformActionListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, long fileHandle, Context context, int action) {
         super();
@@ -62,9 +63,9 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
         this.usersNoChat = usersNoChat;
         this.fileHandle = fileHandle;
         this.action = action;
-
+        application = ((MegaApplication) ((Activity)context).getApplication());
         if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            megaChatApi = application.getMegaChatApi();
         }
     }
 
@@ -83,9 +84,10 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
         this.handles = handles;
         this.action = action;
         this.idChat = idChat;
+        application = ((MegaApplication) ((Activity)context).getApplication());
 
         if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            megaChatApi = application.getMegaChatApi();
         }
     }
 
@@ -177,7 +179,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     } else {
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
                         if (chat != null) {
-                            ((MegaApplication) ((Activity) context).getApplication()).setSpeakerStatus(chat.getChatId(), false);
+                            application.setSpeakerStatus(chat.getChatId(), false);
                             megaChatApi.startChatCall(chat.getChatId(), false, (ContactInfoActivityLollipop) context);
                         } else {
                             logWarning("Chatroom not recovered");
@@ -192,7 +194,8 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     } else {
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
                         if (chat != null) {
-                            ((MegaApplication) ((Activity) context).getApplication()).setSpeakerStatus(chat.getChatId(), true);
+                            application.setSpeakerStatus(chat.getChatId(), true);
+                            application.manuallyActivatedLocalCamera();
                             megaChatApi.startChatCall(chat.getChatId(), true, (ContactInfoActivityLollipop) context);
                         } else {
                             logWarning("Chatroom not recovered");

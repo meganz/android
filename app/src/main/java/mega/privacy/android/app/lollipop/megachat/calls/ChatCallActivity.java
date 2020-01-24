@@ -1464,6 +1464,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 logDebug("Video FAB");
                 if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     displayLinearFAB(false);
+                    application.manuallyActivatedLocalCamera();
                     megaChatApi.answerChatCall(chatId, true, this);
                     clearHandlers();
                     answerCallFAB.clearAnimation();
@@ -1474,6 +1475,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     megaChatApi.disableVideo(chatId, this);
                 } else {
                     logDebug("Enable Video");
+                    application.manuallyActivatedLocalCamera();
                     megaChatApi.enableVideo(chatId, this);
                 }
                 sendSignalPresence();
@@ -2271,6 +2273,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             megaChatApi.signalPresenceActivity();
         }
         application.setSpeakerStatus(callChat.getChatid(), isVideoCall);
+        if(isVideoCall) application.manuallyActivatedLocalCamera();
         megaChatApi.answerChatCall(chatId, isVideoCall, this);
     }
 
