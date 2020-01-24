@@ -829,7 +829,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					MegaNode n = megaApi.getNodeByHandle(monthPic.nodeHandles.get(i));
 					if (n == null){
 						Intent intent = new Intent(context, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  TOUR_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
 				        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 				        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 				        context.startActivity(intent);

@@ -54,7 +54,6 @@ import mega.privacy.android.app.components.ContactsDividerDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
-import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.ContactsFilter;
@@ -76,7 +75,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 public class InviteContactActivity extends PinActivityLollipop implements MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
 
     public static final int SCAN_QR_FOR_INVITE_CONTACTS = 1111;
-    public static final String INVITE_CONTACT_SCAN_QR = "inviteContacts";
+    public static final String INVITE_CONTACT_SCAN_QR = "INVITE_CONTACT_SCAN_QR";
     private static final String KEY_PHONE_CONTACTS = "KEY_PHONE_CONTACTS";
     private static final String KEY_MEGA_CONTACTS = "KEY_MEGA_CONTACTS";
     private static final String KEY_ADDED_CONTACTS = "KEY_ADDED_CONTACTS";
@@ -90,6 +89,11 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     private static final int USER_INDEX_NONE_EXIST = -1;
     private static final int MIN_LIST_SIZE_FOR_FAST_SCROLLER = 20;
     private static final int ADDED_CONTACT_VIEW_MARGIN_LEFT = 10;
+
+    public static final String KEY_FROM = "fromAchievement";
+    public static final String KEY_SENT_EMAIL = "sentEmail";
+    public static final String KEY_SENT_NUMBER = "sentNumber";
+    private boolean fromAchievement;
 
     private DisplayMetrics outMetrics;
     private ActionBar aB;
@@ -137,8 +141,6 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
-
         super.onCreate(savedInstanceState);
         dbH = DatabaseHandler.getDbHandler(this);
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
@@ -226,12 +228,14 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         progressBar = findViewById(R.id.add_contact_progress_bar);
         progressBar = findViewById(R.id.invite_contact_progress_bar);
         refreshInviteContactButton();
-
         //orientation changes
         if (savedInstanceState != null) {
             isGetContactCompleted = savedInstanceState.getBoolean(KEY_IS_GET_CONTACT_COMPLETED, false);
+            fromAchievement = savedInstanceState.getBoolean(KEY_FROM, false);
+        } else {
+            fromAchievement = getIntent().getBooleanExtra(KEY_FROM, false);
         }
-
+        logDebug("Request by Achievement: " + fromAchievement);
         if (isGetContactCompleted) {
             phoneContacts = savedInstanceState.getParcelableArrayList(KEY_PHONE_CONTACTS);
             megaContacts = savedInstanceState.getParcelableArrayList(KEY_MEGA_CONTACTS);
@@ -357,6 +361,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
         outState.putParcelableArrayList(KEY_TOTAL_CONTACTS, totalContacts);
         outState.putBoolean(KEY_IS_PERMISSION_GRANTED, isPermissionGranted);
         outState.putBoolean(KEY_IS_GET_CONTACT_COMPLETED, isGetContactCompleted);
+        outState.putBoolean(KEY_FROM, fromAchievement);
     }
 
     @Override
@@ -787,7 +792,12 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
             logDebug("onPostExecute GetPhoneContactsTask");
             isGettingLocalContact = false;
             onGetContactCompleted();
-            getMegaContact();
+            // no need to invite the contacts that has already been on MEGA to get invitation bonus.
+            if (!fromAchievement) {
+                getMegaContact();
+            } else {
+                isGetContactCompleted = true;
+            }
         }
     }
 
@@ -924,10 +934,7 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
     }
 
     private void inviteContacts(ArrayList<InvitationContactInfo> addedContacts) {
-        logDebug("inviteContacts");
-
         // Email/phone contacts to be invited
-
         contactsEmailsSelected = new ArrayList<>();
         contactsPhoneSelected = new ArrayList<>();
 
@@ -993,20 +1000,29 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
                 logDebug("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
             }
             if (numberSent + numberNotSent == numberToSend) {
+                final Intent result = new Intent();
                 if (numberToSend == 1) {
                     if (numberSent == 1) {
-                        showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
+                        if(!fromAchievement) {
+                            showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
+                        } else {
+                            result.putExtra(KEY_SENT_EMAIL, request.getEmail());
+                        }
                     }
                 } else {
                     if (numberNotSent > 0) {
-                        showSnackbar(getString(R.string.number_no_invite_contact_request, numberSent, numberNotSent));
+                        if(!fromAchievement) {
+                            showSnackbar(getString(R.string.number_no_invite_contact_request, numberSent, numberNotSent));
+                        }
                     } else {
-                        showSnackbar(getString(R.string.number_correctly_invite_contact_request, numberToSend));
+                        if(!fromAchievement) {
+                            showSnackbar(getString(R.string.number_correctly_invite_contact_request, numberToSend));
+                        } else {
+                            result.putExtra(KEY_SENT_NUMBER, numberSent);
+                        }
                     }
                 }
-                numberSent = 0;
-                numberToSend = 0;
-                numberNotSent = 0;
+
                 Util.hideKeyboard(InviteContactActivity.this, 0);
                 new Handler().postDelayed(new Runnable() {
 
@@ -1015,7 +1031,10 @@ public class InviteContactActivity extends PinActivityLollipop implements MegaRe
                         if (contactsPhoneSelected.size() > 0) {
                             invitePhoneContacts(contactsPhoneSelected);
                         }
-                        setResult(Activity.RESULT_OK);
+                        numberSent = 0;
+                        numberToSend = 0;
+                        numberNotSent = 0;
+                        setResult(Activity.RESULT_OK, result);
                         finish();
                     }
                 }, 2000);

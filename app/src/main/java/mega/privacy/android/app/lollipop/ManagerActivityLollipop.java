@@ -207,6 +207,7 @@ import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -2144,7 +2145,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	    if (dbH.getEphemeral() != null){
             Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -2172,7 +2173,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //				AccountController aC = new AccountController(this);
 //				aC.logout(this, megaApi, megaChatApi, false);
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment",  TOUR_FRAGMENT);
+				intent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					startActivity(intent);
@@ -2621,7 +2622,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (getIntent().getAction() != null){
 					if (getIntent().getAction().equals(ACTION_IMPORT_LINK_FETCH_NODES)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_IMPORT_LINK_FETCH_NODES);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -2631,7 +2632,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_MEGA_LINK)){
 						Intent intent = new Intent(managerActivity, FileLinkActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_IMPORT_LINK_FETCH_NODES);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -2641,7 +2642,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -2651,7 +2652,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if(getIntent().getAction().equals(ACTION_OPEN_CHAT_LINK)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OPEN_CHAT_LINK);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -2666,7 +2667,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(getIntent().getAction());
 						startActivity(intent);
@@ -2675,7 +2676,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_SHOW_TRANSFERS)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_SHOW_TRANSFERS);
 						startActivity(intent);
@@ -2684,7 +2685,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_IPC)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_IPC);
 						startActivity(intent);
@@ -2693,7 +2694,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
 						startActivity(intent);
@@ -2702,7 +2703,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
                     else if(getIntent().getAction().equals(ACTION_CHAT_SUMMARY)) {
                         Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-                        intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                        intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.setAction(ACTION_CHAT_SUMMARY);
                         startActivity(intent);
@@ -2711,7 +2712,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                     }
 					else if (getIntent().getAction().equals(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
 						startActivity(intent);
@@ -2720,7 +2721,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_HANDLE_NODE)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OPEN_HANDLE_NODE);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -2730,7 +2731,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_OVERQUOTA_TRANSFER)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OVERQUOTA_TRANSFER);
 						startActivity(intent);
@@ -2739,7 +2740,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_OVERQUOTA_STORAGE)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OVERQUOTA_STORAGE);
 						startActivity(intent);
@@ -2750,7 +2751,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						logDebug("Login");
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.putExtra(CONTACT_HANDLE, getIntent().getLongExtra(CONTACT_HANDLE, -1));
-						intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_OPEN_CONTACTS_SECTION);
 						startActivity(intent);
@@ -2759,7 +2760,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					else if (getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE);
 						startActivity(intent);
@@ -2769,7 +2770,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 			}
 			Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+			intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
@@ -3317,7 +3318,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        			if (intentRec.getAction().equals(ACTION_SHOW_TRANSFERS)){
 	        				drawerItem = DrawerItem.TRANSFERS;
 							setIntent(null);
-	        			}
+	        			} else if (intentRec.getAction().equals(ACTION_REFRESH_AFTER_BLOCKED)) {
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+	        				setIntent(null);
+						}
 	        		}
 	        	}
 				drawerLayout.closeDrawer(Gravity.LEFT);
@@ -3655,12 +3659,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		setTabsVisibility();
 		abL.setVisibility(View.GONE);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.turn_on_notifications_statusbar));
-		}
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.turn_on_notifications_statusbar));
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -3738,7 +3740,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     					if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)){
     						Intent exportIntent = new Intent(managerActivity, LoginActivityLollipop.class);
-							intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+							intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 							exportIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     						exportIntent.setAction(getIntent().getAction());
     						startActivity(exportIntent);
@@ -3790,7 +3792,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					logDebug("ACTION_IMPORT_LINK_FETCH_NODES");
 
 					Intent loginIntent = new Intent(managerActivity, LoginActivityLollipop.class);
-					intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+					intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					loginIntent.setAction(ACTION_IMPORT_LINK_FETCH_NODES);
 					loginIntent.setData(Uri.parse(getIntent().getDataString()));
@@ -4412,7 +4414,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		inputFirstName.setOnEditorActionListener(editorActionListener);
-		inputFirstName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
+		inputFirstName.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
 
 		inputLastName.setSingleLine();
 		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
@@ -4441,7 +4443,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		inputLastName.setOnEditorActionListener(editorActionListener);
-		inputLastName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
+		inputLastName.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
 
 		inputMail.getBackground().mutate().clearColorFilter();
 		inputMail.setSingleLine();
@@ -4473,12 +4475,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		});
 		inputMail.setOnEditorActionListener(editorActionListener);
-		inputMail.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
+		inputMail.setImeActionLabel(getString(R.string.save_action),EditorInfo.IME_ACTION_DONE);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.title_edit_profile_info));
 
-		builder.setPositiveButton(getString(R.string.title_edit_profile_info), new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(getString(R.string.save_action), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 
 					}
@@ -5127,7 +5129,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void startConnection(){
 		logDebug("startConnection");
 		Intent intent = new Intent(this, LoginActivityLollipop.class);
-		intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+		intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 		finish();
@@ -5678,6 +5680,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     	fragmentContainer.setVisibility(View.GONE);
 
+    	if (turnOnNotifications) {
+			fragmentContainer.setVisibility(View.VISIBLE);
+			drawerLayout.closeDrawer(Gravity.LEFT);
+			return;
+		}
+
     	switch (drawerItem) {
 			case CLOUD_DRIVE: {
 				if (getTabItemCloud() == CLOUD_TAB
@@ -5730,6 +5738,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
+	private void removeFragment(Fragment fragment) {
+		if (fragment != null && fragment.isAdded()) {
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.remove(fragment);
+			ft.commit();
+		}
+	}
+
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
 		logDebug("selectDrawerItemLollipop: "+item);
@@ -5739,6 +5755,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		resetActionBar(aB);
 		setTransfersWidget();
 		setCallWidget();
+
+		if (item != DrawerItem.CHAT) {
+			//remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
+			removeFragment(rChatFL);
+		}
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -6369,6 +6390,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					levelsSearch = -1;
 					setSearchDrawerItem();
 					selectDrawerItemLollipop(drawerItem);
+				} else if (drawerItem == DrawerItem.CHAT){
+					Util.resetActionBar(aB);
 				}
 				hideCallMenuItem();
 				hideCallWidget();
@@ -6385,6 +6408,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if (rChatFL != null) {
 						rChatFL.closeSearch();
+						rChatFL.setCustomisedActionBar();
 						supportInvalidateOptionsMenu();
 					}
 				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
@@ -8294,7 +8318,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		        	case ACCOUNT:{
 						//Refresh all the info of My Account
 		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 			    		intent.setAction(ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
 			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
@@ -8657,10 +8681,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (!isOnline(this)){
 				showOfflineMode();
 			}
-			else{
-				backToDrawerItem(bottomNavigationCurrentItem);
-			}
-
+			backToDrawerItem(bottomNavigationCurrentItem);
 			return;
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
@@ -8859,6 +8880,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
+	private void checkIfShouldCloseSearchView(DrawerItem oldDrawerItem, DrawerItem newDrawerItem) {
+    	if (!searchExpand || oldDrawerItem == newDrawerItem) return;
+
+		if (oldDrawerItem == DrawerItem.CHAT || oldDrawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
+			searchExpand = false;
+		}
+	}
+
 	@Override
 	public boolean onNavigationItemSelected(MenuItem menuItem) {
 		logDebug("onNavigationItemSelected");
@@ -8867,6 +8896,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			Menu nVMenu = nV.getMenu();
 			resetNavigationViewMenu(nVMenu);
 		}
+
+		DrawerItem oldDrawerItem = drawerItem;
 
 		switch (menuItem.getItemId()){
 			case R.id.bottom_navigation_item_cloud_drive: {
@@ -8934,6 +8965,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				break;
 			}
 		}
+
+		checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 		selectDrawerItemLollipop(drawerItem);
 		drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -10966,7 +10999,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public long getParentHandleBrowser() {
 		if (parentHandleBrowser == -1) {
-			return megaApi.getRootNode().getHandle();
+			MegaNode rootNode = megaApi.getRootNode();
+			parentHandleBrowser = rootNode != null ? rootNode.getParentHandle() : parentHandleBrowser;
 		}
 
 		return parentHandleBrowser;
@@ -11006,6 +11040,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							parentHandle = parentHandleOutgoing;
 						}
 						break;
+                    case INBOX:
+                        parentHandle = getParentHandleInbox();
+                        break;
 				}
 				break;
 
@@ -11989,14 +12026,19 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void refreshCloudDrive () {
-		if (isCloudAdded()){
+	public void refreshCloudDrive() {
+		MegaNode parentNode = megaApi.getRootNode();
+		if (parentNode == null) return;
+
+		if (isCloudAdded()) {
 			ArrayList<MegaNode> nodes;
-			if(parentHandleBrowser==-1){
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
-			}
-			else{
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+			if (parentHandleBrowser == -1) {
+				nodes = megaApi.getChildren(parentNode, orderCloud);
+			} else {
+				parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+				if (parentNode == null) return;
+
+				nodes = megaApi.getChildren(parentNode, orderCloud);
 			}
 			logDebug("Nodes: " + nodes.size());
 			fbFLol.hideMultipleSelect();
@@ -12215,6 +12257,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void onClick(View v) {
 		logDebug("onClick");
 
+		DrawerItem oldDrawerItem = drawerItem;
+
 		switch(v.getId()){
 			case R.id.navigation_drawer_add_phone_number_button:{
                 Intent intent = new Intent(this,SMSVerificationActivity.class) ;
@@ -12255,6 +12299,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					drawerItem = DrawerItem.ACCOUNT;
 					accountFragment = MY_ACCOUNT_FRAGMENT;
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+					checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 					selectDrawerItemLollipop(drawerItem);
 				}
 				break;
@@ -12262,24 +12307,28 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.inbox_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.INBOX;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.contacts_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.CONTACTS;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.notifications_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.NOTIFICATIONS;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.settings_section: {
 				isFirstTimeCam();
 				drawerItem = DrawerItem.SETTINGS;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -12290,6 +12339,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				drawerItem = DrawerItem.ACCOUNT;
 				accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
 				displayedAccountType = -1;
+				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -14231,32 +14281,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			catch(Exception ex){}
 		}
 		dissmisDialog();
-		long parentHandle = -1;
-		MegaNode parentNode = null;
 
-		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			if (getTabItemCloud() == CLOUD_TAB) {
-				parentHandle = parentHandleBrowser;
-				parentNode = megaApi.getNodeByHandle(parentHandle);
-			}
-			if (parentNode == null){
-				parentNode = megaApi.getRootNode();
-			}
-		}
-		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			int index = viewPagerShares.getCurrentItem();
-			if(index==1){
-				parentNode = megaApi.getNodeByHandle(parentHandleOutgoing);
-			}
-			else{
-				parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
-			}
-			if(parentNode==null){
-				logWarning("Incorrect folder to upload");
-				parentNode = megaApi.getRootNode();
-			}
-		}
-		else if(drawerItem == DrawerItem.ACCOUNT){
+		MegaNode parentNode = getCurrentParentNode(getCurrentParentHandle(), -1);
+
+		if(drawerItem == DrawerItem.ACCOUNT){
 			if(infos!=null){
 				for (ShareInfo info : infos) {
 					String avatarPath = info.getFileAbsolutePath();
@@ -17098,7 +17126,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		((MegaApplication) getApplication()).enableChat();
 
 		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-		intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+		intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 		intent.setAction(ACTION_ENABLE_CHAT);
 		startActivity(intent);
 		finish();
@@ -18024,7 +18052,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void setTransfersWidget() {
 		logDebug("setTransfersWidget");
 
-		if (!isOnline(this)) return;
+		if (!isOnline(this) || transfersOverViewLayout == null) return;
 
 		if (drawerItem != DrawerItem.CLOUD_DRIVE) {
 			transfersOverViewLayout.setVisibility(View.GONE);

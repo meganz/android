@@ -48,6 +48,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -100,9 +101,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static android.content.Context.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class Util {
@@ -1462,6 +1464,13 @@ public class Util {
 			}
 		}
 	}
+
+	public static void changeStatusBarColor(Context context, Window window, int color) {
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		window.setStatusBarColor(ContextCompat.getColor(context, color));
+	}
+
     public static Bitmap createAvatarBackground(String colorString) {
         Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(circle);
@@ -1678,7 +1687,7 @@ public class Util {
 	 *
 	 * @param url the passed url to be decoded
 	 */
-	public static void decodeURL(String url) {
+	public static String decodeURL(String url) {
 		try {
 			url = URLDecoder.decode(url, "UTF-8");
 		} catch (Exception e) {
@@ -1686,7 +1695,7 @@ public class Util {
 			e.printStackTrace();
 		}
 
-		url.replace(' ', '+');
+		url = url.replace(' ', '+');
 
 		if (url.startsWith("mega://")) {
 			url = url.replaceFirst("mega://", "https://mega.nz/");
@@ -1707,6 +1716,7 @@ public class Util {
 		}
 
 		logDebug("URL decoded: " + url);
+		return url;
 	}
 
     public static boolean hasPermissions(Context context, String... permissions) {
@@ -1767,8 +1777,19 @@ public class Util {
 
 	public static void resetActionBar(ActionBar aB) {
 		if (aB != null) {
+			View customView = aB.getCustomView();
+			if(customView != null){
+				ViewParent parent = customView.getParent();
+				if(parent != null){
+					((ViewGroup) parent).removeView(customView);
+				}
+			}
 			aB.setDisplayShowCustomEnabled(false);
 			aB.setDisplayShowTitleEnabled(true);
 		}
+	}
+
+	public static boolean isAndroid10() {
+		return Build.VERSION.SDK_INT >= ANDROID_10_Q;
 	}
 }
