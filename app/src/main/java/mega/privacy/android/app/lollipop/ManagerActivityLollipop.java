@@ -3380,6 +3380,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			logWarning("Not valid contact handle");
     		return;
 		}
+
+		dbH.setLastPublicHandle(handle);
+		dbH.setLastPublicHandleTimeStamp();
+		dbH.setLastPublicHandleType(AFFILIATE_TYPE_CONTACT);
+
 		handleInviteContact = handle;
     	dismissOpenLinkDialog();
 		logDebug("Handle to invite a contact: " + handle);
