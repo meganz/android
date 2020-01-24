@@ -3273,9 +3273,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             case R.id.rl_media_icon_chat: {
                 logDebug("media_icon_chat");
                 if (recordView.isRecordingNow()) break;
-
                 hideKeyboard();
-                openCameraApp();
                 if (participatingInACall(megaChatApi)) {
                     showConfirmationOpenCamera(chatRoom);
                 } else {
