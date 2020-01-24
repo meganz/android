@@ -1030,7 +1030,7 @@
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">Email e/ou senha inválidos. Por favor, tente novamente</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">A sua conta foi suspensa for infringir os Termos de serviço. Para mais informações, entre em contato com support&#64;mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Muitas tentativas de login incorretas. Por favor, aguarde uma hora.</string>
-    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Essa conta ainda não foi confirmada. Por favor, verifique o seu email.</string>
+    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Esta conta ainda não foi confirmada. Por favor, verifique o seu email.</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn’t exist">O link da pasta não está disponível</string>
     <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">O link desta pasta foi eliminado por uma infração dos nossos Termos de serviço.</string>
@@ -1284,7 +1284,7 @@
         <item context="Title of the contact list" quantity="other">%1$d contatos</item>
     </plurals>
 
-    <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">Erro ao compartilhar a pasta. Por favor, tente novamente.</string>
+    <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">Não foi possível compartilhar a pasta. Por favor, tente novamente.</string>
 
     <plurals name="confirmation_remove_contact">
         <item context="confirmation message before removing a contact, Singular" quantity="one">Todos os dados relacionados com este contato serão eliminados permanentemente.</item>
@@ -1603,7 +1603,7 @@
 
     <string name="button_invite_friends" context="button to invite friends for getting achievements">Convide amigos</string>
 
-    <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">Ganhe %1$s de armazenamento e %2$s de cota de transferência para cada indicação</string>
+    <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">Ganhe %1$s de espaço de armazenamento e %2$s de cota de transferência para cada indicação</string>
 
     <string name="figures_achievements_text" context="sentence to detail the figures of storage and transfer quota related to each achievement">Ganhe %1$s de armazenamento e %2$s de cota de transferência</string>
 
@@ -1657,7 +1657,7 @@
     <string name="settings_help" context="Settings category title for Help">Ajuda</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Enviar comentários</string>
     <string name="setting_feedback_subject" context="mail subject">Android - Feedback</string>
-    <string name="setting_feedback_body" context="mail body">Por favor, escreva os seus comentários aqui:</string>
+    <string name="setting_feedback_body" context="mail body">Escreva os seus comentários aqui:</string>
     <string name="settings_feedback_body_device_model" context="mail body">Modelo</string>
     <string name="settings_feedback_body_android_version" context="mail body">Versão de Android</string>
 
@@ -1731,13 +1731,13 @@
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Link copiado para a área de transferência</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">Código QR redefinido corretamente</string>
     <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">Código QR deletado corretamente</string>
-    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">O código QR não foi redefinido devido a um erro. Por favor, tente novamente.</string>
-    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">O código QR não foi deletado devido a um erro. Por favor, tente novamente.</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">Não foi possível resetar o código QR. Por favor, tente novamente.</string>
+    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">Não foi possível deletar o código QR. Por favor, tente novamente.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Convite enviado</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">O usuário %s foi convidado e aparecerá na sua lista de contatos quando aceitar o convite.</string>
-    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">Ocorreu um erro ao tentar compartilhar o arquivo QR. Talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
-    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">Ocorreu um erro ao tentar fazer o upload do arquivo QR. Talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
-    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">Ocorreu um erro ao tentar baixar o arquivo QR. Talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
+    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">Não foi possível compartilhar o código QR, e talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
+    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">Não foi possível fazer o upload do código QR, e talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
+    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">Não foi possível fazer o download do código QR, e talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">O código QR foi salvo em %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Convite não enviado.</string>
     <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">O código QR ou o link de contato é inválido. Por favor, tente escanear um código válido ou acessar um link válido.</string>
@@ -1756,7 +1756,7 @@
 
     <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">Compartilhar usando</string>
 
-    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">Por favor, faça o login antes de ativar o chat</string>
+    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">Por favor, faça login antes de ativar o chat</string>
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Definir período</string>
 
@@ -2122,18 +2122,18 @@
     <string name="add_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Add contatos</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Desconectado</string>
-    <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">A sua conta está ativa. Por favor, faça o login.</string>
+    <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">A sua conta está ativa. Por favor, faça login.</string>
     <string name="confirm_account" context="Text shown to indicate user that his account should be confirmed typing his password">Por favor, digite sua senha para confirmar sua conta</string>
 
     <string name="error_own_email_as_contact" context="Error shown if a user tries to add their own email address as a contact">Não é necessário adicionar o seu próprio email</string>
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Código inválido</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">A sua Nuvem de arquivos está quase cheia. Faça upgrade a PRO e obtenha até 8 TB de espaço de armazenamento e 16 TB de cota de transferência.</string>
-    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">A sua Nuvem de arquivos está quase cheia. Faça um upgrade agora e obtenha até 8 TB de espaço de armazenamento e 16 TB de cota de transferência.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">A sua Nuvem de arquivos está quase cheia. Faça o upgrade a PRO e obtenha até %1$s de espaço de armazenamento e %2$s de cota de transferência.</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">A sua Nuvem de arquivos está quase cheia. Faça um upgrade agora e obtenha até %1$s de espaço de armazenamento e %2$s de cota de transferência.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">A sua Nuvem de arquivos está quase cheia. Se você precisar de mais espaço, entre em contato com o suporte do MEGA para obter um plano personalizado.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">A sua Nuvem de arquivos está cheia. Faça o upgrade a PRO e obtenha até 8 TB de espaço de armazenamento e 16 TB de cota de transferência.</string>
-    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">A sua Nuvem de arquivos está cheia. Faça um upgrade agora e obtenha até 8 TB de espaço de armazenamento e 16 TB de cota de transferência.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">A sua Nuvem de arquivos está cheia. Faça o upgrade a PRO e obtenha até %1$s de espaço de armazenamento e %2$s de cota de transferência.</string>
+    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">A sua Nuvem de arquivos está cheia. Faça um upgrade agora e obtenha até %1$s de espaço de armazenamento e %2$s de cota de transferência.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">A sua Nuvem de arquivos está cheia. Se você precisar de mais espaço, entre em contato com o suporte do MEGA para obter um plano personalizado.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">Veja os planos</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Plano personalizado</string>

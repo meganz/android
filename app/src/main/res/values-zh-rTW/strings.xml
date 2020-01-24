@@ -660,7 +660,7 @@
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">儲存空間</string>
     <string name="settings_pin_lock" context="settings of the pin lock">PIN 鎖定</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">影片壓縮很耗電力；如果要壓縮的影片大小超過%s，MEGA將會要求您主動為設備充電。</string>
-	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">如果啟用，您將上傳關於相片在哪裡拍攝的資訊，所以分享時請格外小心。</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">如果啟用，您將上傳關於相片拍攝位置的資訊，所以分享時請格外小心。</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">進階</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">清除快取</string>
