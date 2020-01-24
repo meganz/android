@@ -549,7 +549,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	boolean checkCurrentFile(MegaNode document)	{
 		logDebug("checkCurrentFile");
-		if(currentFile.exists() && (document.getSize() == currentFile.length())){
+		if (currentFile.exists()
+				&& document.getSize() == currentFile.length()
+				&& isFileDownloadedLatest(currentFile, document)) {
 
 			currentFile.setReadable(true, false);
 //			Toast.makeText(getApplicationContext(), document.getName() + " " +  getString(R.string.general_already_downloaded), Toast.LENGTH_SHORT).show();

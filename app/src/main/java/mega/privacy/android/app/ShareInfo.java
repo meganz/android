@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
@@ -30,6 +29,7 @@ import java.util.List;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 
@@ -45,6 +45,8 @@ public class ShareInfo implements Serializable {
 	private File file = null;
 	public boolean isContact = false;
 	public Uri contactUri = null;
+
+	private static Intent mIntent;
 	
 	/*
 	 * Get ShareInfo from File
@@ -94,6 +96,9 @@ public class ShareInfo implements Serializable {
 		if (context == null) {
 			return null;
 		}
+
+		mIntent = intent;
+
 		// Process multiple items
 		if (Intent.ACTION_SEND_MULTIPLE.equals(intent.getAction())) {
 			logDebug("Multiple!");
@@ -145,12 +150,7 @@ public class ShareInfo implements Serializable {
 			logWarning("Share info file is null");
 			return null;
 		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
-		else{
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
 		
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
 		result.add(shareInfo);
@@ -187,12 +187,7 @@ public class ShareInfo implements Serializable {
 			return null;
 		}
 		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
-		else{
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
 		
 		return result;
 	}
@@ -317,11 +312,8 @@ public class ShareInfo implements Serializable {
                 return;
             }
 			logDebug("Internal No path traversal: " + title);
-            if (context instanceof PdfViewerActivityLollipop) {
-				logDebug("context of PdfViewerActivityLollipop");
-                if (!title.endsWith(".pdf")) {
-                    title += ".pdf";
-                }
+            if (context instanceof PdfViewerActivityLollipop || mIntent.getType().equals("application/pdf")) {
+				title = addPdfFileExtension(title);
             }
             file = new File(context.getCacheDir(), title);
 
@@ -401,24 +393,25 @@ public class ShareInfo implements Serializable {
 	private void processContent(Uri uri, Context context) {
 		logDebug("processContent: " + uri);
 		ContentProviderClient client = null;
-
-		client = context.getContentResolver().acquireContentProviderClient(uri);
 		Cursor cursor = null;
 		try {
+            client = context.getContentResolver().acquireContentProviderClient(uri);
 			cursor = client.query(uri, null, null, null, null);
-		} catch (Exception e1) {
-			logError("cursor EXCEPTION!!!", e1);
-		}
-		if(cursor!=null){
-			if(cursor.getCount()==0){
-				logDebug("RETURN - Cursor get count is 0");
+		} catch (Exception e) {
+			logError("cursor EXCEPTION!!!", e);
+		} finally {
+			if (cursor == null || cursor.getCount() == 0) {
+				logWarning("Error with cursor");
+				if (cursor != null) {
+					cursor.close();
+				}
+				if (client != null) {
+					client.close();
+				}
 				return;
 			}
 		}
-		else{
-			logWarning("RETURN - Cursor is NULL");
-			return;
-		}
+
 		cursor.moveToFirst();
 		int displayIndex = cursor.getColumnIndex("_display_name");
 		if(displayIndex != -1)
@@ -478,8 +471,14 @@ public class ShareInfo implements Serializable {
 		else{
 			logWarning("Nothing done!");
 		}
-	
-		client.release();
+
+		if (cursor != null) {
+			cursor.close();
+		}
+
+		if (client != null) {
+			client.close();
+		}
 		logDebug("---- END process content----");
 	}
 	

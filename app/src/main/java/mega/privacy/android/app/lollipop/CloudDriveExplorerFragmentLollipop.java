@@ -566,6 +566,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			clickNodes = nodes;
 		}
 
+		if (position < 0 || position >= clickNodes.size()) return;
+
 		MegaNode n = clickNodes.get(position);
 
 		if (n.isFolder()){
@@ -762,12 +764,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 			updateActionModeTitle();
 		}
-	}
-
-	public boolean isFolder(int position){
-		MegaNode node = nodes.get(position);
-
-		return node == null || node.isFolder();
 	}
 
 	/*

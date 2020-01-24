@@ -21,29 +21,30 @@
 	         rounded:border_width="0dp"
 	         android:layout_centerInParent="true"
 	         rounded:border_color="@color/border_file_properties"/>
-	    
-	    <TextView
-	        android:id="@+id/contact_request_list_initial_letter"
-	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
+
+		<mega.privacy.android.app.components.twemoji.EmojiTextView
+			android:id="@+id/contact_request_list_initial_letter"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
 			android:layout_centerInParent="true"
 			android:gravity="center_horizontal|center_vertical"
-			android:paddingBottom="3dp" />
-	    
+			android:textSize="22sp"
+			rounded:emojiSize="25sp"/>
+
     </RelativeLayout>
-        
-    <TextView
+
+	<mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/contact_request_list_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/contact_request_list_relative_layout_avatar"
         android:layout_marginTop="16dp"
+		rounded:emojiSize="14sp"
         android:layout_marginLeft="13dp"
-        android:ellipsize="end"
         android:textSize="16sp"
         android:maxLines="1"
-        android:textColor="@color/file_list_first_row" />  
-    
+        android:textColor="@color/file_list_first_row" />
+
     <TextView
         android:id="@+id/contact_request_list_content"
         android:layout_width="wrap_content"

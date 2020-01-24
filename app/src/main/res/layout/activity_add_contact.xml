@@ -384,6 +384,7 @@
 					android:layout_marginRight="16dp"
 					android:hint="@string/hint_type_group"
 					android:textSize="16sp"
+					app:emojiSize="16sp"
 					android:textColorHint="@color/mail_my_account"
 					android:textColor="@color/name_my_account"
 					android:fontFamily="roboto"/>

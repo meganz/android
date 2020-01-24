@@ -496,6 +496,10 @@ public class FileUtils {
         return file != null && file.exists();
     }
 
+    public static boolean isFileDownloadedLatest(File downloadedFile, MegaNode node) {
+        return downloadedFile.lastModified() - node.getModificationTime() * 1000 >= 0;
+    }
+
     public static void copyFolder(File source, File destination) throws IOException {
 
         if (source.isDirectory()) {
@@ -611,20 +615,6 @@ public class FileUtils {
         }
     }
 
-    public static String getSDCardRoot(String path) {
-        int i = 0,x = 0;
-        for(; x < path.toCharArray().length;x++) {
-            char c = path.toCharArray()[x];
-            if(c == '/') {
-                i++;
-            }
-            if(i == 3) {
-                break;
-            }
-        }
-        return path.substring(0,x);
-    }
-
     public static boolean appendStringToFile(final String appendContents, final File file) {
         boolean result = false;
         try {
@@ -661,6 +651,13 @@ public class FileUtils {
      */
     public static boolean isFileNameNumeric(String filename) {
         return getFileNameWithoutExtension(filename).matches("-?\\d+(\\.\\d+)?");
+    }
+
+    public static String addPdfFileExtension(String title) {
+        if (!title.endsWith(".pdf")) {
+            title += ".pdf";
+        }
+        return title;
     }
 }
 

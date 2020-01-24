@@ -15,7 +15,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -78,7 +80,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         if(megaApi==null||megaApi.getRootNode()==null){
             logDebug("Refresh session - sdk");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -92,7 +94,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
                 logDebug("Refresh session - karere");
                 Intent intent = new Intent(this, LoginActivityLollipop.class);
-                intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
@@ -134,7 +136,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         megaApi.getAccountAchievements(this);
 
         if (savedInstanceState != null) {
-            visibleFragment = savedInstanceState.getInt("visibleFragment", ACHIEVEMENTS_FRAGMENT);
+            visibleFragment = savedInstanceState.getInt(VISIBLE_FRAGMENT, ACHIEVEMENTS_FRAGMENT);
             achievementType = savedInstanceState.getInt("achievementType", -1);
             mails = savedInstanceState.getStringArrayList("mails");
             pendingContacts = savedInstanceState.getStringArrayList("pendingContacts");
@@ -146,7 +148,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt("visibleFragment", visibleFragment);
+        outState.putInt(VISIBLE_FRAGMENT, visibleFragment);
         outState.putInt("achievementType", achievementType);
         outState.putStringArrayList("mails", mails);
         outState.putStringArrayList("pendingContacts", pendingContacts);
@@ -283,7 +285,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
             if (e.getErrorCode() == MegaError.API_OK){
                 logDebug("OK INVITE CONTACT: " + request.getEmail());
-                showInviteConfirmationDialog();
+                showInviteConfirmationDialog(getString(R.string.invite_sent_text, request.getEmail()));
             }
             else{
                 logWarning("Code: " + e.getErrorString());
@@ -356,13 +358,22 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         }
     }
 
-    public void showInviteConfirmationDialog(){
+    public void showInviteConfirmationDialog(String contentText){
         logDebug("showInviteConfirmationDialog");
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        View dialoglayout = inflater.inflate(R.layout.dialog_invite_friends_achievement, null);
-        builder.setView(dialoglayout);
+        View dialogLayout = inflater.inflate(R.layout.dialog_invite_friends_achievement, null);
+        TextView content = dialogLayout.findViewById(R.id.invite_content);
+        content.setText(contentText);
+        Button closeButton = dialogLayout.findViewById(R.id.close_btn);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                successDialog.dismiss();
+            }
+        });
+        builder.setView(dialogLayout);
         successDialog = builder.create();
         successDialog.show();
     }
