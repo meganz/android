@@ -211,21 +211,30 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        logDebug("onPrepareOptionsMenu");
-        if(callChat!=null){
-            if((callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS || callChat.getStatus() == MegaChatCall.CALL_STATUS_JOINING) && callChat.hasLocalVideo()){
+        if(isNecessaryToShowSwapCameraOption()){
+            cameraSwapMenuItem.setVisible(true);
+            if(callChat.hasLocalVideo()){
                 cameraSwapMenuItem.setEnabled(true);
                 cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.background_chat));
             }else{
                 cameraSwapMenuItem.setEnabled(false);
                 cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.white_50_opacity));
             }
-
         }else{
-            cameraSwapMenuItem.setEnabled(false);
-            cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.white_50_opacity));
+            cameraSwapMenuItem.setVisible(false);
         }
+
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private boolean isNecessaryToShowSwapCameraOption(){
+        if(callChat == null) return false;
+
+        int callStatus = callChat.getStatus();
+        if(callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || callStatus < MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM || (callStatus > MegaChatCall.CALL_STATUS_IN_PROGRESS && callStatus != MegaChatCall.CALL_STATUS_RECONNECTING))
+            return false;
+
+        return true;
     }
 
     @Override
