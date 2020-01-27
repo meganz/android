@@ -312,7 +312,8 @@ public class ShareInfo implements Serializable {
                 return;
             }
 			logDebug("Internal No path traversal: " + title);
-            if (context instanceof PdfViewerActivityLollipop || mIntent.getType().equals("application/pdf")) {
+            if (context instanceof PdfViewerActivityLollipop
+					|| (mIntent != null && mIntent.getType() != null && mIntent.getType().equals("application/pdf"))) {
 				title = addPdfFileExtension(title);
             }
             file = new File(context.getCacheDir(), title);
