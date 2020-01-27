@@ -876,12 +876,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 		setNodes(nodes);
 	}
 
-	public boolean isFolder(int position){
-		MegaNode node = nodes.get(position);
-
-		return node == null || node.isFolder();
-	}
-
 	boolean isMultiselect() {
 		return modeCloud == FileExplorerActivityLollipop.SELECT && selectFile && ((FileExplorerActivityLollipop) context).isMultiselect();
 	}

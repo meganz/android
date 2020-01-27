@@ -993,7 +993,10 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				adapterType == INCOMING_SHARES_ADAPTER|| adapterType == OUTGOING_SHARES_ADAPTER ||
 				adapterType == SEARCH_ADAPTER || adapterType == FILE_BROWSER_ADAPTER ||
 				adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
-            positionG -= placeholderCount;
+            // only for the first time
+            if(savedInstanceState == null) {
+                positionG -= placeholderCount;
+            }
         }
         MegaApplication app = (MegaApplication)getApplication();
 		if (isFolderLink ){
@@ -1006,7 +1009,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			if (megaApi == null || megaApi.getRootNode() == null) {
 				logDebug("Refresh session - sdk");
 				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-				intentLogin.putExtra("visibleFragment", LOGIN_FRAGMENT);
+				intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intentLogin);
 				finish();
@@ -1020,7 +1023,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
 				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-				intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+				intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intentLogin);
 				finish();
@@ -1179,8 +1182,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			fileNameTextView.setText(new File(paths.get(positionG)).getName());
 		}
 		else if(adapterType == SEARCH_ADAPTER){
-			ArrayList<String> serialized = intent.getStringArrayListExtra(ARRAY_SEARCH);
-			getImageHandles(getSearchedNodes(serialized), savedInstanceState);
+			ArrayList<String> handles = intent.getStringArrayListExtra(ARRAY_SEARCH);
+			getImageHandles(getSearchedNodes(handles), savedInstanceState);
 		}else if(adapterType == SEARCH_BY_ADAPTER){
 			handlesNodesSearched = intent.getLongArrayExtra("handlesNodesSearch");
 

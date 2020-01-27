@@ -2242,7 +2242,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     logDebug("Use provider to share");
-                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+                    share.putExtra(Intent.EXTRA_STREAM, uri);
                     share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
                 else{
@@ -2570,11 +2570,14 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
     public String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            Cursor cursor = null;
             try {
+                cursor = getContentResolver().query(uri, null, null, null, null);
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
+            } catch (Exception e) {
+                logError("Exception getting pdf name", e);
             } finally {
                 if (cursor != null) {
                     cursor.close();
@@ -2584,7 +2587,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         if (result == null) {
             result = uri.getLastPathSegment();
         }
-        return result;
+        return addPdfFileExtension(result);
     }
 
     @Override

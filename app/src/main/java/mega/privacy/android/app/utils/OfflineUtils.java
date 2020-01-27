@@ -204,7 +204,7 @@ public class OfflineUtils {
             MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
             if (offlineNode != null) {
                 File offlineFile = getOfflineFile(context, offlineNode);
-                if (isFileAvailable(offlineFile)) return true;
+                if (isFileAvailable(offlineFile) && isFileDownloadedLatest(offlineFile, node)) return true;
             }
         }
 
@@ -293,6 +293,10 @@ public class OfflineUtils {
         }
 
         return new File(path + File.separator + MegaApiUtils.createStringTree(node, context));
+    }
+
+    public static File getOfflineParentFileName(Context context, MegaNode node) {
+        return new File(File.separator + MegaApiUtils.createStringTree(node, context));
     }
 
     public static String getOfflineSize(Context context) {

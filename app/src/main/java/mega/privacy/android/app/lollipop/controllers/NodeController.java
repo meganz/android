@@ -77,7 +77,7 @@ public class NodeController {
         logDebug("NodeController created");
         this.context = context;
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            megaApi = MegaApplication.getInstance().getMegaApi();
         }
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
@@ -232,31 +232,38 @@ public class NodeController {
 
         for (int i=0; i<nodes.size(); i++) {
             currentNode = nodes.get(i);
-            if (currentNode != null) {
-                if (currentNode.getOwner() == megaApi.getMyUserHandleBinary()) {
-                    ownerNodes.add(currentNode);
-                }
-                else {
-                    String nodeFP = megaApi.getFingerprint(currentNode);
-                    ArrayList<MegaNode> fNodes = megaApi.getNodesByFingerprint(nodeFP);
-                    MegaNode nodeOwner = null;
-                    if (fNodes != null) {
-                        for (int j=0; j<fNodes.size(); j++) {
-                            if (fNodes.get(j).getOwner() == megaApi.getMyUserHandleBinary()){
-                                nodeOwner = fNodes.get(j);
-                                break;
-                            }
-                        }
-                    }
-                    if (nodeOwner != null) {
-                        ownerNodes.add(nodeOwner);
-                    }
-                    else {
-                        notOwnerNodes.add(currentNode);
-                    }
-                }
+            if (currentNode == null) continue;
+
+            MegaNode nodeOwner = checkIfNodeIsMine(currentNode);
+
+            if (nodeOwner != null) {
+                ownerNodes.add(nodeOwner);
+            }
+            else {
+                notOwnerNodes.add(currentNode);
             }
         }
+    }
+
+    public MegaNode checkIfNodeIsMine(MegaNode node) {
+        long myUserHandle = megaApi.getMyUserHandleBinary();
+
+        if (node.getOwner() == myUserHandle) {
+            return node;
+        }
+
+        String nodeFP = megaApi.getFingerprint(node);
+        ArrayList<MegaNode> fNodes = megaApi.getNodesByFingerprint(nodeFP);
+
+        if (fNodes == null) return null;
+
+        for (MegaNode n : fNodes) {
+            if (n.getOwner() == myUserHandle) {
+                return n;
+            }
+        }
+
+        return null;
     }
 
     public void selectChatsToSendNodes(ArrayList<MegaNode> nodes){
@@ -660,9 +667,9 @@ public class NodeController {
             checker.setNodeController(this);
             checker.setDownloadInfo(downloadInfo);
             if (checker.check()) {
-                downloadToSDCard = true;
                 downloadRoot = checker.getDownloadRoot();
                 sdCardOperator = checker.getSdCardOperator();
+                downloadToSDCard = (downloadRoot != null);
             } else {
                 return;
             }
@@ -695,9 +702,10 @@ public class NodeController {
                 if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
                     logDebug("ISFILE");
                     String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
-                    //Check if the file is already downloaded
+                    //Check if the file is already downloaded, and downloaded file is the latest version
                     MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
-                    if(localPath != null){
+                    if (localPath != null
+                            && isFileDownloadedLatest(new File(localPath), tempNode)) {
                         logDebug("localPath != null");
                         try {
                             final File file = new File(localPath);
@@ -915,7 +923,9 @@ public class NodeController {
                             destFile = destDir;
                         }
 
-                        if(destFile.exists() && (document.getSize() == destFile.length())){
+                        if (destFile.exists()
+                                && (document.getSize() == destFile.length())
+                                && isFileDownloadedLatest(destFile, document)) {
                             numberOfNodesAlreadyDownloaded++;
                             logWarning(destFile.getAbsolutePath() + " already downloaded");
                         }
@@ -1729,9 +1739,9 @@ public class NodeController {
             checker.setDocument(currentDocument);
             checker.setUrl(url);
             if (checker.check()) {
-                downloadToSDCard = true;
                 downloadRoot = checker.getDownloadRoot();
                 sdCardOperator = checker.getSdCardOperator();
+                downloadToSDCard = (downloadRoot != null);
             } else {
                 return;
             }

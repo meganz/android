@@ -24,11 +24,9 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -51,6 +49,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -93,7 +92,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class NodeAttachmentHistoryActivity extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface {
+public class NodeAttachmentHistoryActivity extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface, StoreDataBeforeForward<ArrayList<MegaChatMessage>> {
 
 	public static int NUMBER_MESSAGES_TO_LOAD = 20;
 	public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -105,19 +104,14 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 	NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;
 
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
-	MegaChatMessage selectedMessage;
     DatabaseHandler dbH = null;
-    MegaPreferences prefs = null;
     public boolean isList = true;
-
-	int selectedPosition;
 
 	RelativeLayout container;
 	LinearLayout linearLayoutList;
 	LinearLayout linearLayoutGrid;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
-//	GestureDetectorCompat detector;
 	RelativeLayout emptyLayout;
 	TextView emptyTextView;
 	ImageView emptyImageView;
@@ -150,6 +144,10 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 
 	ChatController chatC;
 
+	private MegaNode myChatFilesFolder;
+	private ArrayList<MegaChatMessage> preservedMessagesSelected;
+	private ArrayList<MegaChatMessage> preservedMessagesToImport;
+
 	private NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment;
 
 	@Override
@@ -169,7 +167,7 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 		if(megaChatApi==null||megaChatApi.getInitState()==MegaChatApi.INIT_ERROR||megaChatApi.getInitState()==MegaChatApi.INIT_NOT_DONE){
 			logDebug("Refresh session - karere");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+			intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
@@ -202,19 +200,6 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 		if (savedInstanceState != null){
 			chatId = savedInstanceState.getLong("chatId", -1);
 		}
-
-//        prefs = dbH.getPreferences();
-//        if (prefs == null){
-//            isList=true;
-//        }
-//        else{
-//            if (prefs.getPreferredViewList() == null){
-//                isList = true;
-//            }
-//            else{
-//                isList = Boolean.parseBoolean(prefs.getPreferredViewList());
-//            }
-//        }
 
 		//Set toolbar
 		tB = (Toolbar) findViewById(R.id.toolbar_node_history);
@@ -268,7 +253,6 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 			mLayoutManager = new LinearLayoutManager(this);
 			mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 			listView.setLayoutManager(mLayoutManager);
-			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator());
 		}
 		else{
@@ -398,14 +382,6 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 
         if(messages.size()>0){
             selectMenuItem.setVisible(true);
-            //        if (isList){
-//            thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-//            thumbViewMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-//        }
-//        else{
-//            thumbViewMenuItem.setTitle(getString(R.string.action_list));
-//            thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-//        }
         }
         else{
             selectMenuItem.setVisible(false);
@@ -426,22 +402,10 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 		    	return true;
 		    }
 		    case R.id.action_select:{
-		    	
 		    	selectAll();
 		    	return true;
 		    }
             case R.id.action_grid:{
-//                isList = !isList;
-//                dbH.setPreferredViewList(isList);
-//
-//                if (isList){
-//                    thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-//                }
-//                else{
-//                    thumbViewMenuItem.setTitle(getString(R.string.action_list));
-//                }
-//
-//                adapter.notifyDataSetChanged();
                 return true;
             }
 		    default:{
@@ -843,91 +807,6 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 	}
 
 	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-//		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-	}
-
-	public MegaChatMessage getSelectedMessage() {
-		return selectedMessage;
-	}
-
-	public int getSelectedPosition() {
-		return selectedPosition;
-	}
-
-	public void setSelectedPosition(int selectedPosition) {
-		this.selectedPosition = selectedPosition;
-	}
-
-	public void showConfirmationRemoveVersion(){
-		logDebug("showConfirmationRemoveContact");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getResources().getQuantityString(R.plurals.title_dialog_delete_version, 1));
-		builder.setMessage(getString(R.string.content_dialog_delete_version)).setPositiveButton(R.string.context_delete, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
-	}
-
-	public void showConfirmationRemoveVersions(final List<MegaNode> removeNodes){
-		logDebug("showConfirmationRemoveContactRequests");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		String message="";
-		String title="";
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		if(removeNodes.size()==1){
-
-			title = getResources().getQuantityString(R.plurals.title_dialog_delete_version, 1);
-
-			message= getResources().getString(R.string.content_dialog_delete_version);
-		}else{
-			title = getResources().getQuantityString(R.plurals.title_dialog_delete_version, removeNodes.size());
-			message= getResources().getString(R.string.content_dialog_delete_multiple_version,removeNodes.size());
-		}
-		builder.setTitle(title);
-		builder.setMessage(message).setPositiveButton(R.string.context_delete, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
-	}
-
-	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		logDebug("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
@@ -936,32 +815,21 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 		}
 	}
 
-	//Multiselection
+	@Override
+	public void storedUnhandledData(ArrayList<MegaChatMessage> preservedData) {
+	}
 
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
+	@Override
+	public void handleStoredData() {
+		chatC.proceedWithForward(myChatFilesFolder, preservedMessagesSelected, preservedMessagesToImport, chatId);
+		preservedMessagesSelected = null;
+		preservedMessagesToImport = null;
+	}
 
-		public void onLongPress(MotionEvent e) {
-			logDebug("onLongPress -- RecyclerViewOnGestureListener");
-
-			View view = listView.findChildViewUnder(e.getX(), e.getY());
-			int position = listView.getChildLayoutPosition(view);
-
-			if (!adapter.isMultipleSelect()){
-
-				if(position<0){
-					logError("Position not valid: " + position);
-				}
-				else{
-					adapter.setMultipleSelect(true);
-
-					actionMode = startSupportActionMode(new ActionBarCallBack());
-
-					itemClick(position);
-				}
-			}
-
-			super.onLongPress(e);
-		}
+	@Override
+	public void storedUnhandledData(ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport) {
+		preservedMessagesSelected = messagesSelected;
+		preservedMessagesToImport = messagesToImport;
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -1766,6 +1634,10 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 
 	public MegaChatRoom getChatRoom () {
 		return chatRoom;
+	}
+
+	public void setMyChatFilesFolder(MegaNode myChatFilesFolder) {
+		this.myChatFilesFolder = myChatFilesFolder;
 	}
 }
 

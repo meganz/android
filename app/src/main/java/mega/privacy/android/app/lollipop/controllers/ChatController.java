@@ -27,6 +27,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -283,10 +284,9 @@ public class ChatController {
     }
 
     public void deleteMessage(MegaChatMessage message, long chatId) {
-        logDebug("Message ID: " + message.getMsgId() + ", Chat ID: " + chatId);
+        logDebug("Message : " + message.getMsgId() + ", Chat ID: " + chatId);
         MegaChatMessage messageToDelete;
         if (message == null) return;
-
         if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
             logDebug("Delete node attachment message or voice clip message");
             if (message.getType() == MegaChatMessage.TYPE_VOICE_CLIP && message.getMegaNodeList() != null && message.getMegaNodeList().size() > 0 && message.getMegaNodeList().get(0) != null) {
@@ -296,10 +296,19 @@ public class ChatController {
             return;
         }
 
-        logDebug("Delete normal message");
-        messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
+        logDebug("Delete normal message with status = "+message.getStatus());
+        if(message.getStatus() == MegaChatMessage.STATUS_SENDING && message.getMsgId() == megaApi.INVALID_HANDLE){
+
+            messageToDelete = megaChatApi.deleteMessage(chatId, message.getTempId());
+        }else{
+            messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
+        }
+
         if (messageToDelete == null) {
-            logWarning("The message cannot be deleted");
+            logDebug("The message cannot be deleted");
+        }else{
+            logDebug("The message has been deleted");
+            ((ChatActivityLollipop) context).updatingRemovedMessage(message);
         }
     }
 
@@ -1924,8 +1933,8 @@ public class ChatController {
                 checker.setNodeList(nodeList);
                 checker.setSerializedNodes(serializedNodes);
                 if (checker.check()) {
-                    downloadToSDCard = true;
                     downloadRoot = checker.getDownloadRoot();
+                    downloadToSDCard = (downloadRoot != null);
                 } else {
                     return;
                 }
@@ -2041,7 +2050,6 @@ public class ChatController {
 
         if(m!=null){
             messagesSelected.add(m);
-
             prepareMessagesToForward(messagesSelected, idChat);
         }
         else{
@@ -2051,6 +2059,7 @@ public class ChatController {
 
     public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat){
         ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
+
         for(int i = 0; i<androidMessagesSelected.size(); i++){
             messagesSelected.add(androidMessagesSelected.get(i).getMessage());
         }
@@ -2075,43 +2084,49 @@ public class ChatController {
         }
 
         if(messagesToImport.isEmpty()){
-            logDebug("Proceed to forward");
             forwardMessages(messagesSelected, idChat);
         }
         else{
-            logDebug("Proceed to import nodes to own Cloud");
-            ChatImportToForwardListener listener = new ChatImportToForwardListener(MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
-    
-            MegaNode target = megaApi.getNodeByPath(CHAT_FOLDER, megaApi.getRootNode());
-            if(target==null){
-                logWarning("Error no chat folder - return");
-                return;
+            if (context instanceof ChatActivityLollipop) {
+                ((ChatActivityLollipop) context).storedUnhandledData(messagesSelected, messagesToImport);
+            } else if (context instanceof NodeAttachmentHistoryActivity) {
+                ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
             }
+            megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
+        }
+    }
 
-            for(int j=0; j<messagesToImport.size();j++){
-                MegaChatMessage message = messagesToImport.get(j);
+    public void proceedWithForward(MegaNode myChatFilesFolder, ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport, long idChat) {
+        ChatImportToForwardListener listener = new ChatImportToForwardListener(MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
+        int errors = 0;
 
-                if(message!=null){
+        for(int j=0; j<messagesToImport.size();j++){
+            MegaChatMessage message = messagesToImport.get(j);
 
-                    MegaNodeList nodeList = message.getMegaNodeList();
+            if(message!=null){
 
-                    for(int i=0;i<nodeList.size();i++){
-                        MegaNode document = nodeList.get(i);
-                        if (document != null) {
-                            logDebug("DOCUMENT: " + document.getHandle());
-                            document = authorizeNodeIfPreview(document, megaChatApi.getChatRoom(idChat));
-                            megaApi.copyNode(document, target, listener);
-                        }
-                        else{
-                            logWarning("DOCUMENT: null");
-                        }
+                MegaNodeList nodeList = message.getMegaNodeList();
+
+                for(int i=0;i<nodeList.size();i++){
+                    MegaNode document = nodeList.get(i);
+                    if (document != null) {
+                        logDebug("DOCUMENT: " + document.getHandle());
+                        document = authorizeNodeIfPreview(document, megaChatApi.getChatRoom(idChat));
+                        megaApi.copyNode(document, myChatFilesFolder, listener);
+                    }
+                    else{
+                        logWarning("DOCUMENT: null");
                     }
                 }
-                else{
-                    logWarning("MESSAGE is null");
-                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.messages_forwarded_error));
-                }
             }
+            else{
+                logWarning("MESSAGE is null");
+                errors++;
+            }
+        }
+
+        if (errors > 0) {
+            showSnackbar(SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
         }
     }
 

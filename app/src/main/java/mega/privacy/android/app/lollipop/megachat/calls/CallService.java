@@ -278,7 +278,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
 
     public Bitmap setProfileContactAvatar(long userHandle, String fullName, String email) {
         Bitmap bitmap = null;
-        File avatar = buildAvatarFile(context, email + ".jpg");
+        File avatar = buildAvatarFile(getApplicationContext(), email + ".jpg");
 
         if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
@@ -326,7 +326,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         int color;
         if (userHandle != -1) {
             color = getColorAvatar(this, megaApi, userHandle);
-        }else{
+        } else {
             color = ContextCompat.getColor(this, R.color.divider_upgrade_account);
         }
         return getDefaultAvatar(this, color, fullName, AVATAR_SIZE, true);

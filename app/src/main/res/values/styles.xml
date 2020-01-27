@@ -189,10 +189,11 @@
 
     <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorAccent">@color/accentColor</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textColorPrimary">@color/text_secondary</item>
-        <item name="android:background">@color/white</item>
-        <item name="colorControlNormal">@color/text_secondary</item>
+        <item name="android:positiveButtonText">@color/accentColor</item>
+        <item name="android:negativeButtonText">@color/accentColor</item>
+        <item name="android:content">@color/mail_my_account</item>
+        <item name="colorControlNormal">@color/mail_my_account</item>
+        <item name="android:textColorPrimary">@color/black</item>
         <item name="android:windowMinWidthMajor">85%</item>
         <item name="android:windowMinWidthMinor">85%</item>
     </style>
@@ -247,6 +248,7 @@
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
+        <item name="colorAccent">@color/accentColor</item>
     </style>
 
     <style name="AppCompatAlertDialogStyleAddContacts" parent="Theme.AppCompat.Light.Dialog.Alert">
@@ -282,24 +284,51 @@
     <style name="PreferenceCategoryStyle" parent="@style/Preference.Category.Material">
         <item name="android:layout">@layout/my_category_preference</item>
     </style>
+
+    <style name="InputTextAppearanceError" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/dark_primary_color</item>
+    </style>
+
+    <style name="InputTextAppearanceVeryWeak" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/login_warning</item>
+    </style>
+
+    <style name="InputTextAppearanceWeak" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/pass_weak</item>
+    </style>
+
 	<style name="SMSVerificationStyle" parent="Theme.AppCompat.Light.NoActionBar">
 		<item name="colorPrimaryDark">#3490B1</item>
 		<item name="android:windowNoTitle">true</item>
 	</style>
+
 	<style name="SMSVerificationReceiveTxtActivityTheme" parent="Theme.Megaactionbar">
 		<item name="colorPrimaryDark">#3490B1</item>
 		<item name="colorPrimary">#FFF9F9F9</item>
 	</style>
+
     <style name="GetFreeXxGbWhen" parent="@style/TextAppearance.AppCompat">
         <item name="android:fontFamily">Roboto</item>
         <item name="android:textColor">#FF666666</item>
         <item name="android:textSize">16sp</item>
     </style>
+
     <style name="Button" parent="@style/ButtonStyle">
         <item name="android:textColor">#FF00BFA5</item>
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="InputTextAppearanceMedium" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/green_unlocked_rewards</item>
+    </style>
+
+    <style name="InputTextAppearanceGood" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/pass_good</item>
+    </style>
+
+    <style name="InputTextAppearanceStrong" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/blue_unlocked_rewards</item>
+    </style>
     <style name="CardViewTheme" parent="CardView">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
@@ -340,6 +369,63 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/mail_my_account</item>
+    </style>
+
+    <style name="achievements_subtitle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/name_my_account</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:layout_marginRight">24dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="figures_text_style">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/mail_my_account</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:layout_marginRight">16dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="how_it_works">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">@string/title_achievement_invite_friends</item>
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="android:layout_marginBottom">24dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:lineSpacingMultiplier">1.31</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:textColor">@color/blue_unlocked_rewards</item>
+    </style>
+
+    <style name="how_works_first_p">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:layout_marginLeft">24dp</item>
+        <item name="android:layout_marginRight">24dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:lineSpacingMultiplier">1.43</item>
+        <item name="android:textColor">@color/grey_achievements_invite_friends</item>
+    </style>
+
+    <style name="how_works_second_p" parent="how_works_first_p">
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">24dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingMultiplier">1.67</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textColor">@color/grey_achievements_invite_friends_sub</item>
     </style>
 
     <style name="taken_down_icon">

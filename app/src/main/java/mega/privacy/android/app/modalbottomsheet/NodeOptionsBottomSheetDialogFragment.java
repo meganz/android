@@ -1354,11 +1354,20 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         if (isFileAvailable(offlineParent)) {
             File offlineFile = new File(offlineParent, node.getName());
-            if (isFileAvailable(offlineFile)) {
+            // if the file matches to the latest on the cloud, do nothing
+            if (isFileAvailable(offlineFile)
+                    && isFileDownloadedLatest(offlineFile, node)
+                    && offlineFile.length() == node.getSize()) {
                 return;
+            } else {
+                // if the file does not match the latest on the cloud, delete the old file offline database record
+                String parentName = getOfflineParentFileName(context, node).getAbsolutePath() + File.separator;
+                MegaOffline mOffDelete = dbH.findbyPathAndName(parentName, node.getName());
+                removeFromOffline(mOffDelete);
             }
         }
 
+        // Save the new file to offline
         saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context, megaApi);
     }
 

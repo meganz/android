@@ -79,31 +79,6 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 		
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
-
-//		if(megaApi==null||megaApi.getRootNode()==null){
-//			log("Refresh session - sdk");
-//			Intent intent = new Intent(this, LoginActivityLollipop.class);
-//			intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
-//			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//			startActivity(intent);
-//			finish();
-//			return;
-//		}
-//		if(isChatEnabled()){
-//			if (megaChatApi == null){
-//				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-//			}
-//
-//			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-//				log("Refresh session - karere");
-//				Intent intent = new Intent(this, LoginActivityLollipop.class);
-//				intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
-//				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//				startActivity(intent);
-//				finish();
-//				return;
-//			}
-//		}
 		
 		setContentView(R.layout.activity_open_pass_link);
 		
@@ -248,7 +223,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 				String decryptedLink = request.getText();
 
 				// Folder Download link
-				if (decryptedLink != null && (url.matches("^https://mega.co.nz/#F!.+$") || decryptedLink.matches("^https://mega.nz/#F!.+$"))) {
+				if (decryptedLink != null && matchRegexs(decryptedLink, FOLDER_LINK_REGEXS)) {
 					logDebug("Folder link url");
 
 					Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
@@ -259,7 +234,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 					finish();
 				}
 
-				else if (decryptedLink != null && (decryptedLink.matches("^https://mega.co.nz/#!.+$") || decryptedLink.matches("^https://mega.nz/#!.+$"))) {
+				else if (decryptedLink != null && matchRegexs(decryptedLink, FILE_LINK_REGEXS)) {
 					logDebug("Open link url");
 
 					Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);

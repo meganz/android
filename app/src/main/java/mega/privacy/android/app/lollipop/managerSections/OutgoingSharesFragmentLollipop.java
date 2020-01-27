@@ -1669,6 +1669,8 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public boolean isMultipleselect(){
+		if (adapter == null) return false;
+
 		return adapter.isMultipleSelect();
 	}
 

@@ -289,7 +289,7 @@ public class AccountController implements View.OnClickListener{
 
         Intent intent = new Intent(context, FileStorageActivityLollipop.class);
         intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_SAVE_RECOVERY_KEY, true);
         if (context instanceof TestPasswordActivity){
             ((TestPasswordActivity) context).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
         }
