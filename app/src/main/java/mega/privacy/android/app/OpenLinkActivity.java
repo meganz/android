@@ -270,7 +270,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 						megaApi.queryChangeEmailLink(url, new QueryRecoveryLinkListener(this));
 					}
 				} else {
-					setError(getString(R.string.alert_not_logged_in));
+					setError(getString(R.string.change_email_not_logged_in));
 				}
 			}
 			return;

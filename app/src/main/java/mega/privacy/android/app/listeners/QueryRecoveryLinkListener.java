@@ -41,42 +41,29 @@ public class QueryRecoveryLinkListener extends BaseListener {
                 openLinkActivity.setError(openLinkActivity.getString(R.string.general_text_error));
             }
 
-            String myEmail = request.getEmail();
-            if (myEmail != null && !myEmail.equals(api.getMyEmail())){
-                logWarning("Error opening link not related to this account: " + e.getErrorString() + "___" + e.getErrorCode());
-                openLinkActivity.setError(openLinkActivity.getString(R.string.error_not_logged_with_correct_account));
-            }
-
             switch (e.getErrorCode()) {
                 case MegaError.API_OK:
+                    Intent intent = null;
+
                     if (matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEXS)) {
-                        Intent cancelAccountIntent = new Intent(openLinkActivity, ManagerActivityLollipop.class);
-                        cancelAccountIntent.setAction(ACTION_CANCEL_ACCOUNT);
-                        cancelAccountIntent.setData(Uri.parse(url));
-                        openLinkActivity.startActivity(cancelAccountIntent);
-                        openLinkActivity.finish();
+                        intent = new Intent(openLinkActivity, ManagerActivityLollipop.class);
+                        intent.setAction(ACTION_CANCEL_ACCOUNT);
                     } else if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
-                        boolean mk = request.getFlag();
-                        if (mk) {
-                            Intent resetPassIntent = new Intent(openLinkActivity, LoginActivityLollipop.class);
-                            resetPassIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-                            resetPassIntent.setAction(ACTION_RESET_PASS);
-                            resetPassIntent.setData(Uri.parse(url));
-                            openLinkActivity.startActivity(resetPassIntent);
-                            openLinkActivity.finish();
+                        intent = new Intent(openLinkActivity, LoginActivityLollipop.class);
+                        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+                        if (request.getFlag()) {
+                            intent.setAction(ACTION_RESET_PASS);
                         } else {
-                            Intent resetPassIntent = new Intent(openLinkActivity, LoginActivityLollipop.class);
-                            resetPassIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-                            resetPassIntent.setAction(ACTION_PARK_ACCOUNT);
-                            resetPassIntent.setData(Uri.parse(url));
-                            openLinkActivity.startActivity(resetPassIntent);
-                            openLinkActivity.finish();
+                            intent.setAction(ACTION_PARK_ACCOUNT);
                         }
                     } else if (matchRegexs(url, VERIFY_CHANGE_MAIL_LINK_REGEXS)) {
-                        Intent changeMailIntent = new Intent(openLinkActivity, ManagerActivityLollipop.class);
-                        changeMailIntent.setAction(ACTION_CHANGE_MAIL);
-                        changeMailIntent.setData(Uri.parse(url));
-                        openLinkActivity.startActivity(changeMailIntent);
+                        intent = new Intent(openLinkActivity, ManagerActivityLollipop.class);
+                        intent.setAction(ACTION_CHANGE_MAIL);
+                    }
+
+                    if (intent != null) {
+                        intent.setData(Uri.parse(url));
+                        openLinkActivity.startActivity(intent);
                         openLinkActivity.finish();
                     }
                     break;
@@ -90,7 +77,10 @@ public class QueryRecoveryLinkListener extends BaseListener {
                     break;
 
                 case MegaError.API_EACCESS:
-                    if (matchRegexs(url, VERIFY_CHANGE_MAIL_LINK_REGEXS)) {
+                    if (matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEXS)
+                            || matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)
+                            || matchRegexs(url, VERIFY_CHANGE_MAIL_LINK_REGEXS)) {
+                        logWarning("Error opening link not related to this account: " + e.getErrorString() + "___" + e.getErrorCode());
                         openLinkActivity.setError(openLinkActivity.getString(R.string.error_not_logged_with_correct_account));
                     }
                     break;

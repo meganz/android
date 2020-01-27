@@ -15124,6 +15124,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if(e.getErrorCode() == MegaError.API_OK){
 				logDebug("Email changed");
 				updateMyEmail(request.getEmail());
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.email_changed, request.getEmail()), INVALID_HANDLE);
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXIST){
 				logWarning("The new mail already exists");
