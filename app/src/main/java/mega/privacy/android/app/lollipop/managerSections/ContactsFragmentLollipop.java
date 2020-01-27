@@ -176,6 +176,10 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				handleContactLink = request.getNodeHandle();
 				contactNameContent = request.getName() + " " + request.getText();
 
+				dbH.setLastPublicHandle(handleContactLink);
+				dbH.setLastPublicHandleTimeStamp();
+				dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CONTACT);
+
 				userQuery = queryIfIsContact();
 				showInviteDialog();
 			}

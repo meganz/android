@@ -840,7 +840,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             public void onStart() {
                 logDebug("recordView.setOnRecordListener:onStart");
                 if (participatingInACall(megaChatApi)) {
-                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.not_allowed_recording_voice_clip), -1);
+                    showSnackbar(SNACKBAR_TYPE, getApplicationContext().getString(R.string.not_allowed_recording_voice_clip), -1);
                     return;
                 }
                 if (!isAllowedToRecord()) return;
@@ -2249,7 +2249,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         recordButton.activateOnTouchListener(false);
         recordButton.activateOnClickListener(true);
         recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
-        recordButton.setColorFilter(ContextCompat.getColor(context, R.color.accentColor));
+        recordButton.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor));
     }
 
     /*
@@ -3068,7 +3068,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         String message= getResources().getString(R.string.text_join_call);
         builder.setTitle(R.string.title_join_call);
-        builder.setMessage(message).setPositiveButton(context.getString(R.string.answer_call_incoming).toUpperCase(), dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        builder.setMessage(message).setPositiveButton(getApplicationContext().getString(R.string.answer_call_incoming).toUpperCase(), dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
     public void showConfirmationOpenCamera(final MegaChatRoom c){
@@ -6973,6 +6973,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     megaChatApi.closeChatRoom(idChat, this);
                 }
                 idChat = request.getChatHandle();
+
+                if (e.getErrorCode() == MegaChatError.ERROR_OK && idChat != MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE) {
+                    dbH.setLastPublicHandle(idChat);
+                    dbH.setLastPublicHandleTimeStamp();
+                    dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CHAT);
+                }
+
                 MegaApplication.setOpenChatId(idChat);
                 showChat(null);
 

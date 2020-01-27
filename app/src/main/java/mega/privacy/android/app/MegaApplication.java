@@ -470,7 +470,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
         storageState = dbH.getStorageState();
 
-		setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		boolean staging = false;
 		if (dbH != null) {
@@ -670,17 +669,17 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public void refreshAccountInfo(){
 		//Check if the call is recently
-		if(callToAccountDetails(context) || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
+		if(callToAccountDetails() || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
 			logDebug("megaApi.getAccountDetails SEND");
 			askForAccountDetails();
 		}
 
-		if(callToExtendedAccountDetails(context)){
+		if(callToExtendedAccountDetails()){
 			logDebug("megaApi.getExtendedAccountDetails SEND");
 			askForExtendedAccountDetails();
 		}
 
-		if(callToPaymentMethods(context)){
+		if(callToPaymentMethods()){
 			logDebug("megaApi.getPaymentMethods SEND");
 			askForPaymentMethods();
 		}
@@ -758,7 +757,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			megaChatApi = getMegaChatApi();
 		}
 	}
-	
+
 	public MegaApiAndroid getMegaApi()
 	{
 		if(megaApi == null)
@@ -816,6 +815,14 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 		
 		return megaApi;
+	}
+
+	public DatabaseHandler getDbH() {
+		if (dbH == null) {
+			DatabaseHandler.getDbHandler(getApplicationContext());
+		}
+
+		return dbH;
 	}
 
 	public static boolean isActivityVisible() {
