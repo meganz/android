@@ -26,13 +26,17 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -72,12 +76,16 @@ public class BaseActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(signalPresenceReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE));
+
+        IntentFilter filter =  new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED);
+        filter.addAction(ACTION_EVENT_ACCOUNT_BLOCKED);
+        LocalBroadcastManager.getInstance(this).registerReceiver(accountBlockedReceiver, filter);
     }
 
     @Override
     protected void onPause() {
         logDebug("onPause");
-
+        app.activityPaused();
         checkMegaObjects();
         super.onPause();
     }
@@ -85,7 +93,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         logDebug("onResume");
-
+        app.activityResumed();
         super.onResume();
         setAppFontSize(this);
 
@@ -100,6 +108,7 @@ public class BaseActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
 
         super.onDestroy();
     }
@@ -128,6 +137,18 @@ public class BaseActivity extends AppCompatActivity {
             }
         }
     }
+
+    /**
+     * Broadcast receiver to manage the errors shown and actions when an account is blocked.
+     */
+    private BroadcastReceiver accountBlockedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_EVENT_ACCOUNT_BLOCKED)) return;
+
+            checkWhyAmIBlocked(intent.getLongExtra(EVENT_NUMBER, -1), intent.getStringExtra(EVENT_TEXT));
+        }
+    };
 
     /**
      * Broadcast receiver to manage a possible SSL verification error.
@@ -409,6 +430,66 @@ public class BaseActivity extends AppCompatActivity {
         if(callToAccountDetails(getApplicationContext())){
             logDebug("megaApi.getAccountDetails SEND");
             app.askForAccountDetails();
+        }
+    }
+
+    /**
+     * Method to show an alert or error when the account has been suspended
+     * for any reason
+     *
+     * @param eventNumber long that determines the event for which the account has been suspended
+     * @param stringError string shown as an alert in case there is not any specific action for the event
+     */
+    public void checkWhyAmIBlocked(long eventNumber, String stringError) {
+        Intent intent;
+
+        switch (Long.toString(eventNumber)) {
+            case ACCOUNT_NOT_BLOCKED:
+//                I am not blocked
+                break;
+            case COPYRIGHT_ACCOUNT_BLOCK:
+                showErrorAlertDialog(getString(R.string.account_suspended_breache_ToS), false, this);
+                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
+                break;
+            case MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK:
+                showErrorAlertDialog(getString(R.string.account_suspended_multiple_breaches_ToS), false, this);
+                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
+                break;
+            case SMS_VERIFICATION_ACCOUNT_BLOCK:
+                if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed()) return;
+
+                MegaApplication.smsVerifyShowed(true);
+                String gSession = megaApi.dumpSession();
+                //For first login, keep the valid session,
+                //after added phone number, the account can use this session to fastLogin
+                if (gSession != null) {
+                    MegaUser myUser = megaApi.getMyUser();
+                    String myUserHandle = null;
+                    String lastEmail = null;
+                    if (myUser != null) {
+                        lastEmail = myUser.getEmail();
+                        myUserHandle = myUser.getHandle() + "";
+                    }
+                    UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
+                    dbH.saveCredentials(credentials);
+                }
+
+                logDebug("Show SMS verification activity.");
+                intent = new Intent(getApplicationContext(), SMSVerificationActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(NAME_USER_LOCKED, true);
+                startActivity(intent);
+
+                break;
+            case WEAK_PROTECTION_ACCOUNT_BLOCK:
+                if (app.isBlockedDueToWeakAccount() || app.isWebOpenDueToEmailVerification()) {
+                    break;
+                }
+                intent = new Intent(this, WeakAccountProtectionAlertActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                showErrorAlertDialog(stringError, false, this);
         }
     }
 }

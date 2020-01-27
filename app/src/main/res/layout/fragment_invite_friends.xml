@@ -1,234 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/my_account_complete_relative_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/chat_background">
+        android:layout_height="wrap_content"
+        android:background="@color/grey_my_account_background"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
+            android:background="@color/white"
             android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:layout_below="@+id/container_invite_friends">
+            android:orientation="vertical">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_invite_friends_big"/>
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_invite_friends_big" />
 
             <TextView
                 android:id="@+id/title_card_invite_fragment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="24dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginRight="24dp"
-                android:layout_marginLeft="24dp"
-                android:layout_gravity="center_horizontal"
+                android:fontFamily="sans-serif"
                 android:gravity="center_horizontal"
-                android:textSize="14dp"
                 android:lineSpacingMultiplier="1.2"
-                android:textColor="@color/mail_my_account"/>
+                android:textColor="@color/mail_my_account"
+                android:textSize="14sp" />
 
-            <LinearLayout
-                android:id="@+id/separator_invite_friends"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="43dp"
-                android:orientation="horizontal"
-                android:background="@color/separator_grey"/>
-
-            <LinearLayout
+            <Button
+                android:id="@+id/invite_contacts_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@color/white">
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="26dp"
+                android:background="@drawable/ripple_upgrade"
+                android:elevation="@dimen/elevation_upgrade_low"
+                android:minHeight="0dp"
+                android:paddingLeft="46dp"
+                android:paddingTop="10dp"
+                android:paddingRight="46dp"
+                android:paddingBottom="10dp"
+                android:stateListAnimator="@anim/button_upgrade_elevation"
+                android:text="@string/invite_contacts"
+                android:textColor="@color/white"
+                android:tint="@android:color/white" />
+        </LinearLayout>
 
-                <TextView
-                    android:id="@+id/how_works_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/title_achievement_invite_friends"
-                    android:layout_marginBottom="16dp"
-                    android:layout_marginTop="24dp"
-                    android:textSize="16dp"
-                    android:lineSpacingMultiplier="1.2"
-                    android:layout_gravity="center_horizontal"
-                    android:textColor="@color/blue_unlocked_rewards"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@color/white"
+            android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/how_works_first_p"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/first_paragraph_achievement_invite_friends"
-                    android:layout_marginLeft="24dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_marginRight="24dp"
-                    android:textSize="14dp"
-                    android:lineSpacingMultiplier="1.5"
-                    android:textColor="@color/grey_achievements_invite_friends"/>
+            <TextView
+                android:id="@+id/how_works_title"
+                style="@style/how_it_works" />
 
-                <TextView
-                    android:id="@+id/how_works_second_p"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/second_paragraph_achievement_invite_friends"
-                    android:layout_marginRight="24dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginLeft="24dp"
-                    android:layout_marginBottom="24dp"
-                    android:textStyle="italic"
-                    android:textSize="14dp"
-                    android:lineSpacingMultiplier="1.5"
-                    android:textColor="@color/grey_achievements_invite_friends_sub"/>
+            <TextView
+                android:id="@+id/how_works_first_p"
+                style="@style/how_works_first_p"
+                android:text="@string/first_paragraph_achievement_invite_friends" />
 
-            </LinearLayout>
+            <TextView
+                android:id="@+id/how_works_second_p"
+                style="@style/how_works_second_p"
+                android:text="@string/second_paragraph_achievement_invite_friends" />
 
         </LinearLayout>
 
-            <RelativeLayout
-                android:id="@+id/container_invite_friends"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/card_view_invite_friends_achievement"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="0dp"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginTop="0dp"
-                    card_view:cardCornerRadius="0dp">
-
-                    <LinearLayout
-                        android:id="@+id/card_linear_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
-                        android:layout_marginTop="16dp"
-                        android:orientation="vertical">
-
-                        <RelativeLayout
-                            android:id="@+id/recycler_layout_invite_friends"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="6dp"
-                            android:layout_marginRight="6dp">
-
-                                <android.support.v7.widget.RecyclerView
-                                    android:id="@+id/invite_friends_recycler_view"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:choiceMode="multipleChoice"/>
-
-                        </RelativeLayout>
-
-
-                        <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <EditText
-                                android:id="@+id/edit_text_invite_mail"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
-                                android:hint="@string/contact_email"
-                                android:singleLine="true"
-                                android:inputType="textEmailAddress"
-                                android:theme="@style/ColorControlStyle"/>
-
-                            <ImageView
-                                android:id="@+id/toggle_button_invite_mail"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignRight="@+id/edit_text_invite_mail"
-                                android:layout_alignBottom="@+id/edit_text_invite_mail"
-                                android:paddingBottom="15dp"
-                                android:paddingRight="5dp"
-                                android:paddingLeft="10dp"
-                                android:paddingTop="10dp"
-                                android:src="@drawable/ic_phone_contact_list"/>
-
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/invite_friends_email_error">
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/login_email_text_error_icon"
-                                android:layout_alignParentRight="true"
-                                android:src="@drawable/ic_input_warning"
-                                android:tint="@color/login_warning"
-                                android:layout_marginRight="4dp"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/login_email_text_error_text"
-                                android:textColor="@color/login_warning"
-                                android:layout_toLeftOf="@id/login_email_text_error_icon"
-                                android:layout_alignParentLeft="true"
-                                android:layout_marginLeft="4dp"
-                                android:text="@string/invalid_email_to_invite"
-                                android:layout_centerInParent="true"/>
-
-                        </RelativeLayout>
-
-                        <Button
-                            android:id="@+id/invite_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
-                            android:minWidth="0dp"
-                            android:minHeight="0dp"
-                            android:textColor="@color/white"
-                            android:layout_gravity="right"
-                            android:text="@string/menu_add_contact"
-                            android:background="@color/accentColor"
-                            android:layout_marginRight="6dp"
-                            android:layout_marginTop="16dp"
-                            android:padding="12dp"
-                            android:elevation="@dimen/elevation_upgrade_low"
-                            android:stateListAnimator="@anim/button_upgrade_elevation"
-                            android:tint="@android:color/white" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentTop="true"
-                            android:text="@string/card_title_invite_friends"
-                            android:layout_marginRight="4dp"
-                            android:layout_marginLeft="4dp"
-                            android:layout_marginBottom="12dp"
-                            android:layout_marginTop="15dp"
-                            android:textSize="14dp"
-                            android:lineSpacingMultiplier="1.5"
-                            android:textColor="@color/mail_my_account"/>
-
-                    </LinearLayout>
-
-                </android.support.v7.widget.CardView>
-
-            </RelativeLayout>
-
-</RelativeLayout>
-
+    </LinearLayout>
 
 </ScrollView>
