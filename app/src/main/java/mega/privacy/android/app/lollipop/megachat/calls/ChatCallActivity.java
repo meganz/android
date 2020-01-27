@@ -239,7 +239,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 break;
             }
             case R.id.cab_menu_camera_swap:{
-                changeCamera(megaChatApi);
+                swapCamera(megaChatApi);
                 break;
             }
         }
@@ -729,7 +729,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         logDebug("Type: " + request.getType());
-
         if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER && e.getErrorCode() != MegaError.API_OK) {
             logDebug("TYPE_GET_ATTR_USER: OK");
 

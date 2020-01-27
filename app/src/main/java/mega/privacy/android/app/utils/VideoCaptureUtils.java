@@ -25,9 +25,8 @@ public class VideoCaptureUtils {
         return enumerator.getDeviceNames();
     }
 
-    public static void changeCamera(MegaChatApiAndroid megaChatApi){
+    public static void swapCamera(MegaChatApiAndroid megaChatApi){
         String currentCamera = megaChatApi.getVideoDeviceSelected();
-
         String frontCamera;
         if(isFrontCamera(currentCamera)){
             frontCamera = VideoCaptureUtils.getBackCamera();
