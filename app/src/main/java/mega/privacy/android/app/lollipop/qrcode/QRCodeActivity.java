@@ -43,6 +43,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
+import static mega.privacy.android.app.lollipop.InviteContactActivity.INVITE_CONTACT_SCAN_QR;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -79,6 +80,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     private boolean contacts = false;
     private boolean inviteContacts = false;
+    private boolean showScanQrView = false;
 
     DisplayMetrics outMetrics;
 
@@ -92,10 +94,12 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         if (savedInstanceState != null) {
             contacts = savedInstanceState.getBoolean("contacts", false);
             inviteContacts = savedInstanceState.getBoolean("inviteContacts", false);
+            showScanQrView = savedInstanceState.getBoolean(INVITE_CONTACT_SCAN_QR, false);
         }
         else {
             contacts = getIntent().getBooleanExtra("contacts", false);
             inviteContacts = getIntent().getBooleanExtra("inviteContacts", false);
+            showScanQrView = getIntent().getBooleanExtra(INVITE_CONTACT_SCAN_QR, false);
         }
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -180,7 +184,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
         viewPagerQRCode.setAdapter(qrCodePageAdapter);
         tabLayoutQRCode.setupWithViewPager(viewPagerQRCode);
-        if (contacts || inviteContacts){
+        if (contacts || inviteContacts || showScanQrView){
             viewPagerQRCode.setCurrentItem(1);
         }
         else {
@@ -193,6 +197,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         super.onSaveInstanceState(outState);
         outState.putBoolean("contacts", contacts);
         outState.putBoolean("inviteContacts", inviteContacts);
+        outState.putBoolean(INVITE_CONTACT_SCAN_QR, showScanQrView);
     }
 
     @Override

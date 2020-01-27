@@ -51,8 +51,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -60,9 +58,10 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
@@ -355,15 +354,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         }
         else{
             fullName = myEmail;
-
         }
-
-        String firstLetter = ChatUtil.getFirstLetter(fullName);
-        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-            firstLetter = " ";
-        }
-
-        return Util.createDefaultAvatar(megaApi.getUserAvatarColor(myUser), firstLetter);
+        return getDefaultAvatar(context, getColorAvatar(context, megaApi, myUser), fullName, AVATAR_SIZE, true);
     }
 
     @Override

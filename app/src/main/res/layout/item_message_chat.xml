@@ -76,6 +76,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
+                    rounded:emojiSize="12sp"
                     android:gravity="left|center_vertical"
                     android:layout_centerVertical="true"
                     android:textColor="@color/mail_my_account"/>
@@ -111,11 +112,10 @@
                     android:paddingBottom="10dp"
                     android:paddingLeft="12dp"
                     android:paddingRight="12dp"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginLeft="72dp"
                     android:layout_marginRight="16dp"
-                    android:gravity="left"/>
+                    android:gravity="left"
+                    app:emojiSize="18sp"/>
 
                 <!--triangle icon own text-->
                 <ImageView
@@ -155,6 +155,7 @@
                             android:layout_marginEnd="12dp"
                             android:textColor="@color/white"
                             android:textSize="14sp"
+                            app:emojiSize="18sp"
                             android:layout_gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
 
@@ -700,8 +701,11 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_portrait"
-                            android:layout_width="152dp"
-                            android:layout_height="212dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="152dp"
+                            android:maxHeight="350dp"
+                            android:adjustViewBounds="true"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
 
@@ -749,16 +753,24 @@
                         <!--Transparent coat-->
                         <RelativeLayout
                             android:id="@+id/transparent_coating_portrait"
-                            android:layout_width="152dp"
-                            android:layout_height="212dp"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_alignLeft="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignRight="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignTop="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@drawable/shape_images_chat_transparent"/>
 
                         <!-- Progress bar-->
                         <RelativeLayout
                             android:id="@+id/uploadingProgressBarPort"
-                            android:layout_width="152dp"
-                            android:layout_height="212dp"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_alignLeft="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignRight="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignTop="@+id/content_own_message_thumb_portrait"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
                             android:background="@android:color/transparent">
                             <ProgressBar
                                 android:id="@+id/uploadingProgressBarPort_im"
@@ -832,8 +844,11 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_landscape"
-                            android:layout_width="212dp"
-                            android:layout_height="152dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="212dp"
+                            android:maxHeight="152dp"
+                            android:adjustViewBounds="true"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
 
@@ -882,15 +897,23 @@
                         <!--Transparent coat-->
                         <RelativeLayout
                             android:id="@+id/transparent_coating_landscape"
-                            android:layout_width="212dp"
-                            android:layout_height="152dp"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_alignLeft="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignRight="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignTop="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
                             android:background="@drawable/shape_images_chat_transparent"/>
 
                         <!-- Progress bar-->
                         <RelativeLayout
                             android:id="@+id/uploadingProgressBarLand"
-                            android:layout_width="212dp"
-                            android:layout_height="152dp"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_alignLeft="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignRight="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignTop="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
                             android:background="@android:color/transparent">
 
                             <ProgressBar
@@ -1068,13 +1091,6 @@
                             rounded:border_color="@color/white"
                             rounded:border_width="2dp"
                             rounded:corner_radius="20dp"/>
-
-                        <mega.privacy.android.app.components.twemoji.EmojiTextView
-                            android:id="@+id/content_own_message_contact_initial_letter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
                     <RelativeLayout
                         android:layout_width="wrap_content"
@@ -1089,23 +1105,22 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/white"
                             android:textSize="14sp"
+                            rounded:emojiSize="12sp"
                             android:layout_marginTop="11dp"
                             android:layout_marginBottom="2dp"
                             android:singleLine="true"
-                            android:ellipsize="middle"
-                            android:maxWidth="10dp"
                             android:gravity="left"/>
 
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_own_message_contact_email"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/white"
                             android:layout_below="@+id/content_own_message_contact_name"
                             android:textSize="12sp"
+                            rounded:emojiSize="10sp"
                             android:singleLine="true"
                             android:maxLines="1"
-                            android:ellipsize="end"
                             android:gravity="left"
                             android:layout_marginBottom="11dp" />
                     </RelativeLayout>
@@ -1197,13 +1212,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
+                    rounded:emojiSize="10sp"
                     android:text="name of the contact"
                     android:textColor="@color/name_my_account"
                     android:layout_marginRight="4dp"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:layout_centerVertical="true"
-                    android:gravity="center_vertical"/>
+                    android:gravity="center_vertical" />
 
                 <TextView
                     android:id="@+id/contact_message_chat_time_text"
@@ -1248,14 +1264,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
+                        rounded:emojiSize="12sp"
                         android:gravity="left|center_vertical"
                         android:layout_centerVertical="true"
-                        android:textColor="@color/mail_my_account"/>
+                        android:textColor="@color/mail_my_account" />
                 </RelativeLayout>
 
             </RelativeLayout>
 
-            <!--Management messages-->
             <RelativeLayout
                 android:id="@+id/content_contact_message_layout"
                 android:layout_width="match_parent"
@@ -1268,8 +1284,9 @@
                     android:id="@+id/layout_avatar"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:layout_marginLeft="16dp"
                     android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="16dp"
                     android:layout_marginBottom="10dp"
                     android:background="@android:color/transparent">
 
@@ -1283,15 +1300,6 @@
                         rounded:border_color="@color/border_file_properties"
                         rounded:border_width="0dp"
                         rounded:corner_radius="40dp" />
-
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
-                        android:id="@+id/contact_initial_letter"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:textSize="15sp"
-                        android:gravity="center_horizontal|center_vertical"/>
-
                 </RelativeLayout>
 
                 <!-- text message-->
@@ -1301,12 +1309,15 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/name_my_account"
                     android:textSize="14sp"
+                    app:emojiSize="18sp"
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
                     android:paddingLeft="12dp"
-                    android:paddingRight="12dp" />
+                    android:paddingRight="12dp"
+                    android:layout_marginLeft="48dp"
+                    android:layout_marginRight="40dp"/>
 
                 <!-- contact's Rich links-->
                 <RelativeLayout
@@ -1336,6 +1347,7 @@
                             android:layout_marginEnd="12dp"
                             android:textColor="@color/black"
                             android:textSize="14sp"
+                            app:emojiSize="18sp"
                             android:layout_gravity="center_horizontal|center_vertical"/>/>
 
                     </RelativeLayout>
@@ -1590,6 +1602,7 @@
                             android:id="@+id/contact_rounded_imageview_location"
                             android:layout_width="256dp"
                             android:layout_height="140dp"
+                            android:adjustViewBounds="true"
                             android:layout_marginTop="1dp"
                             android:layout_marginLeft="1dp"
                             android:layout_marginRight="1dp"
@@ -1685,8 +1698,11 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_portrait"
-                            android:layout_width="152dp"
-                            android:layout_height="212dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="152dp"
+                            android:maxHeight="350dp"
+                            android:adjustViewBounds="true"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
 
@@ -1767,8 +1783,11 @@
                         <!--Image with preview-->
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_landscape"
-                            android:layout_width="212dp"
-                            android:layout_height="152dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="212dp"
+                            android:maxHeight="350dp"
+                            android:adjustViewBounds="true"
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:background="@android:color/transparent" />
 
@@ -1953,6 +1972,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
+                            rounded:emojiSize="25sp"
                             android:gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
 
@@ -1969,22 +1989,21 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/name_my_account"
                             android:textSize="14sp"
+                            rounded:emojiSize="12sp"
                             android:layout_marginTop="11dp"
                             android:layout_marginBottom="2dp"
                             android:singleLine="true"
-                            android:ellipsize="middle"
-                            android:maxWidth="10dp"
                             android:gravity="left"/>
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/content_contact_message_contact_email"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/mail_my_account"
                             android:layout_below="@+id/content_contact_message_contact_name"
                             android:textSize="12sp"
+                            rounded:emojiSize="10sp"
                             android:singleLine="true"
                             android:maxLines="1"
-                            android:ellipsize="end"
                             android:gravity="left"
                             android:layout_marginBottom="11dp" />
                     </RelativeLayout>

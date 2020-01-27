@@ -2262,9 +2262,6 @@
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">YENİ</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">dosya adı</string>
-
-    <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">Otomatik dışarıda değeri geçersiz, 0\'dan yüksek olmalı.</string>
-
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Son görülmeyi göster</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Kişilerinizin MEGA\'daki son etkinlik zamanınızı görmesine izin verin.</string>
 

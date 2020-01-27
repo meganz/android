@@ -49,7 +49,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
+import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -289,7 +289,7 @@ public class AccountController implements View.OnClickListener{
 
         Intent intent = new Intent(context, FileStorageActivityLollipop.class);
         intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_SAVE_RECOVERY_KEY, true);
         if (context instanceof TestPasswordActivity){
             ((TestPasswordActivity) context).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
         }
@@ -395,6 +395,11 @@ public class AccountController implements View.OnClickListener{
 
         File externalCacheDir = context.getExternalCacheDir();
         removeFolder(context, externalCacheDir);
+
+        File [] downloadToSDCardCahce = context.getExternalCacheDirs();
+        if(downloadToSDCardCahce.length > 1) {
+            removeFolder(context, downloadToSDCardCahce[1]);
+        }
 
         File cacheDir = context.getCacheDir();
         removeFolder(context, cacheDir);

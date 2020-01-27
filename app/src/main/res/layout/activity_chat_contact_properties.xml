@@ -61,53 +61,6 @@
 
                 </FrameLayout>
 
-              <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom">
-
-                  <TextView
-                      android:id="@+id/first_line_length_toolbar"
-                      android:visibility="invisible"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_marginLeft="72dp"
-                      android:textSize="20sp"
-                      android:paddingTop="6dp"
-                      android:ellipsize="end"
-                      android:maxLines="1"
-                      android:singleLine="true"
-                      android:textAppearance="@style/ToolbarTitle.Secondary"/>
-
-                  <TextView
-                      android:id="@+id/second_line_length_toolbar"
-                      android:visibility="invisible"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textSize="14sp"
-                      android:layout_below="@+id/first_line_length_toolbar"
-                      android:layout_marginLeft="72dp"
-                      android:ellipsize="end"
-                      android:maxLines="1"
-                      android:singleLine="true"
-                      android:textAppearance="@style/ToolbarTitle.Secondary"
-                      android:paddingBottom="9dp"/>
-
-                  <ImageView
-                      android:id="@+id/contact_drawable_state"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_marginLeft="7dp"
-                      android:layout_toEndOf="@+id/first_line_length_toolbar"
-                      android:layout_toRightOf="@+id/first_line_length_toolbar"
-                      android:background="@null"
-                      android:src="@drawable/ic_offline"
-                      app:layout_collapseMode="pin"
-                      android:layout_marginTop="8dp"/>
-
-                </RelativeLayout>
-
-
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
@@ -131,12 +84,23 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="72dp"
                         android:textSize="20sp"
+                        app:emojiSize="18sp"
                         android:paddingTop="6dp"
                         android:textColor="@color/white"
-                        android:ellipsize="end"
                         android:maxLines="1"
                         android:singleLine="true"
                         android:textAppearance="@style/ToolbarTitle.Secondary" />
+
+                    <ImageView
+                        android:id="@+id/contact_drawable_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="7dp"
+                        android:layout_toRightOf="@+id/first_line_toolbar"
+                        android:background="@null"
+                        android:src="@drawable/ic_offline"
+                        app:layout_collapseMode="pin"
+                        android:layout_marginTop="8dp"/>
 
                     <mega.privacy.android.app.components.MarqueeTextView
                         android:id="@+id/second_line_toolbar"
