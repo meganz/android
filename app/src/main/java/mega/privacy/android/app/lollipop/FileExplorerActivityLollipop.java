@@ -2106,35 +2106,18 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 
 			if (error.getErrorCode() != MegaError.API_OK) {
-
+                logWarning("Login failed with error code: " + error.getErrorCode());
 				MegaApplication.setLoggingIn(false);
-
-				//ERROR LOGIN
-				String errorMessage;
-				if (error.getErrorCode() == MegaError.API_ENOENT) {
-					errorMessage = getString(R.string.error_incorrect_email_or_password);
-				}
-				else if (error.getErrorCode() == MegaError.API_ENOENT) {
-					errorMessage = getString(R.string.error_server_connection_problem);
-				}
-				else if (error.getErrorCode() == MegaError.API_ESID){
-					errorMessage = getString(R.string.error_server_expired_session);
-				}
-				else{
-					errorMessage = error.getErrorString();
-				}
-				
-				//Go to the login activity
 			}
 			else{
-				//LOGIN OK
-
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
 
+                gSession = megaApi.dumpSession();
+                credentials = new UserCredentials(lastEmail, gSession, "", "", "");
 				logDebug("Logged in with session");
 				megaApi.fetchNodes(this);
 			}

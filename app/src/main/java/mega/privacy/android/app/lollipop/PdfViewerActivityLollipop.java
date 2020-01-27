@@ -2605,10 +2605,12 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         if (request.getType() == MegaRequest.TYPE_LOGIN){
 
             if (e.getErrorCode() != MegaError.API_OK) {
+                logWarning("Login failed with error code: " + e.getErrorCode());
                 MegaApplication.setLoggingIn(false);
-            }
-            else{
+            } else {
                 //LOGIN OK
+                gSession = megaApi.dumpSession();
+                credentials = new UserCredentials(lastEmail, gSession, "", "", "");
                 logDebug("Logged in with session");
                 megaApi.fetchNodes(this);
             }
