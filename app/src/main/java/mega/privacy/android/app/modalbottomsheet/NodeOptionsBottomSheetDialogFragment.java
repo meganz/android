@@ -41,6 +41,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem.SHARED_ITEMS;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -107,6 +108,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     private int heightDisplay;
 
     private View contentView;
+
+    private boolean isIconOutShare;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -252,6 +255,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
 
         if (isOnline(context)) {
+            if (drawerItem == SHARED_ITEMS) {
+                isIconOutShare = node.isOutShare() || megaApi.isPendingShare(node);
+            } else {
+                isIconOutShare = node.isOutShare();
+            }
             nodeName.setText(node.getName());
 
             if (node.isFolder()) {
@@ -260,7 +268,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                 if (node.isInShare()) {
                     nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
-                } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                } else if (isIconOutShare) {
                     nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
                 }
                 else{
@@ -1107,7 +1115,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 Intent i = new Intent(context, FileInfoActivityLollipop.class);
                 i.putExtra("handle", node.getHandle());
 
-                if(drawerItem== ManagerActivityLollipop.DrawerItem.SHARED_ITEMS){
+                if(drawerItem== SHARED_ITEMS){
                     if(((ManagerActivityLollipop) context).getTabItemShares()==0){
                         i.putExtra("from", FROM_INCOMING_SHARES);
                         int dBT = ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming();
@@ -1144,7 +1152,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     if (node.isInShare()){
                         i.putExtra("imageId", R.drawable.ic_folder_incoming);
                     }
-                    else if (node.isOutShare()||megaApi.isPendingShare(node)){
+                    else if (isIconOutShare){
                         i.putExtra("imageId", R.drawable.ic_folder_outgoing);
                     }
                     else{
@@ -1184,7 +1192,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     logWarning("The selected node is NULL");
                     return;
                 }
-                if(node.isOutShare()||megaApi.isPendingShare(node)){
+                if(node.isOutShare() || megaApi.isPendingShare(node)){
                     Intent i = new Intent(context, FileContactListActivityLollipop.class);
                     i.putExtra("name", node.getHandle());
                     context.startActivity(i);

@@ -689,7 +689,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
                 }
             } else if (type == FILE_BROWSER_ADAPTER) {
-                if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                if (node.isOutShare()) {
                     setFolderGridSelected(holder,position,R.drawable.ic_folder_outgoing);
                 } else if (node.isInShare()) {
                     setFolderGridSelected(holder,position,R.drawable.ic_folder_incoming);
@@ -701,7 +701,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
                 }
             } else {
-                if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                if (node.isOutShare()) {
                     setFolderGridSelected(holder,position,R.drawable.ic_folder_outgoing);
                 } else if (node.isInShare()) {
                     setFolderGridSelected(holder,position,R.drawable.ic_folder_incoming);
@@ -971,7 +971,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
                 }
             } else if (type == FILE_BROWSER_ADAPTER) {
-                if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                if (node.isOutShare()) {
                     setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
                 }
                 else if (node.isInShare()) {
@@ -987,7 +987,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
             } else {
-                if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                if (node.isOutShare()) {
                     setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
                 }
                 else if (node.isInShare()) {

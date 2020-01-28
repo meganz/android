@@ -383,13 +383,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			if(tempListContacts!=null && !tempListContacts.isEmpty()){
 				listContacts.addAll(megaApi.getOutShares(node));
 			}
-
-			tempListContacts = megaApi.getPendingOutShares(node);
-
-			if(tempListContacts!=null && !tempListContacts.isEmpty()){
-				logDebug("Size of pending out shares: " + tempListContacts);
-				listContacts.addAll(megaApi.getPendingOutShares(node));
-			}
 			
 			listView = (RecyclerView) findViewById(R.id.file_contact_list_view_browser);
 			listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
@@ -758,7 +751,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void removeFileContactShare(){
-		logDebug("removeFileContactShare");
 		notifyDataSetChanged();
 
 		showConfirmationRemoveContactFromShare(selectedShare.getUser());
@@ -997,12 +989,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				listContacts.addAll(megaApi.getOutShares(node));
 			}
 
-			tempListContacts = megaApi.getPendingOutShares(node);
-			if(tempListContacts!=null && !tempListContacts.isEmpty()){
-				listContacts.addAll(megaApi.getPendingOutShares(node));
-			}
-
-//			listContacts = megaApi.getOutShares(node);
 			if (listContacts != null){
 				if (listContacts.size() > 0){
 					listView.setVisibility(View.VISIBLE);
@@ -1032,28 +1018,12 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void showConfirmationRemoveContactFromShare (final String email){
-		logDebug("showConfirmationRemoveContactFromShare");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE: {
-						removeShare(email);
-						break;
-					}
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
-		String message= getResources().getString(R.string.remove_contact_shared_folder,email);
-		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        String message = getResources().getString(R.string.remove_contact_shared_folder, email);
+        builder.setMessage(message)
+                .setPositiveButton(R.string.general_remove, (dialog, which) -> removeShare(email))
+                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
+                .show();
 	}
 
 	public void showConfirmationRemoveMultipleContactFromShare (final List<MegaShare> contacts){

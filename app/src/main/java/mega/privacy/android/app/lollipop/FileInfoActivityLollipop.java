@@ -3290,47 +3290,29 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
     }
 
     public void removeFileContactShare(){
-        logDebug("removeFileContactShare");
         showConfirmationRemoveContactFromShare(selectedShare.getUser());
     }
 
-    public void showConfirmationRemoveContactFromShare (final String email){
-        logDebug("showConfirmationRemoveContactFromShare");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE: {
-                        removeShare(email);
-                        break;
-                    }
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
+    public void showConfirmationRemoveContactFromShare(final String email) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-        String message= getResources().getString(R.string.remove_contact_shared_folder,email);
-        builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        String message = getResources().getString(R.string.remove_contact_shared_folder, email);
+        builder.setMessage(message)
+                .setPositiveButton(R.string.general_remove, (dialog, which) -> removeShare(email))
+                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
+                .show();
     }
 
-    public void removeShare (String email)
-    {
+    public void removeShare(String email) {
         ProgressDialog temp = new ProgressDialog(this);
-            temp.setMessage(getString(R.string.context_removing_contact_folder));
-            temp.show();
-    
+        temp.setMessage(getString(R.string.context_removing_contact_folder));
+        temp.show();
+
         removeShare = true;
         changeShare = false;
         statusDialog = temp;
-        if (email != null){
+        if (email != null) {
             megaApi.share(node, email, MegaShare.ACCESS_UNKNOWN, this);
-        }
-        else{
+        } else {
             megaApi.disableExport(node, this);
         }
     }

@@ -1485,44 +1485,21 @@ public class NodeController {
         logDebug("removeAllSharingContacts");
 
         MultipleRequestListener shareMultipleListener = new MultipleRequestListener(MULTIPLE_REMOVE_SHARING_CONTACTS, context);
-        if(listContacts.size()>1){
-            logDebug("listContacts.size()>1");
-            for(int j=0; j<listContacts.size();j++){
-                String cMail = listContacts.get(j).getUser();
-                if(cMail!=null){
-                    MegaUser c = megaApi.getContact(cMail);
-                    if (c != null){
-                        megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, shareMultipleListener);
-                    }
-                    else{
-                        ((ManagerActivityLollipop)context).setIsGetLink(false);
-                        megaApi.disableExport(node);
-                    }
+        for(int j=0; j<listContacts.size();j++){
+            String cMail = listContacts.get(j).getUser();
+            if(cMail!=null){
+                MegaUser c = megaApi.getContact(cMail);
+                if (c != null){
+                    megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, shareMultipleListener);
                 }
                 else{
                     ((ManagerActivityLollipop)context).setIsGetLink(false);
                     megaApi.disableExport(node);
                 }
             }
-        }
-        else{
-            logDebug("listContacts.size()<=1");
-            for(int j=0; j<listContacts.size();j++){
-                String cMail = listContacts.get(j).getUser();
-                if(cMail!=null){
-                    MegaUser c = megaApi.getContact(cMail);
-                    if (c != null){
-                        megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, ((ManagerActivityLollipop)context));
-                    }
-                    else{
-                        ((ManagerActivityLollipop)context).setIsGetLink(false);
-                        megaApi.disableExport(node);
-                    }
-                }
-                else{
-                    ((ManagerActivityLollipop)context).setIsGetLink(false);
-                    megaApi.disableExport(node);
-                }
+            else{
+                ((ManagerActivityLollipop)context).setIsGetLink(false);
+                megaApi.disableExport(node);
             }
         }
     }

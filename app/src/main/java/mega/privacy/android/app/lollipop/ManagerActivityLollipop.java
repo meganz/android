@@ -11542,29 +11542,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void showConfirmationRemoveAllSharingContacts (final ArrayList<MegaShare> shareList, final MegaNode n){
-		logDebug("showConfirmationRemoveAllSharingContacts");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						nC.removeAllSharingContacts(shareList, n);
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		int size = shareList.size();
 		String message = getResources().getQuantityString(R.plurals.confirmation_remove_outgoing_shares, size, size);
-		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
+		builder.setMessage(message)
+				.setPositiveButton(R.string.general_remove, (dialog, which) -> nC.removeAllSharingContacts(shareList, n))
+				.setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
+				.show();
 	}
 
 	public void showConfirmationRemovePublicLink (final MegaNode n){
