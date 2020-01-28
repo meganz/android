@@ -32,10 +32,11 @@ public class InvitationContactInfo implements Parcelable, ContactWithEmail {
     private boolean isHighlighted;
     private int type;
     private Bitmap bitmap;
-    private String name, displayInfo, handle, avatarColor;
+    private String name, displayInfo, handle;
+    private int avatarColor;
     private String normalizedNumber = "";
 
-    public InvitationContactInfo(long id, String name, int type, String displayInfo, String avatarColor) {
+    public InvitationContactInfo(long id, String name, int type, String displayInfo, int avatarColor) {
         this.id = id;
         this.type = type;
         this.name = name;
@@ -136,11 +137,7 @@ public class InvitationContactInfo implements Parcelable, ContactWithEmail {
         return getDisplayInfo().contains(AT_SIGN);
     }
 
-    public String getInitial() {
-        return ChatUtil.getFirstLetter(getName());
-    }
-
-    public String getAvatarColor() {
+    public int getAvatarColor() {
         return avatarColor;
     }
 
@@ -163,7 +160,7 @@ public class InvitationContactInfo implements Parcelable, ContactWithEmail {
         dest.writeString(name);
         dest.writeString(displayInfo);
         dest.writeString(handle);
-        dest.writeString(avatarColor);
+        dest.writeInt(avatarColor);
     }
 
     public InvitationContactInfo(Parcel in) {
@@ -173,6 +170,6 @@ public class InvitationContactInfo implements Parcelable, ContactWithEmail {
         name = in.readString();
         displayInfo = in.readString();
         handle = in.readString();
-        avatarColor = in.readString();
+        avatarColor = in.readInt();
     }
 }

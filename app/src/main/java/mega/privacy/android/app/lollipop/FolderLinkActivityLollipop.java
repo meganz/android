@@ -398,7 +398,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 			if (megaApi == null || megaApi.getRootNode() == null) {
 				logDebug("Refresh session - sdk");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+				intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 				intent.setData(Uri.parse(url));
 				intent.setAction(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -414,7 +414,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 				if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
 					logDebug("Refresh session - karere");
 					Intent intent = new Intent(this, LoginActivityLollipop.class);
-					intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+					intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 					intent.setData(Uri.parse(url));
 					intent.setAction(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -869,9 +869,9 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
             checker.setSize(size);
             checker.setHashes(hashes);
             if (checker.check()) {
-                downloadToSDCard = true;
                 downloadRoot = checker.getDownloadRoot();
                 sdCardOperator = checker.getSdCardOperator();
+                downloadToSDCard = (downloadRoot != null);
             } else {
                 return;
             }
@@ -1239,8 +1239,11 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
 
-				dbH.setLastPublicHandle(request.getNodeHandle());
-				dbH.setLastPublicHandleTimeStamp();
+				if (request.getNodeHandle() != MegaApiJava.INVALID_HANDLE) {
+					dbH.setLastPublicHandle(request.getNodeHandle());
+					dbH.setLastPublicHandleTimeStamp();
+					dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
+				}
 
 				MegaNode rootNode = megaApiFolder.getRootNode();
 				if (rootNode != null){
