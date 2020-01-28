@@ -2336,8 +2336,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         }
 
         if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-            long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-            long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+            long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+            long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
             long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 
             if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
