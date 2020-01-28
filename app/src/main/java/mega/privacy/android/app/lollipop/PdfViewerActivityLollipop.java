@@ -2611,6 +2611,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 //LOGIN OK
                 gSession = megaApi.dumpSession();
                 credentials = new UserCredentials(lastEmail, gSession, "", "", "");
+                dbH.saveCredentials(credentials);
                 logDebug("Logged in with session");
                 megaApi.fetchNodes(this);
             }

@@ -2118,6 +2118,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
                 gSession = megaApi.dumpSession();
                 credentials = new UserCredentials(lastEmail, gSession, "", "", "");
+                dbH.saveCredentials(credentials);
 				logDebug("Logged in with session");
 				megaApi.fetchNodes(this);
 			}
