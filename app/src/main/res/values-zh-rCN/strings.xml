@@ -62,7 +62,7 @@
     -->
     <string name="general_show_info" context="Hint how to cancel the download">显示内容</string>
 
-    <string name="error_general_nodes" context="Error getting the root node">错误。请再试一次。</string>
+    <string name="error_general_nodes" context="Error getting the root node">错误。请重试。</string>
 
     <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-恢复密钥</string>
 
@@ -621,7 +621,7 @@
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">预览尚未载入，请稍等</string>
     <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">内存不足，无法加载预览。请稍后再试。</string>
 
-    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">请在创建帐户之前注销</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">请在创建帐户前登出</string>
 
     <!--
     <string name="import_correct" context="success message after import a file">Imported successfully</string>
@@ -1030,7 +1030,7 @@
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">电子邮件和/或密码无效。请再试一次。</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">您的帐号由于违反服务协议已被暂停。如有疑问，请联系 support&#64;mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">登录错误太多次，请在一个小时后再尝试。</string>
-    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">该帐户尚未经过验证。 请查看您的邮箱。</string>
+    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">该帐户还不是一个有效帐户，请前往您的邮箱进行验证。</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn’t exist">文件夹链接无法使用</string>
     <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">该文件夹链接因违反ToS/AUP使用条款已被移除。</string>
@@ -1160,7 +1160,7 @@
     <string name="title_mega_authenticity_empty_screen" context="Message about MEGA when there are no message in the chat screen">真实性</string>
     <string name="title_mega_confidentiality_empty_screen" context="Message about MEGA when there are no message in the chat screen">保密性</string>
 
-    <string name="error_not_logged_with_correct_account" context="Error message shown when opening a cancel link with an account that not corresponds to the link">该链接不属于这个帐号。请登录正确的帐号。</string>
+    <string name="error_not_logged_with_correct_account" context="Error message shown when opening a cancel link with an account that not corresponds to the link">此链接未关联该帐户。请登录正确的MEGA帐户。</string>
     <string name="cancel_link_expired" context="Message when the user tries to open a cancel link and it has expired">链接已失效，请重新操作一遍。</string>
 
     <string name="no_results_found" context="Text shown after searching and no results found">无结果</string>
@@ -1284,7 +1284,7 @@
         <item context="Title of the contact list" quantity="other">%1$d 个联系人</item>
     </plurals>
 
-    <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">分享文件夹发送错误。请重试。</string>
+    <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">共享文件夹错误。请重试。</string>
 
     <plurals name="confirmation_remove_contact">
         <item context="confirmation message before removing a contact, Singular" quantity="one">与该联系人有关的资料将被永久删除。</item>
@@ -1657,7 +1657,7 @@
     <string name="settings_help" context="Settings category title for Help">帮助</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">发送反馈</string>
     <string name="setting_feedback_subject" context="mail subject">安卓反馈</string>
-    <string name="setting_feedback_body" context="mail body">请在这里写下您的意见：</string>
+    <string name="setting_feedback_body" context="mail body">请在这里写下您的反馈：</string>
     <string name="settings_feedback_body_device_model" context="mail body">设备型号</string>
     <string name="settings_feedback_body_android_version" context="mail body">安卓版本</string>
 
@@ -1731,13 +1731,13 @@
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">链接已复制到剪贴板</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">二维码重置成功</string>
     <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">二维码删除成功</string>
-    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">二维码重置时出错。请再试一次</string>
-    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">二维码删除时出错。请再试一次</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">重置二维码时出错。请重试。</string>
+    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">删除二维码时出错。请重试。</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">邀请已发送</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">已发送邀请给%s，邀请获得接受后将添加至联系人列表。</string>
-    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">共享二维码时出错。可能该文件不存在。请稍后再试。</string>
-    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">尝试上传二维码时出错。可能该文件不存在。请稍后再试。</string>
-    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">尝试下载QR文件时出错。可能该文件不存在。请稍后再试。</string>
+    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">分享二维码文件时出错，可能由于该文件不存在。请稍后再试。</string>
+    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">上传二维码文件时出错，可能该文件不存在。请稍后再试。</string>
+    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">下载二维码文件时出错，可能该文件不存在。请稍后再试。</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">二维码已成功下载到%s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">邀请未发送</string>
     <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">QR码或联系人链接无效。请尝试扫描有效码或打开有效链接。</string>
@@ -1756,7 +1756,7 @@
 
     <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">分享使用</string>
 
-    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">请在开启聊天前登录</string>
+    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">请在开启聊天前登录帐户</string>
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">设定期限</string>
 
@@ -2130,10 +2130,10 @@
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">该码无效</string>
 
     <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">云盘空间几乎已满。升级至PRO帐户并获得高达%1$s的存储空间和%2$s的传输流量。</string>
-    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">云盘空间几乎已满。立即升级并获得高达8TB的存储空间和16TB的传输流量。</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">云盘空间几乎已满。立即升级并获得高达%1$s的存储空间和%2$s的传输流量。</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">云端空间几乎已满。如果您需要更多存储空间，请联系MEGA技术支持获取定制计划。</string>
     <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">云盘空间已满。升级至PRO帐户并获得高达%1$s的存储空间和%2$s的传输流量。</string>
-    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">云盘空间已满。立即升级并获得高达8TB的存储空间和16TB的传输流量。</string>
+    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">云盘空间已满。立即升级并获得高达%1$s的存储空间和%2$s的传输流量。</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">云盘空间已满。如果您需要更多存储空间，请联系MEGA技术支持获取定制计划。</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">参看方案</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">定制专属方案</string>

@@ -1030,7 +1030,7 @@
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">E-mail și/sau parolă nevalide. Te rugăm să încerci din nou.</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Contul tău a fost suspendat din cauza încălcărilor Termenilor de utilizare a serviciului. Te rugăm să contactezi support&#64;mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Prea multe încercări eșuate de autentificare, te rugăm să aștepți o oră.</string>
-    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Acest cont nu a fost încă validat. Te rugăm să îți verifici e-mailul.</string>
+    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Acest cont nu a fost validat încă. Te rugăm să îți verifici e-mailul.</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn’t exist">Linkul folderului indisponibil</string>
     <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">Linkul folderului a fost eliminat din cauza unei încălcări a ToS/AUP.</string>
@@ -1636,13 +1636,13 @@
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">E-mailul este malformat</string>
 
-    <string name="paragraph_info_achievement_install_desktop" context="info paragraph about the achievement install megasync">Atunci când instalezi MEGAsync primești %1$s spațiu de stocare complementar, plus %2$s cotă de transfer, ambele valabile pentru 180 de zile. Aplicația desktop MEGA este disponibilă pentru Windows, macOS și majoritatea distribuțiilor Linux.</string>
-    <string name="paragraph_info_achievement_install_mobile_app" context="info paragraph about the achievement install mobile app">Când instalezi aplicația noastră mobilă, primești %1$s spațiu de stocare complementar, plus %2$s cotă de transfer, ambele valabile pentru 180 zile. Oferim aplicații mobile pentru iOS, Android și Windows Phone.</string>
-    <string name="paragraph_info_achievement_add_phone" context="info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">When you verify your phone number you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days.</string>
+    <string name="paragraph_info_achievement_install_desktop" context="info paragraph about the achievement install megasync">Atunci când instalezi MEGAsync, primești %1$s spațiu de stocare complementar, plus %2$s cotă de transfer, ambele valabile pentru 180 de zile. Aplicația desktop MEGA este disponibilă pentru Windows, macOS și majoritatea distribuțiilor Linux.</string>
+    <string name="paragraph_info_achievement_install_mobile_app" context="info paragraph about the achievement install mobile app">Atunci când instalezi aplicația noastră mobilă, primești %1$s spațiu de stocare complementar, plus %2$s cotă de transfer, ambele valabile pentru 180 de zile. Oferim aplicații mobile pentru iOS, Android și Windows Phone.</string>
+    <string name="paragraph_info_achievement_add_phone" context="info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">Atunci când îți verifici numărul de telefon, primești %1$s spațiu de stocare complementar, plus %2$s cotă de transfer, ambele valabile pentru 180 de zile.</string>
 
     <string name="result_paragraph_info_achievement_install_desktop" context="info paragraph about the completed achievement install megasync">Ai primit %1$s spațiu de stocare și %2$s cotă de transfer pentru instalarea aplicației noastre desktop MEGA.</string>
     <string name="result_paragraph_info_achievement_install_mobile_app" context="info paragraph about the completed achievement install mobile app">Ai primit %1$s spațiu de stocare și %2$s cotă de transfer pentru instalarea aplicației noastre mobile.</string>
-    <string name="result_paragraph_info_achievement_add_phone" context="info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">You have received %1$s storage space and %2$s transfer quota for verifying your phone number.</string>
+    <string name="result_paragraph_info_achievement_add_phone" context="info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">Ai primit %1$s spațiu de stocare și %2$s cotă de transfer pentru verificarea numărului tău de telefon.</string>
     <string name="result_paragraph_info_achievement_registration" context="info paragraph about the completed achievement registration">Ai primit %1$s spațiu de stocare ca bonus de înregistrare gratuită.</string>
 
     <string name="expiration_date_for_achievements" context="info paragraph about the completed achievement registration">Bonusul expiră în %1$d zile</string>
@@ -1657,7 +1657,7 @@
     <string name="settings_help" context="Settings category title for Help">Ajutor</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Trimite feedback</string>
     <string name="setting_feedback_subject" context="mail subject">Feedback pentru Android</string>
-    <string name="setting_feedback_body" context="mail body">Te rugăm să scrii feedbackul tău aici:</string>
+    <string name="setting_feedback_body" context="mail body">Te rugăm să scrii feedbackul aici:</string>
     <string name="settings_feedback_body_device_model" context="mail body">Modelul dispozitivului</string>
     <string name="settings_feedback_body_android_version" context="mail body">Versiunea Android</string>
 
@@ -1731,7 +1731,7 @@
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Link copiat în clipboard</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">Cod QR resetat cu succes</string>
     <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">Cod QR șters cu succes</string>
-    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">Codul QR n-a fost resetat din cauza unei erori. Te rugăm să încerci din nou.</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">Codul QR nu a fost resetat din cauza unei erori. Te rugăm să încerci din nou.</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">Codul QR nu a fost șters din cauza unei erori. Te rugăm să încerci din nou.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invitație trimisă</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">Utilizatorul %s a fost invitat și va apărea în lista de contacte de îndată ce a acceptat invitația.</string>
@@ -2129,11 +2129,11 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Cod nevalid</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Unitatea cloud este aproape plină. Upgradează la PRO și obține până la 8 TB stocare și 16 TB cotă de transfer.</string>
-    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Unitatea cloud este aproape plină. Upgradează acum și obține până la 8 TB stocare și 16 TB cotă de transfer.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Unitatea cloud este aproape plină. Upgradează la PRO și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Unitatea cloud este aproape plină. Upgradează acum și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Unitatea cloud este aproape plină. Dacă ai nevoie de mai mult spațiu de stocare, te rugăm să contactezi asistența MEGA pentru a obține un plan personalizat.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Unitatea cloud este plină. Upgradează la PRO și obține până la 8 TB stocare și 16 TB cotă de transfer.</string>
-    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Unitatea cloud este plină. Upgradează acum și obține până la 8 TB stocare și 16 TB cotă de transfer.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Unitatea cloud este plină. Upgradează la PRO și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
+    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Unitatea cloud este plină. Upgradează acum și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Unitatea cloud este plină. Dacă ai nevoie de mai mult spațiu de stocare, te rugăm să contactezi asistența MEGA pentru a obține un plan personalizat.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">Vezi planurile</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Plan personalizat</string>
@@ -2372,7 +2372,7 @@
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permite accesul la cameră pentru a scana documente, a realiza fotografii și a efectua apeluri video.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Activează apelurile</string>
     <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Activează accesul la contacte</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA needs access to your contacts to help you connect with other people on MEGA.</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA are nevoie de acces la contacte pentru a te ajuta să te conectezi cu alte persoane de pe MEGA.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permite accesul la microfon pentru a efectua apeluri criptate.</string>
     <string name="general_enable_access" context="General enable access">Activează accesul</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Fișiere partajate</string>
@@ -2546,7 +2546,7 @@
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">Invită contacte și începe să chatuiești în siguranță cu chatul criptat MEGA.</string>
     <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">Începe să chatuiești în siguranță cu contactele tale folosind criptarea capăt-la-capăt</string>
 
-    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hi! Have secure conversations on MEGA with me and get up to 50GB free storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Bună! Conversează securizat pe MEGA cu mine și obține până la 50 GB stocare gratuită. %1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it.">Niciun link de chat disponibil.</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Linkul chatului șters cu succes.</string>
@@ -2591,8 +2591,8 @@
     <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]actualizat de [/A]%s</string>
     <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">Eu</string>
 
-    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get %1$s free when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
-    <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Obține %1$s gratuiți atunci când adaugi numărul de telefon. Acest lucru face mai ușor pentru contactele tale să te găsească pe MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Adaugă-ți numărul de telefon pe MEGA. Acest lucru face mai ușor pentru contactele tale să te găsească pe MEGA.</string>
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">Nu este posibilă înregistrarea mesajelor vocale în timp ce există un apel în desfășurare.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">A apărut o eroare la încercarea de încărcare a mesajului vocal.</string>
 
@@ -2601,9 +2601,9 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Se încarcă</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Te rugăm să astepți&#8230;</string>
 
-    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">When you logout, files from your Offline section will be deleted from your device.</string>
+    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe dispozitiv.</string>
     <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">Când te deconectezi, transferurile în curs vor fi anulate.</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">When you logout, files from your Offline section will be deleted from your device and ongoing transfers will be cancelled.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe dispozitiv și transferurile în curs vor fi anulate.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Nume necunoscut</string>
 
