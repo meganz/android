@@ -176,7 +176,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 								logWarning("Shares array is empty");
 								return;
 							}
-							controller.checkShares(shares, item, node, callback);
+							controller.changePermissions(shares, item, node, callback);
                         }
                     });
                     

@@ -111,11 +111,8 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11547,7 +11544,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		String message = getResources().getQuantityString(R.plurals.confirmation_remove_outgoing_shares, size, size);
 
 		builder.setMessage(message)
-				.setPositiveButton(R.string.general_remove, (dialog, which) -> nC.removeAllSharingContacts(shareList, n))
+				.setPositiveButton(R.string.general_remove, (dialog, which) -> nC.removeShares(shareList, n))
 				.setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
 				.show();
 	}

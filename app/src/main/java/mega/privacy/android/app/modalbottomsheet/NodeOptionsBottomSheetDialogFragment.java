@@ -421,7 +421,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionRemoveLink.setVisibility(View.GONE);
                 }
 
-                if (node.isShared()) {
+                if (node.isShared() || megaApi.isPendingShare(node)) {
                     optionClearShares.setVisibility(View.VISIBLE);
                 } else {
                     counterShares--;

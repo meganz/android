@@ -55,6 +55,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.listeners.ShareListener.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -1482,25 +1483,15 @@ public class NodeController {
         }
     }
 
-    public void removeAllSharingContacts (ArrayList<MegaShare> listContacts, MegaNode node){
-        logDebug("removeAllSharingContacts");
+    public void removeShares(ArrayList<MegaShare> listShares, MegaNode node){
+        if (listShares == null || listShares.isEmpty()) return;
 
-        MultipleRequestListener shareMultipleListener = new MultipleRequestListener(MULTIPLE_REMOVE_SHARING_CONTACTS, context);
-        for(int j=0; j<listContacts.size();j++){
-            String cMail = listContacts.get(j).getUser();
-            if(cMail!=null){
-                MegaUser c = megaApi.getContact(cMail);
-                if (c != null){
-                    megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, shareMultipleListener);
-                }
-                else{
-                    ((ManagerActivityLollipop)context).setIsGetLink(false);
-                    megaApi.disableExport(node);
-                }
-            }
-            else{
-                ((ManagerActivityLollipop)context).setIsGetLink(false);
-                megaApi.disableExport(node);
+        ShareListener shareListener = new ShareListener(context, REMOVE_SHARE_LISTENER, listShares.size());
+
+        for (int i = 0; i < listShares.size(); i++) {
+            String email = listShares.get(i).getUser();
+            if (email != null) {
+                removeShare(shareListener, node, email);
             }
         }
     }

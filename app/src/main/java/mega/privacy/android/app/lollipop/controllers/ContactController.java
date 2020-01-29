@@ -498,19 +498,10 @@ public class ContactController {
         return fullName;
     }
 
-    public void checkShares(List<MegaShare> shares, int newPermission, MegaNode node, MegaRequestListenerInterface changeListener) {
+    public void changePermissions(List<MegaShare> shares, int newPermission, MegaNode node, MegaRequestListenerInterface changeListener) {
         for (int i = 0; i < shares.size(); i++) {
             String userId = shares.get(i).getUser();
-            changePermission(userId, newPermission, node, changeListener);
-        }
-    }
-
-    private void changePermission(String userId, int newPermission, MegaNode node, MegaRequestListenerInterface changeListener) {
-        if (userId != null) {
-            MegaUser megaUser = megaApi.getContact(userId);
-            if(megaUser != null){
-                megaApi.share(node, megaUser, newPermission, changeListener);
-            }else{
+            if (userId != null) {
                 megaApi.share(node, userId, newPermission, changeListener);
             }
         }
