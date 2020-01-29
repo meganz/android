@@ -26,6 +26,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -1502,6 +1503,10 @@ public class NodeController {
                 megaApi.disableExport(node);
             }
         }
+    }
+
+    public void removeShare(ShareListener shareListener, MegaNode node, String email){
+        megaApi.share(node, email, MegaShare.ACCESS_UNKNOWN, shareListener);
     }
 
     public void cleanRubbishBin(){

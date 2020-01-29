@@ -3351,27 +3351,12 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
     }
 
     public void showConfirmationRemoveMultipleContactFromShare (final List<MegaShare> contacts){
-        logDebug("showConfirmationRemoveMultipleContactFromShare");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE: {
-                        removeMultipleShares(contacts);
-                        break;
-                    }
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String message= getResources().getString(R.string.remove_multiple_contacts_shared_folder,contacts.size());
-        builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        builder.setMessage(message)
+                .setPositiveButton(R.string.general_remove, (dialog, which) -> removeMultipleShares(contacts))
+                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
+                .show();
     }
 
     public void removeMultipleShares(List<MegaShare> shares){
