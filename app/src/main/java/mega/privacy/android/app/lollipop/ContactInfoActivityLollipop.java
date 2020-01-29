@@ -1160,6 +1160,16 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	}
 
+	private void startingACall(boolean withVideo) {
+		if (megaChatApi != null && isAllowedStartCall(this, megaChatApi, megaChatApi.getChatRoomByUser(user.getHandle()).getChatId())) {
+			logDebug("I'm not in a call");
+			startVideo = withVideo;
+			if (checkPermissionsCall()) {
+				startCall(startVideo);
+			}
+		}
+	}
+
 	@Override
 	public void onClick(View v) {
 
@@ -1186,39 +1196,18 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			}
 			case R.id.chat_contact_properties_chat_send_message_layout:{
 				logDebug("Send message option");
-				if(!checkConnection()) return;
-
+				if(!checkConnection(this)) return;
 				sendMessageToChat();
 				break;
 			}
 			case R.id.chat_contact_properties_chat_call_layout:{
 				logDebug("Start audio call option");
-				if(!checkConnection()) return;
-
-				if(megaChatApi!=null){
-					if(!participatingInACall(megaChatApi)){
-						logDebug("I'm not in a call");
-						startVideo = false;
-						if(checkPermissionsCall()){
-							startCall(startVideo);
-						}
-					}
-				}
+				startingACall(false);
 				break;
 			}
 			case R.id.chat_contact_properties_chat_video_layout:{
 				logDebug("Star video call option");
-				if(!checkConnection()) return;
-
-				if(megaChatApi!=null) {
-					if (!participatingInACall(megaChatApi)) {
-						logDebug("I'm not in a call");
-						startVideo = true;
-						if (checkPermissionsCall()) {
-							startCall(startVideo);
-						}
-					}
-				}
+				startingACall(true);
 				break;
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
@@ -1280,14 +1269,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				break;
 			}
 		}
-	}
-
-	private boolean checkConnection() {
-		if (!isOnline(this)) {
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-			return false;
-		}
-		return true;
 	}
 
 	@Override
