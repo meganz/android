@@ -6,6 +6,8 @@
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     -->
 
+    <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">ดูไฟล์ PDF ด้วย MEGA</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">จาก</string>
     <string name="general_yes" context="Answer for confirmation dialog.">ใช่</string>
     <string name="general_no" context="Answer for confirmation dialog.">ไม่ใช่</string>
@@ -213,11 +215,15 @@
 
     <string name="create_account_text" context="button that allows the user to create an account">สร้างบัญชี</string>
     <string name="name_text" context="category in sort by action">ชื่อ</string>
+    <string name="first_name_text" context="First Name of the user">ชื่อ</string>
     <string name="lastname_text" context="Last name of the user">สกุล</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">ฉันเห็นด้วยกับ[A]เงื่อนไขการให้บริการ[/A]ของ MEGA</string>
+    <string name="top" context="Text placed on the checkbox to make sure user agree that understand the danger of losing password">I understand that [B]if I lose my password, I may lose my data[/B]. Read more about [A]MEGA’s end-to-end encryption[/A]</string>
     <string name="already_account" context="Does the user already have a MEGA account">มีบัญชีอยู่แล้วใช่ไหม</string>
 
     <string name="create_account_no_terms" context="warning dialog">คุณต้องเห็นด้วยกับเงื่อนไขการให้บริการของเราก่อน</string>
+
+    <string name="create_account_no_top" context="warning dialog, for user do not tick checkbox of understanding the danger of losing password">คุณต้องยอมรับว่าคุณเข้าใจถึงอันตราย หากลืมรหัสผ่าน</string>
     <string name="error_enter_username" context="Warning dialog">กรุณากรอกชื่อของคุณ</string>
     <string name="error_enter_userlastname" context="Warning dialog">กรุณาระบุนามสกุลของคุณ</string>
     <string name="error_short_password" context="when creating the account">รหัสผ่านสั้นเกินไป</string>
@@ -639,6 +645,10 @@
 
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">ถ่ายภาพ</string>
 
+    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Allow notifications of incoming MEGA calls</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow call interface to pop up from background.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
+
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fi เท่านั้น</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">WiFi หรือข้อมูลมือถือ</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">ตกลง</string>
@@ -837,6 +847,10 @@
     <string name="sortby_size_largest_first" context="sort files by size largest first">ใหญ่สุด</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">เล็กสุด</string>
 
+    <string name="sortby_type" context="Title of sort by media type options">Media type</string>
+    <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">รูปถ่าย</string>
+    <string name="sortby_type_video_first" context="sort option, sort media files by videos first">วิดีโอ</string>
+
     <string name="per_month" context="in payments, for example: 4.99€ per month">ต่อเดือน</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">ต่อปี</string>
 
@@ -892,7 +906,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">การมีผู้บุกรุกจากภายนอกจะไม่สามารถเข้าถึงบัญชีของคุณที่มีเพียงแค่คีย์หลักของคุณได้ การรีเซ็ตรหัสผ่านต้องมีการใช้คีย์และการเข้าถึงอีเมลของคุณเท่านั้น</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">คัดลอกคีย์การกู้คืนไปยังคลิปบอร์ดหรือบันทึกเป็นไฟล์ข้อความ</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">บันทึก</string>
+    <string name="save_action" context="Action of a button to save something">บันทึก</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">คัดลอกคีย์การกู้คืนสำเร็จแล้ว</string>
 
     <string name="change_pass" context="Button to change the password">เปลี่ยน</string>
@@ -938,14 +952,14 @@
 
     <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">เปลี่ยนรหัสผ่านแล้ว</string>
 
-    <string name="park_account_dialog_title" context="Title of the dialog to park an account">พาร์คบัญชี</string>
-    <string name="park_account_button" context="Button to park an account">พาร์ค</string>
+    <string name="park_account_dialog_title" context="Title of the dialog to park an account">เก็บบัญชี</string>
+    <string name="park_account_button" context="Button to park an account">เก็บบัญชี</string>
     <string name="park_account_title" context="Title of the screen to park an account">อุ๊ปส์!</string>
     <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">เนื่องจากกระบวนการเข้ารหัสตั้งแต่ต้นทางถึงปลายทางของเรา คุณจะไม่สามารถเข้าถึงข้อมูลของคุณโดยไม่ใช้รหัสผ่านหรือข้อมูลสำรองของคีย์การกู้คืนได้</string>
-    <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">คุณสามารถพาร์คบัญชีเดิมของคุณและเริ่มต้นบัญชีใหม่ด้วยที่อยู่อีเมลเดิมได้ ข้อมูลของคุณจะถูกเก็บไว้อย่างน้อย 60 วัน ในกรณีที่คุณจำรหัสผ่านบัญชีที่คุณพาร์คไว้ กรุณาติดต่อ support&#64;mega.nz</string>
+    <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">คุณสามารถเก็บบัญชีเดิมของคุณและเริ่มต้นบัญชีใหม่ด้วยที่อยู่อีเมลเดิมได้ ข้อมูลของคุณจะถูกเก็บไว้อย่างน้อย 60 วัน ในกรณีที่คุณจำรหัสผ่านบัญชีที่คุณเก็บไว้ กรุณาติดต่อ support&#64;mega.nz</string>
 
-    <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">กรุณากรอกที่อยู่อีเมลของคุณด้านล่าง คุณจะได้รับลิงก์การกู้คืนซึ่งจะช่วยให้คุณสามารถพาร์คบัญชีของคุณได้</string>
-    <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">นี่เป็นขั้นตอนสุดท้ายในการพาร์คบัญชีของคุณ กรุณากรอกรหัสผ่านใหม่ของคุณ ข้อมูลของคุณจะถูกเก็บไว้อย่างน้อย 60 วัน ถ้าคุณจำรหัสผ่านของบัญชีที่พาร์คไว้ได้ กรุณาติดต่อ support&#64;mega.nz</string>
+    <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">กรุณากรอกที่อยู่อีเมลของคุณด้านล่าง คุณจะได้รับลิงก์การกู้คืนซึ่งจะช่วยให้คุณสามารถเก็บบัญชีของคุณได้</string>
+    <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">นี่เป็นขั้นตอนสุดท้ายในการเก็บบัญชีของคุณ กรุณากรอกรหัสผ่านใหม่ของคุณ ข้อมูลของคุณจะถูกเก็บไว้อย่างน้อย 60 วัน ถ้าคุณจำรหัสผ่านของบัญชีที่เก็บไว้ได้ กรุณาติดต่อ support&#64;mega.nz</string>
 
     <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">กรอกรหัสผ่านใหม่</string>
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">ลิงก์สำหรับการกู้คืนได้หมดอายุแล้ว กรุณาลองใหม่อีกครั้ง</string>
@@ -1601,8 +1615,6 @@
     <string name="achievements_title" context="title of the section for achievements">ความสำเร็จ</string>
     <string name="achievements_subtitle" context="subtitle of the section for achievements">เชิญเพื่อนและรับรางวัล</string>
 
-    <string name="button_invite_friends" context="button to invite friends for getting achievements">เชิญเพื่อน ๆ</string>
-
     <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">รับพื้นที่เก็บข้อมูลขนาด %1$s และการถ่ายโอน %2$s จากการแนะนำในแต่ละครั้ง</string>
 
     <string name="figures_achievements_text" context="sentence to detail the figures of storage and transfer quota related to each achievement">รับพื้นที่เก็บข้อมูลขนาด %1$s และการถ่ายโอน %2$s สำหรับการแนะนำในแต่ละครั้ง</string>
@@ -1631,7 +1643,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">เลือกผู้ติดต่อจากรายชื่อในโทรศัพท์ของคุณหรือกรอกที่อยู่อีเมลพร้อมกัน</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">เชิญเพื่อนเข้าใช้งาน MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">ขอบคุณนะ! ส่งคำเชิญทางอีเมลแล้ว</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">ส่งคำเชิญแล้ว</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">เชิญชวนให้เพื่อนของคุณลงทะเบียนและติดตั้งแอปพลิเคชัน MEGA ตราบเท่าที่เพื่อนของคุณใช้ที่อยู่อีเมลเดียวกันกับที่คุณได้กรอกไว้ ซึ่งคุณจะได้รับรางวัลโควต้าการถ่ายโอนอีกด้วย</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">อีเมลไม่ถูกต้อง</string>
@@ -1714,6 +1726,9 @@
     <string name="send_feedback_panel" context="Label to show send feedback">ไม่ ส่งคำติชม</string>
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">ตัวเลือกขั้นสูง</string>
+    <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">To download files MEGA needs your permission.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Choose download location</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">ไม่มีผู้ติดต่อที่ได้รับ</string>
 
@@ -1735,6 +1750,7 @@
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">คิวอาร์โค้ดไม่ถูกลบเนื่องจากข้อผิดพลาด กรุณาลองอีกครั้ง</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">ส่งคำเชิญแล้ว</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">ผู้ใช้ %s ได้รับเชิญและจะปรากฏในรายชื่อติดต่อของคุณเมื่อได้รับการยอมรับแล้ว</string>
+    <string name="invite_sent_text_multi" context="Text of dialog shown when multiple contacts request has been sent">ผู้ใช้งานไดรับคำเชิญแล้วและจะปรากฎบนรายชื่อผู้ติดต่อของคุณ</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">เกิดข้อผิดพลาดขณะพยายามแชร์ไฟล์คิวอาร์โค้ด บางทีไฟล์อาจจะไม่มีอยู่ กรุณาลองใหม่อีกครั้งในภายหลัง</string>
     <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">เกิดข้อผิดพลาดขณะพยายามอัปโหลดไฟล์คิวอาร์โค้ด บางทีไฟล์อาจจะไม่มีอยู่ กรุณาลองใหม่อีกครั้งในภายหลัง</string>
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">เกิดข้อผิดพลาดขณะพยายามดาวน์โหลดไฟล์คิวอาร์โค้ด บางทีไฟล์อาจจะไม่มีอยู่ กรุณาลองใหม่อีกครั้งในภายหลัง</string>
@@ -1795,7 +1811,7 @@
     <string name="pass_good" context="Password good">คาดเดาได้ยาก</string>
     <string name="pass_strong" context="Password strong">คาดเดาได้ยากมาก</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">กำลังโทรหา</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">กำลังโทรหา</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">คลิกเพื่อกลับไปที่สายสนทนา</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">กลับไปที่สายสนทนา</string>
 
@@ -1904,8 +1920,9 @@
     <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">ข้ามไปที่ล่าสุด</string>
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">ข้อความใหม่</string>
 
-
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">สายเรียกเข้า</string>
+    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">MEGA background pop-ups are disabled.\nTap to change the settings.</string>
 
     <plurals name="number_unread_messages">
         <item context="Subtitle to show the number of unread messages on a chat, unread message" quantity="one">%1$s ข้อความที่ยังไม่ได้อ่าน</item>
@@ -2576,6 +2593,9 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">รอไฟล์ %d ไฟล์</item>
 	</plurals>
 
+    <string name="login_to_mega" context="Title of the login screen">เข้าสู่ MEGA</string>
+    <string name="create_account_title" context="Title of the create account screen">สร้างบัญชี MEGA ของคุณ</string>
+
     <string name="recents_label" context="Label to reference a recents section">เมื่อเร็ว ๆ นี้</string>
     <string name="chats_label" context="Label to reference a chats section">แชท</string>
 
@@ -2607,7 +2627,23 @@
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">ชื่อที่ไม่รู้จัก</string>
 
+    <string name="title_long" context="Error when renaming a chat title and it is too long">Title too long</string>
     <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">กรุณาเลือกที่อยู่ติดต่ออย่างน้อยหนึ่งรายการ</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">ส่งแล้ว %s ผู้ติดต่อ</string>
+
+    <string name="my_chat_files_folder" context="Name by default of the folder where the files sent to the chat are stored in the cloud">ไฟล์แชทของฉัน</string>
+    <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Error. The folder %1$s was not created</string>
+
+    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Verify your email</string>
+    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily suspended for your safety.</string>
+    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">Please [A]verify your email[/A] and follow its steps to unlock your account.</string>
+    <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">ทำไมฉันเห็นสิ่งนี้</string>
+    <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
+    <string name="locked_accounts_label" context="Title of a helping view about locked accounts">บัญชีถูกล็อกแล้ว</string>
+    <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">เป็นไปได้ว่าคุณกำลังใช้รหัสผ่านเดียวกันสำหรับบัญชี MEGA ของคุณสำหรับบริการอื่น ๆ และอย่างน้อยหนึ่งในบริการอื่น ๆ เหล่านี้ได้รับความเสียหายจากข้อมูล</string>
+    <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">รหัสผ่านของคุณรั่วไหลและกำลังถูกใช้โดยผู้ไม่หวังดีเพื่อเข้าสู่บัญชีของคุณ รวมไปถึง การไม่จำกัดบัญชี MEGA ของคุณ</string>
+
+    <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
 </resources>

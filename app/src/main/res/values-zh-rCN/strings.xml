@@ -6,6 +6,8 @@
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     -->
 
+    <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF 查看器</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">的</string>
     <string name="general_yes" context="Answer for confirmation dialog.">是</string>
     <string name="general_no" context="Answer for confirmation dialog.">否</string>
@@ -213,11 +215,15 @@
 
     <string name="create_account_text" context="button that allows the user to create an account">创建账号</string>
     <string name="name_text" context="category in sort by action">名称</string>
+    <string name="first_name_text" context="First Name of the user">名</string>
     <string name="lastname_text" context="Last name of the user">姓</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">我同意MEGA的[A]服务条款[/A]</string>
+    <string name="top" context="Text placed on the checkbox to make sure user agree that understand the danger of losing password">I understand that [B]if I lose my password, I may lose my data[/B]. Read more about [A]MEGA’s end-to-end encryption[/A]</string>
     <string name="already_account" context="Does the user already have a MEGA account">已经有账号了？</string>
 
     <string name="create_account_no_terms" context="warning dialog">您需要接受服务条款</string>
+
+    <string name="create_account_no_top" context="warning dialog, for user do not tick checkbox of understanding the danger of losing password">您需要同意您已了解丢失密码的风险</string>
     <string name="error_enter_username" context="Warning dialog">请输入名字</string>
     <string name="error_enter_userlastname" context="Warning dialog">请输入您的姓</string>
     <string name="error_short_password" context="when creating the account">密码太短</string>
@@ -639,6 +645,10 @@
 
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">拍照</string>
 
+    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Allow notifications of incoming MEGA calls</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow call interface to pop up from background.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
+
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">仅限Wi-Fi</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或移动数据</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
@@ -837,6 +847,10 @@
     <string name="sortby_size_largest_first" context="sort files by size largest first">从大到小</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">从小到大</string>
 
+    <string name="sortby_type" context="Title of sort by media type options">Media type</string>
+    <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">照片</string>
+    <string name="sortby_type_video_first" context="sort option, sort media files by videos first">影片</string>
+
     <string name="per_month" context="in payments, for example: 4.99€ per month">每月</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">每年</string>
 
@@ -892,7 +906,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">外来攻击者如持有您的密钥仍将无法获取您的资料。密码重置将会需要密钥以及需可存取您的电子邮件。</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">将恢复密钥复制到剪贴板或存为文本文件保存</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">保存</string>
+    <string name="save_action" context="Action of a button to save something">保存</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">已成功复制恢复密钥</string>
 
     <string name="change_pass" context="Button to change the password">更改</string>
@@ -1601,8 +1615,6 @@
     <string name="achievements_title" context="title of the section for achievements">成就</string>
     <string name="achievements_subtitle" context="subtitle of the section for achievements">邀请朋友，并获得奖励</string>
 
-    <string name="button_invite_friends" context="button to invite friends for getting achievements">邀请朋友</string>
-
     <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">每当推荐成功便能获取%1$s的存储空间和%2$s的流量</string>
 
     <string name="figures_achievements_text" context="sentence to detail the figures of storage and transfer quota related to each achievement">获取%1$s的存储空间和%2$s的流量</string>
@@ -1631,7 +1643,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">从手机联系人列表中选择联系人，或输入多个电子邮件地址。</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">邀请好友加入MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">谢谢！邀请函已通过电子邮件发送</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">已邀请</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">鼓励您的朋友注册并安装MEGA应用程序。只要您的朋友使用的电子邮件地址与您输入的电子邮件地址相同，您就会收到您的传输配额奖励。</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">电子邮件格式错误</string>
@@ -1714,6 +1726,9 @@
     <string name="send_feedback_panel" context="Label to show send feedback">无发送反馈</string>
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">高级选项</string>
+    <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">To download files MEGA needs your permission.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Choose download location</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">未通过联系人的允许</string>
 
@@ -1735,6 +1750,7 @@
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">删除二维码时出错。请重试。</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">邀请已发送</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">已发送邀请给%s，邀请获得接受后将添加至联系人列表。</string>
+    <string name="invite_sent_text_multi" context="Text of dialog shown when multiple contacts request has been sent">该用户已被邀请。该邀请被接受后，他将会出现在您的联系人列表中。</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">分享二维码文件时出错，可能由于该文件不存在。请稍后再试。</string>
     <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">上传二维码文件时出错，可能该文件不存在。请稍后再试。</string>
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">下载二维码文件时出错，可能该文件不存在。请稍后再试。</string>
@@ -1795,7 +1811,7 @@
     <string name="pass_good" context="Password good">很好</string>
     <string name="pass_strong" context="Password strong">强</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">通话进行中</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">通话进行中</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">点击返回通话</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">返回到通话</string>
 
@@ -1904,8 +1920,9 @@
     <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">跳转到最新</string>
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">新消息</string>
 
-
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">来电</string>
+    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">MEGA background pop-ups are disabled.\nTap to change the settings.</string>
 
     <plurals name="number_unread_messages">
         <item context="Subtitle to show the number of unread messages on a chat, unread message" quantity="one">%1$s 条未读信息</item>
@@ -2576,6 +2593,9 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d的文件待处理</item>
 	</plurals>
 
+    <string name="login_to_mega" context="Title of the login screen">登录MEGA</string>
+    <string name="create_account_title" context="Title of the create account screen">创建您的MEGA账号</string>
+
     <string name="recents_label" context="Label to reference a recents section">近期</string>
     <string name="chats_label" context="Label to reference a chats section">聊天</string>
 
@@ -2607,7 +2627,23 @@
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">未知名称</string>
 
+    <string name="title_long" context="Error when renaming a chat title and it is too long">Title too long</string>
     <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">请选择一个或多个联系人</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">已传给%s 位联系人。</string>
+
+    <string name="my_chat_files_folder" context="Name by default of the folder where the files sent to the chat are stored in the cloud">我的聊天文件</string>
+    <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Error. The folder %1$s was not created</string>
+
+    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Verify your email</string>
+    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily suspended for your safety.</string>
+    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">Please [A]verify your email[/A] and follow its steps to unlock your account.</string>
+    <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">为什么我的帐户被停用？</string>
+    <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
+    <string name="locked_accounts_label" context="Title of a helping view about locked accounts">帐户已锁</string>
+    <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">您的MEGA帐户使用的密码可能与其他服务使用的密码相同，并且这些其他服务中至少有一项服务的数据已遭泄露。</string>
+    <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">您的密码遭到泄露（包括且不限于MEGA帐户），您的帐户正在被他人登录和使用。</string>
+
+    <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
 </resources>

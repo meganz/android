@@ -6,6 +6,8 @@
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     -->
 
+    <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">Visualizador de PDF MEGA</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">de</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Sim</string>
     <string name="general_no" context="Answer for confirmation dialog.">Não</string>
@@ -213,11 +215,15 @@
 
     <string name="create_account_text" context="button that allows the user to create an account">Criar conta</string>
     <string name="name_text" context="category in sort by action">Nome</string>
+    <string name="first_name_text" context="First Name of the user">Nome</string>
     <string name="lastname_text" context="Last name of the user">Sobrenome</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Concordo com os Termos de serviço do [A]MEGA[/A]</string>
+    <string name="top" context="Text placed on the checkbox to make sure user agree that understand the danger of losing password">I understand that [B]if I lose my password, I may lose my data[/B]. Read more about [A]MEGA’s end-to-end encryption[/A]</string>
     <string name="already_account" context="Does the user already have a MEGA account">Já possui uma conta?</string>
 
     <string name="create_account_no_terms" context="warning dialog">Você precisa aceitar os nossos Termos de Serviço</string>
+
+    <string name="create_account_no_top" context="warning dialog, for user do not tick checkbox of understanding the danger of losing password">Você precisa confirmar que entende o perigo de perder a sua senha</string>
     <string name="error_enter_username" context="Warning dialog">Digite o seu nome</string>
     <string name="error_enter_userlastname" context="Warning dialog">Digite o seu sobrenome.</string>
     <string name="error_short_password" context="when creating the account">Senha demasiado curta</string>
@@ -639,6 +645,10 @@
 
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Tirar foto</string>
 
+    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Allow notifications of incoming MEGA calls</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow call interface to pop up from background.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
+
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Somente Wi-Fi</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi ou dados móveis</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
@@ -837,6 +847,10 @@
     <string name="sortby_size_largest_first" context="sort files by size largest first">Maior</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">Menor</string>
 
+    <string name="sortby_type" context="Title of sort by media type options">Media type</string>
+    <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Fotos</string>
+    <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Vídeos</string>
+
     <string name="per_month" context="in payments, for example: 4.99€ per month">por mês</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">por ano</string>
 
@@ -892,7 +906,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Um atacante externo não pode obter acesso à sua conta apenas com a sua chave. A recuperação de senha necessita tanto a chave como o acesso ao seu email.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copie a chave de recuperação à área de transferência ou salve-a como um arquivo de texto</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">Salvar</string>
+    <string name="save_action" context="Action of a button to save something">Salvar</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">A chave de recuperação foi copiada corretamente</string>
 
     <string name="change_pass" context="Button to change the password">Alterar</string>
@@ -1601,8 +1615,6 @@
     <string name="achievements_title" context="title of the section for achievements">Conquistas</string>
     <string name="achievements_subtitle" context="subtitle of the section for achievements">Convide amigos e ganhe bônus</string>
 
-    <string name="button_invite_friends" context="button to invite friends for getting achievements">Convide amigos</string>
-
     <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">Ganhe %1$s de espaço de armazenamento e %2$s de cota de transferência para cada indicação</string>
 
     <string name="figures_achievements_text" context="sentence to detail the figures of storage and transfer quota related to each achievement">Ganhe %1$s de armazenamento e %2$s de cota de transferência</string>
@@ -1631,7 +1643,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">Selecione os contatos da agenda do seu telefone ou digite os endereços de email.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">Convide amigos para o MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">Obrigado! O convite foi enviado por email.</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">Solicitação de contato enviada</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Incentive os seus amigos a criar uma conta e instalar um aplicativo do MEGA. Se o seu amigo usar o mesmo endereço de email que você digitou, você receberá a sua cota de transferência extra.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">Formato de email incorreto</string>
@@ -1714,6 +1726,9 @@
     <string name="send_feedback_panel" context="Label to show send feedback">Não, enviar feedback</string>
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Opções avançadas</string>
+    <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">To download files MEGA needs your permission.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Choose download location</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">Sem permissão para acessar os contatos</string>
 
@@ -1735,6 +1750,7 @@
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">Não foi possível deletar o código QR. Por favor, tente novamente.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Convite enviado</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">O usuário %s foi convidado e aparecerá na sua lista de contatos quando aceitar o convite.</string>
+    <string name="invite_sent_text_multi" context="Text of dialog shown when multiple contacts request has been sent">Os usuários foram convidados e aparecerão na sua lista de contatos assim que aceitarem.</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">Não foi possível compartilhar o código QR, e talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
     <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">Não foi possível fazer o upload do código QR, e talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">Não foi possível fazer o download do código QR, e talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
@@ -1795,7 +1811,7 @@
     <string name="pass_good" context="Password good">Boa</string>
     <string name="pass_strong" context="Password strong">Forte</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Chamada em curso</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Chamada em curso</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Pressione para voltar à chamada</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Voltar à chamada</string>
 
@@ -1904,8 +1920,9 @@
     <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">Ir ao mais recente</string>
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">Novas mensagens</string>
 
-
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">Chamada recebida</string>
+    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">MEGA background pop-ups are disabled.\nTap to change the settings.</string>
 
     <plurals name="number_unread_messages">
         <item context="Subtitle to show the number of unread messages on a chat, unread message" quantity="one">%1$s mensagem não lida</item>
@@ -2576,6 +2593,9 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d arquivos pendentes.</item>
 	</plurals>
 
+    <string name="login_to_mega" context="Title of the login screen">Fazer login no MEGA</string>
+    <string name="create_account_title" context="Title of the create account screen">Crie a sua conta no MEGA</string>
+
     <string name="recents_label" context="Label to reference a recents section">Atividades recentes</string>
     <string name="chats_label" context="Label to reference a chats section">Chats</string>
 
@@ -2607,7 +2627,23 @@
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Nome desconhecido</string>
 
+    <string name="title_long" context="Error when renaming a chat title and it is too long">Title too long</string>
     <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Por favor, selecione um ou mais contatos.</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Enviados %s contatos.</string>
+
+    <string name="my_chat_files_folder" context="Name by default of the folder where the files sent to the chat are stored in the cloud">Arquivos dos meus chats</string>
+    <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Error. The folder %1$s was not created</string>
+
+    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Verify your email</string>
+    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily suspended for your safety.</string>
+    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">Please [A]verify your email[/A] and follow its steps to unlock your account.</string>
+    <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Por que estou vendo isso?</string>
+    <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
+    <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Contas bloqueadas</string>
+    <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">É possível que você esteja usando no MEGA a mesma senha que usa em outros serviços, e que pelo menos um desses outros serviços tenha sofrido uma filtração de dados.</string>
+    <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">A sua senha foi comprometida, e agora está sendo usada por pessoas mal intencionadas para fazer login nas suas contas, incluindo a sua conta no MEGA (mas não se limitando a ela).</string>
+
+    <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
 </resources>
