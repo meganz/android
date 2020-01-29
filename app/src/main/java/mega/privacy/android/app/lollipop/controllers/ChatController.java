@@ -1625,7 +1625,7 @@ public class ChatController {
 
         logDebug("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
         if(availableFreeSpace < sizeC) {
-            showSnackbar(context, NOT_SPACE_SNACKBAR_TYPE);
+            showSnackbar(context);
             logWarning("Not enough space");
             return;
         }

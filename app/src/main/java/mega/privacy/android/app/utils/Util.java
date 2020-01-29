@@ -1524,18 +1524,40 @@ public class Util {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-	public static void showSnackbar(Context context, int type) {
-		showSnackbar(context, type, null, INVALID_HANDLE);
+    /**
+     * Method to display a NOT_SPACE_SNACKBAR_TYPE Snackbar
+     *
+     * Use this method only from controllers or services or when ut does not know what the context is.
+     *
+     * @param context Class where the Snackbar has to be shown
+     */
+	public static void showSnackbar(Context context) {
+		showSnackbar(context, NOT_SPACE_SNACKBAR_TYPE, null, INVALID_HANDLE);
 	}
 
+    /**
+     * Method to display a simple Snackbar
+     *
+     * Use this method only from controllers or services or when ut does not know what the context is.
+     *
+     * @param context Class where the Snackbar has to be shown
+     * @param message Text to shown in the snackbar
+     */
 	public static void showSnackbar(Context context, String message) {
 		showSnackbar(context, SNACKBAR_TYPE, message, INVALID_HANDLE);
 	}
 
-	public static void showSnackbar(Context context, int snackbarType, String message) {
-		showSnackbar(context, snackbarType, message, INVALID_HANDLE);
-	}
-
+    /**
+     * Method to display a simple or action Snackbar.
+     *
+     * Use this method only from controllers or services or when ut does not know what the context is.
+     *
+     * @param context Class where the Snackbar has to be shown
+     * @param snackbarType specifies the type of the Snackbar.
+     *                     It can be SNACKBAR_TYPE, MESSAGE_SNACKBAR_TYPE or NOT_SPACE_SNACKBAR_TYPE
+     * @param message Text to shown in the snackbar
+     * @param idChat Chat ID. If this param has a valid value, different to -1, the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat
+     */
 	public static void showSnackbar(Context context, int snackbarType, String message, long idChat) {
 		if (context instanceof FullScreenImageViewerLollipop) {
 			((FullScreenImageViewerLollipop) context).showSnackbar(snackbarType, message, idChat);
