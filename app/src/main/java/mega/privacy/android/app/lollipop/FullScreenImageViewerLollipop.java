@@ -999,7 +999,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			if (megaApi == null || megaApi.getRootNode() == null) {
 				logDebug("Refresh session - sdk");
 				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-				intentLogin.putExtra("visibleFragment", LOGIN_FRAGMENT);
+				intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intentLogin);
 				finish();
@@ -1013,7 +1013,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
 				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-				intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+				intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intentLogin);
 				finish();

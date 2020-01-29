@@ -54,7 +54,7 @@
                         app:errorEnabled="true"
                         app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                        <android.support.design.widget.TextInputEditText
+                        <android.support.v7.widget.AppCompatEditText
                             android:id="@+id/login_email_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
                         app:errorEnabled="true"
                         app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                        <android.support.design.widget.TextInputEditText
+                        <android.support.v7.widget.AppCompatEditText
                             android:id="@+id/login_password_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

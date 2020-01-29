@@ -104,6 +104,8 @@ import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -163,16 +165,16 @@ import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ChatActivityLollipop extends DownloadableActivity implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, MyChatFilesExisitListener<ArrayList<AndroidMegaChatMessage>> {
+public class ChatActivityLollipop extends DownloadableActivity implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -403,10 +405,19 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     // Data being stored when My Chat Files folder does not exist
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
+    private ArrayList<MegaChatMessage> preservedMsgSelected;
+    private ArrayList<MegaChatMessage> preservedMsgToImport;
+    private boolean isForwardingFromNC;
+
+    private ArrayList<Intent> preservedIntents = new ArrayList<>();
+    private boolean isWaitingForMoreFiles;
+    private boolean isAskingForMyChatFiles;
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
 
     private BottomSheetDialogFragment bottomSheetDialogFragment;
+
+    private MegaNode myChatFilesFolder;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -415,8 +426,22 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     @Override
     public void handleStoredData() {
-        forwardMessages(preservedMessagesSelected);
-        preservedMessagesSelected = null;
+        if (preservedMessagesSelected != null && !preservedMessagesSelected.isEmpty()) {
+            forwardMessages(preservedMessagesSelected);
+            preservedMessagesSelected = null;
+        } else if (preservedMsgSelected != null && !preservedMsgSelected.isEmpty()) {
+            chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat);
+            isForwardingFromNC = false;
+            preservedMsgSelected = null;
+            preservedMsgToImport = null;
+        }
+    }
+
+    @Override
+    public void storedUnhandledData(ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport) {
+        isForwardingFromNC = true;
+        preservedMsgSelected = messagesSelected;
+        preservedMsgToImport = messagesToImport;
     }
 
     private class UserTyping {
@@ -556,7 +581,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR || megaChatApi.getInitState() == MegaChatApi.INIT_NOT_DONE) {
             logDebug("Refresh session - karere");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -818,7 +843,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             public void onStart() {
                 logDebug("recordView.setOnRecordListener:onStart");
                 if (participatingInACall(megaChatApi)) {
-                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.not_allowed_recording_voice_clip), -1);
+                    showSnackbar(SNACKBAR_TYPE, getApplicationContext().getString(R.string.not_allowed_recording_voice_clip), -1);
                     return;
                 }
                 if (!isAllowedToRecord()) return;
@@ -1953,7 +1978,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     void ifAnonymousModeLogin(boolean pendingJoin) {
         if(chatC.isInAnonymousMode()){
             Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-            loginIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+            loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
             if (pendingJoin && getIntent() != null && getIntent().getDataString() != null) {
                 loginIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
                 loginIntent.setData(Uri.parse(getIntent().getDataString()));
@@ -2227,7 +2252,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         recordButton.activateOnTouchListener(false);
         recordButton.activateOnClickListener(true);
         recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
-        recordButton.setColorFilter(ContextCompat.getColor(context, R.color.accentColor));
+        recordButton.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor));
     }
 
     /*
@@ -2620,10 +2645,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
         }
 
-        if (existsMyChatFiles(messagesSelected, megaApi, this, this)) {
+        isForwardingMessage = true;
+        storedUnhandledData(messagesSelected);
+        megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
+    }
+
+    public void proceedWithAction() {
+        if (isForwardingMessage) {
             stopReproductions();
-            chatC.prepareAndroidMessagesToForward(messagesSelected, idChat);
-            isForwardingMessage = true;
+            chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat);
+        } else {
+            startUploadService();
         }
     }
 
@@ -2984,7 +3016,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                     intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
-                    startService(intent);
+                    checkIfServiceCanStart(intent);
                 }
                 else{
                     logError("Error when adding pending msg to the database");
@@ -3039,7 +3071,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         String message= getResources().getString(R.string.text_join_call);
         builder.setTitle(R.string.title_join_call);
-        builder.setMessage(message).setPositiveButton(context.getString(R.string.answer_call_incoming).toUpperCase(), dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        builder.setMessage(message).setPositiveButton(getApplicationContext().getString(R.string.answer_call_incoming).toUpperCase(), dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
     public void showConfirmationOpenCamera(final MegaChatRoom c){
@@ -6944,6 +6976,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     megaChatApi.closeChatRoom(idChat, this);
                 }
                 idChat = request.getChatHandle();
+
+                if (e.getErrorCode() == MegaChatError.ERROR_OK && idChat != MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE) {
+                    dbH.setLastPublicHandle(idChat);
+                    dbH.setLastPublicHandleTimeStamp();
+                    dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CHAT);
+                }
+
                 MegaApplication.setOpenChatId(idChat);
                 showChat(null);
 
@@ -7367,14 +7406,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
             }
         }
-        else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER && CHAT_FOLDER.equals(request.getName())) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("Create My Chat Files, copy reserved nodes");
-                handleStoredData();
-            } else {
-                logError("Not create My Chat Files" + e.getErrorCode() + " " + e.getErrorString());
-            }
-        }
     }
 
     @Override
@@ -7509,7 +7540,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                     intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
-                    startService(intent);
+                    checkIfServiceCanStart(intent);
                 }
                 else{
                     logError("Error when adding pending msg to the database");
@@ -7884,17 +7915,19 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         File selfie;
         if(isVoiceClip(path)) {
             selfie = buildVoiceClipFile(this, outputFileName);
+            if (!isFileAvailable(selfie)) return;
         }else{
             selfie = new File(path);
+            if (!MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage()) return;
         }
-
-        if(!isVoiceClip(selfie.getAbsolutePath()) && !MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage()) return;
-        if(isVoiceClip(selfie.getAbsolutePath()) && !isFileAvailable(selfie)) return;
 
         Intent intent = new Intent(this, ChatUploadService.class);
         PendingMessageSingle pMsgSingle = new PendingMessageSingle();
         pMsgSingle.setChatId(idChat);
-        if(isVoiceClip(selfie.getAbsolutePath())) pMsgSingle.setType(TYPE_VOICE_CLIP);
+        if(isVoiceClip(selfie.getAbsolutePath())){
+            pMsgSingle.setType(TYPE_VOICE_CLIP);
+            intent.putExtra(EXTRA_TRANSFER_TYPE, EXTRA_VOICE_CLIP);
+        }
 
         long timestamp = System.currentTimeMillis()/1000;
         pMsgSingle.setUploadTimestamp(timestamp);
@@ -7916,11 +7949,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             sendMessageToUI(newNodeAttachmentMsg);
         }
         intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
-        if(isVoiceClip(selfie.getAbsolutePath())) {
-            intent.putExtra(EXTRA_TRANSFER_TYPE, EXTRA_VOICE_CLIP);
-        }
 
-        startService(intent);
+        checkIfServiceCanStart(intent);
     }
 
 
@@ -8450,11 +8480,42 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         isShareLinkDialogDismissed = dismissed;
     }
 
+    private void checkIfServiceCanStart(Intent intent) {
+        preservedIntents.add(intent);
+        if (!isAskingForMyChatFiles) {
+            isAskingForMyChatFiles = true;
+            megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
+        }
+    }
+
+    public void startUploadService() {
+        if (!isWaitingForMoreFiles && !preservedIntents.isEmpty()) {
+            for (Intent intent : preservedIntents) {
+                intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesFolder.serialize());
+                startService(intent);
+            }
+            preservedIntents.clear();
+            isAskingForMyChatFiles = false;
+        }
+    }
+
+    public void setMyChatFilesFolder(MegaNode myChatFilesFolder) {
+        this.myChatFilesFolder = myChatFilesFolder;
+    }
+
+    public boolean isForwardingFromNC() {
+        return isForwardingFromNC;
+    }
+
     private void sendBroadcastChatArchived(String chatTitle) {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED);
         intent.putExtra(CHAT_TITLE, chatTitle);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         closeChat(true);
         finish();
+    }
+
+    public void setIsWaitingForMoreFiles (boolean isWaitingForMoreFiles) {
+        this.isWaitingForMoreFiles = isWaitingForMoreFiles;
     }
 }

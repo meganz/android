@@ -256,13 +256,13 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		logDebug("refreshAccountInfo");
 
 		logDebug("Check the last call to callToPricing");
-		if(callToPricing(context)){
+		if(callToPricing()){
 			logDebug("megaApi.getPricing SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}
 
 		logDebug("Check the last call to callToPaymentMethods");
-		if(callToPaymentMethods(context)){
+		if(callToPaymentMethods()){
 			logDebug("megaApi.getPaymentMethods SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
 		}

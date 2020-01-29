@@ -67,7 +67,7 @@
                 app:errorEnabled="true"
                 app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                <android.support.design.widget.TextInputEditText
+                <android.support.v7.widget.AppCompatEditText
                     android:id="@+id/confirm_email_new_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

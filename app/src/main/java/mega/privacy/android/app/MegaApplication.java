@@ -44,6 +44,7 @@ import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
+import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -92,7 +93,9 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
+
+public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
+
 	final String TAG = "MegaApplication";
 
 	static final public String USER_AGENT = "MEGAAndroid/3.7.3_282";
@@ -145,6 +148,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private static boolean registeredChatListeners = false;
 
     private static boolean isVerifySMSShowed = false;
+
+    private static boolean isBlockedDueToWeakAccount = false;
+    private static boolean isWebOpenDueToEmailVerification = false;
 
 	MegaChatApiAndroid megaChatApi = null;
 
@@ -465,7 +471,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
         storageState = dbH.getStorageState();
 
-		setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		boolean staging = false;
 		if (dbH != null) {
@@ -665,17 +670,17 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	public void refreshAccountInfo(){
 		//Check if the call is recently
-		if(callToAccountDetails(context) || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
+		if(callToAccountDetails() || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
 			logDebug("megaApi.getAccountDetails SEND");
 			askForAccountDetails();
 		}
 
-		if(callToExtendedAccountDetails(context)){
+		if(callToExtendedAccountDetails()){
 			logDebug("megaApi.getExtendedAccountDetails SEND");
 			askForExtendedAccountDetails();
 		}
 
-		if(callToPaymentMethods(context)){
+		if(callToPaymentMethods()){
 			logDebug("megaApi.getPaymentMethods SEND");
 			askForPaymentMethods();
 		}
@@ -753,7 +758,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			megaChatApi = getMegaChatApi();
 		}
 	}
-	
+
 	public MegaApiAndroid getMegaApi()
 	{
 		if(megaApi == null)
@@ -786,7 +791,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			logDebug("ADD REQUESTLISTENER");
 			megaApi.addRequestListener(requestListener);
 
-			megaApi.addGlobalListener(this);
+			megaApi.addGlobalListener(new GlobalListener());
 
 //			DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 //			if (dbH.getCredentials() != null){
@@ -811,6 +816,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 		
 		return megaApi;
+	}
+
+	public DatabaseHandler getDbH() {
+		if (dbH == null) {
+			DatabaseHandler.getDbHandler(getApplicationContext());
+		}
+
+		return dbH;
 	}
 
 	public static boolean isActivityVisible() {
@@ -931,37 +944,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	
 	public void setLocalIpAddress(String ip){
 		localIpAddress = ip;
-	}
-
-	@Override
-	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		logDebug("onUsersUpdate");
-	}
-
-	@Override
-	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-		logDebug("onUserAlertsUpdate");
-		updateAppBadge();
-	}
-
-	@Override
-	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
-		logDebug("onNodesUpdate");
-		if (updatedNodes != null) {
-			logDebug("updatedNodes: " + updatedNodes.size());
-
-			for (int i = 0; i < updatedNodes.size(); i++) {
-				MegaNode n = updatedNodes.get(i);
-				if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)) {
-					logDebug("updatedNodes name: " + n.getName() + " isInshared: " + n.isInShare() + " getchanges: " + n.getChanges() + " haschanged(TYPE_INSHARE): " + n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE));
-
-					showSharedFolderNotification(n);
-				}
-			}
-		}
-		else{
-			logWarning("Updated nodes is NULL");
-		}
 	}
 
 	public void showSharedFolderNotification(MegaNode n) {
@@ -1130,58 +1112,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 //        }
 	}
 
-
-	@Override
-	public void onReloadNeeded(MegaApiJava api) {
-		// TODO Auto-generated method stub
-	}
-
-
-	@Override
-	public void onAccountUpdate(MegaApiJava api) {
-		logDebug("onAccountUpdate");
-
-		megaApi.getPaymentMethods(null);
-		megaApi.getAccountDetails(null);
-		megaApi.getPricing(null);
-		megaApi.creditCardQuerySubscriptions(null);
-		dbH.resetExtendedAccountDetailsTimestamp();
-	}
-
-	@Override
-	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
-		logDebug("onContactRequestUpdate");
-
-		updateAppBadge();
-
-		if(requests!=null){
-			for (int i = 0; i < requests.size(); i++) {
-				MegaContactRequest cr = requests.get(i);
-				if (cr != null) {
-					if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
-
-						ContactsAdvancedNotificationBuilder notificationBuilder;
-						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
-
-						notificationBuilder.removeAllIncomingContactNotifications();
-						notificationBuilder.showIncomingContactRequestNotification();
-
-						logDebug("IPC: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
-					}
-					else if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
-
-						ContactsAdvancedNotificationBuilder notificationBuilder;
-						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
-
-						notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
-
-						logDebug("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
-					}
-				}
-			}
-		}
-	}
-
 	public void sendSignalPresenceActivity(){
 		logDebug("sendSignalPresenceActivity");
 		if(isChatEnabled()){
@@ -1242,7 +1172,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 						if(getUrlConfirmationLink()!=null){
 							logDebug("Launch intent to confirmation account screen");
 							Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-							confirmIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+							confirmIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 							confirmIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
 							confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 							confirmIntent.setAction(ACTION_CONFIRM);
@@ -1261,7 +1191,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 						if(getUrlConfirmationLink()!=null){
 							logDebug("Show confirmation account screen");
 							Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-							confirmIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+							confirmIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 							confirmIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
 							confirmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 							confirmIntent.setAction(ACTION_CONFIRM);
@@ -1307,60 +1237,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		logWarning("onRequestTemporaryError (CHAT): "+e.getErrorString());
 	}
-
-	@Override
-	public void onEvent(MegaApiJava api, MegaEvent event) {
-		logDebug("onEvent: " + event.getText());
-
-		if (event.getType() == MegaEvent.EVENT_STORAGE) {
-			logDebug("Storage status changed");
-			int state = (int) event.getNumber();
-			if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
-				api.getAccountDetails(null);
-			} else {
-				dbH.setStorageState(state);
-				if(state != storageState) {
-					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-					intent.setAction(ACTION_STORAGE_STATE_CHANGED);
-					intent.putExtra(EXTRA_STORAGE_STATE, state);
-					LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-
-					storageState = state;
-				}
-			}
-        } else if (event.getType() == MegaEvent.EVENT_ACCOUNT_BLOCKED) {
-            //need sms verification to unblock
-            long whyAmIBlocked = event.getNumber();
-            int state = api.smsAllowedState();
-            logDebug("whyAmIBlocked: " + whyAmIBlocked + ",state: " + state);
-            if (whyAmIBlocked == 500 && state != 0) {
-            	if (!isVerifySMSShowed) {
-					isVerifySMSShowed = true;
-                	String gSession = megaApi.dumpSession();
-					//For first login, keep the valid session,
-					//after added phone number, the account can use this session to fastLogin
-					if (gSession != null) {
-                        MegaUser myUser = megaApi.getMyUser();
-                        String myUserHandle = null;
-                        String lastEmail = null;
-                        if (myUser != null) {
-                            lastEmail = myUser.getEmail();
-                            myUserHandle = myUser.getHandle() + "";
-                        }
-                        UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
-						dbH.saveCredentials(credentials);
-					}
-
-					logDebug("Show SMS verification activity.");
-					Intent intent = new Intent(getApplicationContext(),SMSVerificationActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra(NAME_USER_LOCKED,true);
-                    startActivity(intent);
-                }
-            }
-        }
-	}
-
 
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
@@ -2021,4 +1897,24 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
         super.unregisterReceiver(receiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(logoutReceiver);
     }
+
+    public static boolean isVerifySMSShowed() {
+		return isVerifySMSShowed;
+	}
+
+	public static void setIsBlockedDueToWeakAccount(boolean isBlockedDueToWeakAccount) {
+		MegaApplication.isBlockedDueToWeakAccount = isBlockedDueToWeakAccount;
+	}
+
+	public static boolean isBlockedDueToWeakAccount() {
+		return isBlockedDueToWeakAccount;
+	}
+
+	public static void setIsWebOpenDueToEmailVerification(boolean isWebOpenDueToEmailVerification) {
+		MegaApplication.isWebOpenDueToEmailVerification = isWebOpenDueToEmailVerification;
+	}
+
+	public static boolean isWebOpenDueToEmailVerification() {
+		return isWebOpenDueToEmailVerification;
+	}
 }

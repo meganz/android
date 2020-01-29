@@ -32,14 +32,6 @@ public class DownloadableActivity extends SorterContentActivity {
 
     private ChatDownloadInfo chatDownloadInfo;
 
-    private DatabaseHandler dbH;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        dbH = DatabaseHandler.getDbHandler(this);
-    }
-
     public void setDownloadInfo(DownloadInfo downloadInfo) {
         this.downloadInfo = downloadInfo;
     }
