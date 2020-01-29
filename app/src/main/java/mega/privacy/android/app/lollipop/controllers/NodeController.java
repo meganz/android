@@ -419,28 +419,6 @@ public class NodeController {
         }
     }
 
-    private void showSnackbar(int type, String s) {
-        if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).showSnackbar(type, s, -1);
-        } else if (context instanceof FullScreenImageViewerLollipop) {
-            ((FullScreenImageViewerLollipop) context).showSnackbar(type, s, -1);
-        } else if (context instanceof FileInfoActivityLollipop) {
-            ((FileInfoActivityLollipop) context).showSnackbar(type, s, -1);
-        } else if (context instanceof ContactFileListActivityLollipop) {
-            ((ContactFileListActivityLollipop) context).showSnackbar(type, s);
-        } else if (context instanceof PdfViewerActivityLollipop) {
-            ((PdfViewerActivityLollipop) context).showSnackbar(type, s, -1);
-        } else if (context instanceof AudioVideoPlayerLollipop) {
-            ((AudioVideoPlayerLollipop) context).showSnackbar(type, s, -1);
-        } else if (context instanceof ContactInfoActivityLollipop) {
-            ((ContactInfoActivityLollipop) context).showSnackbar(type, s, -1);
-        } else if (context instanceof GetLinkActivityLollipop) {
-            ((GetLinkActivityLollipop) context).showSnackbar(s);
-        } else {
-            showSnackBar(context, type, s, -1);
-        }
-    }
-
     //Old downloadTo
     public void checkSizeBeforeDownload(String parentPath, String url, long size, long [] hashes, boolean highPriority){
         //Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
@@ -479,7 +457,7 @@ public class NodeController {
         logDebug("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
 
         if(availableFreeSpace < sizeC) {
-            showSnackbar(NOT_SPACE_SNACKBAR_TYPE, null);
+            showSnackbar(context, NOT_SPACE_SNACKBAR_TYPE);
             logWarning("Not enough space");
             return;
         }
@@ -699,9 +677,9 @@ public class NodeController {
                         try {
                             final File file = new File(localPath);
                             if (file.getParent().equals(parentPath)) {
-                                showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                                showSnackbar(context, context.getString(R.string.general_already_downloaded));
                             } else {
-                                showSnackbar(SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
+                                showSnackbar(context, context.getString(R.string.copy_already_downloaded));
                                 //copy file.
                                 new Thread(new CopyFileThread(downloadToSDCard,localPath,parentPath,tempNode.getName(),sdCardOperator)).start();
                             }
@@ -805,7 +783,7 @@ public class NodeController {
                                         context.startActivity(mediaIntent);
                                     }
                                     else {
-                                        showSnackbar(SNACKBAR_TYPE, context.getString(R.string.intent_not_available));
+                                        showSnackbar(context, context.getString(R.string.intent_not_available));
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                             intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -852,11 +830,11 @@ public class NodeController {
                                             logDebug("Call to startActivity(intentShare)");
                                             context.startActivity(intentShare);
                                         }
-                                        showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                                        showSnackbar(context, context.getString(R.string.general_already_downloaded));
                                     }
                                 }
                                 catch (Exception e){
-                                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                                    showSnackbar(context, context.getString(R.string.general_already_downloaded));
                                 }
                             }
                         }
@@ -970,7 +948,7 @@ public class NodeController {
                 if (numberOfNodesPending > 0) {
                     msg = msg + context.getResources().getQuantityString(R.plurals.file_pending_download,numberOfNodesPending,numberOfNodesPending);
                 }
-                showSnackbar(SNACKBAR_TYPE,msg);
+                showSnackbar(context, msg);
             }
         }
     }
@@ -1075,7 +1053,7 @@ public class NodeController {
     public void exportLink(MegaNode document){
         logDebug("exportLink");
         if (!isOnline(context)) {
-            showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
+            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
             return;
         }
         else if(context instanceof ManagerActivityLollipop){
@@ -1098,7 +1076,7 @@ public class NodeController {
     public void exportLinkTimestamp(MegaNode document, int timestamp){
         logDebug("exportLinkTimestamp: " + timestamp);
         if (!isOnline(context)) {
-            showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
+            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
         }
         else if (context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).setIsGetLink(true);
@@ -1749,16 +1727,16 @@ public class NodeController {
             if(localPath != null){
                 final File file = new File(localPath);
                 if (file.getParent().equals(parentPath)) {
-                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                    showSnackbar(context, context.getString(R.string.general_already_downloaded));
                 } else {
-                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
+                    showSnackbar(context, context.getString(R.string.copy_already_downloaded));
                     //copy file.
                     new Thread(new CopyFileThread(downloadToSDCard,localPath,parentPath,tempNode.getName(),sdCardOperator)).start();
                 }
             }
             else{
                 logDebug("LocalPath is NULL");
-                showSnackbar(SNACKBAR_TYPE, context.getString(R.string.download_began));
+                showSnackbar(context, context.getString(R.string.download_began));
 
                 if(tempNode != null){
                     logDebug("Node!=null: "+tempNode.getName());
@@ -1769,7 +1747,7 @@ public class NodeController {
                         String path = dlFiles.get(document);
 
                         if(availableFreeSpace < document.getSize()){
-                            showSnackbar(NOT_SPACE_SNACKBAR_TYPE, null);
+                            showSnackbar(context, NOT_SPACE_SNACKBAR_TYPE);
                             continue;
                         }
 
@@ -1791,7 +1769,7 @@ public class NodeController {
                 }
                 else if(url != null) {
                     if(availableFreeSpace < currentDocument.getSize()) {
-                        showSnackbar(NOT_SPACE_SNACKBAR_TYPE, null);
+                        showSnackbar(context, NOT_SPACE_SNACKBAR_TYPE);
                     }
 
                     Intent service = new Intent(context, DownloadService.class);

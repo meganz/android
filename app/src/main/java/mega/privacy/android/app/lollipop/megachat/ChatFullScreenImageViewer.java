@@ -791,9 +791,9 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
         if (intent == null) {
             logWarning("extractUri: result intent is null");
             if (resultCode != Activity.RESULT_OK) {
-                showSnackBar(this, SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.download_requires_permission));
             } else {
-                showSnackBar(this, SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected));
             }
             return null;
         }
@@ -994,10 +994,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 	public void showSnackbar(int type, String s){
 		showSnackbar(type, fragmentContainer, s);
 	}
-    
-    public void showSnackbar(int type, String s, int chatId){
-        showSnackbar(type, fragmentContainer, s, chatId);
-    }
 
 	public void touchImage() {
 		logDebug("touchImage");

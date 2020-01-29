@@ -376,7 +376,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		Intent intent = getIntent();
 		prompt = intent.getStringExtra(EXTRA_PROMPT);
 		if (prompt != null) {
-			showSnackBar(this, SNACKBAR_TYPE, prompt, -1);
+			showSnackbar(viewContainer, prompt);
 		}
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
 		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);

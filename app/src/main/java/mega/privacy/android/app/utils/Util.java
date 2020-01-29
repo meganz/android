@@ -90,6 +90,11 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -106,6 +111,7 @@ import static android.content.Context.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class Util {
 
@@ -1518,28 +1524,51 @@ public class Util {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public static void showSnackBar(Context context,int snackbarType,String message,int idChat) {
-        if (context instanceof ChatFullScreenImageViewer) {
-            ((ChatFullScreenImageViewer)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof AudioVideoPlayerLollipop) {
-            ((AudioVideoPlayerLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof PdfViewerActivityLollipop) {
-            ((PdfViewerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof ChatActivityLollipop) {
-            ((ChatActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof NodeAttachmentHistoryActivity) {
-            ((NodeAttachmentHistoryActivity)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof BaseActivity) {
-            View rootView = getRootViewFromContext(context);
-            if (rootView == null) {
-				logWarning("Unable to show snack bar, view does not exist");
-            } else {
-                ((BaseActivity)context).showSnackbar(snackbarType,rootView,message,idChat);
-            }
-        }
-    }
+	public static void showSnackbar(Context context, int type) {
+		showSnackbar(context, type, null, INVALID_HANDLE);
+	}
+
+	public static void showSnackbar(Context context, String message) {
+		showSnackbar(context, SNACKBAR_TYPE, message, INVALID_HANDLE);
+	}
+
+	public static void showSnackbar(Context context, int snackbarType, String message) {
+		showSnackbar(context, snackbarType, message, INVALID_HANDLE);
+	}
+
+	public static void showSnackbar(Context context, int snackbarType, String message, long idChat) {
+		if (context instanceof FullScreenImageViewerLollipop) {
+			((FullScreenImageViewerLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof FileInfoActivityLollipop) {
+			((FileInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof ContactFileListActivityLollipop) {
+			((ContactFileListActivityLollipop) context).showSnackbar(snackbarType, message);
+		} else if (context instanceof ContactInfoActivityLollipop) {
+			((ContactInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof GetLinkActivityLollipop) {
+			((GetLinkActivityLollipop) context).showSnackbar(message);
+		} else if (context instanceof ChatFullScreenImageViewer) {
+			((ChatFullScreenImageViewer) context).showSnackbar(snackbarType, message);
+		} else if (context instanceof AudioVideoPlayerLollipop) {
+			((AudioVideoPlayerLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof PdfViewerActivityLollipop) {
+			((PdfViewerActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof ChatActivityLollipop) {
+			((ChatActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof NodeAttachmentHistoryActivity) {
+			((NodeAttachmentHistoryActivity) context).showSnackbar(snackbarType, message);
+		} else if (context instanceof ManagerActivityLollipop) {
+			((ManagerActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof BaseActivity) {
+			View rootView = getRootViewFromContext(context);
+			if (rootView != null) {
+				((BaseActivity) context).showSnackbar(snackbarType, rootView, message, idChat);
+				return;
+			}
+
+			logWarning("Unable to show snack bar, view does not exist or context is not instance of BaseActivity");
+		}
+	}
 
     private static View getRootViewFromContext(Context context) {
         BaseActivity activity = (BaseActivity)context;
