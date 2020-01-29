@@ -24,7 +24,6 @@ import android.support.annotation.Nullable;
 import android.support.media.ExifInterface;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -173,10 +172,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private String tempRoot;
     private Context mContext;
     private VideoCompressor mVideoCompressor;
-
-    /** the receiver and manager for the broadcast to listen to the pause event */
-    private BroadcastReceiver pauseBroadcastReceiver;
-    private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
 
     private BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
         @Override
