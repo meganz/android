@@ -611,7 +611,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	/*
 	 * Get list of all selected shares
 	 */
-	public List<MegaShare> getSelectedShares() {
+	public ArrayList<MegaShare> getSelectedShares() {
 		ArrayList<MegaShare> shares = new ArrayList<MegaShare>();
 		
 		for (int i = 0; i < selectedItems.size(); i++) {

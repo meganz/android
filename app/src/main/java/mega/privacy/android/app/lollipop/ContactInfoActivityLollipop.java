@@ -110,6 +110,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -1313,46 +1314,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(contactInfoActivityLollipop);
-							temp.setMessage(getString(R.string.context_sharing_folder));
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
+						statusDialog = getProgressDialog(getString(R.string.context_sharing_folder));
 						permissionsDialog.dismiss();
-
-						logDebug("item " + item);
-
-						switch(item) {
-							case 0:{
-								for (int i=0;i<selectedContacts.size();i++){
-									MegaUser user= megaApi.getContact(selectedContacts.get(i));
-									logDebug("user: " + user);
-									logDebug("parentNode: " + parent.getName() + "_" + parent.getHandle());
-									megaApi.share(parent, user, MegaShare.ACCESS_READ, contactInfoActivityLollipop);
-								}
-								break;
-							}
-							case 1:{
-								for (int i=0;i<selectedContacts.size();i++){
-									MegaUser user= megaApi.getContact(selectedContacts.get(i));
-									megaApi.share(parent, user, MegaShare.ACCESS_READWRITE, contactInfoActivityLollipop);
-								}
-								break;
-							}
-							case 2:{
-								for (int i=0;i<selectedContacts.size();i++){
-									MegaUser user= megaApi.getContact(selectedContacts.get(i));
-									megaApi.share(parent, user, MegaShare.ACCESS_FULL, contactInfoActivityLollipop);
-								}
-								break;
-							}
-						}
+						nC.shareFolder(parent, selectedContacts, item);
 					}
 				});
 				permissionsDialog = dialogBuilder.create();

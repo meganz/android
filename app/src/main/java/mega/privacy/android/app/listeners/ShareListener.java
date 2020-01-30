@@ -41,42 +41,43 @@ public class ShareListener extends BaseListener {
             numberErrors++;
         }
 
+        String message = "";
+
         switch (typeShare) {
             case SHARE_LISTENER:
                 if (numberPendingRequests == 0) {
-                    String message;
                     if (numberErrors == 0) {
                         message = context.getString(R.string.context_correctly_shared);
                     } else {
                         message = context.getString(R.string.context_no_shared_number, numberErrors);
                     }
-                    showSnackBar(context, SNACKBAR_TYPE, message, (int) INVALID_HANDLE);
                 }
                 break;
 
             case CHANGE_PERMISSIONS_LISTENER:
                 if (numberPendingRequests == 0) {
-                    String message;
                     if (numberErrors == 0) {
                         message = context.getString(R.string.context_permissions_changed);
                     } else {
                         message = context.getString(R.string.number_permission_incorrectly_changed_from_shared, numberErrors);
                     }
-                    showSnackBar(context, SNACKBAR_TYPE, message, (int) INVALID_HANDLE);
                 }
                 break;
 
             case REMOVE_SHARE_LISTENER:
                 if (numberPendingRequests == 0) {
-                    String message;
                     if (numberErrors == 0) {
                         message = context.getString(R.string.context_share_correctly_removed);
                     } else {
                         message = context.getString(R.string.context_no_removed_shared);
                     }
-                    showSnackBar(context, SNACKBAR_TYPE, message, (int) INVALID_HANDLE);
                 }
                 break;
+        }
+
+        if (numberPendingRequests == 0) {
+            showSnackBar(context, SNACKBAR_TYPE, message, (int) INVALID_HANDLE);
+            sendManageSharesBroadcast();
         }
     }
 

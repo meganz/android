@@ -8,7 +8,10 @@ import android.net.Uri;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ProgressDialogUtil {
 
@@ -47,5 +50,19 @@ public class ProgressDialogUtil {
         if(dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
+    }
+
+    public static ProgressDialog getProgressDialog(String message) {
+      ProgressDialog temp = null;
+      
+        try {
+            temp = new ProgressDialog(MegaApplication.getInstance());
+            temp.setMessage(message);
+            temp.show();
+        } catch (Exception e) {
+            logWarning("Exception creating progress dialog: " + message, e);
+        }
+
+        return temp;
     }
 }

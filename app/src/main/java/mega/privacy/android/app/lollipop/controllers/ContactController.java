@@ -12,6 +12,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -32,6 +33,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.listeners.ShareListener.CHANGE_PERMISSIONS_LISTENER;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -498,12 +500,31 @@ public class ContactController {
         return fullName;
     }
 
-    public void changePermissions(List<MegaShare> shares, int newPermission, MegaNode node, MegaRequestListenerInterface changeListener) {
+    public ArrayList<String> getEmailShares(ArrayList<MegaShare> shares) {
+        if (shares == null || shares.isEmpty()) return null;
+
+        ArrayList<String> sharesEmails = new ArrayList<>();
+
         for (int i = 0; i < shares.size(); i++) {
-            String userId = shares.get(i).getUser();
-            if (userId != null) {
-                megaApi.share(node, userId, newPermission, changeListener);
-            }
+            sharesEmails.add(shares.get(i).getUser());
+        }
+
+        return sharesEmails;
+    }
+
+    public void changePermissions(ArrayList<String> shares, int newPermission, MegaNode node) {
+        if (shares == null || shares.isEmpty()) return;
+
+        ShareListener shareListener = new ShareListener(context, CHANGE_PERMISSIONS_LISTENER, shares.size());
+
+        for (int i = 0; i < shares.size(); i++) {
+            changePermission(shares.get(i), newPermission, node, shareListener);
+        }
+    }
+
+    public void changePermission(String email, int newPermission, MegaNode node, ShareListener shareListener) {
+        if (email != null) {
+            megaApi.share(node, email, newPermission, shareListener);
         }
     }
 }

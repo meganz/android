@@ -12885,22 +12885,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 			dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int item) {
-
 					permissionsDialog.dismiss();
-					switch(item) {
-						case 0:{
-							nC.shareFolder(folderHandle, selectedContacts, MegaShare.ACCESS_READ);
-							break;
-						}
-						case 1:{
-							nC.shareFolder(folderHandle, selectedContacts, MegaShare.ACCESS_READWRITE);
-							break;
-						}
-						case 2:{
-							nC.shareFolder(folderHandle, selectedContacts, MegaShare.ACCESS_FULL);
-							break;
-						}
-					}
+					nC.shareFolder(megaApi.getNodeByHandle(folderHandle), selectedContacts, item);
 				}
 			});
 			dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
@@ -12930,27 +12916,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-
-					permissionsDialog.dismiss();
-
-					switch(item) {
-						case 0:{
-							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READ);
-							break;
-						}
-						case 1:{
-							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READWRITE);
-							break;
-						}
-						case 2:{
-							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_FULL);
-							break;
-						}
-					}
-					}
-				});
+                dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
+                    permissionsDialog.dismiss();
+                    nC.shareFolder(megaApi.getNodeByHandle(nodeHandle), contactsData, item);
+                });
 				dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
 				permissionsDialog = dialogBuilder.create();
 				permissionsDialog.show();
@@ -12964,26 +12933,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-
 						permissionsDialog.dismiss();
-						switch(item) {
-							case 0:{
-								logDebug("ACCESS_READ");
-								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READ);
-								break;
-							}
-							case 1:{
-								logDebug("ACCESS_READWRITE");
-								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READWRITE);
-								break;
-							}
-							case 2:{
-								logDebug("ACCESS_FULL");
-								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_FULL);
-
-								break;
-							}
-						}
+						nC.shareFolders(nodeHandles, contactsData, item);
 					}
 				});
 				dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
