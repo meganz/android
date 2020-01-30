@@ -86,7 +86,7 @@ public class AppRTCAudioManager {
         } else {
             speakerElements(false);
         }
-        start(null);
+        start(context, null);
         if(context instanceof ChatCallActivity) {
             startProximitySensor(context);
         }else{
@@ -187,7 +187,7 @@ public class AppRTCAudioManager {
         }
     }
 
-    public void start(AudioManagerEvents audioManagerEvents) {
+    public void start(Context context, AudioManagerEvents audioManagerEvents) {
         ThreadUtils.checkIsOnMainThread();
         if (amState == AudioManagerState.RUNNING) {
             Log.e(TAG, "AudioManager is already active");
@@ -258,7 +258,12 @@ public class AppRTCAudioManager {
         // required to be in this mode when playout and/or recording starts for
         // best possible VoIP performance.
         // work around (bug13963): android 7 devices make big echo while mode set, so only apply it to other version of OS
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+        if(context instanceof ChatCallActivity){
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            }
+        }else{
             audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         }
 
