@@ -6,6 +6,8 @@
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     -->
 
+    <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF Viewer</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">of</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Yes</string>
     <string name="general_no" context="Answer for confirmation dialog.">No</string>
@@ -1627,8 +1629,6 @@
 
     <string name="achievements_title" context="title of the section for achievements">Achievements</string>
     <string name="achievements_subtitle" context="subtitle of the section for achievements">Invite friends and get rewards</string>
-
-    <string name="button_invite_friends" context="button to invite friends for getting achievements">Invite friends</string>
 
     <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">Get %1$s of storage and %2$s of transfers for each referral</string>
 
