@@ -3,6 +3,7 @@ package mega.privacy.android.app.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -13,6 +14,10 @@ public class ChatLogoutListener extends ChatBaseListener{
 
     public ChatLogoutListener(Context context) {
         super(context);
+
+        if (context instanceof LoginActivityLollipop) {
+            MegaApplication.getInstance().setIsLogginRunning(true);
+        }
     }
 
     @Override
