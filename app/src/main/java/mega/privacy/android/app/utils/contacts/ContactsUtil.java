@@ -31,7 +31,7 @@ public class ContactsUtil {
 
         public LocalContact(long id, String name) {
             this.id = id;
-            this.name = name;
+            this.name = name == null ? "" : name;
         }
 
         public long getId() {
