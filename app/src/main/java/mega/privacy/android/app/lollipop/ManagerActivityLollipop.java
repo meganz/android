@@ -258,7 +258,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -364,7 +363,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	boolean isFabOpen=false;
 	//
 
-	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
 	ChatSettings chatSettings = null;
 	MegaAttributes attr = null;
@@ -1328,12 +1326,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 				MegaAttributes attributes = dbH.getAttributes();
 
-				long lastPublicHandle = getLastPublicHandle(attributes);
-				if (lastPublicHandle == -1){
+				long lastPublicHandle = attributes.getLastPublicHandle();
+				if (lastPublicHandle == INVALID_HANDLE){
 					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), managerActivity);
 				}
 				else{
-					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle, managerActivity);
+					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle,
+							attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), managerActivity);
 				}
             }
             else{
@@ -1341,12 +1340,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (dbH != null){
 					MegaAttributes attributes = dbH.getAttributes();
 
-					long lastPublicHandle = getLastPublicHandle(attributes);
-					if (lastPublicHandle == -1){
+					long lastPublicHandle = attributes.getLastPublicHandle();
+					if (lastPublicHandle == INVALID_HANDLE){
 						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson());
 					}
 					else{
-						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle);
+						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle,
+								attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp());
 					}
 				}
 				else{
@@ -1524,12 +1524,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 						MegaAttributes attributes = dbH.getAttributes();
 
-						long lastPublicHandle = getLastPublicHandle(attributes);
-						if (lastPublicHandle == -1){
+						long lastPublicHandle = attributes.getLastPublicHandle();
+						if (lastPublicHandle == INVALID_HANDLE){
 							megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), managerActivity);
 						}
 						else{
-							megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle, managerActivity);
+							megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle,
+									attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), managerActivity);
 						}
 					}
 				}
@@ -3505,6 +3506,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			logWarning("Not valid contact handle");
     		return;
 		}
+
+		dbH.setLastPublicHandle(handle);
+		dbH.setLastPublicHandleTimeStamp();
+		dbH.setLastPublicHandleType(AFFILIATE_TYPE_CONTACT);
+
 		handleInviteContact = handle;
     	dismissOpenLinkDialog();
 		logDebug("Handle to invite a contact: " + handle);
@@ -8085,7 +8091,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.action_menu_invite:{
 				if (drawerItem == DrawerItem.CHAT){
                     logDebug("to InviteContactActivity");
-                    startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
+                    startActivityForResult(new Intent(getApplicationContext(), InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
 				}
 
 				return true;
@@ -12118,12 +12124,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 					MegaAttributes attributes = dbH.getAttributes();
 
-					long lastPublicHandle = getLastPublicHandle(attributes);
-					if (lastPublicHandle == -1){
+					long lastPublicHandle = attributes.getLastPublicHandle();
+					if (lastPublicHandle == INVALID_HANDLE){
 						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), this);
 					}
 					else{
-						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle, this);
+						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle,
+								attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), this);
 					}
 				}
 			}
@@ -15462,14 +15469,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							setInboxNavigationDrawer();
 						}
 						moveToRubbish = false;
-						resetAccountDetailsTimeStamp(getApplicationContext());
+						resetAccountDetailsTimeStamp();
 					}
 					else if(restoreFromRubbish){
 						logDebug("Restore from rubbish");
 						MegaNode destination = megaApi.getNodeByHandle(request.getParentHandle());
 						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_node_restored, destination.getName()), -1);
 						restoreFromRubbish = false;
-						resetAccountDetailsTimeStamp(getApplicationContext());
+						resetAccountDetailsTimeStamp();
 					}
 					else{
 						logDebug("Not moved to rubbish");
@@ -15598,11 +15605,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				refreshAfterRemoving();
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
-				resetAccountDetailsTimeStamp(getApplicationContext());
+				resetAccountDetailsTimeStamp();
 			} else if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
 				showSnackbar(SNACKBAR_TYPE, e.getErrorString(), -1);
 			} else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
+			    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
 			}
 			logDebug("Remove request finished");
 		}
@@ -15665,7 +15672,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					refreshInboxList();
 				}
 
-				resetAccountDetailsTimeStamp(getApplicationContext());
+				resetAccountDetailsTimeStamp();
 			}
 			else{
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
@@ -15744,7 +15751,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_emptied), -1);
-				resetAccountDetailsTimeStamp(getApplicationContext());
+				resetAccountDetailsTimeStamp();
 				if (getSettingsFragment() != null) {
 					sttFLol.resetRubbishInfo();
 				}
@@ -18323,14 +18330,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	private boolean checkPermissionsCall(){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 			if (!hasCameraPermission) {
 				typesCameraPermission = START_CALL_PERMISSIONS;
 
 				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
 				return false;
 			}
-			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
 			if (!hasRecordAudioPermission) {
 				typesCameraPermission = START_CALL_PERMISSIONS;
 				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);

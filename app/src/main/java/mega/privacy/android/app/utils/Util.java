@@ -135,10 +135,8 @@ public class Util {
 	public static String base64EncodedPublicKey_4 = "wL6PWE8ZGGeeJmU0eAJeRJMsNEwMrW2LATnIoJ4/qLYU4gKDINPMRaIE6/4pQnbd2NurWm8ZQT7XSMQZcisTqwRLS";
 	public static String base64EncodedPublicKey_5 = "YgjYKCXtjloP8QnKu0IGOoo79Cfs3Z9eC3sQ1fcLQsMM2wExlbnYI2KPTs0EGCmcMXrrO5MimGjYeW8GQlrKsbiZ0UwIDAQAB";
 	*/
-	public static DatabaseHandler dbH;
 	public static boolean fileLoggerSDK = false;
 	public static boolean fileLoggerKarere = false;
-	public static Context context;
 
 	public static HashMap<String, String> countryCodeDisplay;
 
@@ -296,6 +294,7 @@ public class Util {
 			count =  list.length;
 		}
 
+		Context context = MegaApplication.getInstance().getApplicationContext();
 		String numChilden = count + " " + context.getResources().getQuantityString(R.plurals.general_num_items, count);
 
 		return numChilden;
@@ -512,7 +511,8 @@ public class Util {
 		float MB = KB * 1024;
 		float GB = MB * 1024;
 		float TB = GB * 1024;
-		
+
+		Context context = MegaApplication.getInstance().getApplicationContext();
 		if (size < KB){
 			sizeString = size + " " + context.getString(R.string.label_file_size_byte);
 		}
@@ -538,6 +538,7 @@ public class Util {
 
         float TB = 1024;
 
+		Context context = MegaApplication.getInstance().getApplicationContext();
         if (gbSize < TB){
             sizeString = decf.format(gbSize) + " " + context.getString(R.string.label_file_size_giga_byte);
         }
@@ -547,14 +548,6 @@ public class Util {
 
         return sizeString;
     }
-
-	public static void setContext(Context c){
-		context = c;
-	}
-
-	public static void setDBH(DatabaseHandler d){
-		dbH = d;
-	}
 
 	public static void setFileLoggerSDK(boolean fL){
 		fileLoggerSDK = fL;
@@ -736,7 +729,7 @@ public class Util {
 		} else {
 			return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS;
 		}
-		
+
 	}
 	
 	/** Returns the consumer friendly device name */
@@ -1091,6 +1084,8 @@ public class Util {
 		int numFolders = 0;
 		int numFiles = 0;
 
+		Context context = MegaApplication.getInstance().getApplicationContext();
+
 		for (int i=0;i<nodes.size();i++){
 			MegaNode c = nodes.get(i);
 			if (c.isFolder()){
@@ -1146,30 +1141,6 @@ public class Util {
 		else{
 			return false;
 		}
-	}
-
-	public static long getLastPublicHandle(MegaAttributes attributes){
-		long lastPublicHandle = -1;
-
-		if (attributes != null){
-			if (attributes.getLastPublicHandle() != null){
-				try{
-					long currentTime = System.currentTimeMillis()/1000;
-					long lastPublicHandleTimeStamp = Long.parseLong(attributes.getLastPublicHandleTimeStamp());
-					logDebug("currentTime: " + currentTime + " _ " + lastPublicHandleTimeStamp);
-					if ((currentTime - lastPublicHandleTimeStamp) < 86400){
-						if (Long.parseLong(attributes.getLastPublicHandle()) != -1){
-							lastPublicHandle = Long.parseLong(attributes.getLastPublicHandle());
-						}
-					}
-				}
-				catch (Exception e){
-					lastPublicHandle = -1;
-				}
-			}
-		}
-
-		return lastPublicHandle;
 	}
 	
 	public static boolean isPaymentMethod(BitSet paymentBitSet, int plan){
@@ -1228,6 +1199,7 @@ public class Util {
 	 * compare the current mail to newly changed email
 	 */
 	public static String comparedToCurrentEmail(String value, Context context) {
+		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
 		if (value.equals(dbH.getCredentials().getEmail())) {
 			return context.getString(R.string.mail_same_as_old);
 		}
@@ -1297,9 +1269,7 @@ public class Util {
 
 	public static boolean isChatEnabled (){
 		logDebug("isChatEnabled");
-		if (dbH == null){
-			dbH = DatabaseHandler.getDbHandler(context);
-		}
+		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
 		ChatSettings chatSettings = dbH.getChatSettings();
 		boolean chatEnabled;
 
@@ -1336,9 +1306,7 @@ public class Util {
 
 		boolean fileLogger = false;
 
-		if (dbH == null){
-			dbH = DatabaseHandler.getDbHandler(context);
-		}
+		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
 
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
@@ -1418,6 +1386,7 @@ public class Util {
     
     //reduce font size for scale mode to prevent title and subtitle overlap
     public static SpannableString adjustForLargeFont(String original) {
+		Context context = MegaApplication.getInstance().getApplicationContext();
         float scale = context.getResources().getConfiguration().fontScale;
         if(scale > 1){
             scale = (float)0.9;
@@ -1501,14 +1470,14 @@ public class Util {
         Paint paintCircle = new Paint();
         paintCircle.setAntiAlias(true);
         int color = (colorString == null) ?
-                ContextCompat.getColor(context, R.color.lollipop_primary_color) :
+                ContextCompat.getColor(MegaApplication.getInstance().getApplicationContext(), R.color.lollipop_primary_color) :
                 Color.parseColor(colorString);
         paintCircle.setColor(color);
         int radius = circle.getWidth() / 2;
         c.drawCircle(radius, radius, radius, paintCircle);
         return circle;
     }
-
+    
 	public static MegaPreferences getPreferences (Context context) {
 		return DatabaseHandler.getDbHandler(context).getPreferences();
 	}
@@ -1771,7 +1740,8 @@ public class Util {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm =
+						(InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
             }
         }, 50);

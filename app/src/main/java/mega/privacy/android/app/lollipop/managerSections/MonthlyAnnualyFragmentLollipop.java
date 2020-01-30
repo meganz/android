@@ -257,12 +257,12 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 	public void refreshAccountInfo(){
 
 		logDebug("Check the last call to callToPricing");
-		if(DBUtil.callToPricing(context)){
+		if(DBUtil.callToPricing()){
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}
 
 		logDebug("Check the last call to callToPaymentMethods");
-		if(DBUtil.callToPaymentMethods(context)){
+		if(DBUtil.callToPaymentMethods()){
 			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
 		}
 	}

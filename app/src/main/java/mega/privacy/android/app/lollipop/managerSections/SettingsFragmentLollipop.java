@@ -888,7 +888,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				waitPresenceConfig();
 			}
 
-			boolean sendOriginalAttachment = isSendOriginalAttachments(context);
+			boolean sendOriginalAttachment = isSendOriginalAttachments();
 			if(sendOriginalAttachment){
 				chatAttachmentsChatListPreference.setValue(1+"");
 			}
@@ -2391,7 +2391,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		//Check if the call is recently
 		logDebug("Check the last call to getAccountDetails");
 		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
-		if(callToAccountDetails(context) || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
+		if(callToAccountDetails() || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
 			logDebug("megaApi.getAccountDetails SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
 		}

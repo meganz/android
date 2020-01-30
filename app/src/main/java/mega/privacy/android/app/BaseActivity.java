@@ -54,6 +54,8 @@ public class BaseActivity extends AppCompatActivity {
     protected MegaApiAndroid megaApiFolder;
     protected MegaChatApiAndroid megaChatApi;
 
+    protected DatabaseHandler dbH;
+
     private AlertDialog sslErrorDialog;
 
     private boolean delaySignalPresence = false;
@@ -66,6 +68,8 @@ public class BaseActivity extends AppCompatActivity {
         if(isChatEnabled()) {
             megaChatApi = app.getMegaChatApi();
         }
+
+        dbH = app.getDbH();
     }
 
     private AlertDialog expiredBusinessAlert;
@@ -163,6 +167,10 @@ public class BaseActivity extends AppCompatActivity {
             if (megaChatApi == null){
                 megaChatApi = app.getMegaChatApi();
             }
+        }
+
+        if (dbH == null) {
+            dbH = app.getDbH();
         }
     }
 
@@ -464,7 +472,7 @@ public class BaseActivity extends AppCompatActivity {
 
         //Check if the call is recently
         logDebug("Check the last call to getAccountDetails");
-        if(callToAccountDetails(getApplicationContext())){
+        if(callToAccountDetails()){
             logDebug("megaApi.getAccountDetails SEND");
             app.askForAccountDetails();
         }

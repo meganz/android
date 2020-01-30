@@ -425,27 +425,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		return fragment;
 	}
 
-	public void refreshAccountInfo(){
-		logDebug("refreshAccountInfo");
-
-		//Check if the call is recently
-		logDebug("Check the last call to getAccountDetails");
-		if(callToAccountDetails(context)){
-			logDebug("megaApi.getAccountDetails SEND");
-			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
-		}
-		logDebug("Check the last call to getExtendedAccountDetails");
-		if(callToExtendedAccountDetails(context)){
-			logDebug("megaApi.getExtendedAccountDetails SEND");
-			((MegaApplication) ((Activity)context).getApplication()).askForExtendedAccountDetails();
-		}
-		logDebug("Check the last call to getPaymentMethods");
-		if(callToPaymentMethods(context)){
-			logDebug("megaApi.getPaymentMethods SEND");
-			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
-		}
-	}
-
 	private void permitEditNameAndEmail() {
 		nameView.setOnClickListener(this);
 		infoEmail.setOnClickListener(this);
