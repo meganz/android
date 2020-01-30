@@ -896,7 +896,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         stopService(new Intent(this, IncomingCallService.class));
         restoreHeightAndWidth();
         if (rtcAudioManager != null) {
-            rtcAudioManager.startProximitySensor(this);
+            rtcAudioManager.startProximitySensor();
         }
         application.createChatAudioManager();
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);

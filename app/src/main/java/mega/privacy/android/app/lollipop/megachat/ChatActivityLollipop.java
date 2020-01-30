@@ -8448,7 +8448,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     public void startProximitySensor(){
         createSpeakerAudioManger();
-        rtcAudioManager.startProximitySensor(this);
+        rtcAudioManager.startProximitySensor();
     }
     private void activateSpeaker(){
         if(!speakerWasActivated){
