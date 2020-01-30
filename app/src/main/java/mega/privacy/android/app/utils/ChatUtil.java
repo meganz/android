@@ -541,7 +541,7 @@ public class ChatUtil {
         return result;
     }
 
-    public static boolean isAllowedStartCall(Context context, MegaChatApiAndroid megaChatApi, long chatId) {
+    public static boolean isStatusConnected(Context context, MegaChatApiAndroid megaChatApi, long chatId) {
         return checkConnection(context) && megaChatApi != null && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED && megaChatApi.getChatConnectionState(chatId) == MegaChatApi.CHAT_CONNECTION_ONLINE;
     }
 
