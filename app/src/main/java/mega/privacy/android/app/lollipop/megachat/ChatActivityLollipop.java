@@ -7580,11 +7580,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void markAsSeen(MegaChatMessage msg){
+    public void markAsSeen(MegaChatMessage msg) {
         logDebug("markAsSeen");
-        if(activityVisible){
-            if(msg.getStatus()!=MegaChatMessage.STATUS_SEEN && MegaApplication.isActivityVisible()) {
-                logDebug("markAsSeen: request to set " + msg.getMsgId() + " as seen");
+        if (activityVisible) {
+            if (msg.getStatus() != MegaChatMessage.STATUS_SEEN) {
+                logDebug("Mark message: " + msg.getMsgId() + " as seen");
                 megaChatApi.setMessageSeen(chatRoom.getChatId(), msg.getMsgId());
             }
         }

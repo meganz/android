@@ -94,41 +94,18 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             wl.setReferenceCounted(false);
             wl.acquire(AWAKE_CPU_FOR);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if(shouldBeep(remoteMessage)) {
+        if(shouldBeep(remoteMessage)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(new Intent(this, KeepAliveService.class));
-            }
-        } else {
-            if(shouldBeep(remoteMessage)) {
+            } else {
                 startService(new Intent(this, KeepAliveService.class));
             }
         }
     }
 
     private boolean shouldBeep(RemoteMessage message) {
-        boolean beep;
-        try{
-            String silent = message.getData().get(SILENT);
-            logDebug("Silent payload: "+silent);
-
-            if(silent!=null){
-                if(silent.equals(NO_BEEP)){
-                    beep = false;
-                }
-                else{
-                    beep = true;
-                }
-            }
-            else{
-                logDebug("NO DATA on the PUSH");
-                beep = true;
-            }
-        }
-        catch(Exception e){
-            logWarning("ERROR:remoteSilentParameter");
-            beep = true;
-        }
-        return beep;
+        String silent = message.getData().get(SILENT);
+        return !NO_BEEP.equals(silent);
     }
 
     /**

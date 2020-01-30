@@ -68,6 +68,9 @@ public final class ChatAdvancedNotificationBuilder {
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
+    private static final String STRING_FALSE = "false";
+    private static final String STRING_TRUE = "true";
+
     private NotificationCompat.Builder mBuilderCompat;
 
     private static Set<Integer> notificationIds = new HashSet<>();
@@ -206,10 +209,8 @@ public final class ChatAdvancedNotificationBuilder {
             notificationBuilder.setSound(uriParameter);
         }
 
-        if (vibration != null) {
-            if (vibration.equals("true")) {
-                notificationBuilder.setVibrate(new long[]{0, 500});
-            }
+        if (STRING_TRUE.equals(vibration)) {
+            notificationBuilder.setVibrate(new long[]{0, 500});
         }
 
         notificationBuilder.setStyle(inboxStyle);
@@ -380,7 +381,6 @@ public final class ChatAdvancedNotificationBuilder {
             NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
             channel.setShowBadge(true);
             channel.enableVibration(false);
-            channel.setVibrationPattern(new long[]{0});
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
             }
@@ -499,12 +499,12 @@ public final class ChatAdvancedNotificationBuilder {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (!"false".equals(vibration)) {
+            if (!STRING_FALSE.equals(vibration)) {
                 //use the channel with vibration
                 notificationBuilderO.setChannelId(notificationChannelIdChatSummaryV2);
             }
         } else {
-            if ("true".equals(vibration)) {
+            if (STRING_TRUE.equals(vibration)) {
                 notificationBuilder.setVibrate(new long[]{0, 500});
             }
         }
@@ -640,7 +640,6 @@ public final class ChatAdvancedNotificationBuilder {
         NotificationChannel channelNoVibration = new NotificationChannel(notificationChannelIdChatSummaryNoVibrate,notificationChannelNameChatSummaryNoVibrate,NotificationManager.IMPORTANCE_HIGH);
         channelNoVibration.setShowBadge(true);
         channelNoVibration.enableVibration(false);
-        channelNoVibration.setVibrationPattern(new long[] {0});
 
         NotificationManager manager = context.getSystemService(NotificationManager.class);
         if (manager != null) {
@@ -666,7 +665,6 @@ public final class ChatAdvancedNotificationBuilder {
                 NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
                 channel.setShowBadge(true);
                 channel.enableVibration(false);
-                channel.setVibrationPattern(new long[]{ 0 });
                 if (notificationManager != null) {
                     notificationManager.createNotificationChannel(channel);
                 }
@@ -688,7 +686,7 @@ public final class ChatAdvancedNotificationBuilder {
                 ChatSettings chatSettings = dbH.getChatSettings();
                 if (chatSettings != null){
                     if (chatSettings.getVibrationEnabled()!=null && !chatSettings.getVibrationEnabled().isEmpty()){
-                        if (chatSettings.getVibrationEnabled().compareTo("false") == 0){
+                        if (STRING_FALSE.equals(chatSettings.getVibrationEnabled())){
                             vibrationEnabled = false;
                         }
                     }
@@ -748,7 +746,6 @@ public final class ChatAdvancedNotificationBuilder {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
             channel.enableVibration(false);
-            channel.setVibrationPattern(new long[]{ 0 });
             channel.setShowBadge(true);
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -1120,7 +1117,6 @@ public final class ChatAdvancedNotificationBuilder {
         logDebug("generateChatNotification");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            logDebug("generateChatNotification:POST Android O");
             newGenerateChatNotification(request);
         }
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -1348,7 +1344,7 @@ public final class ChatAdvancedNotificationBuilder {
                     checkNotificationsSoundPreN(request, beep, lastChatId);
                 }
                 else{
-                    if (chatSettings.getNotificationsEnabled().equals("true")) {
+                    if (STRING_TRUE.equals(chatSettings.getNotificationsEnabled())) {
                         logDebug("Notifications ON for all chats");
                         checkNotificationsSoundPreN(request, beep, lastChatId);
                     } else {
@@ -1360,11 +1356,11 @@ public final class ChatAdvancedNotificationBuilder {
                 logDebug("Notifications DEFAULT ON");
 
                 Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                buildNotificationPreN(defaultSoundUri2, "true", request);
+                buildNotificationPreN(defaultSoundUri2, STRING_TRUE, request);
             }
         }
         else{
-            buildNotificationPreN(null, "false", request);
+            buildNotificationPreN(null, STRING_FALSE, request);
         }
     }
 
@@ -1374,7 +1370,7 @@ public final class ChatAdvancedNotificationBuilder {
         ChatSettings chatSettings = dbH.getChatSettings();
         ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(lastChatId));
 
-        if (chatItemPreferences == null || chatItemPreferences.getNotificationsEnabled() == null || chatItemPreferences.getNotificationsEnabled().isEmpty() || chatItemPreferences.getNotificationsEnabled().equals("true")) {
+        if (chatItemPreferences == null || chatItemPreferences.getNotificationsEnabled() == null || chatItemPreferences.getNotificationsEnabled().isEmpty() || STRING_TRUE.equals(chatItemPreferences.getNotificationsEnabled())) {
             logDebug("Notifications OFF for this chat");
 
             if (chatSettings.getNotificationsSound() == null){
@@ -1391,7 +1387,7 @@ public final class ChatAdvancedNotificationBuilder {
                 Uri uri = Uri.parse(soundString);
                 logDebug("Uri: " + uri);
 
-                if (soundString.equals("true") || soundString.equals("")) {
+                if (STRING_TRUE.equals(soundString) || "".equals(soundString)) {
 
                     Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
                     buildNotificationPreN(defaultSoundUri, chatSettings.getVibrationEnabled(), request);
@@ -1427,7 +1423,7 @@ public final class ChatAdvancedNotificationBuilder {
                     return checkNotificationsSound(chatid, handleListUnread, beep);
                 }
                 else{
-                    if (chatSettings.getNotificationsEnabled().equals("true")) {
+                    if (STRING_TRUE.equals(chatSettings.getNotificationsEnabled())) {
                         logDebug("Notifications ON for all chats");
 
                         return checkNotificationsSound(chatid, handleListUnread, beep);
@@ -1441,12 +1437,12 @@ public final class ChatAdvancedNotificationBuilder {
                 logDebug("Notifications DEFAULT ON");
 
                 Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                sendBundledNotification(defaultSoundUri2, "true", chatid, handleListUnread);
+                sendBundledNotification(defaultSoundUri2, STRING_TRUE, chatid, handleListUnread);
                 return true;
             }
         }
         else{
-            sendBundledNotification(null, "false", chatid, handleListUnread);
+            sendBundledNotification(null, STRING_FALSE, chatid, handleListUnread);
             return true;
         }
     }
@@ -1464,7 +1460,7 @@ public final class ChatAdvancedNotificationBuilder {
                     return shouldCheckNotificationsSound(chatid, handleListUnread, beep);
                 }
                 else{
-                    if (chatSettings.getNotificationsEnabled().equals("true")) {
+                    if (STRING_TRUE.equals(chatSettings.getNotificationsEnabled())) {
                         logDebug("Notifications ON for all chats");
 
                         return shouldCheckNotificationsSound(chatid, handleListUnread, beep);
@@ -1490,7 +1486,7 @@ public final class ChatAdvancedNotificationBuilder {
         ChatSettings chatSettings = dbH.getChatSettings();
         ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(chatid));
 
-        if (chatItemPreferences == null || chatItemPreferences.getNotificationsEnabled() == null || chatItemPreferences.getNotificationsEnabled().isEmpty() ||chatItemPreferences.getNotificationsEnabled().equals("true")) {
+        if (chatItemPreferences == null || chatItemPreferences.getNotificationsEnabled() == null || chatItemPreferences.getNotificationsEnabled().isEmpty() ||STRING_TRUE.equals(chatItemPreferences.getNotificationsEnabled())) {
             logDebug("checkNotificationsSound: Notifications ON for this chat");
 
             removeAllChatNotifications();
@@ -1509,7 +1505,7 @@ public final class ChatAdvancedNotificationBuilder {
                 Uri uri = Uri.parse(soundString);
                 logDebug("Uri: " + uri);
 
-                if (soundString.equals("true") || soundString.equals("")) {
+                if (STRING_TRUE.equals(soundString) || "".equals(soundString)) {
 
                     Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
                     sendBundledNotification(defaultSoundUri, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
@@ -1539,7 +1535,7 @@ public final class ChatAdvancedNotificationBuilder {
         ChatSettings chatSettings = dbH.getChatSettings();
         ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(chatid));
 
-        if (chatItemPreferences == null || chatItemPreferences.getNotificationsEnabled() == null || chatItemPreferences.getNotificationsEnabled().isEmpty() ||chatItemPreferences.getNotificationsEnabled().equals("true")) {
+        if (chatItemPreferences == null || chatItemPreferences.getNotificationsEnabled() == null || chatItemPreferences.getNotificationsEnabled().isEmpty() ||STRING_TRUE.equals(chatItemPreferences.getNotificationsEnabled())) {
             logDebug("Notifications ON for this chat");
             return true;
         } else {
