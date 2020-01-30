@@ -42,7 +42,6 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
-import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -71,8 +70,6 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaEvent;
-import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
@@ -80,9 +77,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
-import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
@@ -1551,7 +1546,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				}
 
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
-				    if(shouldNotify(this)) {
+				    if(shouldNotify(this) && call.getDuration() > 0) {
                         toSystemSettingNotification(this);
                     }
                     cancelIncomingCallNotification(this);
