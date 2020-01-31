@@ -8,7 +8,6 @@ import android.net.Uri;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.LogUtil.*;

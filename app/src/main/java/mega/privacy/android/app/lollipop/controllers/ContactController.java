@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.controllers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -29,7 +28,6 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 

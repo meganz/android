@@ -53,7 +53,6 @@ import mega.privacy.android.app.utils.download.DownloadInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.listeners.ShareListener.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;

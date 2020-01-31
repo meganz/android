@@ -15514,32 +15514,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logError("TYPE_CREATE_FOLDER ERROR: " + e.getErrorCode() + " " + e.getErrorString());
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_no_created), -1);
 			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_SHARE){
-			try {
-				statusDialog.dismiss();
-				logDebug("Dismiss");
-			}
-			catch (Exception ex) {logError("Exception", ex);}
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("OK MegaRequest.TYPE_SHARE");
-				if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_remove_sharing), -1);
-				}
-				else{
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_shared), -1);
-				}
-			}
-			else{
-				if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed_shared), -1);
-				}
-				else{
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_shared), -1);
-				}
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT){
+		} else if (request.getType() == MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT){
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("PURCHASE CORRECT!");
 				drawerItem = DrawerItem.CLOUD_DRIVE;

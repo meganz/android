@@ -82,7 +82,6 @@ import mega.privacy.android.app.lollipop.adapters.MegaFileInfoSharedContactLolli
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
-import mega.privacy.android.app.lollipop.listeners.FileContactMultipleRequestListener;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -175,8 +174,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
 	private boolean isGetLink = false;
 	private boolean isShareContactExpanded = false;
-    boolean removeShare = false;
-    boolean changeShare = false;
 
 	float scaleText;
 
@@ -318,8 +315,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
     int versionsRemoved = 0;
     int errorVersionRemove = 0;
 
-    private FileContactMultipleRequestListener.RequestCompletedCallback requestCompletedCallback;
-
     private FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment;
 
     private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
@@ -420,9 +415,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                             if(permissionsDialog != null){
                                 permissionsDialog.dismiss();
                             }
-                            removeShare = false;
-                            changeShare = true;
-
                             statusDialog = getProgressDialog(fileInfoActivityLollipop, getString(R.string.context_permissions_changing_folder));
                             cC.changePermissions(cC.getEmailShares(shares), item, node);
                         }
@@ -540,13 +532,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         if (extras != null) {
             imageId = extras.getInt("imageId");
         }
-
-        requestCompletedCallback = new FileContactMultipleRequestListener.RequestCompletedCallback() {
-            @Override
-            public void onRequestCompleted(String message) {
-                editMultipleSharesCallback(message);
-            }
-        };
 
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
@@ -2945,20 +2930,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
         super.onBackPressed();
 	}
-	
-	public void editMultipleSharesCallback(String message){
-	    if(statusDialog != null){
-            statusDialog.dismiss();
-        }
-        
-        if(adapter!=null){
-            if(adapter.isMultipleSelect()){
-                adapter.clearSelections();
-                hideMultipleSelect();
-            }
-        }
-        showSnackbar(SNACKBAR_TYPE, message, -1);
-    }
 
 	public void showSnackbar(int type, String s, long idChat){
 	    showSnackbar(type, fragmentContainer, s, idChat);
@@ -3155,8 +3126,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
         dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                removeShare = false;
-                changeShare = true;
                 statusDialog = getProgressDialog(fileInfoActivityLollipop, getString(R.string.context_permissions_changing_folder));
                 permissionsDialog.dismiss();
                 cC.changePermission(selectedShare.getUser(), item, node, new ShareListener(fileInfoActivityLollipop, ShareListener.CHANGE_PERMISSIONS_LISTENER, 1));
@@ -3180,8 +3149,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
     }
 
     public void removeShare(String email) {
-        removeShare = true;
-        changeShare = false;
         statusDialog = getProgressDialog(fileInfoActivityLollipop, getString(R.string.context_removing_contact_folder));
         nC.removeShare(new ShareListener(fileInfoActivityLollipop, ShareListener.REMOVE_SHARE_LISTENER, 1), node, email);
     }
@@ -3230,8 +3197,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
     public void removeMultipleShares(ArrayList<MegaShare> shares){
         logDebug("removeMultipleShares");
-        removeShare = true;
-        changeShare = false;
         statusDialog = getProgressDialog(fileInfoActivityLollipop, getString(R.string.context_removing_contact_folder));
         nC.removeShares(shares, node);
     }
