@@ -341,11 +341,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.itemLayout.setOnClickListener(this);
 				holder.itemLayout.setOnLongClickListener(this);
 			}
-
 			if (isChatEnabled() && chat.isCallInProgress() && megaChatApi != null && megaChatApi.getNumCalls() != 0) {
 				MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
 				if (call != null) {
-					if(call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
+					if(call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT || call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED){
 						((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
 						((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 						((ViewHolderNormalChatList) holder).textViewContent.setVisibility(View.VISIBLE);
@@ -2265,7 +2264,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			} else if (messageType == MegaChatMessage.TYPE_CONTACT_ATTACHMENT && lastMessage != null && lastMessage.getUsersCount() > 1) {
 				long contactsCount = lastMessage.getUsersCount();
-				String contactAttachmentMessage = converterShortCodes(context.getString(R.string.contacts_sent, contactsCount));
+				String contactAttachmentMessage = converterShortCodes(context.getString(R.string.contacts_sent, String.valueOf(contactsCount)));
 				Spannable myMessage = new SpannableString(contactAttachmentMessage);
 
 				if (chat.getLastMessageSender() == megaChatApi.getMyUserHandle()) {

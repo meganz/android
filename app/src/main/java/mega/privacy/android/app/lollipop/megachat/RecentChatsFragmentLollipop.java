@@ -282,6 +282,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     }
                 } else {
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                         appBarLayout.setElevation(px2dp(4, outMetrics));
                     } else {
@@ -309,7 +310,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
         appBarLayout = v.findViewById(R.id.linear_layout_add);
-        aB = ((AppCompatActivity) context).getSupportActionBar();
+        if(context instanceof ArchivedChatsActivity) {
+            appBarLayout.setVisibility(View.GONE);
+        } else {
+            aB = ((AppCompatActivity) context).getSupportActionBar();
+        }
         emptyLayoutContainer = v.findViewById(R.id.scroller);
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
         fastScroller = (FastScroller) v.findViewById(R.id.fastscroll_chat);
@@ -1643,7 +1648,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         }
-        refreshMegaContactsList();
+        // if in ArchivedChatsActivity or user close the invitation banner, no need to load contacts.
+        if(appBarLayout.getVisibility() != View.GONE) {
+            refreshMegaContactsList();
+        }
         setStatus();
         super.onResume();
     }
