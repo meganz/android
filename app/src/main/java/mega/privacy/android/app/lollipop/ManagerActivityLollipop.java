@@ -16923,6 +16923,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private boolean shouldShowFabWhenSearch() {
+		if (searchDrawerItem == null) {
+			return false;
+		}
+
 		switch (searchDrawerItem) {
 			case RUBBISH_BIN:
 			case INBOX:
