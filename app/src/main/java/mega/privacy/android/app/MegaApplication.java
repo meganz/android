@@ -150,6 +150,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
     private static boolean isBlockedDueToWeakAccount = false;
     private static boolean isWebOpenDueToEmailVerification = false;
+    private static boolean isLoggingRunning = false;
 
 	MegaChatApiAndroid megaChatApi = null;
 
@@ -1167,37 +1168,30 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					AccountController aC = new AccountController(this);
 					aC.logoutConfirmed(this);
 
-					if(activityVisible){
-						if(getUrlConfirmationLink()!=null){
-							logDebug("Launch intent to confirmation account screen");
-							Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-							confirmIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-							confirmIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
-							confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							confirmIntent.setAction(ACTION_CONFIRM);
-							setUrlConfirmationLink(null);
-							startActivity(confirmIntent);
-						}
-						else{
-							logDebug("Launch intent to login activity");
-							Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-							tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-							this.startActivity(tourIntent);
-						}
+					if (isIsLoggingRunning()) {
+						logDebug("Already in Login Activity, not necessary to launch it again");
+						return;
 					}
-					else{
-						logDebug("No activity visible on logging out chat");
-						if(getUrlConfirmationLink()!=null){
-							logDebug("Show confirmation account screen");
-							Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-							confirmIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-							confirmIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
-							confirmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-							confirmIntent.setAction(ACTION_CONFIRM);
-							setUrlConfirmationLink(null);
-							startActivity(confirmIntent);
+
+					Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+
+					if (getUrlConfirmationLink() != null) {
+						loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
+						loginIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
+						if (isActivityVisible()) {
+							loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						} else {
+							loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 						}
+						loginIntent.setAction(ACTION_CONFIRM);
+						setUrlConfirmationLink(null);
+					} else if (isActivityVisible()) {
+						loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					} else {
+						loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					}
+
+					startActivity(loginIntent);
 				}
 				else{
 					logDebug("Disable chat finish logout");
@@ -1898,5 +1892,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public static boolean isWebOpenDueToEmailVerification() {
 		return isWebOpenDueToEmailVerification;
+	}
+
+	public void setIsLoggingRunning (boolean isLoggingRunning) {
+		MegaApplication.isLoggingRunning = isLoggingRunning;
+	}
+
+	public boolean isIsLoggingRunning() {
+		return isLoggingRunning;
 	}
 }

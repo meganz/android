@@ -89,19 +89,19 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         logDebug("onPause");
-        app.activityPaused();
         checkMegaObjects();
+        app.activityPaused();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
         logDebug("onResume");
-        app.activityResumed();
         super.onResume();
         setAppFontSize(this);
 
         checkMegaObjects();
+        app.activityResumed();
 
         retryConnectionsAndSignalPresence();
     }
