@@ -336,9 +336,7 @@ public class ChatExplorerFragment extends Fragment {
         }
 
         String fullName = getContactNameDB(megaApi, context, handle);
-        if(fullName ==  null){
-            fullName = user.getEmail();
-        }
+        if(fullName ==  null) fullName = user.getEmail();
 
         if (handle != -1) {
             int userStatus = megaChatApi.getUserOnlineStatus(handle);

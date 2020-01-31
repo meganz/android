@@ -2346,6 +2346,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
+    private MegaContactAdapter createMegaContact(int position){
+        long contactHandle = contactsMEGA.get(position).getHandle();
+        String fullName = getContactNameDB(megaApi, this, contactHandle);
+        if(fullName ==  null) fullName = contactsMEGA.get(position).getEmail();
+        return new MegaContactAdapter(getContactDB(contactHandle), contactsMEGA.get(position), fullName);
+    }
+
     private void getVisibleMEGAContacts () {
         contactsMEGA = megaApi.getContacts();
         visibleContactsMEGA.clear();
@@ -2374,19 +2381,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                                 }
                             }
 
-                            long contactHandle = contactsMEGA.get(i).getHandle();
-                            String fullName = getContactNameDB(megaApi, this, contactHandle);
-                            if(fullName ==  null){
-                                fullName = contactsMEGA.get(i).getEmail();
-                            }
-
                             if(!found){
-                                logDebug("Added to list: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
-                                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contactsMEGA.get(i), fullName);
+                                MegaContactAdapter megaContactAdapter = createMegaContact(i);
                                 visibleContactsMEGA.add(megaContactAdapter);
                             }
                             else{
-                                logDebug("Removed from list - already included on chat: " + fullName);
+                                logDebug("Removed from list - already included on chat: ");
                             }
                         }
                     }
@@ -2395,13 +2395,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     for (int i=0;i<contactsMEGA.size();i++){
                         logDebug("Contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
                         if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-
-                            long contactHandle = contactsMEGA.get(i).getHandle();
-                            String fullName = getContactNameDB(megaApi, this, contactHandle);
-                            if(fullName ==  null){
-                                fullName = contactsMEGA.get(i).getEmail();
-                            }
-                            MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contactsMEGA.get(i), fullName);
+                            MegaContactAdapter megaContactAdapter = createMegaContact(i);
                             visibleContactsMEGA.add(megaContactAdapter);
                         }
                     }
@@ -2421,14 +2415,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 found = false;
                 logDebug("Contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
                 if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-
-                    long contactHandle = contactsMEGA.get(i).getHandle();
-                    String fullName = getContactNameDB(megaApi, this, contactHandle);
-                    if(fullName ==  null){
-                        fullName = contactsMEGA.get(i).getEmail();
-                    }
-                    MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contactsMEGA.get(i), fullName);
-
+                    MegaContactAdapter megaContactAdapter = createMegaContact(i);
                     for (int j=0; j<shared.size(); j++) {
                         if (getMegaContactMail(megaContactAdapter).equals(shared.get(j).getUser())){
                             found = true;
@@ -2446,14 +2433,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             for (int i=0;i<contactsMEGA.size();i++){
                 logDebug("Contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
                 if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-
-                    long contactHandle = contactsMEGA.get(i).getHandle();
-                    String fullName = getContactNameDB(megaApi, this, contactHandle);
-                    if(fullName ==  null){
-                        fullName = contactsMEGA.get(i).getEmail();
-                    }
-
-                    MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contactsMEGA.get(i), fullName);
+                    MegaContactAdapter megaContactAdapter = createMegaContact(i);
                     visibleContactsMEGA.add(megaContactAdapter);
                 }
             }

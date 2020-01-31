@@ -811,10 +811,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
-		if(isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-			}
+		if(isChatEnabled() && megaChatApi == null){
+			megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
 		}
 		else{
 			logWarning("Chat not enabled!");
@@ -1148,33 +1146,31 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public void updateContact(long contactHandle){
 		int positionVisibleContacts = -1;
 		int positionContacts = -1;
-		for(int i=0; i<visibleContacts.size(); i++){
-			if(visibleContacts.get(i).getMegaUser().getHandle() == contactHandle){
+		for (int i = 0; i < visibleContacts.size(); i++) {
+			if (visibleContacts.get(i).getMegaUser().getHandle() == contactHandle) {
 				positionVisibleContacts = i;
 				break;
 
 			}
 		}
-		for(int i=0; i<contacts.size(); i++){
-			if(contacts.get(i).getHandle() == contactHandle){
+		for (int i = 0; i < contacts.size(); i++) {
+			if (contacts.get(i).getHandle() == contactHandle) {
 				positionContacts = i;
 				break;
 			}
 		}
-		if(positionVisibleContacts != -1 && positionContacts != -1){
+		if (positionVisibleContacts != -1 && positionContacts != -1) {
 			MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contacts.get(positionContacts), getContactNameDB(megaApi, context, contactHandle));
 			visibleContacts.set(positionVisibleContacts, megaContactAdapter);
 
-			if(adapter == null){
-				if (((ManagerActivityLollipop)context).isList()) {
+			if (adapter == null) {
+				if (((ManagerActivityLollipop) context).isList()) {
 					logDebug("isList");
 					adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-				}
-				else{
+				} else {
 					adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 				}
-			}
-			else{
+			} else {
 				adapter.notifyItemChanged(positionVisibleContacts);
 			}
 			sortBy();

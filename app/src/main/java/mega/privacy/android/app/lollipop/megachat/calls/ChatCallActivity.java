@@ -2,15 +2,11 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -53,7 +49,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -97,7 +92,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     final private static int REMOTE_VIDEO_ENABLED = 1;
     final private static int REMOTE_VIDEO_DISABLED = 0;
     final private static int BIG_LETTER_SIZE = 60;
-    final private static int SMALL_LETTER_SIZE = 40;
     final private static int MIN_PEERS_LIST = 7;
     final private static int MAX_PEERS_GRID = 6;
     final private static int ARROW_ANIMATION = 250;
@@ -3041,22 +3035,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (userSession.getStatus() == MegaChatSession.SESSION_STATUS_INITIAL || userSession.hasAudio()) {
             mutateContactCallLayout.setVisibility(View.GONE);
         } else {
-
             String name = chat.getPeerFirstname(0);
-            if ((name == null) || (name == " ")) {
-                if (megaChatApi != null) {
-                    name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
-                }
-                if (name == null) {
-                    name = " ";
-                }
+            if (name == null || name.trim().length() <= 0) {
+                if (megaChatApi != null) name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
+                if (name == null) name = getString(R.string.unknown_name_label);
             }
 
             String nickname = getNicknameContact(chat.getPeerHandle(0));
-            if(nickname != null){
-                name = nickname;
-            }
-
+            if(nickname != null) name = nickname;
+            
             mutateCallText.setText(getString(R.string.muted_contact_micro, name));
             mutateContactCallLayout.setVisibility(View.VISIBLE);
         }

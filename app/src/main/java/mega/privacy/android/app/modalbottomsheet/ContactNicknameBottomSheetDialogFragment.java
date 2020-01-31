@@ -10,9 +10,11 @@ import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
+
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -33,23 +35,16 @@ public class ContactNicknameBottomSheetDialogFragment extends BottomSheetDialogF
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logDebug("onCreate");
         if (savedInstanceState != null) {
-            logDebug("Bundle is NOT NULL");
             nickname = savedInstanceState.getString(EXTRA_USER_NICKNAME, null);
-        } else {
-            logWarning("Bundle NULL");
-            if (context instanceof ContactInfoActivityLollipop) {
-                nickname = ((ContactInfoActivityLollipop) context).getNickname();
-            }
+        } else if (context instanceof ContactInfoActivityLollipop) {
+            nickname = ((ContactInfoActivityLollipop) context).getNickname();
         }
     }
 
     @Override
     public void onClick(View v) {
-        logDebug("onClick");
         switch (v.getId()) {
-
             case R.id.edit_nickname_layout: {
                 ((ContactInfoActivityLollipop) context).showConfirmationSetNickname(nickname);
                 break;
@@ -74,19 +69,15 @@ public class ContactNicknameBottomSheetDialogFragment extends BottomSheetDialogF
         heightDisplay = outMetrics.heightPixels;
 
         super.setupDialog(dialog, style);
-        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_nickname, null);
 
+        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_nickname, null);
         mainLinearLayout = contentView.findViewById(R.id.nickname_bottom_sheet);
         items_layout = contentView.findViewById(R.id.items_layout);
-
         titleText = contentView.findViewById(R.id.nickname_title_text);
-
         optionEditNickname = contentView.findViewById(R.id.edit_nickname_layout);
         optionRemoveNickname = contentView.findViewById(R.id.remove_nickname_layout);
-
         optionEditNickname.setOnClickListener(this);
         optionRemoveNickname.setOnClickListener(this);
-
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, getContext(), 48));
@@ -105,5 +96,4 @@ public class ContactNicknameBottomSheetDialogFragment extends BottomSheetDialogF
         super.onSaveInstanceState(outState);
         outState.putString(EXTRA_USER_NICKNAME, nickname);
     }
-
 }

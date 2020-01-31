@@ -70,10 +70,12 @@ public class ContactNameListener implements MegaRequestListenerInterface {
             }
             case USER_ATTR_ALIAS: {
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    String nickname = null;
+                    String nickname;
+
                     if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
                         nickname = request.getText();
                         dbH.setContactNickname(nickname, request.getNodeHandle());
+
                     } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
                         nickname = request.getName();
                         if (nickname == null) {

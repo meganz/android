@@ -738,9 +738,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SHOW_INVITE_BANNER + " = '" + encrypt("true") + "';");
         }
 
-		if (oldVersion <= 51) {
-			db.execSQL("ALTER TABLE " + TABLE_CONTACTS + " ADD COLUMN " + KEY_CONTACT_NICKNAME + " TEXT;");
-		}
+
 		if(oldVersion <= 48) {
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT;");
             db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_MODIFICATION_DESC)) + "';");
@@ -753,6 +751,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if(oldVersion <= 50) {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_ASK_FOR_DISPLAY_OVER + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_ASK_FOR_DISPLAY_OVER + " = '" + encrypt("true") + "';");
+		}
+
+		if (oldVersion <= 51) {
+			db.execSQL("ALTER TABLE " + TABLE_CONTACTS + " ADD COLUMN " + KEY_CONTACT_NICKNAME + " TEXT;");
 		}
 	}
 
@@ -1971,10 +1973,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_CONTACT_NAME, encrypt(contact.getName()));
         values.put(KEY_CONTACT_LAST_NAME, encrypt(contact.getLastName()));
         values.put(KEY_CONTACT_NICKNAME, encrypt(contact.getNickname()));
-//        values.put(KEY_CONTACT_HANDLE, (contacts.getHandle()));
-//        values.put(KEY_CONTACT_MAIL, (contacts.getMail()));
-//        values.put(KEY_CONTACT_NAME, (contacts.getName()));
-//        values.put(KEY_CONTACT_LAST_NAME, (contacts.getLastName()));
 		db.insert(TABLE_CONTACTS, null, values);
 	}
 

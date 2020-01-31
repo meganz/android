@@ -381,12 +381,10 @@ public class ContactController {
             if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
                 MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "", null);
                 dbH.setContact(megaContactDB);
-
             }
             megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(context));
             megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(context));
             megaApi.getUserAlias(user.getHandle(), new ContactNameListener(context));
-
         }
     }
 

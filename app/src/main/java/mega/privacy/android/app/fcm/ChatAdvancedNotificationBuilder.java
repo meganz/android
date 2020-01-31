@@ -822,6 +822,11 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
+    private String getFullName(MegaChatRoom chat){
+        String fullName = getNicknameContact(chat.getPeerHandle(0));
+        if(fullName == null) fullName = chat.getPeerFullname(0);
+        return fullName;
+    }
 
 
     public void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
@@ -894,11 +899,7 @@ public final class ChatAdvancedNotificationBuilder {
                     notificationBuilderO.setContentTitle(chatToAnswer.getTitle());
                 }
                 else{
-                    String fullName = getNicknameContact(chatToAnswer.getPeerHandle(0));
-                    if(fullName == null){
-                        fullName = chatToAnswer.getPeerFullname(0);
-                    }
-                    notificationBuilderO.setContentTitle(fullName);
+                    notificationBuilderO.setContentTitle(getFullName(chatToAnswer));
                 }
 
                 Bitmap largeIcon = setUserAvatar(chatToAnswer);
@@ -925,11 +926,7 @@ public final class ChatAdvancedNotificationBuilder {
                 if(chatToAnswer.isGroup()){
                     notificationBuilder.setContentTitle(chatToAnswer.getTitle());
                 }else{
-                    String fullName = getNicknameContact(chatToAnswer.getPeerHandle(0));
-                    if(fullName == null){
-                        fullName = chatToAnswer.getPeerFullname(0);
-                    }
-                    notificationBuilder.setContentTitle(fullName);
+                    notificationBuilder.setContentTitle(getFullName(chatToAnswer));
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1058,10 +1055,7 @@ public final class ChatAdvancedNotificationBuilder {
         if (chat.isGroup()) {
             notificationContent = chat.getTitle();
         } else {
-            notificationContent = getNicknameContact(chat.getPeerHandle(0));
-            if(notificationContent == null){
-                notificationContent = chat.getPeerFullname(0);
-            }
+            notificationContent = getFullName(chat);
         }
 
         long chatCallId = call.getId();

@@ -499,6 +499,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     }
 
+    private String checkParticipantName(long handle, int position){
+        String fullName = getNicknameContact(handle);
+        if(fullName == null) fullName = getParticipantFullName(position);
+        return fullName;
+    }
+
     public void setParticipants(){
         logDebug("Participants size: " + participants.size());
         //Set the first element = me
@@ -519,10 +525,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
 
             long peerHandle = chat.getPeerHandle(i);
-            String fullName = getNicknameContact(peerHandle);
-            if(fullName == null){
-                fullName = getParticipantFullName(i);
-            }
+            String fullName = checkParticipantName(peerHandle, i);
+
             String participantEmail = chat.getPeerEmail(i);
 
             logDebug(i + " - Handle of the peer: "+ peerHandle + ", Pprivilege: " + peerPrivilege);
@@ -592,27 +596,19 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         if(position != -1){
-            String fullName = getNicknameContact(contactHandle);
-            if(fullName == null){
-                fullName = getParticipantFullName(position);
-            }
+            String fullName = checkParticipantName(contactHandle, position);
             participants.get(position).setFullName(fullName);
             adapter.updateParticipant(position+1, participants);
         }
     }
 
-    public String getParticipantFullName(long contact) {
-
+    private String getParticipantFullName(long contact) {
         String nickname = getNicknameContact(contact);
-        if(nickname != null){
-           return nickname;
-        }
+        if (nickname != null) return nickname;
 
         String fullName = chat.getPeerFullname(contact);
-        if(fullName == null || fullName.trim().length()<=0){
-            String email = chat.getPeerEmail(contact);
-            return email;
-        }
+        if (fullName == null || fullName.trim().length() <= 0) return chat.getPeerEmail(contact);
+
         return fullName;
     }
 

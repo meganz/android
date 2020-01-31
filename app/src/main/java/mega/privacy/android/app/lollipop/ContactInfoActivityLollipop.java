@@ -122,6 +122,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
 @SuppressLint("NewApi")
@@ -411,7 +412,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			chatHandle = extras.getLong("handle",-1);
 			userEmailExtra = extras.getString("name");
-
 			if (chatHandle != -1) {
 
 				logDebug("From chat!!");
@@ -428,7 +428,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					checkNickname(user.getHandle());
 				} else {
 					String fullName = "";
-					if (chat.getTitle() != null && !chat.getTitle().isEmpty() && !chat.getTitle().equals("")) {
+					if (chat.getTitle() != null && !chat.getTitle().trim().isEmpty()) {
 						fullName = chat.getTitle();
 					} else if (userEmailExtra != null) {
 						fullName = userEmailExtra;
@@ -624,36 +624,32 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		return;
 	}
 
-	private void checkNickname(long contactHandle){
+	private void checkNickname(long contactHandle) {
 		MegaContactDB contactDB = getContactDB(contactHandle);
-		if (contactDB != null) {
-			String fullName = buildFullName(contactDB.getName(), contactDB.getLastName(), contactDB.getMail());
-			//Check if the contact has nickname:
-			String nicknameText = contactDB.getNickname();
-			if(nicknameText == null || nicknameText.trim().length()<=0){
-				withoutNickname(fullName);
-			}else{
-				withNickname(fullName, nicknameText);
-			}
+		if (contactDB == null) return;
+		String fullName = buildFullName(contactDB.getName(), contactDB.getLastName(), contactDB.getMail());
+		//Check if the contact has nickname:
+		String nicknameText = contactDB.getNickname();
+		if (nicknameText == null || nicknameText.trim().length() <= 0) {
+			withoutNickname(fullName);
 		} else {
-			logWarning("checkNickname:: The contactDB is null: ");
+			withNickname(fullName, nicknameText);
 		}
 	}
 
-	private void withoutNickname(String name){
+	private void withoutNickname(String name) {
 		firstLineTextToolbar.setText(name);
 		nameText.setVisibility(View.GONE);
 		setNicknameText.setText(getString(R.string.add_nickname));
 		setDefaultAvatar();
-
 	}
-	private void withNickname(String name, String nickname){
+
+	private void withNickname(String name, String nickname) {
 		firstLineTextToolbar.setText(nickname);
 		nameText.setText(name);
 		nameText.setVisibility(View.VISIBLE);
 		setNicknameText.setText(getString(R.string.edit_nickname));
 		setDefaultAvatar();
-
 	}
 
 
@@ -1154,7 +1150,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		return dominantColor;
 	}
 
-	public void setDefaultAvatar() {
+	private void setDefaultAvatar() {
 		logDebug("setDefaultAvatar");
 		Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
@@ -1163,17 +1159,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		p.setColor(Color.TRANSPARENT);
 		c.drawPaint(p);
 
-		String color = megaApi.getUserAvatarColor(user);
-		if (color != null) {
-			logDebug("The color to set the avatar is " + color);
-			imageLayout.setBackgroundColor(Color.parseColor(color));
-		} else {
-			logDebug("Default color to the avatar");
-			imageLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-		}
-
+		int color = getColorAvatar(this, megaApi, user);
+		imageLayout.setBackgroundColor(color);
 		contactPropertiesImage.setImageBitmap(defaultAvatar);
-
 	}
 
 	@Override
@@ -1330,7 +1318,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		input.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
 		input.addTextChangedListener(new TextWatcher() {
 			private void handleText() {
@@ -1353,7 +1341,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			@Override
 			public void afterTextChanged(Editable s) {
 				handleText();
-
 			}
 		});
 
@@ -1369,14 +1356,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		builder.setPositiveButton(getString(R.string.button_set),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
-						String name = input.getText().toString();
-						if (name.equals("") || name.isEmpty() || name.trim().isEmpty()) {
-							input.setError(getString(R.string.invalid_string));
-							input.requestFocus();
-						} else {
-							addNickname(alias, name);
-							setNicknameDialog.dismiss();
-						}
+						onClickAlertDialog(input, alias);
 					}
 				});
 
@@ -1396,23 +1376,25 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		setNicknameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				logDebug("OK BTTN CHANGE");
-				String name = input.getText().toString();
-				if (name.equals("") || name.isEmpty() || name.trim().isEmpty()) {
-					logWarning("Input is empty");
-					input.setError(getString(R.string.invalid_string));
-					input.requestFocus();
-				} else {
-					addNickname(alias, name);
-					setNicknameDialog.dismiss();
-				}
+				onClickAlertDialog(input, alias);
 			}
 		});
-
 	}
 
-	public void addNickname(String oldNickname, String newNickname){
-		if(oldNickname != null && newNickname != null && oldNickname.equals(newNickname)) return;
+	private void onClickAlertDialog(EmojiEditText input, String alias) {
+		String name = input.getText().toString();
+		if (name.equals("") || name.isEmpty() || name.trim().isEmpty()) {
+			logWarning("Input is empty");
+			input.setError(getString(R.string.invalid_string));
+			input.requestFocus();
+		} else {
+			addNickname(alias, name);
+			setNicknameDialog.dismiss();
+		}
+	}
+
+	public void addNickname(String oldNickname, String newNickname) {
+		if (oldNickname != null && newNickname != null && oldNickname.equals(newNickname)) return;
 		//Update the new nickname
 		megaApi.setUserAlias(user.getHandle(), newNickname, new ContactNameListener(this));
 	}
@@ -2099,7 +2081,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public String getNickname() {
 		return nickname;
 	}
-
 
 	public void onFileClick(ArrayList<Long> handleList) {
         

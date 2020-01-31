@@ -1,11 +1,13 @@
 package mega.privacy.android.app.utils;
 
 import android.content.Context;
+
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaUser;
+
 import static mega.privacy.android.app.utils.Util.*;
 
 public class ContactUtil {
@@ -26,18 +28,18 @@ public class ContactUtil {
         MegaContactDB contactDB = getContactDB(contactHandle);
         if (contactDB != null) {
             String nicknameText = contactDB.getNickname();
-            if(nicknameText != null){
+            if (nicknameText != null) {
                 return nicknameText;
             }
 
             String firstNameText = contactDB.getName();
-            if (firstNameText == null || firstNameText.trim().length()<=0) {
+            if (firstNameText == null || firstNameText.trim().length() <= 0) {
                 MegaUser user = megaApi.getContact(contactDB.getMail());
                 megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(context));
             }
 
             String lastNameText = contactDB.getLastName();
-            if (lastNameText == null || lastNameText.trim().length()<=0) {
+            if (lastNameText == null || lastNameText.trim().length() <= 0) {
                 MegaUser user = megaApi.getContact(contactDB.getMail());
                 megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(context));
             }
@@ -49,21 +51,19 @@ public class ContactUtil {
         return null;
     }
 
-    public static String getNicknameContact(long contactHandle){
+    public static String getNicknameContact(long contactHandle) {
         MegaContactDB contactDB = getContactDB(contactHandle);
-        if(contactDB == null) return null;
+        if (contactDB == null) return null;
         String nicknameText = contactDB.getNickname();
         return nicknameText;
     }
 
     public static String buildFullName(String name, String lastName, String mail) {
-        if (name == null || name.trim().length()<=0) {
-            name = "";
-        }
-        if (lastName == null) {
-            lastName = "";
-        }
-        String fullName = "";
+        if (name == null) name = "";
+
+        if (lastName == null) lastName = "";
+
+        String fullName;
 
         if (name.trim().length() <= 0) {
             fullName = lastName;
@@ -72,14 +72,8 @@ public class ContactUtil {
         }
 
         if (fullName.trim().length() <= 0) {
-            if (mail == null) {
-                mail = "";
-            }
-            if (mail.trim().length() <= 0) {
-                return "";
-            } else {
-                return mail;
-            }
+            if (mail == null || mail.trim().length() <= 0) mail = "";
+            return mail;
         }
         return fullName;
     }
@@ -107,7 +101,6 @@ public class ContactUtil {
                 emailText = "";
             }
             if (emailText.trim().length() > 0) return emailText;
-
         }
         return "";
     }

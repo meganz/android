@@ -7603,7 +7603,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             activityVisible = true;
             showCallLayout(megaChatApi.getChatCall(idChat));
             if(aB != null && aB.getTitle() != null){
-                logDebug("***** 1 titleToolbar.setText = "+titleToolbar.getText().toString());
                 titleToolbar.setText(adjustForLargeFont(titleToolbar.getText().toString()));
             }
         }

@@ -614,18 +614,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         nodeIconLayout.setVisibility(View.GONE);
                     } else {
                         //Show the owner of the shared folder
-                        ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-                        for (int j = 0; j < sharesIncoming.size(); j++) {
-                            MegaShare mS = sharesIncoming.get(j);
-                            if (mS.getNodeHandle() == node.getHandle()) {
-                                MegaUser user = megaApi.getContact(mS.getUser());
-                                if (user != null) {
-                                    nodeInfo.setText(getMegaUserNameDB(megaApi, context, user));
-                                } else {
-                                    nodeInfo.setText(mS.getUser());
-                                }
-                            }
-                        }
+                        showOwnerSharedFolder();
                         optionLeaveShares.setVisibility(View.VISIBLE);
 
                         switch (accessLevel) {
@@ -830,18 +819,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         nodeIconLayout.setVisibility(View.GONE);
                     } else {
                         //Show the owner of the shared folder
-                        ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-                        for (int j = 0; j < sharesIncoming.size(); j++) {
-                            MegaShare mS = sharesIncoming.get(j);
-                            if (mS.getNodeHandle() == node.getHandle()) {
-                                MegaUser user = megaApi.getContact(mS.getUser());
-                                if (user != null) {
-                                    nodeInfo.setText(getMegaUserNameDB(megaApi, context, user));
-                                } else {
-                                    nodeInfo.setText(mS.getUser());
-                                }
-                            }
-                        }
+                        showOwnerSharedFolder();
                         optionLeaveShares.setVisibility(View.VISIBLE);
 
                         switch (accessLevel) {
@@ -1047,6 +1025,21 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 }
             }
         });
+    }
+
+    private void showOwnerSharedFolder(){
+        ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+        for (int j = 0; j < sharesIncoming.size(); j++) {
+            MegaShare mS = sharesIncoming.get(j);
+            if (mS.getNodeHandle() == node.getHandle()) {
+                MegaUser user = megaApi.getContact(mS.getUser());
+                if (user != null) {
+                    nodeInfo.setText(getMegaUserNameDB(megaApi, context, user));
+                } else {
+                    nodeInfo.setText(mS.getUser());
+                }
+            }
+        }
     }
 
     @Override

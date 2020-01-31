@@ -5991,12 +5991,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					contacts = megaApi.getContacts();
 					for (int i=0;i<contacts.size();i++){
 						if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-                            long contactHandle = contacts.get(i).getHandle();
-                            String fullName = getContactNameDB(megaApi, this, contactHandle);
-                            if(fullName ==  null){
-                                fullName = contacts.get(i).getEmail();
-                            }
-
 							visibleContacts.add(contacts.get(i));
 						}
 					}
