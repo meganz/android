@@ -52,11 +52,11 @@ public class ProgressDialogUtil {
         }
     }
 
-    public static ProgressDialog getProgressDialog(String message) {
+    public static ProgressDialog getProgressDialog(Context context, String message) {
       ProgressDialog temp = null;
       
         try {
-            temp = new ProgressDialog(MegaApplication.getInstance());
+            temp = new ProgressDialog(context);
             temp.setMessage(message);
             temp.show();
         } catch (Exception e) {

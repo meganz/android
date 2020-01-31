@@ -140,25 +140,20 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 			switch (intent.getStringExtra(TYPE_SHARE)) {
 				case SHARE_LISTENER:
-					break;
-
 				case CHANGE_PERMISSIONS_LISTENER:
-					changeShare = false;
+					if (adapter != null) {
+						if(adapter.isMultipleSelect()){
+							adapter.clearSelections();
+							hideMultipleSelect();
+						}
+						adapter.setShareList(listContacts);
+					}
 					break;
-
-				case REMOVE_SHARE_LISTENER:
-					removeShare = false;
-					break;
-
 			}
 
-			if (adapter == null) return;
-
-			if(adapter.isMultipleSelect()){
-				adapter.clearSelections();
-				hideMultipleSelect();
+			if (permissionsDialog != null) {
+				permissionsDialog.dismiss();
 			}
-			adapter.setShareList(listContacts);
 
 			if (statusDialog != null) {
 				statusDialog.dismiss();
@@ -196,7 +191,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
                             removeShare = false;
                             changeShare = true;
 
-                            statusDialog = getProgressDialog(getString(R.string.context_permissions_changing_folder));
+                            statusDialog = getProgressDialog(fileContactListActivityLollipop, getString(R.string.context_permissions_changing_folder));
                             cC.changePermissions(cC.getEmailShares(shares), item, node);
                         }
                     });
@@ -718,7 +713,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				removeShare = false;
 				changeShare = true;
 
-				statusDialog = getProgressDialog(getString(R.string.context_permissions_changing_folder));
+				statusDialog = getProgressDialog(fileContactListActivityLollipop, getString(R.string.context_permissions_changing_folder));
 				permissionsDialog.dismiss();
 				cC.changePermission(selectedShare.getUser(), item, node, new ShareListener(getApplicationContext(), CHANGE_PERMISSIONS_LISTENER, 1));
 			}
@@ -799,7 +794,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int item) {
-							statusDialog = getProgressDialog(getString(R.string.context_sharing_folder));
+							statusDialog = getProgressDialog(fileContactListActivityLollipop, getString(R.string.context_sharing_folder));
 							permissionsDialog.dismiss();
 							nC.shareFolder(node, emails, item);
 						}
@@ -909,7 +904,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void removeShare (String email) {
-		statusDialog = getProgressDialog(getString(R.string.context_removing_contact_folder));
+		statusDialog = getProgressDialog(fileContactListActivityLollipop, getString(R.string.context_removing_contact_folder));
 
 		if (email != null){
 			removeShare = true;
@@ -920,7 +915,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	public void removeMultipleShares(ArrayList<MegaShare> shares){
 		logDebug("Number of shared to remove: " + shares.size());
 
-		statusDialog = getProgressDialog(getString(R.string.context_removing_contact_folder));
+		statusDialog = getProgressDialog(fileContactListActivityLollipop, getString(R.string.context_removing_contact_folder));
 		nC.removeShares(shares, node);
 	}
 

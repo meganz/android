@@ -81,6 +81,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
@@ -137,6 +138,22 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 	ActionBar aB;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
+
+	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null) return;
+
+			if (cflF != null) {
+				cflF.clearSelections();
+				cflF.hideMultipleSelect();
+			}
+
+			if (statusDialog != null) {
+				statusDialog.dismiss();
+			}
+		}
+	};
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -527,7 +544,10 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 
 		contactPropertiesMainActivity = this;
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
+				new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
+				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
 		handler = new Handler();
 		dbH = DatabaseHandler.getDbHandler(this);
@@ -753,6 +773,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		}
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
 	}
 
 	@Override
@@ -1159,7 +1180,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
-					statusDialog = getProgressDialog(getString(R.string.context_sharing_folder));
+					statusDialog = getProgressDialog(contactPropertiesMainActivity, getString(R.string.context_sharing_folder));
 					permissionsDialog.dismiss();
 					nC.shareFolder(parent, selectedContacts, item);
 				});
@@ -1464,22 +1485,6 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			}
 			moveToRubbish = false;
 			logDebug("Move request finished");
-		} else if (request.getType() == MegaRequest.TYPE_SHARE) {
-			try {
-				statusDialog.dismiss();
-			} catch (Exception ex) {
-			}
-
-			if (e.getErrorCode() == MegaError.API_OK) {
-				cflF.clearSelections();
-				cflF.hideMultipleSelect();
-				logDebug("Shared folder correctly: " + request.getNodeHandle());
-				Toast.makeText(this, getString(R.string.context_correctly_shared), Toast.LENGTH_SHORT).show();
-			} else {
-				cflF.clearSelections();
-				cflF.hideMultipleSelect();
-				Toast.makeText(this, getString(R.string.context_no_shared), Toast.LENGTH_LONG).show();
-			}
 		}
 	}
 

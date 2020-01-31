@@ -3,9 +3,11 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -22,6 +24,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
@@ -101,11 +104,11 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -115,8 +118,6 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
-
-
 
 @SuppressLint("NewApi")
 public class ContactInfoActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
@@ -223,6 +224,22 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
 
     private AskForDisplayOverDialog askForDisplayOverDialog;
+
+	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null) return;
+
+			if (sharedFoldersFragment != null) {
+				sharedFoldersFragment.clearSelections();
+				sharedFoldersFragment.hideMultipleSelect();
+			}
+
+			if (statusDialog != null) {
+				statusDialog.dismiss();
+			}
+		}
+	};
 
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
@@ -621,6 +638,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         if(askForDisplayOverDialog != null) {
             askForDisplayOverDialog.showDialog();
         }
+
+		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
+				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+
 	}
 
 	private void visibilityStateIcon() {
@@ -1314,7 +1335,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						statusDialog = getProgressDialog(getString(R.string.context_sharing_folder));
+						statusDialog = getProgressDialog(contactInfoActivityLollipop, getString(R.string.context_sharing_folder));
 						permissionsDialog.dismiss();
 						nC.shareFolder(parent, selectedContacts, item);
 					}
@@ -1531,21 +1552,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					}
 				}
 			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_SHARE){
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("Shared folder correctly: " + request.getNodeHandle());
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_shared), -1);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_shared), -1);
-			}
-		}else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
+		} else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
             try {
                 statusDialog.dismiss();
             }
@@ -1667,26 +1674,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             }
             moveToRubbish=false;
 			logDebug("Move request finished");
-        }
-        else if (request.getType() == MegaRequest.TYPE_SHARE){
-            try {
-                statusDialog.dismiss();
-            }
-            catch (Exception ex) {}
-            
-            if (e.getErrorCode() == MegaError.API_OK){
-                sharedFoldersFragment.clearSelections();
-                sharedFoldersFragment.hideMultipleSelect();
-				logDebug("Shared folder correctly: " + request.getNodeHandle());
-                Toast.makeText(this, getString(R.string.context_correctly_shared), Toast.LENGTH_SHORT).show();
-            }
-            else{
-                sharedFoldersFragment.clearSelections();
-                sharedFoldersFragment.hideMultipleSelect();
-                Toast.makeText(this, getString(R.string.context_no_shared), Toast.LENGTH_LONG).show();
-            }
-        }
-		else if(request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
+        } else if(request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
 			logDebug("Contact removed");
 			finish();
 		}
@@ -1717,6 +1705,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         if (askForDisplayOverDialog != null) {
             askForDisplayOverDialog.recycle();
         }
+
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
 	}
 
 	@Override
