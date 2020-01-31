@@ -69,6 +69,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 /*
@@ -401,8 +402,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
 				String megaFingerprint = megaApi.getFingerprint(currentDocument);
 
-				if (localFingerprint != null && !localFingerprint.isEmpty()
-						&& megaFingerprint != null && !megaFingerprint.isEmpty()
+				if (!isTextEmpty(localFingerprint)
+						&& !isTextEmpty(megaFingerprint)
 						&& localFingerprint.equals(megaFingerprint)) {
 					logDebug("Delete the old version");
 					currentFile.delete();
