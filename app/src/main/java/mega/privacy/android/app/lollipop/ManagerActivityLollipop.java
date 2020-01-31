@@ -15370,11 +15370,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
 			logDebug("MegaRequest.TYPE_PAUSE_TRANSFERS");
+			//force update the pause notification to prevent missed onTransferUpdate
+			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+
 			if (e.getErrorCode() == MegaError.API_OK) {
 
 				if(drawerItem == DrawerItem.CLOUD_DRIVE){
-					//force update the pause notification to prevent missed onTransferUpdate
-					LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 					updateTransferButton();
 				}
 
