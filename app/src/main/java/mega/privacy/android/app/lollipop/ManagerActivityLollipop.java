@@ -4130,51 +4130,44 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void setProfileAvatar(){
+	public void setProfileAvatar() {
 		logDebug("setProfileAvatar");
 		File avatar = buildAvatarFile(this, megaApi.getMyEmail() + ".jpg");
-		Bitmap imBitmap = null;
-		if (isFileAvailable(avatar)){
-			if (avatar.length() > 0){
-				BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inJustDecodeBounds = true;
-				BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+		Bitmap imBitmap;
+		if (isFileAvailable(avatar) && avatar.length() > 0) {
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+			BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
 
-				// Calculate inSampleSize
-				options.inSampleSize = calculateInSampleSize(options, 250, 250);
+			// Calculate inSampleSize
+			options.inSampleSize = calculateInSampleSize(options, 250, 250);
 
-				// Decode bitmap with inSampleSize set
-				options.inJustDecodeBounds = false;
+			// Decode bitmap with inSampleSize set
+			options.inJustDecodeBounds = false;
 
-				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-				if (imBitmap == null) {
-					avatar.delete();
-                    megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
-                }
-				else{
-					Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+			imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+			if (imBitmap == null) {
+				avatar.delete();
+				megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
+			} else {
+				Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
-					BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
-					Paint paint = new Paint();
-					paint.setShader(shader);
+				BitmapShader shader = new BitmapShader(imBitmap, TileMode.CLAMP, TileMode.CLAMP);
+				Paint paint = new Paint();
+				paint.setShader(shader);
 
-					Canvas c = new Canvas(circleBitmap);
-					int radius;
-					if (imBitmap.getWidth() < imBitmap.getHeight())
-						radius = imBitmap.getWidth()/2;
-					else
-						radius = imBitmap.getHeight()/2;
+				Canvas c = new Canvas(circleBitmap);
+				int radius;
+				if (imBitmap.getWidth() < imBitmap.getHeight())
+					radius = imBitmap.getWidth() / 2;
+				else
+					radius = imBitmap.getHeight() / 2;
 
-					c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
-					nVPictureProfile.setImageBitmap(circleBitmap);
-				}
+				c.drawCircle(imBitmap.getWidth() / 2, imBitmap.getHeight() / 2, radius, paint);
+				nVPictureProfile.setImageBitmap(circleBitmap);
 			}
-			else{
-                megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyUser().getEmail() + ".jpg").getAbsolutePath(), this);
-			}
-		}
-		else{
-            megaApi.getUserAvatar(megaApi.getMyUser(),buildAvatarFile(this,megaApi.getMyUser().getEmail() + ".jpg").getAbsolutePath(),this);
+		} else {
+			megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
 		}
 	}
 
@@ -16932,6 +16925,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private boolean shouldShowFabWhenSearch() {
+		if (searchDrawerItem == null) {
+			return false;
+		}
+
 		switch (searchDrawerItem) {
 			case RUBBISH_BIN:
 			case INBOX:
