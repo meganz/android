@@ -1546,7 +1546,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				}
 
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
-				    if(shouldNotify(this) && call.getDuration() > 0) {
+				    if(shouldNotify(this)) {
                         toSystemSettingNotification(this);
                     }
                     cancelIncomingCallNotification(this);
@@ -1564,9 +1564,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 							if (call.isLocalTermCode() == false) {
 								logDebug("localTermCodeNotLocal");
 								try {
-                                    if(shouldNotify(this) && call.getDuration() == 0) {
-                                        toSystemSettingNotification(this);
-                                    }
 									ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 									notificationBuilder.showMissedCallNotification(call);
 								} catch (Exception e) {

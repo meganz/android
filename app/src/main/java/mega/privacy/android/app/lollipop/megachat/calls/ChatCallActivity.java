@@ -1506,9 +1506,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 logDebug("Click on reject fab or hang fab");
                 megaChatApi.hangChatCall(chatId, this);
                 sendSignalPresence();
-                if(shouldNotify(this)) {
-                    toSystemSettingNotification(this);
-                }
                 break;
             }
             case R.id.answer_call_fab: {
