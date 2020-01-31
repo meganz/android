@@ -3189,18 +3189,10 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
     }
 
     public void removeShare(String email) {
-        ProgressDialog temp = new ProgressDialog(this);
-        temp.setMessage(getString(R.string.context_removing_contact_folder));
-        temp.show();
-
         removeShare = true;
         changeShare = false;
-        statusDialog = temp;
-        if (email != null) {
-            megaApi.share(node, email, MegaShare.ACCESS_UNKNOWN, this);
-        } else {
-            megaApi.disableExport(node, this);
-        }
+        statusDialog = getProgressDialog(getString(R.string.context_removing_contact_folder));
+        nC.removeShare(new ShareListener(this, ShareListener.REMOVE_SHARE_LISTENER, 1), node, email);
     }
 
     public void refresh(){
@@ -3236,7 +3228,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         }
     }
 
-    public void showConfirmationRemoveMultipleContactFromShare (final List<MegaShare> contacts){
+    public void showConfirmationRemoveMultipleContactFromShare (final ArrayList<MegaShare> contacts){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String message= getResources().getString(R.string.remove_multiple_contacts_shared_folder,contacts.size());
         builder.setMessage(message)
@@ -3245,36 +3237,12 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 .show();
     }
 
-    public void removeMultipleShares(List<MegaShare> shares){
+    public void removeMultipleShares(ArrayList<MegaShare> shares){
         logDebug("removeMultipleShares");
         removeShare = true;
         changeShare = false;
-        ProgressDialog temp = null;
-        try{
-            temp = new ProgressDialog(this);
-            temp.setMessage(getString(R.string.context_removing_contact_folder));
-            temp.show();
-        }
-        catch(Exception e){
-            return;
-        }
-        statusDialog = temp;
-
-        FileContactMultipleRequestListener removeMultipleListener = new FileContactMultipleRequestListener(MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER, this, requestCompletedCallback);
-        for(int j=0;j<shares.size();j++){
-            if(shares.get(j).getUser()!=null){
-                MegaUser u = megaApi.getContact(shares.get(j).getUser());
-                if(u!=null){
-                    megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, removeMultipleListener);
-                }
-                else{
-                    megaApi.share(node, shares.get(j).getUser(), MegaShare.ACCESS_UNKNOWN, removeMultipleListener);
-                }
-            }
-            else{
-                megaApi.disableExport(node, removeMultipleListener);
-            }
-        }
+        statusDialog = getProgressDialog(getString(R.string.context_removing_contact_folder));
+        nC.removeShares(shares, node);
     }
     
     // Clear all selected items
