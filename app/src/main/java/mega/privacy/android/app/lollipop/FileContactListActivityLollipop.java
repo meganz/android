@@ -138,17 +138,12 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null) return;
 
-			switch (intent.getStringExtra(TYPE_SHARE)) {
-				case SHARE_LISTENER:
-				case CHANGE_PERMISSIONS_LISTENER:
-					if (adapter != null) {
-						if(adapter.isMultipleSelect()){
-							adapter.clearSelections();
-							hideMultipleSelect();
-						}
-						adapter.setShareList(listContacts);
-					}
-					break;
+			if (adapter != null) {
+				if(adapter.isMultipleSelect()){
+					adapter.clearSelections();
+					hideMultipleSelect();
+				}
+				adapter.setShareList(listContacts);
 			}
 
 			if (permissionsDialog != null) {

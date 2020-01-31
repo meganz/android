@@ -328,6 +328,10 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             if (intent == null) return;
 
             if (adapter != null) {
+                if (adapter.isMultipleSelect()) {
+                    adapter.clearSelections();
+                    hideMultipleSelect();
+                }
                 adapter.setShareList(listContacts);
             }
 
