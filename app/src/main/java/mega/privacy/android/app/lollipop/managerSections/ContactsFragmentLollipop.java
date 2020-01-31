@@ -893,7 +893,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_list_empty_text_first);
-
 			setContacts(megaApi.getContacts());
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
@@ -1068,7 +1067,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 				long contactHandle = contacts.get(i).getHandle();
 				String fullName = getContactNameDB(megaApi, context, contactHandle);
-				MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contacts.get(i), fullName);
+				MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(context, contactHandle), contacts.get(i), fullName);
 				visibleContacts.add(megaContactAdapter);
 			}
 		}
@@ -1164,7 +1163,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 		}
 		if (positionVisibleContacts != -1 && positionContacts != -1) {
-			MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contacts.get(positionContacts), getContactNameDB(megaApi, context, contactHandle));
+			MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(context, contactHandle), contacts.get(positionContacts), getContactNameDB(megaApi, context, contactHandle));
 			visibleContacts.set(positionVisibleContacts, megaContactAdapter);
 
 			if (adapter == null) {

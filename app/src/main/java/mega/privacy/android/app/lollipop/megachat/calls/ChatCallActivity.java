@@ -801,7 +801,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         } else {
             email = chat.getPeerEmail(0);
             name = chat.getPeerFullname(0);
-            String nickname = getNicknameContact(chat.getPeerHandle(0));
+            String nickname = getNicknameContact(this, chat.getPeerHandle(0));
             if(nickname != null){
                 name = nickname;
             }
@@ -3057,7 +3057,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 if (name == null) name = getString(R.string.unknown_name_label);
             }
 
-            String nickname = getNicknameContact(chat.getPeerHandle(0));
+            String nickname = getNicknameContact(this, chat.getPeerHandle(0));
             if(nickname != null) name = nickname;
             
             mutateCallText.setText(getString(R.string.muted_contact_micro, name));

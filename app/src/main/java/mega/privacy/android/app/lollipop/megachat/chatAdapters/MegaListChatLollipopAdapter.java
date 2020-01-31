@@ -1151,7 +1151,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	}
 
 	private String getMessageSenderName(MegaChatRoom chatRoom, long chatId,long handle){
-		String fullNameAction = getNicknameContact(handle);
+		String fullNameAction = getNicknameContact(context, handle);
 
 		if(fullNameAction == null )
 			fullNameAction = chatRoom.getPeerFullnameByHandle(handle);

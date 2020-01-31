@@ -934,7 +934,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (intent != null) {
 				long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
 				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-				if(cFLol!=null){
+				if(cFLol != null){
 					cFLol.updateContact(userHandle);
 				}
 			}

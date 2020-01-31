@@ -115,7 +115,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 long contactHandle = contacts.get(i).getHandle();
                 String fullName = getContactNameDB(megaApi, context, contactHandle);
-                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contacts.get(i), fullName);
+                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(context, contactHandle), contacts.get(i), fullName);
                 visibleContacts.add(megaContactAdapter);
             }
         }
@@ -131,7 +131,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
             if (contactsDB != null && !contactsDB.isEmpty()) {
                 for (int i = 0; i < contactsDB.size(); i++) {
                     long contactDBHandle = contactsDB.get(i).getMegaUser().getHandle();
-                    String nickname = getNicknameContact(contactDBHandle);
+                    String nickname = getNicknameContact(context, contactDBHandle);
                     if (nickname != null) {
                         dbH.setContactNickname(null, contactDBHandle);
                         notifyNicknameUpdate(contactDBHandle);
@@ -186,12 +186,10 @@ public class ContactNameListener implements MegaRequestListenerInterface {
     }
 
     @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-    }
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) { }
 
     @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-    }
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) { }
 
     private void notifyNicknameUpdate(long userHandle) {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_ALIAS);

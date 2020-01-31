@@ -1555,7 +1555,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     public String getParticipantFullName(MegaChatRoom chat, long i) {
 
-        String nickname = getNicknameContact(chat.getPeerHandle(i));
+        String nickname = getNicknameContact(context, chat.getPeerHandle(i));
         if(nickname != null) return nickname;
 
         String participantFirstName = chat.getPeerFirstname(i);

@@ -2350,7 +2350,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         long contactHandle = contactsMEGA.get(position).getHandle();
         String fullName = getContactNameDB(megaApi, this, contactHandle);
         if(fullName ==  null) fullName = contactsMEGA.get(position).getEmail();
-        return new MegaContactAdapter(getContactDB(contactHandle), contactsMEGA.get(position), fullName);
+        return new MegaContactAdapter(getContactDB(this, contactHandle), contactsMEGA.get(position), fullName);
     }
 
     private void getVisibleMEGAContacts () {

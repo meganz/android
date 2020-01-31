@@ -334,7 +334,6 @@ public class ChatExplorerFragment extends Fragment {
             logDebug("Chat ID " + chat.getChatId() + " with PeerHandle: " + handle + " is NULL");
             return null;
         }
-
         String fullName = getContactNameDB(megaApi, context, handle);
         if(fullName ==  null) fullName = user.getEmail();
 
@@ -346,7 +345,7 @@ public class ChatExplorerFragment extends Fragment {
             }
         }
 
-        return new MegaContactAdapter(getContactDB(handle), user, fullName);
+        return new MegaContactAdapter(getContactDB(context, handle), user, fullName);
     }
 
     @Override
@@ -397,7 +396,7 @@ public class ChatExplorerFragment extends Fragment {
                 if(fullName ==  null){
                     fullName = contactsMEGA.get(i).getEmail();
                 }
-                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(contactHandle), contactsMEGA.get(i), fullName);
+                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(context, contactHandle), contactsMEGA.get(i), fullName);
                 contacts.add(megaContactAdapter);
             }
         }

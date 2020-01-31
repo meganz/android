@@ -783,8 +783,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        logDebug("onCreateViewHolder");
-
         if (viewType == TYPE_HEADER) {
             logDebug("Create header");
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.header_item_chat, parent, false);
@@ -1489,7 +1487,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void onBindViewHolderMessage(RecyclerView.ViewHolder holder, int position) {
-        logDebug("position: " + position);
+        logDebug("Position: " + position);
 
         ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams paramsDefault = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -8192,23 +8190,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         handlerVoiceNotes = null;
     }
 
-    void setContactMessageName(int pos, ViewHolderMessageChat holder, long handle, boolean visibility) {
+    private void setContactMessageName(int pos, ViewHolderMessageChat holder, long handle, boolean visibility) {
         if (isHolderNull(pos, holder)) {
             return;
         }
-
-        if (!visibility) {
-            holder.fullNameTitle = getContactMessageName(pos, holder, handle);
-            return;
-        }
+        holder.fullNameTitle = getContactMessageName(pos, holder, handle);
+        if (!visibility) return;
 
         if (chatRoom.isGroup()) {
-            holder.fullNameTitle = getContactMessageName(pos, holder, handle);
             holder.nameContactText.setVisibility(View.VISIBLE);
             holder.nameContactText.setText(holder.fullNameTitle);
         }
         else {
-            holder.fullNameTitle = chatRoom.getTitle();
             holder.nameContactText.setVisibility(View.GONE);
         }
     }
@@ -8238,7 +8231,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (isHolderNull(pos, holder)) {
             return null;
         }
-
         String name = cC.getFullName(handle, chatRoom);
 
         if (name == null) {

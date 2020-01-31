@@ -505,7 +505,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
                 long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-                if(userHandle != 0) showChat(null);
+                if(userHandle != 0) updateNicknameInChat();
             }
         }
     };
@@ -1219,7 +1219,16 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         setSizeInputText(true);
     }
 
-    public void showChat(String textSnackbar){
+    public void updateNicknameInChat() {
+        if(idChat == -1 || megaChatApi.getChatRoom(idChat) == null) return;
+        chatRoom = megaChatApi.getChatRoom(idChat);
+        initializeInputText();
+        if (adapter != null) adapter.notifyDataSetChanged();
+        titleToolbar.setText(chatRoom.getTitle());
+        setChatSubtitle();
+    }
+
+    private void showChat(String textSnackbar){
         if(idChat!=-1) {
             //Recover chat
             logDebug("Recover chat with id: " + idChat);
@@ -1229,7 +1238,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 finish();
             }
 
-            initializeInputText();
             megaChatApi.closeChatRoom(idChat, this);
             boolean result = megaChatApi.openChatRoom(idChat, this);
 
@@ -1263,9 +1271,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
             }
             else {
+                initializeInputText();
                 int chatConnection = megaChatApi.getChatConnectionState(idChat);
                 logDebug("Chat connection (" + idChat + ") is: " + chatConnection);
-                if (adapter == null) createAdapter();
+                if (adapter == null) {
+                    createAdapter();
+                }else {
+                    adapter.notifyDataSetChanged();
+                }
                 setPreviewersView();
                 titleToolbar.setText(chatRoom.getTitle());
                 setChatSubtitle();
@@ -1649,7 +1662,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
 
             //Check nickname
-            String nickname = getNicknameContact(chatRoom.getPeerHandle(i));
+            String nickname = getNicknameContact(this, chatRoom.getPeerHandle(i));
             if(nickname != null){
                 participant = nickname;
             }

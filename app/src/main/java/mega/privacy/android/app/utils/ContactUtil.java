@@ -2,30 +2,29 @@ package mega.privacy.android.app.utils;
 
 import android.content.Context;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.Util.*;
-
 public class ContactUtil {
 
-    public static MegaContactDB getContactDB(long contactHandle) {
+    public static MegaContactDB getContactDB(Context context, long contactHandle) {
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         return dbH.findContactByHandle(String.valueOf(contactHandle));
     }
 
     public static String getMegaUserNameDB(MegaApiAndroid megaApi, Context context, MegaUser user) {
         if (user == null) return null;
-
         String nameContact = getContactNameDB(megaApi, context, user.getHandle());
         if (nameContact != null) return nameContact;
         return user.getEmail();
     }
 
     public static String getContactNameDB(MegaApiAndroid megaApi, Context context, long contactHandle) {
-        MegaContactDB contactDB = getContactDB(contactHandle);
+        MegaContactDB contactDB = getContactDB(context, contactHandle);
         if (contactDB != null) {
             String nicknameText = contactDB.getNickname();
             if (nicknameText != null) {
@@ -51,8 +50,8 @@ public class ContactUtil {
         return null;
     }
 
-    public static String getNicknameContact(long contactHandle) {
-        MegaContactDB contactDB = getContactDB(contactHandle);
+    public static String getNicknameContact(Context context, long contactHandle) {
+        MegaContactDB contactDB = getContactDB(context, contactHandle);
         if (contactDB == null) return null;
         String nicknameText = contactDB.getNickname();
         return nicknameText;
@@ -78,8 +77,8 @@ public class ContactUtil {
         return fullName;
     }
 
-    public static String getFirstNameDB(long contactHandle) {
-        MegaContactDB contactDB = getContactDB(contactHandle);
+    public static String getFirstNameDB(Context context, long contactHandle) {
+        MegaContactDB contactDB = getContactDB(context, contactHandle);
         if (contactDB != null) {
             String nicknameText = contactDB.getNickname();
             if (nicknameText != null) return nicknameText;

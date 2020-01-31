@@ -625,7 +625,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	private void checkNickname(long contactHandle) {
-		MegaContactDB contactDB = getContactDB(contactHandle);
+		MegaContactDB contactDB = getContactDB(this, contactHandle);
 		if (contactDB == null) return;
 		String fullName = buildFullName(contactDB.getName(), contactDB.getLastName(), contactDB.getMail());
 		//Check if the contact has nickname:
