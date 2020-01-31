@@ -1169,8 +1169,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					aC.logoutConfirmed(this);
 
 					if (isIsLoggingRunning()) {
-//						Already in Login activy, not necessary to launch it again
-						setIsLogginRunning(false);
+						logDebug("Already in Login Activity, not necessary to launch it again");
 						return;
 					}
 
@@ -1895,11 +1894,11 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		return isWebOpenDueToEmailVerification;
 	}
 
-	public static void setIsLogginRunning (boolean isLoggingRunning) {
+	public void setIsLoggingRunning (boolean isLoggingRunning) {
 		MegaApplication.isLoggingRunning = isLoggingRunning;
 	}
 
-	public static boolean isIsLoggingRunning() {
+	public boolean isIsLoggingRunning() {
 		return isLoggingRunning;
 	}
 }

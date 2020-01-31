@@ -140,6 +140,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     @Override
     protected void onDestroy() {
         logDebug("onDestroy");
+
+        app.setIsLoggingRunning(false);
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onAccountUpdateReceiver);
 
@@ -153,6 +156,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         super.onCreate(savedInstanceState);
 
         loginActivity = this;
+
+        app.setIsLoggingRunning(true);
 
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
