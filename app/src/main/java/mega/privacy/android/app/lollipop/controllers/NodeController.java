@@ -109,9 +109,6 @@ public class NodeController {
         for (int i=0; i<handleList.size(); i++){
             Long handle = handleList.get(i);
             MegaNode node = megaApi.getNodeByHandle(handle);
-            if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
-                return;
-            }
             longArray[i] = handle;
         }
         intent.putExtra("COPY_FROM", longArray);
@@ -389,10 +386,6 @@ public class NodeController {
         for (int i=0;i<handleList.size();i++){
             hashes[i] = handleList.get(i);
             MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
-
-            if (showTakenDownNodeActionNotAvailableDialog(nodeTemp, context)) {
-                return;
-            }
 
             if (nodeTemp != null){
                 if (nodeTemp.isFile()){

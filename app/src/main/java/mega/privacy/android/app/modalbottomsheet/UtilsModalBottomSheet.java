@@ -86,10 +86,6 @@ public class UtilsModalBottomSheet {
     public static void openWith (MegaApiAndroid megaApi, Context context, MegaNode node) {
         logDebug("openWith");
 
-        if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
-            return;
-        }
-
         boolean isError = false;
 
         String mimeType = MimeTypeList.typeForName(node.getName()).getType();

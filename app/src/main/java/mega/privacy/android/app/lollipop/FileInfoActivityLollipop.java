@@ -1372,9 +1372,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 				break;
 			}
 			case R.id.cab_menu_file_info_copy: {
-                if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
-                    return false;
-                }
 				showCopy();
 				break;
 			}

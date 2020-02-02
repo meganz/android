@@ -11573,8 +11573,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void showConfirmationRemovePublicLink (final MegaNode n){
 		logDebug("showConfirmationRemovePublicLink");
 
-        if (isNodeTakenDown(n)) {
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_download_takendown_node), -1);
+        if (showTakenDownNodeActionNotAvailableDialog(n, this)) {
             return;
         }
 

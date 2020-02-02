@@ -898,9 +898,6 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				break;
 			}
 			case R.id.full_image_viewer_copy: {
-				if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
-					return false;
-				}
 				showCopy();
 				break;
 			}
