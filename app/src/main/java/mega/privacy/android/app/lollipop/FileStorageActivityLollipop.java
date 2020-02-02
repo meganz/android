@@ -529,11 +529,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-
-		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-		}else{
+		if (isScreenInPortrait(this)) {
 			emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+		} else {
+			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 		}
 	}
 
