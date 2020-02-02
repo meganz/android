@@ -59,7 +59,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -107,9 +106,7 @@ public class NodeController {
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
         long[] longArray = new long[handleList.size()];
         for (int i=0; i<handleList.size(); i++){
-            Long handle = handleList.get(i);
-            MegaNode node = megaApi.getNodeByHandle(handle);
-            longArray[i] = handle;
+            longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
         ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
