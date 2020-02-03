@@ -42,7 +42,6 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
-import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -71,8 +70,6 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaEvent;
-import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
@@ -80,9 +77,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
-import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
@@ -264,33 +259,28 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 				if (e.getErrorCode() == MegaError.API_OK){
-
-					if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME||request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-						logDebug("Name: " + request.getText());
-						if (megaApi != null){
-							if(request.getEmail()!=null){
-								logDebug("Email: " + request.getEmail());
-								MegaUser user = megaApi.getContact(request.getEmail());
-								if (user != null) {
-									logDebug("User handle: " + user.getHandle());
-									logDebug("Visibility: " + user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
-									if(user.getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
-										logDebug("Non-contact");
-										if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-											dbH.setNonContactEmail(request.getEmail(), user.getHandle()+"");
-											dbH.setNonContactFirstName(request.getText(), user.getHandle()+"");
-										}
-										else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-											dbH.setNonContactLastName(request.getText(), user.getHandle()+"");
-										}
+					if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME || request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
+						if (megaApi != null && request.getEmail()!=null){
+							MegaUser user = megaApi.getContact(request.getEmail());
+							if (user != null) {
+								logDebug("User handle: " + user.getHandle());
+								logDebug("Visibility: " + user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
+								if(user.getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
+									logDebug("Non-contact");
+									if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
+										dbH.setNonContactEmail(request.getEmail(), user.getHandle()+"");
+										dbH.setNonContactFirstName(request.getText(), user.getHandle()+"");
 									}
-									else{
-										logDebug("The user is or was CONTACT: " + user.getEmail());
+									else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
+										dbH.setNonContactLastName(request.getText(), user.getHandle()+"");
 									}
 								}
 								else{
-									logWarning("User is NULL");
+									logDebug("The user is or was CONTACT:");
 								}
+							}
+							else{
+								logWarning("User is NULL");
 							}
 						}
 					}

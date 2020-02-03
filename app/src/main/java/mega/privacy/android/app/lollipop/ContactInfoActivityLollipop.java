@@ -296,7 +296,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		if (extras != null) {
 			LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
 			if (localBroadcastManager != null) {
-				localBroadcastManager.registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_ALIAS));
+				localBroadcastManager.registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
 			}
 			setContentView(R.layout.activity_chat_contact_properties);
             fragmentContainer = findViewById(R.id.fragment_container);
@@ -329,6 +329,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				width = px2dp(MAX_WIDTH_APPBAR_LAND, outMetrics);
 				secondLineTextToolbar.setPadding(0,0,0,5);
 			}
+			nameText.setMaxWidthEmojis(width);
 			firstLineTextToolbar.setMaxWidthEmojis(width);
 			secondLineTextToolbar.setMaxWidth(width);
 
@@ -1320,13 +1321,26 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
+		input.setImeActionLabel(getString(R.string.add_nickname), EditorInfo.IME_ACTION_DONE);
+		if (alias == null) {
+			input.setHint(getString(R.string.add_nickname));
+			builder.setTitle(getString(R.string.add_nickname));
+
+		} else {
+			input.setHint(alias);
+			input.setText(alias);
+			builder.setTitle(getString(R.string.edit_nickname));
+		}
+
 		input.addTextChangedListener(new TextWatcher() {
 			private void handleText() {
-				final Button okButton = setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-				if (input.getText().length() == 0) {
-					okButton.setEnabled(false);
-				} else {
-					okButton.setEnabled(true);
+				if(setNicknameDialog != null) {
+					final Button okButton = setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+					if (input.getText().length() == 0) {
+						okButton.setEnabled(false);
+					} else {
+						okButton.setEnabled(true);
+					}
 				}
 			}
 
@@ -1343,16 +1357,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				handleText();
 			}
 		});
-
-		input.setImeActionLabel(getString(R.string.add_nickname), EditorInfo.IME_ACTION_DONE);
-		if (alias == null) {
-			input.setHint(getString(R.string.add_nickname));
-			builder.setTitle(getString(R.string.add_nickname));
-
-		} else {
-			input.setHint(alias);
-			builder.setTitle(getString(R.string.edit_nickname));
-		}
 		builder.setPositiveButton(getString(R.string.button_set),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {

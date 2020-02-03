@@ -46,7 +46,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -327,13 +326,13 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     public void setVisibleContacts() {
         visibleContacts.clear();
         ArrayList<MegaUser> contacts = megaApi.getContacts();
-
         for (int i = 0; i < contacts.size(); i++) {
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 long contactHandle = contacts.get(i).getHandle();
-                String fullName = getContactNameDB(megaApi, context, contactHandle);
+                MegaContactDB contactDB = getContactDB(context, contactHandle);
+                String fullName = getContactNameDB(megaApi, context, contactDB);
                 if(fullName == null) fullName = contacts.get(i).getEmail();
-                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(context, contactHandle), contacts.get(i), fullName);
+                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
                 visibleContacts.add(megaContactAdapter);
             }
         }

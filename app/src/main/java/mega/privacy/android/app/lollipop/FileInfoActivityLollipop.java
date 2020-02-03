@@ -3,9 +3,11 @@ package mega.privacy.android.app.lollipop;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -589,6 +591,11 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 }
             }
         });
+
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        if (localBroadcastManager != null) {
+            localBroadcastManager.registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+        }
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -2973,6 +2980,8 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         if (drawableLeave != null) drawableLeave.setColorFilter(null);
         if (drawableCopy != null) drawableCopy.setColorFilter(null);
         if (drawableChat != null) drawableChat.setColorFilter(null);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
+
     }
 
 	@Override
@@ -3340,7 +3349,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         listContacts = new ArrayList<>();
         if (node != null) {
             fullListContacts = megaApi.getOutShares(node);
-
             if (fullListContacts.size() > MAX_NUMBER_OF_CONTACTS_IN_LIST) {
                 listContacts = new ArrayList<>(fullListContacts.subList(0,MAX_NUMBER_OF_CONTACTS_IN_LIST));
             } else {
@@ -3435,6 +3443,30 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 actionMode = startSupportActionMode(new ActionBarCallBack());
             }
             updateActionModeTitle();
+        }
+    }
+
+    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+                updateAdapter(userHandle);
+            }
+        }
+    };
+
+    private void updateAdapter(long handleReceived) {
+        if (listContacts != null && !listContacts.isEmpty()) {
+            for (int i = 0; i < listContacts.size(); i++) {
+                String email = listContacts.get(i).getUser();
+                MegaUser contact = megaApi.getContact(email);
+                long handleUser = contact.getHandle();
+                if (handleUser == handleReceived) {
+                    adapter.notifyItemChanged(i);
+                    break;
+                }
+            }
         }
     }
     

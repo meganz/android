@@ -35,7 +35,7 @@ public class FillDBContactsTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... params) {
         ArrayList<MegaUser> contacts = megaApi.getContacts();
-        for(int i=0; i<contacts.size(); i++){
+        for (int i = 0; i < contacts.size(); i++) {
             MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "", null);
             dbH.setContact(megaContactDB);
             megaApi.getUserAttribute(contacts.get(i), MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(context));

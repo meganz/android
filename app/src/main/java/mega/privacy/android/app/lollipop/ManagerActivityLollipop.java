@@ -2085,7 +2085,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
 		if (localBroadcastManager != null) {
 			localBroadcastManager.registerReceiver(nicknameReceiver,
-					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_ALIAS));
+					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
 
 			localBroadcastManager.registerReceiver(receiverUpdatePosition,
 					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
@@ -2827,7 +2827,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			nVEmail.setText(megaApi.getMyEmail());
 //				megaApi.getUserData(this);
 			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
-
 			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
 
 			this.setDefaultAvatar();
@@ -4712,7 +4711,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		if (!firstTimeAfterInstallation){
 			logDebug("Its NOT first time");
-
 			int dbContactsSize = dbH.getContactsSize();
 			int sdkContactsSize = megaApi.getContacts().size();
 			if (dbContactsSize != sdkContactsSize){

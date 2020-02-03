@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -71,7 +72,6 @@ public class ContactNameListener implements MegaRequestListenerInterface {
             case USER_ATTR_ALIAS: {
                 if (e.getErrorCode() == MegaError.API_OK) {
                     String nickname;
-
                     if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
                         nickname = request.getText();
                         dbH.setContactNickname(nickname, request.getNodeHandle());
@@ -82,6 +82,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
                             updateDBNickname(request.getMegaStringMap());
                             break;
                         }
+                        dbH.setContactNickname(nickname, request.getNodeHandle());
                     }
 
                     if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER && context != null && context instanceof ContactInfoActivityLollipop) {
@@ -114,8 +115,9 @@ public class ContactNameListener implements MegaRequestListenerInterface {
         for (int i = 0; i < contacts.size(); i++) {
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 long contactHandle = contacts.get(i).getHandle();
-                String fullName = getContactNameDB(megaApi, context, contactHandle);
-                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(getContactDB(context, contactHandle), contacts.get(i), fullName);
+                MegaContactDB contactDB = getContactDB(context, contactHandle);
+                String fullName = getContactNameDB(megaApi, context, contactDB);
+                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
                 visibleContacts.add(megaContactAdapter);
             }
         }
@@ -192,7 +194,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) { }
 
     private void notifyNicknameUpdate(long userHandle) {
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_ALIAS);
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_NICKNAME);
         intent.putExtra(EXTRA_USER_HANDLE, userHandle);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }

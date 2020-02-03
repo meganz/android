@@ -224,7 +224,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
             LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
             if (localBroadcastManager != null) {
-                localBroadcastManager.registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_ALIAS));
+                localBroadcastManager.registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
             }
             setContentView(R.layout.activity_group_chat_properties);
 
