@@ -619,6 +619,9 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 				((ManagerActivityLollipop) context).setTextSubmitted();
 			}
 
+			//To avoid ArrayIndexOutOfBoundsException
+			if (position < 0 || position >= mOffList.size()) return;
+
 			MegaOffline currentNode = mOffList.get(position);
 			File currentFile = getOfflineFile(context, currentNode);
 
