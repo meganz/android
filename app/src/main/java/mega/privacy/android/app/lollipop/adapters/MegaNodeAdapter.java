@@ -40,6 +40,7 @@ import mega.privacy.android.app.lollipop.ContactFileListFragmentLollipop;
 import mega.privacy.android.app.lollipop.ContactSharedFolderFragment;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -681,13 +682,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 else {
                     setFolderGridSelected(holder,position,R.drawable.ic_folder);
                 }
-                //Show the number of contacts who shared the folder
-                ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-                if (sl != null) {
-                    if (sl.size() != 0) {
-                        holder.textViewFileSize.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact) + " " + sl.size() + " " + context.getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-                    }
-                }
+                //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
+                holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
             } else if (type == FILE_BROWSER_ADAPTER) {
                 if (node.isOutShare() || megaApi.isPendingShare(node)) {
                     setFolderGridSelected(holder,position,R.drawable.ic_folder_outgoing);
@@ -963,13 +959,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 else {
                     setFolderListSelected(holder, position, R.drawable.ic_folder_list);
                 }
-                //Show the number of contacts who shared the folder
-                ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-                if (sl != null) {
-                    if (sl.size() != 0) {
-                        holder.textViewFileSize.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact) + " " + sl.size() + " " + context.getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-                    }
-                }
+                //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
+                holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
             } else if (type == FILE_BROWSER_ADAPTER) {
                 if (node.isOutShare() || megaApi.isPendingShare(node)) {
                     setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
@@ -1401,7 +1392,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         return null;
     }
 
-
     public long getParentHandle() {
         return parentHandle;
     }
@@ -1428,5 +1418,27 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     public void setListFragment (RecyclerView listFragment) {
         this.listFragment = listFragment;
+    }
+
+    private String getOutgoingSubtitle(String currentSubtitle, MegaNode node) {
+        String subtitle = currentSubtitle;
+
+        ArrayList<MegaShare> sl = megaApi.getOutShares(node);
+        if (sl != null && sl.size() != 0) {
+            if (sl.size() == 1 && sl.get(0).getUser() != null) {
+                subtitle = sl.get(0).getUser();
+                MegaContactDB contactDB = dbH.findContactByEmail(subtitle);
+                if (contactDB != null) {
+                    String fullName = new ContactController(context).getFullName(contactDB.getName(), contactDB.getLastName(), contactDB.getMail());
+                    if (fullName != null) {
+                        subtitle = fullName;
+                    }
+                }
+            } else {
+                subtitle = context.getResources().getString(R.string.file_properties_shared_folder_select_contact) + " " + sl.size() + " " + context.getResources().getQuantityString(R.plurals.general_num_users, sl.size());
+            }
+        }
+
+        return subtitle;
     }
 }
