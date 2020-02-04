@@ -14,24 +14,32 @@ import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
 public abstract class RotatableFragment extends Fragment {
 
+    private final static String UNHANDLED_ITEM = "unHandledItem";
     private final static String SELECTED_ITEMS = "selectedItems";
-    private final static String FOLDER_COUNT = "folderCount";
     private final static String LAST_PLACE_HOLDER_COUNT = "lastPlaceHolderCount";
+
     protected abstract RotatableAdapter getAdapter();
 
     public abstract void activateActionMode();
 
     public abstract void multipleItemClick(int position);
 
+    /** Reselect the unhandled item after rotation
+     * @param position the index of unhandled item
+     */
+    public abstract void reselectUnHandledSingleItem(int position);
+
     protected abstract void updateActionModeTitle();
 
     private ArrayList<Integer> selectedItems;
+
+    private int unHandledItem = -1;
 
     private int lastPlaceHolderCount;
 
     private boolean waitingForSearchedNodes;
 
-    public void reDoTheSelectionAfterRotation() {
+    protected void reDoTheSelectionAfterRotation() {
         logDebug("Reselect items");
         setWaitingForSearchedNodes(false);
 
@@ -44,21 +52,43 @@ public abstract class RotatableFragment extends Fragment {
             activateActionMode();
 
             for (int selectedItem : selectedItems) {
-                int position;
-
-                if (isList() || adapter.getFolderCount() == 0) {
-                    position = selectedItem;
-                } else if (isScreenInPortrait(getContext())){
-                    position = selectedItem - (lastPlaceHolderCount - adapter.getPlaceholderCount());
-                } else {
-                    position = selectedItem + (adapter.getPlaceholderCount() - lastPlaceHolderCount);
-                }
-
-                multipleItemClick(position);
+                multipleItemClick(transferPosition(selectedItem, adapter));
             }
         }
 
         updateActionModeTitle();
+    }
+
+    protected void reSelectUnhandledItem() {
+        if (unHandledItem == -1) {
+            return;
+        }
+        RotatableAdapter adapter = getAdapter();
+        if (adapter == null) {
+            return;
+        }
+        reselectUnHandledSingleItem(transferPosition(unHandledItem, adapter));
+        unHandledItem = -1;
+    }
+
+    /**
+     * @param originalPosition original position before rotation
+     * @param adapter the adapter where rotation happens
+     * @return the list position after rotation of adapter
+     */
+    private int transferPosition(int originalPosition, RotatableAdapter adapter) {
+        int position;
+
+        int folderCount = adapter.getFolderCount();
+
+        if (isList() || folderCount == 0 || originalPosition < folderCount) {
+            position = originalPosition;
+        } else if (isScreenInPortrait(getContext())) {
+            position = originalPosition - (lastPlaceHolderCount - adapter.getPlaceholderCount());
+        } else {
+            position = originalPosition + (adapter.getPlaceholderCount() - lastPlaceHolderCount);
+        }
+        return position;
     }
 
     private boolean isList() {
@@ -78,8 +108,8 @@ public abstract class RotatableFragment extends Fragment {
         if(currentAdapter != null){
             ArrayList<Integer> selectedItems = (ArrayList<Integer>) (currentAdapter.getSelectedItems());
             outState.putSerializable(SELECTED_ITEMS, selectedItems);
-            outState.putInt(FOLDER_COUNT, currentAdapter.getFolderCount());
             outState.putInt(LAST_PLACE_HOLDER_COUNT, currentAdapter.getPlaceholderCount());
+            outState.putInt(UNHANDLED_ITEM, currentAdapter.getUnhandledItem());
             lastPlaceHolderCount = -1;
         }
     }
@@ -89,7 +119,8 @@ public abstract class RotatableFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
             selectedItems = (ArrayList<Integer>) savedInstanceState.getSerializable(SELECTED_ITEMS);
-            lastPlaceHolderCount = savedInstanceState.getInt(LAST_PLACE_HOLDER_COUNT);
+            unHandledItem = savedInstanceState.getInt(UNHANDLED_ITEM, -1);
+            lastPlaceHolderCount = savedInstanceState.getInt(LAST_PLACE_HOLDER_COUNT, -1);
         }
     }
 
@@ -100,6 +131,8 @@ public abstract class RotatableFragment extends Fragment {
         if (!isWaitingForSearchedNodes()) {
             reDoTheSelectionAfterRotation();
             selectedItems = null;
+            reSelectUnhandledItem();
+            unHandledItem = -1;
         }
     }
 
