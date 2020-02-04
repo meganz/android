@@ -95,6 +95,8 @@ public class ContactsUtil {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(0);
                 String name = cursor.getString(1);
+                //If contact name has double quotes replace by single quotes to avoid JSON parse error of the string
+                name = name.replaceAll("\"","''");
                 contact = new LocalContact(id, name);
                 localContacts.add(contact);
             }
