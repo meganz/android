@@ -2601,7 +2601,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     cursore.close();
                 }
 
-                if (!emailAddress.isEmpty() && emailAddress.contains("@") && !emailAddress.contains("s.whatsapp.net")) {
+                if (emailAddress != null && !emailAddress.isEmpty() && emailAddress.contains("@") && !emailAddress.contains("s.whatsapp.net")) {
                     contactList.add(new PhoneContactInfo(id, name, emailAddress, null));
                 }
             }

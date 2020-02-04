@@ -101,13 +101,16 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     @Override
     public int getItemViewType(int position) {
         ShareContactInfo contact = getItem(position);
-        if (contact.isHeader()){
-            return HEADER_VIEW_TYPE;
-        } else if (contact.isProgress()) {
-            return ITEM_PROGRESS;
-        } else{
-            return ITEM_VIEW_TYPE;
+
+        if (contact != null) {
+            if (contact.isHeader()) {
+                return HEADER_VIEW_TYPE;
+            } else if (contact.isProgress()) {
+                return ITEM_PROGRESS;
+            }
         }
+
+        return ITEM_VIEW_TYPE;
     }
 
     public class ViewHolderShareContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener{
