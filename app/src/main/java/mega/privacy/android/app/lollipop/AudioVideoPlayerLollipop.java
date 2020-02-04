@@ -745,9 +745,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             hideActionStatusBar(0);
         }
 
-        if (!isOffline && !isZip && isNodeTakenDown(megaApi.getNodeByHandle(handle))) {
-            showTakenDownAlert(this);
-        } else if (isPlayList) {
+        if (isPlayList) {
             getMediaFilesTask = new GetMediaFilesTask();
             getMediaFilesTask.execute();
         }
@@ -2391,10 +2389,18 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 break;
             }
             case R.id.full_video_viewer_get_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)){
+                    break;
+                }
+
                 showGetLinkActivity();
                 break;
             }
             case R.id.full_video_viewer_remove_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)){
+                    break;
+                }
+
                 showRemoveLink();
                 break;
             }

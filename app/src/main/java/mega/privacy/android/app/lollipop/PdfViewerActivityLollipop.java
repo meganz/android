@@ -503,9 +503,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         defaultScrollHandle = new DefaultScrollHandle(PdfViewerActivityLollipop.this);
 
         loading = true;
-        if (megaApi != null && isNodeTakenDown(megaApi.getNodeByHandle(handle))) {
-            showTakenDownAlert(this);
-        } else if (uri.toString().contains("http://")){
+        if (uri.toString().contains("http://")){
             isUrl = true;
             loadStreamPDF();
         }
@@ -1653,14 +1651,12 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 break;
             }
             case R.id.pdf_viewer_chat: {
-                long[] longArray = new long[1];
-                longArray[0] = handle;
 
                 if(nC ==null){
                     nC = new NodeController(this, isFolderLink);
                 }
 
-                MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
+                MegaNode attachNode = megaApi.getNodeByHandle(handle);
                 if (attachNode != null) {
                     nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
                 }
@@ -1671,10 +1667,18 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 break;
             }
             case R.id.pdf_viewer_get_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)) {
+                    break;
+                }
+
                 showGetLinkActivity();
                 break;
             }
             case R.id.pdf_viewer_remove_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)) {
+                    break;
+                }
+
                 showRemoveLink();
                 break;
             }

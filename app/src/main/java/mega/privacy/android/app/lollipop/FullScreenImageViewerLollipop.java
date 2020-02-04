@@ -727,6 +727,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 			case R.id.full_image_viewer_remove_link: {
 				shareIt = false;
+
+				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 				if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
 					return false;
 				}

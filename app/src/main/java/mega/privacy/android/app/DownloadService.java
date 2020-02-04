@@ -63,6 +63,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -92,6 +93,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static final String EXTRA_CONTENT_URI = "CONTENT_URI";
 	public static final String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
 
+	private static int errorEBloqued = 0;
 	private int errorCount = 0;
 	private int alreadyDownloaded = 0;
 
@@ -531,9 +533,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			logDebug("onQueueComplete: reset total downloads");
 			megaApi.resetTotalDownloads();
 			megaApiFolder.resetTotalDownloads();
+			errorEBloqued = 0;
 			errorCount = 0;
 			alreadyDownloaded = 0;
 		}
+	}
+
+	private void sendTakenDownAlert() {
+	    if (errorEBloqued <= 0) return;
+
+		Intent intent = new Intent(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES);
+		intent.putExtra(NUMBER_FILES, errorEBloqued);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
 	private File getDir(MegaNode document, Intent intent) {
@@ -596,6 +607,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			size = getResources().getQuantityString(R.plurals.already_downloaded_service, alreadyDownloaded, alreadyDownloaded);
 		}
 		else if(errorCount>0){
+            sendTakenDownAlert();
 			int totalNumber = totalDownloads + errorCount;
 			notificationTitle = getResources().getQuantityString(R.plurals.download_service_final_notification_with_details, totalNumber, totalDownloads, totalNumber);
 
@@ -1673,6 +1685,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							localFile.delete();
 						}
 					}else{
+						if (error.getErrorCode() == MegaError.API_EBLOCKED) {
+							errorEBloqued++;
+						}
+
 						if(!transfer.isFolderTransfer()){
 							errorCount++;
 						}
