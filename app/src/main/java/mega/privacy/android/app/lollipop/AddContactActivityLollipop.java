@@ -2576,40 +2576,41 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private ArrayList<PhoneContactInfo> getPhoneContacts() {
         logDebug("getPhoneContacts");
         ArrayList<PhoneContactInfo> contactList = new ArrayList<>();
-        logDebug("inputString empty");
-        String filter = ContactsContract.CommonDataKinds.Email.DATA + " NOT LIKE ''  AND " + ContactsContract.Contacts.IN_VISIBLE_GROUP + "=1";
+
+        ContentResolver cr = getContentResolver();
+        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME},
+                null,
+                null,
+                null);
 
         try {
-            ContentResolver cr = getBaseContext().getContentResolver();
-            String SORT_ORDER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? ContactsContract.Contacts.SORT_KEY_PRIMARY : ContactsContract.Contacts.DISPLAY_NAME;
+            while (cursor.moveToNext()) {
+                long id = cursor.getLong(0);
+                String name = cursor.getString(1);
 
-            Cursor c = cr.query(
-                    ContactsContract.Data.CONTENT_URI,
-                    null,filter,
-                    null, SORT_ORDER);
+                String emailAddress = null;
+                Cursor cursore = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
+                        new String[]{String.valueOf(id)},
+                        ContactsContract.Contacts.SORT_KEY_PRIMARY);
 
-            while (c.moveToNext()){
-                long id = c.getLong(c.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-                String name = c.getString(c.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
-                String emailAddress = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-                logDebug("ID: " + id + "___ NAME: " + name + "____ EMAIL: " + emailAddress);
+                if (cursore != null && cursore.moveToFirst()) {
+                    emailAddress = cursore.getString(cursore.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+                    cursore.close();
+                }
 
-                if ((!emailAddress.equalsIgnoreCase("")) && (emailAddress.contains("@")) && (!emailAddress.contains("s.whatsapp.net"))) {
-                    PhoneContactInfo contactPhone = new PhoneContactInfo(id, name, emailAddress, null);
-                    contactList.add(contactPhone);
+                if (!emailAddress.isEmpty() && emailAddress.contains("@") && !emailAddress.contains("s.whatsapp.net")) {
+                    contactList.add(new PhoneContactInfo(id, name, emailAddress, null));
                 }
             }
-            c.close();
-
-            logDebug("contactList.size() = " + contactList.size());
-
-            return contactList;
-
+            cursor.close();
         } catch (Exception e) {
-            logError("Exception", e);
+            logWarning("Exception getting phone contacts", e);
         }
 
-        return null;
+        return contactList;
     }
 
     @Override
