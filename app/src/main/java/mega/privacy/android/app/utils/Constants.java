@@ -48,6 +48,7 @@ public class Constants {
     public static final int REQUEST_CODE_VERIFY_CODE = 1032;
     public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
 
+    public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
     public static final String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
     public static final String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
@@ -353,6 +354,9 @@ public class Constants {
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
 
+    //link for introduction end to end encryption
+    public static final String URL_E2EE = "https://mega.nz/security";
+
     public static final int MIN_ITEMS_SCROLLBAR = 30;
     public static final int MIN_ITEMS_SCROLLBAR_GRID = 200;
     public static final int MIN_ITEMS_SCROLLBAR_CHAT = 20;
@@ -411,13 +415,14 @@ public class Constants {
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String HANDLE = "handle";
     public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
+    public static final String VISIBLE_FRAGMENT = "VISIBLE_FRAGMENT";
 
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;
     public static final int EMOJI_SIZE_HIGH = 30;
     public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
     public static final int EMOJI_AVATAR_CALL_SMALL = 40;
-    public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
+    public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 28;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND = 350;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT = 200;
     public static final int MAX_WIDTH_ADD_CONTACTS = 60;
@@ -520,4 +525,18 @@ public class Constants {
             "^https://mega\\.nz/.*#pwr.+$",
             "^https://mega\\.nz/.*pwr.+$"
     };
+
+    public static final String[] EMAIL_VERIFY_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/#emailverify.+$",
+            "^https://mega\\.nz/#emailverify.+$"
+    };
+
+    //Types of blocked accounts
+    public static final String ACCOUNT_NOT_BLOCKED = "0";
+    public static final String COPYRIGHT_ACCOUNT_BLOCK = "200";
+    public static final String MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK = "300";
+    public static final String DISABLED_ACCOUNT_BLOCK = "400";
+    public static final String REMOVED_ACCOUNT_BLOCK = "401";
+    public static final String SMS_VERIFICATION_ACCOUNT_BLOCK = "500";
+    public static final String WEAK_PROTECTION_ACCOUNT_BLOCK = "700";
 }

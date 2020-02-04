@@ -740,7 +740,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             if(megaApi==null||megaApi.getRootNode()==null){
                 logDebug("Refresh session - sdk");
                 Intent intent = new Intent(this, LoginActivityLollipop.class);
-                intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
@@ -754,7 +754,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
                     logDebug("Refresh session - karere");
                     Intent intent = new Intent(this, LoginActivityLollipop.class);
-                    intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+                    intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                     finish();
@@ -3231,7 +3231,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
     public void changePermissions(){
         logDebug("changePermissions");
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
         final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
         dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), new DialogInterface.OnClickListener() {

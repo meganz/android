@@ -275,6 +275,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     public void sendImages(){
         String filePath;
         if(isMultipleselect()){
+            ((ChatActivityLollipop) getActivity()).setIsWaitingForMoreFiles(true);
             for(Integer element:posSelected){
                 //filePath = mPhotoUris.get(element);
                 filePath = imagesPath.get(element);
@@ -282,6 +283,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             }
             clearSelections();
             hideMultipleSelect();
+            ((ChatActivityLollipop) getActivity()).setIsWaitingForMoreFiles(false);
         }
     }
 
