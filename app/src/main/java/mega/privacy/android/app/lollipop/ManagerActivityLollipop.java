@@ -142,7 +142,6 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
-import mega.privacy.android.app.fcm.IncomingMessageService;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
@@ -5003,10 +5002,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void updateNavigationToolbarIcon(){
-		logDebug("updateNavigationToolbarIcon");
-        Intent myService = new Intent(this, IncomingMessageService.class);
-        stopService(myService);
-
 		int totalHistoric = megaApi.getNumUnreadUserAlerts();
 		int totalIpc = 0;
 		ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
