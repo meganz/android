@@ -142,6 +142,7 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
@@ -274,6 +275,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private final int RECENTS_TAB = 1;
 	private final int INCOMING_TAB = 0;
 	private final int OUTGOING_TAB = 1;
+	private final int LINKS_TAB = 2;
 	private final int CONTACTS_TAB = 0;
 	private final int SENT_REQUESTS_TAB = 1;
 	private final int RECEIVED_REQUESTS_TAB = 2;
@@ -410,7 +412,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     public enum FragmentTag {
 		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
-		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION;
+		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
 			switch (this) {
@@ -443,6 +445,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case EXPORT_RECOVERY_KEY: return "eRKeyF";
 				case PERMISSIONS: return "pF";
                 case SMS_VERIFICATION: return "svF";
+				case LINKS: return "lF";
 			}
 			return null;
 		}
@@ -605,6 +608,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private InboxFragmentLollipop iFLol;
     private IncomingSharesFragmentLollipop inSFLol;
 	private OutgoingSharesFragmentLollipop outSFLol;
+	private LinksFragment lF;
 	private ContactsFragmentLollipop cFLol;
 	private ReceivedRequestsFragmentLollipop rRFLol;
 	private SentRequestsFragmentLollipop sRFLol;
@@ -2517,11 +2521,28 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logDebug("selectDrawerItemSharedItems - TabId: " +  position);
 				supportInvalidateOptionsMenu();
 				checkScrollElevation();
-				if(position == 1 && isIncomingAdded() && inSFLol.isMultipleselect()){
-					inSFLol.actionMode.finish();
-				}
-				else if(position == 0 && isOutgoingAdded() && outSFLol.isMultipleselect()){
-					outSFLol.actionMode.finish();
+				switch (position) {
+					case INCOMING_TAB:
+						if (isOutgoingAdded() && outSFLol.isMultipleselect()) {
+							outSFLol.getActionMode().finish();
+						} else if (isLinksAdded() && lF.isMultipleselect()) {
+							lF.getActionMode().finish();
+						}
+						break;
+					case OUTGOING_TAB:
+						if (isIncomingAdded() && inSFLol.isMultipleselect()) {
+							inSFLol.getActionMode().finish();
+						}  else if (isLinksAdded() && lF.isMultipleselect()) {
+							lF.getActionMode().finish();
+						}
+						break;
+					case LINKS_TAB:
+						if (isIncomingAdded() && inSFLol.isMultipleselect()) {
+							inSFLol.getActionMode().finish();
+						} else if (isOutgoingAdded() && outSFLol.isMultipleselect()) {
+							outSFLol.getActionMode().finish();
+						}
+						break;
 				}
 				setToolbarTitle();
 				showFabButton();
@@ -6058,19 +6079,25 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private boolean isIncomingAdded () {
     	if (sharesPageAdapter == null) return false;
 
-		inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-		if (inSFLol != null && inSFLol.isAdded()) return true;
+		inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, INCOMING_TAB);
 
-    	return false;
+    	return inSFLol != null && inSFLol.isAdded();
 	}
 
 	private boolean isOutgoingAdded() {
     	if (sharesPageAdapter == null) return false;
 
-		outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-		if (outSFLol != null && outSFLol.isAdded()) return true;
+		outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, OUTGOING_TAB);
 
-    	return false;
+		return outSFLol != null && outSFLol.isAdded();
+	}
+
+	private boolean isLinksAdded() {
+    	if (sharesPageAdapter == null) return false;
+
+    	lF = (LinksFragment) sharesPageAdapter.instantiateItem(viewPagerShares, LINKS_TAB);
+
+    	return lF != null && lF.isAdded();
 	}
 
     public void checkScrollElevation() {
@@ -8119,7 +8146,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
 	        		if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
 						inSFLol.selectAll();
-						if (inSFLol.showSelectMenuItem()) {
+						if (inSFLol.isMultipleselect()) {
 							selectMenuItem.setVisible(true);
 							unSelectMenuItem.setVisible(false);
 						}
@@ -8130,7 +8157,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 	        		else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) {
 						outSFLol.selectAll();
-						if (outSFLol.showSelectMenuItem()) {
+						if (outSFLol.isMultipleselect()) {
 							selectMenuItem.setVisible(true);
 							unSelectMenuItem.setVisible(false);
 						}

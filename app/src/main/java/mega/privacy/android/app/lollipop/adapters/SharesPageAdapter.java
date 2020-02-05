@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
@@ -14,7 +15,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SharesPageAdapter extends FragmentStatePagerAdapter {
 
-    final int PAGE_COUNT = 2;
+    final int PAGE_COUNT = 3;
     private Context context;
 
     public SharesPageAdapter(FragmentManager fm, Context context) {
@@ -44,6 +45,15 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
                     return OutgoingSharesFragmentLollipop.newInstance();
                 }
             }
+            case 2:{
+                LinksFragment lF = (LinksFragment) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.LINKS.getTag());
+                if (lF != null)  {
+                    return lF;
+                }
+                else {
+                    return LinksFragment.newInstance();
+                }
+            }
         }
         return null;
     }
@@ -62,6 +72,9 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
             }
             case 1:{
                 return context.getString(R.string.tab_outgoing_shares);
+            }
+            case 2:{
+                return context.getString(R.string.tab_links_shares);
             }
         }
         return null;

@@ -42,24 +42,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -72,59 +68,27 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class OutgoingSharesFragmentLollipop extends RotatableFragment{
+public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 	public static ImageView imageDrag;
-
-	Context context;
-
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
-	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyLinearLayout;
 	TextView emptyTextViewFirst;
 
 	boolean allFiles = true;
-
-	MegaNodeAdapter adapter;
-
-	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
-
-	Stack<Integer> lastPositionStack;
-	
-	float density;
-	DisplayMetrics outMetrics;
-	Display display;
-
-	MegaApiAndroid megaApi;
-		
-	ArrayList<MegaNode> nodes;
 	
 	public NewHeaderItemDecoration headerItemDecoration;
 
-	public ActionMode actionMode;
-
-	DatabaseHandler dbH;
-	MegaPreferences prefs;
-	String downloadLocationDefaultPath;
-	
 	private int placeholderCount;
 
 	@Override
-	protected MegaNodeAdapter getAdapter() {
-		return adapter;
-	}
-
-	@Override
-	public void activateActionMode(){
-		logDebug("activateActionMode");
-		if (!adapter.isMultipleSelect()){
-			adapter.setMultipleSelect(true);
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-		}
+	public void activateActionMode() {
+		super.activateActionMode();
+		actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack());
 	}
 
 	public void updateScrollPosition(int position) {
@@ -515,31 +479,13 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public static OutgoingSharesFragmentLollipop newInstance() {
-		logDebug("newInstance");
-		OutgoingSharesFragmentLollipop fragment = new OutgoingSharesFragmentLollipop();
-		return fragment;
+		return new OutgoingSharesFragmentLollipop();
 	}
 
 	@Override
 	public void onDestroy() {
 		adapter.clearTakenDownDialog();
 		super.onDestroy();
-	}
-			
-	@Override
-	public void onCreate (Bundle savedInstanceState){
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-
-		dbH = DatabaseHandler.getDbHandler(context);
-		prefs = dbH.getPreferences();
-		downloadLocationDefaultPath = getDownloadLocation(context);
-
-		lastPositionStack = new Stack<>();
-		nodes = new ArrayList<MegaNode>();
-		super.onCreate(savedInstanceState);
-		logDebug("onCreate");
 	}
 
 	public void checkScroll () {
@@ -554,19 +500,10 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		logDebug("onCreateView");
-		
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
 
 		if (megaApi.getRootNode() == null){
 			return null;
 		}
-		
-		display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;		
 
 		((ManagerActivityLollipop)context).showFabButton();
 
@@ -1039,35 +976,29 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 	}
 
-	public void findNodes(){
+	public void findNodes() {
 		logDebug("findNodes");
 		ArrayList<MegaShare> outNodeList = megaApi.getOutShares();
 		ArrayList<MegaShare> pendingNodeList = megaApi.getPendingOutShares();
 
 		nodes.clear();
-		long lastFolder=-1;		
-		
-		for(int k=0;k<outNodeList.size();k++){
-			
-			if(outNodeList.get(k).getUser()!=null){
-				MegaShare mS = outNodeList.get(k);				
+		long lastFolder = -1;
+
+		for (int k = 0; k < outNodeList.size(); k++) {
+
+			if (outNodeList.get(k).getUser() != null) {
+				MegaShare mS = outNodeList.get(k);
 				MegaNode node = megaApi.getNodeByHandle(mS.getNodeHandle());
-				
-				if(lastFolder!=node.getHandle()){
-					lastFolder=node.getHandle();
-					nodes.add(node);			
-				}	
+
+				if (lastFolder != node.getHandle()) {
+					lastFolder = node.getHandle();
+					nodes.add(node);
+				}
 			}
 		}
 
 		orderNodes();
 	}
-
-	@Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
-    }
 
 	public void openFile(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
 		if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()) {
@@ -1450,40 +1381,6 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		}
 	}
 
-	@Override
-	public void multipleItemClick(int position) {
-		adapter.toggleSelection(position);
-	}
-
-	@Override
-	public void reselectUnHandledSingleItem(int position) {
-		adapter.filClicked(position);
-	}
-
-	public void selectAll(){
-		if (adapter != null){
-			if(adapter.isMultipleSelect()){
-				adapter.selectAll();
-			}
-			else{
-				adapter.setMultipleSelect(true);
-				adapter.selectAll();
-				
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			}
-			
-			updateActionModeTitle();
-		}
-	}
-	
-	public boolean showSelectMenuItem(){
-		if (adapter != null){
-			return adapter.isMultipleSelect();
-		}
-
-		return false;
-	}
-
 	public void setNodes(ArrayList<MegaNode> nodes){
 		logDebug("setNodes");
 		this.nodes = nodes;
@@ -1500,65 +1397,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		addSectionTitle(nodes, adapter.getAdapterType());
 		adapter.setNodes(nodes);
 	}
-			
-	/*
-	 * Clear all selected items
-	 */
-	private void clearSelections() {
-		if(adapter.isMultipleSelect()){
-			adapter.clearSelections();
-		}
-	}
 
-	@Override
-	protected void updateActionModeTitle() {
-		if (actionMode == null || getActivity() == null) {
-			return;
-		}
-		List<MegaNode> documents = adapter.getSelectedNodes();
-		int files = 0;
-		int folders = 0;
-		for (MegaNode document : documents) {
-			if (document.isFile()) {
-				files++;
-			} else if (document.isFolder()) {
-				folders++;
-			}
-		}
-		Resources res = getActivity().getResources();
-		String title;
-		int sum=files+folders;
-
-		if (files == 0 && folders == 0) {
-			title = Integer.toString(sum);
-		} else if (files == 0) {
-			title = Integer.toString(folders);
-		} else if (folders == 0) {
-			title = Integer.toString(files);
-		} else {
-			title = Integer.toString(sum);
-		}
-		actionMode.setTitle(title);
-		try {
-			actionMode.invalidate();
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-			logError("Invalidate error", e);
-		}
-		// actionMode.
-	}
-	
-	/*
-	 * Disable selection
-	 */
-	public void hideMultipleSelect() {
-		adapter.setMultipleSelect(false);
-		if (actionMode != null) {
-			actionMode.finish();
-		}
-	}
-
-	
 	public int onBackPressed(){
 		logDebug("deepBrowserTree: " + ((ManagerActivityLollipop) context).deepBrowserTreeOutgoing);
 					
@@ -1653,37 +1492,5 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
-	}
-
-	public void notifyDataSetChanged(){
-		if (adapter != null){
-			adapter.notifyDataSetChanged();
-		}
-	}
-
-	public int getItemCount(){
-		if(adapter!=null){
-			return adapter.getItemCount();
-		}
-		return 0;
-	}
-
-	public boolean isMultipleselect(){
-		if (adapter == null) return false;
-
-		return adapter.isMultipleSelect();
-	}
-
-	public void visibilityFastScroller(){
-		if(adapter == null){
-			fastScroller.setVisibility(View.GONE);
-		}else{
-			if(adapter.getItemCount() < MIN_ITEMS_SCROLLBAR){
-				fastScroller.setVisibility(View.GONE);
-			}else{
-				fastScroller.setVisibility(View.VISIBLE);
-			}
-		}
-
 	}
 }
