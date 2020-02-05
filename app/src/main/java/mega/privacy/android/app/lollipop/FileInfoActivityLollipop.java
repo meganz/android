@@ -112,6 +112,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
@@ -1298,10 +1299,16 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 			}
 			case R.id.cab_menu_file_info_get_link:
 			case R.id.cab_menu_file_info_edit_link:{
+                if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
+                    return false;
+                }
 				showGetLinkActivity(node.getHandle());
 				break;
 			}
 			case R.id.cab_menu_file_info_remove_link: {
+			    if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
+			        return false;
+                }
 				shareIt = false;
 				AlertDialog removeLinkDialog;
 				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);

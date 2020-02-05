@@ -48,6 +48,8 @@ public class BaseActivity extends AppCompatActivity {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
 
+    private BaseActivity baseActivity;
+
     protected  MegaApplication app;
 
     protected MegaApiAndroid megaApi;
@@ -81,6 +83,8 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
 
+        baseActivity = this;
+
         super.onCreate(savedInstanceState);
         checkMegaObjects();
 
@@ -97,6 +101,9 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(businessExpiredReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
+
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
             if (isExpiredBusinessAlertShown) {
@@ -108,6 +115,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown);
+
         super.onSaveInstanceState(outState);
     }
 
@@ -141,6 +149,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
 
         super.onDestroy();
     }
@@ -222,6 +231,20 @@ public class BaseActivity extends AppCompatActivity {
             if (intent != null) {
                 showExpiredBusinessAlert();
             }
+        }
+    };
+
+    /**
+     * Broadcast to show taken down files info
+     */
+    private BroadcastReceiver takenDownFilesReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) return;
+
+            logDebug("BROADCAST INFORM THERE ARE TAKEN DOWN FILES IMPLIED IN ACTION");
+            int numberFiles = intent.getIntExtra(NUMBER_FILES, 1);
+            showSnackBar(baseActivity, SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.alert_taken_down_files, numberFiles, numberFiles), -1);
         }
     };
 

@@ -111,11 +111,8 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -146,7 +143,6 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
-import mega.privacy.android.app.fcm.IncomingMessageService;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
@@ -207,9 +203,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
@@ -258,11 +252,14 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -5131,10 +5128,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void updateNavigationToolbarIcon(){
-		logDebug("updateNavigationToolbarIcon");
-        Intent myService = new Intent(this, IncomingMessageService.class);
-        stopService(myService);
-
 		int totalHistoric = megaApi.getNumUnreadUserAlerts();
 		int totalIpc = 0;
 		ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
@@ -6518,7 +6511,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					setSearchDrawerItem();
 					selectDrawerItemLollipop(drawerItem);
 				} else if (drawerItem == DrawerItem.CHAT){
-					Util.resetActionBar(aB);
+					resetActionBar(aB);
 				}
 				hideCallMenuItem();
 				hideCallWidget();
@@ -9449,6 +9442,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void showGetLinkActivity(long handle){
 		logDebug("Handle: " + handle);
+		MegaNode node = megaApi.getNodeByHandle(handle);
+		if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
+			return;
+		}
+
 		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
 		linkIntent.putExtra("handle", handle);
 		startActivity(linkIntent);
@@ -11691,6 +11689,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void showConfirmationRemovePublicLink (final MegaNode n){
 		logDebug("showConfirmationRemovePublicLink");
+
+        if (showTakenDownNodeActionNotAvailableDialog(n, this)) {
+            return;
+        }
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -18091,10 +18093,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		logDebug("Level: " + level);
         if(level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL){
 			logWarning("Low memory");
-			ThumbnailUtilsLollipop.isDeviceMemoryLow = true;
+			isDeviceMemoryLow = true;
         }else{
 			logDebug("Memory OK");
-			ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
+			isDeviceMemoryLow = false;
         }
     }
 
