@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/recording_layout"
+    android:layout_width="180dp"
+    android:layout_height="180dp"
+    android:visibility="gone"
+    android:layout_gravity="center"
+    android:gravity="center_horizontal"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:background="@drawable/recording">
+
+        <TextView
+            android:id="@+id/recording_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="gravity"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:textSize="15sp" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src = "@drawable/ic_voice_clip_feedback"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textAlignment="gravity"
+            android:singleLine="true"
+            android:textSize="15sp"
+            android:text="@string/recording_layout"/>
+
+</RelativeLayout>

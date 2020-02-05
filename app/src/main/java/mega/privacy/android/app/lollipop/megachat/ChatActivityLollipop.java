@@ -393,8 +393,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private RecordView recordView;
     private FrameLayout fragmentVoiceClip;
     private RelativeLayout voiceClipLayout;
-
     private boolean isShareLinkDialogDismissed = false;
+    private RelativeLayout recordingLayout;
+    private TextView recordingChrono;
 
     private ActionMode actionMode;
 
@@ -674,7 +675,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         pickFileStorageButton = findViewById(R.id.pick_file_storage_icon_chat);
         pickAttachButton = findViewById(R.id.pick_attach_chat);
 
-
         keyboardHeight = outMetrics.heightPixels / 2 - getActionBarHeight(this, getResources());
         marginBottomDeactivated = px2dp(MARGIN_BUTTON_DEACTIVATED, outMetrics);
         marginBottomActivated = px2dp(MARGIN_BUTTON_ACTIVATED, outMetrics);
@@ -684,6 +684,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         callInProgressText = findViewById(R.id.call_in_progress_text);
         callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
         callInProgressChrono.setVisibility(View.GONE);
+
+        recordingLayout = findViewById(R.id.recording_layout);
+        recordingChrono = findViewById(R.id.recording_time);
+        recordingChrono.setText(new SimpleDateFormat("mm:ss").format(0));
+        recordingLayout.setVisibility(View.GONE);
 
         enableButton(rLKeyboardTwemojiButton, keyboardTwemojiButton);
         enableButton(rLMediaButton, mediaButton);
@@ -714,7 +719,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         recordView = findViewById(R.id.record_view);
         recordView.setVisibility(View.GONE);
         bubbleLayout = findViewById(R.id.bubble_layout);
-        BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this,R.color.turn_on_notifications_text));
+        BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this,R.color.voice_clip_bubble));
         myBubble.setCornerRadius(CORNER_RADIUS_BUBBLE);
         myBubble.setPointerAlignment(BubbleDrawable.RIGHT);
         myBubble.setPadding(PADDING_BUBBLE, PADDING_BUBBLE, PADDING_BUBBLE, PADDING_BUBBLE);
@@ -880,6 +885,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (!isAllowedToRecord()) return;
                 startRecording();
             }
+
+            @Override
+            public void changeTimer(CharSequence time) {
+               if(recordingLayout != null && recordingChrono != null && recordingLayout.getVisibility() == View.VISIBLE){
+                   recordingChrono.setText(time);
+               }
+            }
+
         });
 
         recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
@@ -2116,6 +2129,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         myAudioRecorder.start();
         setRecordingNow(true);
         recordView.startRecordingTime();
+        recordingLayout.setVisibility(View.VISIBLE);
     }
 
     public static String getVoiceClipName(long timestamp) {
@@ -2137,6 +2151,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void controlErrorRecording() {
+        destroyAudioRecorderElements();
+        textChat.requestFocus();
+    }
+
+    private void hideRecordingLayout(){
+        if(recordingLayout.getVisibility() == View.GONE) return;
+        recordingChrono.setText("00:00");
+        recordingLayout.setVisibility(View.GONE);
+    }
+
+    private void destroyAudioRecorderElements(){
+        hideRecordingLayout();
         outputFileVoiceNotes = null;
         outputFileName = null;
         setRecordingNow(false);
@@ -2145,7 +2171,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         myAudioRecorder.reset();
         myAudioRecorder.release();
         myAudioRecorder = null;
-        textChat.requestFocus();
     }
 
     /*
@@ -2153,7 +2178,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      */
     private void cancelRecording() {
         logDebug("cancelRecording");
+
         if (!isRecordingNow() || myAudioRecorder == null) return;
+        hideRecordingLayout();
+
         try {
             myAudioRecorder.stop();
             myAudioRecorder.reset();
@@ -2176,7 +2204,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      */
     private void sendRecording() {
         logDebug("sendRecording");
+
         if ((!recordView.isRecordingNow()) || (myAudioRecorder == null)) return;
+        hideRecordingLayout();
 
         try {
             myAudioRecorder.stop();
@@ -7166,13 +7196,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         hideCallInProgressLayout(null);
 
-        if(myAudioRecorder!=null){
-            myAudioRecorder.reset();
-            myAudioRecorder.release();
-            myAudioRecorder = null;
-            outputFileVoiceNotes = null;
-            setRecordingNow(false);
-        }
+        destroyAudioRecorderElements();
         if(adapter!=null) {
             adapter.destroyVoiceElemnts();
         }
