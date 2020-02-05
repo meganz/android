@@ -74,7 +74,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
     ProgressDialog temp = null;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
-	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	boolean folderzipped = false;
 
 	RelativeLayout zipLayout;

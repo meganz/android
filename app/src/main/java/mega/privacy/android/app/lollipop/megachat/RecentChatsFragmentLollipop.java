@@ -61,6 +61,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
+import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -146,6 +147,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     private ActionMode actionMode;
 
+    private AskForDisplayOverDialog askForDisplayOverDialog;
+
     public static RecentChatsFragmentLollipop newInstance() {
         logDebug("newInstance");
         RecentChatsFragmentLollipop fragment = new RecentChatsFragmentLollipop();
@@ -171,6 +174,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     @Override
+    public void reselectUnHandledSingleItem(int position) {
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         logDebug("onCreate");
@@ -192,6 +199,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         grantedContactPermission = hasPermissions(context, Manifest.permission.READ_CONTACTS);
         contactGetter = new MegaContactGetter(context);
         contactGetter.setMegaContactUpdater(this);
+
+        askForDisplayOverDialog = new AskForDisplayOverDialog(context);
     }
 
     @Override
@@ -276,6 +285,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     }
                 } else {
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                         appBarLayout.setElevation(px2dp(4, outMetrics));
                     } else {
@@ -303,7 +313,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
         appBarLayout = v.findViewById(R.id.linear_layout_add);
-        aB = ((AppCompatActivity) context).getSupportActionBar();
+        if(context instanceof ArchivedChatsActivity) {
+            appBarLayout.setVisibility(View.GONE);
+        } else {
+            aB = ((AppCompatActivity) context).getSupportActionBar();
+        }
         emptyLayoutContainer = v.findViewById(R.id.scroller);
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
         fastScroller = (FastScroller) v.findViewById(R.id.fastscroll_chat);
@@ -404,7 +418,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         } else {
             bannerContainer.setVisibility(View.GONE);
         }
-
+        if(askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.showDialog();
+        }
         return v;
     }
 
@@ -1601,6 +1617,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(askForDisplayOverDialog != null) {
+            askForDisplayOverDialog.recycle();
+        }
+    }
+
+    @Override
     public void onResume() {
         logDebug("onResume: lastFirstVisiblePosition " + lastFirstVisiblePosition);
         if (lastFirstVisiblePosition > 0) {
@@ -1623,7 +1647,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         }
-        refreshMegaContactsList();
+        // if in ArchivedChatsActivity or user close the invitation banner, no need to load contacts.
+        if(appBarLayout.getVisibility() != View.GONE) {
+            refreshMegaContactsList();
+        }
         setStatus();
         super.onResume();
     }

@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,7 +29,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckBox;
@@ -52,11 +52,11 @@ import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import nz.mega.sdk.MegaApiAndroid;
@@ -75,15 +75,14 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static android.graphics.Color.BLACK;
-import static android.graphics.Color.TRANSPARENT;
+import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
+public class ChatFullScreenImageViewer extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
 	private static final long ANIMATION_DURATION = 400L;
 	boolean fromChatSavedInstance = false;
 	int[] screenPosition;
@@ -347,7 +346,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			if((megaApi==null||megaApi.getRootNode()==null) && !chatC.isInAnonymousMode()){
 				logDebug("Refresh session - sdk");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+				intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();
@@ -363,7 +362,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
 				logDebug("Refresh session - karere");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+				intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();
@@ -787,10 +786,22 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		});
 	}
-	
+
+    private Uri extractUri(Intent intent, int resultCode) {
+        if (intent == null) {
+            logWarning("extractUri: result intent is null");
+            if (resultCode != Activity.RESULT_OK) {
+                showSnackBar(this, SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+            } else {
+                showSnackBar(this, SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
+            }
+            return null;
+        }
+        return intent.getData();
+    }
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		
 		if (intent == null) {
 			return;
 		}
@@ -798,14 +809,16 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			logDebug("Local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			chatC.prepareForDownload(intent, parentPath);
-		}
+		} else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, true, null);
+        }
 		else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
 			if(!isOnline(this)||megaApi==null) {
 				try{
 					statusDialog.dismiss();
-				} catch(Exception ex) {};
+				} catch(Exception ex) {}
 
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
@@ -1006,6 +1019,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 							}
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(ANIMATION_DURATION).start();
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -1017,6 +1031,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
 				bottomLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
 
 		}

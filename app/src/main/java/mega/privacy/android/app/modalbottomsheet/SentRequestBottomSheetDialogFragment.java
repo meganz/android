@@ -3,22 +3,15 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.content.ContextCompat;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -32,6 +25,8 @@ import nz.mega.sdk.MegaContactRequest;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+
 
 public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -46,7 +41,6 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
     public TextView titleNameContactChatPanel;
     public TextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
-    public TextView avatarInitialLetter;
     public LinearLayout optionReinvite;
     public LinearLayout optionDelete;
 
@@ -99,7 +93,6 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
         titleNameContactChatPanel = (TextView) contentView.findViewById(R.id.sent_request_list_contact_name_text);
         titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.sent_request_list_contact_mail_text);
         contactImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_sent_request_list_thumbnail);
-        avatarInitialLetter = (TextView) contentView.findViewById(R.id.sliding_sent_request_list_initial_letter);
         optionReinvite = (LinearLayout) contentView.findViewById(R.id.contact_list_option_reinvite_layout);
         optionDelete= (LinearLayout) contentView.findViewById(R.id.contact_list_option_delete_request_layout);
 
@@ -135,51 +128,8 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
     }
 
     public void addAvatarRequestPanel(MegaContactRequest request){
-
-        ////DEfault AVATAR
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth() / 2;
-        else
-            radius = defaultAvatar.getHeight() / 2;
-
-        c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, p);
-        contactImageView.setImageBitmap(defaultAvatar);
-
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        String fullName = request.getTargetEmail();
-
-        if (fullName != null) {
-            if (fullName.length() > 0) {
-                if (fullName.trim().length() > 0) {
-                    String firstLetter = fullName.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                    avatarInitialLetter.setText(firstLetter);
-                    avatarInitialLetter.setTextColor(Color.WHITE);
-                    avatarInitialLetter.setVisibility(View.VISIBLE);
-                    avatarInitialLetter.setTextSize(22);
-                } else {
-                    avatarInitialLetter.setVisibility(View.INVISIBLE);
-                }
-            }
-            else{
-                avatarInitialLetter.setVisibility(View.INVISIBLE);
-            }
-
-        } else {
-            avatarInitialLetter.setVisibility(View.INVISIBLE);
-        }
-
-        ////
+        /*Default Avatar*/
+        contactImageView.setImageBitmap(getDefaultAvatar(context, getColorAvatar(context, megaApi, -1), request.getTargetEmail(), AVATAR_SIZE, true));
     }
 
     @Override

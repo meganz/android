@@ -607,22 +607,14 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         }
     }
 
-	public void selectAll(){
-		for (int i= 0; i<this.getItemCount();i++){
-			if(!isItemChecked(i)){
-				if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
-					if(!((CloudDriveExplorerFragmentLollipop) fragment).isFolder(i)){
-						toggleSelection(i);
-					}
-				}
-				else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
-					if(!((IncomingSharesExplorerFragmentLollipop) fragment).isFolder(i)){
-						toggleSelection(i);
-					}
-				}
-			}
-		}
-	}
+    public void selectAll() {
+        for (int i = 0; i < nodes.size(); i++) {
+            MegaNode node = nodes.get(i);
+            if (node != null && !node.isFolder() && !isItemChecked(i)) {
+                toggleSelection(i);
+            }
+        }
+    }
 
 	public void clearSelections() {
 		logDebug("clearSelections");
@@ -669,6 +661,11 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
     @Override
     public int getPlaceholderCount() {
         return placeholderCount;
+    }
+
+    @Override
+    public int getUnhandledItem() {
+        return -1;
     }
 
     /*

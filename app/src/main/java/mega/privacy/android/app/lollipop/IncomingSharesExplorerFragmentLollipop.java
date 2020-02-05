@@ -128,6 +128,10 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 		adapter.toggleSelection(position);
 	}
 
+	@Override
+	public void reselectUnHandledSingleItem(int position) {
+	}
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -870,12 +874,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment im
 		}
 
 		setNodes(nodes);
-	}
-
-	public boolean isFolder(int position){
-		MegaNode node = nodes.get(position);
-
-		return node == null || node.isFolder();
 	}
 
 	boolean isMultiselect() {

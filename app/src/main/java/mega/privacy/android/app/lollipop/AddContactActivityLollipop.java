@@ -1524,7 +1524,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if(megaApi==null||megaApi.getRootNode()==null){
             logDebug("Refresh session - sdk");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -1538,7 +1538,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
                 logDebug("Refresh session - karere");
                 Intent intent = new Intent(this, LoginActivityLollipop.class);
-                intent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
@@ -1625,7 +1625,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         containerAddedContactsRecyclerView.setVisibility(View.GONE);
         fabImageGroup = (FloatingActionButton) findViewById(R.id.image_group_floating_button);
         nameGroup = findViewById(R.id.name_group_edittext);
-        nameGroup.setEmojiSize(px2dp(EMOJI_SIZE_SMALL, outMetrics));
         nameGroup.setFilters(new InputFilter[]{new InputFilter.LengthFilter(MAX_ALLOWED_CHARACTERS_AND_EMOJIS)});
 
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);

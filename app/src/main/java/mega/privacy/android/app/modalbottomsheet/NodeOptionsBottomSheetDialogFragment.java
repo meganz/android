@@ -258,23 +258,23 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 nodeInfo.setText(getInfoFolder(node, context, megaApi));
                 nodeVersionsIcon.setVisibility(View.GONE);
 
-                if (node.isInShare()) {
-                    nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
-                } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                    nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
-                }
-                else{
-                    if(((ManagerActivityLollipop) context).isCameraUploads(node)){
-                        nodeThumb.setImageResource(R.drawable.ic_folder_image_list);
-                    }else{
-                        nodeThumb.setImageResource(R.drawable.ic_folder_list);
+                    if (node.isInShare()) {
+                        nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
+                    } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                        nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
                     }
-                }
-                counterShares--;
-                optionSendChat.setVisibility(View.GONE);
-            } else {
-                long nodeSize = node.getSize();
-                nodeInfo.setText(getSizeString(nodeSize));
+                    else{
+                        if(((ManagerActivityLollipop) context).isCameraUploads(node)){
+                            nodeThumb.setImageResource(R.drawable.ic_folder_image_list);
+                        }else{
+                            nodeThumb.setImageResource(R.drawable.ic_folder_list);
+                        }
+                    }
+                    counterShares--;
+                    optionSendChat.setVisibility(View.GONE);
+                } else {
+                    long nodeSize = node.getSize();
+                    nodeInfo.setText(getSizeString(nodeSize));
 
                 if(megaApi.hasVersions(node)){
                     nodeVersionsIcon.setVisibility(View.VISIBLE);
@@ -797,7 +797,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                 int dBT = nC.getIncomingLevel(node);
                 if (nC.nodeComesFromIncoming(node)) {
-                    logDebug("dBT: "+dBT);
+                    logDebug("dBT: " + dBT);
                     if (node.isFolder()) {
                         optionInfoText.setText(R.string.general_folder_info);
                         counterShares--;
@@ -806,8 +806,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionInfoText.setText(R.string.general_file_info);
                         if (isChatEnabled()) {
                             optionSendChat.setVisibility(View.VISIBLE);
-                        }
-                        else {
+                        } else {
                             counterShares--;
                             optionSendChat.setVisibility(View.GONE);
                         }
@@ -820,8 +819,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionDownload.setVisibility(View.VISIBLE);
                     if (availableOffline(context, node)) {
                         optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    }
-                    else {
+                    } else {
                         optionOfflineText.setText(getString(R.string.save_for_offline));
                     }
                     optionInfo.setVisibility(View.VISIBLE);
@@ -940,8 +938,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             break;
                         }
                     }
-                }
-                else {
+                } else {
                     if (node.isExported()) {
                         //Node has public link
                         nodeIconLayout.setVisibility(View.VISIBLE);
@@ -971,8 +968,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionDownload.setVisibility(View.VISIBLE);
                     if (availableOffline(context, node)) {
                         optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    }
-                    else {
+                    } else {
                         optionOfflineText.setText(getString(R.string.save_for_offline));
                     }
                     optionInfo.setVisibility(View.VISIBLE);
@@ -1023,39 +1019,29 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         dialog.setContentView(contentView);
 
-        mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-//            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
+            mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
+            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
-//            final NodeOptionsBottomSheetDialogFragment thisclass = this;
-        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
-//            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//                mBehavior.setPeekHeight((heightDisplay / 2) * 2);
-//            }
-//            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//            }
-
-        mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                    dismissAllowingStateLoss();
+            mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                @Override
+                public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                    if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                        dismissAllowingStateLoss();
+                    }
                 }
-            }
 
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-                    ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-                    if (getActivity() != null && getActivity().findViewById(R.id.toolbar) != null) {
-                        int tBHeight = getActivity().findViewById(R.id.toolbar).getHeight();
-                        Rect rectangle = new Rect();
-                        getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
-                        int windowHeight = rectangle.bottom;
-                        int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8, context.getResources().getDisplayMetrics());
-                        int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
+                @Override
+                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                    if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                        ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                        if (getActivity() != null && getActivity().findViewById(R.id.toolbar) != null) {
+                            int tBHeight = getActivity().findViewById(R.id.toolbar).getHeight();
+                            Rect rectangle = new Rect();
+                            getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
+                            int windowHeight = rectangle.bottom;
+                            int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8, context.getResources().getDisplayMetrics());
+                            int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
 
                         logDebug("bottomSheet.height: "+mainLinearLayout.getHeight()+" maxHeight: "+maxHeight);
                         if (mainLinearLayout.getHeight() > maxHeight) {
@@ -1314,7 +1300,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
         }
 
-//        dismiss();
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
@@ -1369,11 +1354,20 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         if (isFileAvailable(offlineParent)) {
             File offlineFile = new File(offlineParent, node.getName());
-            if (isFileAvailable(offlineFile)) {
+            // if the file matches to the latest on the cloud, do nothing
+            if (isFileAvailable(offlineFile)
+                    && isFileDownloadedLatest(offlineFile, node)
+                    && offlineFile.length() == node.getSize()) {
                 return;
+            } else {
+                // if the file does not match the latest on the cloud, delete the old file offline database record
+                String parentName = getOfflineParentFileName(context, node).getAbsolutePath() + File.separator;
+                MegaOffline mOffDelete = dbH.findbyPathAndName(parentName, node.getName());
+                removeFromOffline(mOffDelete);
             }
         }
 
+        // Save the new file to offline
         saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context, megaApi);
     }
 

@@ -31,7 +31,6 @@ public class ContactFileBaseFragment extends RotatableFragment {
     public static int REQUEST_CODE_GET = 1000;
     public static int REQUEST_CODE_GET_LOCAL = 1003;
     public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
-    public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
     
     protected MegaApiAndroid megaApi;
@@ -166,6 +165,10 @@ public class ContactFileBaseFragment extends RotatableFragment {
     @Override
     public void multipleItemClick(int position) {
         adapter.toggleSelection(position);
+    }
+
+    @Override
+    public void reselectUnHandledSingleItem(int position) {
     }
 
     @Override

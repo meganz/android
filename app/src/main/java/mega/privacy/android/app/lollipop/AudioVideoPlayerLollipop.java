@@ -149,8 +149,6 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static android.graphics.Color.BLACK;
-import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
@@ -158,12 +156,15 @@ import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLo
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
+public class AudioVideoPlayerLollipop extends DownloadableActivity implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener, MegaChatCallListenerInterface {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
@@ -575,7 +576,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if(megaApi==null){
                     logDebug("Refresh session - sdk");
                     Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                    intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                    intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                     intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intentLogin);
                     finish();
@@ -586,7 +587,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         if(megaApi.getRootNode()==null){
                             logDebug("Refresh session logged in but no fetch - sdk");
                             Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                            intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                            intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                             intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intentLogin);
                             finish();
@@ -603,7 +604,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
                         logDebug("Refresh session - karere");
                         Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                        intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+                        intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                         intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intentLogin);
                         finish();
@@ -850,8 +851,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
             else if(adapterType == SEARCH_ADAPTER){
                 mediaHandles = new ArrayList<>();
-                ArrayList<String> serialized = getIntent().getStringArrayListExtra(ARRAY_SEARCH);
-                getMediaHandles(getSearchedNodes(serialized));
+                ArrayList<String> handles = getIntent().getStringArrayListExtra(ARRAY_SEARCH);
+                getMediaHandles(getSearchedNodes(handles));
             }
             else if(adapterType == FILE_LINK_ADAPTER){
                 if (currentDocument != null) {
@@ -981,6 +982,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (nodes != null) {
                 for (int i = 0; i < nodes.size(); i++) {
                     MegaNode n = nodes.get(i);
+                    if (isNodeTakenDown(n)) continue;
+
                     if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
                             || (MimeTypeList.typeForName(n.getName()).isAudio() && !MimeTypeList.typeForName(n.getName()).isAudioNotSupported())) {
                         mediaHandles.add(n.getHandle());
@@ -1318,7 +1321,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         numErrors++;
         player.stop();
         if (numErrors <= 6) {
-            if (isPlayList && size > 1 && playListCreated) {
+            if (isPlayList && size > 1 && playListCreated && concatenatingMediaSource != null) {
 //                player.prepare(finalLoopingMediaSource);
                 player.prepare(concatenatingMediaSource);
             }
@@ -2386,10 +2389,18 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 break;
             }
             case R.id.full_video_viewer_get_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)){
+                    break;
+                }
+
                 showGetLinkActivity();
                 break;
             }
             case R.id.full_video_viewer_remove_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)){
+                    break;
+                }
+
                 showRemoveLink();
                 break;
             }
@@ -3206,6 +3217,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
             }
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, (adapterType == FROM_CHAT), nC);
         }
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
@@ -3228,7 +3241,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if(nC==null){
                     nC = new NodeController(this, isFolderLink);
                 }
-                nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
+                nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
@@ -3615,6 +3628,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
             }
+        } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
+            showTakenDownAlert(this);
         }
     }
 
@@ -3905,7 +3920,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         downloadConfirmationDialog.show();
     }
 
-    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
+    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath,String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
         logDebug("askConfirmationNoAppInstaledBeforeDownload");
 
         final String parentPathC = parentPath;
@@ -4150,6 +4165,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     void initPlaylist (int index, long time) {
+        if (concatenatingMediaSource == null) return;
+
         creatingPlaylist = false;
         player.prepare(concatenatingMediaSource);
         player.seekTo(index, time);
