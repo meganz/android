@@ -332,6 +332,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 
 	@Override
+	public int getUnhandledItem() {
+		return -1;
+	}
+
+	@Override
 	public List<Integer> getSelectedItems() {
 		if (selectedItems != null) {
 			logDebug("getSelectedItems");

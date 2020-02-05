@@ -175,6 +175,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     @Override
+    public void reselectUnHandledSingleItem(int position) {
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         logDebug("onCreate");

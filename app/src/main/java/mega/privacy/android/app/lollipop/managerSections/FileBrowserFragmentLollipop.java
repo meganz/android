@@ -704,6 +704,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
         aB = ((AppCompatActivity)context).getSupportActionBar();
     }
 
+    @Override
+	public void onDestroy() {
+		adapter.clearTakenDownDialog();
+		super.onDestroy();
+	}
+
 	public void openFile(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
 		if (MimeTypeList.typeForName(node.getName()).isImage()) {
 			Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
@@ -1036,6 +1042,11 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	@Override
 	public void multipleItemClick(int position) {
 		adapter.toggleSelection(position);
+	}
+
+	@Override
+	public void reselectUnHandledSingleItem(int position) {
+		adapter.filClicked(position);
 	}
 
 	public void setFolderInfoNavigation(MegaNode n){

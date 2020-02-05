@@ -44,6 +44,7 @@ import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.GlobalListener;
+import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -1193,7 +1194,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_PUSH_RECEIVED) {
 			logDebug("TYPE_PUSH_RECEIVED: " + e.getErrorCode() + "__" + e.getErrorString());
-
+			stopService(new Intent(this, KeepAliveService.class));
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				logDebug("OK:TYPE_PUSH_RECEIVED");
 				chatNotificationReceived = true;

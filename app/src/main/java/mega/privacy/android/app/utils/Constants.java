@@ -174,6 +174,7 @@ public class Constants {
     public static final int COLOR_STATUS_BAR_SMS_VERIFICATION = 5;
 
     public static final String CONTACT_LINK_BASE_URL = "https://mega.nz/C!";
+    public static final String DISPUTE_URL = "https://mega.nz/dispute";
     public static final String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
     public static final String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
@@ -325,6 +326,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
     public static final String NOTIFICATION_CHANNEL_CHAT_NAME = "MEGA Chat";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID = "ChatSummaryNotification";
+    public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2 = "ChatSummaryNotificationV2";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME = "MEGA Chat Summary";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID = "ChatSummaryNotificationNoVibrate";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME = "MEGA Chat Summary (no vibration)";
