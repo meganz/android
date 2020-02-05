@@ -1,161 +1,145 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/file_list_item_layout"
     android:layout_width="fill_parent"
     android:layout_height="72dp"
-    android:descendantFocusability="blocksDescendants"
     android:background="@drawable/statelist_item_layout"
-    android:id="@+id/file_list_item_layout" >
-    
+    android:descendantFocusability="blocksDescendants">
+
     <ImageView
         android:id="@+id/file_list_saved_offline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_cloud_saved_offline"
-		android:background="@null" 
-        android:layout_centerVertical="true"/> 
-        
-<!--       <ImageView
-        android:id="@+id/file_list_saved_offline_multiselect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_cloud_saved_offline"
-		android:background="@null" 
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/file_list_checkbox"/> 
-     -->
-	<RelativeLayout
-		android:id="@+id/container_thumbnail"
-		android:layout_width="48dp"
-		android:layout_height="match_parent"
-		android:layout_toRightOf="@+id/file_list_saved_offline"
-		android:layout_centerVertical="true"
-		android:layout_margin="0dp"
-		android:padding="0dp">
+        android:background="@null"
+        android:src="@drawable/ic_cloud_saved_offline"
+        tools:ignore="ContentDescription" />
 
-		<ImageView
-			android:id="@+id/file_list_thumbnail"
-			android:layout_width="48dp"
-			android:layout_height="48dp"
-			android:layout_centerVertical="true"
-			android:scaleType="fitCenter"/>
-
-	</RelativeLayout>
-<!--    
-        <TextView
-        android:id="@+id/file_list_owner"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_toRightOf="@id/file_list_filename"
-        android:paddingLeft="5dp"
-        android:paddingBottom="7dp"
-        android:textColor="@color/file_list_second_row" 
-        android:textSize="12sp"
-        android:ellipsize="end"
-        android:maxLines="1"/> --> 
-       	
     <RelativeLayout
-		android:id="@+id/file_list_three_dots_layout"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:layout_alignParentRight="true">
+        android:id="@+id/container_thumbnail"
+        android:layout_width="48dp"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_margin="0dp"
+        android:layout_toEndOf="@+id/file_list_saved_offline"
+        android:padding="0dp">
 
-		<ImageView
-			android:id="@+id/file_list_three_dots"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:src="@drawable/ic_dots_vertical_grey"
-			android:background="@null"
-			android:layout_marginRight="10dp"
-			android:layout_centerVertical="true" />
+        <ImageView
+            android:id="@+id/file_list_thumbnail"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:scaleType="fitCenter"
+            tools:ignore="ContentDescription" />
 
-	</RelativeLayout>
+    </RelativeLayout>
 
-	<ImageView
-		android:id="@+id/file_list_incoming_permissions"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:src="@drawable/ic_permissions_full_access"
-		android:alpha="0.35"
-		android:background="@null"
-		android:layout_marginRight="12dp"
-		android:layout_marginLeft="12dp"
-		android:layout_toLeftOf="@id/file_list_three_dots_layout"
-		android:layout_centerVertical="true"
-		android:visibility="gone"/>
+    <RelativeLayout
+        android:id="@+id/file_list_three_dots_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true">
 
-	<RelativeLayout
-		android:id="@+id/file_list_filename_layout"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_toRightOf="@id/container_thumbnail"
-		android:layout_toLeftOf="@id/file_list_three_dots_layout"
-		android:layout_marginTop="15dp"
-		android:layout_marginLeft="12dp">
+        <ImageView
+            android:id="@+id/file_list_three_dots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:src="@drawable/ic_dots_vertical_grey"
+            tools:ignore="ContentDescription" />
 
-		<TextView
-			android:id="@+id/file_list_filename"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textColor="@color/file_list_first_row"
-			android:maxLines="1"
-			android:singleLine="true"
-			android:ellipsize="middle"
-			android:textSize="16sp"/>
+    </RelativeLayout>
 
-		<ImageView
-			android:id="@+id/file_list_public_link"
-			android:layout_width="16dp"
-			android:layout_height="16dp"
-			android:src="@drawable/link_ic"
-			android:background="@null"
-			android:alpha="0.35"
-			android:layout_centerVertical="true"
-			android:layout_toRightOf="@+id/file_list_filename"
-			android:layout_marginTop="6dp"
-			android:layout_marginRight="6dp"
-			android:layout_marginLeft="6dp"/>
-
-	</RelativeLayout>
-
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_toRightOf="@id/container_thumbnail"
-		android:layout_toLeftOf="@id/file_list_incoming_permissions"
-		android:layout_below="@+id/file_list_filename_layout"
-		android:layout_marginLeft="13dp">
-
-		<ImageView
-			android:id="@+id/file_list_versions_icon"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:src="@drawable/ic_versions_small"
-			android:background="@null"
-			android:alpha="0.76"
-			android:layout_marginRight="8dp"
-			android:layout_centerVertical="true"
-			android:visibility="gone"/>
-
-		<TextView
-			android:id="@+id/file_list_filesize"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textColor="@color/file_list_second_row"
-			android:textSize="14sp"
-			android:layout_toRightOf="@id/file_list_versions_icon"
-			android:ellipsize="end"
-			android:maxLines="1"/>
-	</RelativeLayout>
-
-
-<!--    
     <ImageView
-        android:id="@+id/file_list_arrow_selection"
+        android:id="@+id/file_list_incoming_permissions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/arrow_selection"
-		android:layout_alignBottom="@id/container_thumbnail"
-        android:layout_alignParentRight="true"
-        android:paddingRight="15dp" />-->        
-    
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_toStartOf="@id/file_list_three_dots_layout"
+        android:alpha="0.35"
+        android:background="@null"
+        android:src="@drawable/ic_permissions_full_access"
+        android:visibility="gone"
+        tools:ignore="ContentDescription" />
+
+    <RelativeLayout
+        android:id="@+id/file_list_filename_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="15dp"
+        android:layout_toStartOf="@id/file_list_three_dots_layout"
+        android:layout_toEndOf="@id/container_thumbnail">
+
+        <TextView
+            android:id="@+id/file_list_filename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:textColor="@color/file_list_first_row"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/file_list_public_link"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_toEndOf="@+id/file_list_filename"
+            android:alpha="0.35"
+            android:background="@null"
+            android:src="@drawable/link_ic"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/file_list_taken_down"
+            style="@style/taken_down_icon"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_toEndOf="@+id/file_list_filename"
+            android:src="@drawable/ic_input_warning"
+            tools:ignore="ContentDescription" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/file_list_filename_layout"
+        android:layout_marginStart="13dp"
+        android:layout_toStartOf="@id/file_list_incoming_permissions"
+        android:layout_toEndOf="@id/container_thumbnail">
+
+        <ImageView
+            android:id="@+id/file_list_versions_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:alpha="0.76"
+            android:background="@null"
+            android:src="@drawable/ic_versions_small"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/file_list_filesize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/file_list_versions_icon"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/file_list_second_row"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
 </RelativeLayout>
 

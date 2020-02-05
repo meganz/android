@@ -135,6 +135,11 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		adapter.toggleSelection(position);
 	}
 
+	@Override
+	public void reselectUnHandledSingleItem(int position) {
+		adapter.filClicked(position);
+	}
+
 	public void updateScrollPosition(int position) {
 		logDebug("Position: " + position);
 		if (adapter != null) {
@@ -465,7 +470,13 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
 		}
 	}
-	
+
+	@Override
+	public void onDestroy() {
+		adapter.clearTakenDownDialog();
+		super.onDestroy();
+	}
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		if (megaApi == null){
@@ -1271,6 +1282,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 		if (isWaitingForSearchedNodes()) {
 			reDoTheSelectionAfterRotation();
+			reSelectUnhandledItem();
 		}
 	}
 
