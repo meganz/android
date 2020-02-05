@@ -1,11 +1,9 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,8 +16,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,15 +34,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -67,116 +59,16 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
-	public static ImageView imageDrag;
-	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
-
-	ImageView emptyImageView;
-	LinearLayout emptyLinearLayout;
-	TextView emptyTextViewFirst;
-
 	boolean allFiles = true;
-	
-	public NewHeaderItemDecoration headerItemDecoration;
-
-	private int placeholderCount;
 
 	@Override
 	public void activateActionMode() {
 		super.activateActionMode();
 		actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack());
-	}
-
-	public void updateScrollPosition(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
-				mLayoutManager.scrollToPosition(position);
-			}
-			else if (gridLayoutManager != null) {
-				gridLayoutManager.scrollToPosition(position);
-			}
-		}
-	}
-    
-    public void addSectionTitle(List<MegaNode> nodes,int type) {
-        Map<Integer, String> sections = new HashMap<>();
-        int folderCount = 0;
-        int fileCount = 0;
-        for (MegaNode node : nodes) {
-            if(node == null) {
-                continue;
-            }
-            if (node.isFolder()) {
-                folderCount++;
-            }
-            if (node.isFile()) {
-                fileCount++;
-            }
-        }
-
-        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
-            int spanCount = 2;
-            if (recyclerView instanceof NewGridRecyclerView) {
-                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
-            }
-            if(folderCount > 0) {
-                for (int i = 0;i < spanCount;i++) {
-                    sections.put(i, getString(R.string.general_folders));
-                }
-            }
-            
-            if(fileCount > 0 ) {
-                placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
-                if (placeholderCount == 0) {
-                    for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + i, getString(R.string.general_files));
-                    }
-                } else {
-                    for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + placeholderCount + i, getString(R.string.general_files));
-                    }
-                }
-            }
-        } else {
-            placeholderCount = 0;
-            sections.put(0, getString(R.string.general_folders));
-            sections.put(folderCount, getString(R.string.general_files));
-        }
-
-		if (headerItemDecoration == null) {
-			logDebug("Create new decoration");
-			headerItemDecoration = new NewHeaderItemDecoration(context);
-		} else {
-			logDebug("Remove old decoration");
-			recyclerView.removeItemDecoration(headerItemDecoration);
-		}
-		headerItemDecoration.setType(type);
-		headerItemDecoration.setKeys(sections);
-		recyclerView.addItemDecoration(headerItemDecoration);
-    }
-
-	public ImageView getImageDrag(int position) {
-		logDebug("Position: " + position);
-		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
-				View v = mLayoutManager.findViewByPosition(position);
-				if (v != null) {
-					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
-				}
-			}
-			else if (gridLayoutManager != null){
-				View v = gridLayoutManager.findViewByPosition(position);
-				if (v != null) {
-					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
-				}
-			}
-		}
-		return null;
 	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -481,21 +373,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	public static OutgoingSharesFragmentLollipop newInstance() {
 		return new OutgoingSharesFragmentLollipop();
 	}
-
-	@Override
-	public void onDestroy() {
-		adapter.clearTakenDownDialog();
-		super.onDestroy();
-	}
-
-	public void checkScroll () {
-		if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())){
-			((ManagerActivityLollipop) context).changeActionBarElevation(true);
-		}
-		else {
-			((ManagerActivityLollipop) context).changeActionBarElevation(false);
-		}
-	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -507,473 +384,113 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 		((ManagerActivityLollipop)context).showFabButton();
 
+		View v;
+
 		if (((ManagerActivityLollipop)context).isList){
-			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
+			v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
-			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
-
 			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
-			recyclerView.setClipToPadding(false);
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.setItemAnimator(new DefaultItemAnimator());
-			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-				@Override
-				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-					super.onScrolled(recyclerView, dx, dy);
-					checkScroll();
-				}
-			});
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyLinearLayout = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+
 			if (adapter == null){
 				logDebug("Creating the adapter: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleOutgoing(), recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
-
-			if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
-				logWarning("Parent Handle == -1");
-				findNodes();
-			}else{
-				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
-				logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-			}
-
-			((ManagerActivityLollipop)context).setToolbarTitle();
-			addSectionTitle(nodes,adapter.getAdapterType());
-			adapter.setNodes(nodes);
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			adapter.setMultipleSelect(false);
-			
-			recyclerView.setAdapter(adapter);
-			fastScroller.setRecyclerView(recyclerView);
-
-			if (adapter != null){
-				addSectionTitle(nodes,adapter.getAdapterType());
-				adapter.setNodes(nodes);
-				visibilityFastScroller();
-
-				if (adapter.getItemCount() == 0){
-					recyclerView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyLinearLayout.setVisibility(View.VISIBLE);
-
-					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleOutgoing()||((ManagerActivityLollipop)context).getParentHandleOutgoing()==-1) {
-						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
-						}else{
-							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
-						}
-						String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
-						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
-					}else {
-						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-						}else{
-							emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-						}
-						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
-					}
-				}
-				else{
-					recyclerView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyLinearLayout.setVisibility(View.GONE);
-				}			
-			}
-
-			return v;
 		}
 		else{
-			logDebug("Grid View");
-			
-			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
+			v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
 			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
-			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
-
 			recyclerView.setPadding(0, 0, 0, scaleHeightPx(80, outMetrics));
-			recyclerView.setClipToPadding(false);
-			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-
-			recyclerView.setItemAnimator(new DefaultItemAnimator());
-			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-				@Override
-				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-					super.onScrolled(recyclerView, dx, dy);
-					checkScroll();
-				}
-			});
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyLinearLayout = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
+
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleOutgoing(), recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
-				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
+		}
 
-			if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
-				logWarning("Parent Handle == -1");
-				findNodes();
+		adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
+		adapter.setListFragment(recyclerView);
+
+		if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == INVALID_HANDLE){
+			logWarning("Parent Handle == -1");
+			findNodes();
+			adapter.setParentHandle(INVALID_HANDLE);
+		}else{
+			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
+			logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
+
+			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+			addSectionTitle(nodes,adapter.getAdapterType());
+			adapter.setNodes(nodes);
+		}
+
+		((ManagerActivityLollipop)context).setToolbarTitle();
+
+		recyclerView.setClipToPadding(false);
+		recyclerView.setItemAnimator(new DefaultItemAnimator());
+		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				checkScroll();
 			}
-			else{
-				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
-				logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
+		});
 
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-				addSectionTitle(nodes,adapter.getAdapterType());
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-				adapter.setNodes(nodes);
-			}
+		adapter.setMultipleSelect(false);
+		recyclerView.setAdapter(adapter);
+		fastScroller.setRecyclerView(recyclerView);
+		visibilityFastScroller();
+		setEmptyView();
 
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-			adapter.setMultipleSelect(false);
-			
-			recyclerView.setAdapter(adapter);
-			fastScroller.setRecyclerView(recyclerView);
-			visibilityFastScroller();
-			if (adapter.getItemCount() == 0){
-				recyclerView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyLinearLayout.setVisibility(View.VISIBLE);
-
-				if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleOutgoing()||((ManagerActivityLollipop)context).getParentHandleOutgoing()==-1) {
-
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
-					}
-					String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-
-				}else {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-					}else{
-						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-					}
-					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				}
-			}
-			else{
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyLinearLayout.setVisibility(View.GONE);
-			}
-
-			return v;
-		}		
+		return v;
 	}
 
+	@Override
 	public void refresh (){
 		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
 
-        if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
-            findNodes();
-
-            ((ManagerActivityLollipop)context).setToolbarTitle();
-            if(adapter != null){
-				logDebug("adapter != null");
-				addSectionTitle(nodes,adapter.getAdapterType());
-                adapter.setNodes(nodes);
-				visibilityFastScroller();
-
-                if (adapter.getItemCount() == 0){
-					logDebug("adapter.getItemCount() = 0");
-                    recyclerView.setVisibility(View.GONE);
-                    emptyImageView.setVisibility(View.VISIBLE);
-                    emptyLinearLayout.setVisibility(View.VISIBLE);
-
-					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).getParentHandleOutgoing()||((ManagerActivityLollipop)context).getParentHandleOutgoing()==-1) {
-
-						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
-						}else{
-							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
-						}
-						String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
-						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
-
-					}else {
-						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-						}else{
-							emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-						}
-						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-						try{
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
-					}
-                }
-                else{
-					logDebug("adapter.getItemCount() != 0");
-                    recyclerView.setVisibility(View.VISIBLE);
-                    emptyImageView.setVisibility(View.GONE);
-                    emptyLinearLayout.setVisibility(View.GONE);
-                }
-			}
-        }
-        else{
-            MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
-
-           	((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			((ManagerActivityLollipop)context).setToolbarTitle();
-
-			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
-			addSectionTitle(nodes,adapter.getAdapterType());
-
-            adapter.setNodes(nodes);
-			visibilityFastScroller();
-
-            //If folder has no files
-            if (adapter.getItemCount() == 0){
-                recyclerView.setVisibility(View.GONE);
-                emptyImageView.setVisibility(View.VISIBLE);
-                emptyLinearLayout.setVisibility(View.VISIBLE);
-
-                if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
-					}
-					String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				} else {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-					}else{
-						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-					}
-					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				}
-            }
-            else{
-                recyclerView.setVisibility(View.VISIBLE);
-                emptyImageView.setVisibility(View.GONE);
-                emptyLinearLayout.setVisibility(View.GONE);
-            }
-        }
-        ((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-	}
-
-	public void refreshContent (){
-		logDebug("Parent Handle: " + ((ManagerActivityLollipop)context).getParentHandleOutgoing());
-
-		if (((ManagerActivityLollipop)context).getParentHandleOutgoing() == -1){
+		if (((ManagerActivityLollipop) context).getParentHandleOutgoing() == -1) {
 			findNodes();
-			if(adapter != null){
-				logDebug("adapter != null");
-				addSectionTitle(nodes,adapter.getAdapterType());
-				adapter.setNodes(nodes);
-				visibilityFastScroller();
+		} else {
+			MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleOutgoing());
+			((ManagerActivityLollipop) context).setToolbarTitle();
 
-				if (adapter.getItemCount() == 0){
-					logDebug("adapter.getItemCount() = 0");
-					recyclerView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyLinearLayout.setVisibility(View.VISIBLE);
-				}
-				else{
-					logDebug("adapter.getItemCount() != 0");
-					recyclerView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyLinearLayout.setVisibility(View.GONE);
-				}
-			}
-		}
-		else{
-			MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleOutgoing());
-			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
-			addSectionTitle(nodes,adapter.getAdapterType());
-
+			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop) context).orderCloud);
+			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
-			visibilityFastScroller();
-
-			//If folder has no files
-			if (adapter.getItemCount() == 0){
-				recyclerView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyLinearLayout.setVisibility(View.VISIBLE);
-
-				if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
-					}
-					String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-
-				} else {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-					}else{
-						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-					}
-					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
-					}
-					catch (Exception e){}
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					emptyTextViewFirst.setText(result);
-				}
-			}else{
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyLinearLayout.setVisibility(View.GONE);
-			}
 		}
-		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+        ((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+        visibilityFastScroller();
+        clearSelections();
+        hideMultipleSelect();
+        setEmptyView();
 	}
 
 	public void findNodes() {
@@ -1269,6 +786,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		}
 	}
 
+	@Override
 	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		if (adapter.isMultipleSelect()) {
 			logDebug("multiselect ON");
@@ -1313,65 +831,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 				visibilityFastScroller();
-
-				//If folder has no files
-				if (adapter.getItemCount() == 0) {
-					recyclerView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyLinearLayout.setVisibility(View.VISIBLE);
-
-					if (megaApi.getRootNode().getHandle() == n.getHandle()) {
-
-						if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
-						} else {
-							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
-						}
-
-						String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
-						try {
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						} catch (Exception e) {
-						}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
-
-					} else {
-						if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-						} else {
-							emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-						}
-						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-						try {
-							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-							textToShow = textToShow.replace("[/B]", "</font>");
-						} catch (Exception e) {
-						}
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						emptyTextViewFirst.setText(result);
-
-					}
-				} else {
-					recyclerView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyLinearLayout.setVisibility(View.GONE);
-				}
+				setEmptyView();
 				checkScroll();
 				((ManagerActivityLollipop) context).showFabButton();
 			} else {
@@ -1381,13 +841,14 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		}
 	}
 
+	@Override
 	public void setNodes(ArrayList<MegaNode> nodes){
 		logDebug("setNodes");
 		this.nodes = nodes;
 		orderNodes();
 	}
 
-	private void orderNodes() {
+	protected void orderNodes() {
 		if (((ManagerActivityLollipop) context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC) {
 			sortByNameDescending(this.nodes);
 		} else {
@@ -1398,6 +859,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		adapter.setNodes(nodes);
 	}
 
+	@Override
 	public int onBackPressed(){
 		logDebug("deepBrowserTree: " + ((ManagerActivityLollipop) context).deepBrowserTreeOutgoing);
 					
@@ -1489,8 +951,44 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			return 0;
 		}
 	}
-	
-	public RecyclerView getRecyclerView(){
-		return recyclerView;
+
+	@Override
+	protected void setEmptyView() {
+		String textToShow;
+
+		if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop) context).getParentHandleOutgoing()
+				|| ((ManagerActivityLollipop) context).getParentHandleOutgoing() == -1) {
+			if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
+			} else {
+				emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
+			}
+			textToShow = String.format(context.getString(R.string.context_empty_outgoing));
+		} else {
+			if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+			}
+			textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+		}
+
+		try {
+			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[/A]", "</font>");
+			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[/B]", "</font>");
+		} catch (Exception e) {
+			logWarning("Exception formatting string", e);
+		}
+		Spanned result = null;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			result = Html.fromHtml(textToShow);
+		}
+		emptyTextViewFirst.setText(result);
+
+		checkEmptyView();
 	}
 }
