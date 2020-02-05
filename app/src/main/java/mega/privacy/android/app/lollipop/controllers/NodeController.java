@@ -384,6 +384,7 @@ public class NodeController {
         for (int i=0;i<handleList.size();i++){
             hashes[i] = handleList.get(i);
             MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
+
             if (nodeTemp != null){
                 if (nodeTemp.isFile()){
                     size += nodeTemp.getSize();

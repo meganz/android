@@ -518,6 +518,12 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		OutgoingSharesFragmentLollipop fragment = new OutgoingSharesFragmentLollipop();
 		return fragment;
 	}
+
+	@Override
+	public void onDestroy() {
+		adapter.clearTakenDownDialog();
+		super.onDestroy();
+	}
 			
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -1445,6 +1451,11 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	@Override
 	public void multipleItemClick(int position) {
 		adapter.toggleSelection(position);
+	}
+
+	@Override
+	public void reselectUnHandledSingleItem(int position) {
+		adapter.filClicked(position);
 	}
 
 	public void selectAll(){

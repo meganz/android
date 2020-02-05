@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -54,6 +55,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
@@ -1902,9 +1904,20 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0){
-			//Intent to new activity Chat Settings
-			Intent i = new Intent(context, ChatPreferencesActivity.class);
-			startActivity(i);
+		    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+		        //create default chat summary channel
+                ChatAdvancedNotificationBuilder.createChatSummaryChannel(context);
+		        //to system channel settings page
+                Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
+                intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
+                // change the setting of chat summary channel
+                intent.putExtra(Settings.EXTRA_CHANNEL_ID, NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2);
+                startActivity(intent);
+            } else {
+                //Intent to new activity Chat Settings
+                Intent i = new Intent(context, ChatPreferencesActivity.class);
+                startActivity(i);
+            }
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN

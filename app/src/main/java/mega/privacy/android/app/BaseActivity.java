@@ -44,6 +44,8 @@ import static mega.privacy.android.app.utils.Constants.*;
 
 public class BaseActivity extends AppCompatActivity {
 
+    private BaseActivity baseActivity;
+
     protected  MegaApplication app;
 
     protected MegaApiAndroid megaApi;
@@ -72,6 +74,8 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
 
+        baseActivity = this;
+
         super.onCreate(savedInstanceState);
         checkMegaObjects();
 
@@ -84,6 +88,9 @@ public class BaseActivity extends AppCompatActivity {
         IntentFilter filter =  new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED);
         filter.addAction(ACTION_EVENT_ACCOUNT_BLOCKED);
         LocalBroadcastManager.getInstance(this).registerReceiver(accountBlockedReceiver, filter);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
     }
 
     @Override
@@ -113,6 +120,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
 
         super.onDestroy();
     }
@@ -185,6 +193,20 @@ public class BaseActivity extends AppCompatActivity {
                     retryConnectionsAndSignalPresence();
                 }
             }
+        }
+    };
+
+    /**
+     * Broadcast to show taken down files info
+     */
+    private BroadcastReceiver takenDownFilesReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) return;
+
+            logDebug("BROADCAST INFORM THERE ARE TAKEN DOWN FILES IMPLIED IN ACTION");
+            int numberFiles = intent.getIntExtra(NUMBER_FILES, 1);
+            showSnackBar(baseActivity, SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.alert_taken_down_files, numberFiles, numberFiles), -1);
         }
     };
 
