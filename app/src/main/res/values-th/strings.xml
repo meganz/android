@@ -218,13 +218,13 @@
     <string name="first_name_text" context="First Name of the user">ชื่อ</string>
     <string name="lastname_text" context="Last name of the user">สกุล</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">ฉันเห็นด้วยกับ[A]เงื่อนไขการให้บริการ[/A]ของ MEGA</string>
-    <string name="top" context="Text placed on the checkbox to make sure user agree that understand the danger of losing password">I understand that [B]if I lose my password, I may lose my data[/B]. Read more about [A]MEGA’s end-to-end encryption[/A]</string>
+    <string name="top" context="Text placed on the checkbox to make sure user agree that understand the danger of losing password">ฉันเข้าใจว่า[B]ถ้าฉันทำรหัสผ่านหาย[/B] ฉันอาจสูญเสียข้อมูลของฉันได้ อ่านเพิ่มเติมเกี่ยวกับ[A]การเข้ารหัสลับแบบต้นทางถึงปลายทางของ MEGA[/A] ได้</string>
     <string name="already_account" context="Does the user already have a MEGA account">มีบัญชีอยู่แล้วใช่ไหม</string>
 
     <string name="create_account_no_terms" context="warning dialog">คุณต้องเห็นด้วยกับเงื่อนไขการให้บริการของเราก่อน</string>
 
     <string name="create_account_no_top" context="warning dialog, for user do not tick checkbox of understanding the danger of losing password">คุณต้องยอมรับว่าคุณเข้าใจถึงอันตราย หากลืมรหัสผ่าน</string>
-    <string name="error_enter_username" context="Warning dialog">กรุณากรอกชื่อของคุณ</string>
+    <string name="error_enter_username" context="Warning message when the first name is a required field to submit a form. For example during the create account process.">กรุณากรอกชื่อของคุณ</string>
     <string name="error_enter_userlastname" context="Warning dialog">กรุณาระบุนามสกุลของคุณ</string>
     <string name="error_short_password" context="when creating the account">รหัสผ่านสั้นเกินไป</string>
     <string name="error_passwords_dont_match" context="when creating the account">รหัสผ่านไม่ตรงกัน</string>
@@ -645,8 +645,8 @@
 
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">ถ่ายภาพ</string>
 
-    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Allow notifications of incoming MEGA calls</string>
-    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow call interface to pop up from background.</string>
+    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">อนุญาตให้แจ้งเตือนเมื่อมีสายโทรเข้าจากแอป MEGA</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
     <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fi เท่านั้น</string>
@@ -847,7 +847,7 @@
     <string name="sortby_size_largest_first" context="sort files by size largest first">ใหญ่สุด</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">เล็กสุด</string>
 
-    <string name="sortby_type" context="Title of sort by media type options">Media type</string>
+    <string name="sortby_type" context="Title of sort by media type options">ประเภทสื่อ</string>
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">รูปถ่าย</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">วิดีโอ</string>
 
@@ -1726,9 +1726,9 @@
     <string name="send_feedback_panel" context="Label to show send feedback">ไม่ ส่งคำติชม</string>
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">ตัวเลือกขั้นสูง</string>
-    <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">To download files MEGA needs your permission.</string>
+    <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">MEGA ต้องได้รับอนุญาตจากคุณในการดาวน์โหลดไฟล์</string>
     <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
-    <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Choose download location</string>
+    <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">เลือกตำแหน่งดาวน์โหลด</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">ไม่มีผู้ติดต่อที่ได้รับ</string>
 
@@ -1922,7 +1922,7 @@
 
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">สายเรียกเข้า</string>
     <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
-    <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">MEGA background pop-ups are disabled.\nTap to change the settings.</string>
+    <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">ป๊อปอัพพื้นหลัง MEGA ถูกปิดใช้งาน\nแตะเพื่อเปลี่ยนการตั้งค่า</string>
 
     <plurals name="number_unread_messages">
         <item context="Subtitle to show the number of unread messages on a chat, unread message" quantity="one">%1$s ข้อความที่ยังไม่ได้อ่าน</item>
@@ -2627,23 +2627,23 @@
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">ชื่อที่ไม่รู้จัก</string>
 
-    <string name="title_long" context="Error when renaming a chat title and it is too long">Title too long</string>
+    <string name="title_long" context="Error when renaming a chat title and it is too long">ชื่อยาวเกินไป</string>
     <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">กรุณาเลือกที่อยู่ติดต่ออย่างน้อยหนึ่งรายการ</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">ส่งแล้ว %s ผู้ติดต่อ</string>
 
     <string name="my_chat_files_folder" context="Name by default of the folder where the files sent to the chat are stored in the cloud">ไฟล์แชทของฉัน</string>
-    <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Error. The folder %1$s was not created</string>
+    <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">ผิดพลาด ไม่สามารถสร้างโฟลเดอร์ %1$s ได้</string>
 
-    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Verify your email</string>
-    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily suspended for your safety.</string>
-    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">Please [A]verify your email[/A] and follow its steps to unlock your account.</string>
+    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">ยืนยันที่อยู่อีเมลของคุณ</string>
+    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">บัญชีถูกล็อกชั่วคราวเพื่อความปลอดภัยของคุณ</string>
+    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]กรุณาตรวจสอบอีเมล[/A]และทำตามขั้นตอนในอีเมลของ MEGA เพื่อปลดล็อกบัญชีของคุณ</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">ทำไมฉันเห็นสิ่งนี้</string>
-    <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
+    <string name="resend_email_label" cotext="Label of a button which action is resend an email">ส่งอีเมลอีกครั้ง</string>
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">บัญชีถูกล็อกแล้ว</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">เป็นไปได้ว่าคุณกำลังใช้รหัสผ่านเดียวกันสำหรับบัญชี MEGA ของคุณสำหรับบริการอื่น ๆ และอย่างน้อยหนึ่งในบริการอื่น ๆ เหล่านี้ได้รับความเสียหายจากข้อมูล</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">รหัสผ่านของคุณรั่วไหลและกำลังถูกใช้โดยผู้ไม่หวังดีเพื่อเข้าสู่บัญชีของคุณ รวมไปถึง การไม่จำกัดบัญชี MEGA ของคุณ</string>
 
-    <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
+    <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">กำลังเชื่อมต่อใหม่</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
 </resources>

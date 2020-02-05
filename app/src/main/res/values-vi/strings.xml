@@ -218,13 +218,13 @@
     <string name="first_name_text" context="First Name of the user">Tên</string>
     <string name="lastname_text" context="Last name of the user">Họ</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Tôi đồng ý với [A]Điều Khoản Dịch Vụ[/A] của MEGA</string>
-    <string name="top" context="Text placed on the checkbox to make sure user agree that understand the danger of losing password">I understand that [B]if I lose my password, I may lose my data[/B]. Read more about [A]MEGA’s end-to-end encryption[/A]</string>
+    <string name="top" context="Text placed on the checkbox to make sure user agree that understand the danger of losing password">I understand that [B]if I lose my password, I may lose my data[/B]. Read more about [A]MEGA’s end-to-end encryption[/A].</string>
     <string name="already_account" context="Does the user already have a MEGA account">Bạn đã tạo một tài khoản rồi?</string>
 
     <string name="create_account_no_terms" context="warning dialog">Bạn phải chấp thuận Điều Khoản Sử Dụng.</string>
 
     <string name="create_account_no_top" context="warning dialog, for user do not tick checkbox of understanding the danger of losing password">You need to agree that you understand the danger of losing your password</string>
-    <string name="error_enter_username" context="Warning dialog">Xin điền tên của bạn</string>
+    <string name="error_enter_username" context="Warning message when the first name is a required field to submit a form. For example during the create account process.">Xin điền tên của bạn</string>
     <string name="error_enter_userlastname" context="Warning dialog">Xin nhập tên họ</string>
     <string name="error_short_password" context="when creating the account">Mật khẩu quá ngắn</string>
     <string name="error_passwords_dont_match" context="when creating the account">Hai mật khẩu này không trùng khớp</string>
@@ -645,8 +645,8 @@
 
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Chụp ảnh</string>
 
-    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Allow notifications of incoming MEGA calls</string>
-    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow call interface to pop up from background.</string>
+    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Allow notifications for incoming MEGA calls</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
     <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Chỉ lúc dùng Wi-Fi</string>
@@ -1726,7 +1726,7 @@
     <string name="send_feedback_panel" context="Label to show send feedback">Không, gửi phản hồi</string>
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Tùy chỉnh nâng cao</string>
-    <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">To download files MEGA needs your permission.</string>
+    <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">MEGA needs your permission to download files</string>
     <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
     <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Choose download location</string>
 
@@ -2635,9 +2635,9 @@
     <string name="my_chat_files_folder" context="Name by default of the folder where the files sent to the chat are stored in the cloud">Tệp tôi gửi trong chát</string>
     <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Error. The folder %1$s was not created</string>
 
-    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Verify your email</string>
-    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily suspended for your safety.</string>
-    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">Please [A]verify your email[/A] and follow its steps to unlock your account.</string>
+    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Xác thực địa chỉ email của bạn</string>
+    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily locked for your safety.</string>
+    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]Please verify your email address[/A] and follow the steps in MEGA’s email to unlock your account.</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Why am I seeing this?</string>
     <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Locked Accounts</string>
