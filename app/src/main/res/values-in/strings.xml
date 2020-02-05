@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Orang luar yang ingin merusak tidak dapat mendapatkan akses ke akun anda hanya dengan kunci anda. Reset password membutuhkan kunci dan akses ke e-mail anda.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Salin Kunci Pemulihan ke clipboard atau simpan sebagai file teks</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">Simpan</string>
+    <string name="save_action" context="Action of a button to save something">Simpan</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Kunci Pemulihan telah berhasil disalin</string>
 
     <string name="change_pass" context="Button to change the password">Ganti</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">Pilih kontak dari daftar kontak telepon Anda atau masukkan beberapa alamat email.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">Undang teman ke MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">Terima kasih! Undangan dikirim melalui email</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">Undangan terkirim</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Dorong teman-teman Anda untuk mendaftar dan menginstal aplikasi MEGA. Selama teman Anda menggunakan alamat email yang sama dengan yang Anda masukkan, Anda akan menerima hadiah kuota transfer Anda.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">Email salah</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">Bagus</string>
     <string name="pass_strong" context="Password strong">Kuat</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Panggilan sedang berlangsung</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Panggilan sedang berlangsung</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Klik untuk kembali ke panggilan</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Kembali ke panggilan</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Request kontak dari [/B][A]%s [/A][B]telah ditolak[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Akun anda sekarang adalah [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Tunduk pada partisipasi Anda dalam program pencapaian kami</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject pada partisipasi anda dalam achievements program kami</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Pilih metoda pembayaran</string>
 
     <string name="billing_period_title" context="title of billing period">Periode pembayaran</string>

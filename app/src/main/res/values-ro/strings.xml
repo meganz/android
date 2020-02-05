@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Un atacator extern nu poate obține acces la contul tău doar cu cheia ta. Resetarea parolei necesită atât cheia, cât și acces la adresa ta de e-mail.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copiază cheia de recuperare în clipboard sau salveaz-o ca fișier text</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">Salvează</string>
+    <string name="save_action" context="Action of a button to save something">Salvează</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Cheia de recuperare a fost copiată cu succes</string>
 
     <string name="change_pass" context="Button to change the password">Schimbă</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">Selectează contacte din lista de contacte a telefonului sau introdu mai multe adrese de e-mail.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">Invită prieteni pe MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">Îți mulțumim! Invitația a fost trimisă prin e-mail</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">Invitație trimisă</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Încurajează-ți prietenii să se înregistreze și să instaleze o aplicație MEGA. Atâta timp cât prietenul tău folosește aceeași adresă de e-mail pe care ai introdus-o, vei primi recompensă pentru cota de transfer.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">E-mailul este malformat</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">Bună</string>
     <string name="pass_strong" context="Password strong">Puternică</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Apel în desfășurare</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Apel în desfășurare</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Clic pentru a te întoarce la apel</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Revino la apel</string>
 
@@ -2540,7 +2540,7 @@
     <string name="action_open_contact_link" context="Menu item">Deschide linkul de contact</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">Oamenii se pot alătura grupului folosind acest link.</string>
-    <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">Link nou de chat</string>
+    <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">Link de chat nou</string>
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">Introdu numele grupului</string>
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">Pentru a creat un link de chat trebuie să denumești grupul.</string>
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">Invită contacte și începe să chatuiești în siguranță cu chatul criptat MEGA.</string>

@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">外来攻击者如持有您的密钥仍将无法获取您的资料。密码重置将会需要密钥以及需可存取您的电子邮件。</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">将恢复密钥复制到剪贴板或存为文本文件保存</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">保存</string>
+    <string name="save_action" context="Action of a button to save something">保存</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">已成功复制恢复密钥</string>
 
     <string name="change_pass" context="Button to change the password">更改</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">从手机联系人列表中选择联系人，或输入多个电子邮件地址。</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">邀请好友加入MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">谢谢！邀请函已通过电子邮件发送</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">已邀请</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">鼓励您的朋友注册并安装MEGA应用程序。只要您的朋友使用的电子邮件地址与您输入的电子邮件地址相同，您就会收到您的传输配额奖励。</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">电子邮件格式错误</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">很好</string>
     <string name="pass_strong" context="Password strong">强</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">通话进行中</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">通话进行中</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">点击返回通话</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">返回到通话</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]来自[/B][A]%s [/A][B]的联系请求已拒绝[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">您的当前帐户是[A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">*根据您完成的成就奖励而定</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">取决于您所达成的奖励挑战。</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">选择付款方式</string>
 
     <string name="billing_period_title" context="title of billing period">结算周期</string>

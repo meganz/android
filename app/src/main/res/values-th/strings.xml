@@ -677,7 +677,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">อุปกรณ์แสดงผลขั้นสูง (SD ภายนอก)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">เพิ่มหมายเลขโทรศัพท์</string>
 	<string name="verify_account_title" context="enter verification code page title">ตรวจสอบบัญชีของคุณ</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">บัญชีของคุณถูกระงับชั่วคราวเนื่องจากอาจมีการละเมิด กรุณายืนยันหมายเลขโทรศัพท์เพื่อปลดล็อกบัญชีของคุณ</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">บัญชีของคุณถูกล็อกชั่วคราวเนื่องจากอาจมีการละเมิด กรุณายืนยันหมายเลขโทรศัพท์เพื่อปลดล็อกบัญชีของคุณ</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">ประเทศ</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">หมายเลขโทรศัพท์ของคุณ</string>
     <string name="general_back_button" context="Button label - go to previous page">กลับ</string>
@@ -694,9 +694,9 @@
 	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">หมายเลขนี้เชื่อมโยงกับบัญชี MEGA แล้ว</string>
 	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">คุณถึงขีดจำกัดรายวันแล้ว</string>
 	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">รหัสยืนยันไม่ตรงกัน</string>
-	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">รหัสได้รับการยืนยันแล้ว</string>
+	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">รหัสได้รับการตรวจสอบแล้ว</string>
 	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">รหัสไม่ถูกต้อง กรุณาลองใหม่หรือส่งอีกครั้ง</string>
-	<string name="verify_account_successfully" context="verify phone number successfully">ยืนยันหมายเลขโทรศัพท์ของคุณเรียบร้อยแล้ว</string>
+	<string name="verify_account_successfully" context="verify phone number successfully">ตรวจสอบหมายเลขโทรศัพท์ของคุณเรียบร้อยแล้ว</string>
 
     <string-array name="settings_storage_download_location_array">
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">พื้นที่เก็บข้อมูลภายใน</item>
@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">การมีผู้บุกรุกจากภายนอกจะไม่สามารถเข้าถึงบัญชีของคุณที่มีเพียงแค่คีย์หลักของคุณได้ การรีเซ็ตรหัสผ่านต้องมีการใช้คีย์และการเข้าถึงอีเมลของคุณเท่านั้น</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">คัดลอกคีย์การกู้คืนไปยังคลิปบอร์ดหรือบันทึกเป็นไฟล์ข้อความ</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">บันทึก</string>
+    <string name="save_action" context="Action of a button to save something">บันทึก</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">คัดลอกคีย์การกู้คืนสำเร็จแล้ว</string>
 
     <string name="change_pass" context="Button to change the password">เปลี่ยน</string>
@@ -938,14 +938,14 @@
 
     <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">เปลี่ยนรหัสผ่านแล้ว</string>
 
-    <string name="park_account_dialog_title" context="Title of the dialog to park an account">พาร์คบัญชี</string>
-    <string name="park_account_button" context="Button to park an account">พาร์ค</string>
+    <string name="park_account_dialog_title" context="Title of the dialog to park an account">เก็บบัญชี</string>
+    <string name="park_account_button" context="Button to park an account">เก็บบัญชี</string>
     <string name="park_account_title" context="Title of the screen to park an account">อุ๊ปส์!</string>
     <string name="park_account_first_paragraph" context="First paragraph of the screen to park an account">เนื่องจากกระบวนการเข้ารหัสตั้งแต่ต้นทางถึงปลายทางของเรา คุณจะไม่สามารถเข้าถึงข้อมูลของคุณโดยไม่ใช้รหัสผ่านหรือข้อมูลสำรองของคีย์การกู้คืนได้</string>
-    <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">คุณสามารถพาร์คบัญชีเดิมของคุณและเริ่มต้นบัญชีใหม่ด้วยที่อยู่อีเมลเดิมได้ ข้อมูลของคุณจะถูกเก็บไว้อย่างน้อย 60 วัน ในกรณีที่คุณจำรหัสผ่านบัญชีที่คุณพาร์คไว้ กรุณาติดต่อ support&#64;mega.nz</string>
+    <string name="park_account_second_paragraph" context="Second paragraph of the screen to park an account">คุณสามารถเก็บบัญชีเดิมของคุณและเริ่มต้นบัญชีใหม่ด้วยที่อยู่อีเมลเดิมได้ ข้อมูลของคุณจะถูกเก็บไว้อย่างน้อย 60 วัน ในกรณีที่คุณจำรหัสผ่านบัญชีที่คุณเก็บไว้ กรุณาติดต่อ support&#64;mega.nz</string>
 
-    <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">กรุณากรอกที่อยู่อีเมลของคุณด้านล่าง คุณจะได้รับลิงก์การกู้คืนซึ่งจะช่วยให้คุณสามารถพาร์คบัญชีของคุณได้</string>
-    <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">นี่เป็นขั้นตอนสุดท้ายในการพาร์คบัญชีของคุณ กรุณากรอกรหัสผ่านใหม่ของคุณ ข้อมูลของคุณจะถูกเก็บไว้อย่างน้อย 60 วัน ถ้าคุณจำรหัสผ่านของบัญชีที่พาร์คไว้ได้ กรุณาติดต่อ support&#64;mega.nz</string>
+    <string name="dialog_park_account" context="Text of the dialog message to ask for the link to park the account">กรุณากรอกที่อยู่อีเมลของคุณด้านล่าง คุณจะได้รับลิงก์การกู้คืนซึ่งจะช่วยให้คุณสามารถเก็บบัญชีของคุณได้</string>
+    <string name="park_account_text_last_step" context="Text shown in the last alert dialog to park an account">นี่เป็นขั้นตอนสุดท้ายในการเก็บบัญชีของคุณ กรุณากรอกรหัสผ่านใหม่ของคุณ ข้อมูลของคุณจะถูกเก็บไว้อย่างน้อย 60 วัน ถ้าคุณจำรหัสผ่านของบัญชีที่เก็บไว้ได้ กรุณาติดต่อ support&#64;mega.nz</string>
 
     <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">กรอกรหัสผ่านใหม่</string>
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">ลิงก์สำหรับการกู้คืนได้หมดอายุแล้ว กรุณาลองใหม่อีกครั้ง</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">เลือกผู้ติดต่อจากรายชื่อในโทรศัพท์ของคุณหรือกรอกที่อยู่อีเมลพร้อมกัน</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">เชิญเพื่อนเข้าใช้งาน MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">ขอบคุณนะ! ส่งคำเชิญทางอีเมลแล้ว</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">ส่งคำเชิญแล้ว</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">เชิญชวนให้เพื่อนของคุณลงทะเบียนและติดตั้งแอปพลิเคชัน MEGA ตราบเท่าที่เพื่อนของคุณใช้ที่อยู่อีเมลเดียวกันกับที่คุณได้กรอกไว้ ซึ่งคุณจะได้รับรางวัลโควต้าการถ่ายโอนอีกด้วย</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">อีเมลไม่ถูกต้อง</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">คาดเดาได้ยาก</string>
     <string name="pass_strong" context="Password strong">คาดเดาได้ยากมาก</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">กำลังโทรหา</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">กำลังโทรหา</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">คลิกเพื่อกลับไปที่สายสนทนา</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">กลับไปที่สายสนทนา</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]คำขอติดต่อจาก [/B][A]%s [/A][B]ถูกปฏิเสธแล้ว[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">บัญชีปัจจุบันของคุณคือ [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* ขึ้นอยู่กับว่าคุณมีส่วนร่วมในโปรแกรมความสำเร็จของเราหรือไม่</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">ขึ้นอยู่กับการมีส่วนร่วมในโครงการความสำเร็จของเรา</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">เลือกวิธีการชำระเงิน</string>
 
     <string name="billing_period_title" context="title of billing period">ระยะเวลาการเรียกเก็บเงิน</string>
