@@ -102,6 +102,7 @@ import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
+import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
@@ -7602,10 +7603,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void markAsSeen(MegaChatMessage msg){
+    public void markAsSeen(MegaChatMessage msg) {
         logDebug("markAsSeen");
-        if(activityVisible){
-            if(msg.getStatus()!=MegaChatMessage.STATUS_SEEN) {
+        if (activityVisible) {
+            if (msg.getStatus() != MegaChatMessage.STATUS_SEEN) {
+                logDebug("Mark message: " + msg.getMsgId() + " as seen");
                 megaChatApi.setMessageSeen(chatRoom.getChatId(), msg.getMsgId());
             }
         }
@@ -7616,7 +7618,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     protected void onResume(){
        logDebug("onResume");
         super.onResume();
-
+       stopService(new Intent(this, KeepAliveService.class));
         if(idChat!=-1 && chatRoom!=null) {
             setNodeAttachmentVisible();
 
@@ -7747,7 +7749,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                             lastMessage = messages.get(index);
                         }
 
-                        if (lastMessage.getMessage() != null) {
+                        if (lastMessage.getMessage() != null && MegaApplication.isActivityVisible()) {
                             boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                             logDebug("Result setMessageSeen: " + resultMarkAsSeen);
                         }
@@ -7770,7 +7772,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 lastMessage = messages.get(index);
                             }
 
-                            if (lastMessage.getMessage() != null) {
+                            if (lastMessage.getMessage() != null && MegaApplication.isActivityVisible()) {
                                 boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                                 logDebug("Result setMessageSeen: " + resultMarkAsSeen);
                             }

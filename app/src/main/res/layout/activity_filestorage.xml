@@ -16,7 +16,7 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         tools:context=".FolderLinkActivityLollipop" />
-   
+
     <TextView
 	    android:id="@+id/file_storage_content_text"
 	    android:layout_width="match_parent"
@@ -30,24 +30,35 @@
 	    android:background="@color/content_text_folder"
 	    android:textSize="14sp"/>
 
-	<ImageView
-		android:id="@+id/file_storage_empty_image"
+	<RelativeLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_centerHorizontal="true"
-		android:layout_centerVertical="true"
-		android:gravity="center_horizontal" />
+		android:layout_centerInParent="true"
+		android:gravity="center_horizontal">
 
-	<TextView
-		android:id="@+id/file_storage_empty_text"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_below="@id/file_storage_empty_image"
-		android:layout_centerHorizontal="true"
-		android:layout_marginTop="@dimen/standard_margin"
-		android:textColor="@color/text_secondary"
-		android:textSize="16sp" />
-    
+		<ImageView
+			android:id="@+id/file_storage_empty_image"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerHorizontal="true" />
+
+		<LinearLayout
+			android:id="@+id/offline_empty_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/file_storage_empty_image"
+			android:layout_centerHorizontal="true"
+			android:orientation="horizontal">
+
+			<TextView
+				android:id="@+id/file_storage_empty_text"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="@color/text_secondary"
+				android:textSize="16sp" />
+		</LinearLayout>
+	</RelativeLayout>
+
     <LinearLayout
         android:id="@+id/options_file_storage_layout"
         android:layout_width="match_parent"
@@ -84,7 +95,7 @@
 		android:layout_height="1dip"
 		android:layout_above="@id/options_file_storage_layout"
 		android:background="@color/tour_bar_grey" />
-    
+
    <android.support.v7.widget.RecyclerView
         android:id="@+id/file_storage_list_view"
         android:layout_width="match_parent"

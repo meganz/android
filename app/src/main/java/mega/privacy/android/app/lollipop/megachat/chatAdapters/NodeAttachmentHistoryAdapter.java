@@ -385,7 +385,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         } else if (viewType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_GRID) {
             logDebug("Type: ITEM_VIEW_TYPE_GRID");
 
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid_new,parent,false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid,parent,false);
             NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid holderGrid = new NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid(v);
 
             holderGrid.fileLayout = v.findViewById(R.id.item_file_grid_file);

@@ -128,7 +128,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	MegaPhotoSyncListAdapterLollipop adapterList;
 	MegaPhotoSyncGridTitleAdapterLollipop adapterGrid;
 	private MegaApiAndroid megaApi;
-	
+
 	private int orderBy = MegaApiJava.ORDER_MODIFICATION_DESC;
 
 //	long parentHandle = -1;
@@ -985,8 +985,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 
 			if (adapterList == null) {
-				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, CAMERA_UPLOAD_ADAPTER);
-			    adapterList.setOrder(orderBy);
+				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView,this, CAMERA_UPLOAD_ADAPTER);
 			} else {
 				if (context != adapterList.getContext()) {
 					logDebug("Attached activity changed");
@@ -1316,6 +1315,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public void onResume() {
 		super.onResume();
 		reDoTheSelectionAfterRotation();
+		reSelectUnhandledItem();
 	}
 
 	private void reDoTheSelectionAfterRotation() {
@@ -1331,7 +1331,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				adapterGrid.refreshActionModeTitle();
 			}
 		}
+	}
 
+	private void reSelectUnhandledItem() {
+		if (((ManagerActivityLollipop) context).isListCameraUploads() && adapterList != null) {
+			adapterList.reSelectUnhandledNode();
+		}
 	}
 
 	public void selectAll(){
@@ -2076,9 +2081,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	    if (adapterGrid != null) {
 	        adapterGrid.setOrder(orderBy);
         }
-	    if(adapterList != null) {
-	        adapterList.setOrder(orderBy);
-        }
     }
 
 	public void setNodes(ArrayList<MegaNode> nodes){
@@ -2435,8 +2437,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (handler != null) {
 			handler.removeCallbacksAndMessages(null);
 		}
-		
 		super.onDestroy();
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		if (((ManagerActivityLollipop) context).isListCameraUploads() && adapterList != null) {
+			adapterList.clearTakenDownDialog();
+		}
 	}
 
 	@Override
