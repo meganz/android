@@ -687,7 +687,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Afficher les appareils avancés (SD externe)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Ajouter un numéro de téléphone</string>
 	<string name="verify_account_title" context="enter verification code page title">Confirmer votre compte</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Votre compte a temporairement été désactivé en raison d\'un abus potentiel. Veuillez confirmer votre numéro de téléphone pour déverrouiller votre compte.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Votre compte a temporairement été verrouillé en raison d\'un abus potentiel. Veuillez confirmer votre numéro de téléphone pour déverrouiller votre compte.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Pays</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Votre numéro de téléphone</string>
     <string name="general_back_button" context="Button label - go to previous page">Retour</string>
@@ -950,7 +950,7 @@
     <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">Réinitialisation du mot de passe</string>
     <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Veuillez saisir votre clé de récupération ci-dessous</string>
 
-    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Mot de passe changé !</string>
+    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Le mot de passe a été changé</string>
 
     <string name="park_account_dialog_title" context="Title of the dialog to park an account">Remiser le compte</string>
     <string name="park_account_button" context="Button to park an account">Remiser</string>
@@ -1288,7 +1288,7 @@
 
     <string name="messages_copied_clipboard" context="success alert when the user copy some messages to the clipboard">A été copié dans le presse-papiers</string>
 
-    <string name="chat_error_open_title" context="Title of the error dialog when opening a chat">Erreur de dialogue en ligne !</string>
+    <string name="chat_error_open_title" context="Title of the error dialog when opening a chat">Erreur de dialogue en ligne</string>
     <string name="chat_error_open_message" context="Message of the error dialog when opening a chat">Il n\'a pas été possible d\'ouvrir la conversation avec succès</string>
 
     <string name="menu_choose_contact" context="Menu option to add a contact to your contact list.">Choisir un contact</string>
@@ -2091,7 +2091,7 @@
     <string name="success_archive_chat" context="Message shown when a chat is successfully archived, it shows the name of the chat">%s conversation a été archivée</string>
     <string name="error_archive_chat" context="Error message shown when a chat has not be archived, it shows the name of the chat">Erreur. %s conversation n\'a pas été archivée</string>
 
-    <string name="success_unarchive_chat" context="Message shown when a chat is successfully unarchived, it shows the name of the chat">%s conversation a été désarchivée</string>
+    <string name="success_unarchive_chat" context="Message shown when a chat is successfully unarchived, it shows the name of the chat">La conversation %s a été désarchivée</string>
     <string name="error_unarchive_chat" context="Error message shown when a chat has not be unarchived, it shows the name of the chat">Erreur. Il a été impossible de désarchiver %s conversation</string>
 
     <string name="archived_chats_empty" context="Message shown when the user has no archived chats">[A]Aucune[/A] [B]conversation n\'est archivée[/B]</string>
@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]La demande de contact de [/B][A]%s [/A][B]a été refusée[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Votre compte actuel est [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Sous réserve de votre participation à notre programme d\'objectifs</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Sous réserve de votre participation à notre programme d\'objectifs.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Sélectionner un mode de paiement</string>
 
     <string name="billing_period_title" context="title of billing period">Cycle de facturation</string>

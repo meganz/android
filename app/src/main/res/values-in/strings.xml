@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Request kontak dari [/B][A]%s [/A][B]telah ditolak[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Akun anda sekarang adalah [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Tunduk pada partisipasi Anda dalam program pencapaian kami</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject pada partisipasi anda dalam achievements program kami</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Pilih metoda pembayaran</string>
 
     <string name="billing_period_title" context="title of billing period">Periode pembayaran</string>

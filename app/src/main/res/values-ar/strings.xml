@@ -66,7 +66,7 @@
 
     <string name="error_general_nodes" context="Error getting the root node">خطأ، الرجاء المحاولة مرة أخرى.</string>
 
-    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">ميغا MEGA-مفتاح الإستعادة</string>
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist">مجلد الوسائط الثانوي غير موجود، الرجاء اختيار مجلد جديد</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">لم يتم العثور على وحدة تخزين خارجية</string>
@@ -174,7 +174,7 @@
     <string name="alert_no_app" context="Alert text before download">ليس هناك أي تطبيق لفتح الملف %s. هل تريد متابعة التنزيل؟</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">لا تظهر مرة أخرى</string>
 
-    <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Are you sure that you want to cancel the current login process?</string>
+    <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">هل أنت متأكد من أنك تريد إلغاء عملية تسجيل الدخول الحالية؟</string>
 
     <string name="login_text" context="Login button">تسجيل الدخول</string>
     <string name="email_text" context="email label">البريد الإلكتروني</string>
@@ -552,7 +552,7 @@
     <string name="upload_prepare" context="Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file">جاري معالجة الملف</string>
     <plurals name="upload_prepare">
         <item context="Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file" quantity="one">جاري معالجة الملف</item>
-        <item context="Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+        <item context="Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files" quantity="other">معالجة الملفات</item>
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">الموارد غير متوفرة مؤقتا، يرجى المحاولة مرة أخرى في وقت لاحق</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">لا يمكن فتح الملف المحدد</string>
@@ -687,7 +687,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">عرض الوسائل المتقدمة (SD خارجي)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
 	<string name="verify_account_title" context="enter verification code page title">تأكيد حسابك</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been locked temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">الدولة</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">رقم هاتفك</string>
     <string name="general_back_button" context="Button label - go to previous page">العودة</string>
@@ -773,7 +773,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">سيتم حذف الملفات المحلية وسيتم تسجيل خروجك بعد 10 محاولات فاشلة</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">رمز غير صحيح</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">رمز PIN خاطئ، يرجى المحاولة مرة أخرى. لديك 1 محاولة باقية</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">رمز PIN خاطئ، يرجى إعادة المحاولة. تبقى لديك  %2d محاولات</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">رمز PIN غير متطابق</string>
@@ -1949,7 +1949,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">المخدمات مشغولة جدا، يرجى الانتظار</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">هذه العملية تستغرق وقتا أطول من المتوقع. أرجو الإنتظار.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">تجاوز الحد الاعظمي للطلبات. من فضلك انتظر.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">Canceling login process. Please wait&#8230;</string>
+    <string name="login_in_progress" context="message when previous login is being canceled">إلغاء عملية تسجيل الدخول. يرجى الإنتظار&#8230;</string>
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">حدث خطأ، الملف معطوب او غير موجود</string>
 
@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]طلب التواصل من [/B][A]%s [/A][B]قد تم رفضه[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">حسابك الحالي هو [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* تخضع لمشاركتك في برنامج الإنجازات لدينا</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">خاضع لمشاركاتك في برنامج إنجازاتنا.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">اختر طريقة الدفع</string>
 
     <string name="billing_period_title" context="title of billing period">فترة الفاتورة</string>
@@ -2432,14 +2432,14 @@
     <string name="error_meta_message_invalid" context="Content of a invalid meta message">تحتوي الرسالة على بيانات وصفية غير صالحة.</string>
 
     <string name="title_activity_maps" context="Title of the activity that sends a location">إرسال موقع</string>
-    <string name="current_location_label" context="Label layout on maps activity that permits send current location">Send your current location</string>
-    <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">Send your current location: [A]%1$s[/A]</string>
-    <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">Nearby places</string>
+    <string name="current_location_label" context="Label layout on maps activity that permits send current location">إرسال موقعك الحالي</string>
+    <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">إرسال موقعك الحالي: [A]%1$s[/A]</string>
+    <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">الاماكن المجاورة</string>
     <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">سيتم فتح هذا الموقع باستخدام طرف ثالث مزود خرائط من خارج منصة ميغا MEGA المشفرة من طرف إلى طرف.</string>
     <string name="title_marker_maps" context="Title of the location marker set by the user">إرسال هذا الموقع</string>
-    <string name="no_places_found" context="Label shown when after a maps search and no places were found">No places were found</string>
-    <string name="gps_disabled" context="Title of the dialog shown when the location is disabled">The GPS is disabled</string>
-    <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">Would you like to open the location settings?</string>
+    <string name="no_places_found" context="Label shown when after a maps search and no places were found">لم يتم العثور على أية أماكن</string>
+    <string name="gps_disabled" context="Title of the dialog shown when the location is disabled">تم تعطيل نظام تحديد المواقع GPS.</string>
+    <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">هل ترغب في فتح إعدادات الموقع؟</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
@@ -2449,7 +2449,7 @@
     </plurals>
 
     <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">موقع مثبت</string>
-    <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">From File System</string>
+    <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">من نظام الملفات</string>
 
     <plurals name="num_files_not_send">
         <item context="Alert shown when a num of files have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">لم يتم إرسال %d ملف إلى %d المحادثات</item>
@@ -2548,13 +2548,13 @@
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">ادخل رابط المحادثة</string>
 
-    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
-    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please enter a valid chat link</string>
-    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
-    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
-    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">لصق رابط</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">رابط ملف أو مجلد غير صالح</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">الرجاء إدخال رابط  ملف أو مجلد صالح</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">يرجى إدخال رابط محادثة صالح</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">لقد قمت بلصق رابط محادثة.</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">لقد قمت بلصق رابط جهة اتصال.</string>
+    <string name="action_open_contact_link" context="Menu item">فتح رابط جهة الاتصال</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">يمكن للأشخاص الانضمام إلى مجموعتك باستخدام هذا الرابط.</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">رابط محادثة جديد</string>
@@ -2577,9 +2577,9 @@
 
     <string name="version_restored" context="Message shown when it restored successfully a file version">Version restored successfully.</string>
 
-    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
+    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">انقر مطولاً للتسجيل، ثم حرر للإرسال.</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">إزلق للإلغاء</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">هذه الرسالة الصوتية غير متوفرة</string>
 
     <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Invite a friend via</string>
     <string name="invite_contact_action_button" context="Action button label">Invite a friend via&#8230;</string>
@@ -2613,7 +2613,7 @@
 
     <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get %1$s free when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
-    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">لا يمكن تسجيل الرسائل الصوتية أثناء وجود مكالمة جارية.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 
     <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">مكالمة واردة</string>

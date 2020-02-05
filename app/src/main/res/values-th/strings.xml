@@ -687,7 +687,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">อุปกรณ์แสดงผลขั้นสูง (SD ภายนอก)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">เพิ่มหมายเลขโทรศัพท์</string>
 	<string name="verify_account_title" context="enter verification code page title">ตรวจสอบบัญชีของคุณ</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">บัญชีของคุณถูกระงับชั่วคราวเนื่องจากอาจมีการละเมิด กรุณายืนยันหมายเลขโทรศัพท์เพื่อปลดล็อกบัญชีของคุณ</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">บัญชีของคุณถูกล็อกชั่วคราวเนื่องจากอาจมีการละเมิด กรุณายืนยันหมายเลขโทรศัพท์เพื่อปลดล็อกบัญชีของคุณ</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">ประเทศ</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">หมายเลขโทรศัพท์ของคุณ</string>
     <string name="general_back_button" context="Button label - go to previous page">กลับ</string>
@@ -704,9 +704,9 @@
 	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">หมายเลขนี้เชื่อมโยงกับบัญชี MEGA แล้ว</string>
 	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">คุณถึงขีดจำกัดรายวันแล้ว</string>
 	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">รหัสยืนยันไม่ตรงกัน</string>
-	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">รหัสได้รับการยืนยันแล้ว</string>
+	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">รหัสได้รับการตรวจสอบแล้ว</string>
 	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">รหัสไม่ถูกต้อง กรุณาลองใหม่หรือส่งอีกครั้ง</string>
-	<string name="verify_account_successfully" context="verify phone number successfully">ยืนยันหมายเลขโทรศัพท์ของคุณเรียบร้อยแล้ว</string>
+	<string name="verify_account_successfully" context="verify phone number successfully">ตรวจสอบหมายเลขโทรศัพท์ของคุณเรียบร้อยแล้ว</string>
 
     <string-array name="settings_storage_download_location_array">
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">พื้นที่เก็บข้อมูลภายใน</item>
@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]คำขอติดต่อจาก [/B][A]%s [/A][B]ถูกปฏิเสธแล้ว[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">บัญชีปัจจุบันของคุณคือ [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* ขึ้นอยู่กับว่าคุณมีส่วนร่วมในโปรแกรมความสำเร็จของเราหรือไม่</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">ขึ้นอยู่กับการมีส่วนร่วมในโครงการความสำเร็จของเรา</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">เลือกวิธีการชำระเงิน</string>
 
     <string name="billing_period_title" context="title of billing period">ระยะเวลาการเรียกเก็บเงิน</string>

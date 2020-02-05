@@ -687,7 +687,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Отображать дополнительные устройства (внешняя SD-карта)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Добавить номер телефона</string>
 	<string name="verify_account_title" context="enter verification code page title">Подтвердить аккаунт</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Ваш аккаунт был временно приостановлен из-за возможного злоупотребления. Пожалуйста, подтвердите номер телефона, чтобы разблокировать аккаунт.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Ваш аккаунт был временно заблокирован из-за возможного злоупотребления. Пожалуйста, подтвердите номер телефона, чтобы разблокировать аккаунт.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Страна</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Ваш телефонный номер</string>
     <string name="general_back_button" context="Button label - go to previous page">Назад</string>
@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Запрос от [/B][A]%s [/A][B]отклонён[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Ваш текущий аккаунт — [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* При условии участия в нашей программе достижений</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">При условии вашего участия в программе достижений.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Выберите способ оплаты</string>
 
     <string name="billing_period_title" context="title of billing period">Расчётный период</string>

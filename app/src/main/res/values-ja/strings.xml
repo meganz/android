@@ -687,7 +687,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">アドバンス・デバイス（外部SD）表示</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">電話番号を追加</string>
 	<string name="verify_account_title" context="enter verification code page title">アカウントを検証する</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">不正使用の可能性があるため、あなたのアカウントは一時的に凍結されています。アカウントのロックを解除するには、電話番号を検証してください。</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">不正使用の可能性があるため、あなたのアカウントは一時的にロックされています。アカウントのロックを解除するには、電話番号を検証してください。</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">国</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">あなたの電話番号</string>
     <string name="general_back_button" context="Button label - go to previous page">戻る</string>
@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B][A]%s [/A]さんからのコンタクト要求[/B]は[B]拒否されました[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">あなたの現在のアカウントは[A]%s[/A]です</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* 当社の達成プログラムにご参加いただくことを条件とします</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">当社の達成プログラムにご参加いただくことを条件とします。</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">支払い方法選択</string>
 
     <string name="billing_period_title" context="title of billing period">お支払い請求期間</string>

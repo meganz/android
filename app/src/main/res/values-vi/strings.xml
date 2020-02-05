@@ -687,7 +687,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Hiện các thiết bị nâng cao (thẻ nhớ SD ngoài)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
 	<string name="verify_account_title" context="enter verification code page title">Xác thực tài khoản</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been locked temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Quốc gia</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Số điện thoại của bạn</string>
     <string name="general_back_button" context="Button label - go to previous page">Quay lại</string>
@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Lời yêu cầu thêm vào danh bạ từ [/B][A]%s [/A][B]đã bị từ chối[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Hạng của tài khoản bây giờ là [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Tùy thuộc vào cách người sử dụng tham gia vào chương trình làm nhiệm vụ thưởng</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Tùy thuộc vào việc tham gia của người sử dụng dịch vụ khi thực hiện các nhiệm vụ phần thưởng thành tích.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Chọn phương thức thanh toán</string>
 
     <string name="billing_period_title" context="title of billing period">Chu kỳ thanh toán</string>

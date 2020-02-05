@@ -687,7 +687,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">顯示高級設備（外置SD）</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">新增電話號碼</string>
 	<string name="verify_account_title" context="enter verification code page title">驗證您的帳戶</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">因為潛在的濫用，您的帳號已被暫停使用。請驗證您的電話號碼以將您的帳號解鎖。</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">因為潛在的濫用，您的帳號已被暫停封鎖。請驗證您的電話號碼來解鎖您的帳號。</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">國家</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">您的手機號碼</string>
     <string name="general_back_button" context="Button label - go to previous page">返回</string>
@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">來自[A]%s[/A][B]的聯絡人請求[/B][B]被拒絕[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">您現在的帳戶是[A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">*依您參與我們的獎勵計劃狀況而定</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">取決於您所達成的獎勵挑戰。</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">選擇付款方式</string>
 
     <string name="billing_period_title" context="title of billing period">繳費週期</string>

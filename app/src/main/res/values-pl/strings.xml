@@ -687,7 +687,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Wyświetl pozostałe urządzenia (zewnętrzny dysk SD)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Dodaj numer telefonu</string>
 	<string name="verify_account_title" context="enter verification code page title">Zweryfikuj swoje konto</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Twoje konto zostało tymczasowo zawieszone z powodu potencjalnego nadużycia. Sprawdź swój numer telefonu, aby odblokować konto.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Twoje konto zostało tymczasowo zablokowane z powodu potencjalnego nadużycia. Sprawdź swój numer telefonu, aby odblokować konto.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Kraj</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Twój numer telefonu</string>
     <string name="general_back_button" context="Button label - go to previous page">Powrót</string>
@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Zaproszenie od [/B][A]%s [/A][B]zostało anulowane[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Twoje aktualne konto [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Podlega regulaminowi i zasadą programu</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Podlega zasadom opisanym w programie osiągnięć.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Wybierz formę płatności</string>
 
     <string name="billing_period_title" context="title of billing period">Okres rozliczeniowy</string>

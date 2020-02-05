@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]La richiesta di contatto di[/B] [A]%s[/A] [B]è stata declinata[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Il tuo account corrente è [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Soggetto alla tua partecipazione al nostro programma ad obiettivi.</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Soggetto alla tua partecipazione nel nostro programma di obiettivi.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Scegli metodo di pagamento</string>
 
     <string name="billing_period_title" context="title of billing period">Periodo di fatturazione</string>

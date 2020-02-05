@@ -687,7 +687,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">고급 장치 표시 (외부 SD)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">전화번호 추가</string>
 	<string name="verify_account_title" context="enter verification code page title">계정을 인증하세요</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">당신의 계정은 잠재적 남용을 방지하기 위해 일시적으로 정지되었습니다. 계정을 해제하려면 전화번호를 인증하세요.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">당신의 계정은 잠재적 남용을 방지하기 위해 일시적으로 잠겼습니다. 계정을 해제하려면 전화번호를 인증하세요.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">국가</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">당신의 전화번호</string>
     <string name="general_back_button" context="Button label - go to previous page">뒤로</string>
@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[A]%s님이 보낸 [/A][B]연락처 요청을 [/B][B]거절하였습니다[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">현재 계정은 [A]%s[/A]입니다</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* 도전 과제 프로그램에 참여한 경우</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">도전 과제 프로그램에 참여할 수 있습니다.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">지불 수단을 선택하세요</string>
 
     <string name="billing_period_title" context="title of billing period">결제 주기</string>

@@ -2307,7 +2307,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]来自[/B][A]%s [/A][B]的联系请求已拒绝[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">您的当前帐户是[A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">*根据您完成的成就奖励而定</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">取决于您所达成的奖励挑战。</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">选择付款方式</string>
 
     <string name="billing_period_title" context="title of billing period">结算周期</string>
