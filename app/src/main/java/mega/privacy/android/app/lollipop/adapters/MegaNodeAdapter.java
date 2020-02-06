@@ -868,7 +868,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.publicLinkImage.setVisibility(View.INVISIBLE);
         holder.permissionsIcon.setVisibility(View.GONE);
 
-        if (node.isExported()) {
+        if (node.isExported() && type != LINKS_ADAPTER) {
             //Node has public link
             holder.publicLinkImage.setVisibility(View.VISIBLE);
             if (node.isExpired()) {

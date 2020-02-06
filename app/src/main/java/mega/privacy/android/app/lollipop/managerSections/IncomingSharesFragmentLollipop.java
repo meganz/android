@@ -370,7 +370,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		if (((ManagerActivityLollipop) context).getParentHandleIncoming() == INVALID_HANDLE) {
 			logWarning("ParentHandle -1");
 			findNodes();
-			adapter.setParentHandle(INVALID_HANDLE);
 		} else {
 			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleIncoming());
 			logDebug("ParentHandle to find children: " + ((ManagerActivityLollipop) context).getParentHandleIncoming());
@@ -893,18 +892,18 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 		if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop) context).getParentHandleIncoming()
 				|| ((ManagerActivityLollipop) context).getParentHandleIncoming() == -1) {
-			if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-				emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
-			} else {
+			if (isScreenInPortrait(context)) {
 				emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+			} else {
+				emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
 			}
 			textToShow = String.format(context.getString(R.string.context_empty_incoming));
 		} else {
-			if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-				emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-			} else {
-				emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-			}
+            if (isScreenInPortrait(context)) {
+                emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+            } else {
+                emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+            }
 			textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 		}
 

@@ -1794,6 +1794,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]No [/B][A]Incoming Shared folders[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]No [/B][A]Outgoing Shared folders[/A][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Sent requests</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Received requests</string>

@@ -958,17 +958,17 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 		if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop) context).getParentHandleOutgoing()
 				|| ((ManagerActivityLollipop) context).getParentHandleOutgoing() == -1) {
-			if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-				emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
-			} else {
+			if (isScreenInPortrait(context)) {
 				emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
+			} else {
+				emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
 			}
 			textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 		} else {
-			if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-				emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-			} else {
+			if (isScreenInPortrait(context)) {
 				emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 			}
 			textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 		}
