@@ -124,7 +124,7 @@ public class ChatController {
         longArray[0] = contact.getHandle();
 
         Intent i = new Intent(context, ChatExplorerActivity.class);
-        i.putExtra("USER_HANDLES", longArray);
+        i.putExtra(USER_HANDLES, longArray);
 
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
@@ -142,7 +142,7 @@ public class ChatController {
         }
 
         Intent i = new Intent(context, ChatExplorerActivity.class);
-        i.putExtra("USER_HANDLES", longArray);
+        i.putExtra(USER_HANDLES, longArray);
 
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
@@ -2139,7 +2139,7 @@ public class ChatController {
         }
 
         Intent i = new Intent(context, ChatExplorerActivity.class);
-        i.putExtra("ID_MESSAGES", idMessages);
+        i.putExtra(ID_MESSAGES, idMessages);
         i.putExtra("ID_CHAT_FROM", idChat);
         i.setAction(ACTION_FORWARD_MESSAGES);
         if(context instanceof  ChatActivityLollipop){
