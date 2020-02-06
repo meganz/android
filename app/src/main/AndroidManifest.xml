@@ -499,7 +499,6 @@
         <!-- Used for Google Play Store Campaign Measurement-->
         <service
             android:name="com.google.android.gms.analytics.CampaignTrackingService" />
-		<service android:name=".fcm.IncomingMessageService"/>
         <service
             android:name=".jobservices.CameraUploadsService"
             android:exported="false" />
@@ -508,6 +507,7 @@
 		    android:permission="android.permission.BIND_JOB_SERVICE"
 		    android:exported="false" />
         <service android:name=".fcm.IncomingCallService" android:exported="true"/>
+        <service android:name=".fcm.KeepAliveService" android:exported="true"/>
         <receiver
             android:name="mega.privacy.android.app.receivers.CustomInstallReferrerReceiver"
             android:exported="true">

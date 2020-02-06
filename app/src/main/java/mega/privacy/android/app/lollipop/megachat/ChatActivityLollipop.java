@@ -102,6 +102,7 @@ import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
+import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
@@ -840,7 +841,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             public void onStart() {
                 logDebug("recordView.setOnRecordListener:onStart");
                 if (participatingInACall(megaChatApi)) {
-                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.not_allowed_recording_voice_clip), -1);
+                    showSnackbar(SNACKBAR_TYPE, getApplicationContext().getString(R.string.not_allowed_recording_voice_clip), -1);
                     return;
                 }
                 if (!isAllowedToRecord()) return;
@@ -2249,7 +2250,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         recordButton.activateOnTouchListener(false);
         recordButton.activateOnClickListener(true);
         recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
-        recordButton.setColorFilter(ContextCompat.getColor(context, R.color.accentColor));
+        recordButton.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor));
     }
 
     /*
@@ -2757,49 +2758,53 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             showProgressForwarding();
 
-            long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
-            logDebug("Send " + idMessages.length + " messages");
+            long[] idMessages = intent.getLongArrayExtra(ID_MESSAGES);
+            if (idMessages != null) logDebug("Send " + idMessages.length + " messages");
 
-            long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-            logDebug("Send to " + chatHandles.length + " chats");
+            long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+            if (chatHandles != null) logDebug("Send to " + chatHandles.length + " chats");
 
-            long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+            long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
+            if (contactHandles != null) logDebug("Send to " + contactHandles.length + " contacts");
 
-            if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
+            if(idMessages != null) {
+                ArrayList<MegaChatRoom> chats = new ArrayList<>();
+                ArrayList<MegaUser> users = new ArrayList<>();
+
                 if (contactHandles != null && contactHandles.length > 0) {
-                    ArrayList<MegaUser> users = new ArrayList<>();
-                    ArrayList<MegaChatRoom> chats = new ArrayList<>();
-
                     for (int i = 0; i < contactHandles.length; i++) {
                         MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
                         if (user != null) {
                             users.add(user);
                         }
                     }
+                    if (chatHandles != null && chatHandles.length > 0 ){
+                        for (int i = 0; i < chatHandles.length; i++) {
+                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
+                            if (chatRoom != null) {
+                                chats.add(chatRoom);
+                            }
+                        }
+                    }
+                    CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, idMessages, this, CreateChatToPerformActionListener.SEND_MESSAGES, idChat);
 
-                    for (int i = 0; i < chatHandles.length; i++) {
-                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
-                        if (chatRoom != null) {
-                            chats.add(chatRoom);
+                    if(users != null && !users.isEmpty()) {
+                        for (MegaUser user : users) {
+                            MegaChatPeerList peers = MegaChatPeerList.createInstance();
+                            peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+                            megaChatApi.createChat(false, peers, listener);
                         }
                     }
 
-                    CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, idMessages, this, CreateChatToPerformActionListener.SEND_MESSAGES, idChat);
-
-                    for (MegaUser user : users) {
-                        MegaChatPeerList peers = MegaChatPeerList.createInstance();
-                        peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-                        megaChatApi.createChat(false, peers, listener);
-                    }
-                } else {
+                }else if (chatHandles != null && chatHandles.length > 0 ){
                     int countChat = chatHandles.length;
                     logDebug("Selected: " + countChat + " chats to send");
 
                     MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, idChat);
                     forwardChatProcessor.forward(chatRoom);
+                }else{
+                    logError("Error on sending to chat");
                 }
-            } else {
-                logError("Error on sending to chat");
             }
         }
         else if (requestCode == TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
@@ -3068,7 +3073,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         String message= getResources().getString(R.string.text_join_call);
         builder.setTitle(R.string.title_join_call);
-        builder.setMessage(message).setPositiveButton(context.getString(R.string.answer_call_incoming).toUpperCase(), dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        builder.setMessage(message).setPositiveButton(getApplicationContext().getString(R.string.answer_call_incoming).toUpperCase(), dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
     public void showConfirmationOpenCamera(final MegaChatRoom c){
@@ -6973,6 +6978,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     megaChatApi.closeChatRoom(idChat, this);
                 }
                 idChat = request.getChatHandle();
+
+                if (e.getErrorCode() == MegaChatError.ERROR_OK && idChat != MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE) {
+                    dbH.setLastPublicHandle(idChat);
+                    dbH.setLastPublicHandleTimeStamp();
+                    dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CHAT);
+                }
+
                 MegaApplication.setOpenChatId(idChat);
                 showChat(null);
 
@@ -7579,10 +7591,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void markAsSeen(MegaChatMessage msg){
+    public void markAsSeen(MegaChatMessage msg) {
         logDebug("markAsSeen");
-        if(activityVisible){
-            if(msg.getStatus()!=MegaChatMessage.STATUS_SEEN) {
+        if (activityVisible) {
+            if (msg.getStatus() != MegaChatMessage.STATUS_SEEN) {
+                logDebug("Mark message: " + msg.getMsgId() + " as seen");
                 megaChatApi.setMessageSeen(chatRoom.getChatId(), msg.getMsgId());
             }
         }
@@ -7593,7 +7606,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     protected void onResume(){
        logDebug("onResume");
         super.onResume();
-
+       stopService(new Intent(this, KeepAliveService.class));
         if(idChat!=-1 && chatRoom!=null) {
             setNodeAttachmentVisible();
 
@@ -7724,7 +7737,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                             lastMessage = messages.get(index);
                         }
 
-                        if (lastMessage.getMessage() != null) {
+                        if (lastMessage.getMessage() != null && MegaApplication.isActivityVisible()) {
                             boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                             logDebug("Result setMessageSeen: " + resultMarkAsSeen);
                         }
@@ -7747,7 +7760,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 lastMessage = messages.get(index);
                             }
 
-                            if (lastMessage.getMessage() != null) {
+                            if (lastMessage.getMessage() != null && MegaApplication.isActivityVisible()) {
                                 boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                                 logDebug("Result setMessageSeen: " + resultMarkAsSeen);
                             }

@@ -114,6 +114,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
@@ -687,6 +688,9 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+					if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
+						return false;
+					}
 					shareIt = false;
 			    	showGetLinkActivity(node.getHandle());
 					break;
@@ -723,6 +727,11 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 			case R.id.full_image_viewer_remove_link: {
 				shareIt = false;
+
+				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+				if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
+					return false;
+				}
 				android.support.v7.app.AlertDialog removeLinkDialog;
 				android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
@@ -2384,8 +2393,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+			long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
 			long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 
 			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {

@@ -124,7 +124,9 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class PdfViewerActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
@@ -1649,14 +1651,12 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 break;
             }
             case R.id.pdf_viewer_chat: {
-                long[] longArray = new long[1];
-                longArray[0] = handle;
 
                 if(nC ==null){
                     nC = new NodeController(this, isFolderLink);
                 }
 
-                MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
+                MegaNode attachNode = megaApi.getNodeByHandle(handle);
                 if (attachNode != null) {
                     nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
                 }
@@ -1667,10 +1667,18 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 break;
             }
             case R.id.pdf_viewer_get_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)) {
+                    break;
+                }
+
                 showGetLinkActivity();
                 break;
             }
             case R.id.pdf_viewer_remove_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)) {
+                    break;
+                }
+
                 showRemoveLink();
                 break;
             }
@@ -2336,8 +2344,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         }
 
         if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-            long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-            long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+            long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+            long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
             long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 
             if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
@@ -2605,27 +2613,14 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         if (request.getType() == MegaRequest.TYPE_LOGIN){
 
             if (e.getErrorCode() != MegaError.API_OK) {
-
+                logWarning("Login failed with error code: " + e.getErrorCode());
                 MegaApplication.setLoggingIn(false);
-
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                dbH.clearCredentials();
-                if (dbH.getPreferences() != null){
-                    dbH.clearPreferences();
-                    dbH.setFirstTime(false);
-                }
-            }
-            else{
+            } else {
                 //LOGIN OK
-
                 gSession = megaApi.dumpSession();
                 credentials = new UserCredentials(lastEmail, gSession, "", "", "");
-
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                dbH.clearCredentials();
-
+                dbH.saveCredentials(credentials);
                 logDebug("Logged in with session");
-
                 megaApi.fetchNodes(this);
             }
         }
@@ -2988,6 +2983,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     }
                 }
             }
+        } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
+            showTakenDownAlert(this);
         }
     }
 

@@ -1108,9 +1108,9 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 
 			showProgressForwarding();
 
-			long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
-			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+			long[] idMessages = intent.getLongArrayExtra(ID_MESSAGES);
+			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+			long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
 
 			if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
 				if (contactHandles != null && contactHandles.length > 0) {
