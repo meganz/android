@@ -6,45 +6,93 @@
     android:layout_width="180dp"
     android:layout_height="180dp"
     android:visibility="gone"
-    android:layout_gravity="center"
-    android:gravity="center_horizontal"
     android:paddingTop="16dp"
     android:paddingBottom="16dp"
     android:background="@drawable/recording">
-
         <TextView
             android:id="@+id/recording_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:textAlignment="gravity"
             android:textStyle="bold"
             android:singleLine="true"
-            android:textSize="15sp" />
-
+            android:textSize="15sp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
+            android:minHeight="59dp"
+            android:layout_below="@id/recording_time"
+            android:layout_above="@id/recording_text"
+            android:layout_centerHorizontal="true"
+            android:gravity="bottom">
             <ImageView
+                android:id="@+id/recording_micro_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:layout_alignParentBottom="true"
                 android:src = "@drawable/ic_voice_clip_feedback"/>
-            <ImageView
+            <RelativeLayout
+                android:id="@+id/amplitud_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/recording_micro_image"
+                android:layout_toRightOf="@id/recording_micro_image">
+                <ImageView
+                    android:id="@+id/first_bar"
+                    android:layout_width="8dp"
+                    android:layout_height="16dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginRight="6dp"/>
+                <ImageView
+                    android:id="@+id/second_bar"
+                    android:layout_width="8dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toRightOf="@id/first_bar"
+                    android:layout_marginRight="6dp"/>
+                <ImageView
+                    android:id="@+id/third_bar"
+                    android:layout_width="8dp"
+                    android:layout_height="34dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toRightOf="@id/second_bar"
+                    android:layout_marginRight="6dp"/>
+                <ImageView
+                    android:id="@+id/fourth_bar"
+                    android:layout_width="8dp"
+                    android:layout_height="43dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toRightOf="@id/third_bar"
+                    android:layout_marginRight="6dp"/>
+                <ImageView
+                    android:id="@+id/fifth_bar"
+                    android:layout_width="8dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toRightOf="@id/fourth_bar"
+                    android:layout_marginRight="6dp"/>
+                <ImageView
+                    android:id="@+id/sixth_bar"
+                    android:layout_width="8dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toRightOf="@id/fifth_bar"
+                    android:layout_height="59dp" />
+            </RelativeLayout>
         </RelativeLayout>
 
         <TextView
+            android:id="@+id/recording_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="26dp"
             android:textColor="@color/white"
-            android:gravity="center"
             android:textStyle="bold"
+            android:gravity="bottom"
             android:textAlignment="gravity"
             android:singleLine="true"
             android:textSize="15sp"
