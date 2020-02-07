@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
@@ -23,6 +24,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -40,12 +42,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
         actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack());
     }
 
-    private class ActionBarCallBack implements ActionMode.Callback {
-
-        @Override
-        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            return false;
-        }
+    private class ActionBarCallBack extends BaseActionBarCallBack {
 
         @Override
         public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
@@ -55,11 +52,6 @@ public class LinksFragment extends MegaNodeBaseFragment {
         @Override
         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
             return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode actionMode) {
-
         }
     }
 
@@ -93,9 +85,9 @@ public class LinksFragment extends MegaNodeBaseFragment {
         emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
 
         if (adapter == null) {
-            adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).getParentHandleLinks(), recyclerView, null, LINKS_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+            adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).getParentHandleLinks(), recyclerView, null, LINKS_ADAPTER, ITEM_VIEW_TYPE_LIST);
         } else {
-            adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+            adapter.setAdapterType(ITEM_VIEW_TYPE_LIST);
         }
 
         adapter.setListFragment(recyclerView);
@@ -132,8 +124,10 @@ public class LinksFragment extends MegaNodeBaseFragment {
     }
 
     @Override
-    protected void setNodes(ArrayList<MegaNode> nodes) {
-
+    public void setNodes(ArrayList<MegaNode> nodes) {
+        this.nodes = nodes;
+        addSectionTitle(nodes, ITEM_VIEW_TYPE_LIST);
+        adapter.setNodes(nodes);
     }
 
     @Override
@@ -177,17 +171,49 @@ public class LinksFragment extends MegaNodeBaseFragment {
     }
 
     @Override
-    protected int onBackPressed() {
-        return 0;
+    public int onBackPressed() {
+        if (adapter == null || ((ManagerActivityLollipop) context).getParentHandleLinks() == INVALID_HANDLE) {
+            return 0;
+        }
     }
 
     @Override
-    protected void itemClick(int position, int[] screenPosition, ImageView imageView) {
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+        if (adapter.isMultipleSelect()) {
+            logDebug("multiselect ON");
+            adapter.toggleSelection(position);
 
+            List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+            if (selectedNodes.size() > 0) {
+                updateActionModeTitle();
+            }
+        } else {
+            if (nodes.get(position).isFolder()) {
+                MegaNode n = nodes.get(position);
+
+                lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
+
+                ((ManagerActivityLollipop) context).setParentHandleLinks(n.getHandle());
+                ((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
+                ((ManagerActivityLollipop) context).setToolbarTitle();
+
+                nodes = megaApi.getChildren(n, ((ManagerActivityLollipop) context).orderCloud);
+                addSectionTitle(nodes, adapter.getAdapterType());
+
+                adapter.setNodes(nodes);
+                recyclerView.scrollToPosition(0);
+                visibilityFastScroller();
+                setEmptyView();
+                checkScroll();
+                ((ManagerActivityLollipop) context).showFabButton();
+            } else {
+                //Is file
+            }
+        }
     }
 
     @Override
-    protected void refresh() {
+    public void refresh() {
 
     }
 }

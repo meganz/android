@@ -1685,7 +1685,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        }
 			case REQUEST_READ_WRITE_STORAGE:{
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-					onGetReadWritePermission();
+					showUploadPanel();
 				}
 				break;
 			}
@@ -6625,7 +6625,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					upgradeAccountMenuItem.setVisible(true);
 					importLinkMenuItem.setVisible(true);
 					addMenuItem.setEnabled(true);
-					addMenuItem.setVisible(true);
 					takePicture.setVisible(true);
 
 					if (getTabItemCloud() == CLOUD_TAB) {
@@ -10214,11 +10213,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case SHARED_ITEMS:
 				if (viewPagerShares == null) break;
 
-				if (viewPagerShares.getCurrentItem() == 0) {
+				if (getTabItemShares() == INCOMING_TAB) {
 					parentHandle = parentHandleIncoming;
-				} else if (viewPagerShares.getCurrentItem() == 1) {
+				} else if (getTabItemShares() == OUTGOING_TAB) {
 					parentHandle = parentHandleOutgoing;
-				}
+				} else if (getTabItemShares() == LINKS_TAB) {
+				    parentHandle = parentHandleLinks;
+                }
 				break;
 
 			case SEARCH:
@@ -10231,11 +10232,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						parentHandle = getParentHandleBrowser();
 						break;
 					case SHARED_ITEMS:
-						if (searchSharedTab == 0) {
+						if (searchSharedTab == INCOMING_TAB) {
 							parentHandle = parentHandleIncoming;
-						} else if (searchSharedTab == 1) {
+						} else if (searchSharedTab == OUTGOING_TAB) {
 							parentHandle = parentHandleOutgoing;
-						}
+						} else if (searchSharedTab == LINKS_TAB) {
+						    parentHandle = parentHandleLinks;
+                        }
 						break;
                     case INBOX:
                         parentHandle = getParentHandleInbox();
@@ -11086,16 +11089,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		logDebug("showUploadPanel");
 		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 			requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
-		} else {
-			onGetReadWritePermission();
+			return;
 		}
-	}
 
-	private void onGetReadWritePermission(){
 		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
-		bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public int getHeightToPanel(BottomSheetDialogFragment dialog){
@@ -12215,38 +12215,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			String folderPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivityLollipop.EXTRA_FILES);
 
-			int i = 0;
-			long parentHandleUpload=-1;
-			logDebug("On section: " + drawerItem);
-			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-				if (getTabItemCloud() == CLOUD_TAB) {
-					parentHandleUpload = parentHandleBrowser;
-				}
-				else if (getTabItemCloud() == RECENTS_TAB) {
-					MegaNode parentNode = megaApi.getRootNode();
-					if (parentNode == null) return;
-					parentHandleUpload = parentNode.getHandle();
-				}
-			}
-			else if(drawerItem == DrawerItem.SHARED_ITEMS){
-				if(getTabItemShares() == INCOMING_TAB){
-						parentHandleUpload=parentHandleIncoming;
-				}
-				else if(getTabItemShares() == OUTGOING_TAB){
-					parentHandleUpload=parentHandleOutgoing;
-				}
-			}
-			else if (drawerItem == DrawerItem.SEARCH){
-				if(getSearchFragment() != null)				{
-					parentHandleUpload = sFLol.getParentHandle();
-				}
-			}
-			else{
-				logDebug("Return - nothing to be done");
-				return;
-			}
-
-			UploadServiceTask uploadServiceTask = new UploadServiceTask(folderPath, paths, parentHandleUpload);
+			UploadServiceTask uploadServiceTask = new UploadServiceTask(folderPath, paths, getCurrentParentHandle());
 			uploadServiceTask.start();
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
@@ -13529,13 +13498,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
 		}
 		else {
-			Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began), -1);
 			for (ShareInfo info : infos) {
 				if(info.isContact){
 					requestContactsPermissions(info, parentNode);
 				}
 				else{
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began), -1);
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
@@ -16075,6 +16043,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 						break;
 					}
+					case LINKS_TAB:
+						if (isLinksAdded()) {
+							if (parentHandleLinks == INVALID_HANDLE) {
+								fabButton.hide();
+							} else {
+								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+								fabButton.show();
+							}
+						}
+						break;
+
 					default: {
 						fabButton.setVisibility(View.GONE);
 						break;

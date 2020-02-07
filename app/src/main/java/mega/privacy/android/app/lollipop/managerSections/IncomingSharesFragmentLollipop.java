@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,7 +67,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack());
     }
 
-	private class ActionBarCallBack implements ActionMode.Callback {
+	private class ActionBarCallBack extends BaseActionBarCallBack {
 		
 		boolean showRename = false;
 		boolean showMove = false;
@@ -174,27 +172,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				}
 			}
 			return false;
-		}
-
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.file_browser_action, menu);
-			((ManagerActivityLollipop)context).hideFabButton();
-			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
-			checkScroll();
-			return true;
-		}
-
-		@Override
-		public void onDestroyActionMode(ActionMode arg0) {
-			clearSelections();
-			adapter.setMultipleSelect(false);
-			((ManagerActivityLollipop)context).showFabButton();
-			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
-			checkScroll();
 		}
 
 		@Override

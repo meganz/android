@@ -3,6 +3,9 @@ package mega.privacy.android.app.fragments;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -68,6 +71,44 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public MegaNodeBaseFragment() {
         prefs = dbH.getPreferences();
         downloadLocationDefaultPath = getDownloadLocation(getContext());
+    }
+
+    protected class BaseActionBarCallBack implements ActionMode.Callback {
+
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            MenuInflater inflater = actionMode.getMenuInflater();
+            inflater.inflate(R.menu.file_browser_action, menu);
+            if (context instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) context).hideFabButton();
+                ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
+                ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
+            }
+            checkScroll();
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+            clearSelections();
+            adapter.setMultipleSelect(false);
+            if (context instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) context).showFabButton();
+                ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
+                ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
+            }
+            checkScroll();
+        }
     }
 
     @Override

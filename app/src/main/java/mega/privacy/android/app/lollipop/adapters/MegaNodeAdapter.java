@@ -36,6 +36,7 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListFragmentLollipop;
 import mega.privacy.android.app.lollipop.ContactSharedFolderFragment;
@@ -1332,6 +1333,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             ((FolderLinkActivityLollipop) context).itemClick(currentPosition, dimens, imageView);
         } else if (type == SEARCH_ADAPTER) {
             ((SearchFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+        } else if (type == LINKS_ADAPTER) {
+            ((LinksFragment) fragment).itemClick(currentPosition, dimens, imageView);
         } else {
             logDebug("layout FileBrowserFragmentLollipop!");
             ((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
@@ -1368,6 +1371,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 ((FolderLinkActivityLollipop)context).itemClick(currentPosition,null,null);
             } else if (type == SEARCH_ADAPTER) {
                 ((SearchFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+            } else if (type == LINKS_ADAPTER) {
+                ((LinksFragment) fragment).itemClick(currentPosition, null, null);
             } else {
                 logDebug("click layout FileBrowserFragmentLollipop!");
                 ((FileBrowserFragmentLollipop)fragment).itemClick(currentPosition,null,null);
@@ -1418,6 +1423,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 ((SearchFragmentLollipop)fragment).activateActionMode();
                 ((SearchFragmentLollipop)fragment).itemClick(currentPosition,null,null);
             }
+        } else if (type == LINKS_ADAPTER) {
+            logDebug("FOLDER_LINK_ADAPTER");
+            ((LinksFragment)fragment).activateActionMode();
+            ((LinksFragment)fragment).itemClick(currentPosition,null,null);
         } else {
             logDebug("click layout FileBrowserFragmentLollipop!");
             ((FileBrowserFragmentLollipop)fragment).activateActionMode();
