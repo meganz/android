@@ -3459,21 +3459,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
         builder.setTitle(R.string.section_photo_sync)
                 .setMessage(R.string.camera_uploads_business_alert)
-                .setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        isBusinessCUAlertShown = false;
-                        dialog.dismiss();
-                    }
-                })
-                .setPositiveButton(R.string.general_enable, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        enableCU();
-                    }
-                });
-
-        builder.setCancelable(false);
+                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
+                .setPositiveButton(R.string.general_enable, (dialog, which) -> enableCU())
+				.setCancelable(false)
+				.setOnDismissListener(dialog -> isBusinessCUAlertShown = false);
         businessCUAlert = builder.create();
         businessCUAlert.show();
         isBusinessCUAlertShown = true;
