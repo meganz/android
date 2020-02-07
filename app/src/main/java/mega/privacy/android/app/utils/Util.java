@@ -1531,7 +1531,7 @@ public class Util {
      *
      * @param context Class where the Snackbar has to be shown
      */
-	public static void showSnackbar(Context context) {
+	public static void showNotEnoughSpaceSnackbar(Context context) {
 		showSnackbar(context, NOT_SPACE_SNACKBAR_TYPE, null, INVALID_HANDLE);
 	}
 

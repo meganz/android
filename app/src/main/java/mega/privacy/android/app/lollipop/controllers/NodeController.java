@@ -457,7 +457,7 @@ public class NodeController {
         logDebug("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
 
         if(availableFreeSpace < sizeC) {
-            showSnackbar(context);
+            showNotEnoughSpaceSnackbar(context);
             logWarning("Not enough space");
             return;
         }
@@ -1747,7 +1747,7 @@ public class NodeController {
                         String path = dlFiles.get(document);
 
                         if(availableFreeSpace < document.getSize()){
-                            showSnackbar(context);
+                            showNotEnoughSpaceSnackbar(context);
                             continue;
                         }
 
@@ -1769,7 +1769,7 @@ public class NodeController {
                 }
                 else if(url != null) {
                     if(availableFreeSpace < currentDocument.getSize()) {
-                        showSnackbar(context);
+                        showNotEnoughSpaceSnackbar(context);
                     }
 
                     Intent service = new Intent(context, DownloadService.class);
