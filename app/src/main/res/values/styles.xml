@@ -277,6 +277,11 @@
         <item name="android:minWidth">44dp</item>
     </style>
 
+    <style name="ButtonStyleWithoutBorder" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:minHeight">24dp</item>
+        <item name="android:minWidth">44dp</item>
+    </style>
+
     <style name="PreferenceStyle" parent="@style/PreferenceThemeOverlay.v14.Material">
         <item name="preferenceCategoryStyle">@style/PreferenceCategoryStyle</item>
     </style>
