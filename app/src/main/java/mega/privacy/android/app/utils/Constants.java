@@ -417,6 +417,10 @@ public class Constants {
     public static final String HANDLE = "handle";
     public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
     public static final String VISIBLE_FRAGMENT = "VISIBLE_FRAGMENT";
+    public static final String SELECTED_CHATS = "SELECTED_CHATS";
+    public static final String SELECTED_USERS = "SELECTED_USERS";
+    public static final String ID_MESSAGES = "ID_MESSAGES";
+    public static final String USER_HANDLES = "USER_HANDLES";
 
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;

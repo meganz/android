@@ -48,9 +48,9 @@ public class DownloadableActivity extends SorterContentActivity {
         if (intent == null) {
             logWarning("extractUri: result intent is null");
             if (resultCode != Activity.RESULT_OK) {
-                Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+                Util.showSnackbar(this, getString(R.string.download_requires_permission));
             } else {
-                Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
+                Util.showSnackbar(this, getString(R.string.no_external_SD_card_detected));
             }
             return null;
         }
