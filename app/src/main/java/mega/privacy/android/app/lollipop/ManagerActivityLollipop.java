@@ -1758,7 +1758,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                         sttFLol.enableCameraUpload();
                     }
                 } else {
-                    showSnackBar(this, SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
                 }
 
                 break;
@@ -1771,7 +1771,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                         cuFL.cameraOnOff();
                     }
                 } else {
-                    showSnackBar(this,SNACKBAR_TYPE,getString(R.string.on_refuse_storage_permission),-1);
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
                 }
                 break;
             }
@@ -1792,7 +1792,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                             cuFL.onStoragePermissionRefused();
                         }
                     } else {
-                        showSnackBar(this, SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
                     }
                 }
 

@@ -1423,7 +1423,7 @@ public class ChatController {
                     File offlineFile = new File(destination, document.getName());
                     if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
                         logWarning("File already exists!");
-                        showSnackbar(SNACKBAR_TYPE, context.getString(R.string.file_already_exists));
+                        showSnackbar(context, context.getString(R.string.file_already_exists));
                     }
                     else{
                         dlFiles.put(document, destination.getAbsolutePath());
@@ -1463,24 +1463,6 @@ public class ChatController {
             context.startService(service);
         }
 
-    }
-
-    void showSnackbar(int type, String s) {
-        if (context instanceof ChatFullScreenImageViewer){
-            ((ChatFullScreenImageViewer) context).showSnackbar(type, s);
-        }
-        else if (context instanceof AudioVideoPlayerLollipop){
-            ((AudioVideoPlayerLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if (context instanceof PdfViewerActivityLollipop){
-            ((PdfViewerActivityLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if (context instanceof ChatActivityLollipop){
-            ((ChatActivityLollipop) context).showSnackbar(type, s, -1);
-        }
-        else if (context instanceof NodeAttachmentHistoryActivity){
-            ((NodeAttachmentHistoryActivity) context).showSnackbar(type, s);
-        }
     }
 
     public void requestLocalFolder (long size, ArrayList<String> serializedNodes,@Nullable String sdRoot) {
@@ -1643,7 +1625,7 @@ public class ChatController {
 
         logDebug("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
         if(availableFreeSpace < sizeC) {
-            showSnackbar(NOT_SPACE_SNACKBAR_TYPE, null);
+            showNotEnoughSpaceSnackbar(context);
             logWarning("Not enough space");
             return;
         }
@@ -1769,7 +1751,7 @@ public class ChatController {
                         boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
                         if(!autoPlayEnabled){
                             logDebug("Auto play disabled");
-                            showSnackBar(context,SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded),-1);
+                            showSnackbar(context, context.getString(R.string.general_already_downloaded));
                             return;
                         }
 
@@ -1832,7 +1814,7 @@ public class ChatController {
                                         context.startActivity(mediaIntent);
                                     }
                                     else {
-                                        showSnackbar(SNACKBAR_TYPE, context.getString(R.string.intent_not_available));
+                                        showSnackbar(context, context.getString(R.string.intent_not_available));
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                             intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -1902,11 +1884,11 @@ public class ChatController {
                                             logDebug("Call to startActivity(intentShare)");
                                             context.startActivity(intentShare);
                                         }
-                                        showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                                        showSnackbar(context, context.getString(R.string.general_already_downloaded));
                                     }
                                 }
                                 catch (Exception e){
-                                    showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                                    showSnackbar(context, context.getString(R.string.general_already_downloaded));
                                 }
                             }
 
@@ -2126,7 +2108,7 @@ public class ChatController {
         }
 
         if (errors > 0) {
-            showSnackbar(SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
+            showSnackbar(context, context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
         }
     }
 

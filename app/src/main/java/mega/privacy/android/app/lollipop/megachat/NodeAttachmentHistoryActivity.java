@@ -1562,10 +1562,6 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 	public void showSnackbar(int type, String s){
 		showSnackbar(type, container, s);
 	}
-    
-    public void showSnackbar(int type, String s,int chatId){
-        showSnackbar(type, container, s, chatId);
-    }
 
 	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
 		logDebug("Size: " + size);
