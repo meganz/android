@@ -1108,9 +1108,9 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 
 			showProgressForwarding();
 
-			long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
-			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+			long[] idMessages = intent.getLongArrayExtra(ID_MESSAGES);
+			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+			long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
 
 			if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
 				if (contactHandles != null && contactHandles.length > 0) {
@@ -1562,10 +1562,6 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 	public void showSnackbar(int type, String s){
 		showSnackbar(type, container, s);
 	}
-    
-    public void showSnackbar(int type, String s,int chatId){
-        showSnackbar(type, container, s, chatId);
-    }
 
 	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
 		logDebug("Size: " + size);

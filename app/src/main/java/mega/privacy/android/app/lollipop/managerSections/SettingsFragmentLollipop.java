@@ -1455,12 +1455,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 showSelectDownloadLocationDialog();
             }
         } else {
-            showSnackBar(context, SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+            showSnackbar(context, getString(R.string.download_requires_permission));
         }
     }
 
     private void onCannotWriteOnSDCard() {
-        showSnackBar(context, SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
+        showSnackbar(context, getString(R.string.no_external_SD_card_detected));
         new Handler().postDelayed(new Runnable() {
 
             @Override
@@ -2191,7 +2191,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 logDebug("intent NULL");
                 if(requestCode != Activity.RESULT_OK) {
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        showSnackBar(context, SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+                        showSnackbar(context, getString(R.string.download_requires_permission));
                     }
                 } else {
                     onCannotWriteOnSDCard();

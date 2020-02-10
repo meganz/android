@@ -1416,7 +1416,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 
-			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
 			logDebug("Send to " + chatHandles.length + " chats");
 
 			int countChat = chatHandles.length;

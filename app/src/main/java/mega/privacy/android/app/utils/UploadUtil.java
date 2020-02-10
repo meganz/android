@@ -57,7 +57,7 @@ public class UploadUtil {
         logDebug("uploadTakePicture");
         File imgFile = getCacheFile(context, TEMPORAL_FOLDER, "picture.jpg");
         if (!isFileAvailable(imgFile)) {
-            Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.general_error), -1);
+            Util.showSnackbar(context, context.getString(R.string.general_error));
             return;
         }
 
@@ -66,7 +66,7 @@ public class UploadUtil {
         File newFile = buildTempFile(context, name);
         imgFile.renameTo(newFile);
 
-        UploadUtil.uploadFile(context, newFile.getAbsolutePath(), parentHandle, megaApi);
+        uploadFile(context, newFile.getAbsolutePath(), parentHandle, megaApi);
     }
 
     /**
