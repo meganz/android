@@ -13,7 +13,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class LogoutListener extends BaseListener {
@@ -30,23 +29,14 @@ public class LogoutListener extends BaseListener {
         if (request.getType() != MegaRequest.TYPE_LOGOUT) return;
 
         if (e.getErrorCode() == MegaError.API_OK) {
-            if(isChatEnabled()){
-                logDebug("END logout sdk request - wait chat logout");
-            }
-            else{
-                logDebug("END logout sdk request - chat disabled");
+            new AccountController(context).logoutConfirmed(context);
 
-                app.getDbH().clearEphemeral();
+            Intent tourIntent = new Intent(context, LoginActivityLollipop.class);
+            tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            context.startActivity(tourIntent);
 
-                new AccountController(context).logoutConfirmed(context);
-
-                Intent tourIntent = new Intent(context, LoginActivityLollipop.class);
-                tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                context.startActivity(tourIntent);
-
-                if (context instanceof WeakAccountProtectionAlertActivity) {
-                    ((WeakAccountProtectionAlertActivity) context).finish();
-                }
+            if (context instanceof WeakAccountProtectionAlertActivity) {
+                ((WeakAccountProtectionAlertActivity) context).finish();
             }
         } else {
             showSnackBar(context, SNACKBAR_TYPE, context.getString(R.string.general_error), -1);
