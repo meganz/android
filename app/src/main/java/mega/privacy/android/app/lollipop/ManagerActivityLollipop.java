@@ -266,6 +266,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
         NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener {
 
+	private static final String DEEP_BROWSER_TREE_LINKS = "DEEP_BROWSER_TREE_LINKS";
     private static final String PARENT_HANDLE_LINKS = "PARENT_HANDLE_LINKS";
     private static final String DEEP_BROWSER_TREE_RECENTS = "DEEP_BROWSER_TREE_RECENTS";
     public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
@@ -596,6 +597,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private BucketSaved bucketSaved;
 	public int deepBrowserTreeIncoming = 0;
 	public int deepBrowserTreeOutgoing = 0;
+	private int deepBrowserTreeLinks;
 	int indexCloud = -1;
 	int indexShares = -1;
 	int indexContacts = -1;
@@ -1869,12 +1871,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		outState.putBoolean(STATE_KEY_SMS_DIALOG, isSMSDialogShowing);
 		outState.putString(STATE_KEY_SMS_BONUS, bonusStorageSMS);
 
-		if(parentHandleIncoming!=-1){
+		if (parentHandleIncoming != INVALID_HANDLE) {
 			outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
 		}
 
-		if(parentHandleOutgoing!=-1){
+		if (parentHandleOutgoing != INVALID_HANDLE) {
 			outState.putInt("deepBrowserTreeOutgoing", deepBrowserTreeOutgoing);
+		}
+
+		if (parentHandleLinks != INVALID_HANDLE) {
+			outState.putInt(DEEP_BROWSER_TREE_LINKS, deepBrowserTreeLinks);
 		}
 
 		if (deepBrowserTreeRecents > 0 && isRecentsAdded() && getBucketSaved() != null) {
@@ -2007,6 +2013,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
+			deepBrowserTreeLinks = savedInstanceState.getInt(DEEP_BROWSER_TREE_LINKS, 0);
 			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
 			isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false);
 			bonusStorageSMS = savedInstanceState.getString(STATE_KEY_SMS_BONUS);
@@ -2070,6 +2077,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			indexContacts = -1;
 			deepBrowserTreeIncoming = 0;
 			deepBrowserTreeOutgoing = 0;
+			deepBrowserTreeLinks = 0;
 			this.setPathNavigationOffline("/");
 		}
 
@@ -6947,8 +6955,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 					}
 		    		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-		    			if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) inSFLol.onBackPressed();
-		    			else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) outSFLol.onBackPressed();
+						if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
+							inSFLol.onBackPressed();
+						} else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) {
+							outSFLol.onBackPressed();
+						} else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) {
+							lF.onBackPressed();
+						}
 		    		}
 					else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 						cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
@@ -7877,7 +7890,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
 			if ((getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.onBackPressed() == 0)
-					|| (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.onBackPressed() == 0)) {
+					|| (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.onBackPressed() == 0)
+					|| (getTabItemShares() == LINKS_TAB && isLinksAdded() && lF.onBackPressed() == 0)) {
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 				selectDrawerItemLollipop(drawerItem);
 			}
@@ -15866,6 +15880,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		deepBrowserTreeOutgoing--;
 	}
 
+	public void setDeepBrowserTreeLinks(int deepBrowserTreeLinks) {
+		this.deepBrowserTreeLinks = deepBrowserTreeLinks;
+	}
+
+	public int getDeepBrowserTreeLinks() {
+		return deepBrowserTreeLinks;
+	}
+
+	public void increaseDeepBrowserTreeLinks() {
+		deepBrowserTreeLinks++;
+	}
+
+	public void decreaseDeepBrowserTreeLinks() {
+		deepBrowserTreeLinks--;
+	}
+
 	public static DrawerItem getDrawerItem() {
 		return drawerItem;
 	}
@@ -16045,7 +16075,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 					case LINKS_TAB:
 						if (isLinksAdded()) {
-							if (parentHandleLinks == INVALID_HANDLE) {
+							if (deepBrowserTreeLinks <= 0) {
 								fabButton.hide();
 							} else {
 								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
@@ -16959,13 +16989,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case SHARED_ITEMS: {
 					if (viewPagerShares == null || sharesPageAdapter == null) break;
 
-					if (getTabItemShares() == 0) {
+					if (getTabItemShares() == INCOMING_TAB) {
 						setParentHandleIncoming(node.getHandle());
 						increaseDeepBrowserTreeIncoming();
 						sharesPageAdapter.notifyDataSetChanged();
-					} else if (getTabItemShares() == 1) {
+					} else if (getTabItemShares() == OUTGOING_TAB) {
 						setParentHandleOutgoing(node.getHandle());
 						increaseDeepBrowserTreeOutgoing();
+						sharesPageAdapter.notifyDataSetChanged();
+					} else if (getTabItemShares() == LINKS_TAB) {
+						setParentHandleLinks(node.getHandle());
+						increaseDeepBrowserTreeLinks();
 						sharesPageAdapter.notifyDataSetChanged();
 					}
 

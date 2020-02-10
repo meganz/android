@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments;
 
+import android.content.Context;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +35,8 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
+    protected ManagerActivityLollipop managerActivity;
+
     public static ImageView imageDrag;
 
     protected ActionMode actionMode;
@@ -108,6 +111,15 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
             }
             checkScroll();
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof ManagerActivityLollipop) {
+            managerActivity = (ManagerActivityLollipop) context;
         }
     }
 
