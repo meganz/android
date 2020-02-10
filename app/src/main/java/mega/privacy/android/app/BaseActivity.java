@@ -58,11 +58,15 @@ public class BaseActivity extends AppCompatActivity {
 
     public BaseActivity() {
         app = MegaApplication.getInstance();
-        megaApi = app.getMegaApi();
-        megaApiFolder = app.getMegaApiFolder();
 
-        if(isChatEnabled()) {
-            megaChatApi = app.getMegaChatApi();
+        //Will be checked again and initialized at `onCreate()`
+        if (app != null) {
+            megaApi = app.getMegaApi();
+            megaApiFolder = app.getMegaApiFolder();
+
+            if(isChatEnabled()) {
+                megaChatApi = app.getMegaChatApi();
+            }
         }
 
         dbH = app.getDbH();
@@ -127,17 +131,19 @@ public class BaseActivity extends AppCompatActivity {
             app = MegaApplication.getInstance();
         }
 
-        if (megaApi == null){
-            megaApi = app.getMegaApi();
-        }
+        if (app != null) {
+            if (megaApi == null){
+                megaApi = app.getMegaApi();
+            }
 
-        if (megaApiFolder == null) {
-            megaApiFolder = app.getMegaApiFolder();
-        }
+            if (megaApiFolder == null) {
+                megaApiFolder = app.getMegaApiFolder();
+            }
 
-        if(isChatEnabled()){
-            if (megaChatApi == null){
-                megaChatApi = app.getMegaChatApi();
+            if(isChatEnabled()){
+                if (megaChatApi == null){
+                    megaChatApi = app.getMegaChatApi();
+                }
             }
         }
 

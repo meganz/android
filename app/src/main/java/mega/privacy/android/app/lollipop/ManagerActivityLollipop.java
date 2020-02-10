@@ -16242,12 +16242,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void pauseIndividualTransfer(MegaTransfer mT){
-		logDebug("pauseIndividualTransfer");
-		if(mT.getState()==MegaTransfer.STATE_PAUSED){
-			megaApi.pauseTransfer(mT, false, managerActivity);
+	public void pauseIndividualTransfer(MegaTransfer mT) {
+		if (mT == null) {
+			logWarning("Transfer object is null.");
+			return;
 		}
-		else{
+
+		if (mT.getState() == MegaTransfer.STATE_PAUSED) {
+			logDebug("Resume transfer - Node handle: " + mT.getNodeHandle());
+			megaApi.pauseTransfer(mT, false, managerActivity);
+		} else {
+			logDebug("Pause transfer - Node handle: " + mT.getNodeHandle());
 			megaApi.pauseTransfer(mT, true, managerActivity);
 		}
 	}

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
@@ -393,24 +394,31 @@ public class ShareInfo implements Serializable {
 	 */
 	private void processContent(Uri uri, Context context) {
 		logDebug("processContent: " + uri);
+
 		ContentProviderClient client = null;
 		Cursor cursor = null;
 		try {
-            client = context.getContentResolver().acquireContentProviderClient(uri);
-			cursor = client.query(uri, null, null, null, null);
-		} catch (Exception e) {
-			logError("cursor EXCEPTION!!!", e);
-		} finally {
-			if (cursor == null || cursor.getCount() == 0) {
-				logWarning("Error with cursor");
-				if (cursor != null) {
-					cursor.close();
-				}
-				if (client != null) {
-					client.close();
-				}
-				return;
+			client = context.getContentResolver().acquireContentProviderClient(uri);
+			if (client != null) {
+				cursor = client.query(uri, null, null, null, null);
 			}
+		} catch (Exception e) {
+			logError("client or cursor EXCEPTION: ", e);
+		}
+
+		if (cursor == null || cursor.getCount() == 0) {
+			logWarning("Error with cursor");
+			if (cursor != null) {
+				cursor.close();
+			}
+			if (client != null) {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					client.close();
+				} else {
+					client.release();
+				}
+			}
+			return;
 		}
 
 		cursor.moveToFirst();
@@ -473,13 +481,13 @@ public class ShareInfo implements Serializable {
 			logWarning("Nothing done!");
 		}
 
-		if (cursor != null) {
-			cursor.close();
+		cursor.close();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			client.close();
+		} else {
+			client.release();
 		}
 
-		if (client != null) {
-			client.close();
-		}
 		logDebug("---- END process content----");
 	}
 	
