@@ -29,9 +29,10 @@ public class ContactsUtil {
 
         private List<String> emailList = new ArrayList<>();
 
-        public LocalContact(long id, String name) {
+        private LocalContact(long id, String name) {
             this.id = id;
-            this.name = name == null ? "" : name;
+            //If contact name has double quotes replace by single quotes to avoid JSON parse error of the string
+            this.name = name == null ? "" : name.replaceAll("\"","''");
         }
 
         public long getId() {
@@ -95,8 +96,6 @@ public class ContactsUtil {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(0);
                 String name = cursor.getString(1);
-                //If contact name has double quotes replace by single quotes to avoid JSON parse error of the string
-                name = name.replaceAll("\"","''");
                 contact = new LocalContact(id, name);
                 localContacts.add(contact);
             }
