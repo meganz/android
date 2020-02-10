@@ -29,7 +29,7 @@ public class LogoutListener extends BaseListener {
         if (request.getType() != MegaRequest.TYPE_LOGOUT) return;
 
         if (e.getErrorCode() == MegaError.API_OK) {
-            new AccountController(context).logoutConfirmed(context);
+            AccountController.logoutConfirmed(context);
 
             Intent tourIntent = new Intent(context, LoginActivityLollipop.class);
             tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -132,7 +132,7 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
                 break;
 
             case R.id.logout_button:
-                new AccountController(this).logout(this, megaApi);
+                AccountController.logout(this, megaApi);
                 break;
         }
     }
