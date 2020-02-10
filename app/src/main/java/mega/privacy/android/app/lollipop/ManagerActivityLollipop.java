@@ -173,7 +173,6 @@ import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLoll
 import mega.privacy.android.app.lollipop.managerSections.FortumoFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.MonthlyAnnualyFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
@@ -245,6 +244,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
@@ -414,7 +414,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     public enum FragmentTag {
 		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
-		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION;
+		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION;
 
 		public String getTag () {
 			switch (this) {
@@ -439,7 +439,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case RECENT_CHAT: return "rChat";
 				case NOTIFICATIONS: return "notificFragment";
 				case UPGRADE_ACCOUNT: return "upAFL";
-				case MONTHLY_ANUALLY: return "myF";
 				case FORTUMO: return "fF";
 				case CENTILI: return "ctF";
 				case CREDIT_CARD: return "ccF";
@@ -620,7 +619,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private SettingsFragmentLollipop sttFLol;
 	private CameraUploadFragmentLollipop muFLol;
 	private UpgradeAccountFragmentLollipop upAFL;
-	private MonthlyAnnualyFragmentLollipop myFL;
 	private FortumoFragmentLollipop fFL;
 	private CentiliFragmentLollipop ctFL;
 	private CreditCardFragmentLollipop ccFL;
@@ -791,12 +789,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 					if(upAFL!=null){
 						upAFL.setPricing();
-					}
-
-					//MONTHLY_YEARLY_FRAGMENT
-					myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
-					if(myFL!=null){
-						myFL.setPricing();
 					}
 
 					//CENTILI_FRAGMENT
@@ -1197,32 +1189,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	};
 
-	// SKU for our subscription PRO_I monthly
-	public static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
-	// SKU for our subscription PRO_I yearly
-	public static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
-	// SKU for our subscription PRO_II monthly
-	public static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
-	// SKU for our subscription PRO_II yearly
-	public static final String SKU_PRO_II_YEAR = "mega.android.pro2.oneyear";
-	// SKU for our subscription PRO_III monthly
-	public static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
-	// SKU for our subscription PRO_III yearly
-	public static final String SKU_PRO_III_YEAR = "mega.android.pro3.oneyear";
-	// SKU for our subscription PRO_LITE monthly
-	public static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
-	// SKU for our subscription PRO_LITE yearly
-	public static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
-
-	public void launchPayment(String productId) {
-		//start purchase/subscription flow
-		SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
-		Purchase purchase = app.getMyAccountInfo().getActiveGooglePlaySubscription();
-		String oldSku = purchase == null ? null : purchase.getSku();
-		if (mBillingManager != null) {
-			mBillingManager.initiatePurchaseFlow(oldSku, skuDetails);
-		}
-	}
+    public void launchPayment(String productId) {
+        //start purchase/subscription flow
+        SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
+        Purchase purchase = app.getMyAccountInfo().getActiveGooglePlaySubscription();
+        String oldSku = purchase == null ? null : purchase.getSku();
+        String token = purchase == null ? null : purchase.getPurchaseToken();
+        if (mBillingManager != null) {
+            mBillingManager.initiatePurchaseFlow(oldSku, token, skuDetails);
+        }
+    }
 
 	private SkuDetails getSkuDetails(List<SkuDetails> list, String key) {
 		if (list == null || list.isEmpty()) {
@@ -1283,7 +1259,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	@Override
 	public void onQueryPurchasesFinished(int resultCode, List<Purchase> purchases) {
 		if (resultCode != BillingClient.BillingResponseCode.OK || purchases == null) {
-			logWarning("onPurchasesUpdated failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
+			logWarning("Query of purchases failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
 			return;
 		}
 
@@ -1298,26 +1274,31 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             if (purchases != null && !purchases.isEmpty()) {
                 Purchase purchase = purchases.get(0);
                 //payment may take time to process, we will not give privilege until it has been fully processed
+                String sku = purchase.getSku();
+                String subscriptionType = getSubscriptionType(this, sku);
+                String subscriptionRenewalType = getSubscriptionRenewalType(this, sku);
                 if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
                     //payment has been processed
                     updateAccountInfo(purchases);
-                    String sku = purchase.getSku();
-                    message = getString(R.string.message_user_purchased_subscription,
-                            getSubscriptionType(this, sku),
-                            getSubscriptionRenewalType(this, sku));
+                    logDebug("Purchase " + sku + " successfully, subscription type is: " + subscriptionType + ", subscription renewal type is: " + subscriptionRenewalType);
+                    message = getString(R.string.message_user_purchased_subscription, subscriptionType, subscriptionRenewalType);
                     updateSubscriptionLevel(app.getMyAccountInfo());
                 } else {
                     //payment is being processed or in unknown state
+                    logDebug("Purchase " + sku + " is being processed or in unknown state.");
                     message = getString(R.string.message_user_payment_pending);
                 }
                 showAlert(this, message, null);
             } else {
                 //down grade case
+                logDebug("Downgrade, the new subscription takes effect when the old one expires.");
                 message = getString(R.string.message_user_purchased_subscription_down_grade);
                 showAlert(this, message, null);
             }
             drawerItem = DrawerItem.CLOUD_DRIVE;
             selectDrawerItemLollipop(drawerItem);
+        } else {
+            logWarning("Update purchase failed, with result code: " + resultCode);
         }
 	}
 
@@ -1327,7 +1308,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		int temp = -1;
 		Purchase max = null;
 		for (Purchase purchase : purchases) {
-			logDebug("purchased (JSON): " + purchase.getOriginalJson());
+			logDebug(purchase.getSku() + " (JSON): " + purchase.getOriginalJson());
 			switch (purchase.getSku()) {
 				case SKU_PRO_LITE_MONTH:
 				case SKU_PRO_LITE_YEAR:
@@ -1363,11 +1344,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 		if (upAFL != null) {
 			upAFL.setPricing();
-		}
-
-		myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
-		if (myFL != null) {
-			myFL.setPricing();
 		}
 	}
 
@@ -1674,10 +1650,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 //		outState.putParcelable("obj", myClass);
 		if(drawerItem==DrawerItem.ACCOUNT){
 			outState.putInt("accountFragment", accountFragment);
-			if(accountFragment==MONTHLY_YEARLY_FRAGMENT){
-				outState.putInt("selectedAccountType", selectedAccountType);
-				outState.putInt("selectedPaymentMethod", selectedPaymentMethod);
-			}
 		}
 		outState.putBoolean(MK_LAYOUT_VISIBLE, mkLayoutVisible);
 
@@ -4725,10 +4697,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					aB.setTitle(getString(R.string.section_account).toUpperCase());
 					setFirstNavigationLevel(true);
 				}
-				else if(accountFragment==MONTHLY_YEARLY_FRAGMENT){
-					aB.setTitle(getString(R.string.action_upgrade_account).toUpperCase());
-					setFirstNavigationLevel(false);
-				}
 				else if(accountFragment==UPGRADE_ACCOUNT_FRAGMENT){
 					aB.setTitle(getString(R.string.action_upgrade_account).toUpperCase());
 					setFirstNavigationLevel(false);
@@ -5244,11 +5212,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				showUpAF();
 				break;
 			}
-			case MONTHLY_YEARLY_FRAGMENT:{
-				showmyF(selectedPaymentMethod, selectedAccountType);
-				showFabButton();
-				break;
-			}
 			default:{
 				app.refreshAccountInfo();
 				accountFragment=MY_ACCOUNT_FRAGMENT;
@@ -5485,8 +5448,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					case FORTUMO_FRAGMENT:
 					case CC_FRAGMENT:
 					case UPGRADE_ACCOUNT_FRAGMENT:
-					case BACKUP_RECOVERY_KEY_FRAGMENT:
-					case MONTHLY_YEARLY_FRAGMENT:{
+					case BACKUP_RECOVERY_KEY_FRAGMENT:{
 						fragmentContainer.setVisibility(View.VISIBLE);
 						break;
 					}
@@ -6072,21 +6034,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			ctFL = new CentiliFragmentLollipop();
 		}
 		replaceFragment(ctFL, FragmentTag.CENTILI.getTag());
-		setTabsVisibility();
-	}
-
-	public void showmyF(int paymentMethod, int type){
-		logDebug("paymentMethod: " + paymentMethod + ", type: " + type);
-
-		accountFragment = MONTHLY_YEARLY_FRAGMENT;
-		setToolbarTitle();
-
-		myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
-		if (myFL == null){
-			myFL = new MonthlyAnnualyFragmentLollipop();
-		}
-		myFL.setInfo(paymentMethod, type);
-		replaceFragment(myFL, FragmentTag.MONTHLY_ANUALLY.getTag());
 		setTabsVisibility();
 	}
 
@@ -7623,13 +7570,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								showUpAF();
 								return true;
 							}
-							case MONTHLY_YEARLY_FRAGMENT:{
-								myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
-								if (myFL != null){
-									myFL.onBackPressed();
-								}
-								return true;
-							}
 						}
 					}
 				}
@@ -8579,13 +8519,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	    		}
 	    		case OVERQUOTA_ALERT:{
 	    			backToDrawerItem(bottomNavigationCurrentItem);
-	    			return;
-	    		}
-	    		case MONTHLY_YEARLY_FRAGMENT:{
-					myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
-	    			if (myFL != null){
-	    				myFL.onBackPressed();
-	    			}
 	    			return;
 	    		}
 	    		default:{
@@ -16776,10 +16709,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public UpgradeAccountFragmentLollipop getUpgradeAccountFragment() {
 		return upAFL;
-	}
-
-	public MonthlyAnnualyFragmentLollipop getMonthlyAnnualyFragment() {
-		return myFL;
 	}
 
 	public CentiliFragmentLollipop getCentiliFragment() {

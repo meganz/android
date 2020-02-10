@@ -531,7 +531,11 @@ public class MyAccountInfo {
         if (activeGooglePlaySubscription == null) {
             return false;
         }
-        return activeGooglePlaySubscription.getSku().equals(sku);
+        boolean result = activeGooglePlaySubscription.getSku().equals(sku);
+        if (result) {
+            logDebug(sku + " already subscribed.");
+        }
+        return result;
     }
 
     public void setAvailableSkus(List<SkuDetails> skuDetailsList) {

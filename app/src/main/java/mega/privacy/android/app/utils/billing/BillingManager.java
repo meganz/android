@@ -16,6 +16,7 @@
 package mega.privacy.android.app.utils.billing;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.android.billingclient.api.AcknowledgePurchaseParams;
@@ -39,13 +40,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.utils.TextUtil;
+import nz.mega.sdk.MegaUser;
 
 import static com.android.billingclient.api.BillingFlowParams.ProrationMode.DEFERRED;
 import static com.android.billingclient.api.BillingFlowParams.ProrationMode.IMMEDIATE_WITH_TIME_PRORATION;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logInfo;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.Util.getProductLevel;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 
 /**
  * Handles all the interactions with Play Store (via Billing library), maintains connection to
@@ -71,13 +71,41 @@ public class BillingManager implements PurchasesUpdatedListener {
      * item was finished
      */
     public interface BillingUpdatesListener {
+
+        /**
+         * Callback when {@link BillingClient#startConnection} successfully.
+         */
         void onBillingClientSetupFinished();
 
+        /**
+         * Callback when purchase updated. {@link PurchasesUpdatedListener#onPurchasesUpdated}
+         *
+         * @param resultCode Response code from {@link BillingResult#getResponseCode()}
+         * @see BillingResponseCode
+         * @param purchases Current Google account's purchases.
+         */
         void onPurchasesUpdated(int resultCode, List<Purchase> purchases);
 
+        /**
+         * Callback when {@link BillingClient#queryPurchases} finished.
+         *
+         * @param resultCode Response code from {@link PurchasesResult#getResponseCode()}
+         * @see BillingResponseCode
+         * @param purchases {@code if(resultCode == BillingResponseCode.OK)},
+         *                  get purchases list from {@link PurchasesResult#getPurchasesList()};
+         *                  otherwise the list is empty.
+         */
         void onQueryPurchasesFinished(int resultCode, List<Purchase> purchases);
     }
 
+    /**
+     * Handles all the interactions with Play Store (via Billing library), maintains connection to
+     * it through BillingClient and caches temporary states/data if needed.
+     *
+     * @param activity The Context, here's {@link mega.privacy.android.app.lollipop.ManagerActivityLollipop}
+     * @param updatesListener The callback, when billing status update. {@link BillingUpdatesListener}
+     * @param pl Payload, using MegaUser's hanlde as payload. {@link MegaUser#getHandle()}
+     */
     public BillingManager(Activity activity, final BillingUpdatesListener updatesListener, String pl) {
         mActivity = activity;
         mBillingUpdatesListener = updatesListener;
@@ -117,8 +145,12 @@ public class BillingManager implements PurchasesUpdatedListener {
 
     /**
      * Start a purchase or subscription replace flow
+     *
+     * @param oldSku The sku of current purchased item.
+     * @param purchaseToken The token of current purchased item.
+     * @param skuDetails The item to purchase.
      */
-    public void initiatePurchaseFlow(final String oldSku, final SkuDetails skuDetails) {
+    public void initiatePurchaseFlow(@Nullable String oldSku, @Nullable String purchaseToken, @NonNull SkuDetails skuDetails) {
         logDebug("oldSku is:" + oldSku + ", new sku is:" + skuDetails);
 
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
@@ -130,7 +162,7 @@ public class BillingManager implements PurchasesUpdatedListener {
                 BillingFlowParams purchaseParams = BillingFlowParams
                         .newBuilder()
                         .setSkuDetails(skuDetails)
-                        .setOldSku(oldSku)
+                        .setOldSku(oldSku, purchaseToken)
                         .setReplaceSkusProrationMode(prorationMode)
                         .build();
                 mBillingClient.launchBillingFlow(mActivity, purchaseParams);
@@ -151,8 +183,15 @@ public class BillingManager implements PurchasesUpdatedListener {
         }
     }
 
-    public void querySkuDetailsAsync(@SkuType final String itemType, final List<String> skuList,
-                                     final SkuDetailsResponseListener listener) {
+    /**
+     * Query all the available skus of MEGA in Play Store.
+     *
+     * @param itemType The type of sku, for MEGA it should always be {@link BillingClient.SkuType#SUBS}
+     * @param skuList Supported skus' id.
+     * @see PaymentUtils
+     * @param listener Callback when query available skus finished.
+     */
+    public void querySkuDetailsAsync(@SkuType String itemType, List<String> skuList, SkuDetailsResponseListener listener) {
         logDebug("querySkuDetailsAsync type is " + itemType);
         // Creating a runnable from the request to use it inside our connection retry policy below
         Runnable queryRequest = new Runnable() {
@@ -189,7 +228,7 @@ public class BillingManager implements PurchasesUpdatedListener {
      */
     private void handlePurchase(Purchase purchase) {
         if (!verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
-            logInfo("invalid purchase found");
+            logWarning("Invalid purchase found");
             return;
         }
 
@@ -219,10 +258,16 @@ public class BillingManager implements PurchasesUpdatedListener {
             logDebug("new purchase added, " + purchase.getOriginalJson());
             mPurchases.add(purchase);
         } else {
-            logInfo("invalid DeveloperPayload");
+            logWarning("Invalid DeveloperPayload");
         }
     }
 
+    /**
+     * Check if the payload of a purchase is valid(the purchase belongs to current open MEGA account).
+     *
+     * @param pl Payload, using MegaUser's hanlde as payload. {@link MegaUser#getHandle()}
+     * @return If the payload is valid.
+     */
     public boolean isPayloadValid(String pl) {
         //backward compatibility - old version does not have payload so just let it go
         return TextUtil.isTextEmpty(pl) || payload.equals(pl);
@@ -230,6 +275,8 @@ public class BillingManager implements PurchasesUpdatedListener {
 
     /**
      * Handle a result from querying of purchases and report an updated list to the listener
+     *
+     * @param result PurchasesResult contains purchase result {@link BillingResult} and a list which includes all the purchased items.
      */
     private void onQueryPurchasesFinished(PurchasesResult result) {
         logDebug("onQueryPurchasesFinished, succeed? " + (result.getResponseCode() == BillingResponseCode.OK));
@@ -297,15 +344,19 @@ public class BillingManager implements PurchasesUpdatedListener {
         executeServiceRequest(queryToExecute);
     }
 
+    /**
+     * Connect to Google billing library service.
+     *
+     * @param executeOnSuccess Once billing client setup finished, the runnable will be executed.
+     */
     private void startServiceConnection(final Runnable executeOnSuccess) {
         mBillingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingSetupFinished(BillingResult billingResult) {
-                logInfo("onBillingSetupFinished, response code is " + billingResult.getResponseCode());
+                logDebug("Response code is: " + billingResult.getResponseCode());
                 int BillingResponseCodeCode = billingResult.getResponseCode();
 
                 if (BillingResponseCodeCode == BillingResponseCode.OK) {
-                    logInfo("onBillingSetupFinished OK");
                     mIsServiceConnected = true;
                     if (executeOnSuccess != null) {
                         executeOnSuccess.run();
@@ -321,6 +372,11 @@ public class BillingManager implements PurchasesUpdatedListener {
         });
     }
 
+    /***
+     * Request to server, if hasn't connected to service, start to connect first, otherwise, execute directly.
+     *
+     * @param runnable The request will be executed.
+     */
     private void executeServiceRequest(Runnable runnable) {
         if (mIsServiceConnected) {
             runnable.run();
@@ -330,11 +386,18 @@ public class BillingManager implements PurchasesUpdatedListener {
         }
     }
 
+    /**
+     * Verify signature of purchase.
+     *
+     * @param signedData the content of a purchase.
+     * @param signature the signature of a purchase.
+     * @return If the purchase is valid.
+     */
     private boolean verifyValidSignature(String signedData, String signature) {
         try {
             return Security.verifyPurchase(BASE_64_ENCODED_PUBLIC_KEY, signedData, signature);
         } catch (IOException e) {
-            logWarning("purchase failed to valid signature");
+            logWarning("Purchase failed to valid signature", e);
             return false;
         }
     }

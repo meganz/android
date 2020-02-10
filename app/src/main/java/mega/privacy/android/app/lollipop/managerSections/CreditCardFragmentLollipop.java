@@ -41,6 +41,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 
 public class CreditCardFragmentLollipop extends Fragment implements MegaRequestListenerInterface, OnClickListener, OnItemSelectedListener{
 	
@@ -546,7 +547,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 		
 			case 1:{
 				
-				((ManagerActivityLollipop)context).launchPayment(ManagerActivityLollipop.SKU_PRO_I_YEAR);
+				((ManagerActivityLollipop)context).launchPayment(SKU_PRO_I_YEAR);
 				
 //				for (int i=0;i<accounts.size();i++){
 //					
@@ -584,7 +585,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 				break;
 			}			
 			case 4:{
-				((ManagerActivityLollipop)context).launchPayment(ManagerActivityLollipop.SKU_PRO_LITE_YEAR);
+				((ManagerActivityLollipop)context).launchPayment(SKU_PRO_LITE_YEAR);
 				break;
 			}
 			

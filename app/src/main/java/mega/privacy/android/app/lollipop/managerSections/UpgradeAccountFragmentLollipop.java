@@ -32,14 +32,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import nz.mega.sdk.MegaApiAndroid;
 
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_III_MONTH;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_III_YEAR;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_II_MONTH;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_II_YEAR;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_I_MONTH;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_I_YEAR;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_LITE_MONTH;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_LITE_YEAR;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -754,26 +747,22 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	private void hideProLite(){
 		logDebug("hideProLite");
 		proLiteTransparentLayout.setVisibility(View.VISIBLE);
-		proLiteLayout.setClickable(false);
 	}
 
 	private void hideProI(){
 		logDebug("hideProI");
 		pro1TransparentLayout.setVisibility(View.VISIBLE);
-		pro1Layout.setClickable(false);
 	}
 
 	private void hideProII(){
 		logDebug("hideProII");
 		pro2TransparentLayout.setVisibility(View.VISIBLE);
-		pro2Layout.setClickable(false);
 	}
 
 	private void hideProIII(){
 		logDebug("hideProIII");
 		pro3TransparentLayout.setVisibility(View.VISIBLE);
 		labelCustomPlan.setVisibility(View.VISIBLE);
-		pro3Layout.setClickable(false);
 	}
 
 	private Spanned generateByteString(long gb, int labelType) {
@@ -968,7 +957,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_III_YEAR);
+									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_III_YEAR);
 									break;
 								}
 							}
@@ -982,7 +971,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
-									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_LITE_YEAR);
+									((ManagerActivityLollipop) context).launchPayment(SKU_PRO_LITE_YEAR);
 									break;
 								}
 							}
@@ -1111,15 +1100,10 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayout.setVisibility(View.GONE);
 					}
 					else{
-						if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							if (myAccountInfo.isPurchasedAlready(SKU_PRO_I_MONTH) && myAccountInfo.isPurchasedAlready(SKU_PRO_I_YEAR)) {
-								googlePlayLayout.setVisibility(View.GONE);
-							}
-							else{
-								googlePlayLayout.setVisibility(View.VISIBLE);
-                                layoutButtons.setVisibility(View.VISIBLE);
-							}
-						}
+                        if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
+                            googlePlayLayout.setVisibility(View.VISIBLE);
+                            layoutButtons.setVisibility(View.VISIBLE);
+                        }
 					}
 
 					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
@@ -1155,16 +1139,10 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayout.setVisibility(View.GONE);
 					}
 					else{
-						if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							if (myAccountInfo.isPurchasedAlready(SKU_PRO_II_MONTH) && myAccountInfo.isPurchasedAlready(SKU_PRO_II_YEAR)) {
-								googlePlayLayout.setVisibility(View.GONE);
-							}
-							else{
-								googlePlayLayout.setVisibility(View.VISIBLE);
-                                layoutButtons.setVisibility(View.VISIBLE);
-
-                            }
-						}
+                        if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
+                            googlePlayLayout.setVisibility(View.VISIBLE);
+                            layoutButtons.setVisibility(View.VISIBLE);
+                        }
 					}
 
 					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
@@ -1196,16 +1174,10 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayout.setVisibility(View.GONE);
 					}
 					else{
-						if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
-							if (myAccountInfo.isPurchasedAlready(SKU_PRO_III_MONTH) && myAccountInfo.isPurchasedAlready(SKU_PRO_III_YEAR)) {
-								googlePlayLayout.setVisibility(View.GONE);
-							}
-							else{
-								googlePlayLayout.setVisibility(View.VISIBLE);
-                                layoutButtons.setVisibility(View.VISIBLE);
-
-                            }
-						}
+                        if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
+                            googlePlayLayout.setVisibility(View.VISIBLE);
+                            layoutButtons.setVisibility(View.VISIBLE);
+                        }
 					}
 
 					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
@@ -1234,16 +1206,10 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayout.setVisibility(View.GONE);
 					}
 					else {
-						if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
-							if (myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_MONTH) && myAccountInfo.isPurchasedAlready(SKU_PRO_LITE_YEAR)) {
-								googlePlayLayout.setVisibility(View.GONE);
-							}
-							else{
-								googlePlayLayout.setVisibility(View.VISIBLE);
-                                layoutButtons.setVisibility(View.VISIBLE);
-
-                            }
-						}
+                        if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)) {
+                            googlePlayLayout.setVisibility(View.VISIBLE);
+                            layoutButtons.setVisibility(View.VISIBLE);
+                        }
 					}
 
 					if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){

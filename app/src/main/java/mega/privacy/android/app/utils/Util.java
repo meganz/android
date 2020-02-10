@@ -106,14 +106,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_III_MONTH;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_III_YEAR;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_II_MONTH;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_II_YEAR;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_I_MONTH;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_I_YEAR;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_LITE_MONTH;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SKU_PRO_LITE_YEAR;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1788,66 +1780,12 @@ public class Util {
 				requestCode);
 	}
 
-	public static String getSubscriptionRenewalType(Context context, String sku) {
-		switch (sku){
-			case SKU_PRO_LITE_MONTH:
-			case SKU_PRO_I_MONTH:
-			case SKU_PRO_II_MONTH:
-			case SKU_PRO_III_MONTH:
-				return context.getString(R.string.subscription_type_monthly);
-			case SKU_PRO_LITE_YEAR:
-			case SKU_PRO_I_YEAR:
-			case SKU_PRO_II_YEAR:
-			case SKU_PRO_III_YEAR:
-				return context.getString(R.string.subscription_type_yearly);
-			default:
-				return "";
-
-		}
-	}
-
-	public static String getSubscriptionType(Context context, String sku) {
-		switch (sku) {
-			case SKU_PRO_LITE_MONTH:
-			case SKU_PRO_LITE_YEAR:
-				return context.getString(R.string.prolite_account);
-			case SKU_PRO_I_MONTH:
-			case SKU_PRO_I_YEAR:
-				return context.getString(R.string.pro1_account);
-			case SKU_PRO_II_MONTH:
-			case SKU_PRO_II_YEAR:
-				return context.getString(R.string.pro2_account);
-			case SKU_PRO_III_MONTH:
-			case SKU_PRO_III_YEAR:
-				return context.getString(R.string.pro3_account);
-			default:
-				return "";
-		}
-	}
-
-	public static int getProductLevel(String productId){
-		if (TextUtil.isTextEmpty(productId)) {
-			return -1;
-		}
-		switch (productId) {
-			case SKU_PRO_LITE_MONTH:
-			case SKU_PRO_LITE_YEAR:
-				return 0;
-			case SKU_PRO_I_MONTH:
-			case SKU_PRO_I_YEAR:
-				return 1;
-			case SKU_PRO_II_MONTH:
-			case SKU_PRO_II_YEAR:
-				return 2;
-			case SKU_PRO_III_MONTH:
-			case SKU_PRO_III_YEAR:
-				return 3;
-			default:
-				return -1;
-		}
-	}
-
-	//convert color in int to hex
+    /**
+     * Convert color integer to corresponding string in hex format.
+     *
+     * @param color An integer which represents a color.
+     * @return The color string in hex format, e.g., #FFABCDEF.
+     */
 	public static String getHexValue(int color){
 		return String.format("#%06X", 0xFFFFFF & color);
 	}

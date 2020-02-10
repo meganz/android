@@ -29,6 +29,8 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+
 /**
  * Security-related methods. For a secure implementation, all of this code should be implemented on
  * a server that communicates with the application on the device.
@@ -53,6 +55,7 @@ public class Security {
         if (TextUtils.isEmpty(signedData) || TextUtils.isEmpty(base64PublicKey)
                 || TextUtils.isEmpty(signature)) {
             BillingHelper.logWarn(TAG, "Purchase verification failed: missing data.");
+            logWarning("Purchase verification failed: missing data.");
             return false;
         }
 
@@ -74,11 +77,17 @@ public class Security {
             return keyFactory.generatePublic(new X509EncodedKeySpec(decodedKey));
         } catch (NoSuchAlgorithmException e) {
             // "RSA" is guaranteed to be available.
+            logError("RSA is unavailable.", e);
             throw new RuntimeException(e);
         } catch (InvalidKeySpecException e) {
             String msg = "Invalid key specification: " + e;
             BillingHelper.logWarn(TAG, msg);
+            logWarning(msg, e);
             throw new IOException(msg);
+        } catch (IllegalArgumentException e) {
+            BillingHelper.logWarn(TAG, e.getMessage());
+            logWarning(e.getMessage(), e);
+            throw new IOException(e.getMessage());
         }
     }
 
@@ -97,6 +106,7 @@ public class Security {
             signatureBytes = Base64.decode(signature, Base64.DEFAULT);
         } catch (IllegalArgumentException e) {
             BillingHelper.logWarn(TAG, "Base64 decoding failed.");
+            logWarning("Base64 decoding failed.", e);
             return false;
         }
         try {
@@ -105,16 +115,20 @@ public class Security {
             signatureAlgorithm.update(signedData.getBytes());
             if (!signatureAlgorithm.verify(signatureBytes)) {
                 BillingHelper.logWarn(TAG, "Signature verification failed.");
+                logWarning("Signature verification failed.");
                 return false;
             }
             return true;
         } catch (NoSuchAlgorithmException e) {
             // "RSA" is guaranteed to be available.
+            logError("RSA is unavailable.", e);
             throw new RuntimeException(e);
         } catch (InvalidKeyException e) {
             BillingHelper.logWarn(TAG, "Invalid key specification.");
+            logWarning("Invalid key specification.", e);
         } catch (SignatureException e) {
             BillingHelper.logWarn(TAG, "Signature exception.");
+            logWarning("Signature exception.", e);
         }
         return false;
     }
