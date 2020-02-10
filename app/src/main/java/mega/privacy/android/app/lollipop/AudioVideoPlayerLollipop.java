@@ -156,7 +156,9 @@ import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLo
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -980,6 +982,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             if (nodes != null) {
                 for (int i = 0; i < nodes.size(); i++) {
                     MegaNode n = nodes.get(i);
+                    if (isNodeTakenDown(n)) continue;
+
                     if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
                             || (MimeTypeList.typeForName(n.getName()).isAudio() && !MimeTypeList.typeForName(n.getName()).isAudioNotSupported())) {
                         mediaHandles.add(n.getHandle());
@@ -2385,10 +2389,18 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 break;
             }
             case R.id.full_video_viewer_get_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)){
+                    break;
+                }
+
                 showGetLinkActivity();
                 break;
             }
             case R.id.full_video_viewer_remove_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)){
+                    break;
+                }
+
                 showRemoveLink();
                 break;
             }
@@ -3161,8 +3173,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
 
         if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-            long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-            long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+            long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+            long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
             long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 
             if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
@@ -3616,6 +3628,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
                 }
             }
+        } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
+            showTakenDownAlert(this);
         }
     }
 

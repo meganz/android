@@ -376,7 +376,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		Intent intent = getIntent();
 		prompt = intent.getStringExtra(EXTRA_PROMPT);
 		if (prompt != null) {
-			showSnackBar(this, SNACKBAR_TYPE, prompt, -1);
+			showSnackbar(viewContainer, prompt);
 		}
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
 		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
@@ -524,6 +524,16 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		path.mkdirs();
 		changeFolder(path);
 		logDebug("Path to show: " + path);
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		if (isScreenInPortrait(this)) {
+			emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+		} else {
+			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+		}
 	}
 
 	@Override

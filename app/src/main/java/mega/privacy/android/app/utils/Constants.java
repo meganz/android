@@ -172,6 +172,7 @@ public class Constants {
     public static final int COLOR_STATUS_BAR_SMS_VERIFICATION = 5;
 
     public static final String CONTACT_LINK_BASE_URL = "https://mega.nz/C!";
+    public static final String DISPUTE_URL = "https://mega.nz/dispute";
     public static final String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
     public static final String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
@@ -322,6 +323,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
     public static final String NOTIFICATION_CHANNEL_CHAT_NAME = "MEGA Chat";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID = "ChatSummaryNotification";
+    public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2 = "ChatSummaryNotificationV2";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME = "MEGA Chat Summary";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID = "ChatSummaryNotificationNoVibrate";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME = "MEGA Chat Summary (no vibration)";
@@ -415,6 +417,10 @@ public class Constants {
     public static final String HANDLE = "handle";
     public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
     public static final String VISIBLE_FRAGMENT = "VISIBLE_FRAGMENT";
+    public static final String SELECTED_CHATS = "SELECTED_CHATS";
+    public static final String SELECTED_USERS = "SELECTED_USERS";
+    public static final String ID_MESSAGES = "ID_MESSAGES";
+    public static final String USER_HANDLES = "USER_HANDLES";
 
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;

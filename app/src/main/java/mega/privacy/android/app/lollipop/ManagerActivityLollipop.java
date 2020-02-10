@@ -111,11 +111,8 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -145,7 +142,6 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
-import mega.privacy.android.app.fcm.IncomingMessageService;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
@@ -256,12 +252,13 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -1761,7 +1758,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                         sttFLol.enableCameraUpload();
                     }
                 } else {
-                    showSnackBar(this, SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
                 }
 
                 break;
@@ -1774,7 +1771,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                         cuFL.cameraOnOff();
                     }
                 } else {
-                    showSnackBar(this,SNACKBAR_TYPE,getString(R.string.on_refuse_storage_permission),-1);
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
                 }
                 break;
             }
@@ -1795,7 +1792,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                             cuFL.onStoragePermissionRefused();
                         }
                     } else {
-                        showSnackBar(this, SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
                     }
                 }
 
@@ -5005,10 +5002,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void updateNavigationToolbarIcon(){
-		logDebug("updateNavigationToolbarIcon");
-        Intent myService = new Intent(this, IncomingMessageService.class);
-        stopService(myService);
-
 		int totalHistoric = megaApi.getNumUnreadUserAlerts();
 		int totalIpc = 0;
 		ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
@@ -9323,6 +9316,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void showGetLinkActivity(long handle){
 		logDebug("Handle: " + handle);
+		MegaNode node = megaApi.getNodeByHandle(handle);
+		if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
+			return;
+		}
+
 		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
 		linkIntent.putExtra("handle", handle);
 		startActivity(linkIntent);
@@ -11570,6 +11568,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void showConfirmationRemovePublicLink (final MegaNode n){
 		logDebug("showConfirmationRemovePublicLink");
 
+        if (showTakenDownNodeActionNotAvailableDialog(n, this)) {
+            return;
+        }
+
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -12683,10 +12685,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
 			logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 
-			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+			long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
 			long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
-			long[] userHandles = intent.getLongArrayExtra("USER_HANDLES");
+			long[] userHandles = intent.getLongArrayExtra(USER_HANDLES);
 
 			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
 				if (contactHandles != null && contactHandles.length > 0) {
