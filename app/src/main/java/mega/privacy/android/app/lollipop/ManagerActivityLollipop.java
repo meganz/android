@@ -7243,197 +7243,101 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				return true;
 			}
 	        case R.id.action_select:{
-        		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-					if (isCloudAdded()){
-						fbFLol.selectAll();
-						if (fbFLol.showSelectMenuItem()){
-							selectMenuItem.setVisible(true);
-							unSelectMenuItem.setVisible(false);
+	        	switch (drawerItem) {
+					case CLOUD_DRIVE:
+						if (isCloudAdded()){
+							fbFLol.selectAll();
 						}
-						else{
-							selectMenuItem.setVisible(false);
-							unSelectMenuItem.setVisible(true);
-						}
-					}
+						break;
 
-        			return true;
-	        	}
-	        	else if (drawerItem == DrawerItem.RUBBISH_BIN){
-					rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
-					if (rubbishBinFLol != null){
-						rubbishBinFLol.selectAll();
-						if (rubbishBinFLol.showSelectMenuItem()){
-							selectMenuItem.setVisible(true);
-							unSelectMenuItem.setVisible(false);
+					case RUBBISH_BIN:
+						if (getRubbishBinFragment() != null){
+							rubbishBinFLol.selectAll();
 						}
-						else{
-							selectMenuItem.setVisible(false);
-							unSelectMenuItem.setVisible(true);
+						break;
+
+					case CONTACTS:
+						switch(getTabItemContacts()){
+							case CONTACTS_TAB:{
+								if (getContactsFragment() != null){
+									cFLol.selectAll();
+								}
+								break;
+							}
+							case SENT_REQUESTS_TAB:{
+								if (getSentRequestFragment() != null){
+									sRFLol.selectAll();
+								}
+								break;
+							}
+							case RECEIVED_REQUESTS_TAB:{
+								if (getReceivedRequestFragment() != null){
+									rRFLol.selectAll();
+								}
+								break;
+							}
 						}
-					}
-					return true;
+						break;
+
+					case SHARED_ITEMS:
+						switch (getTabItemShares()) {
+							case INCOMING_TAB:
+								if (isIncomingAdded()) {
+									inSFLol.selectAll();
+								}
+								break;
+
+							case OUTGOING_TAB:
+								if (isOutgoingAdded()) {
+									outSFLol.selectAll();
+								}
+								break;
+
+							case LINKS_TAB:
+								if (isLinksAdded()) {
+									lF.selectAll();
+								}
+								break;
+						}
+						break;
+
+					case SAVED_FOR_OFFLINE:
+						if (getOfflineFragment() != null) {
+							oFLol.selectAll();
+						}
+						break;
+
+					case CHAT:
+						if (getChatsFragment() != null) {
+							rChatFL.selectAll();
+						}
+						break;
+
+					case INBOX:
+						if (getInboxFragment() != null) {
+							iFLol.selectAll();
+						}
+						break;
+
+					case SEARCH:
+						if (getSearchFragment() != null) {
+							sFLol.selectAll();
+						}
+						break;
+
+					case MEDIA_UPLOADS:
+						if (getMediaUploadFragment() != null) {
+							muFLol.selectAll();
+						}
+						break;
+
+					case CAMERA_UPLOADS:
+						if (getCameraUploadFragment() != null) {
+							cuFL.selectAll();
+						}
+						break;
 				}
-	        	if (drawerItem == DrawerItem.CONTACTS){
-					int index = getTabItemContacts();
-					logDebug("INDEX: " + index);
 
-					switch(index){
-						case CONTACTS_TAB:{
-							cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-							if (cFLol != null){
-								cFLol.selectAll();
-								if (cFLol.showSelectMenuItem()){
-									selectMenuItem.setVisible(true);
-									unSelectMenuItem.setVisible(false);
-								}
-								else{
-									selectMenuItem.setVisible(false);
-									unSelectMenuItem.setVisible(true);
-								}
-							}
-							break;
-						}
-						case SENT_REQUESTS_TAB:{
-							sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SENT_REQUESTS.getTag());
-							if (sRFLol != null){
-								sRFLol.selectAll();
-								if (sRFLol.showSelectMenuItem()){
-									selectMenuItem.setVisible(true);
-									unSelectMenuItem.setVisible(false);
-								}
-								else{
-									selectMenuItem.setVisible(false);
-									unSelectMenuItem.setVisible(true);
-								}
-							}
-							break;
-						}
-						case RECEIVED_REQUESTS_TAB:{
-							rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECEIVED_REQUESTS.getTag());
-							if (rRFLol != null){
-								rRFLol.selectAll();
-								if (rRFLol.showSelectMenuItem()){
-									selectMenuItem.setVisible(true);
-									unSelectMenuItem.setVisible(false);
-								}
-								else{
-									selectMenuItem.setVisible(false);
-									unSelectMenuItem.setVisible(true);
-								}
-							}
-							break;
-						}
-
-					}
-	        	}
-	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
-	        		if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
-						inSFLol.selectAll();
-						if (inSFLol.isMultipleselect()) {
-							selectMenuItem.setVisible(true);
-							unSelectMenuItem.setVisible(false);
-						}
-						else {
-							selectMenuItem.setVisible(false);
-							unSelectMenuItem.setVisible(true);
-						}
-					}
-	        		else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) {
-						outSFLol.selectAll();
-						if (outSFLol.isMultipleselect()) {
-							selectMenuItem.setVisible(true);
-							unSelectMenuItem.setVisible(false);
-						}
-						else {
-							selectMenuItem.setVisible(false);
-							unSelectMenuItem.setVisible(true);
-						}
-					}
-        			return true;
-	        	}
-	        	if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-					oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-	        		if (oFLol != null){
-	    				oFLol.selectAll();
-	    				if (oFLol.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-						}
-	        			else{
-							selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}
-	        		}
-    			}
-				if (drawerItem == DrawerItem.CHAT){
-					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-					if (rChatFL != null){
-						rChatFL.selectAll();
-						if (rChatFL.showSelectMenuItem()){
-							selectMenuItem.setVisible(true);
-							unSelectMenuItem.setVisible(false);
-						}
-						else{
-							selectMenuItem.setVisible(false);
-							unSelectMenuItem.setVisible(true);
-						}
-					}
-				}
-	        	if (drawerItem == DrawerItem.INBOX){
-					iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
-	        		if (iFLol != null){
-	        			iFLol.selectAll();
-	    				if (iFLol.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-						}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}
-	        		}
-    			}
-	        	if (drawerItem == DrawerItem.SEARCH){
-					if (getSearchFragment() != null){
-	        			sFLol.selectAll();
-	    				if (sFLol.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-						}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}
-	        		}
-    			}
-	        	if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-					muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-	        		if (muFLol != null){
-	        			muFLol.selectAll();
-	        			if (muFLol.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-						}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}
-	        		}
-	        	}
-	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-					cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-	        		if (cuFL != null){
-	        			cuFL.selectAll();
-	        			if (cuFL.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-	        			}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}
-	        		}
-	        	}
 	        	return true;
 	        }
 	        case R.id.action_grid_view_large_small:{
@@ -7658,9 +7562,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         //Refresh shares section
         refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
 
-        if(sharesPageAdapter!=null){
-            sharesPageAdapter.notifyDataSetChanged();
-        }
+		refreshSharesPageAdapter();
 
         //Refresh search section
         refreshFragment(FragmentTag.SEARCH.getTag());
@@ -8159,9 +8061,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						parentHandleOutgoing = -1;
 						refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
 					}
-					if(sharesPageAdapter!=null){
-						sharesPageAdapter.notifyDataSetChanged();
-					}
+					refreshSharesPageAdapter();
 				} else {
 					drawerItem = DrawerItem.SHARED_ITEMS;
 					setBottomNavigationMenuItemChecked(SHARED_BNV);
@@ -11275,6 +11175,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
+	private void refreshSharesPageAdapter() {
+		if(sharesPageAdapter!=null){
+			sharesPageAdapter.notifyDataSetChanged();
+			setSharesTabIcons(getTabItemShares());
+		}
+	}
+
 	public void refreshCloudOrder(int newOrderCloud){
 		logDebug("New order: " + newOrderCloud);
 		this.setOrderCloud(newOrderCloud);
@@ -11284,9 +11191,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		//Refresh Rubbish Fragment
 		refreshRubbishBin();
 
-		if(sharesPageAdapter!=null){
-			sharesPageAdapter.notifyDataSetChanged();
-		}
+		refreshSharesPageAdapter();
 
 		iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
 		if (iFLol != null){
@@ -11313,9 +11218,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		this.setOrderOthers(newOrderOthers);
 
-		if(sharesPageAdapter!=null){
-			sharesPageAdapter.notifyDataSetChanged();
-		}
+		refreshSharesPageAdapter();
 	}
 
 	public void selectSortUploads(int orderCamera){
@@ -15269,9 +15172,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		refreshIncomingShares();
 		refreshLinks();
 
-		if (sharesPageAdapter != null) {
-		    sharesPageAdapter.notifyDataSetChanged();
-        }
+		refreshSharesPageAdapter();
 	}
 
 	@Override
@@ -17007,16 +16908,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if (getTabItemShares() == INCOMING_TAB) {
 						setParentHandleIncoming(node.getHandle());
 						increaseDeepBrowserTreeIncoming();
-						sharesPageAdapter.notifyDataSetChanged();
 					} else if (getTabItemShares() == OUTGOING_TAB) {
 						setParentHandleOutgoing(node.getHandle());
 						increaseDeepBrowserTreeOutgoing();
-						sharesPageAdapter.notifyDataSetChanged();
 					} else if (getTabItemShares() == LINKS_TAB) {
 						setParentHandleLinks(node.getHandle());
 						increaseDeepBrowserTreeLinks();
-						sharesPageAdapter.notifyDataSetChanged();
 					}
+					refreshSharesPageAdapter();
 
 					break;
 				}

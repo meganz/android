@@ -53,6 +53,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 menu.findItem(R.id.cab_menu_rename).setVisible(false);
                 menu.findItem(R.id.cab_menu_copy).setVisible(false);
                 menu.findItem(R.id.cab_menu_move).setVisible(false);
+                showRemoveLink = true;
                 for (MegaNode node : selected) {
                     if (node.isTakenDown()) {
                         showRemoveLink = false;
