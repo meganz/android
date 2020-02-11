@@ -107,7 +107,7 @@ public class AppRTCAudioManager {
         if (proximitySensor != null) return;
         proximitySensor = AppRTCProximitySensor.create(apprtcContext, new Runnable() {
             public void run() {
-                onProximitySensorChangedState(apprtcContext);
+                onProximitySensorChangedState();
             }
         });
     }
@@ -121,7 +121,7 @@ public class AppRTCAudioManager {
      * This method is called when the proximity sensor reports a state change,
      * e.g. from "NEAR to FAR" or from "FAR to NEAR".
      */
-    private void onProximitySensorChangedState(Context context) {
+    private void onProximitySensorChangedState() {
         // The proximity sensor should only be activated when there are exactly two available audio devices.
         if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
             boolean isNear;
@@ -129,31 +129,24 @@ public class AppRTCAudioManager {
                 logDebug("Status of proximity sensor is: Near");
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
-
-                if ((context instanceof ChatCallActivity && isSpeakerOn) || context instanceof ChatActivityLollipop) {
+                if ((apprtcContext instanceof ChatCallActivity && isSpeakerOn) || apprtcContext instanceof ChatActivityLollipop) {
                     logDebug("Disabling the speakerphone");
                     defaultAudioDevice = AudioDevice.EARPIECE;
+                    updateSpeakerDeviceState();
+                    if (proximitySensorListener != null) proximitySensorListener.needToUpdate(true);
                 }
-                isNear = true;
             } else {
                 logDebug("Status of proximity sensor is: Far");
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
-                if ((context instanceof ChatCallActivity && isSpeakerOn) || context instanceof ChatActivityLollipop) {
+                if ((apprtcContext instanceof ChatCallActivity && isSpeakerOn) || apprtcContext instanceof ChatActivityLollipop) {
                     logDebug("Enabling the speakerphone");
                     defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
+                    updateSpeakerDeviceState();
+                    if (proximitySensorListener != null) proximitySensorListener.needToUpdate(false);
                 }
-                isNear = false;
             }
-
-            if(defaultAudioDevice !=  selectedAudioDevice) updateAudioDeviceState();
-            if (proximitySensorListener != null) proximitySensorListener.needToUpdate(isNear);
         }
-    }
-
-    public void stopProximitySensor() {
-        if (proximitySensor == null) return;
-        proximitySensor.stop();
     }
 
     public void unregisterProximitySensor() {
@@ -181,9 +174,7 @@ public class AppRTCAudioManager {
         logDebug("The speaker status is "+speakerStatus);
         if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
             speakerElements(speakerStatus);
-            if(defaultAudioDevice != selectedAudioDevice){
-                updateAudioDeviceState();
-            }
+            updateSpeakerDeviceState();
         }
     }
 
@@ -193,6 +184,7 @@ public class AppRTCAudioManager {
             Log.e(TAG, "AudioManager is already active");
             return;
         }
+
         // TODO(henrika): perhaps call new method called preInitAudio() here if UNINITIALIZED.
         Log.d(TAG, "AudioManager starts...");
         this.audioManagerEvents = audioManagerEvents;
@@ -204,58 +196,55 @@ public class AppRTCAudioManager {
         savedIsMicrophoneMute = audioManager.isMicrophoneMute();
         hasWiredHeadset = hasWiredHeadset();
 
+        // Create an AudioManager.OnAudioFocusChangeListener instance.
+        audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+            // Called on the listener to notify if the audio focus for this listener has been changed.
+            // The |focusChange| value indicates whether the focus was gained, whether the focus was lost,
+            // and whether that loss is transient, or whether the new focus holder will hold it for an
+            // unknown amount of time.
+            // logging for now.
+            @Override
+            public void onAudioFocusChange(int focusChange) {
+                String typeOfChange = "AUDIOFOCUS_NOT_DEFINED";
+                switch (focusChange) {
+                    case AudioManager.AUDIOFOCUS_GAIN:
+                        typeOfChange = "AUDIOFOCUS_GAIN";
+                        break;
+                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
+                        typeOfChange = "AUDIOFOCUS_GAIN_TRANSIENT";
+                        break;
+                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE:
+                        typeOfChange = "AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE";
+                        break;
+                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK:
+                        typeOfChange = "AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK";
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS:
+                        typeOfChange = "AUDIOFOCUS_LOSS";
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                        typeOfChange = "AUDIOFOCUS_LOSS_TRANSIENT";
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                        typeOfChange = "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK";
+                        break;
+                    default:
+                        typeOfChange = "AUDIOFOCUS_INVALID";
+                        break;
+                }
+                Log.d(TAG, "onAudioFocusChange: " + typeOfChange);
+            }
+        };
+
+        // Request audio playout focus (without ducking) and install listener for changes in focus.
+        int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            Log.d(TAG, "Audio focus request granted for VOICE_CALL streams");
+        } else {
+            Log.e(TAG, "Audio focus request failed");
+        }
 
         if(apprtcContext instanceof ChatCallActivity){
-            // Create an AudioManager.OnAudioFocusChangeListener instance.
-
-            audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
-                // Called on the listener to notify if the audio focus for this listener has been changed.
-                // The |focusChange| value indicates whether the focus was gained, whether the focus was lost,
-                // and whether that loss is transient, or whether the new focus holder will hold it for an
-                // unknown amount of time.
-                // TODO(henrika): possibly extend support of handling audio-focus changes. Only contains
-                // logging for now.
-                @Override
-                public void onAudioFocusChange(int focusChange) {
-                    String typeOfChange = "AUDIOFOCUS_NOT_DEFINED";
-                    switch (focusChange) {
-                        case AudioManager.AUDIOFOCUS_GAIN:
-                            typeOfChange = "AUDIOFOCUS_GAIN";
-                            break;
-                        case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
-                            typeOfChange = "AUDIOFOCUS_GAIN_TRANSIENT";
-                            break;
-                        case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE:
-                            typeOfChange = "AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE";
-                            break;
-                        case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK:
-                            typeOfChange = "AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK";
-                            break;
-                        case AudioManager.AUDIOFOCUS_LOSS:
-                            typeOfChange = "AUDIOFOCUS_LOSS";
-                            break;
-                        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                            typeOfChange = "AUDIOFOCUS_LOSS_TRANSIENT";
-                            break;
-                        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                            typeOfChange = "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK";
-                            break;
-                        default:
-                            typeOfChange = "AUDIOFOCUS_INVALID";
-                            break;
-                    }
-                    Log.d(TAG, "onAudioFocusChange: " + typeOfChange);
-                }
-            };
-
-            // Request audio playout focus (without ducking) and install listener for changes in focus.
-            int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                Log.d(TAG, "Audio focus request granted for VOICE_CALL streams");
-            } else {
-                Log.e(TAG, "Audio focus request failed");
-            }
-
             // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
             // required to be in this mode when playout and/or recording starts for
             // best possible VoIP performance.
@@ -263,6 +252,9 @@ public class AppRTCAudioManager {
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                 audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             }
+        }else if(apprtcContext instanceof ChatActivityLollipop){
+            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+
         }
 
         // Always disable microphone mute during a WebRTC call.
@@ -322,19 +314,11 @@ public class AppRTCAudioManager {
     private void setAudioDeviceInternal(AudioDevice device) {
         Log.d(TAG, "setAudioDeviceInternal(device=" + device + ")");
         AppRTCUtils.assertIsTrue(audioDevices.contains(device));
-
         switch (device) {
             case SPEAKER_PHONE:
-                if(apprtcContext instanceof ChatActivityLollipop){
-                    audioManager.setMode(AudioManager.MODE_NORMAL);
-                    ((ChatActivityLollipop)apprtcContext).setVolumeControlStream(AudioManager.STREAM_MUSIC);
-                }
                 setSpeakerphoneOn(true);
                 break;
             case EARPIECE:
-                if(apprtcContext instanceof ChatActivityLollipop){
-                    audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-                }
                 setSpeakerphoneOn(false);
                 break;
             case WIRED_HEADSET:
@@ -474,6 +458,14 @@ public class AppRTCAudioManager {
         }
     }
 
+    private void updateSpeakerDeviceState(){
+        if(defaultAudioDevice == selectedAudioDevice){
+            return;
+        }
+        setAudioDeviceInternal(defaultAudioDevice);
+        if (audioManagerEvents != null) audioManagerEvents.onAudioDeviceChanged(selectedAudioDevice, audioDevices);
+    }
+
     /**
      * Updates list of possible audio devices and make new device selection.
      * TODO(henrika): add unit test to verify all state transitions.
@@ -491,7 +483,6 @@ public class AppRTCAudioManager {
 
         // Check if any Bluetooth headset is connected. The internal BT state will
         // change accordingly.
-        // TODO(henrika): perhaps wrap required state into BT manager.
         if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
                 || bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE
                 || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_DISCONNECTING) {

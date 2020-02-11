@@ -7779,7 +7779,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         logDebug("onPause");
         super.onPause();
         if (rtcAudioManager != null)
-            rtcAudioManager.stopProximitySensor();
+            rtcAudioManager.unregisterProximitySensor();
         hideKeyboard();
         activityVisible = false;
         MegaApplication.setOpenChatId(-1);
@@ -8449,6 +8449,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     public void startProximitySensor(){
+        logDebug("Starting proximity sensor");
         createSpeakerAudioManger();
         rtcAudioManager.startProximitySensor();
     }
@@ -8464,7 +8465,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     public void stopProximitySensor(){
         if(rtcAudioManager == null) return;
         activateSpeaker();
-        rtcAudioManager.stopProximitySensor();
+        rtcAudioManager.unregisterProximitySensor();
     }
 
     private void destroySpeakerAudioManger(){
