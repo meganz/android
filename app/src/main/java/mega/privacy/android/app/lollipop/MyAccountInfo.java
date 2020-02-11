@@ -50,6 +50,7 @@ public class MyAccountInfo {
     boolean accountDetailsFinished = false;
     boolean getPaymentMethodsBoolean = false;
 
+    MegaApplication app;
     MegaApiAndroid megaApi;
 
     String firstNameText = "";
@@ -61,7 +62,6 @@ public class MyAccountInfo {
     long createSessionTimeStamp = -1;
 
     DatabaseHandler dbH;
-    Context context;
 
     public ArrayList<Product> productAccounts;
 
@@ -78,18 +78,68 @@ public class MyAccountInfo {
     public final int hasProDetails = 0x04;
     public final int hasSessionsDetails = 0x020;
 
-    public MyAccountInfo(Context context){
+    public MyAccountInfo(){
         logDebug("MyAccountInfo created");
 
-        this.context = context;
+        if (app == null) {
+            app = MegaApplication.getInstance();
+        }
 
         if (megaApi == null){
-            megaApi = ((MegaApplication) context).getMegaApi();
+            megaApi = app.getMegaApi();
         }
 
         if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context);
+            dbH = app.getDbH();
         }
+    }
+
+    /**
+     * Clear all MyAccountInfo
+     */
+    public void clear() {
+        usedPerc = -1;
+        usedStorage = -1;
+        accountType = -1;
+        accountInfo = null;
+        paymentBitSet = null;
+        numberOfSubscriptions = -1;
+        subscriptionStatus = -1;
+        subscriptionRenewTime = -1;
+        proExpirationTime = -1;
+        usedFormatted = "";
+        totalFormatted = "";
+        formattedUsedCloud = "";
+        formattedUsedInbox = "";
+        formattedUsedIncoming = "";
+        formattedUsedRubbish = "";
+        formattedAvailableSpace = "";
+        usedTransferFormatted = "";
+        totalTransferFormatted = "";
+        levelInventory = -1;
+        levelAccountDetails = -1;
+
+        inventoryFinished = false;
+        accountDetailsFinished = false;
+        getPaymentMethodsBoolean = false;
+
+        firstNameText = "";
+        lastNameText = "";
+        firstLetter = "";
+        fullName = "";
+
+        lastSessionFormattedDate = "";
+        createSessionTimeStamp = -1;
+
+        productAccounts.clear();
+
+        availableSkus.clear();
+        activeGooglePlaySubscription = null;
+
+        pricing = null;
+
+        numVersions = -1;
+        previousVersionsSize = -1;
     }
 
     public void setAccountDetails(int numDetails){
@@ -348,7 +398,8 @@ public class MyAccountInfo {
             fullName = splitEmail[0];
         }
 
-        if (fullName.trim().length() <= 0){
+        if (fullName.trim().length() <= 0) {
+            Context context = app.getApplicationContext();
             fullName = context.getString(R.string.name_text)+" "+context.getString(R.string.lastname_text);
             logDebug("Full name set by default: " + fullName);
         }

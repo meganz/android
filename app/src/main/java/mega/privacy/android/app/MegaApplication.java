@@ -234,7 +234,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					}
 				} else if (e.getErrorCode() == MegaError.API_ESID) {
 					logWarning("TYPE_LOGOUT:API_ESID");
-					myAccountInfo = new MyAccountInfo(getApplicationContext());
+					myAccountInfo = new MyAccountInfo();
 
 					esid = true;
 
@@ -555,7 +555,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			megaApi.useHttpsOnly(useHttpsOnly);
 		}
 
-		myAccountInfo = new MyAccountInfo(this);
+		myAccountInfo = new MyAccountInfo();
 
 		if (dbH != null) {
 			dbH.resetExtendedAccountDetailsTimestamp();
