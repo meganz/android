@@ -1936,7 +1936,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 						String priceMonthly = priceMonthlyInteger+priceMonthlyDecimal;
 
-						String textToShowMonthly = getString(R.string.billed_monthly_text, priceMonthly);
+						String textToShowMonthly = paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET ?
+								getString(R.string.billed_monthly_text, priceMonthly) : getString(R.string.billed_one_off_month, priceMonthly);
 						try{
 							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
 							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
@@ -1973,8 +1974,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 						String priceYearly = priceYearlyInteger+priceYearlyDecimal;
 
-
-						String textToShowYearly = getString(R.string.billed_yearly_text, priceYearly);
+						String textToShowYearly = paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET ?
+								getString(R.string.billed_yearly_text, priceYearly) : getString(R.string.billed_one_off_year, priceYearly);
 						try{
 							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
 							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
