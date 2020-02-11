@@ -43,8 +43,6 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop> implements View.OnClickListener, SectionTitleProvider {
 
     DatabaseHandler dbH = null;
-    public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
-    public static int MAX_WIDTH_CONTACT_NAME_PORT=200;
     private Context mContext;
     OnItemClickListener mItemClickListener;
     private List<ShareContactInfo> shareContacts;

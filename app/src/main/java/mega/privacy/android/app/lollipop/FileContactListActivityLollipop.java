@@ -188,7 +188,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
                     break;
 				}
 				case R.id.action_file_contact_list_delete:{
-					if (shares != null && shares.size() != 0) {
+					if (shares != null && !shares.isEmpty()) {
 						if (shares.size() > 1) {
 							logDebug("Remove multiple contacts");
 							showConfirmationRemoveMultipleContactFromShare(shares);

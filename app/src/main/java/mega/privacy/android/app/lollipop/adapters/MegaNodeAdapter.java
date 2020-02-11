@@ -36,6 +36,7 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListFragmentLollipop;
 import mega.privacy.android.app.lollipop.ContactSharedFolderFragment;
@@ -105,7 +106,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView publicLinkImage;
         public ImageView takenDownImage;
         public TextView textViewFileName;
-        public TextView textViewFileSize;
+        public EmojiTextView textViewFileSize;
         public long document;
         public RelativeLayout itemLayout;
     }
@@ -501,6 +502,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
 
             holderList.textViewFileSize = v.findViewById(R.id.file_list_filesize);
+            if (isScreenInPortrait(context)) {
+                holderList.textViewFileSize.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+            } else {
+                holderList.textViewFileSize.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+            }
 
             holderList.threeDotsLayout = v.findViewById(R.id.file_list_three_dots_layout);
 
