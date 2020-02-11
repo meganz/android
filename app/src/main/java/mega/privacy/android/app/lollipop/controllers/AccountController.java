@@ -453,6 +453,9 @@ public class AccountController implements View.OnClickListener{
         preferences.edit().putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0).apply();
 
         new LastShowSMSDialogTimeChecker(context).reset();
+
+        //Clear MyAccountInfo
+        MegaApplication.getInstance().getMyAccountInfo().clear();
     }
 
     public static void removeFolder(Context context, File folder) {
@@ -496,9 +499,6 @@ public class AccountController implements View.OnClickListener{
         logDebug("logoutConfirmed");
 
         localLogoutApp(context);
-
-        //Clear num verions after logout
-        MegaApplication.getInstance().getMyAccountInfo().setNumVersions(-1);
 
         PackageManager m = context.getPackageManager();
         String s = context.getPackageName();
