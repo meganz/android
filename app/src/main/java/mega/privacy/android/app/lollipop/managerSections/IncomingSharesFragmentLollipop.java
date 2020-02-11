@@ -68,219 +68,37 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
     }
 
 	private class ActionBarCallBack extends BaseActionBarCallBack {
-		
-		boolean showRename = false;
-		boolean showMove = false;
-		boolean showLink = false;
-		boolean showCopy = false;
-		boolean showTrash =false;
-
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-			List<MegaNode> documents = adapter.getSelectedNodes();
-			
-			switch(item.getItemId()){
-				case R.id.cab_menu_download:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
-					}
-
-					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList, false);
-					break;
-				}
-				case R.id.cab_menu_trash:{
-
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
-					}
-					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
-					break;
-				}
-				case R.id.cab_menu_rename:{
-
-					if (documents.size()==1){
-						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
-					}
-					clearSelections();
-					hideMultipleSelect();
-					break;
-				}
-				case R.id.cab_menu_copy:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
-					}
-
-					NodeController nC = new NodeController(context);
-					nC.chooseLocationToCopyNodes(handleList);
-					clearSelections();
-					hideMultipleSelect();
-					break;
-				}	
-				case R.id.cab_menu_move:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
-					}
-
-					NodeController nC = new NodeController(context);
-					nC.chooseLocationToMoveNodes(handleList);
-
-					clearSelections();
-					hideMultipleSelect();
-
-					break;
-				}
-				case R.id.cab_menu_share_link:{
-
-					if (documents.size()==1){
-						NodeController nC = new NodeController(context);
-						nC.exportLink(documents.get(0));
-					}
-					break;
-				}
-				case R.id.cab_menu_select_all:{
-					selectAll();
-					break;
-				}
-				case R.id.cab_menu_unselect_all:{
-					clearSelections();
-					hideMultipleSelect();
-					break;
-				}
-				case R.id.cab_menu_leave_multiple_share: {
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
-					}
-
-					((ManagerActivityLollipop) context).showConfirmationLeaveMultipleShares(handleList);
-					break;
-				}
-				case R.id.cab_menu_send_to_chat:{
-					logDebug("Send files to chat");
-					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
-					NodeController nC = new NodeController(context);
-					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
-					clearSelections();
-					hideMultipleSelect();
-					break;
-				}
-			}
-			return false;
-		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<MegaNode> selected = adapter.getSelectedNodes();
-			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+		    checkSelectOptions(menu, false);
 
-			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+		    if (managerActivity.getDeepBrowserTreeIncoming() == 0) {
+                menu.findItem(R.id.cab_menu_rename).setVisible(false);
+                menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                menu.findItem(R.id.cab_menu_move).setVisible(false);
+                menu.findItem(R.id.cab_menu_trash).setVisible(false);
+            } else {
+                checkOptions();
 
-			boolean showSendToChat = false;
+                menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 
-			if (selected.size() != 0) {
+                menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+                menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+                menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				showCopy = true;
-				showMove = false;
-				showTrash =false;
-				showRename=false;
-				if(selected.size()==adapter.getItemCount()){
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					unselect.setTitle(getString(R.string.action_unselect_all));
-					unselect.setVisible(true);
-				  	if(selected.size()==1){
-				  		showRename=true;
-					}else{
-						showRename=false;
-					}
-					showMove = false;
-					showTrash=false;
+                if (selected.size() >= 1 && megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() != MegaError.API_OK) {
+                    showMove = false;
+                }
+                menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+                menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 
-				}else if(selected.size()==1){
+                menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+            }
 
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					unselect.setTitle(getString(R.string.action_unselect_all));
-					unselect.setVisible(true);
-
-					if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
-						showRename = true;
-
-					}else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
-						showRename = false;
-
-					}else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
-						showRename = false;
-					}
-
- 				}else{
-
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					unselect.setTitle(getString(R.string.action_unselect_all));
-					unselect.setVisible(true);
-					showRename = false;
-				}
-
-				if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming == 0){
-
-					showTrash = false;
-					showMove = false;
-					menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
-					menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-				}else{
-
-					if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
-						showTrash = true;
-						showMove = true;
-					}else{
-						showTrash = false;
-						showMove = false;
-					}
-
-					menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
-					menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-				}
-
-				boolean areFiles = true;
-				for (int i=0; i<selected.size(); i++) {
-					if (selected.get(i).isFolder()) {
-						areFiles = false;
-						break;
-					}
-				}
-
-				if(areFiles && isChatEnabled()) {
-					showSendToChat = true;
-				}
-				else {
-					showSendToChat = false;
-				}
-
-				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
-				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
-			else{
-                menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-			}
-			
-			menu.findItem(R.id.cab_menu_download).setVisible(true);
-			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-
-			menu.findItem(R.id.cab_menu_copy).setVisible(true);
-			menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-
-			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+            menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			return false;
 		}

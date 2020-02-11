@@ -20,11 +20,11 @@ import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
+import static android.view.MenuItem.*;
+import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -46,11 +46,64 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
         @Override
         public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-            return false;
-        }
+            checkSelectOptions(menu, false);
 
-        @Override
-        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            if (managerActivity.getDeepBrowserTreeLinks() == 0) {
+                menu.findItem(R.id.cab_menu_download).setVisible(false);
+                menu.findItem(R.id.cab_menu_rename).setVisible(false);
+                menu.findItem(R.id.cab_menu_copy).setVisible(false);
+                menu.findItem(R.id.cab_menu_move).setVisible(false);
+                for (MegaNode node : selected) {
+                    if (node.isTakenDown()) {
+                        showRemoveLink = false;
+                    }
+                }
+                menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
+                menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                menu.findItem(R.id.cab_menu_trash).setVisible(false);
+            } else {
+                checkOptions();
+
+                menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+                menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+                menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+                int show;
+                if (onlyOneFileSelected) {
+                    show = SHOW_AS_ACTION_NEVER;
+                } else {
+                    show = SHOW_AS_ACTION_ALWAYS;
+                }
+                menu.findItem(R.id.cab_menu_copy).setShowAsAction(show);
+                menu.findItem(R.id.cab_menu_move).setShowAsAction(show);
+
+                menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+                menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
+                menu.findItem(R.id.cab_menu_edit_link).setVisible(showEditLink);
+                if(showLink){
+                    menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                    menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(SHOW_AS_ACTION_NEVER);
+                }else{
+                    menu.findItem(R.id.cab_menu_share_link).setShowAsAction(SHOW_AS_ACTION_NEVER);
+                    menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                }
+
+                menu.findItem(R.id.cab_menu_share).setVisible(showShare);
+                menu.findItem(R.id.cab_menu_share).setTitle(context.getResources().getQuantityString(R.plurals.context_share_folders, selected.size()));
+                if (onlyOneFileSelected) {
+                    menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                } else {
+                    menu.findItem(R.id.cab_menu_share).setShowAsAction(SHOW_AS_ACTION_NEVER);
+                }
+
+                menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+            }
+
+            menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
+
             return false;
         }
     }
@@ -108,19 +161,11 @@ public class LinksFragment extends MegaNodeBaseFragment {
         adapter.setMultipleSelect(false);
         recyclerView.setAdapter(adapter);
 
-        setEmptyView();
-        visibilityFastScroller();
-
         return v;
     }
 
     private void findNodes() {
-        nodes = megaApi.getPublicLinks(ORDER_DEFAULT_ASC);
-
-        addSectionTitle(nodes, adapter.getAdapterType());
-        adapter.setNodes(nodes);
-
-        setEmptyView();
+        setNodes(megaApi.getPublicLinks(ORDER_DEFAULT_ASC));
     }
 
     @Override
@@ -128,6 +173,8 @@ public class LinksFragment extends MegaNodeBaseFragment {
         this.nodes = nodes;
         addSectionTitle(nodes, ITEM_VIEW_TYPE_LIST);
         adapter.setNodes(nodes);
+        setEmptyView();
+        visibilityFastScroller();
     }
 
     @Override
@@ -200,7 +247,6 @@ public class LinksFragment extends MegaNodeBaseFragment {
             mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
         }
 
-        visibilityFastScroller();
         managerActivity.showFabButton();
         managerActivity.setToolbarTitle();
         managerActivity.supportInvalidateOptionsMenu();
@@ -219,23 +265,17 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 updateActionModeTitle();
             }
         } else {
-            if (nodes.get(position).isFolder()) {
-                MegaNode n = nodes.get(position);
+            MegaNode n = nodes.get(position);
 
+            if (n.isFolder()) {
                 lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
-
                 managerActivity.increaseDeepBrowserTreeLinks();
                 managerActivity.setParentHandleLinks(n.getHandle());
                 managerActivity.supportInvalidateOptionsMenu();
                 managerActivity.setToolbarTitle();
 
-                nodes = megaApi.getChildren(n, managerActivity.orderCloud);
-                addSectionTitle(nodes, adapter.getAdapterType());
-
-                adapter.setNodes(nodes);
+                setNodes(megaApi.getChildren(n, managerActivity.orderCloud));
                 recyclerView.scrollToPosition(0);
-                visibilityFastScroller();
-                setEmptyView();
                 checkScroll();
                 managerActivity.showFabButton();
             } else {
@@ -246,6 +286,15 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
     @Override
     public void refresh() {
+        clearSelections();
+        hideMultipleSelect();
 
+        if (managerActivity.getParentHandleLinks() == INVALID_HANDLE
+                || megaApi.getNodeByHandle(managerActivity.getParentHandleLinks()) == null) {
+            findNodes();
+        } else {
+            MegaNode parentNodeLinks = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
+            setNodes(megaApi.getChildren(parentNodeLinks, managerActivity.orderCloud));
+        }
     }
 }

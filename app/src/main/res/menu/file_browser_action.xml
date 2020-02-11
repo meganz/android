@@ -37,6 +37,15 @@
         MEGA:showAsAction="never" />
 
     <item
+        android:id="@+id/cab_menu_remove_share"
+        android:icon="@drawable/ic_remove_share"
+        android:tint="@color/white"
+        android:orderInCategory="105"
+        android:title="@string/context_share_folder"
+        android:visible="false"
+        MEGA:showAsAction="never" />
+
+    <item
         android:id="@+id/cab_menu_rename"
         android:icon="@drawable/ic_menu_rename_dark"
         android:orderInCategory="110"

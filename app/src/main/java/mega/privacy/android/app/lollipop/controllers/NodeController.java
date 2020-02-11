@@ -26,6 +26,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -1095,13 +1096,21 @@ public class NodeController {
         }
     }
 
-    public void removeLink(MegaNode document){
-        logDebug("removeLink");
+    public void removeLink(MegaNode document, ExportListener exportListener){
+        megaApi.disableExport(document, exportListener);
+    }
+
+    public void removeLinks(ArrayList<MegaNode> nodes){
         if (!isOnline(context)){
             ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
-        megaApi.disableExport(document, ((ManagerActivityLollipop) context));
+
+        ExportListener exportListener = new ExportListener(context, true, nodes.size());
+
+        for (MegaNode node : nodes) {
+            removeLink(node, exportListener);
+        }
     }
 
 

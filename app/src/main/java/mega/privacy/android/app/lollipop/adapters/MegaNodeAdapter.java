@@ -286,6 +286,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 ((FolderLinkActivityLollipop)context).hideMultipleSelect();
             } else if (type == SEARCH_ADAPTER) {
                 ((SearchFragmentLollipop)fragment).hideMultipleSelect();
+            } else if (type == LINKS_ADAPTER) {
+                ((LinksFragment) fragment).hideMultipleSelect();
             } else {
                 ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
             }

@@ -27,12 +27,16 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaError.*;
+import static nz.mega.sdk.MegaShare.*;
 
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected ManagerActivityLollipop managerActivity;
@@ -78,14 +82,29 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     protected class BaseActionBarCallBack implements ActionMode.Callback {
 
+        protected List<MegaNode> selected;
+
+        protected boolean onlyOneFileSelected;
+        protected boolean showShare;
+        protected boolean allFiles;
+        protected boolean showRename;
+        protected boolean showCopy;
+        protected boolean showMove;
+        protected boolean showRemoveLink;
+        protected boolean showLink;
+        protected boolean showEditLink;
+        protected boolean showSendToChat;
+        protected boolean showTrash;
+        protected boolean showSelectAll;
+
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
             MenuInflater inflater = actionMode.getMenuInflater();
             inflater.inflate(R.menu.file_browser_action, menu);
             if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).hideFabButton();
-                ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-                ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
+                managerActivity.hideFabButton();
+                managerActivity.showHideBottomNavigationView(true);
+                managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
             }
             checkScroll();
             return true;
@@ -97,7 +116,109 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
 
         @Override
-        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            logDebug("onActionItemClicked");
+            ArrayList<Long> handleList = new ArrayList<Long>();
+            for (MegaNode node : selected) {
+                handleList.add(node.getHandle());
+            }
+
+            NodeController nC = new NodeController(context);
+
+            switch (item.getItemId()) {
+                case R.id.cab_menu_download:
+                    nC.prepareForDownload(handleList, false);
+                    break;
+
+                case R.id.cab_menu_rename:
+                    if (selected.get(0) == null) {
+                        logWarning("The selected node is NULL");
+                        break;
+                    }
+                    managerActivity.showRenameDialog(selected.get(0), selected.get(0).getName());
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+
+                case R.id.cab_menu_copy:
+                    nC.chooseLocationToCopyNodes(handleList);
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+
+                case R.id.cab_menu_move:
+                    nC.chooseLocationToMoveNodes(handleList);
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+
+                case R.id.cab_menu_share:
+                    nC.selectContactToShareFolders(handleList);
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+
+                case R.id.cab_menu_share_link:
+                    if (selected.get(0) == null) {
+                        logWarning("The selected node is NULL");
+                        break;
+                    }
+                    managerActivity.showGetLinkActivity(selected.get(0).getHandle());
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+
+                case R.id.cab_menu_share_link_remove:
+                    if (onlyOneFileSelected && selected.get(0) == null) {
+                        logWarning("The selected node is NULL");
+                        break;
+                    }
+
+                    ArrayList<MegaNode> nodes = new ArrayList<>();
+                    nodes.addAll(selected);
+                    managerActivity.showConfirmationRemoveSeveralPublicLinks(null, nodes);
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+
+                case R.id.cab_menu_edit_link:
+                    if (selected.get(0) == null) {
+                        logWarning("The selected node is NULL");
+                        break;
+                    }
+
+                    managerActivity.showGetLinkActivity(selected.get(0).getHandle());
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+
+                case R.id.cab_menu_leave_multiple_share:
+                    ((ManagerActivityLollipop) context).showConfirmationLeaveMultipleShares(handleList);
+                    break;
+
+                case R.id.cab_menu_send_to_chat:
+                    nC.checkIfNodesAreMineAndSelectChatsToSendNodes(adapter.getArrayListSelectedNodes());
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+
+                case R.id.cab_menu_trash:
+                    managerActivity.askConfirmationMoveToRubbish(handleList);
+                    break;
+
+                case R.id.cab_menu_select_all:
+                    selectAll();
+                    break;
+
+                case R.id.cab_menu_unselect_all:
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+
+                case R.id.cab_menu_remove_share:
+                    break;
+            }
+
             return false;
         }
 
@@ -106,11 +227,78 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             clearSelections();
             adapter.setMultipleSelect(false);
             if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).showFabButton();
-                ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-                ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
+                managerActivity.showFabButton();
+                managerActivity.showHideBottomNavigationView(false);
+                managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
             }
             checkScroll();
+        }
+
+        protected void checkOptions() {
+            onlyOneFileSelected = false;
+            showShare = true;
+            allFiles = true;
+            showRename = false;
+            showCopy = true;
+            showMove = true;
+            showRemoveLink = false;
+            showLink = false;
+            showEditLink = false;
+            showSendToChat = true;
+            showTrash = true;
+
+
+            for (MegaNode node : selected) {
+                if (!node.isFile()) {
+                    allFiles = false;
+                }
+
+                if (!node.isFolder()) {
+                    showShare = false;
+                }
+
+                if (megaApi.checkMove(node, megaApi.getRubbishNode()).getErrorCode() != API_OK) {
+                    showTrash = false;
+                }
+            }
+
+            if(!allFiles || !isChatEnabled()){
+                showSendToChat = false;
+            }
+
+            if (selected.size() == 1) {
+                onlyOneFileSelected = true;
+                MegaNode node = selected.get(0);
+                if (megaApi.checkAccess(selected.get(0), ACCESS_FULL).getErrorCode() == API_OK) {
+                    showRename = true;
+                }
+
+                if (!node.isTakenDown() && megaApi.checkAccess(selected.get(0), ACCESS_OWNER).getErrorCode() == API_OK) {
+                    if (node.isExported()) {
+                        showRemoveLink = true;
+                        showLink = false;
+                        showEditLink = true;
+                    } else {
+                        showRemoveLink = false;
+                        showLink = true;
+                        showEditLink = false;
+                    }
+                }
+            }
+        }
+
+        protected void checkSelectOptions(Menu menu, boolean fromTrash) {
+            selected = adapter.getSelectedNodes();
+
+            if (selected.size() == adapter.getItemCount()) {
+                showSelectAll = false;
+            } else {
+                showSelectAll = true;
+            }
+            menu.findItem(R.id.cab_menu_select_all).setVisible(showSelectAll);
+            if (!fromTrash) {
+                menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(false);
+            }
         }
     }
 
@@ -344,9 +532,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public void checkScroll() {
         if (recyclerView != null) {
             if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+                managerActivity.changeActionBarElevation(true);
             } else {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                managerActivity.changeActionBarElevation(false);
             }
         }
     }

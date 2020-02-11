@@ -777,6 +777,63 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionLeaveShares.setVisibility(View.GONE);
                     counterOpen--;
                     optionOpenFolder.setVisibility(View.GONE);
+                } else if (tabSelected == 2) {
+                    if (node.isFolder()) {
+                        optionInfoText.setText(R.string.general_folder_info);
+                        optionShare.setVisibility(View.VISIBLE);
+                        if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                            optionShareText.setText(R.string.context_sharing_folder);
+                        } else {
+                            optionShareText.setText(R.string.context_share_folder);
+                        }
+                    } else {
+                        optionInfoText.setText(R.string.general_file_info);
+                        counterShares--;
+                        optionShare.setVisibility(View.GONE);
+                    }
+
+                    if (node.isExported()) {
+                        //Node has public link
+                        nodeIconLayout.setVisibility(View.VISIBLE);
+                        nodeIcon.setImageResource(R.drawable.link_ic);
+
+                        optionLinkText.setText(R.string.edit_link_option);
+                        optionRemoveLink.setVisibility(View.VISIBLE);
+                    } else {
+                        nodeIconLayout.setVisibility(View.GONE);
+                        optionLinkText.setText(R.string.context_get_link_menu);
+                        counterShares--;
+                        optionRemoveLink.setVisibility(View.GONE);
+                    }
+
+                    if (node.isShared()) {
+                        optionClearShares.setVisibility(View.VISIBLE);
+                    } else {
+                        counterShares--;
+                        optionClearShares.setVisibility(View.GONE);
+                    }
+
+                    if (availableOffline(context, node)) {
+                        optionOfflineText.setText(getString(R.string.context_delete_offline));
+                    }
+                    else {
+                        optionOfflineText.setText(getString(R.string.save_for_offline));
+                    }
+                    optionInfo.setVisibility(View.VISIBLE);
+                    optionRubbishBin.setVisibility(View.VISIBLE);
+                    optionLink.setVisibility(View.VISIBLE);
+
+                    optionRename.setVisibility(View.VISIBLE);
+                    optionMove.setVisibility(View.VISIBLE);
+                    optionCopy.setVisibility(View.VISIBLE);
+
+                    //Hide
+                    counterRemove--;
+                    optionRemove.setVisibility(View.GONE);
+                    counterShares--;
+                    optionLeaveShares.setVisibility(View.GONE);
+                    counterOpen--;
+                    optionOpenFolder.setVisibility(View.GONE);
                 }
 
                 counterModify--;

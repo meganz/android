@@ -145,6 +145,7 @@ import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -4667,6 +4668,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			else if (fTag.equals(FragmentTag.OUTGOING_SHARES.getTag())) {
 				((OutgoingSharesFragmentLollipop) f).headerItemDecoration = null;
 			}
+            else if (fTag.equals(FragmentTag.LINKS.getTag())) {
+                ((LinksFragment) f).headerItemDecoration = null;
+            }
 			else if (fTag.equals(FragmentTag.OFFLINE.getTag())) {
 				((OfflineFragmentLollipop) f).setHeaderItemDecoration(null);
 				((OfflineFragmentLollipop) f).setPathNavigation(pathNavigationOffline);
@@ -10779,30 +10783,39 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void showConfirmationRemovePublicLink (final MegaNode n){
 		logDebug("showConfirmationRemovePublicLink");
 
-        if (showTakenDownNodeActionNotAvailableDialog(n, this)) {
-            return;
-        }
+		if (showTakenDownNodeActionNotAvailableDialog(n, this)) {
+			return;
+		}
 
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						nC.removeLink(n);
-						break;
+		showConfirmationRemoveSeveralPublicLinks(n, null);
+	}
 
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
+	public void showConfirmationRemoveSeveralPublicLinks(MegaNode node, ArrayList<MegaNode> nodes) {
+		String message = null;
+
+		if (node != null) {
+			message = getResources().getQuantityString(R.plurals.remove_links_warning_text, 1);
+		} else if (nodes != null){
+			message = getResources().getQuantityString(R.plurals.remove_links_warning_text, nodes.size());;
+		}
+
+		if (message == null) return;
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.alert_leave_share));
-		String message= getResources().getString(R.string.context_remove_link_warning_text);
-		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+		builder.setMessage(message)
+				.setPositiveButton(R.string.general_remove, (dialog, which) -> {
+					if (node != null) {
+						if (!isOnline(managerActivity)){
+							showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+							return;
+						}
+						nC.removeLink(node, new ExportListener(managerActivity, true, 1));
+					} else {
+						nC.removeLinks(nodes);
+					}
+				})
+				.setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
+				.show();
 
 		refreshAfterMovingToRubbish();
 	}
@@ -14838,15 +14851,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				logError("FCM ERROR TOKEN TYPE_REGISTER_PUSH_NOTIFICATION: " + e.getErrorCode() + "__" + e.getErrorString());
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_EXPORT) {
-			if (e.getErrorCode() == MegaError.API_ENOENT) {
-				logError("Removing link error");
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_link_removal_error), -1);
-			}
-			else if (e.getErrorCode() != MegaError.API_OK) {
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_link_action_error), -1);
-			}
-		}
 		else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK) {
 			if (e.getErrorCode() == MegaError.API_OK) {
 				if (request.getFlag()) {
@@ -15245,6 +15249,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		outSFLol.refresh();
     }
 
+    private void refreshLinks () {
+        if (!isLinksAdded()) return;
+
+        lF.refresh();
+    }
+
 	public void refreshInboxList () {
 		iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
 		if (iFLol != null){
@@ -15257,6 +15267,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		refreshOutgoingShares();
 		refreshIncomingShares();
+		refreshLinks();
+
+		if (sharesPageAdapter != null) {
+		    sharesPageAdapter.notifyDataSetChanged();
+        }
 	}
 
 	@Override
