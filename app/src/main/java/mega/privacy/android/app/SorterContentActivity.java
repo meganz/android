@@ -13,23 +13,26 @@ import android.widget.TextView;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import nz.mega.sdk.MegaApiJava;
-
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class SorterContentActivity extends PinActivityLollipop {
+
+    private ManagerActivityLollipop managerActivityLollipop;
+
+    private boolean isIncomingOrOutgoingRootLevel;
 
     public void showSortOptions(final Context context, DisplayMetrics outMetrics) {
 
         ManagerActivityLollipop.DrawerItem drawerItem = null;
-
         AlertDialog sortByDialog;
         LayoutInflater inflater = getLayoutInflater();
 
         if (context instanceof ManagerActivityLollipop) {
-            drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+            managerActivityLollipop = (ManagerActivityLollipop) context;
+            drawerItem = managerActivityLollipop.getDrawerItem();
         }
 
         View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
@@ -96,12 +99,12 @@ public class SorterContentActivity extends PinActivityLollipop {
         boolean smallest = false;
         boolean photoFirst = false;
         boolean videoFirst = false;
-        int order = MegaApiJava.ORDER_DEFAULT_ASC;
+        int order = ORDER_DEFAULT_ASC;
 
         if (context instanceof ManagerActivityLollipop) {
             switch (drawerItem) {
                 case CONTACTS: {
-                    order = ((ManagerActivityLollipop) context).getOrderContacts();
+                    order = managerActivityLollipop.getOrderContacts();
 
                     sortByDateTV.setVisibility(View.GONE);
                     newestCheck.setVisibility(View.GONE);
@@ -113,40 +116,41 @@ public class SorterContentActivity extends PinActivityLollipop {
                     break;
                 }
                 case SHARED_ITEMS: {
-                    int index = ((ManagerActivityLollipop) context).getTabItemShares();
-                    if ((index == 0 && ((ManagerActivityLollipop) context).getParentHandleIncoming() == -1)
-                            || (index == 1 && ((ManagerActivityLollipop) context).getDeepBrowserTreeOutgoing() == -1)) {
-                        order = ((ManagerActivityLollipop) context).getOrderOthers();
-                    }
-                    else{
-                        order = ((ManagerActivityLollipop) context).orderCloud;
+                    int index = managerActivityLollipop.getTabItemShares();
+                    if ((index == 0 && managerActivityLollipop.getDeepBrowserTreeIncoming() == 0)
+                            || (index == 1 && managerActivityLollipop.getDeepBrowserTreeOutgoing() == 0)) {
+                        isIncomingOrOutgoingRootLevel = true;
+                        order = managerActivityLollipop.getOrderOthers();
+                    } else {
+                        isIncomingOrOutgoingRootLevel = false;
+                        order = managerActivityLollipop.orderCloud;
                     }
 
-                    if(((ManagerActivityLollipop) context).isFirstNavigationLevel()){
-                        if (((ManagerActivityLollipop) context).getTabItemShares()==0){
-                            //Incoming Shares
-                            sortByNameTV.setText(context.getString(R.string.sortby_owner_mail));
-                        }
-                        else{
-                            sortByNameTV.setText(context.getString(R.string.sortby_name));
-                        }
+                    if (managerActivityLollipop.isFirstNavigationLevel()) {
+                        if (isIncomingOrOutgoingRootLevel) {
+                            if (index == 0) {
+                                //Incoming Shares
+                                sortByNameTV.setText(context.getString(R.string.sortby_owner_mail));
+                            } else if (index == 1) {
+                                sortByNameTV.setText(context.getString(R.string.sortby_name));
+                            }
 
-                        sortByDateTV.setVisibility(View.GONE);
-                        newestCheck.setVisibility(View.GONE);
-                        oldestCheck.setVisibility(View.GONE);
-                        sortBySizeTV.setVisibility(View.GONE);
-                        largestCheck.setVisibility(View.GONE);
-                        smallestCheck.setVisibility(View.GONE);
-                    }
-                    else{
-                        sortByNameTV.setText(context.getString(R.string.sortby_name));
+                            sortByDateTV.setVisibility(View.GONE);
+                            newestCheck.setVisibility(View.GONE);
+                            oldestCheck.setVisibility(View.GONE);
+                            sortBySizeTV.setVisibility(View.GONE);
+                            largestCheck.setVisibility(View.GONE);
+                            smallestCheck.setVisibility(View.GONE);
+                        } else if (index == 2 && managerActivityLollipop.getDeepBrowserTreeLinks() == 0) {
+                            sortByDateTV.setText(R.string.sortby_link_creation_date);
+                        }
                     }
 
                     break;
                 }
                 case CAMERA_UPLOADS:
                 case MEDIA_UPLOADS: {
-                    order = ((ManagerActivityLollipop) context).orderCamera;
+                    order = managerActivityLollipop.orderCamera;
 
                     sortByNameTV.setVisibility(View.GONE);
                     ascendingCheck.setVisibility(View.GONE);
@@ -161,7 +165,7 @@ public class SorterContentActivity extends PinActivityLollipop {
                     break;
                 }
                 default: {
-                    order = ((ManagerActivityLollipop) context).orderCloud;
+                    order = managerActivityLollipop.orderCloud;
 
                     break;
                 }
@@ -212,37 +216,37 @@ public class SorterContentActivity extends PinActivityLollipop {
         }
 
         switch(order){
-            case MegaApiJava.ORDER_DEFAULT_ASC:{
+            case ORDER_DEFAULT_ASC:{
                 ascending = true;
                 break;
             }
-            case MegaApiJava.ORDER_DEFAULT_DESC:{
+            case ORDER_DEFAULT_DESC:{
                 descending = true;
                 break;
             }
-            case MegaApiJava.ORDER_MODIFICATION_ASC:
-            case MegaApiJava.ORDER_CREATION_DESC:{
+            case ORDER_MODIFICATION_ASC:
+            case ORDER_CREATION_DESC:{
                 oldest = true;
                 break;
             }
-            case MegaApiJava.ORDER_MODIFICATION_DESC:
-            case MegaApiJava.ORDER_CREATION_ASC:{
+            case ORDER_MODIFICATION_DESC:
+            case ORDER_CREATION_ASC:{
                 newest = true;
                 break;
             }
-            case MegaApiJava.ORDER_SIZE_ASC:{
+            case ORDER_SIZE_ASC:{
                 smallest = true;
                 break;
             }
-            case MegaApiJava.ORDER_SIZE_DESC:{
+            case ORDER_SIZE_DESC:{
                 largest = true;
                 break;
             }
-            case MegaApiJava.ORDER_PHOTO_DESC: {
+            case ORDER_PHOTO_DESC: {
                 photoFirst = true;
                 break;
             }
-            case MegaApiJava.ORDER_VIDEO_DESC: {
+            case ORDER_VIDEO_DESC: {
                 videoFirst = true;
                 break;
             }
@@ -269,58 +273,58 @@ public class SorterContentActivity extends PinActivityLollipop {
                 boolean smallest = false;
                 boolean photoFirst = false;
                 boolean videoFirst = false;
-                int order = MegaApiJava.ORDER_DEFAULT_ASC;
+                int order = ORDER_DEFAULT_ASC;
 
                 switch (v.getId()) {
                     case R.id.sortby_dialog_ascending_check: {
                         ascending = true;
-                        order = MegaApiJava.ORDER_DEFAULT_ASC;
+                        order = ORDER_DEFAULT_ASC;
                         break;
                     }
                     case R.id.sortby_dialog_descending_check: {
                         descending = true;
-                        order = MegaApiJava.ORDER_DEFAULT_DESC;
+                        order = ORDER_DEFAULT_DESC;
                         break;
                     }
                     case R.id.sortby_dialog_newest_check: {
                         newest = true;
 
                         if (finalDrawerItem == ManagerActivityLollipop.DrawerItem.CONTACTS) {
-                            order = MegaApiJava.ORDER_CREATION_ASC;
+                            order = ORDER_CREATION_ASC;
                         }
                         else {
-                            order = MegaApiJava.ORDER_MODIFICATION_DESC;
+                            order = ORDER_MODIFICATION_DESC;
                         }
                         break;
                     }
                     case R.id.sortby_dialog_oldest_check: {
                         oldest = true;
                         if (finalDrawerItem == ManagerActivityLollipop.DrawerItem.CONTACTS) {
-                            order = MegaApiJava.ORDER_CREATION_DESC;
+                            order = ORDER_CREATION_DESC;
                         }
                         else {
-                            order = MegaApiJava.ORDER_MODIFICATION_ASC;
+                            order = ORDER_MODIFICATION_ASC;
                         }
                         break;
                     }
                     case R.id.sortby_dialog_largest_first_check: {
                         largest = true;
-                        order = MegaApiJava.ORDER_SIZE_DESC;
+                        order = ORDER_SIZE_DESC;
                         break;
                     }
                     case R.id.sortby_dialog_smallest_first_check: {
                         smallest = true;
-                        order = MegaApiJava.ORDER_SIZE_ASC;
+                        order = ORDER_SIZE_ASC;
                         break;
                     }
                     case R.id.sortby_dialog_photo_check: {
                         photoFirst = true;
-                        order = MegaApiJava.ORDER_PHOTO_DESC;
+                        order = ORDER_PHOTO_DESC;
                         break;
                     }
                     case R.id.sortby_dialog_video_check: {
                         videoFirst = true;
-                        order = MegaApiJava.ORDER_VIDEO_DESC;
+                        order = ORDER_VIDEO_DESC;
                         break;
                     }
                 }
@@ -341,10 +345,10 @@ public class SorterContentActivity extends PinActivityLollipop {
                     }
                     case SHARED_ITEMS: {
                         if (context instanceof ManagerActivityLollipop) {
-                            if(((ManagerActivityLollipop) context).isFirstNavigationLevel()){
+                            if (((ManagerActivityLollipop) context).isFirstNavigationLevel()
+                                    && isIncomingOrOutgoingRootLevel) {
                                 ((ManagerActivityLollipop) context).refreshOthersOrder(order);
-                            }
-                            else {
+                            } else {
                                 ((ManagerActivityLollipop) context).refreshCloudOrder(order);
                             }
                         }

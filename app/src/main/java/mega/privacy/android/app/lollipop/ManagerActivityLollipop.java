@@ -464,7 +464,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case SAVED_FOR_OFFLINE: return context.getString(R.string.section_saved_for_offline_new);
 				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
 				case INBOX: return context.getString(R.string.section_inbox);
-				case SHARED_ITEMS: return context.getString(R.string.section_shared_items);
+				case SHARED_ITEMS: return context.getString(R.string.title_shared_items);
 				case CONTACTS: {
 					context.getString(R.string.section_contacts);
 				}
@@ -4842,7 +4842,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							if (parentHandleIncoming != -1) {
 								MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
 								if (node == null) {
-									aB.setTitle(getResources().getString(R.string.section_shared_items).toUpperCase());
+									aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
 								}
 								else {
 									aB.setTitle(node.getName());
@@ -4851,7 +4851,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								firstNavigationLevel = false;
 							}
 							else {
-								aB.setTitle(getResources().getString(R.string.section_shared_items).toUpperCase());
+								aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
 								firstNavigationLevel = true;
 							}
 						}
@@ -4868,7 +4868,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								aB.setTitle(node.getName());
 								firstNavigationLevel = false;
 							} else {
-								aB.setTitle(getResources().getString(R.string.section_shared_items).toUpperCase());
+								aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
 								firstNavigationLevel = true;
 							}
 						}
@@ -4877,7 +4877,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                     case LINKS_TAB:
                         if (isLinksAdded()) {
                             if (parentHandleLinks == INVALID_HANDLE) {
-                                aB.setTitle(getResources().getString(R.string.section_shared_items).toUpperCase());
+                                aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
                                 firstNavigationLevel = true;
                             } else {
                                 MegaNode node = megaApi.getNodeByHandle(parentHandleLinks);
@@ -4887,7 +4887,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
                         }
                         break;
 					default: {
-						aB.setTitle(getResources().getString(R.string.section_shared_items).toUpperCase());
+						aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
 						firstNavigationLevel = true;
 						break;
 					}

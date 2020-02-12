@@ -190,6 +190,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 	RelativeLayout publicLinkLayout;
 	RelativeLayout publicLinkCopyLayout;
 	TextView publicLinkText;
+	private TextView publicLinkDate;
 	RelativeLayout sharedLayout;
 	Button usersSharedWithTextButton;
 	View dividerSharedLayout;
@@ -678,6 +679,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         publicLinkCopyLayout = (RelativeLayout) findViewById(R.id.file_properties_copy_layout);
 
         publicLinkText = (TextView) findViewById(R.id.file_properties_link_text);
+        publicLinkDate = findViewById(R.id.file_properties_link_date);
         publicLinkButton = (Button) findViewById(R.id.file_properties_link_button);
         publicLinkButton.setText(getString(R.string.context_copy));
         publicLinkButton.setOnClickListener(this);
@@ -1433,6 +1435,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 			publicLinkLayout.setVisibility(View.VISIBLE);
 			publicLinkCopyLayout.setVisibility(View.VISIBLE);
 			publicLinkText.setText(node.getPublicLink());
+			publicLinkDate.setText(getString(R.string.general_date_label, formatLongDateTime(node.getPublicLinkCreationTime())));
 		}
 		else{
 			publicLink=false;

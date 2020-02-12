@@ -166,7 +166,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
     }
 
     private void findNodes() {
-        setNodes(megaApi.getPublicLinks(ORDER_DEFAULT_ASC));
+        setNodes(megaApi.getPublicLinks(managerActivity.orderCloud));
     }
 
     @Override
