@@ -199,8 +199,10 @@
     <color name="business_alert_background">#FFF6F6F6</color>
     <color name="expired_red">#FFE1000F</color>
     <color name="grace_yellow">#FFF29907</color>
-    <color name="expired_business_admin">#FF79556C</color>
-    <color name="expired_business_user">#379ABB</color>
+    <color name="expired_business_admin_statusbar">#825572</color>
+    <color name="expired_business_user_statusbar">#29A6D1</color>
+    <color name="expired_business_admin">#966B87</color>
+    <color name="expired_business_user">#44BCE6</color>
     <color name="business_color">#2BA6DE</color>
 
     <color name="black_40_alpha">#66000000</color>

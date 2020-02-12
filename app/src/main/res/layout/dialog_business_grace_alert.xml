@@ -27,7 +27,7 @@
             android:layout_height="100dp"
             android:layout_gravity="center"
             android:layout_marginTop="22dp"
-            android:src="@drawable/account_expired_dialog"/>
+            android:src="@drawable/ic_account_expired"/>
 
         <TextView
             android:layout_width="match_parent"

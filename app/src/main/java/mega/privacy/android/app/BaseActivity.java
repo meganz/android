@@ -80,11 +80,17 @@ public class BaseActivity extends AppCompatActivity {
 
     private boolean isPaused = false;
 
+    private DisplayMetrics outMetrics;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
 
         baseActivity = this;
+
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
 
         super.onCreate(savedInstanceState);
         checkMegaObjects();
@@ -600,5 +606,9 @@ public class BaseActivity extends AppCompatActivity {
             default:
                 showErrorAlertDialog(stringError, false, this);
         }
+    }
+
+    public DisplayMetrics getOutMetrics() {
+        return outMetrics;
     }
 }
