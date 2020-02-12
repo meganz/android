@@ -99,7 +99,6 @@ public class Constants {
     public static final int OVERQUOTA_ALERT = 5003;
     public static final int CC_FRAGMENT = 5004;
     public static final int FORTUMO_FRAGMENT = 5005;
-    public static final int MONTHLY_YEARLY_FRAGMENT = 5006;
     public static final int CENTILI_FRAGMENT = 5007;
     public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5008;
 
@@ -399,6 +398,7 @@ public class Constants {
 
     public static final int HEADER_VIEW_TYPE = 0;
     public static final int ITEM_VIEW_TYPE = 1;
+    public static final int ITEM_PROGRESS = 2;
 
     public static final int FILE_LINK = 200;
     public static final int FOLDER_LINK = 201;
@@ -420,6 +420,10 @@ public class Constants {
     public static final String HANDLE = "handle";
     public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
     public static final String VISIBLE_FRAGMENT = "VISIBLE_FRAGMENT";
+    public static final String SELECTED_CHATS = "SELECTED_CHATS";
+    public static final String SELECTED_USERS = "SELECTED_USERS";
+    public static final String ID_MESSAGES = "ID_MESSAGES";
+    public static final String USER_HANDLES = "USER_HANDLES";
 
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;

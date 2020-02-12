@@ -524,15 +524,6 @@
 						</TableLayout>
 					</RelativeLayout>
 				</RelativeLayout>
-				<LinearLayout
-					android:id="@+id/linear_divider_pro_iii"
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:layout_marginLeft="16dp"
-					android:layout_marginRight="16dp"
-					android:layout_alignBottom="@id/upgrade_pro_iii_layout_content"
-					android:background="@color/grid_item_separator"
-					android:orientation="horizontal" />
 
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_iii_layout_transparent"
@@ -542,6 +533,26 @@
 					android:background="#90ffffff"/>
 
 			</RelativeLayout>
+
+			<TextView
+				android:id="@+id/lbl_custom_plan"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="16dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginTop="4dp"
+				android:layout_marginBottom="7dp"
+				android:textSize="13sp"
+				android:text="@string/label_custom_plan"/>
+
+			<LinearLayout
+				android:id="@+id/linear_divider_pro_iii"
+				android:layout_width="match_parent"
+				android:layout_height="1dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginRight="16dp"
+				android:background="@color/grid_item_separator"
+				android:orientation="horizontal" />
 
 			<!-- Business -->
 			<RelativeLayout

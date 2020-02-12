@@ -2,15 +2,18 @@ package mega.privacy.android.app.lollipop;
 
 import android.content.Context;
 
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.SkuDetails;
+
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -50,6 +53,7 @@ public class MyAccountInfo {
     private boolean businessStatusReceived = false;
     private boolean shouldShowBusinessAlert = false;
 
+    MegaApplication app;
     MegaApiAndroid megaApi;
 
     String firstNameText = "";
@@ -61,18 +65,11 @@ public class MyAccountInfo {
     long createSessionTimeStamp = -1;
 
     DatabaseHandler dbH;
-    Context context;
 
     public ArrayList<Product> productAccounts;
 
-    Purchase proLiteMonthly = null;
-    Purchase proLiteYearly = null;
-    Purchase proIMonthly = null;
-    Purchase proIYearly = null;
-    Purchase proIIMonthly = null;
-    Purchase proIIYearly = null;
-    Purchase proIIIMonthly = null;
-    Purchase proIIIYearly = null;
+    private List<SkuDetails> availableSkus = new ArrayList<>();
+    private Purchase activeGooglePlaySubscription = null;
 
     MegaPricing pricing;
 
@@ -84,18 +81,68 @@ public class MyAccountInfo {
     public final int hasProDetails = 0x04;
     public final int hasSessionsDetails = 0x020;
 
-    public MyAccountInfo(Context context){
+    public MyAccountInfo(){
         logDebug("MyAccountInfo created");
 
-        this.context = context;
+        if (app == null) {
+            app = MegaApplication.getInstance();
+        }
 
         if (megaApi == null){
-            megaApi = ((MegaApplication) context).getMegaApi();
+            megaApi = app.getMegaApi();
         }
 
         if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context);
+            dbH = app.getDbH();
         }
+    }
+
+    /**
+     * Clear all MyAccountInfo
+     */
+    public void clear() {
+        usedPerc = -1;
+        usedStorage = -1;
+        accountType = -1;
+        accountInfo = null;
+        paymentBitSet = null;
+        numberOfSubscriptions = -1;
+        subscriptionStatus = -1;
+        subscriptionRenewTime = -1;
+        proExpirationTime = -1;
+        usedFormatted = "";
+        totalFormatted = "";
+        formattedUsedCloud = "";
+        formattedUsedInbox = "";
+        formattedUsedIncoming = "";
+        formattedUsedRubbish = "";
+        formattedAvailableSpace = "";
+        usedTransferFormatted = "";
+        totalTransferFormatted = "";
+        levelInventory = -1;
+        levelAccountDetails = -1;
+
+        inventoryFinished = false;
+        accountDetailsFinished = false;
+        getPaymentMethodsBoolean = false;
+
+        firstNameText = "";
+        lastNameText = "";
+        firstLetter = "";
+        fullName = "";
+
+        lastSessionFormattedDate = "";
+        createSessionTimeStamp = -1;
+
+        productAccounts.clear();
+
+        availableSkus.clear();
+        activeGooglePlaySubscription = null;
+
+        pricing = null;
+
+        numVersions = -1;
+        previousVersionsSize = -1;
     }
 
     public void setAccountDetails(int numDetails){
@@ -354,7 +401,8 @@ public class MyAccountInfo {
             fullName = splitEmail[0];
         }
 
-        if (fullName.trim().length() <= 0){
+        if (fullName.trim().length() <= 0) {
+            Context context = app.getApplicationContext();
             fullName = context.getString(R.string.name_text)+" "+context.getString(R.string.lastname_text);
             logDebug("Full name set by default: " + fullName);
         }
@@ -480,70 +528,6 @@ public class MyAccountInfo {
         this.firstLetter = firstLetter;
     }
 
-    public void setProLiteMonthly(Purchase proLiteMonthly) {
-        this.proLiteMonthly = proLiteMonthly;
-    }
-
-    public void setProLiteYearly(Purchase proLiteYearly) {
-        this.proLiteYearly = proLiteYearly;
-    }
-
-    public void setProIMonthly(Purchase proIMonthly) {
-        this.proIMonthly = proIMonthly;
-    }
-
-    public void setProIYearly(Purchase proIYearly) {
-        this.proIYearly = proIYearly;
-    }
-
-    public void setProIIMonthly(Purchase proIIMonthly) {
-        this.proIIMonthly = proIIMonthly;
-    }
-
-    public void setProIIYearly(Purchase proIIYearly) {
-        this.proIIYearly = proIIYearly;
-    }
-
-    public void setProIIIMonthly(Purchase proIIIMonthly) {
-        this.proIIIMonthly = proIIIMonthly;
-    }
-
-    public void setProIIIYearly(Purchase proIIIYearly) {
-        this.proIIIYearly = proIIIYearly;
-    }
-
-    public Purchase getProLiteMonthly() {
-        return proLiteMonthly;
-    }
-
-    public Purchase getProLiteYearly() {
-        return proLiteYearly;
-    }
-
-    public Purchase getProIMonthly() {
-        return proIMonthly;
-    }
-
-    public Purchase getProIYearly() {
-        return proIYearly;
-    }
-
-    public Purchase getProIIMonthly() {
-        return proIIMonthly;
-    }
-
-    public Purchase getProIIYearly() {
-        return proIIYearly;
-    }
-
-    public Purchase getProIIIMonthly() {
-        return proIIIMonthly;
-    }
-
-    public Purchase getProIIIYearly() {
-        return proIIIYearly;
-    }
-
     public boolean isGetPaymentMethodsBoolean() {
         return getPaymentMethodsBoolean;
     }
@@ -603,5 +587,28 @@ public class MyAccountInfo {
 
     public boolean shouldShowBusinessAlert() {
         return shouldShowBusinessAlert;
+    }
+
+    public Purchase getActiveGooglePlaySubscription() {
+        return activeGooglePlaySubscription;
+    }
+
+    public void setActiveGooglePlaySubscription(Purchase activeGooglePlaySubscription) {
+        this.activeGooglePlaySubscription = activeGooglePlaySubscription;
+    }
+
+    public boolean isPurchasedAlready(String sku) {
+        if (activeGooglePlaySubscription == null) {
+            return false;
+        }
+        boolean result = activeGooglePlaySubscription.getSku().equals(sku);
+        if (result) {
+            logDebug(sku + " already subscribed.");
+        }
+        return result;
+    }
+
+    public void setAvailableSkus(List<SkuDetails> skuDetailsList) {
+        this.availableSkus = skuDetailsList;
     }
 }

@@ -76,7 +76,7 @@ public class CreateFolderListener extends BaseListener {
                 nodeAttachmentHistoryActivity.setMyChatFilesFolder(node);
                 nodeAttachmentHistoryActivity.handleStoredData();
             } else {
-                nodeAttachmentHistoryActivity.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+                nodeAttachmentHistoryActivity.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error));
             }
         }
 

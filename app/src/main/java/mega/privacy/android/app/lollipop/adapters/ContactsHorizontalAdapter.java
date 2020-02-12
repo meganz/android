@@ -101,7 +101,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
                         logDebug("Sent invite to: " + email);
                         // for UI smoothness, ignore the callback
                         megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
-                        showSnackBar(context, SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
+                        showSnackbar(context, context.getString(R.string.context_contact_request_sent, email));
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         dialog.dismiss();

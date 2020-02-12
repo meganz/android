@@ -72,7 +72,7 @@ public class MegaNodeUtil {
      */
     public static boolean showTakenDownNodeActionNotAvailableDialog(MegaNode node, Context context) {
         if (isNodeTakenDown(node)) {
-            showSnackBar(context, SNACKBAR_TYPE, context.getString(R.string.error_download_takendown_node), -1);
+            showSnackbar(context, context.getString(R.string.error_download_takendown_node));
             return true;
         } else {
             return false;

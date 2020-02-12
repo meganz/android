@@ -32,6 +32,7 @@ import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -244,7 +245,7 @@ public class BaseActivity extends AppCompatActivity {
 
             logDebug("BROADCAST INFORM THERE ARE TAKEN DOWN FILES IMPLIED IN ACTION");
             int numberFiles = intent.getIntExtra(NUMBER_FILES, 1);
-            showSnackBar(baseActivity, SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.alert_taken_down_files, numberFiles, numberFiles), -1);
+            Util.showSnackbar(baseActivity, getResources().getQuantityString(R.plurals.alert_taken_down_files, numberFiles, numberFiles));
         }
     };
 

@@ -234,7 +234,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public void onStoragePermissionRefused() {
-        showSnackBar(context, SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+        showSnackbar(context, getString(R.string.on_refuse_storage_permission));
         toCloudDrive();
     }
 
