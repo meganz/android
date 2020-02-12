@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA는 모바일 기기를 위한 전용 앱과 함께 표준 웹 브라우저를 통하여 이용자가 제어하는 암호화된 클라우드 저장소와 대화를 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 절대 우리가 아닌 당신의 클아이언트 기기를 통해서만 암호화되고 해독됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로드한 후 어디서든, 어떤 기기에서든, 아무때나 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제할 수 있습니다. 당신의 지인들과 파일을 공유하고 그들의 업데이트를 실시간으로 보세요. 암호화 과정은 우리가 당신의 비밀번호에 접근하거나 재설정할 수 없다는 뜻이기 때문에 반드시 기억해야 하지 않으면 (복구 키를 백업하지 않았다면) 당신이 저장한 파일에 대한 접근을 잃게 됩니다.\n\n종단간 이용자 암호화 MEGA 영상 대화는 완전한 프라이버시가 가능하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 이것은 우리의 모바일 앱에도 확장되어 여러 기기를 통하여 대화 기록에 접근할 수 있습니다. 이용자들은 또한 그들의 MEGA 클라우드 드라이브에서 대화에 파일을 쉽게 추가할 수 있습니다.\n\nMEGA는 모든 가입자들에게 보너스 도전과제와 함께 넉넉한 50 GB의 무료 저장 공간을 제공하며, 더 높은 한도를 가진 유료 요금제를 제공합니다:\n\n\nPRO LITE 요금제: 월 4.99 € 또는 연 49.99 €로 200 GB의 저장 공간과 월 1 TB의 전송 할당량을 제공합니다.\nPRO I 요금제: 월 9.99 € 또는 연 99.99 €로 1 TB의 저장 공간과 월 2 TB의 전송 할당량을 제공합니다.\nPRO II 요금제: 월 19.99 € 또는 연 199.99 €로 4 TB의 저장 공간과 월 8 TB의 전송 할당량을 제공합니다.\nPRO III 요금제: 월 29.99 € 또는 연 299.99 €로 8 TB의 저장 공간과 월 16 TB의 전송 할당량을 제공합니다.\n\n구독은 처임 선택했던 기간과 동일한 기간과 동일한 가격으로 자동 갱신됩니다. 구독을 관리하려면 모바일 기기에서 Play Store 아이콘을 클릭하고, Google ID로 로그인하고 (만약 하지 않았다면) 그리고 MEGA 앱을 클릭합니다. 당신의 구독을 그 곳에서 관리할 수 있습니다.\n\n앱 권한:\n외부 저장소 쓰기 -> MEGA에서 당신의 기기로 파일을 다운로드하고 기기에서 MEGA로 파일을 업로드합니다\n카메라 -> 사진을 찍고 MEGA에 당신의 사진을 업로드합니다\n연락처 읽기 -> 당신의 기기에서 쉽게 연락처를 MEGA 연락처로 추가합니다\n녹음 &amp; 녹화 (마이크와 카메라) -> MEGA는 종단간 암호화된 음성/영상 통화를 제공합니다\n\n\nMEGA 시세틈에 대한 이용들의 확신을 높이기 위하여, 모든 클라이언트 사이드 코드는 공개되어 있으므로, 흥미 있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱 코드는 다음에 있습니다: https://github.com/meganz/android\n\n더 많은 정보는, 우리의 웹사이트에서 확인하세요:\nhttps://mega.nz/terms\n\n\n데스크톱 - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA는 모바일 기기를 위한 전용 앱과 함께 표준 웹 브라우저를 통하여 이용자가 제어하는 암호화된 클라우드 저장소와 대화를 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 절대 우리가 아닌 당신의 클아이언트 기기를 통해서만 암호화되고 해독됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로드한 후 어디서든, 어떤 기기에서든, 아무때나 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제할 수 있습니다. 당신의 지인들과 파일을 공유하고 그들의 업데이트를 실시간으로 보세요. 암호화 과정은 우리가 당신의 비밀번호에 접근하거나 재설정할 수 없다는 뜻이기 때문에 반드시 기억해야 하지 않으면 (복구 키를 백업하지 않았다면) 당신이 저장한 파일에 대한 접근을 잃게 됩니다.\n\n종단간 이용자 암호화 MEGA 영상 대화는 완전한 프라이버시가 가능하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 이것은 우리의 모바일 앱에도 확장되어 여러 기기를 통하여 대화 기록에 접근할 수 있습니다. 이용자들은 또한 그들의 MEGA 클라우드 드라이브에서 대화에 파일을 쉽게 추가할 수 있습니다.\n\nMEGA는 모든 가입자들에게 보너스 도전과제와 함께 넉넉한 50 GB의 무료 저장 공간을 제공하며, 더 높은 한도를 가진 유료 요금제를 제공합니다:\n\n\nPRO LITE 요금제: 월 4.99 € 또는 연 49.99 €로 400 GB의 저장 공간과 월 1 TB의 전송 할당량을 제공합니다.\nPRO I 요금제: 월 9.99 € 또는 연 99.99 €로 2 TB의 저장 공간과 월 2 TB의 전송 할당량을 제공합니다.\nPRO II 요금제: 월 19.99 € 또는 연 199.99 €로 8 TB의 저장 공간과 월 8 TB의 전송 할당량을 제공합니다.\nPRO III 요금제: 월 29.99 € 또는 연 299.99 €로 16 TB의 저장 공간과 월 16 TB의 전송 할당량을 제공합니다.\n\n구독은 처임 선택했던 기간과 동일한 기간과 동일한 가격으로 자동 갱신됩니다. 구독을 관리하려면 모바일 기기에서 Play Store 아이콘을 클릭하고, Google ID로 로그인하고 (만약 하지 않았다면) 그리고 MEGA 앱을 클릭합니다. 당신의 구독을 그 곳에서 관리할 수 있습니다.\n\n앱 권한:\n외부 저장소 쓰기 -> MEGA에서 당신의 기기로 파일을 다운로드하고 기기에서 MEGA로 파일을 업로드합니다\n카메라 -> 사진을 찍고 MEGA에 당신의 사진을 업로드합니다\n연락처 읽기 -> 당신의 기기에서 쉽게 연락처를 MEGA 연락처로 추가합니다\n녹음 &amp; 녹화 (마이크와 카메라) -> MEGA는 종단간 암호화된 음성/영상 통화를 제공합니다\n\n\nMEGA 시세틈에 대한 이용들의 확신을 높이기 위하여, 모든 클라이언트 사이드 코드는 공개되어 있으므로, 흥미 있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱 코드는 다음에 있습니다: https://github.com/meganz/android\n\n더 많은 정보는, 우리의 웹사이트에서 확인하세요:\nhttps://mega.nz/terms\n\n\n데스크톱 - https://mega.nz/</string>
 
     <!--
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -9,7 +9,7 @@
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">개째 진행중. 전체:</string>
     <string name="general_yes" context="Answer for confirmation dialog.">예</string>
     <string name="general_no" context="Answer for confirmation dialog.">아니오</string>
-    <string name="general_cancel" context="Answer for confirmation dialog.">취소</string>
+    <string name="general_cancel" context="dialog option cancel in alert dialog">취소</string>
     <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">이동할 곳</string>
     <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">복사할 곳</string>
     <!--
@@ -24,28 +24,28 @@
     -->
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">다운로드</string>
     <string name="general_add" context="button">추가</string>
-    <string name="general_move" context="button">이동</string>
-    <string name="general_remove" context="button">제거</string>
+    <string name="general_move" context="Item menu option upon right click on one or multiple files.">이동</string>
+    <string name="general_remove" context="Menu option to delete one or multiple selected items.">제거</string>
     <string name="general_share" context="button">공유</string>
     <!--
     <string name="general_confirm" context="button">Confirm</string>
     -->
-    <string name="general_leave" context="button">떠나기</string>
+    <string name="general_leave" context="Item menu option upon right click on one or multiple files.">떠나기</string>
     <string name="general_decryp" context="button">해독</string>
 
     <string name="general_export" context="button">내보내기</string>
 
-    <string name="general_retry" context="Button to try retry some action">재시도</string>
+    <string name="general_retry" context="option shown when a message could not be sent">재시도</string>
     <string name="general_open_browser" context="Button to open the default web browser">브라우저 열기</string>
     <!--
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
     -->
-    <string name="general_loading" context="state previous to import a file">불러오는중</string>
+    <string name="general_loading" context="The title of progress dialog when loading web content">불러오는중</string>
     <string name="general_importing" context="state while importing the file">들여오는 중</string>
     <string name="general_forwarding" context="state while importing the file">전달</string>
-    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">들여오기</string>
-    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">저장소</string>
-    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">전송 할당량</string>
+    <string name="general_import" context="Menu option to choose to add file or folders to Cloud Drive">들여오기</string>
+    <string name="general_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">저장소</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: “8TB Bandwidth”. Can also be translated as data transfer.">전송 할당량</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">구독</string>
     <!--
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>
@@ -60,13 +60,13 @@
     <!--
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
     -->
-    <string name="general_show_info" context="Label of a button/notification to show info about something">정보 보기</string>
+    <string name="general_show_info" context="Hint how to cancel the download">정보 보기</string>
 
     <string name="error_general_nodes" context="Error getting the root node">오류. 다시 시도하세요.</string>
 
-    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-복구키</string>
 
-    <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">보조 미디어 폴더가 존재하지 않습니다, 새 폴더를 선택하세요</string>
+    <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist">보조 미디어 폴더가 존재하지 않습니다, 새 폴더를 선택하세요</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">외부 저장 공간이 탐지되지 않았습니다</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">이 폴더는 읽기 전용입니다. 업로드할 권한이 없습니다</string>
 
@@ -92,20 +92,21 @@
     -->
 
     <string name="action_logout" context="Button where the user can sign off or logout">로그아웃</string>
-    <string name="action_add" context="Menu item">업로드</string>
+    <string name="action_add" context="Item menu option upon right click on one or multiple files.">업로드</string>
     <string name="action_create_folder" context="Menu item">새 폴더 생성</string>
-    <string name="action_open_link" context="Menu item">링크 열기</string>
+    <string name="action_open_link" context="Item menu option upon right click on one or multiple files.">링크 열기</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     -->
 
     <string name="action_settings" context="Menu item">설정</string>
     <string name="action_search" context="Search button">검색</string>
+    <string name="action_search_country" context="Select country page title">국가 선택</string>
     <string name="action_play" context="Search button">재생</string>
     <string name="action_pause" context="Search button">일시정지</string>
     <string name="action_refresh" context="Menu item">새로 고침</string>
     <string name="action_sort_by" context="Menu item">정렬 기준</string>
-    <string name="action_help" context="Menu item">도움말</string>
+    <string name="action_help" context="Settings category title for Help">도움말</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">계정 업그레이드</string>
     <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">계정 업그레이드중</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">모두 선택</string>
@@ -120,14 +121,19 @@
     <string name="success_kill_all_sessions" context="Message after kill all opened sessions">남은 세션이 올바르게 닫혔습니다</string>
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">열린 세션을 닫는 도중 오류가 발생하였습니다.</string>
 
-    <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
-        <item context="Singular of file. 1 file" quantity="one">파일</item>
-        <item context="Plural of file. 2 files" quantity="other">파일</item>
+    <plurals name="general_num_files">
+        <item context="this is used for example when downloading 1 file or 2 files, Singular of file. 1 file" quantity="one">파일</item>
+        <item context="this is used for example when downloading 1 file or 2 files, Plural of file. 2 files" quantity="other">파일</item>
     </plurals>
 
     <plurals name="general_num_contacts">
-        <item context="referring to a contact in the contact list of the user" quantity="one">연락처</item>
-        <item context="Title of the contact list" quantity="other">연락처</item>
+        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 1 user" quantity="one">연락처</item>
+        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 2 or more users" quantity="other">연락처</item>
+    </plurals>
+
+    <plurals name="num_contacts_selected">
+        <item context="chat invitation - tool bar subtitle, when users selected single contact. Placeholder - number of contacts selected" quantity="one">%d개의 연락처</item>
+        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d개의 연락처</item>
     </plurals>
 
     <plurals name="general_num_folders">
@@ -154,9 +160,9 @@
     </plurals>
     -->
 
-    <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
-        <item context="used for example when a folder is shared with 1 user" quantity="one">연락처</item>
-        <item context="used for example when a folder is shared with 2 or more users" quantity="other">연락처</item>
+    <plurals name="general_num_users">
+        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 1 user" quantity="one">연락처</item>
+        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 2 or more users" quantity="other">연락처</item>
     </plurals>
 
     <!--
@@ -171,15 +177,15 @@
     <string name="login_text" context="Login button">로그인</string>
     <string name="email_text" context="email label">이메일</string>
     <string name="password_text" context="password label">비밀번호</string>
-    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">비밀번호 확인</string>
+    <string name="confirm_password_text" context="Hint of the confirmation dialog to get link with password">비밀번호 확인</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">가나다</string>
     <!--
     <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
     -->
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">MEGA에 처음이신가요?</string>
-    <string name="create_account" context="label and text button when creating the account">계정 생성</string>
+    <string name="create_account" context="button that allows the user to create an account">계정 생성</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">이메일 주소를 입력하세요</string>
-    <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">잘못된 이메일 주소</string>
+    <string name="error_invalid_email" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">잘못된 이메일 주소</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">비밀번호를 입력하세요</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">네트워크 연결 없음</string>
     <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">다른 위치에서 이 기기를 로그아웃하였습니다.</string>
@@ -206,7 +212,7 @@
     <string name="tour_access_text">언제, 어디서든 완전히 암호화</string>
 
     <string name="create_account_text" context="button that allows the user to create an account">계정 생성</string>
-    <string name="name_text" context="Name of the user">이름</string>
+    <string name="name_text" context="category in sort by action">이름</string>
     <string name="lastname_text" context="Last name of the user">성</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">MEGA의 [A]이용 약관[/A]에 동의합니다</string>
     <string name="already_account" context="Does the user already have a MEGA account">이미 계정이 있으신가요?</string>
@@ -232,11 +238,11 @@
     <string name="cancel_all_transfer_confirmation">모든 전송을 삭제할까요?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">클라우드 드라이브</string>
-    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">최근</string>
+    <string name="section_recents" context="Label to reference a recents section">최근</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">미디어 업로드</string>
     <string name="section_inbox" context="title of the screen that show the inbox">수신함</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">오프라인으로 저장됨</string>
-    <string name="section_saved_for_offline_new" context="title of the screen that shows the files saved for offline in the device">오프라인</string>
+    <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">오프라인</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -249,13 +255,13 @@
     <string name="received_requests_empty" context="the user has not received any contact request from other users">[A]수신된 요청[/A] [B]없음[/B][B].[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">전송</string>
 
-    <string name="section_account" context="button to the settings of the user\'s account">내 계정</string>
+    <string name="section_account" context="button to the settings of the user’s account">내 계정</string>
     <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">카메라 업로드</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
-    <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">수신</string>
-    <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">나가는 공유</string>
+    <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">들어옴</string>
+    <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">나감</string>
 
     <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">들어오는 공유</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">다음과의 들어오는 공유</string>
@@ -274,14 +280,14 @@
     <!--
     <string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Properties</string>
     -->
-    <string name="file_properties_available_offline" context="The file are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">오프라인으로 사용 가능</string>
+    <string name="file_properties_available_offline" context="The file are available “offline” (without a network Wi-Fi mobile data connection)">오프라인으로 사용 가능</string>
     <!--
     <string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ON</string>
     -->
     <!--
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
-    <string name="file_properties_info_size_file" context="Refers to the size of a file.">크기</string>
+    <string name="file_properties_info_size_file" context="category in sort by action">크기</string>
     <string name="file_properties_info_last_modified" context="When the file was last modified">마지막으로 수정한 날짜</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">추가됨</string>
     <!--
@@ -297,7 +303,7 @@
     <string name="file_properties_owner" context="shows the owner of an incoming shared folder">소유자</string>
     <string name="contact_invite" context="positive button on dialog to invite a contact">초대</string>
     <string name="contact_reinvite" context="option to reinvite a contact">재초대</string>
-    <string name="contact_ignore" context="option to ignore a contact invitation">무시</string>
+    <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">무시</string>
     <string name="contact_decline" context="option to decline a contact invitation">거절</string>
     <string name="contact_accept" context="option to accept a contact invitation">수락</string>
     <string name="contact_properties_activity" context="title of the contact properties screen">연락처 정보</string>
@@ -327,7 +333,7 @@
     <!--
 	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transferring</string>
 	-->
-    <string name="download_preparing_files" context="message before the download or upload start ">파일 준비중</string>
+    <string name="download_preparing_files" context="Alert shown when some content is sharing with chats and they are processing">파일 준비중</string>
     <string name="download_began" context="message when the download starts">다운로드가 시작되었습니다</string>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -335,7 +341,7 @@
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">취소하려면 터치하세요</string>
     <string name="download_touch_to_show" context="Hint how to cancel the download">전송 보기</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">대부분의 장치는 4GB를 초과하는 파일을 다운로드할 수 없습니다. 다운로드가 실패할 수 있습니다</string>
-    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">장치에 이 파일을 실행할 앱이 없습니다</string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">장치에 이 파일을 실행할 앱이 없습니다</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">다음을 사용하여 이미지 공유</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">링크 공유</string>
@@ -389,7 +395,7 @@
 
     <!--<string name="context_send_link" context="get the link and send it">Send link</string>-->
 
-    <string name="context_send" context="get the link and send it">보내기</string>
+    <string name="context_send" context="send cancel subscriptions dialog">보내기</string>
     <string name="context_send_file_inbox" context="send the file to inbox">연락처에게 보내기</string>
     <!--
     <string name="context_copy_link" context="get the link and copy it">Copy link</string>
@@ -416,7 +422,7 @@
     <!--
     <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Phone Contacts</string>
     -->
-    <string name="context_delete" context="menu item">삭제</string>
+    <string name="context_delete" context="Button in My Account section to confirm the account deletion">삭제</string>
     <!--
     <string name="context_more" context="menu item">More</string>
     -->
@@ -448,7 +454,7 @@
     <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">수신함으로 보내짐</string>
     <string name="context_no_sent_node" context="error message when sending a node to Inbox">오류. 수신함으로 보내지지 않음</string>
     <string name="context_no_copied" context="error message">오류. 복사되지 않았습니다</string>
-    <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">대상 폴더를 선택하세요</string>
+    <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">대상 폴더를 선택하세요</string>
     <string name="context_correctly_moved" context="success message when moving a node">올바르게 이동되었습니다</string>
     <string name="number_correctly_moved" context="success message when moving a node">%d개의 항목이 성공적으로 이동되었습니다</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d개의 항목이 이동되지 않았습니다</string>
@@ -515,7 +521,7 @@
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">이미지</string>
     <string name="upload_to_audio" context="upload to. Then choose an Audio file">오디오</string>
-    <string name="upload_to_video" context="upload to. Then choose a Video file">동영상</string>
+    <string name="upload_to_video" context="Title of the button in the contact info screen to start a video call">동영상</string>
     <!--
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
@@ -537,10 +543,10 @@
     <!--
     <string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Do you want to cancel the upload?</string>
     -->
-    <string name="upload_prepare" context="Status text at the beginning of an upload">파일 처리중</string>
-    <plurals name="upload_prepare" context="Status text at the beginning of an upload">
-        <item context="Status text at the beginning of an upload for 1 file" quantity="one">파일 처리중</item>
-        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">파일 처리중</item>
+    <string name="upload_prepare" context="Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file">파일 처리중</string>
+    <plurals name="upload_prepare">
+        <item context="Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file" quantity="one">파일 처리중</item>
+        <item context="Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files" quantity="other">파일 처리중</item>
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">리소스가 일시적으로 사용 불가능합니다, 나중에 다시 시도하세요</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">선택한 파일을 열 수 없습니다</string>
@@ -607,7 +613,7 @@
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">월간*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">연간*</string>
 
-    <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">링크가 클립보드로 복사되었습니다</string>
+    <string name="file_properties_get_link" context="the user can get the link and it’s copied to the clipboard">링크가 클립보드로 복사되었습니다</string>
     <!--
     <string name="file_properties_remove_link" context="the user can remove the public link">The link has been removed</string>
     -->
@@ -631,14 +637,14 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">모든 전송 삭제</string>
 
-    <string name="menu_take_picture" context="menu item">사진 찍기</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">사진 찍기</string>
 
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">와이파이 전용</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">와이파이 또는 모바일 데이터</string>
+    <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">와이파이 전용</string>
+    <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">와이파이 또는 모바일 데이터</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">넘기기</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">정지</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">카메라 업로드 진행중</string>
+    <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">카메라 업로드 진행중</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">카메라 업로드를 정지하시겠습니까?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
@@ -651,15 +657,16 @@
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">카메라 업로드 완료</string>
 
-    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">저장소</string>
-    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN 잠금</string>
+    <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">저장소</string>
+    <string name="settings_pin_lock" context="settings of the pin lock">PIN 잠금</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">동영상 압축은 전력을 많이 소모합니다, MEGA는 압축하려는 동영상이 %s보다 클 경우 기기를 충전할 것을 요구할 것입니다.</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">활성화하면, 당신이 어디에서 사진을 촬영하였는지에 대한 정보가 업로드 되오니, 공유할 때 유의하시기 바랍니다.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">고급</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">캐시 지우기</string>
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">오프라인 파일 삭제</string>
 
-    <string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">다운로드 완료 후 파일 열기</string>
+    <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">다운로드 완료 후 파일 열기</string>
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">계정 취소</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">현재 %s 사용중</string>
@@ -668,15 +675,37 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">기본 다운로드 위치</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">항상 다운로드 위치 묻기</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">고급 장치 표시 (외부 SD)</string>
+	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">전화번호 추가</string>
+	<string name="verify_account_title" context="enter verification code page title">계정을 인증하세요</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">당신의 계정은 잠재적 남용을 방지하기 위해 일시적으로 잠겼습니다. 계정을 해제하려면 전화번호를 인증하세요.</string>
+    <string name="general_country_label" context="Hint text of the country edittext for billing purposes">국가</string>
+	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">당신의 전화번호</string>
+    <string name="general_back_button" context="Button label - go to previous page">뒤로</string>
+	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">나중에</string>
+    <string name="general_confirm_button" context="Button label - confirm some action">확인</string>
+	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">국가 코드를 선택하세요</string>
+    <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">국가 코드를 얻어올 수 없었습니다.</string>
+	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">유효한 전화번호를 입력하세요.</string>
+	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">다음으로 전송된 코드를 입력하세요</string>
+	<string name="verify_account_enter_code_title" context="enter verification code page title">계정을 인증하세요</string>
+	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">잘못된 코드. 다시 시도하거나 재발송하세요.</string>
+	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">코드를 받지 못했나요?</string>
+    <string name="general_resend_button" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">재발송</string>
+	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">이 번호는 이미 MEGA 계정에 연결되어 있습니다.</string>
+	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">일일 한도에 도달하였습니다</string>
+	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">인증 코드가 일치하지 않습니다.</string>
+	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">코드가 인증되었습니다</string>
+	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">잘못된 코드. 다시 시도하거나 재발송하세요.</string>
+	<string name="verify_account_successfully" context="verify phone number successfully">전화번호가 성공적으로 인증되었습니다</string>
 
-    <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
-        <item context="internal storage option">내부 저장소</item>
-        <item context="external storage option">외부 저장소</item>
+    <string-array name="settings_storage_download_location_array">
+        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">내부 저장소</item>
+        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">외부 저장소</item>
     </string-array>
 
-    <string-array name="add_contact_array" context="choose the way the new user's email is inserted">
-        <item context="write option">이용자의 이메일을 쓰세요</item>
-        <item context="import from phone option">장치에서 들여오기</item>
+    <string-array name="add_contact_array">
+        <item context="title of the dialog shown when sending or sharing a folder">이용자의 이메일을 쓰세요</item>
+        <item context="choose the way the new user’s email is inserted, import from phone option">장치에서 들여오기</item>
     </string-array>
 
     <string name="settings_camera_upload_on" context="settings option">카메라 업로드 활성화</string>
@@ -685,24 +714,25 @@
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">업로드 방법</string>
 
     <string name="settings_secondary_upload_on" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">보조 미디어 업로드 활성화</string>
-    <string name="settings_secondary_upload_off" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won't be running anymore. This is the text that appears in the settings option to disable the second synchronization.">보조 미디어 업로드 비활성화</string>
+    <string name="settings_secondary_upload_off" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization.">보조 미디어 업로드 비활성화</string>
 
-    <string name="settings_empty_folder" context="settings option">폴더 선택</string>
+    <string name="settings_empty_folder" context="Title of shared folder explorer to choose a folder to perform an action">폴더 선택</string>
 
-    <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">와이파이 또는 모바일 데이터</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">와이파이 전용</item>
+    <string-array name="settings_camera_upload_how_to_entries">
+        <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">와이파이 또는 모바일 데이터</item>
+        <item context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">와이파이 전용</item>
     </string-array>
 
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">파일 올리기</string>
 
-    <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
-        <item context="the options of what to upload.">사진만</item>
-        <item context="the options of what to upload.">동영상만</item>
-        <item context="the options of what to upload.">사진과 동영상</item>
+    <string-array name="settings_camera_upload_file_upload_entries">
+        <item context="what kind of file are going to be uploaded. Needed for the settings summary">사진만</item>
+        <item context="what kind of file are going to be uploaded. Needed for the settings summary">동영상만</item>
+        <item context="what kind of file are going to be uploaded. Needed for the settings summary">사진과 동영상</item>
     </string-array>
 
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">충전중일 때만</string>
+    <string name="settings_camera_upload_include_gps" context="Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded">위치 태그 포함</string>
     <string name="settings_camera_upload_require_plug_in" context="Option to choose that the video compression will only be enable when the device is charging">내 기기의 충전을 요구하세요</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">장치의 파일명 유지하기</string>
 
@@ -743,11 +773,11 @@
     <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">PIN 코드를 다시 입력하세요</string>
     <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">%1d초 후 모든 로컬 데이터가 삭제되고 로그아웃 됩니다</string>
 
-    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">대하여</string>
-    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">개인 정보 보호 정책</string>
-    <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">이용 약관</string>
+    <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">대하여</string>
+    <string name="settings_about_privacy_policy" context="App means “Application”">개인 정보 보호 정책</string>
+    <string name="settings_about_terms_of_service" context="App means “Application”">이용 약관</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
-    <string name="settings_about_app_version" context="App means &quot;Application&quot;">앱 버전</string>
+    <string name="settings_about_app_version" context="App means “Application”">앱 버전</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK 버전</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK 버전</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">소스 코드 보기</string>
@@ -844,7 +874,7 @@
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">로그가 비활성화 되었습니다.</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">위치 열기</string>
-    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">과정이 예상보다 오래 걸립니다. 기다려주세요.</string>
+    <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">과정이 예상보다 오래 걸립니다. 기다려주세요.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">무료 계정</string>
     <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite 계정</string>
@@ -854,15 +884,15 @@
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite 계정</string>
 
-    <string name="backup_title" context="Title of the screen to backup the master key">복구 키를 백업하세요</string>
+    <string name="backup_title" context="">복구 키를 백업하세요</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">당신의 비밀번호는 복구 키로 잠금 해제됩니다</string>
 
     <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">당신의 데이터는 우리가 암호화하여 저장한 당신의 비밀번호로 만든, 마스터 암호화 키로 시작하는 해독 작업의 연속을 통해서만 읽을 수 있습니다. 이것은 당신이 비밀번호를 잊으면, 마스터 키가 해독될 수 없으며, 당신의 데이터를 해독할 수 없다는 것을 의미합니다.</string>
-    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">복구 키를 내보내고 안전한 장소에 보관하는 것은 데이터 손실 없이 새 비밀번호를 설정할 수 있도록 해줍니다.</string>
+    <string name="backup_second_paragraph" context="Summary of the preference Recovery key on Settings section">복구 키를 내보내고 안전한 장소에 보관하는 것은 데이터 손실 없이 새 비밀번호를 설정할 수 있도록 해줍니다.</string>
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">외부 공격자가 당신의 키만으로 계정에 접근할 수는 없습니다. 비밀번호 재설정은 당신의 이메일에 대한 접근과 키 모두를 요구합니다.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">복구 키를 클립보드에 복사하거나 텍스트 파일로 저장하세요</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">저장</string>
+    <string name="save_action" context="Action of a button to save something">저장</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">복구 키가 성공적으로 복사되었습니다</string>
 
     <string name="change_pass" context="Button to change the password">변경</string>
@@ -961,8 +991,8 @@
 
     <string name="email_verification_text_change_mail" context="Text of the alert dialog to inform the user that have to check the email to validate his new email">새 이메일 주소를 검증해야합니다. 진행하려면 이메일을 확인하세요,</string>
 
-    <string name="confirmation_delete_avatar" context="Confirmation before deleting the avatar of the user's profile">프로필 사진을 삭제할까요?</string>
-    <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">수정</string>
+    <string name="confirmation_delete_avatar" context="Confirmation before deleting the avatar of the user’s profile">프로필 사진을 삭제할까요?</string>
+    <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user’s account">수정</string>
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">만료일 설정</string>
     <string name="title_set_password_protection" context="Title of the dialog to get link with password">비밀번호 보호 설정</string>
@@ -974,7 +1004,7 @@
 
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">링크 관리</string>
 
-    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">입력하신 현재 비밀번호가 맞지 않습니다.</string>
+    <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password">입력하신 현재 비밀번호가 맞지 않습니다.</string>
 
     <string name="number_correctly_reinvite_contact_request" context="success message when reinviting multiple contacts">%d개의 재초대 요청이 발송됨</string>
 
@@ -1002,10 +1032,10 @@
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">로그인 시도 실패가 너무 많습니다, 1시간 동안 기다려주세요.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">이 계정은 아직 확인되지 않았습니다. 이메일을 확인하세요.</string>
 
-    <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn't exist">폴더 링크가 사용불가입니다</string>
+    <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn’t exist">폴더 링크가 사용불가입니다</string>
     <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">이 파일은 이용 약관/용인 가능한 이용 정책 위반으로 삭제되었습니다.</string>
 
-    <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">파일 링크가 사용불가능합니다</string>
+    <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn’t exist">파일 링크가 사용불가능합니다</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">파일 링크가 이용 약관 위반으로 인해 삭제되었습니다.</string>
 
     <string name="link_broken" context="Error message shown when opening a folder link or file link which has been corrupt or deformed">이 URL은 손상되었거나 변형되었습니다. 접근하려는 링크가 존재하지 않습니다.</string>
@@ -1028,7 +1058,7 @@
     <string name="section_chat" context="Item of the navigation title for the chat section">대화</string>
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">대화 [A](%1$d)[/A]</string>
 
-    <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">보관함</string>
+    <string name="tab_archive_chat" context="Confirmation button of the dialog to archive a chat">보관함</string>
     <!--
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
     -->
@@ -1095,7 +1125,7 @@
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d개의 초대 요청이 성공적으로 발송되었습니다.</string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d개의 초대 요청이 성공적으로 발송되었지만 %2$d개는 발송되지 않았습니다.</string>
 
-    <string name="chat_me_text_bracket" context="Word next to own user's message in chat screen">%1s (나)</string>
+    <string name="chat_me_text_bracket" context="Word next to own user’s message in chat screen">%1s (나)</string>
     <string name="type_message_hint" context="Hint shown in the field to write a message in the chat screen">메시지를 입력하세요</string>
 
     <string name="general_mute" context="button">조용히</string>
@@ -1117,7 +1147,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">대화 기록이 삭제되었습니다</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn't been successfully deleted">오류. 대화 기록이 올바르게 삭제되지 않았습니다</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">오류. 대화 기록이 올바르게 삭제되지 않았습니다</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">참가자 추가</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">참가자 제거</string>
@@ -1135,10 +1165,10 @@
 
     <string name="no_results_found" context="Text shown after searching and no results found">결과가 없습니다</string>
 
-    <string name="offline_status" context="Info label about the status of the user">오프라인</string>
-    <string name="online_status" context="Info label about the status of the user">온라인</string>
-    <string name="away_status" context="Info label about the status of the user">자리 비움</string>
-    <string name="busy_status" context="Info label about the status of the user">바쁨</string>
+    <string name="offline_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">오프라인</string>
+    <string name="online_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">온라인</string>
+    <string name="away_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">자리 비움</string>
+    <string name="busy_status" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">바쁨</string>
     <string name="invalid_status" context="Info label about the status of the user">연결 없음</string>
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">이 메시지는 삭제되었습니다</string>
@@ -1158,9 +1188,9 @@
     <string name="title_properties_chat_leave_chat" context="Title of the section to leave a group content in the Contact Properties screen">단체 떠나기</string>
     <string name="participants_chat_label" context="Label for participants of a group chat">참여자</string>
 
-    <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">%s님을 이 대화에서 제거할까요?</string>
+    <string name="confirmation_remove_chat_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">%s님을 이 대화에서 제거할까요?</string>
 
-    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">읽기 전용</string>
+    <string name="observer_permission_label_participants_panel" context="Refers to access rights for a file folder.">읽기 전용</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1177,7 +1207,7 @@
     <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">기록을 삭제할까요?</string>
 
 
-    <string name="add_participant_error_already_exists" context="Message show when a participant hasn't been successfully invited to a group chat">참가자가 이미 이 그룹 대화에 존재합니다.</string>
+    <string name="add_participant_error_already_exists" context="Message show when a participant hasn’t been successfully invited to a group chat">참가자가 이미 이 그룹 대화에 존재합니다.</string>
 
     <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d명의 참여자가 올바르게 초대되었습니다</string>
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d명의 참가자가 올바르게 초대되었지만 %2$d명은 초대되지 않았습니다.</string>
@@ -1216,8 +1246,8 @@
     <!--
     <string name="changing_status_to_busy_success" context="message shown when the status of the user successfully changed to offline">You\'re now busy</string>
     -->
-    <string name="changing_status_error" context="message shown when the status of the user coudn't be changed">오류. 당신의 상태가 변경되지 않았습니다</string>
-    <string name="leave_chat_error" context="message shown when a user couldn't leave chat">대화를 떠나는 중 오류가 발생했습니다</string>
+    <string name="changing_status_error" context="message shown when the status of the user coudn’t be changed">오류. 당신의 상태가 변경되지 않았습니다</string>
+    <string name="leave_chat_error" context="message shown when a user couldn’t leave chat">대화를 떠나는 중 오류가 발생했습니다</string>
     <string name="create_chat_error" context="message shown when a chat has not been created">대화를 만드는 중 오류가 발생했습니다</string>
 
     <string name="settings_chat_vibration" context="settings of the chat to choose the status">진동</string>
@@ -1225,7 +1255,8 @@
     <!--
     <string name="list_message_deleted" context="Text show in list of chats when the last message has been deleted">Message deleted</string>
     -->
-
+    <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">다른 계정으로 MEGA를 이용하려면 [A]로그아웃[/A]하세요</string>
+    <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">현재 계정에서 로그아웃 하시겠습니까?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">이 메시지는 %1$s님에 의해 삭제되었습니다.</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">대화 기록이 지워졌습니다</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">%1$s님에 의해 기록이 삭제되었습니다</string>
@@ -1255,14 +1286,14 @@
 
     <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">폴더 공유 오류. 다시 시도하세요.</string>
 
-    <plurals name="confirmation_remove_contact" context="confirmation message before removing a contact">
-        <item context="Singular" quantity="one">선택한 연락처와 관련된 모든 데이터가 영구적으로 손실됩니다.</item>
-        <item context="Plural" quantity="other">선택한 연락처와 관련된 모든 데이터가 영구적으로 손실됩니다.</item>
+    <plurals name="confirmation_remove_contact">
+        <item context="confirmation message before removing a contact, Singular" quantity="one">선택한 연락처와 관련된 모든 데이터가 영구적으로 손실됩니다.</item>
+        <item context="confirmation message before removing a contact, Plural" quantity="other">선택한 연락처와 관련된 모든 데이터가 영구적으로 손실됩니다.</item>
     </plurals>
 
-    <plurals name="title_confirmation_remove_contact" context="title of confirmation alert before removing a contact">
-        <item context="Singular" quantity="one">연락처를 제거할까요?</item>
-        <item context="Plural" quantity="other">연락체를 삭제할까요?</item>
+    <plurals name="title_confirmation_remove_contact">
+        <item context="title of confirmation alert before removing a contact, Singular" quantity="one">연락처를 제거할까요?</item>
+        <item context="title of confirmation alert before removing a contact, Plural" quantity="other">연락체를 삭제할까요?</item>
     </plurals>
 
     <!--
@@ -1276,19 +1307,20 @@
 
     <string name="no_conversation_history" context="message shown when a chat has no messages">대화 기록 없음</string>
 
-    <plurals name="user_typing" context="title of confirmation alert before removing a contact">
-        <item context="Singular" quantity="one">%1$s님이 [A]입력중&#8230;[/A]</item>
-        <item context="Plural" quantity="other">%1$s님이 [A]입력중&#8230;[/A]</item>
+    <plurals name="user_typing">
+        <item context="title of confirmation alert before removing a contact, Singular" quantity="one">%1$s님이 [A]입력중&#8230;[/A]</item>
+        <item context="title of confirmation alert before removing a contact, Plural" quantity="other">%1$s님이 [A]입력중&#8230;[/A]</item>
     </plurals>
 
-    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s님 외 다수가 [A]입력중&#8230;[/A]</string>
-    <string name="label_more" context="button label more">더 보기</string>
-    <string name="label_close" context="button label Close">닫기</string>
+
+    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230;">%1$s님 외 다수가 [A]입력중&#8230;[/A]</string>
+    <string name="label_more" context="More button in contact info page">더 보기</string>
+    <string name="label_close" context="Text button">닫기</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">일반</string>
-    <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">저장소</string>
-    <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">저장소</string>
-    <string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">전송 할당량</string>
-    <string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">전송 할당량</string>
+    <string name="tab_my_account_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">저장소</string>
+    <string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">저장소</string>
+    <string name="label_transfer_quota_upgrade_account" context="Title of the section about the transfer quota in the storage tab in My Account Section">전송 할당량</string>
+    <string name="label_transfer_quota_achievements" context="Title of the section about the transfer quota in the storage tab in My Account Section">전송 할당량</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">요금제</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">저장소 공간</string>
@@ -1306,7 +1338,6 @@
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">대화가 비활성화되어있고 연결 없이 활성화할 수 없습니다.</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">상태 설정</string>
-
     <string name="general_dismiss" context="Answer for confirmation dialog.">해제</string>
 
     <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">초대 수락됨</string>
@@ -1330,16 +1361,17 @@
     <string name="autoaway_disabled" context="Word to indicated the autoaway is disabled">Disabled</string>
     -->
 
-    <string-array name="settings_status_entries" context="the options of what to upload in an array. Needed for the settings">
-        <item context="the options of what to upload.">온라인</item>
-        <item context="the options of what to upload.">자리 비움</item>
-        <item context="the options of what to upload.">바쁨</item>
-        <item context="the options of what to upload.">오프라인</item>
+    <string-array name="settings_status_entries">
+        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">온라인</item>
+        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">자리 비움</item>
+        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">바쁨</item>
+        <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">오프라인</item>
     </string-array>
 
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">오프라인용으로 저장된 파일 없음</string>
 
     <string name="general_enable" context="Positive confirmation to enable logs">활성화</string>
+    <string name="general_allow" context="Positive confirmation to allow MEGA to read contacts book.">허가</string>
     <string name="enable_log_text_dialog" context="Dialog to confirm the action of enabling logs">기록은 당신의 계정과 관련된 정보를 포함할 수 있습니다</string>
 
     <string name="confirmation_to_reconnect" context="Dialog to confirm the reconnect action">네트워크 연결이 복구되었습니다. MEGA에 연결할까요?</string>
@@ -1347,13 +1379,13 @@
 
     <string name="error_editing_message" context="Error when a message cannot be edited">이 메시지는 수정할 수 없습니다</string>
 
-    <plurals name="text_number_transfers" context="Label to show the number of transfers in progress">
-        <item context="Singular" quantity="one">파일 %2$d개 중 %1$d개</item>
-        <item context="Plural" quantity="other">파일 %2$d개 중 %1$d개</item>
+    <plurals name="text_number_transfers">
+        <item context="Label to show the number of transfers in progress, Singular" quantity="one">파일 %2$d개 중 %1$d개</item>
+        <item context="Label to show the number of transfers in progress, Plural" quantity="other">파일 %2$d개 중 %1$d개</item>
     </plurals>
 
 	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">과정을 완료하는 중&#8230;</string>
-    <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">보기</string>
+    <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">보기</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">모든 전송 일시정지</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">모든 전송 재개</string>
     <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">완료된 항목 삭제</string>
@@ -1366,7 +1398,7 @@
     <string name="title_tab_in_progress_transfers" context="Title of the tab section for transfers in progress">진행중</string>
     <string name="title_tab_completed_transfers" context="Title of the tab section for completed transfers">완료</string>
 
-    <string name="transfer_paused" context="Possible state of a transfer">일시정지됨</string>
+    <string name="transfer_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">일시정지됨</string>
     <string name="transfer_queued" context="Possible state of a transfer">대기열</string>
     <!--
     <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
@@ -1381,61 +1413,61 @@
     <string name="message_transfers_completed" context="Message shown when the pending transfers are completed">Transfers finished</string>
     -->
 
-    <plurals name="upload_service_notification" context="Text of the notification shown when the upload service is running">
-        <item context="Singular" quantity="one">파일 %2$d개 중 %1$d번째 파일 업로드중</item>
-        <item context="Plural" quantity="other">파일 %2$d개 중 %1$d번째 파일 업로드중</item>
+    <plurals name="upload_service_notification">
+        <item context="Text of the notification shown when the upload service is running, Singular" quantity="one">파일 %2$d개 중 %1$d번째 파일 업로드중</item>
+        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">파일 %2$d개 중 %1$d번째 파일 업로드중</item>
     </plurals>
 
-	<plurals name="folder_upload_service_notification" context="Text of the notification shown when the folder upload service is running">
-		<item context="Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">%2$d개의 폴더 중 %1$d번째 업로드중</item>
-		<item context="Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">%2$d개의 폴더 중 %1$d번째 업로드중</item>
+	<plurals name="folder_upload_service_notification">
+		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">%2$d개의 폴더 중 %1$d번째 업로드중</item>
+		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">%2$d개의 폴더 중 %1$d번째 업로드중</item>
 	</plurals>
 
-    <plurals name="upload_service_final_notification" context="Text of the notification shown when the upload service has finished">
-        <item context="Singular" quantity="one">파일 %1$d개 업로드됨</item>
-        <item context="Plural" quantity="other">파일 %1$d개 업로드됨</item>
+    <plurals name="upload_service_final_notification">
+        <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">파일 %1$d개 업로드됨</item>
+        <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">파일 %1$d개 업로드됨</item>
     </plurals>
 
-	<plurals name="folder_upload_service_final_notification" context="Text of the notification shown when the folder upload service has finished">
-		<item context="Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">폴더 %1$d개 업로드 완료</item>
-		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">폴더 %1$d개 업로드 완료</item>
+	<plurals name="folder_upload_service_final_notification">
+		<item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">폴더 %1$d개 업로드 완료</item>
+		<item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">폴더 %1$d개 업로드 완료</item>
 	</plurals>
 
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">전체 크기: %1$s</string>
 
-    <plurals name="upload_service_failed" context="Text of the notification shown when the upload service has finished with any transfer error">
-        <item context="Singular" quantity="one">파일 %1$d개가 업로드 되지 않음</item>
-        <item context="Plural" quantity="other">파일 %1$d개가 업로드 되지 않음</item>
+    <plurals name="upload_service_failed">
+        <item context="Text of the notification shown when the upload service has finished with any transfer error, Singular" quantity="one">파일 %1$d개가 업로드 되지 않음</item>
+        <item context="Text of the notification shown when the upload service has finished with any transfer error, Plural" quantity="other">파일 %1$d개가 업로드 되지 않음</item>
     </plurals>
 
-    <plurals name="copied_service_upload" context="Text of the notification shown when the upload service has finished with any copied file instead uploaded">
-        <item context="Singular" quantity="one">%1$d개의 파일 복사됨</item>
-        <item context="Plural" quantity="other">%1$d개의 파일 복사됨</item>
+    <plurals name="copied_service_upload">
+        <item context="Text of the notification shown when the upload service has finished with any copied file instead uploaded, Singular" quantity="one">%1$d개의 파일 복사됨</item>
+        <item context="Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural" quantity="other">%1$d개의 파일 복사됨</item>
     </plurals>
 
-    <plurals name="already_downloaded_service" context="Text of the notification shown when the download service do not download because the file is already on the device">
-        <item context="Singular" quantity="one">%1$d개의 파일이 이전에 다운로드됨</item>
-        <item context="Plural" quantity="other">%1$d개의 파일이 이전에 다운로드됨</item>
+    <plurals name="already_downloaded_service">
+        <item context="Text of the notification shown when the download service do not download because the file is already on the device, Singular" quantity="one">%1$d개의 파일이 이전에 다운로드됨</item>
+        <item context="Text of the notification shown when the download service do not download because the file is already on the device, Plural" quantity="other">%1$d개의 파일이 이전에 다운로드됨</item>
     </plurals>
 
-    <plurals name="download_service_final_notification" context="Text of the notification shown when the download service has finished">
-        <item context="Singular" quantity="one">파일 %1$d개 다운로드됨</item>
-        <item context="Plural" quantity="other">파일 %1$d개 다운로드됨</item>
+    <plurals name="download_service_final_notification">
+        <item context="Text of the notification shown when the download service has finished, Singular" quantity="one">파일 %1$d개 다운로드됨</item>
+        <item context="Text of the notification shown when the download service has finished, Plural" quantity="other">파일 %1$d개 다운로드됨</item>
     </plurals>
 
-    <plurals name="download_service_final_notification_with_details" context="Text of the notification shown when the download service has finished with any error">
-        <item context="Singular" quantity="one">파일 %2$d개 중 %1$d개 다운로드됨</item>
-        <item context="Plural" quantity="other">파일 %2$d개 중 %1$d개 다운로드됨</item>
+    <plurals name="download_service_final_notification_with_details">
+        <item context="Text of the notification shown when the download service has finished with any error, Singular" quantity="one">파일 %2$d개 중 %1$d개 다운로드됨</item>
+        <item context="Text of the notification shown when the download service has finished with any error, Plural" quantity="other">파일 %2$d개 중 %1$d개 다운로드됨</item>
     </plurals>
 
-    <plurals name="download_service_failed" context="Text of the notification shown when the download service has finished with any transfer error">
-        <item context="Singular" quantity="one">파일 %1$d개가 다운로드 되지 않음</item>
-        <item context="Plural" quantity="other">파일 %1$d개가 다운로드 되지 않음</item>
+    <plurals name="download_service_failed">
+        <item context="Text of the notification shown when the download service has finished with any transfer error, Singular" quantity="one">파일 %1$d개가 다운로드 되지 않음</item>
+        <item context="Text of the notification shown when the download service has finished with any transfer error, Plural" quantity="other">파일 %1$d개가 다운로드 되지 않음</item>
     </plurals>
 
-    <plurals name="download_service_notification" context="Text of the notification shown when the download service is running">
-        <item context="Singular" quantity="one">파일 %2$d개 중 %1$d번째 파일 다운로드중</item>
-        <item context="Plural" quantity="other">파일 %2$d개 중 %1$d번째 파일 다운로드중</item>
+    <plurals name="download_service_notification">
+        <item context="Text of the notification shown when the download service is running, Singular" quantity="one">파일 %2$d개 중 %1$d번째 파일 다운로드중</item>
+        <item context="Text of the notification shown when the download service is running, Plural" quantity="other">파일 %2$d개 중 %1$d번째 파일 다운로드중</item>
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is depleted">고갈된 전송 할당량</string>
@@ -1443,9 +1475,9 @@
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">요금제 보기</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">계정 없이 계속하기</string>
 
-    <plurals name="new_general_num_files" context="this is used for example when downloading 1 file or 2 files">
-        <item context="Singular of file. 1 file" quantity="one">파일 %1$d개</item>
-        <item context="Plural of file. 2 files" quantity="other">파일 %1$d개</item>
+    <plurals name="new_general_num_files">
+        <item context="this is used for example when downloading 1 file or 2 files, Singular of file. 1 file" quantity="one">파일 %1$d개</item>
+        <item context="this is used for example when downloading 1 file or 2 files, Plural of file. 2 files" quantity="other">파일 %1$d개</item>
     </plurals>
 
     <string name="general_view" context="Menu option">파일 보기</string>
@@ -1496,10 +1528,10 @@
     <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">당신의 이름이 올바르게 수정되었습니다</string>
 
     <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">참가자 추가됨</string>
-    <string name="add_participant_error" context="Message show when a participant hasn't been successfully invited to a group chat">오류. 참가자가 추가되지 않음</string>
+    <string name="add_participant_error" context="Message show when a participant hasn’t been successfully invited to a group chat">오류. 참가자가 추가되지 않음</string>
 
     <string name="remove_participant_success" context="Message show when a participant has been successfully removed from a group chat">참가자 제거됨</string>
-    <string name="remove_participant_error" context="Message show when a participant hasn't been successfully removed from a group chat">오류. 참가자가 제거되지 않음</string>
+    <string name="remove_participant_error" context="Message show when a participant hasn’t been successfully removed from a group chat">오류. 참가자가 제거되지 않음</string>
 
     <string name="no_files_selected_warning">파일이 선택되지 않음</string>
 
@@ -1518,13 +1550,13 @@
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">완전 접근</string>
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">읽기 전용</string>
-    <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">읽기와 쓰기</string>
+    <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">읽기와 쓰기</string>
 
     <string name="attachment_uploading_state_uploading">업로드 중&#8230;</string>
     <string name="attachment_uploading_state_error">오류. 전송되지 않음.</string>
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d개의 파일이 이미 다운로드 되었습니다.</string>
-    <string name="pending_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">파일 %d개 보류중.</string>
+    <string name="pending_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files">파일 %d개 대기중.</string>
 
     <string name="contact_is_me">옵션이 존재하지 않습니다, 자신을 선택하였습니다</string>
 
@@ -1545,7 +1577,7 @@
     <string name="messages_chat_notification" context="messages string in chat notification">메시지</string>
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">폴더가 공유됨, 공유자:</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">새 공유 폴더</string>
-    <string name="title_contact_request_notification" context="title of contact request notification">새 연락처 요청</string>
+    <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">새 연락처 요청</string>
 
     <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">대화 기록 삭제</string>
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">연락처 삭제</string>
@@ -1553,7 +1585,7 @@
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">대화 알림</string>
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone">[A]%1$s님이[/A][B] 대화 기록을 지웠습니다[/B]</string>
 
-    <string name="number_messages_chat_notification" formatted="false" context="messages string in chat notification">%1$d개의 읽지 않은 대화</string>
+    <string name="number_messages_chat_notification" formatted="false" context="Notification title to show the number of unread chats, unread messages">%1$d개의 읽지 않은 대화</string>
 
     <string name="context_permissions_changing_folder" context="Item menu option upon clicking on one or multiple files.">권한 변경중</string>
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">공유된 폴더에서 연락처 제거중</string>
@@ -1581,6 +1613,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">초대 보너스</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">모바일 앱 설치</string>
+    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">휴대전화번호 추가</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">가입 보너스</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">MEGA 데스크톱 앱 설치</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">계정 기본 할당량</string>
@@ -1598,16 +1631,18 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">휴대전화 연락처 목록에서 선택하거나 여러 이메일 주소를 입력하세요.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">MEGA에 친구 초대</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">고맙습니다! 초대장이 이메일로 발송되었습니다</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">초대 발송됨</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">당신의 친구들이 가입하고 MEGA 앱을 설치하도록 독려하세요. 친구들이 당신이 입력한 같은 이메일 주소를 사용하면, 당신은 전송 할당량 보상을 받게 됩니다.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">이메일이 변형되었습니다</string>
 
     <string name="paragraph_info_achievement_install_desktop" context="info paragraph about the achievement install megasync">MEGAsync를 설치하면 %1$s의 보상 저장 공간과 %2$s의 전송 할당량을 받게 되며, 둘 다 180일간 유효합니다. MEGA 데스크톱 앱은 Windows, macOS, 그리고 대부분의 Linux 배포판에서 사용 가능합니다.</string>
     <string name="paragraph_info_achievement_install_mobile_app" context="info paragraph about the achievement install mobile app">MEGA 모바일 앱을 설치하면 180일간 이용할 수 있는 %1$s의 추가 저장 공간과 %2$s의 전송 할당량을 받게 됩니다. MEGA 모바일 앱은 iOS, Android 그리고 Windows Phone에서 사용 가능합니다.</string>
+    <string name="paragraph_info_achievement_add_phone" context="info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">전화번호를 인증하면 180일간 유효한 %1$s의 무료 저장 공간과 %2$s의 전송 할당량을 드립니다.</string>
 
     <string name="result_paragraph_info_achievement_install_desktop" context="info paragraph about the completed achievement install megasync">당신은 MEGA 데스크톱 앱을 설치하여 %1$s의 저장 공간과 %2$s의 전송 할당량을 받았습니다.</string>
     <string name="result_paragraph_info_achievement_install_mobile_app" context="info paragraph about the completed achievement install mobile app">당신은 우리의 모바일 앱을 설치하여 %1$s의 저장 공간과 %2$s의 전송 할당량을 받았습니다.</string>
+    <string name="result_paragraph_info_achievement_add_phone" context="info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB">전화번호를 인증하여서 %1$s의 무료 저장 공간과 %2$s의 전송 할당량을 받았습니다.</string>
     <string name="result_paragraph_info_achievement_registration" context="info paragraph about the completed achievement registration">당신은 무료 가입 보너스로 %1$s의 저장 공간을 받았습니다.</string>
 
     <string name="expiration_date_for_achievements" context="info paragraph about the completed achievement registration">%1$d일 후 보너스 만료</string>
@@ -1652,7 +1687,7 @@
     <string name="general_search_year" context="title of a button to apply search by year">지난 해</string>
 
     <string name="label_set_day" context="title of a Search by date tag">날짜 설정</string>
-    <string name="snackbar_search_by_date" context="the user can't choose this date">요구된 날짜가 유효하지 않습니다.</string>
+    <string name="snackbar_search_by_date" context="the user can’t choose this date">요구된 날짜가 유효하지 않습니다.</string>
 
     <string name="invalid_characters" context="Error when the user writes a character not allowed">글자가 허용되지 않습니다.</string>
 
@@ -1691,13 +1726,13 @@
     <string name="section_my_code" context="Title of QR code section">내 코드</string>
     <string name="section_scan_code" context="Title of QR code scan section">코드 스캔</string>
     <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">자동 승인</string>
-    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">당신의 QR 코드를 스캔한 연락처는 자동으로 연락처 목록에 추가됩니다.</string>
+    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">당신의 QR 코드를 스캔한 MEGA 이용자는 자동으로 연락처 목록에 추가됩니다.</string>
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">이전 QR 코드는 더 이상 유효하지 않게 됩니다</string>
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">링크가 클립보드에 복사되었습니다</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">QR 코드가 성공적으로 초기화되었습니다</string>
     <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">QR 코드가 성공적으로 삭제되었습니다</string>
-    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">오류로 인해 QR 코드가 초기화되지 않았습니다, 다시 시도하세요.</string>
-    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">오류로 인해 QR 코드가 삭제되지 않았습니다, 다시 시도하세요.</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">오류로 인해 QR 코드가 초기화되지 않았습니다. 다시 시도하세요.</string>
+    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">오류로 인해 QR 코드가 삭제되지 않았습니다. 다시 시도하세요.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">초대를 발송하였습니다</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">이용자 %s님이 초대되었고 승락하면 당신의 연락처 목록에 나타날 것입니다.</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">QR 파일을 공유하던 중 오류가 발생하였습니다. 파일이 존재하지 않을 수도 있습니다. 다시 시도하세요.</string>
@@ -1721,7 +1756,7 @@
 
     <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">앱을 사용하여 공유</string>
 
-    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">대화를 활성화하기 전에 로그인 하세요.</string>
+    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">대화를 활성화하기 전에 로그인 하세요</string>
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">기간 설정</string>
 
@@ -1732,7 +1767,7 @@
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]휴지통[/A] [B]비우기[/B][B].[/B]</string>
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[A]수신함[/A][B]에 파일이 없음[/B][B].[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive ">[A]클라우드 드라이브[/A][B]에 파일 없음[/B][B].[/B]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[A]클라우드 드라이브[/A][B]에 파일 없음[/B][B].[/B]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[A]오프라인[/A] [B]에 파일 없음[/B][B].[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[A]연락처[/A] [B]없음[/B][B].[/B]</string>
 
@@ -1760,41 +1795,41 @@
     <string name="pass_good" context="Password good">좋음</string>
     <string name="pass_strong" context="Password strong">강함</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">진행중인 통화</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">진행중인 통화</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">통화로 돌아가려면 클릭하세요</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">통화로 돌아옴</string>
 
-    <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list's header">MEGA에서</string>
-    <string name="contacts_phone" context="When it lists contacts of phone, the title of list's header">휴대전화 연락처</string>
+    <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list’s header">MEGA에서</string>
+    <string name="contacts_phone" context="When it lists contacts of phone, the title of list’s header">휴대전화 연락처</string>
 
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">당신의 계정은 MEGA 이용 약관을 다수 위반하여 정지되었습니다. 이메일 수신함을 확인하세요.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">당신의 계정은 타인의 권리 침해, 불법 데이터의 공유 및 내보내기, 시스템 오용 등의 MEGA 이용 약관 위반으로 제거되었습니다.</string>
 
-    <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device's images but there aren't available images">파일 없음</string>
+    <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">파일 없음</string>
     <string name="label_file_size_byte" context="size in byte">B</string>
     <string name="label_file_size_kilo_byte" context="size in kilobyte">KB</string>
     <string name="label_file_size_mega_byte" context="size in megabyte">MB</string>
     <string name="label_file_size_giga_byte" context="size in gigabyte">GB</string>
     <string name="label_file_size_tera_byte" context="size in terabyte">TB</string>
 
-    <plurals name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">
-        <item context="version item" quantity="one">%1$d 버전</item>
-        <item context="version items" quantity="other">%1$d개의 버전</item>
+    <plurals name="number_of_versions" formatted="false">
+        <item context="Number of versions of a file shown on the screen info of the file, version item" quantity="one">%1$d 버전</item>
+        <item context="Number of versions of a file shown on the screen info of the file, version items" quantity="other">%1$d개의 버전</item>
     </plurals>
 
     <string name="title_section_versions" context="Title of the section Versions for files">버전</string>
 
     <string name="header_current_section_item" context="Header of the item to show the current version of a file in a list">현재 버전</string>
-    <plurals name="header_previous_section_item" context="Header of the item to show the previous versions of a file in a list">
-        <item context="file item" quantity="one">이전 버전</item>
-        <item context="file items" quantity="other">이전 버전</item>
+    <plurals name="header_previous_section_item">
+        <item context="Header of the item to show the previous versions of a file in a list, file item" quantity="one">이전 버전</item>
+        <item context="" quantity="other">이전 버전</item>
     </plurals>
 
     <string name="general_revert" context="option menu to revert a file version">되돌리기</string>
     <string name="menu_item_clear_versions" context="option menu to clear all the previous versions">이전 버전 제거</string>
-    <plurals name="title_dialog_delete_version" context="Title of the dialog to confirm that a version os going to be deleted">
-        <item context="version item" quantity="one">버전을 삭제할까요?</item>
-        <item context="version items" quantity="other">버전을 삭제할까요?</item>
+    <plurals name="title_dialog_delete_version">
+        <item context="Title of the dialog to confirm that a version os going to be deleted, version item" quantity="one">버전을 삭제할까요?</item>
+        <item context="Title of the dialog to confirm that a version os going to be deleted, version items" quantity="other">버전을 삭제할까요?</item>
     </plurals>
 
     <string name="content_dialog_delete_version" context="Content of the dialog to confirm that a version is going to be deleted">이 버전은 영구적으로 삭제됩니다.</string>
@@ -1803,11 +1838,11 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">대화 업로드중</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">대화 동영상 품질</string>
-	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">동영상 품질</string>
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">동영상 품질</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">카메라 업로드는 당신의 기기의 사진과 다른 미디어에 대한 접근을 필요로 합니다. 설정 페이지에 가서 권한을 부여해주세요.</string>
-    <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of origin quality multimedia file to upload.">원본 품질</item>
-        <item context="the options of medium quality multimedia file to  upload.">중간 품질</item>
+    <string-array name="settings_chat_upload_quality_entries">
+        <item context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of origin quality multimedia file to upload.">원본 품질</item>
+        <item context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload.">중간 품질</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">부재중 전화</string>
@@ -1816,20 +1851,20 @@
     <string name="file_properties_folder_current_versions" cotext="Title of the label to show the size of the current files inside a folder">현재 버전</string>
     <string name="file_properties_folder_previous_versions" cotext="Title of the label to show the size of the versioned files inside a folder">이전 버전</string>
 
-    <plurals name="number_of_versions_inside_folder" formatted="false" context="Number of versioned files inside a folder shown on the screen info of the folder">
-        <item context="version item" quantity="one">%1$d개의 버전 파일</item>
-        <item context="version items" quantity="other">%1$d개의 버전 파일</item>
+    <plurals name="number_of_versions_inside_folder" formatted="false">
+        <item context="Number of versioned files inside a folder shown on the screen info of the folder, version item" quantity="one">%1$d개의 버전 파일</item>
+        <item context="Number of versioned files inside a folder shown on the screen info of the folder, version items" quantity="other">%1$d개의 버전 파일</item>
     </plurals>
 
-    <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">전달된 메시지</string>
+    <string name="messages_forwarded_success" context="Confirmation message after forwarding one or several messages, version items">전달된 메시지</string>
     <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">오류. 올바르게 전달되지 않음</string>
-    <plurals name="messages_forwarded_partial_error" formatted="false" context="Error message if any of the forwarded messages fails">
-        <item context="message item" quantity="one">오류. %1$d개의 메시지가 전달되지 않음</item>
-        <item context="message items" quantity="other">오류. %1$d개의 메시지가 전달되지 않음</item>
+    <plurals name="messages_forwarded_partial_error" formatted="false">
+        <item context="Error message if any of the forwarded messages fails, message item" quantity="one">오류. %1$d개의 메시지가 전달되지 않음</item>
+        <item context="Error message if any of the forwarded messages fails, message items" quantity="other">오류. %1$d개의 메시지가 전달되지 않음</item>
     </plurals>
-    <plurals name="messages_forwarded_error_not_available" formatted="false" context="Error non existing resource after forwarding one or several messages to several chats">
-        <item context="message item" quantity="one">오류. 리소스가 더 이상 이용할 수 없음</item>
-        <item context="message items" quantity="other">오류. 리소스가 더 이상 이용할 수 없음</item>
+    <plurals name="messages_forwarded_error_not_available" formatted="false">
+        <item context="Error non existing resource after forwarding one or several messages to several chats, message item" quantity="one">오류. 리소스가 더 이상 이용할 수 없음</item>
+        <item context="Error non existing resource after forwarding one or several messages to several chats, message items" quantity="other">오류. 리소스가 더 이상 이용할 수 없음</item>
     </plurals>
 
     <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">알림 켜기</string>
@@ -1840,29 +1875,29 @@
     <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">[A]앱 알림[/A]을 엽니다</string>
     <string name="turn_on_notifications_fifth_step" context="Fifth step to turn on notifications">켜기로 전환하고 설정하세요</string>
 
-    <plurals name="files_send_to_chat_success" context="Alert message after sending to chat one or several messages to several chats">
-        <item context="version item" quantity="one">파일이 올바르게 보내졌습니다</item>
-        <item context="version items" quantity="other">전송된 파일</item>
+    <plurals name="files_send_to_chat_success">
+        <item context="Alert message after sending to chat one or several messages to several chats, version item" quantity="one">파일이 올바르게 보내졌습니다</item>
+        <item context="Alert message after sending to chat one or several messages to several chats, version items" quantity="other">전송된 파일</item>
     </plurals>
     <string name="files_send_to_chat_error" context="Error message after sending to chat one or several messages to several chats">오류. 올바르게 전송되지 않음</string>
 
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">대화</string>
 
-    <string name="remember_pwd_dialog_title" context="Title of the dialog 'Do you remember your password?'">비밀번호가 기억났나요?</string>
-    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog 'Do you remember your password?' when logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
-    <string name="remember_pwd_dialog_text" context="Text of the dialog 'Do you remember your password?'">당신이 비밀번호를 기억하는지 확실하게 하기 위해 비밀번호를 시험해보세요. 만약 비밀번호를 잊으면, 당신의 MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
-    <string name="remember_pwd_dialog_do_not_show" context="'Do you remember your password?' dialog option that permits user do not show it again">다시 보여주지 마세요</string>
-    <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">비밀번호 시험</string>
+    <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">비밀번호가 기억났나요?</string>
+    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
+    <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">당신이 비밀번호를 기억하는지 확실하게 하기 위해 비밀번호를 시험해보세요. 만약 비밀번호를 잊으면, 당신의 MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
+    <string name="remember_pwd_dialog_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">다시 보여주지 마세요</string>
+    <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">비밀번호 시험</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">비밀번호를 시험하세요</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">비밀번호 확인됨</string>
     <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">잘못된 비밀번호.\n최대한 빨리 복구 키를 백업하세요!</string>
-    <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">복구 키 내보내짐</string>
-    <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">복구 키가 MEGARecoveryKey.txt라는 이름으로 오프라인 영역에 저장되었습니다.\n참고: 로그아웃하시면 삭제되니, 안전한 곳에 보관하세요.</string>
-    <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
+    <string name="recovery_key_exported_dialog_title" context="Title of the dialog ‘Recovery Key exported’">복구 키 내보내짐</string>
+    <string name="recovery_key_exported_dialog_text" context="Text of the dialog ‘Recovery Key exported’">복구 키가 MEGARecoveryKey.txt라는 이름으로 오프라인 영역에 저장되었습니다.\n참고: 로그아웃하시면 삭제되니, 안전한 곳에 보관하세요.</string>
+    <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">클립보드로 복사됨</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">복구 키 내보내기</string>
     <string name="proceed_to_logout" context="Option that permits user logout">로그아웃 진행</string>
-    <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">복구 키</string>
+    <string name="recovery_key_bottom_sheet" context="Title of the preference Recovery key on Settings section">복구 키</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">파일 시스템에 저장</string>
     <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">클립보드로 복사되었습니다</string>
 
@@ -1870,21 +1905,21 @@
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">새 메시지</string>
 
 
-    <string name="notification_subtitle_incoming" context="notification subtitle of incoming calls">전화 수신중</string>
+    <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">전화 수신중</string>
 
-    <plurals name="number_unread_messages" context="Subtitle to show the number of unread messages on a chat">
-        <item context="unread message" quantity="one">%1$s개의 읽지 않은 메시지</item>
-        <item context="unread messages" quantity="other">%1$s개의 읽지 않은 메시지</item>
+    <plurals name="number_unread_messages">
+        <item context="Subtitle to show the number of unread messages on a chat, unread message" quantity="one">%1$s개의 읽지 않은 메시지</item>
+        <item context="Subtitle to show the number of unread messages on a chat, unread messages" quantity="other">%1$s개의 읽지 않은 메시지</item>
     </plurals>
 
-    <plurals name="plural_number_messages_chat_notification" context="Notification title to show the number of unread chats">
-        <item context="unread message" quantity="one">%1$d개의 읽지 않은 대화</item>
-        <item context="unread messages" quantity="other">%1$d개의 읽지 않은 대화</item>
+    <plurals name="plural_number_messages_chat_notification">
+        <item context="Notification title to show the number of unread chats, unread message" quantity="one">%1$d개의 읽지 않은 대화</item>
+        <item context="Notification title to show the number of unread chats, unread messages" quantity="other">%1$d개의 읽지 않은 대화</item>
     </plurals>
 
     <string name="chat_loading_messages" context="Message shown when a chat is opened and the messages are being recovered">[B]메시지[/B] [A]불러오는 중&#8230;[/A]</string>
 
-    <string name="general_error_internal_node_not_found" context="Error message shown when opening a file link which doesn't exist">파일 또는 폴더가 발견되지 않았습니다. 당신의 브라우저에서 다른 계정으로 로그인 하였나요? 현재 앱에서 로그인한 계정의 파일 또는 폴더에만 접근할 수 있습니다.</string>
+    <string name="general_error_internal_node_not_found" context="Error message shown when opening a file link which doesn’t exist">파일 또는 폴더가 발견되지 않았습니다. 당신의 브라우저에서 다른 계정으로 로그인 하였나요? 현재 앱에서 로그인한 계정의 파일 또는 폴더에만 접근할 수 있습니다.</string>
 
 
     <string name="context_loop_video" context="menu option to loop video or audio file">반복</string>
@@ -1896,7 +1931,7 @@
     <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">MEGA에 접속할 수 없습니다. 연결을 확인하거나 나중에 다시 시도하세요.</string>
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">서버가 너무 바쁩니다. 잠시만 기다리세요.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">과정이 예상보다 오래 걸립니다. 기다려주세요.</string>
-    <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit ">요청이 너무 많습니다. 기다려주세요.</string>
+    <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">요청이 너무 많습니다. 기다려주세요.</string>
     <string name="login_in_progress" context="message when previous login is being canceled">로그인 과정 취소중. 잠시만 기다리세요&#8230;</string>
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">오류. 파일이 손상되었거나 존재하지 않습니다.</string>
@@ -1912,7 +1947,7 @@
 
     <string name="pending_outshare_indicator" context="label to indicate that a share is still pending on outgoing shares of a node">(대기중)</string>
 
-    <string name="option_enable_chat_rich_preview" context="Option in Settings section to enable the rick links previews">Rich URL 미리보기</string>
+    <string name="option_enable_chat_rich_preview" context="Title of the dialog to disable the rich links previews on chat">Rich URL 미리보기</string>
 
     <string name="button_always_rich_links" context="Button to allow the rich links previews on chat">항상 허용</string>
     <string name="button_not_now_rich_links" context="Button do not allow now the rich links previews on chat">나중에</string>
@@ -1929,14 +1964,14 @@
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">새 연락처</string>
     <string name="title_storage_usage" context="title of usage storage section in Storage">저장소 이용량</string>
 
-    <plurals name="plural_number_contact_request_notification" context="Notification title to show the number of incoming contact request">
-        <item context="contact request" quantity="one">%1$d개의 대기중인 연락처 요청</item>
-        <item context="contact requests" quantity="other">%1$d개의 대기중인 연락처 요청</item>
+    <plurals name="plural_number_contact_request_notification">
+        <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d개의 대기중인 연락처 요청</item>
+        <item context="Notification title to show the number of incoming contact request, contact requests" quantity="other">%1$d개의 대기중인 연락처 요청</item>
     </plurals>
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">새 연락처 요청</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen">"%s"에게 메시지 쓰는 중&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">"%s"에게 메시지 쓰는 중&#8230;</string>
     <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]활성화된[/B] [A]전송[/A] [B]없음.[/B]</string>
     <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]완료된[/B] [A]전송[/A] [B]없음.[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]빈[/B] [A]폴더[/A][B].[/B]</string>
@@ -1957,9 +1992,9 @@
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">시드 또는 QR 코드를 생성하던 중 오류가 발생하였습니다, 다시 시도하세요.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">2단계 인증 활성화됨</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">다음번 로그인 때 당신의 인증기 앱에서 생성된 6자리 코드를 요구합니다.</string>
-    <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>복구 키를 백업하세요</b></string>
-    <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">잘못된 코드</string>
-    <string name="lost_your_authenticator_device" context="When a user tries to login with Two-Factor Authentication and lost his device, button that permits get information about how login">인증기 장치를 잃어버렸나요?</string>
+    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>복구 키를 백업하세요</b></string>
+    <string name="pin_error_2fa" context="Error shown when it is scanning a QR code and it is invalid">잘못된 코드</string>
+    <string name="lost_your_authenticator_device" context="Title of screen Lost authenticator decive">인증기 장치를 잃어버렸나요?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">로그인 인증</string>
     <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">2단계 인증\n비밀번호 변경</string>
     <string name="cancel_account_verification" context="Title of screen Cancel account verification with Two-Factor Authentication">2단계 인증\n계정 취소</string>
@@ -1971,7 +2006,7 @@
     <string name="title_enable_2fa" context="Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication">2단계 인증 활성화</string>
     <string name="label_2fa_disabled" context="Label shown when it disables the Two-Factor Authentication">2단계 인증 비활성화됨</string>
     <string name="open_app_button" context="Text of the button which action is to show the authentication apps">다음으로 열기</string>
-    <string name="intent_not_available_2fa" context="message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn\'t any app that open it">당신의 기기에 2단계 인증을 활성화할 수 있는 앱이 없습니다</string>
+    <string name="intent_not_available_2fa" context="message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it">당신의 기기에 2단계 인증을 활성화할 수 있는 앱이 없습니다</string>
     <string name="general_close" context="Text button">닫기</string>
 
     <string name="backup_rk_2fa_end" context="Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process">완료하려면 복구 키를 내보내세요</string>
@@ -1983,14 +2018,14 @@
 
     <string name="number_correctly_imported_from_chat" context="success message when importing multiple files from">%d개의 파일이 성공적으로 공유됨</string>
     <string name="number_no_imported_from_chat" context="error message when importing multiple files from chat">%d개의 파일이 공유되지 않음</string>
-    <string name="preview_content" context="button's text to open a full screen image">컨텐츠 미리보기</string>
+    <string name="preview_content" context="button’s text to open a full screen image">컨텐츠 미리보기</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">스트리밍을 실행할 수 없고 파일이 다운로드되지 않았습니다</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">파일이 이미 오프라인용으로 저장되어 있습니다</string>
 
-    <plurals name="error_forwarding_messages" context="Error message if forwarding a message failed">
-        <item context="one message" quantity="one">메시지가 전달되지 않음</item>
-        <item context="many messages" quantity="other">메시지가 전달되지 않음</item>
+    <plurals name="error_forwarding_messages">
+        <item context="Error message if forwarding a message failed, one message" quantity="one">메시지가 전달되지 않음</item>
+        <item context="Error message if forwarding a message failed, many messages" quantity="other">메시지가 전달되지 않음</item>
     </plurals>
 
     <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">Rich URL 미리보기</string>
@@ -2017,9 +2052,9 @@
 
     <string name="context_send_message" context="menu item from contact section to send a message to a contact">메시지 보내기</string>
 
-    <plurals name="plural_contact_sent_to_chats" context="Message shown when a contact is successfully sent to several chats">
-        <item context="one contact" quantity="one">연락처가 성공적으로 대화에 전송됨</item>
-        <item context="more contacts" quantity="other">연락처들이 성공적으로 대화에 전송됨</item>
+    <plurals name="plural_contact_sent_to_chats">
+        <item context="Message shown when a contact is successfully sent to several chats, one contact" quantity="one">연락처가 성공적으로 대화에 전송됨</item>
+        <item context="Message shown when a contact is successfully sent to several chats, more contacts" quantity="other">연락처들이 성공적으로 대화에 전송됨</item>
     </plurals>
 
     <string name="error_MEGAdrop_not_supported" context="Error message on opening a MEGAdrop folder link">MEGAdrop 폴더는 아직 지원되지 않습니다</string>
@@ -2074,13 +2109,13 @@
     <string name="error_delete_versions" context="error message when deleting all the versions of the account">당신의 파일의 모든 이전 버전을 삭제하던 중 오류가 발생했습니다, 나중에 다시 시도하세요.</string>
 
     <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">파일 버전 기록</string>
-    <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">당신의 계정 전체에 대해 파일 버전 기록을 활성화하거나 비활성화합니다.\n연락처가 이것을 활성화했다면 공유된 폴더에서 계속해서 파일 버전을 받게 됩니다.</string>
+    <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">계정 전체에 대한 파일 버전 기록을 활성화하거나 비활성화합니다.\n파일 버전 기록을 해제하면 지인이 공유된 폴더에 새로운 버전을 만드는 것을 막을 수 없습니다.</string>
     <string name="choose_chat" context="section title to select a chat to send a file">대화 선택</string>
 
     <string name="type_mail" context="Hint shown to guide user on activity add contacts">탭하고, 이름 또는 이메일을 입력하세요</string>
 
     <string name="confirmation_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">%s을/를 연락처에 추가할까요?</string>
-    <string name="confirmation_not_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and the contact is already a contact">연락처 %s은(는) 이미 추가되어 있습니다.</string>
+    <string name="confirmation_not_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">연락처 %s은(는) 이미 추가되어 있습니다.</string>
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">연락처 %s은(는) 이미 추가되어 있습니다.</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">%s와(과) 공유할까요?</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">새 그룹 대화</string>
@@ -2094,11 +2129,11 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">잘못된 코드</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">클라우드 드라이브가 거의 찼습니다. PRO로 업그레이드하고 최대 8 TB의 저장소와 16 TB의 전송 할당량을 받으세요.</string>
-    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">클라우드 드라이브가 거의 찼습니다. 지금 업그레이드 하고 8 TB의 저장소와 16 TB의 전송 할당량을 받으세요.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">클라우드 드라이브가 거의 찼습니다. PRO로 업그레이드하고 최대 %1$s TB의 저장소와 %2$s TB의 전송 할당량을 받으세요.</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">클라우드 드라이브가 거의 찼습니다. 지금 업그레이드 하고 %1$s TB의 저장소와 %2$s TB의 전송 할당량을 받으세요.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">클라우드 드라이브가 거의 찼습니다. 더 많은 저장소가 필요하다면 맞춤 요금제를 위해 MEGA 고객 지원에 연락하세요.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">클라우드 드라이브가 가득 찼습니다. PRO로 업그레이드하고 최대 8 TB의 저장소와 16 TB의 전송 할당량을 받으세요.</string>
-    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">클라우드 드라이브가 가득 찼습니다. 지금 업그레이드하고 최대 8 TB의 저장소와 16 TB의 전송 할당량을 받으세요.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">클라우드 드라이브가 가득 찼습니다. PRO로 업그레이드하고 최대 %1$s TB의 저장소와 %2$s TB의 전송 할당량을 받으세요.</string>
+    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">클라우드 드라이브가 가득 찼습니다. 지금 업그레이드하고 최대 %1$s TB의 저장소와 %2$s TB의 전송 할당량을 받으세요.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">클라우드 드라이브가 가득 찼습니다. 더 많은 저장소가 필요하다면 맞춤 요금제를 위해 MEGA 고객 지원에 연락하세요.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">요금제 보기</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">커스텀 요금제</string>
@@ -2118,10 +2153,12 @@
 
     <string name="contact_info_button_more" context="More button in contact info page">더 보기</string>
 
-    <plurals name="plural_select_file" context="Section title to select a file to perform an action">
-        <item context="one file" quantity="one">파일 선택</item>
-        <item context="more files" quantity="other">파일 선택</item>
+    <plurals name="plural_select_file">
+        <item context="Section title to select a file to perform an action, one file" quantity="one">파일 선택</item>
+        <item context="Section title to select a file to perform an action, more files" quantity="other">파일 선택</item>
     </plurals>
+
+    <string name="title_confirm_send_invitation" context="Title of confirmation dialog of sending invitation to a contact">%1$s님을 초대할까요?</string>
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">폴더 선택</string>
 
@@ -2162,10 +2199,10 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">대화 링크 관리</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">암호화 키 순환 활성화</string>
-    <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
+    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
 
-    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A]님이[B] 대화 링크를 만들었습니다.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A]님이[B] 대화 링크를 삭제하였습니다.[/B]</string>
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A]님이[B] 대화 링크를 만들었습니다.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A]님이[B] 대화 링크를 삭제하였습니다.[/B]</string>
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">대화 링크 삭제</string>
 
@@ -2173,7 +2210,7 @@
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">이것은 현재 세션을 제외한 모든 활성 세션을 로그아웃시킵니다.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">모든 다른 세션을 닫으시겠습니까?</string>
 
-    <string name="number_of_participants" context="Subtitle to show the number of participants of a chat. Please keep the placeholder because is to show the number of participants in runtime.">참가자 %d명</string>
+    <string name="number_of_participants" context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants">참가자 %d명</string>
 
     <string name="action_join" context="Label of the button to join a chat by a chat link">참여</string>
 
@@ -2188,15 +2225,15 @@
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">이 대화 미리 보기는 더 이상 유효하지 않습니다. 미리 보기를 떠나면, 다시 열 수 없습니다.</string>
 
-    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A]님이[B] 암호화 키 순환을 활성화하였습니다.[/B]</string>
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A]님이[B] 암호화 키 순환을 활성화하였습니다.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">이 대화는 더 이상 유효하지 않습니다</string>
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">잘못된 대화 링크</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">암호화 키 순환</string>
-    <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
+    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
 
-    <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
+    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
     <string name="action_open_chat_link" context="Menu item">대화 링크 열기</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">연락처 %s에 대한 초대장이 이전에 발송되었으며, 발송된 요청 탭에서 찾아볼 수 있습니다.</string>
@@ -2253,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[A]%s님이 보낸 [/A][B]연락처 요청을 [/B][B]거절하였습니다[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">현재 계정은 [A]%s[/A]입니다</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* 도전 과제 프로그램에 참여한 경우</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">도전 과제 프로그램에 참여할 수 있습니다.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">지불 수단을 선택하세요</string>
 
     <string name="billing_period_title" context="title of billing period">결제 주기</string>
@@ -2270,9 +2307,6 @@
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">신규</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">파일명</string>
-
-    <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">자동 부재중 설정에 올바르지 않은 값입니다, 0보다 커야합니다.</string>
-
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">최근 접속 시간 보기&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">당신의 연락처가 당신이 최근에 MEGA에서 활동한 시간을 볼 수 있도록 합니다.</string>
 
@@ -2280,41 +2314,41 @@
 	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">동영상 압축을 할 저장소 공간이 충분하지 않습니다.</string>
 	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">동영상 압축 크기가 너무 큽니다</string>
 	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">압축하려는 동영상의 합계가 %s를 초과할 경우, 계속하려면 기기를 충전 상태에 두세요.</string>
-	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">이 설정은 다음번 카메라 업로드 실행시 적용됩니다</string>
+	<string name="message_keep_device_name" context="Message displayed when the user changes the ‘Keep file names as in the device’ setting">이 설정은 다음번 카메라 업로드 실행시 적용됩니다</string>
 	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s 압축되었음</string>
 	<string name="title_compress_video" context="notification title when compressing video">동영상 압축중 %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">잘못된 폴더 선택됨</string>
 
-    <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
-        <item context="Singular of file. 1 file" quantity="one">%d개의 파일</item>
-        <item context="Plural of file. 2 files" quantity="other">%d개의 파일</item>
+    <plurals name="num_files_with_parameter">
+        <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d개의 파일</item>
+        <item context="on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files" quantity="other">%d개의 파일</item>
     </plurals>
 
-    <plurals name="num_folders_with_parameter" context="on the section notifications indicates the number of folder added to a shared folder">
-        <item context="Singular of folder/directory. 1 folder" quantity="one">%d개의 폴더</item>
-        <item context="Plural of folder/directory. 2 folders" quantity="other">%d개의 폴더</item>
+    <plurals name="num_folders_with_parameter">
+        <item context="on the section notifications indicates the number of folder added to a shared folder, Singular of folder/directory. 1 folder" quantity="one">%d개의 폴더</item>
+        <item context="on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders" quantity="other">%d개의 폴더</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s님이[/A][B] %2$s와/과 %3$s을/를 추가하였습니다[/B]</string>
 
-    <plurals name="subtitle_notification_added_files" context="Subtitle of the historic notification for new additions inside an existing shared folder">
-        <item context="Singular of file. 1 file" quantity="one">[A]%1$s님이[/A][B] 파일 %2$d개를 추가하였습니다.[/B]</item>
-        <item context="Plural of file. 2 files" quantity="other">[A]%1$s님이[/A][B] 파일 %2$d개를 추가하였습니다.[/B]</item>
+    <plurals name="subtitle_notification_added_files">
+        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Singular of file. 1 file" quantity="one">[A]%1$s님이[/A][B] 파일 %2$d개를 추가하였습니다.[/B]</item>
+        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files" quantity="other">[A]%1$s님이[/A][B] 파일 %2$d개를 추가하였습니다.[/B]</item>
     </plurals>
 
-    <plurals name="subtitle_notification_deleted_items" context="Subtitle of the historic notification for deletions inside an existing shared folder">
-        <item context="Singular of item. 1 item" quantity="one">[A]%1$s님이[/A][B] %2$d개 항목을 삭제하였습니다.[/B]</item>
-        <item context="Plural of item. 2 items" quantity="other">[A]%1$s님이[/A][B] %2$d개 항목을 삭제하였습니다.[/B]</item>
+    <plurals name="subtitle_notification_deleted_items">
+        <item context="Subtitle of the historic notification for deletions inside an existing shared folder, Singular of item. 1 item" quantity="one">[A]%1$s님이[/A][B] %2$d개 항목을 삭제하였습니다.[/B]</item>
+        <item context="Subtitle of the historic notification for deletions inside an existing shared folder, Plural of item. 2 items" quantity="other">[A]%1$s님이[/A][B] %2$d개 항목을 삭제하였습니다.[/B]</item>
     </plurals>
 
-    <plurals name="subtitle_notification_added_folders" context="Subtitle of the historic notification for new additions inside an existing shared folder">
-        <item context="Singular of folder. 1 folder" quantity="one">[A]%1$s님이[/A][B] 폴더 %2$d개를 추가하였습니다.[/B]</item>
-        <item context="Plural of folder. 2 folders" quantity="other">[A]%1$s님이[/A][B] 폴더 %2$d개를 추가하였습니다.[/B]</item>
+    <plurals name="subtitle_notification_added_folders">
+        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Singular of folder. 1 folder" quantity="one">[A]%1$s님이[/A][B] 폴더 %2$d개를 추가하였습니다.[/B]</item>
+        <item context="Subtitle of the historic notification for new additions inside an existing shared folder, Plural of folder. 2 folders" quantity="other">[A]%1$s님이[/A][B] 폴더 %2$d개를 추가하였습니다.[/B]</item>
     </plurals>
 
-    <plurals name="subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions and not archived">
-        <item context="Singular of participant. 1 participant" quantity="one">참가자 %d명</item>
-        <item context="Plural of participant. 2 participants" quantity="other">참가자 %d명</item>
+    <plurals name="subtitle_of_group_chat">
+        <item context="Subtitle chat screen for groups with permissions and not archived, Singular of participant. 1 participant" quantity="one">참가자 %d명</item>
+        <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">참가자 %d명</item>
     </plurals>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">이 대화의 링크를 생성하기 전, 설명을 입력해야합니다:</string>
@@ -2337,6 +2371,8 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">카메라 활성화</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">문서 스캔, 사진 촬영 그리고 영상 통화를 하려면 당신의 카메라에 대한 접근을 허용하세요.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">통화 활성화</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">연락처 접근 활성화</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA에 있는 다른 사람들과 당신을 연결하기 위해서는 당신의 연락처에 대한 접근이 필요합니다.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">암호화된 통화를 하려면 당신의 마이크에 접근을 허용하세요.</string>
     <string name="general_enable_access" context="General enable access">접근 허용</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">공유된 파일</string>
@@ -2344,22 +2380,22 @@
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">첨부물이 이미 발송됨</string>
 
     <string name="call_ended_message" context="Message shown when a call ends.">[A]통화 종료[/A][C]. 시간: [/C]</string>
-    <plurals name="plural_call_ended_messages_hours" context="Message that shows the hours of a call when it ends">
-        <item context="one hour" quantity="one">[B]%1$s 시간[/B]</item>
-        <item context="more hours" quantity="other">[B]%1$s 시간[/B]</item>
+    <plurals name="plural_call_ended_messages_hours">
+        <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s 시간[/B]</item>
+        <item context="Message that shows the hours of a call when it ends, more hours" quantity="other">[B]%1$s 시간[/B]</item>
     </plurals>
-    <plurals name="plural_call_ended_messages_minutes" context="Message that shows the minutes of a call when it ends">
-        <item context="one minute" quantity="one">[B]%1$s 분[/B]</item>
-        <item context="more minutes" quantity="other">[B]%1$s 분[/B]</item>
+    <plurals name="plural_call_ended_messages_minutes">
+        <item context="Message that shows the minutes of a call when it ends, one minute" quantity="one">[B]%1$s 분[/B]</item>
+        <item context="Message that shows the minutes of a call when it ends, more minutes" quantity="other">[B]%1$s 분[/B]</item>
     </plurals>
-    <plurals name="plural_call_ended_messages_seconds" context="Message that shows the seconds of a call when it ends">
-        <item context="one second" quantity="one">[B]%1$d 초[/B]</item>
-        <item context="more seconds" quantity="other">[B]%1$d 초[/B]</item>
+    <plurals name="plural_call_ended_messages_seconds">
+        <item context="Message that shows the seconds of a call when it ends, one second" quantity="one">[B]%1$d 초[/B]</item>
+        <item context="Message that shows the seconds of a call when it ends, more seconds" quantity="other">[B]%1$d 초[/B]</item>
     </plurals>
 
     <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]최근 접속 시간 [/A]오늘 %1$s</string>
-    <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it's been a long time ago that we don't see any activity from that user">[A]최근 접속 시간 [/A]오래 전</string>
-    <string name="last_seen_general" context="String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. ">[A]최근 접속 시간 [/A]%1$s %2$s</string>
+    <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user">[A]최근 접속 시간 [/A]오래 전</string>
+    <string name="last_seen_general" context="String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m.">[A]최근 접속 시간 [/A]%1$s %2$s</string>
 
     <string name="label_today" context="label today">오늘</string>
     <string name="label_yesterday" context="label yesterday">어제</string>
@@ -2390,28 +2426,37 @@
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
-    <plurals name="messages_forwarded_success_plural" formatted="false" context="Confirmation message after forwarding one or several messages">
-        <item context="version item" quantity="one">메시지 전달됨</item>
-        <item context="version items" quantity="other">전달된 메시지</item>
+    <plurals name="messages_forwarded_success_plural" formatted="false">
+        <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">메시지 전달됨</item>
+        <item context="Confirmation message after forwarding one or several messages, version items" quantity="other">전달된 메시지</item>
     </plurals>
 
     <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">고정된 위치</string>
     <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">파일 시스템에서</string>
 
-    <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
-        <item context="Singular of file. 1 file" quantity="one">%d개의 파일이 %d개의 대화에 전송되지 않았습니다</item>
-        <item context="Plural of file. 2 files" quantity="other">%d개의 파일이 %d개의 대화에 전송되지 않았습니다</item>
+    <plurals name="num_files_not_send">
+        <item context="Alert shown when a num of files have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">%d개의 파일이 %d개의 대화에 전송되지 않았습니다</item>
+        <item context="Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files" quantity="other">%d개의 파일이 %d개의 대화에 전송되지 않았습니다</item>
     </plurals>
 
-    <plurals name="num_contacts_not_send" context="Alert shown when a num of contacts have not been sent because of any error occurs">
-        <item context="Singular of file. 1 file" quantity="one">%d개의 연락처가 %d개의 대화에 전송되지 않았습니다</item>
-        <item context="Plural of file. 2 files" quantity="other">%d개의 연락처가 %d개의 대화에 전송되지 않았습니다</item>
+    <plurals name="num_contacts_not_send">
+        <item context="Alert shown when a num of contacts have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">%d개의 연락처가 %d개의 대화에 전송되지 않았습니다</item>
+        <item context="Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files" quantity="other">%d개의 연락처가 %d개의 대화에 전송되지 않았습니다</item>
     </plurals>
 
-    <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
-        <item context="Singular of file. 1 file" quantity="one">%d개의 메시지가 %d개의 대화에 전송되지 않았습니다</item>
-        <item context="Plural of file. 2 files" quantity="other">%d개의 메시지가 %d개의 대화에 전송되지 않았습니다</item>
+    <plurals name="num_messages_not_send">
+        <item context="Alert shown when a num of messages have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">%d개의 메시지가 %d개의 대화에 전송되지 않았습니다</item>
+        <item context="Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files" quantity="other">%d개의 메시지가 %d개의 대화에 전송되지 않았습니다</item>
     </plurals>
+
+    <plurals name="quantity_of_local_contact">
+        <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">MEGA에서 %d개의 연락처 찾음</item>
+        <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">MEGA에서 %d개의 연락처 찾음</item>
+    </plurals>
+    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">지금 연락처를 초대할까요?</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">누가 MEGA를 사용중인지 보기</string>
+    <string name="get_registered_contacts" context="Getting registered contacts">MEGA에서 연락처 불러오는 중&#8230;</string>
+
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">항목이 %d개의 대화에 전송되지 않았습니다</string>
 
@@ -2427,17 +2472,18 @@
     <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">이전 버전이 삭제되었습니다.</string>
     <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">이전 버전이 삭제되지 않았습니다.</string>
 
-    <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
-        <item context="version item" quantity="one">%d개의 버전이 성공적으로 삭제되었습니다</item>
-        <item context="version items" quantity="other">%d개의 버전이 성공적으로 삭제되었습니다</item>
+    <plurals name="versions_deleted_succesfully" formatted="false">
+        <item context="Confirmation message after deleted file versions, version item" quantity="one">%d개의 버전이 성공적으로 삭제되었습니다</item>
+        <item context="Confirmation message after deleted file versions, version items" quantity="other">%d개의 버전이 성공적으로 삭제되었습니다</item>
     </plurals>
 
-    <plurals name="versions_not_deleted" formatted="false" context="Alert shown when some versions are not deleted successfully">
-        <item context="version item" quantity="one">%d개의 버전이 삭제되지 않았습니다</item>
-        <item context="version items" quantity="other">%d개의 버전이 삭제되지 않았습니다</item>
+    <plurals name="versions_not_deleted" formatted="false">
+        <item context="Alert shown when some versions are not deleted successfully, version item" quantity="one">%d개의 버전이 삭제되지 않았습니다</item>
+        <item context="Alert shown when some versions are not deleted successfully, version items" quantity="other">%d개의 버전이 삭제되지 않았습니다</item>
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">MEGA 연락처가 없습니다. 연락처 부문에서 친구들을 초대하세요.</string>
+    <string name="invite_more" context="Invite button for chat top cell">더 초대하기&#8230;</string>
 
     <string name="title_tour_one" context="Title of first tour screen">당신이 열쇠를 갖습니다</string>
     <string name="content_tour_one" cotext="Content of first tour screen">보안은 우리의 존재 이유이며, 당신의 파일들은 당신만이 접근 할수 있도록 우리 서버에 마치 잘 관리된 암호화 기계 뒤에 있는 것처럼 매우 안전합니다.</string>
@@ -2460,7 +2506,7 @@
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s님이 그룹 통화를 시작하였습니다. 참여하려면 탭하세요.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call">통화로 돌아가려면 탭하세요</string>
 
-    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A]님이[B] 단체 대화에 참여하였습니다.[/B]</string>
+    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime.">[A]%1$s[/A]님이[B] 단체 대화에 참여하였습니다.[/B]</string>
 
     <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">대화 링크가 삭제되면 그것을 통하여 이 대화에 참여할 수 없게 됩니다.</string>
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">암호화 키 순환은 새 단체 대화를 만드는 것 없이 대화 링크를 만드는 것을 허용하지 않습니다.</string>
@@ -2475,7 +2521,7 @@
     <string name="hint_action_search" context="Hint of the Search view">검색&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">응답</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">무시</string>
-    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s님이 이 통화를 음소거 하였습니다</string>
+    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s님이 이 통화를 음소거 하였습니다</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">음소거됨</string>
 
     <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File already downloaded. Copied to the selected path.</string>
@@ -2497,9 +2543,12 @@
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">새 대화 링크</string>
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">그룹 이름을 입력하세요</string>
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">대화 링크를 생성하려면 그룹 이름을 지어야합니다.</string>
-    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">지인을 초대하고 MEGA의 암호화된 대화로 안전하게 대화를 시작하세요.</string>
+    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">지인을 초대하고 MEGA의 암호화된 대화로 안전하게 대화를 시작하세요.</string>
+    <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">종단간 암호화를 통하여 당신의 연락처와 안전하게 대화를 시작하세요</string>
 
-    <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">사용 가능한 대화 링크 없음</string>
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">안녕하세요! 저와 MEGA에서 안전한 대화를 하고 최대 50GB의 무료 저장 공간을 받으세요. %1$s</string>
+
+    <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it.">사용 가능한 대화 링크 없음</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">대화 링크를 성공적으로 삭제하였습니다.</string>
 
     <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (승낙함)</string>
@@ -2507,12 +2556,16 @@
     <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (거절함)</string>
     <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (무시함)</string>
     <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (상기함)</string>
-    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (보류중)</string>
+    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (대기중)</string>
+
+    <string name="version_restored" context="Message shown when it restored successfully a file version">성공적으로 버전을 복구하였습니다.</string>
 
     <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">녹음하려면 누른 상태로 유지하시고, 전송하려면 놓으세요.</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">취소하려면 슬라이드하세요</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">이 음성 메시지를 사용할 수 없습니다</string>
 
+    <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">다음을 통해 친구 초대</string>
+    <string name="invite_contact_action_button" context="Action button label">다음을 통해 친구 초대&#8230;</string>
 	<plurals name="file_already_downloaded">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d개의 파일은 이미 다운로드 되었습니다.&#160;</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d개의 파일은 이미 다운로드 되었습니다.&#160;</item>
@@ -2520,24 +2573,26 @@
 
 	<plurals name="file_pending_download">
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d개의 파일 대기중.</item>
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">파일 %d개 보류중.</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">파일 %d개 대기중.</item>
 	</plurals>
 
     <string name="recents_label" context="Label to reference a recents section">최근</string>
-    <string name="chats_label" context="Label to reference a chats section">Chats</string>
+    <string name="chats_label" context="Label to reference a chats section">대화</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
-    <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
-    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
-    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
-    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">%1$d Images and %2$d Videos</string>
-    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">%d Images and 1 Video</string>
-    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">1 Image and %d Videos</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[A]최근 항목[/A][B]에 출력할 파일 활동이 보이지 않습니다[/B][B].[/B]</string>
+    <string name="title_bucket" cotext="Title of a recents bucket">%1$s 그리고 %2$d개 더</string>
+    <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">이미지 %d개</string>
+    <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">동영상 %d개</string>
+    <string name="title_media_bucket_images_and_videos" cotext="Title of a media recents bucket that contains some images and some videos">이미지 %1$d개와 동영상 %2$d개</string>
+    <string name="title_media_bucket_images_and_video" cotext="Title of a media recents bucket that contains some images and a video">이미지 %d개와 동영상 1개</string>
+    <string name="title_media_bucket_image_and_videos" cotext="Title of a media recents bucket that contains an image and some videos">이미지 1개와 동영상 %d개</string>
     <string name="title_media_bucket_image_and_video" cotext="Title of a media recents bucket that contains an image and a video">이미지 1개와 동영상 1개</string>
-    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
-    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
+    <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]생성인[/A] %s</string>
+    <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]수정인[/A] %s</string>
     <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">나</string>
 
+    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">전화번호를 추가하고 %1$s를 무료로 받으세요. 이것은 당신의 지인들이 MEGA에서 당신을 쉽게 찾도록 해줍니다.</string>
+    <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">MEGA에 전화번호를 추가하세요. 이것은 당신의 지인들이 당신을 MEGA에서 더 쉽게 찾도록 해줍니다.</string>
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">통화가 진행중이면 음성 메시지를 녹음할 수 없습니다.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">음성 메시지 업로드를 시도하던 중 오류 발생.</string>
 
@@ -2546,6 +2601,13 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">불러오는중</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">잠시만 기다리세요&#8230;</string>
 
-    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">로그아웃하면 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
+    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">로그아웃하면, 진행중인 전송은 취소됩니다.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">로그아웃하면, 기기의 오프라인 섹션의 파일들이 삭제되고 진행중인 전송이 취소됩니다.</string>
+
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">알 수 없는 이름</string>
+
+    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">하나 이상의 연락처를 선택하세요.</string>
+
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s개의 연락처 보냄.</string>
 </resources>

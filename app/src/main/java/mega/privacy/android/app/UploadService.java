@@ -46,6 +46,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -525,7 +526,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 size = getResources().getQuantityString(R.plurals.upload_service_failed,errorCount,errorCount);
             } else {
                 long transferredBytes = getTransferredByte(mapProgressFileTransfers);
-                String totalBytes = Formatter.formatFileSize(UploadService.this,transferredBytes);
+                String totalBytes = getSizeString(transferredBytes);
                 size = getString(R.string.general_total_size,totalBytes);
             }
 
@@ -549,7 +550,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 notificationSubTitle = getResources().getQuantityString(R.plurals.upload_service_failed,childUploadFailed,childUploadFailed);
             }else{
                 long transferredBytes = getTransferredByte(mapProgressFolderTransfers);
-                String totalBytes = Formatter.formatFileSize(UploadService.this,transferredBytes);
+                String totalBytes = getSizeString(transferredBytes);
                 notificationSubTitle = getString(R.string.general_total_size,totalBytes);
             }
 
@@ -938,7 +939,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 				}
 
-				String qrFileName = megaApi.getMyEmail() + "QRcode.jpg";
+				String qrFileName = megaApi.getMyEmail() + QR_IMAGE_FILE_NAME;
 
 				File localFile = buildQrFile(getApplicationContext(),transfer.getFileName());
                 if (isFileAvailable(localFile) && !localFile.getName().equals(qrFileName)) {

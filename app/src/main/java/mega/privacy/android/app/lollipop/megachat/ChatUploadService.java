@@ -252,6 +252,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	}
 
 	private void handleIntentIfFolderExist(Intent intent) {
+		if (intent == null) return;
 		ArrayList<PendingMessageSingle> pendingMessageSingles = new ArrayList<>();
 		if (intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
 			HashMap<String, String> fileFingerprints = (HashMap<String, String>) intent.getSerializableExtra(EXTRA_UPLOAD_FILES_FINGERPRINTS);
@@ -259,16 +260,16 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			long[] attachFiles = intent.getLongArrayExtra(EXTRA_ATTACH_FILES);
 			long[] idChats = intent.getLongArrayExtra(EXTRA_ATTACH_CHAT_IDS);
 
-			if (attachFiles!=null && attachFiles.length>0 && idChats!=null && idChats.length>0) {
-				for (int i=0; i<attachFiles.length; i++) {
-					for (int j=0; j<idChats.length; j++) {
+			if (attachFiles != null && attachFiles.length > 0 && idChats != null && idChats.length > 0) {
+				for (int i = 0; i < attachFiles.length; i++) {
+					for (int j = 0; j < idChats.length; j++) {
 						requestSent++;
 						megaChatApi.attachNode(idChats[j], attachFiles[i], this);
 					}
 				}
 			}
 
-			if (idPendMsgs!=null && idPendMsgs.length>0 && fileFingerprints!=null && !fileFingerprints.isEmpty()) {
+			if (idPendMsgs != null && idPendMsgs.length > 0 && fileFingerprints != null && !fileFingerprints.isEmpty()) {
 				for (Map.Entry<String, String> entry : fileFingerprints.entrySet()) {
 					if (entry != null) {
 						String fingerprint = entry.getKey();
@@ -281,11 +282,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 						totalUploads++;
 
-						if(!wl.isHeld()){
+						if (!wl.isHeld()) {
 							wl.acquire();
 						}
 
-						if(!lock.isHeld()){
+						if (!lock.isHeld()) {
 							lock.acquire();
 						}
 						pendingMessageSingles.clear();
@@ -294,53 +295,51 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							if (idPendMsgs[i] != -1) {
 								pendingMsg = dbH.findPendingMessageById(idPendMsgs[i]);
 //									One transfer for file --> onTransferFinish() attach to all selected chats
-									if (pendingMsg != null && pendingMsg.getChatId() != -1 && path.equals(pendingMsg.getFilePath()) && fingerprint.equals(pendingMsg.getFingerprint())) {
-										pendingMessageSingles.add(pendingMsg);
-									}
+								if (pendingMsg != null && pendingMsg.getChatId() != -1 && path.equals(pendingMsg.getFilePath()) && fingerprint.equals(pendingMsg.getFingerprint())) {
+									pendingMessageSingles.add(pendingMsg);
 								}
 							}
-							initUpload(pendingMessageSingles, null);
 						}
+						initUpload(pendingMessageSingles, null);
 					}
 				}
 			}
-			else {
-				long chatId = intent.getLongExtra(EXTRA_CHAT_ID, -1);
-				type = intent.getStringExtra(EXTRA_TRANSFER_TYPE);
-				long idPendMsg = intent.getLongExtra(EXTRA_ID_PEND_MSG, -1);
-				PendingMessageSingle pendingMsg = null;
-				if(idPendMsg!=-1){
-					pendingMsg = dbH.findPendingMessageById(idPendMsg);
-				}
+		} else {
+			long chatId = intent.getLongExtra(EXTRA_CHAT_ID, -1);
+			type = intent.getStringExtra(EXTRA_TRANSFER_TYPE);
+			long idPendMsg = intent.getLongExtra(EXTRA_ID_PEND_MSG, -1);
+			PendingMessageSingle pendingMsg = null;
+			if (idPendMsg != -1) {
+				pendingMsg = dbH.findPendingMessageById(idPendMsg);
+			}
 
-			if (pendingMsg!=null) {
+			if (pendingMsg != null) {
 				sendOriginalAttachments = isSendOriginalAttachments(this);
 				logDebug("sendOriginalAttachments is " + sendOriginalAttachments);
 
-				if(chatId!=-1){
+				if (chatId != -1) {
 					logDebug("The chat ID is: " + chatId);
 
-						if((type==null)||(!type.equals(EXTRA_VOICE_CLIP))){
-							totalUploads++;
-						}
+					if ((type == null) || (!type.equals(EXTRA_VOICE_CLIP))) {
+						totalUploads++;
+					}
 
-					if(!wl.isHeld()){
+					if (!wl.isHeld()) {
 						wl.acquire();
 					}
 
-						if(!lock.isHeld()){
-							lock.acquire();
-						}
-						pendingMessageSingles.clear();
-						pendingMessageSingles.add(pendingMsg);
-						initUpload(pendingMessageSingles, type);
+					if (!lock.isHeld()) {
+						lock.acquire();
 					}
+					pendingMessageSingles.clear();
+					pendingMessageSingles.add(pendingMsg);
+					initUpload(pendingMessageSingles, type);
 				}
-				else{
+			} else {
 				logError("Error the chatId is not correct: " + chatId);
-				}
 			}
 		}
+	}
 
 	void initUpload (ArrayList<PendingMessageSingle> pendingMsgs, String type) {
 		logDebug("initUpload");

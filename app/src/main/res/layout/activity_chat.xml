@@ -158,9 +158,7 @@
 
             </android.support.v7.widget.Toolbar>
 
-            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
+            <RelativeLayout
                 android:id="@+id/writing_container_layout_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -224,6 +222,7 @@
                                 android:maxLines="1"
                                 android:textColor="@color/black"
                                 android:textSize="14sp" />
+
                         </RelativeLayout>
                     </RelativeLayout>
 
@@ -322,7 +321,7 @@
                 </LinearLayout>
             </RelativeLayout>
 
-            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <RelativeLayout
                 android:id="@+id/join_chat_layout_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="96dp"
@@ -361,34 +360,37 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/toolbar_chat"
-                android:background="@color/background_chat"
                 android:layout_above="@id/writing_container_layout_chat_layout"
+                android:background="@color/background_chat"
                 android:orientation="vertical">
 
                 <!--Empty messages -->
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/empty_messages_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/background_chat"
-                    android:orientation="vertical">
+                    android:background="@color/background_chat">
 
                     <ImageView
                         android:id="@+id/empty_image_view_chat"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:background="@null"
                         android:layout_gravity="center_horizontal" />
 
                     <TextView
                         android:id="@+id/empty_text_chat_recent"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:layout_below="@id/empty_image_view_chat"
+                        android:layout_centerInParent="true"
                         android:layout_gravity="center_horizontal"
-                        android:gravity="center"
                         android:text="@string/chat_loading_messages"
                         android:textColor="@color/adapters_background"
                         android:textSize="18sp" />
-                </LinearLayout>
+                </RelativeLayout>
 
                 <!-- Layout with chat content -->
                 <RelativeLayout
@@ -512,9 +514,7 @@
                 android:layout_below="@id/toolbar_chat"/>
 
 
-            <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
+            <FrameLayout
                 android:id="@+id/fragment_voice_clip"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

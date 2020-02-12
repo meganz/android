@@ -79,12 +79,12 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, AdapterView.OnItemClickListener {
 
@@ -152,6 +152,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     private RoundedImageView avatarImageView;
     private EmojiTextView infoTitleChatText;
     private MegaApiAndroid megaApi = null;
+
+    private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -899,15 +901,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void showParticipantsPanel(MegaChatParticipant participant){
         logDebug("Participant Handle: " + participant.getHandle());
-        if (participant != null) {
-            this.selectedHandleParticipant = participant.getHandle();
-        }
-        else{
-            logWarning("participant is NULL");
-            return;
-        }
 
-        ParticipantBottomSheetDialogFragment bottomSheetDialogFragment = new ParticipantBottomSheetDialogFragment();
+        if (participant == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedHandleParticipant = participant.getHandle();
+        bottomSheetDialogFragment = new ParticipantBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 

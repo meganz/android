@@ -399,15 +399,18 @@ public class ShareInfo {
 	 */
 	private void processContent(Uri uri, Context context) {
 		logDebug("processContent: " + uri);
-		ContentProviderClient client = null;
 
-		client = context.getContentResolver().acquireContentProviderClient(uri);
+		ContentProviderClient client = null;
 		Cursor cursor = null;
 		try {
-			cursor = client.query(uri, null, null, null, null);
-		} catch (Exception e1) {
-			logError("cursor EXCEPTION!!!", e1);
+			client = context.getContentResolver().acquireContentProviderClient(uri);
+			if (client != null) {
+				cursor = client.query(uri, null, null, null, null);
+			}
+		} catch (Exception e) {
+			logError("client or cursor EXCEPTION: ", e);
 		}
+
 		if(cursor!=null){
 			if(cursor.getCount()==0){
 				logDebug("RETURN - Cursor get count is 0");
@@ -479,6 +482,8 @@ public class ShareInfo {
 		}
 	
 		client.release();
+		cursor.close();
+
 		logDebug("---- END process content----");
 	}
 	

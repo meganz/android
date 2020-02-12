@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -183,9 +184,10 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			holder.itemLayout = v.findViewById(R.id.file_explorer_item_layout);
 			holder.imageView = v.findViewById(R.id.file_explorer_thumbnail);
 			holder.textViewFileName = v.findViewById(R.id.file_explorer_filename);
-			holder.textViewFileSize = v.findViewById(R.id.file_explorer_filesize);
+            holder.textViewFileSize = v.findViewById(R.id.file_explorer_filesize);
 			holder.permissionsIcon = v.findViewById(R.id.file_explorer_permissions);
-
+            holder.textViewFileName.setOnClickListener(this);
+            holder.textViewFileName.setTag(holder);
 			v.setTag(holder);
 			return holder;
 		} else {
@@ -605,22 +607,14 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         }
     }
 
-	public void selectAll(){
-		for (int i= 0; i<this.getItemCount();i++){
-			if(!isItemChecked(i)){
-				if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
-					if(!((CloudDriveExplorerFragmentLollipop) fragment).isFolder(i)){
-						toggleSelection(i);
-					}
-				}
-				else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
-					if(!((IncomingSharesExplorerFragmentLollipop) fragment).isFolder(i)){
-						toggleSelection(i);
-					}
-				}
-			}
-		}
-	}
+    public void selectAll() {
+        for (int i = 0; i < nodes.size(); i++) {
+            MegaNode node = nodes.get(i);
+            if (node != null && !node.isFolder() && !isItemChecked(i)) {
+                toggleSelection(i);
+            }
+        }
+    }
 
 	public void clearSelections() {
 		logDebug("clearSelections");
@@ -836,7 +830,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		}
 		return false;
 	}
-
 
 
 	@Override
