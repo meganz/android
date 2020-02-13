@@ -6,6 +6,8 @@
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     -->
 
+    <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF Viewer</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">of</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Yes</string>
     <string name="general_no" context="Answer for confirmation dialog.">No</string>
@@ -212,13 +214,17 @@
     <string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
 
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
-    <string name="name_text" context="category in sort by action">Name</string>
+    <string name="name_text" context="Name of the user">Name</string>
+    <string name="first_name_text" context="First Name of the user">First Name</string>
     <string name="lastname_text" context="Last name of the user">Last Name</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA’s [A]Terms of Service[/A]</string>
+    <string name="top" context="text placed on the checkbox to make sure user agree that understand the danger of losing password">I understand that [B]if I lose my password, I may lose my data[/B]. Read more about [A]MEGA’s end-to-end encryption[/A]</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
 
     <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service</string>
-    <string name="error_enter_username" context="Warning dialog">Please enter your name</string>
+
+    <string name="create_account_no_top" context="warning dialog, for user do not tick checkbox of understanding the danger of losing password">You need to agree that you understand the danger of losing your password</string>
+    <string name="error_enter_username" context="Warning dialog">Please enter your first name</string>
     <string name="error_enter_userlastname" context="Warning dialog">Please enter your last name.</string>
     <string name="error_short_password" context="when creating the account">Password is too short</string>
     <string name="error_passwords_dont_match" context="when creating the account">Passwords do not match</string>
@@ -503,6 +509,13 @@
     -->
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Thank you for your feedback! Are you sure you want to cancel your MEGA subscription?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Your subscription has not been cancelled. Please provide a reason for your cancellation</string>
+    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Thank you for subscribing to %1$s %2$s!</string>
+    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
+    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
+    <string name="subscription_type_monthly" context="">Monthly</string>
+    <string name="subscription_type_yearly" context="">Yearly</string>
+
+    <string name="error_subscription_purchased_already" context="error message when user wants to purchase subscription he already on">You have purchased this subscription already.</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">The folder is now private</string>
 
@@ -638,6 +651,10 @@
     <string name="menu_cancel_all_transfers" context="menu item">Delete all transfers</string>
 
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Take picture</string>
+
+    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the \'display over other apps\' permission" >Allow notifications of incoming MEGA calls</string>
+    <string name="ask_for_display_over_msg" context="Dialog title, to explain why MEGA needs the \'display over other apps\' permission">MEGA needs your authorization to allow call interface to pop up from background.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn't want to make MEGA grant the \'display over other apps\' permission for now.">Don\'t worry, you can still manually set up on your device’s settings.</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or mobile data</string>
@@ -836,6 +853,10 @@
     <string name="sortby_size" context="category in sort by action">Size</string>
     <string name="sortby_size_largest_first" context="sort files by size largest first">Largest</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">Smallest</string>
+
+    <string name="sortby_type" context="title of sort by media type options">Media type</string>
+    <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Photos</string>
+    <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Videos</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
@@ -1221,8 +1242,6 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] left the group chat[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Message not sent. Tap for options</string>
-
-    <string name="chat_status_title" context="settings of the chat to choose the status">Status</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1331,7 +1350,7 @@
 
     <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">No billing cycle</string>
 
-    <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]of %2$s[/A]</string>
+    <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section. Please, keep the placeholders, the first one is for the space consumed and the second one is for the total space available. For instance: 144.44 GB of 200 GB. Please, keep the markers ([A]...[/A], [B]...[/B]), they are for formatting the string setting a font style">[A]%1$s[/A] [B]of %2$s[/B]</string>
 
     <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Remove from Save for Offline?</string>
 
@@ -1339,6 +1358,7 @@
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
+    <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Not available</string>
 
     <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">Invitation accepted</string>
     <string name="context_invitacion_reply_declined" context="Declined request invitacion alert">Invitation declined</string>
@@ -1601,8 +1621,6 @@
     <string name="achievements_title" context="title of the section for achievements">Achievements</string>
     <string name="achievements_subtitle" context="subtitle of the section for achievements">Invite friends and get rewards</string>
 
-    <string name="button_invite_friends" context="button to invite friends for getting achievements">Invite friends</string>
-
     <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">Get %1$s of storage and %2$s of transfers for each referral</string>
 
     <string name="figures_achievements_text" context="sentence to detail the figures of storage and transfer quota related to each achievement">Get %1$s of storage and %2$s of transfers</string>
@@ -1619,7 +1637,7 @@
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Account Base Quota</string>
     <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">No files in Camera Uploads</string>
     <string name="general_num_days_left" context="indicates the number of days left related to a achievement">%1$d d left</string>
-    <string name="expired_achievement" context="state to indicate the achievement has expired">Expired</string>
+    <string name="expired_label" context="State to indicate something has expired (achivements of business status account for instance)">Expired</string>
 
     <string name="setting_title_use_https_only" context="title of the advanced setting to choose the use of https">Don’t use HTTP</string>
     <string name="setting_subtitle_use_https_only" context="subtitle of the advanced setting to choose the use of https">Enable this option only if your transfers don’t start. In normal circumstances HTTP is satisfactory as all transfers are already encrypted.</string>
@@ -1714,6 +1732,9 @@
     <string name="send_feedback_panel" context="Label to show send feedback">No, send feedback</string>
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Advanced options</string>
+    <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">To download files MEGA needs your permission.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Choose download location</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">No contact permissions granted</string>
 
@@ -1735,6 +1756,7 @@
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">QR code not deleted due to an error. Please try again.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invite sent</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">The user %s has been invited and will appear in your contact list once accepted.</string>
+    <string name="invite_sent_text_multi" context="Text of dialog shown when multiple contacts request has been sent">The users have been invited and will appear in your contact list once accepted.</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">An error occurred while trying to share the QR file. Perhaps the file does not exist. Please try again later.</string>
     <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">An error occurred while trying to upload the QR file. Perhaps the file does not exist. Please try again later.</string>
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">An error occurred while trying to download the QR file. Perhaps the file does not exist. Please try again later.</string>
@@ -1904,8 +1926,9 @@
     <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">Jump to latest</string>
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">New messages</string>
 
-
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">Incoming call</string>
+    <string name="notification_incoming_action" context="notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_enable_display" context="text explains why needs to go to system setting to enable allow display over other apps">MEGA background pop-ups are disabled.\nTap to change the settings.</string>
 
     <plurals name="number_unread_messages">
         <item context="Subtitle to show the number of unread messages on a chat, unread message" quantity="one">%1$s unread message</item>
@@ -2272,6 +2295,15 @@
     <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been taken down.[/C]</string>
     <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been taken down.[/C]</string>
 
+    <string name="message_file_takedown_pop_out_notification" context="Popup notification text on mouse-over of taken down file.">This file has been the subject of a takedown notice.</string>
+    <string name="message_folder_takedown_pop_out_notification" context="Popup notification text on mouse-over taken down folder.">This folder has been the subject of a takedown notice.</string>
+    <string name="dispute_takendown_file" context="option to dispute taken down file or folder">Dispute Takedown</string>
+    <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">Not accessible due to ToS/AUP violation</string>
+    <plurals name="alert_taken_down_files">
+        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">%d file was not downloaded due to ToS/AUP violation.</item>
+        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">%d files were not downloaded due to ToS/AUP violation.</item>
+    </plurals>
+
     <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
     <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]</string>
 
@@ -2294,8 +2326,10 @@
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Select payment method</string>
 
     <string name="billing_period_title" context="title of billing period">Billing period</string>
-    <string name="billed_monthly_text" context="option of billing period, monthly">[A]Billed monthly[/A] %s /month</string>
-    <string name="billed_yearly_text" context="option of billing period, yearly">[A]Billed yearly[/A] %s /year</string>
+    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
+    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]One-off (year)[/A] %s</string>
+    <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]Monthly[/A] %s /month</string>
+    <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Yearly[/A] %s /year</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">Cancel</string>
     <string name="button_continue" context="dialog option continue in alert dialog">Continue</string>
 
@@ -2305,6 +2339,7 @@
     <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">To upgrade from you current subscription, please contact support for a [A]custom plan[/A].</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">file name</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show Last seen&#8230;</string>
@@ -2356,6 +2391,7 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat link copied to the clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s / [A]month[/A] *</string>
+    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user / [A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Recurring subscription can be cancelled any time before the renewal date.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Call Started</string>
 
@@ -2576,6 +2612,9 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
 	</plurals>
 
+    <string name="login_to_mega" context="Title of the login screen">Login to MEGA</string>
+    <string name="create_account_title" context="Title of the create account screen">Create your MEGA account</string>
+
     <string name="recents_label" context="Label to reference a recents section">Recents</string>
     <string name="chats_label" context="Label to reference a chats section">Chats</string>
 
@@ -2601,13 +2640,60 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Loading</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Please wait&#8230;</string>
 
+    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %1$d contacts</string>
+
+    <string name="account_label" context="Head label to show the business account type">Account type</string>
+    <string name="business_label" context="Label in My Account section to show user account type">Business</string>
+    <string name="admin_label" context="Business user role">Admin</string>
+    <string name="user_label" context="Business user role">User</string>
+    <string name="status_label" context="General label to show the status of something or someone">Status</string>
+    <string name="inactive_label" context="State to indicate something is inactive (business status account for instance)">Inactive</string>
+    <string name="active_label" context="State to indicate something is active (business status account for instance)">Active</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">Grace</string>
+    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
+    <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Usage</string>
+    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
+    <string name="overall_usage_label" context="Title of overall usage section in Storage">Overall usage</string>
+    <string name="transfer_label" context="Title of transfer section in Storage">Transfer</string>
+
+    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
+    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA in a desktop browser for more information.</string>
+    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Your business account is expired</string>
+    <string name="expired_admin_business_text" context="Details shown when a Business account is expired. Details for the administrator of the Business account">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
+    <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Your account is currently [B]suspended[/B]. You can only browse your data.</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view your Camera Uploads in your user account</string>
+    <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Something went wrong</string>
+    <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contact your business account administrator to resolve the issue and activate your account.</string>
+    <string name="business_account_clarification" context="">** For genuine business purposes.</string>
+    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep the placeholder is to indicate if the space is refered to storage or transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]%1$s[/A] **</string>
+
+    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
+
     <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">When you logout, files from your Offline section will be deleted from your device.</string>
     <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">When you logout, ongoing transfers will be cancelled.</string>
     <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">When you logout, files from your Offline section will be deleted from your device and ongoing transfers will be cancelled.</string>
 
-    <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
-
+    <string name="title_long" context="Error when renaming a chat title and it is too long">Title too long</string>
     <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Please select one or more contacts.</string>
 
-    <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">Sent %s Contacts.</string>
+    <string name="my_chat_files_folder" context="Name by default of the folder where the files sent to the chat are stored in the cloud">My chat files</string>
+    <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Error. The folder %1$s was not created</string>
+
+    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Verify your email</string>
+    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily suspended for your safety.</string>
+    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">Please [A]verify your email[/A] and follow its steps to unlock your account.</string>
+    <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Why am I seeing this?</string>
+    <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
+    <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Locked Accounts</string>
+    <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">It is possible that you are using the same password for your MEGA account as for other services, and that at least one of these other services has suffered a data breach.</string>
+    <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Your password leaked and is now being used by bad actors to log into your accounts, including, but not limited to, your MEGA account.</string>
+
+    <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
+
+    <string name="create_new_file_action" context="Text shown for the action create new file">Create new file</string>
+    <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.
+">You do not have the permissions required to revert this file. In order to continue, we can create a new file with the reverted data. Would you like to proceed?</string>
+    <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Permissions error</string>
+    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
 </resources>

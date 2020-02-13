@@ -64,10 +64,13 @@ import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.listeners.CreateFolderListener;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -115,6 +118,9 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public final static int INCOMING_FRAGMENT = 1;
 	public final static int CHAT_FRAGMENT = 3;
 	public final static int IMPORT_FRAGMENT = 4;
+    public static final String EXTRA_SHARE_INFOS = "share_infos";
+    public static final String EXTRA_SHARE_ACTION = "share_action";
+    public static final String EXTRA_SHARE_TYPE = "share_type";
 
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
@@ -240,6 +246,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private SearchView searchView;
 
+    private boolean needLogin;
+
 	private FileExplorerActivityLollipop fileExplorerActivityLollipop;
 
 	private String querySearch = "";
@@ -324,12 +332,31 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		@Override
 		protected List<ShareInfo> doInBackground(Intent... params) {
 			logDebug("OwnFilePrepareTask: doInBackground");
-			return ShareInfo.processIntent(params[0], context);
+            Intent intent = params[0];
+            List<ShareInfo> shareInfos = (List<ShareInfo>) intent.getSerializableExtra(EXTRA_SHARE_INFOS);
+            if(shareInfos != null) {
+                return  shareInfos;
+            }
+            return ShareInfo.processIntent(intent, context);
 		}
 
 		@Override
 		protected void onPostExecute(List<ShareInfo> info) {
 			filePreparedInfos = info;
+			if(needLogin) {
+                Intent loginIntent = new Intent(FileExplorerActivityLollipop.this, LoginActivityLollipop.class);
+                loginIntent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+                loginIntent.putExtra(EXTRA_SHARE_ACTION, getIntent().getAction());
+                loginIntent.putExtra(EXTRA_SHARE_TYPE, getIntent().getType());
+                loginIntent.putExtra(EXTRA_SHARE_INFOS,new ArrayList<>(info));
+                // close previous login page
+                loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                loginIntent.setAction(ACTION_FILE_EXPLORER_UPLOAD);
+                needLogin = false;
+                startActivity(loginIntent);
+                finish();
+                return;
+            }
 			if (action != null && getIntent() != null) {
 				getIntent().setAction(action);
 			}
@@ -425,11 +452,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		
 		if (credentials == null){
 			logWarning("User credentials NULL");
-			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-			loginIntent.putExtra("visibleFragment",  LOGIN_FRAGMENT);
-			loginIntent.setAction(ACTION_FILE_EXPLORER_UPLOAD);
-			startActivity(loginIntent);
-			finish();
+            needLogin = true;
+            OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
+            ownFilePrepareTask.execute(getIntent());
+            createAndShowProgressDialog(false, R.string.upload_prepare);
 			return;
 		}
 		else{
@@ -773,7 +799,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						if (!multiselect) {
 							return;
 						}
-						
+
 						if (isSearchExpanded && !pendingToOpenSearchView) {
 							clearQuerySearch();
 							collapseSearchView();
@@ -878,7 +904,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 		return false;
 	}
-	
+
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		logDebug("onCreateOptionsMenuLollipop");
@@ -1574,6 +1600,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
 					intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
 					intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
+					intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
 					startService(intent);
 
 					finishFileExplorer();
@@ -1607,6 +1634,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
 				intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
 				intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
+				intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
 				startService(intent);
 
 				finishFileExplorer();
@@ -1632,7 +1660,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		finishActivity();
 	}
 
-	private void checkIfFilesExistsInMEGA () {
+	public void checkIfFilesExistsInMEGA () {
 		for (ShareInfo info : filePreparedInfos) {
 			String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
 			MegaNode node = megaApi.getNodeByFingerprint(fingerprint);
@@ -1671,14 +1699,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		    showSnackbar(getString(R.string.upload_can_not_open));
 		}
 		else {
-			myChatFilesNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
-			if(myChatFilesNode == null){
-				logDebug("Create folder: " + CHAT_FOLDER);
-				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
-			}
-			else {
-				checkIfFilesExistsInMEGA();
-			}
+			megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
 		}
 	}
 
@@ -2018,7 +2039,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					return;
 				}
 				
-				megaApi.createFolder(title, parentNode, this);
+				megaApi.createFolder(title, parentNode, new CreateFolderListener(this));
 			}
 			else{
 				showSnackbar(getString(R.string.context_folder_already_exists));
@@ -2048,7 +2069,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						return;
 					}
 
-					megaApi.createFolder(title, parentNode, this);
+					megaApi.createFolder(title, parentNode, new CreateFolderListener(this));
 				}
 				else{
 					showSnackbar(getString(R.string.context_folder_already_exists));
@@ -2082,90 +2103,23 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
 		logDebug("onRequestFinish");
-		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-			myChatFilesNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
-			if (myChatFilesNode != null && myChatFilesNode.getHandle() == request.getNodeHandle()) {
-				checkIfFilesExistsInMEGA();
-			}
-			else {
-				try {
-					statusDialog.dismiss();
-				}
-				catch (Exception ex) {}
-
-				if (error.getErrorCode() == MegaError.API_OK){
-					cDriveExplorer = getCloudExplorerFragment();
-					iSharesExplorer = getIncomingExplorerFragment();
-
-					if (isCloudVisible()){
-						cDriveExplorer.navigateToFolder(request.getNodeHandle());
-						parentHandleCloud = request.getNodeHandle();
-					}
-					else if (isIncomingVisible()){
-						iSharesExplorer.navigateToFolder(request.getNodeHandle());
-						parentHandleIncoming = request.getNodeHandle();
-					}
-				}
-			}
-		}
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 
 			if (error.getErrorCode() != MegaError.API_OK) {
-
+                logWarning("Login failed with error code: " + error.getErrorCode());
 				MegaApplication.setLoggingIn(false);
-
-				//ERROR LOGIN
-				String errorMessage;
-				if (error.getErrorCode() == MegaError.API_ENOENT) {
-					errorMessage = getString(R.string.error_incorrect_email_or_password);
-				}
-				else if (error.getErrorCode() == MegaError.API_ENOENT) {
-					errorMessage = getString(R.string.error_server_connection_problem);
-				}
-				else if (error.getErrorCode() == MegaError.API_ESID){
-					errorMessage = getString(R.string.error_server_expired_session);
-				}
-				else{
-					errorMessage = error.getErrorString();
-				}
-				
-				//Go to the login activity
-				/*
-				loginLoggingIn.setVisibility(View.GONE);
-				loginLogin.setVisibility(View.VISIBLE);
-				loginDelimiter.setVisibility(View.VISIBLE);
-				loginCreateAccount.setVisibility(View.VISIBLE);
-				queryingSignupLinkText.setVisibility(View.GONE);
-				confirmingAccountText.setVisibility(View.GONE);
-				generatingKeysText.setVisibility(View.GONE);
-				loggingInText.setVisibility(View.GONE);
-				fetchingNodesText.setVisibility(View.GONE);
-				prepareNodesText.setVisibility(View.GONE);*/
-				
-				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				dbH.clearCredentials();
-				if (dbH.getPreferences() != null){
-					dbH.clearPreferences();
-					dbH.setFirstTime(false);
-				}
 			}
 			else{
-				//LOGIN OK
-
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
-				
-				gSession = megaApi.dumpSession();
-				credentials = new UserCredentials(lastEmail, gSession, "", "", "");
 
-				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				dbH.clearCredentials();
-
+                gSession = megaApi.dumpSession();
+                credentials = new UserCredentials(lastEmail, gSession, "", "", "");
+                dbH.saveCredentials(credentials);
 				logDebug("Logged in with session");
-
 				megaApi.fetchNodes(this);
 			}
 		}
@@ -3483,6 +3437,31 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	public boolean isMultiselect() {
 		return multiselect;
+	}
+
+	public void setMyChatFilesFolder(MegaNode myChatFilesNode) {
+		this.myChatFilesNode = myChatFilesNode;
+	}
+
+	public void finishCreateFolder(boolean success, long handle) {
+		try {
+			statusDialog.dismiss();
+		}
+		catch (Exception ex) {}
+
+		if (success){
+			cDriveExplorer = getCloudExplorerFragment();
+			iSharesExplorer = getIncomingExplorerFragment();
+
+			if (isCloudVisible()){
+				cDriveExplorer.navigateToFolder(handle);
+				parentHandleCloud = handle;
+			}
+			else if (isIncomingVisible()){
+				iSharesExplorer.navigateToFolder(handle);
+				parentHandleIncoming = handle;
+			}
+		}
 	}
 
 	public void setShouldRestartSearch(boolean shouldRestartSearch) {

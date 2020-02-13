@@ -467,16 +467,19 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                     scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
                 }
             }
-        }
-        //        megaApi.contactLinkQuery(request.getNodeHandle(), this);
-        else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY){
+        } else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY){
+            if (e.getErrorCode() == MegaError.API_OK) {
+                dbH.setLastPublicHandle(request.getNodeHandle());
+                dbH.setLastPublicHandleTimeStamp();
+                dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CONTACT);
+            }
+
             if (inviteContacts) {
                 Intent intent = new Intent();
                 intent.putExtra("mail", request.getEmail());
                 setResult(RESULT_OK, intent);
                 finish();
-            }
-            else {
+            } else {
                 if (scanCodeFragment == null) {
                     logWarning("ScanCodeFragment is NULL");
                     scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);

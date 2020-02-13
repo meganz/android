@@ -32,8 +32,8 @@
             android:textColor="@color/file_list_first_row"
             android:maxLines="1"
             android:singleLine="true"
-            android:ellipsize="end"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            rounded:emojiSize="14sp"/>
 
         <ImageView
             android:id="@+id/contact_state"
@@ -78,6 +78,19 @@
             android:layout_marginTop="8dp"
             android:textStyle="bold"
             android:layout_marginLeft="16dp"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/item_progress"
+        android:layout_width="match_parent"
+        android:layout_height="72dp">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLargeInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
 

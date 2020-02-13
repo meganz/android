@@ -7,9 +7,10 @@ import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 
-import static mega.privacy.android.app.utils.Constants.MEGA_BLOG_LINK_REGEXS;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 
@@ -55,9 +56,18 @@ public class WebViewActivityLollipop extends Activity {
         if (intent != null) {
             String url = intent.getDataString();
             logDebug("URL: " + url);
+            if (matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
+                MegaApplication.getInstance().setIsWebOpenDueToEmailVerification(true);
+            }
             myWebView.loadUrl(url);
             progressDialog = ProgressDialog.show(activity, this.getString(R.string.embed_web_browser_loading_title), this.getString(R.string.embed_web_browser_loading_message), true);
             progressDialog.setCancelable(false);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MegaApplication.getInstance().setIsWebOpenDueToEmailVerification(false);
     }
 }

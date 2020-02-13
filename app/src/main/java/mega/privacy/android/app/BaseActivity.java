@@ -3,6 +3,7 @@ package mega.privacy.android.app;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -26,13 +28,18 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -40,11 +47,17 @@ import static mega.privacy.android.app.utils.Constants.*;
 
 public class BaseActivity extends AppCompatActivity {
 
+    private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
+
+    private BaseActivity baseActivity;
+
     protected  MegaApplication app;
 
     protected MegaApiAndroid megaApi;
     protected MegaApiAndroid megaApiFolder;
     protected MegaChatApiAndroid megaChatApi;
+
+    protected DatabaseHandler dbH;
 
     private AlertDialog sslErrorDialog;
 
@@ -62,11 +75,26 @@ public class BaseActivity extends AppCompatActivity {
                 megaChatApi = app.getMegaChatApi();
             }
         }
+
+        dbH = app.getDbH();
     }
+
+    private AlertDialog expiredBusinessAlert;
+    private boolean isExpiredBusinessAlertShown = false;
+
+    private boolean isPaused = false;
+
+    private DisplayMetrics outMetrics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
+
+        baseActivity = this;
+
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
 
         super.onCreate(savedInstanceState);
         checkMegaObjects();
@@ -76,24 +104,50 @@ public class BaseActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(signalPresenceReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE));
+
+        IntentFilter filter =  new IntentFilter(BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED);
+        filter.addAction(ACTION_EVENT_ACCOUNT_BLOCKED);
+        LocalBroadcastManager.getInstance(this).registerReceiver(accountBlockedReceiver, filter);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(businessExpiredReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
+
+        if (savedInstanceState != null) {
+            isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
+            if (isExpiredBusinessAlertShown) {
+                showExpiredBusinessAlert();
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onPause() {
         logDebug("onPause");
-
+        app.activityPaused();
         checkMegaObjects();
+        isPaused = true;
         super.onPause();
     }
 
     @Override
     protected void onResume() {
         logDebug("onResume");
-
+        app.activityResumed();
         super.onResume();
         setAppFontSize(this);
 
         checkMegaObjects();
+        isPaused = false;
 
         retryConnectionsAndSignalPresence();
     }
@@ -104,6 +158,9 @@ public class BaseActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
 
         super.onDestroy();
     }
@@ -133,7 +190,23 @@ public class BaseActivity extends AppCompatActivity {
                 }
             }
         }
+
+        if (dbH == null) {
+            dbH = app.getDbH();
+        }
     }
+
+    /**
+     * Broadcast receiver to manage the errors shown and actions when an account is blocked.
+     */
+    private BroadcastReceiver accountBlockedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null || !intent.getAction().equals(ACTION_EVENT_ACCOUNT_BLOCKED)) return;
+
+            checkWhyAmIBlocked(intent.getLongExtra(EVENT_NUMBER, -1), intent.getStringExtra(EVENT_TEXT));
+        }
+    };
 
     /**
      * Broadcast receiver to manage a possible SSL verification error.
@@ -162,6 +235,29 @@ public class BaseActivity extends AppCompatActivity {
                     retryConnectionsAndSignalPresence();
                 }
             }
+        }
+    };
+
+    private BroadcastReceiver businessExpiredReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                showExpiredBusinessAlert();
+            }
+        }
+    };
+
+    /**
+     * Broadcast to show taken down files info
+     */
+    private BroadcastReceiver takenDownFilesReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) return;
+
+            logDebug("BROADCAST INFORM THERE ARE TAKEN DOWN FILES IMPLIED IN ACTION");
+            int numberFiles = intent.getIntExtra(NUMBER_FILES, 1);
+            Util.showSnackbar(baseActivity, getResources().getQuantityString(R.plurals.alert_taken_down_files, numberFiles, numberFiles));
         }
     };
 
@@ -412,9 +508,113 @@ public class BaseActivity extends AppCompatActivity {
 
         //Check if the call is recently
         logDebug("Check the last call to getAccountDetails");
-        if(callToAccountDetails(getApplicationContext())){
+        if(callToAccountDetails()){
             logDebug("megaApi.getAccountDetails SEND");
             app.askForAccountDetails();
         }
+    }
+
+    /**
+     * This method is shown in a business account when the account is expired.
+     * It informs that all the actions are only read.
+     * The message is different depending if the account belongs to an admin or an user.
+     *
+     */
+    private void showExpiredBusinessAlert(){
+        if (isPaused || (expiredBusinessAlert != null && expiredBusinessAlert.isShowing())) {
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+        builder.setTitle(R.string.expired_business_title);
+
+        if (megaApi.isMasterBusinessAccount()) {
+            builder.setMessage(R.string.expired_admin_business_text);
+        } else {
+            String expiredString = getString(R.string.expired_user_business_text);
+            try {
+                expiredString = expiredString.replace("[B]", "<b><font color=\'#000000\'>");
+                expiredString = expiredString.replace("[/B]", "</font></b>");
+            } catch (Exception e) {
+                logWarning("Exception formatting string", e);
+            }
+            builder.setMessage(TextUtils.concat(getSpannedHtmlText(expiredString), "\n\n" + getString(R.string.expired_user_business_text_2)));
+        }
+
+        builder.setNegativeButton(R.string.general_dismiss, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                isExpiredBusinessAlertShown = false;
+                dialog.dismiss();
+            }
+        });
+        builder.setCancelable(false);
+        expiredBusinessAlert = builder.create();
+        expiredBusinessAlert.show();
+        isExpiredBusinessAlertShown = true;
+    }
+
+    /**
+     * Method to show an alert or error when the account has been suspended
+     * for any reason
+     *
+     * @param eventNumber long that determines the event for which the account has been suspended
+     * @param stringError string shown as an alert in case there is not any specific action for the event
+     */
+    public void checkWhyAmIBlocked(long eventNumber, String stringError) {
+        Intent intent;
+
+        switch (Long.toString(eventNumber)) {
+            case ACCOUNT_NOT_BLOCKED:
+//                I am not blocked
+                break;
+            case COPYRIGHT_ACCOUNT_BLOCK:
+                showErrorAlertDialog(getString(R.string.account_suspended_breache_ToS), false, this);
+                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
+                break;
+            case MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK:
+                showErrorAlertDialog(getString(R.string.account_suspended_multiple_breaches_ToS), false, this);
+                megaChatApi.logout(new ChatLogoutListener(getApplicationContext()));
+                break;
+            case SMS_VERIFICATION_ACCOUNT_BLOCK:
+                if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed()) return;
+
+                MegaApplication.smsVerifyShowed(true);
+                String gSession = megaApi.dumpSession();
+                //For first login, keep the valid session,
+                //after added phone number, the account can use this session to fastLogin
+                if (gSession != null) {
+                    MegaUser myUser = megaApi.getMyUser();
+                    String myUserHandle = null;
+                    String lastEmail = null;
+                    if (myUser != null) {
+                        lastEmail = myUser.getEmail();
+                        myUserHandle = myUser.getHandle() + "";
+                    }
+                    UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
+                    dbH.saveCredentials(credentials);
+                }
+
+                logDebug("Show SMS verification activity.");
+                intent = new Intent(getApplicationContext(), SMSVerificationActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(NAME_USER_LOCKED, true);
+                startActivity(intent);
+
+                break;
+            case WEAK_PROTECTION_ACCOUNT_BLOCK:
+                if (app.isBlockedDueToWeakAccount() || app.isWebOpenDueToEmailVerification()) {
+                    break;
+                }
+                intent = new Intent(this, WeakAccountProtectionAlertActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                showErrorAlertDialog(stringError, false, this);
+        }
+    }
+
+    public DisplayMetrics getOutMetrics() {
+        return outMetrics;
     }
 }

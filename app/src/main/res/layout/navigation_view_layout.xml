@@ -57,6 +57,7 @@
                 android:layout_below="@id/navigation_drawer_user_account_relative_layout_profile_avatar"
                 android:gravity="center_vertical"
                 android:layout_marginTop="16dp"
+                android:layout_marginBottom="20dp"
                 android:orientation="vertical">
 
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -64,10 +65,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    rounded:emojiSize="14sp"
                     android:textColor="@color/name_my_account"
                     android:text="User Name"
                     android:singleLine="true"
-                    android:ellipsize="end"
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"/>
 
@@ -76,11 +77,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="@color/name_my_account"
                     android:text="email@domain.com"
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:fontFamily="roboto"/>
+
+				<TextView
+					android:id="@+id/business_label"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textSize="12sp"
+					android:textAllCaps="true"
+					android:text="@string/business_label"
+					android:textColor="@color/business_color"
+					android:layout_below="@id/navigation_drawer_account_information"
+					android:layout_marginTop="7dp"/>
 
             </LinearLayout>
 
@@ -96,8 +108,7 @@
                     android:id="@+id/manager_used_space_bar"
                     style="@style/UsedSpaceProgressBar"
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginTop="20dp"/>
+                    android:layout_height="2dp"/>
 
                 <TextView
                     android:id="@+id/navigation_drawer_space"
@@ -109,13 +120,6 @@
                     android:textStyle="bold"
                     android:textSize="13sp"/>
             </RelativeLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/nv_used_space_layout"
-                android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account"/>
 
         </RelativeLayout>
         
@@ -135,7 +139,6 @@
                 android:textStyle="bold"
                 android:textColor="@color/name_my_account"
                 android:text="@string/section_account"/>
-
 
             <View
                 android:layout_width="match_parent"
@@ -245,6 +248,7 @@
 
 
             <View
+                android:id="@+id/settings_separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="16dp"

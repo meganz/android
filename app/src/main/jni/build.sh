@@ -19,20 +19,20 @@ APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
 LOG_FILE=/dev/null
 
 CRYPTOPP=cryptopp
-CRYPTOPP_VERSION=800
+CRYPTOPP_VERSION=820
 CRYPTOPP_SOURCE_FILE=cryptopp${CRYPTOPP_VERSION}.zip
 CRYPTOPP_SOURCE_FOLDER=${CRYPTOPP}/${CRYPTOPP}
 CRYPTOPP_DOWNLOAD_URL=http://www.cryptopp.com/${CRYPTOPP_SOURCE_FILE}
-CRYPTOPP_SHA1="dd0dc0586c0a3e0696cd323efc6fa2e2945ad920"
+CRYPTOPP_SHA1="b042d2f0c93410abdec7c12bcd92787d019f8da1"
 
 SQLITE=sqlite
-SQLITE_VERSION=3120200
-SQLITE_YEAR=2016
+SQLITE_VERSION=3300100
+SQLITE_YEAR=2019
 SQLITE_BASE_NAME=sqlite-amalgamation-${SQLITE_VERSION}
 SQLITE_SOURCE_FILE=${SQLITE_BASE_NAME}.zip
 SQLITE_SOURCE_FOLDER=${SQLITE}/${SQLITE}
 SQLITE_DOWNLOAD_URL=http://www.sqlite.org/${SQLITE_YEAR}/${SQLITE_SOURCE_FILE}
-SQLITE_SHA1="22632bf0cfacedbeddde9f92695f71cab8d8c0a5"
+SQLITE_SHA1="ff9b4e140fe0764bc7bc802facf5ac164443f517"
 
 CURL=curl
 CURL_VERSION=7.67.0
@@ -49,20 +49,12 @@ ARES_CONFIGURED=${CURL}/${ARES_SOURCE_FOLDER}/Makefile.inc
 ARES_DOWNLOAD_URL=http://c-ares.haxx.se/download/${ARES_SOURCE_FILE}
 ARES_SHA1="74a50c02b7f051c4fb66c0f60f187350f196d908"
 
-OPENSSL=openssl
-OPENSSL_VERSION=1.0.2h
-OPENSSL_SOURCE_FILE=openssl-${OPENSSL_VERSION}.tar.gz
-OPENSSL_SOURCE_FOLDER=${OPENSSL}-${OPENSSL_VERSION}
-OPENSSL_DOWNLOAD_URL=http://www.openssl.org/source/${OPENSSL_SOURCE_FILE}
-OPENSSL_PREFIX=${JNI_PATH}/${OPENSSL}/${OPENSSL_SOURCE_FOLDER}
-OPENSSL_SHA1="577585f5f5d299c44dd3c993d3c0ac7a219e4949"
-
 SODIUM=sodium
-SODIUM_VERSION=1.0.16
+SODIUM_VERSION=1.0.18
 SODIUM_SOURCE_FILE=libsodium-${SODIUM_VERSION}.tar.gz
 SODIUM_SOURCE_FOLDER=libsodium-${SODIUM_VERSION}
-SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/old/${SODIUM_SOURCE_FILE}
-SODIUM_SHA1="c7ea321d7b8534e51c5e3d86055f6c1aa1e48ee9"
+SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/${SODIUM_SOURCE_FILE}
+SODIUM_SHA1="795b73e3f92a362fabee238a71735579bf46bb97"
 
 LIBUV=libuv
 LIBUV_VERSION=1.8.0
@@ -93,11 +85,11 @@ LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/${LI
 LIBWEBSOCKETS_SHA1="cb99f397f586ce7333a1dc8b3e4a831cfb854dbc"
 
 PDFVIEWER=pdfviewer
-PDFVIEWER_VERSION=1.8.2
+PDFVIEWER_VERSION=1.9.0
 PDFVIEWER_SOURCE_FILE=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}.zip
 PDFVIEWER_SOURCE_FOLDER=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}
 PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-android-${PDFVIEWER_VERSION}.zip
-PDFVIEWER_SHA1="93205f9cff143d864c138534f3205351e3d6c42e"
+PDFVIEWER_SHA1="9c346de2fcf328c65c7047f03357a049dc55b403"
 
 function downloadCheckAndUnpack()
 {
@@ -206,8 +198,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${CURL}/${CURL}
     rm -rf ${CURL}/${ARES_SOURCE_FOLDER}
     rm -rf ${CURL}/ares
-    rm -rf ${OPENSSL}/${OPENSSL_SOURCE_FOLDER}
-    rm -rf ${OPENSSL}/${OPENSSL}
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FOLDER}
     rm -rf ${SODIUM}/${SODIUM}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
@@ -228,8 +218,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${CURL}/${CURL_SOURCE_FILE}
     rm -rf ${CURL}/${ARES_SOURCE_FILE}
     rm -rf ${CURL}/${CURL_SOURCE_FILE}.ready
-    rm -rf ${OPENSSL}/${OPENSSL_SOURCE_FILE}
-    rm -rf ${OPENSSL}/${OPENSSL_SOURCE_FILE}.ready
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}
@@ -276,7 +264,7 @@ if [ ! -f ${SODIUM}/${SODIUM_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${SODIUM_DOWNLOAD_URL} ${SODIUM}/${SODIUM_SOURCE_FILE} ${SODIUM_SHA1} ${SODIUM}
     ln -sf ${SODIUM_SOURCE_FOLDER} ${SODIUM}/${SODIUM}
     pushd ${SODIUM}/${SODIUM} &>> ${LOG_FILE}
-    export ANDROID_NDK_HOME=${NDK_ROOT32}
+    export ANDROID_NDK_HOME=${NDK_ROOT64}
     ./autogen.sh &>> ${LOG_FILE}
     echo "#include <limits.h>" >>  src/libsodium/include/sodium/export.h
     sed -i 's/enable-minimal/enable-minimal --disable-pie/g' dist-build/android-build.sh
@@ -306,7 +294,7 @@ echo "* Setting up Crypto++"
 if [ ! -f ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready ]; then
     mkdir -p ${CRYPTOPP}/${CRYPTOPP}
     downloadCheckAndUnpack ${CRYPTOPP_DOWNLOAD_URL} ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE} ${CRYPTOPP_SHA1} ${CRYPTOPP}/${CRYPTOPP}
-    cp ${NDK_ROOT32}/sources/android/cpufeatures/cpu-features.h ${CRYPTOPP}/${CRYPTOPP}/
+    cp ${NDK_ROOT64}/sources/android/cpufeatures/cpu-features.h ${CRYPTOPP}/${CRYPTOPP}/
     touch ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready
 fi
 echo "* Crypto++ is ready"
@@ -344,18 +332,6 @@ if [ ! -f ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE}.ready ]; then
 fi
 echo "* MediaInfo is ready"
 
-echo "* Setting up OpenSSL"
-if [ ! -f ${OPENSSL}/${OPENSSL_SOURCE_FILE}.ready ]; then
-    downloadCheckAndUnpack ${OPENSSL_DOWNLOAD_URL} ${OPENSSL}/${OPENSSL_SOURCE_FILE} ${OPENSSL_SHA1} ${OPENSSL}
-    ln -sf ${OPENSSL_SOURCE_FOLDER} ${OPENSSL}/${OPENSSL}
-    ln -sf ${LIBDIR} ${OPENSSL}/${OPENSSL_SOURCE_FOLDER}/lib
-    pushd ${OPENSSL}/${OPENSSL} &>> ${LOG_FILE}
-    ./Configure android &>> ${LOG_FILE}
-    popd &>> ${LOG_FILE}
-    touch ${OPENSSL}/${OPENSSL_SOURCE_FILE}.ready
-fi
-echo "* OpenSSL is ready"
-
 echo "* Setting up cURL with c-ares"
 if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
     echo "* Setting up cURL"
@@ -383,8 +359,9 @@ echo "* libwebsockets is ready"
 
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
-    if [ ! -d megachat/webrtc/include ] || [ ! -f megachat/webrtc/libwebrtc_x86_64.a ] || [ ! -f megachat/webrtc/libwebrtc_arm64.a ]; then
-        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#F!BzwF0Qba!-KXBHgwonRUnSptmVJr4qg"
+    WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm.a | cut -d " " -f 1`
+    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "2d0e9cff4e691d9da4747315f0775be25d62b0bd" ]; then
+        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#!wixgSaZZ!6zRMV_d8ogouBaEidHzGws1KvLrBwBiKEm0VIVgXEPk"
         echo "and uncompress it in megachat/webrtc"
         exit 1
     else
@@ -415,6 +392,7 @@ echo "* PdfViewer is ready"
 
 echo "* All dependencies are prepared!"
 
+
 rm -rf ../tmpLibs
 mkdir ../tmpLibs
 echo "* Running ndk-build x86"
@@ -439,4 +417,3 @@ mv ../tmpLibs/* ../libs/
 rmdir ../tmpLibs/
 
 echo "* Task finished OK"
-

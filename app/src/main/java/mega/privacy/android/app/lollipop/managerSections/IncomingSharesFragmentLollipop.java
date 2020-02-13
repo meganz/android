@@ -1204,6 +1204,10 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 		adapter.toggleSelection(position);
 	}
 
+	@Override
+	public void reselectUnHandledSingleItem(int position) {
+	}
+
 	public void findNodes(){
 		logDebug("findNodes");
 		nodes=megaApi.getInShares();

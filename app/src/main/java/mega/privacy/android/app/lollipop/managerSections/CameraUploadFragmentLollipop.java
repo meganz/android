@@ -85,10 +85,11 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
+import static mega.privacy.android.app.MegaPreferences.*;
+import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.MegaPreferences.*;
-import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -128,6 +129,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	MegaPhotoSyncListAdapterLollipop adapterList;
 	MegaPhotoSyncGridTitleAdapterLollipop adapterGrid;
 	private MegaApiAndroid megaApi;
+
+	private int orderBy = MegaApiJava.ORDER_MODIFICATION_DESC;
 
 //	long parentHandle = -1;
 //	private boolean firstTimeCam = false;
@@ -212,6 +215,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		return null;
 	}
 
+    public int getItemCount() {
+        if (adapterList != null) {
+            return adapterList.getItemCount();
+        }
+        if (adapterGrid != null) {
+            return adapterGrid.getItemCount();
+        }
+        return 0;
+    }
+
 	public void activateActionMode(){
 		logDebug("activateActionMode");
 		if (!adapterList.isMultipleSelect()){
@@ -221,7 +234,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public void onStoragePermissionRefused() {
-        showSnackBar(context, SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+        showSnackbar(context, getString(R.string.on_refuse_storage_permission));
         toCloudDrive();
     }
 
@@ -696,7 +709,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						}
 					}
 				}
-			}
+                if (prefs.getPreferredSortCameraUpload() != null) {
+                    orderBy = Integer.parseInt(prefs.getPreferredSortCameraUpload());
+                    logDebug("The orderCamera preference is: " + orderBy);
+                } else {
+                    logDebug("Preference orderCamera is NULL -> ORDER_MODIFICATION_DESC");
+                }
+            }
 		}
 
 		logDebug("After recovering bundle type: " + type);
@@ -906,10 +925,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 
 			if(!((ManagerActivityLollipop)context).getIsSearchEnabled()) {
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 			}
 			else{
-				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 				searchByDate = ((ManagerActivityLollipop)context).getTypeOfSearch();
 				nodes = searchDate(searchByDate,searchNodes);
 			}
@@ -967,7 +986,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 
 			if (adapterList == null) {
-				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, CAMERA_UPLOAD_ADAPTER);
+				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView,this, CAMERA_UPLOAD_ADAPTER);
 			} else {
 				if (context != adapterList.getContext()) {
 					logDebug("Attached activity changed");
@@ -1139,10 +1158,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			int countTitles = 0;
 
 			if(!((ManagerActivityLollipop)context).getIsSearchEnabled()) {
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 			}
 			else{
-				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), orderBy);
 				searchByDate = ((ManagerActivityLollipop)context).getTypeOfSearch();
 				nodes = searchDate(searchByDate,searchNodes);
 			}
@@ -1243,6 +1262,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (adapterGrid == null) {
 				logDebug("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
 				adapterGrid = new MegaPhotoSyncGridTitleAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, CAMERA_UPLOAD_ADAPTER, itemInformationList.size(), countTitles, itemInformationList, defaultPath);
+				adapterGrid.setOrder(orderBy);
 				adapterGrid.setHasStableIds(true);
 			} else {
 				logDebug("ADAPTERGRID.MONTHPICS = " + monthPics.size());
@@ -1296,6 +1316,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public void onResume() {
 		super.onResume();
 		reDoTheSelectionAfterRotation();
+		reSelectUnhandledItem();
 	}
 
 	private void reDoTheSelectionAfterRotation() {
@@ -1311,7 +1332,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				adapterGrid.refreshActionModeTitle();
 			}
 		}
+	}
 
+	private void reSelectUnhandledItem() {
+		if (((ManagerActivityLollipop) context).isListCameraUploads() && adapterList != null) {
+			adapterList.reSelectUnhandledNode();
+		}
 	}
 
 	public void selectAll(){
@@ -1564,7 +1590,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
         switch (requestCode) {
             case REQUEST_CAMERA_ON_OFF:{
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    cameraOnOff();
+					((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, false);
                 }
         
                 break;
@@ -1572,7 +1598,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
     
             case REQUEST_CAMERA_ON_OFF_FIRST_TIME:{
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    cameraOnOffFirstTime();
+					((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, true);
                 }
         
                 break;
@@ -1591,7 +1617,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
             case R.id.relative_layout_file_list_browser_camera_upload_on_off: {
                 if (type == TYPE_CAMERA) {
                     if (hasPermissions(context,permissions)) {
-                        cameraOnOff();
+						((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, false);
                     } else {
                         requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
                     }
@@ -1602,7 +1628,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
             }
             case R.id.cam_sync_button_ok: {
                 if (hasPermissions(context,permissions)) {
-                    cameraOnOffFirstTime();
+					((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, true);
                 }else{
                     requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
                 }
@@ -1726,7 +1752,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
 
 							}
-							String localPath = findVideoLocalPath(context, psHMegaNode);
+                            String localPath = null;
+                            try {
+                                localPath = findVideoLocalPath(context, psHMegaNode);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                logWarning(e.getMessage());
+                            }
                             if (localPath != null && checkFingerprint(megaApi,psHMegaNode,localPath)) {
 								File mediaFile = new File(localPath);
 
@@ -1950,7 +1982,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			long cameraUploadHandle = getPhotoSyncHandle();
 			MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 			if (nps != null) {
-				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, orderBy);
 				setNodes(nodes);
 
 				((ManagerActivityLollipop)context).invalidateOptionsMenu();
@@ -2044,6 +2076,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		
 		return photosyncHandle;
 	}
+
+	public void setOrderBy(int orderBy) {
+	    this.orderBy = orderBy;
+	    if (adapterGrid != null) {
+	        adapterGrid.setOrder(orderBy);
+        }
+    }
 
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
@@ -2399,8 +2438,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (handler != null) {
 			handler.removeCallbacksAndMessages(null);
 		}
-		
 		super.onDestroy();
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		if (((ManagerActivityLollipop) context).isListCameraUploads() && adapterList != null) {
+			adapterList.clearTakenDownDialog();
+		}
 	}
 
 	@Override

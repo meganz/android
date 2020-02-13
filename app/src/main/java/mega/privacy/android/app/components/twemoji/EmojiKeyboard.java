@@ -3,6 +3,7 @@ package mega.privacy.android.app.components.twemoji;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -139,7 +140,7 @@ public class EmojiKeyboard extends LinearLayout {
         if (imm == null) return;
         imm.showSoftInput(view, 0, null);
         isLetterKeyboardShown = true;
-        emojiIcon.setImageResource(R.drawable.ic_emojicon);
+        changeKeyboardIcon(false);
         needToReplace();
     }
 
@@ -149,7 +150,7 @@ public class EmojiKeyboard extends LinearLayout {
         hideLetterKeyboard();
         setVisibility(VISIBLE);
         isEmojiKeyboardShown = true;
-        emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
+        changeKeyboardIcon(true);
         if (editInterface instanceof View) {
             View view = (View) editInterface;
             view.setFocusableInTouchMode(true);
@@ -164,7 +165,7 @@ public class EmojiKeyboard extends LinearLayout {
         logDebug("hideBothKeyboard()");
         hideEmojiKeyboard();
         hideLetterKeyboard();
-        emojiIcon.setImageResource(R.drawable.ic_emojicon);
+        changeKeyboardIcon(false);
     }
 
     public void hideLetterKeyboard() {
@@ -177,6 +178,21 @@ public class EmojiKeyboard extends LinearLayout {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0, null);
         isLetterKeyboardShown = false;
         needToReplace();
+    }
+    public void hideKeyboardFromFileStorage(){
+        hideEmojiKeyboard();
+        hideLetterKeyboard();
+        changeKeyboardIcon(true);
+    }
+
+    public void changeKeyboardIcon(boolean isKeyboard){
+        Drawable drawable;
+        if(isKeyboard){
+            drawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
+        }else {
+            drawable = getResources().getDrawable(R.drawable.ic_emojicon);
+        }
+        emojiIcon.setImageDrawable(drawable);
     }
 
     public void hideEmojiKeyboard() {
@@ -191,9 +207,7 @@ public class EmojiKeyboard extends LinearLayout {
             View view = (View) editInterface;
             view.clearFocus();
         }
-
         needToReplace();
-
     }
 
     public void setListenerActivated(boolean listenerActivated) {
