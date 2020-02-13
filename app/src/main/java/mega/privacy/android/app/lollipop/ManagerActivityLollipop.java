@@ -11828,7 +11828,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 		if (cFLol != null){
 			cFLol.sortBy();
-			cFLol.updateOrder();
 		}
 	}
 

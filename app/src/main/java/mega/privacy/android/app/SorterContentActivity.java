@@ -103,9 +103,6 @@ public class SorterContentActivity extends PinActivityLollipop {
                 case CONTACTS: {
                     order = ((ManagerActivityLollipop) context).getOrderContacts();
 
-                    sortByDateTV.setVisibility(View.GONE);
-                    newestCheck.setVisibility(View.GONE);
-                    oldestCheck.setVisibility(View.GONE);
                     sortBySizeTV.setVisibility(View.GONE);
                     largestCheck.setVisibility(View.GONE);
                     smallestCheck.setVisibility(View.GONE);
