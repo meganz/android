@@ -131,7 +131,7 @@ public class InfoAchievementsFragment extends Fragment{
 					title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
 				}
 				else{
-					title.setText(context.getResources().getString(R.string.expired_achievement));
+					title.setText(context.getResources().getString(R.string.expired_label));
 				}
 
 				long storageAppInstall = ((AchievementsActivity)context).megaAchievements.getRewardStorageByAwardId(awardId);
@@ -166,7 +166,7 @@ public class InfoAchievementsFragment extends Fragment{
                     title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
                 }
                 else{
-                    title.setText(context.getResources().getString(R.string.expired_achievement));
+                    title.setText(context.getResources().getString(R.string.expired_label));
                 }
 
                 long storageAddPhone = ((AchievementsActivity)context).megaAchievements.getRewardStorageByAwardId(awardId);
@@ -204,7 +204,7 @@ public class InfoAchievementsFragment extends Fragment{
 					title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
 				}
 				else{
-					title.setText(context.getResources().getString(R.string.expired_achievement));
+					title.setText(context.getResources().getString(R.string.expired_label));
 				}
 
 				long storageDesktopInstall = ((AchievementsActivity)context).megaAchievements.getRewardStorageByAwardId(awardId);
@@ -232,7 +232,7 @@ public class InfoAchievementsFragment extends Fragment{
 				title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
 			}
 			else{
-				title.setText(context.getResources().getString(R.string.expired_achievement));
+				title.setText(context.getResources().getString(R.string.expired_label));
 			}
 
 			long storageRegistration = ((AchievementsActivity)context).megaAchievements.getRewardStorageByAwardId(awardId);

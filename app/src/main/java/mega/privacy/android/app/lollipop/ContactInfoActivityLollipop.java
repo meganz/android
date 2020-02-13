@@ -53,7 +53,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
 
@@ -109,15 +108,16 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -233,6 +233,22 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
 
     private AskForDisplayOverDialog askForDisplayOverDialog;
+
+	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null) return;
+
+			if (sharedFoldersFragment != null) {
+				sharedFoldersFragment.clearSelections();
+				sharedFoldersFragment.hideMultipleSelect();
+			}
+
+			if (statusDialog != null) {
+				statusDialog.dismiss();
+			}
+		}
+	};
 
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
@@ -607,6 +623,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         if(askForDisplayOverDialog != null) {
             askForDisplayOverDialog.showDialog();
         }
+
+		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
+				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+
 	}
 
 	private void visibilityStateIcon() {
@@ -1455,46 +1475,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(contactInfoActivityLollipop);
-							temp.setMessage(getString(R.string.context_sharing_folder));
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
+						statusDialog = getProgressDialog(contactInfoActivityLollipop, getString(R.string.context_sharing_folder));
 						permissionsDialog.dismiss();
-
-						logDebug("item " + item);
-
-						switch(item) {
-							case 0:{
-								for (int i=0;i<selectedContacts.size();i++){
-									MegaUser user= megaApi.getContact(selectedContacts.get(i));
-									logDebug("user: " + user);
-									logDebug("parentNode: " + parent.getName() + "_" + parent.getHandle());
-									megaApi.share(parent, user, MegaShare.ACCESS_READ, contactInfoActivityLollipop);
-								}
-								break;
-							}
-							case 1:{
-								for (int i=0;i<selectedContacts.size();i++){
-									MegaUser user= megaApi.getContact(selectedContacts.get(i));
-									megaApi.share(parent, user, MegaShare.ACCESS_READWRITE, contactInfoActivityLollipop);
-								}
-								break;
-							}
-							case 2:{
-								for (int i=0;i<selectedContacts.size();i++){
-									MegaUser user= megaApi.getContact(selectedContacts.get(i));
-									megaApi.share(parent, user, MegaShare.ACCESS_FULL, contactInfoActivityLollipop);
-								}
-								break;
-							}
-						}
+						nC.shareFolder(parent, selectedContacts, item);
 					}
 				});
 				permissionsDialog = dialogBuilder.create();
@@ -1558,7 +1541,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 
-			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
 			logDebug("Send to " + chatHandles.length + " chats");
 
 			int countChat = chatHandles.length;
@@ -1709,21 +1692,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					}
 				}
 			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_SHARE){
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("Shared folder correctly: " + request.getNodeHandle());
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_shared), -1);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_shared), -1);
-			}
-		}else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
+		} else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
             try {
                 statusDialog.dismiss();
             }
@@ -1804,67 +1773,45 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			logDebug("Copy nodes request finished");
         }
-        else if (request.getType() == MegaRequest.TYPE_MOVE){
-            try {
-                statusDialog.dismiss();
-            }
-            catch (Exception ex) {}
-            
-            if(moveToRubbish){
+        else if (request.getType() == MegaRequest.TYPE_MOVE) {
+			try {
+				statusDialog.dismiss();
+			} catch (Exception ex) {
+			}
+
+			if (moveToRubbish) {
 				logDebug("Finish move to Rubbish!");
-                if (e.getErrorCode() == MegaError.API_OK){
-                    if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                        sharedFoldersFragment.clearSelections();
-                        sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish), -1);
-                    }
-                }
-                else{
-                    if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                        sharedFoldersFragment.clearSelections();
-                        sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-                    }
-                }
-            }
-            else{
-                if (e.getErrorCode() == MegaError.API_OK){
-                    if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                        sharedFoldersFragment.clearSelections();
-                        sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
-                    }
-                }
-                else{
-                    if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                        sharedFoldersFragment.clearSelections();
-                        sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-                    }
-                }
-            }
-            moveToRubbish=false;
+				if (e.getErrorCode() == MegaError.API_OK) {
+					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+						sharedFoldersFragment.clearSelections();
+						sharedFoldersFragment.hideMultipleSelect();
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish), -1);
+					}
+				} else {
+					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+						sharedFoldersFragment.clearSelections();
+						sharedFoldersFragment.hideMultipleSelect();
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
+					}
+				}
+			} else {
+				if (e.getErrorCode() == MegaError.API_OK) {
+					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+						sharedFoldersFragment.clearSelections();
+						sharedFoldersFragment.hideMultipleSelect();
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
+					}
+				} else {
+					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+						sharedFoldersFragment.clearSelections();
+						sharedFoldersFragment.hideMultipleSelect();
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
+					}
+				}
+			}
+			moveToRubbish = false;
 			logDebug("Move request finished");
-        }
-        else if (request.getType() == MegaRequest.TYPE_SHARE){
-            try {
-                statusDialog.dismiss();
-            }
-            catch (Exception ex) {}
-            
-            if (e.getErrorCode() == MegaError.API_OK){
-                sharedFoldersFragment.clearSelections();
-                sharedFoldersFragment.hideMultipleSelect();
-				logDebug("Shared folder correctly: " + request.getNodeHandle());
-                Toast.makeText(this, getString(R.string.context_correctly_shared), Toast.LENGTH_SHORT).show();
-            }
-            else{
-                sharedFoldersFragment.clearSelections();
-                sharedFoldersFragment.hideMultipleSelect();
-                Toast.makeText(this, getString(R.string.context_no_shared), Toast.LENGTH_LONG).show();
-            }
-        }
-		else if(request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
+		} else if(request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
 			logDebug("Contact removed");
 			finish();
 		}
@@ -1896,6 +1843,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         if (askForDisplayOverDialog != null) {
             askForDisplayOverDialog.recycle();
         }
+
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
 	}
 
 	@Override

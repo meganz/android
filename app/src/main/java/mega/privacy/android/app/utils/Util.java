@@ -35,6 +35,7 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.support.v7.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
@@ -42,6 +43,7 @@ import android.support.v4.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -90,6 +92,11 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -100,12 +107,13 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
-import static android.content.Context.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class Util {
 
@@ -121,18 +129,6 @@ public class Util {
 	// Debug flag to enable logging and some other things
 	public static boolean DEBUG = false;
 
-	public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
-	public static String base64EncodedPublicKey_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
-	public static String base64EncodedPublicKey_3 = "55k9FIh3vDXXTHJn4oM9JwFwbcZf1zmVLyes5ld7+G15SZ7QmCchqfY4N/a/qVcGFsfwqm";
-	public static String base64EncodedPublicKey_4 = "RU3VzOUwAYHb4mV/frPctPIRlJbzwCXpe3/mrcsAP+k6ECcd19uIUCPibXhsTkNbAk8CRkZ";
-	public static String base64EncodedPublicKey_5 = "KOy+czuZWfjWYx3Mp7srueyQ7xF6/as6FWrED0BlvmhJYj0yhTOTOopAXhGNEk7cUSFxqP2FKYX8e3pHm/uNZvKcSrLXbLUhQnULhn4WmKOQIDAQAB";
-	
-	/*public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlxJdfjvhsCAK1Lu5n6WtQf";
-	public static String base64EncodedPublicKey_2 = "MkjjOUCDDuM7zeiS3jsfCghG1bpwMmD4E8vQfPboyYtQBftdEG5GbWrqWJL+z6M/2SN";
-	public static String base64EncodedPublicKey_3 = "+6pHqExFw8fjzP/4/CDzHLhmITKTOegm/6cfMUWcrghZuiHKfM6n4vmNYrHy4Bpx68RJW+J4B";
-	public static String base64EncodedPublicKey_4 = "wL6PWE8ZGGeeJmU0eAJeRJMsNEwMrW2LATnIoJ4/qLYU4gKDINPMRaIE6/4pQnbd2NurWm8ZQT7XSMQZcisTqwRLS";
-	public static String base64EncodedPublicKey_5 = "YgjYKCXtjloP8QnKu0IGOoo79Cfs3Z9eC3sQ1fcLQsMM2wExlbnYI2KPTs0EGCmcMXrrO5MimGjYeW8GQlrKsbiZ0UwIDAQAB";
-	*/
 	public static boolean fileLoggerSDK = false;
 	public static boolean fileLoggerKarere = false;
 
@@ -546,15 +542,6 @@ public class Util {
 
         return sizeString;
     }
-
-	public static String getDateString(long date){
-		DateFormat datf = DateFormat.getDateTimeInstance();
-		String dateString = "";
-		
-		dateString = datf.format(new Date(date*1000));
-		
-		return dateString;
-	}
 
 	public static void setFileLoggerSDK(boolean fL){
 		fileLoggerSDK = fL;
@@ -1518,28 +1505,73 @@ public class Util {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public static void showSnackBar(Context context,int snackbarType,String message,int idChat) {
-        if (context instanceof ChatFullScreenImageViewer) {
-            ((ChatFullScreenImageViewer)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof AudioVideoPlayerLollipop) {
-            ((AudioVideoPlayerLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof PdfViewerActivityLollipop) {
-            ((PdfViewerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof ChatActivityLollipop) {
-            ((ChatActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof NodeAttachmentHistoryActivity) {
-            ((NodeAttachmentHistoryActivity)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof BaseActivity) {
-            View rootView = getRootViewFromContext(context);
-            if (rootView == null) {
-				logWarning("Unable to show snack bar, view does not exist");
-            } else {
-                ((BaseActivity)context).showSnackbar(snackbarType,rootView,message,idChat);
-            }
-        }
-    }
+    /**
+     * Method to display a NOT_SPACE_SNACKBAR_TYPE Snackbar
+     *
+     * Use this method only from controllers or services or when ut does not know what the context is.
+     *
+     * @param context Class where the Snackbar has to be shown
+     */
+	public static void showNotEnoughSpaceSnackbar(Context context) {
+		showSnackbar(context, NOT_SPACE_SNACKBAR_TYPE, null, INVALID_HANDLE);
+	}
+
+    /**
+     * Method to display a simple Snackbar
+     *
+     * Use this method only from controllers or services or when ut does not know what the context is.
+     *
+     * @param context Class where the Snackbar has to be shown
+     * @param message Text to shown in the snackbar
+     */
+	public static void showSnackbar(Context context, String message) {
+		showSnackbar(context, SNACKBAR_TYPE, message, INVALID_HANDLE);
+	}
+
+    /**
+     * Method to display a simple or action Snackbar.
+     *
+     * Use this method only from controllers or services or when ut does not know what the context is.
+     *
+     * @param context Class where the Snackbar has to be shown
+     * @param snackbarType specifies the type of the Snackbar.
+     *                     It can be SNACKBAR_TYPE, MESSAGE_SNACKBAR_TYPE or NOT_SPACE_SNACKBAR_TYPE
+     * @param message Text to shown in the snackbar
+     * @param idChat Chat ID. If this param has a valid value, different to -1, the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat
+     */
+	public static void showSnackbar(Context context, int snackbarType, String message, long idChat) {
+		if (context instanceof FullScreenImageViewerLollipop) {
+			((FullScreenImageViewerLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof FileInfoActivityLollipop) {
+			((FileInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof ContactFileListActivityLollipop) {
+			((ContactFileListActivityLollipop) context).showSnackbar(snackbarType, message);
+		} else if (context instanceof ContactInfoActivityLollipop) {
+			((ContactInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof GetLinkActivityLollipop) {
+			((GetLinkActivityLollipop) context).showSnackbar(message);
+		} else if (context instanceof ChatFullScreenImageViewer) {
+			((ChatFullScreenImageViewer) context).showSnackbar(snackbarType, message);
+		} else if (context instanceof AudioVideoPlayerLollipop) {
+			((AudioVideoPlayerLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof PdfViewerActivityLollipop) {
+			((PdfViewerActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof ChatActivityLollipop) {
+			((ChatActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof NodeAttachmentHistoryActivity) {
+			((NodeAttachmentHistoryActivity) context).showSnackbar(snackbarType, message);
+		} else if (context instanceof ManagerActivityLollipop) {
+			((ManagerActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof BaseActivity) {
+			View rootView = getRootViewFromContext(context);
+			if (rootView != null) {
+				((BaseActivity) context).showSnackbar(snackbarType, rootView, message, idChat);
+				return;
+			}
+
+			logWarning("Unable to show snack bar, view does not exist or context is not instance of BaseActivity");
+		}
+	}
 
     private static View getRootViewFromContext(Context context) {
         BaseActivity activity = (BaseActivity)context;
@@ -1741,6 +1773,16 @@ public class Util {
 				requestCode);
 	}
 
+    /**
+     * Convert color integer to corresponding string in hex format.
+     *
+     * @param color An integer which represents a color.
+     * @return The color string in hex format, e.g., #FFABCDEF.
+     */
+	public static String getHexValue(int color){
+		return String.format("#%06X", 0xFFFFFF & color);
+	}
+
     public static void showKeyboardDelayed(final View view) {
 		logDebug("showKeyboardDelayed");
         Handler handler = new Handler();
@@ -1753,6 +1795,15 @@ public class Util {
             }
         }, 50);
     }
+
+    public static Spanned getSpannedHtmlText(String string) {
+
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
+		}
+
+		return Html.fromHtml(string);
+	}
 
 	/**
 	 * This method is to start camera from Activity

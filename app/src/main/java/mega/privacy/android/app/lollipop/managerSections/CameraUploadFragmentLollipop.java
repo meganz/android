@@ -85,6 +85,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
 import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -233,7 +234,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public void onStoragePermissionRefused() {
-        showSnackBar(context, SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+        showSnackbar(context, getString(R.string.on_refuse_storage_permission));
         toCloudDrive();
     }
 
@@ -1589,7 +1590,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
         switch (requestCode) {
             case REQUEST_CAMERA_ON_OFF:{
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    cameraOnOff();
+					((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, false);
                 }
         
                 break;
@@ -1597,7 +1598,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
     
             case REQUEST_CAMERA_ON_OFF_FIRST_TIME:{
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    cameraOnOffFirstTime();
+					((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, true);
                 }
         
                 break;
@@ -1616,7 +1617,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
             case R.id.relative_layout_file_list_browser_camera_upload_on_off: {
                 if (type == TYPE_CAMERA) {
                     if (hasPermissions(context,permissions)) {
-                        cameraOnOff();
+						((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, false);
                     } else {
                         requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
                     }
@@ -1627,7 +1628,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
             }
             case R.id.cam_sync_button_ok: {
                 if (hasPermissions(context,permissions)) {
-                    cameraOnOffFirstTime();
+					((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_CU, true);
                 }else{
                     requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
                 }

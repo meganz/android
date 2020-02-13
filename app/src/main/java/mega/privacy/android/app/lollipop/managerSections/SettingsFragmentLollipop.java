@@ -80,6 +80,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_SETTINGS;
 import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -1455,12 +1456,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 showSelectDownloadLocationDialog();
             }
         } else {
-            showSnackBar(context, SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+            showSnackbar(context, getString(R.string.download_requires_permission));
         }
     }
 
     private void onCannotWriteOnSDCard() {
-        showSnackBar(context, SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
+        showSnackbar(context, getString(R.string.no_external_SD_card_detected));
         new Handler().postDelayed(new Runnable() {
 
             @Override
@@ -2130,7 +2131,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             if (!hasPermissions(context,PERMISSIONS)) {
                 ActivityCompat.requestPermissions((ManagerActivityLollipop)context,PERMISSIONS,REQUEST_CAMERA_UPLOAD);
             } else {
-                enableCameraUpload();
+				((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_SETTINGS, false);
             }
         } else {
             disableCameraUpload();
@@ -2191,7 +2192,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 logDebug("intent NULL");
                 if(requestCode != Activity.RESULT_OK) {
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        showSnackBar(context, SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+                        showSnackbar(context, getString(R.string.download_requires_permission));
                     }
                 } else {
                     onCannotWriteOnSDCard();

@@ -172,6 +172,10 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
                     break;
                 }
             }
+
+            if (share.isPending()) {
+                titleMailContactPanel.append(" " + getString(R.string.pending_outshare_indicator));
+            }
         }
         else{
             titleMailContactPanel.setText(contact.getEmail());
