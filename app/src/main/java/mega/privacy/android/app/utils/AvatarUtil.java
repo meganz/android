@@ -173,10 +173,12 @@ public class AvatarUtil {
     public static Bitmap getAvatarShareContact(Context context, MegaApiAndroid megaApi, ShareContactInfo contact){
         String mail = ((AddContactActivityLollipop) context).getShareContactMail(contact);
         int color;
-        if(contact.isPhoneContact()){
+        if (contact.isPhoneContact()) {
             color = ContextCompat.getColor(context, R.color.color_default_avatar_phone);
-        }else{
+        } else if (contact.isMegaContact()) {
             color = getColorAvatar(context, megaApi, contact.getMegaContactAdapter().getMegaUser());
+        } else {
+            color = getColorAvatar(context, null);
         }
 
         String fullName = null;

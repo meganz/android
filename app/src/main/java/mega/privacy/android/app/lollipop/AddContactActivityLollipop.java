@@ -210,6 +210,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     private FilterContactsTask filterContactsTask;
     private GetContactsTask getContactsTask;
+    private GetPhoneContactsTask getPhoneContactsTask;
     private RecoverContactsTask recoverContactsTask;
     private QueryIfContactSouldBeAddedTask queryIfContactSouldBeAddedTask;
 
@@ -253,6 +254,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     MegaContactAdapter myContact;
 
     private boolean onlyCreateGroup;
+    private boolean waitingForPhoneContacts;
 
     @Override
     public List<ShareContactInfo> getAdapterData() {
@@ -261,6 +263,57 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         else {
             return filteredContactsShare;
+        }
+    }
+
+    private class GetPhoneContactsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            getDeviceContacts();
+            MegaContactAdapter contactMEGA;
+            PhoneContactInfo contactPhone;
+            boolean found;
+            shareContacts.clear();
+
+            ShareContactInfo lastItem = filteredContactsShare.get(filteredContactsShare.size() - 1);
+            if (lastItem.isProgress()) {
+               filteredContactsShare.remove(lastItem);
+            }
+
+            if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
+                shareContacts.add(new ShareContactInfoHeader(true, false, true));
+                for (int i=0; i<filteredContactsPhone.size(); i++) {
+                    found = false;
+                    contactPhone = filteredContactsPhone.get(i);
+                    for (int j=0; j<filteredContactMEGA.size(); j++) {
+                        contactMEGA = filteredContactMEGA.get(j);
+                        if (contactPhone.getEmail().equals(getMegaContactMail(contactMEGA))){
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        shareContacts.add(new ShareContactInfo(contactPhone, null, null));
+                    }
+                    else {
+                        filteredContactsPhone.remove(contactPhone);
+                        i--;
+                    }
+                }
+
+                for (int i=0; i<shareContacts.size(); i++) {
+                    filteredContactsShare.add(shareContacts.get(i));
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            waitingForPhoneContacts = false;
+            setShareAdapterContacts(filteredContactsShare);
         }
     }
 
@@ -317,13 +370,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
             else {
-                getBothContacts();
+                getVisibleMEGAContacts();
                 addedContactsPhone.clear();
                 MegaContactAdapter contactMEGA;
-                PhoneContactInfo contactPhone;
                 ShareContactInfo contact;
-                boolean found;
                 shareContacts.clear();
+                filteredContactsShare.clear();
+
                 if (filteredContactMEGA != null && !filteredContactMEGA.isEmpty()) {
                     shareContacts.add(new ShareContactInfoHeader(true, true, false));
                     for (int i = 0; i<filteredContactMEGA.size(); i++) {
@@ -331,31 +384,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         contact = new ShareContactInfo(null, contactMEGA, null);
                         shareContacts.add(contact);
                     }
-                }
-                if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
-                    shareContacts.add(new ShareContactInfoHeader(true, false, true));
-                    for (int i=0; i<filteredContactsPhone.size(); i++) {
-                        found = false;
-                        contactPhone = filteredContactsPhone.get(i);
-                        for (int j=0; j<filteredContactMEGA.size(); j++) {
-                            contactMEGA = filteredContactMEGA.get(j);
-                            if (contactPhone.getEmail().equals(getMegaContactMail(contactMEGA))){
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            shareContacts.add(new ShareContactInfo(contactPhone, null, null));
-                        }
-                        else {
-                            filteredContactsPhone.remove(contactPhone);
-                            i--;
-                        }
+
+                    for (int i=0; i<shareContacts.size(); i++) {
+                        filteredContactsShare.add(shareContacts.get(i));
                     }
-                }
-                filteredContactsShare.clear();
-                for (int i=0; i<shareContacts.size(); i++) {
-                    filteredContactsShare.add(shareContacts.get(i));
                 }
             }
 
@@ -367,7 +399,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             logDebug("onPostExecute GetContactsTask");
             progressBar.setVisibility(View.GONE);
             if (searchExpand) {
-                if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
+                if (isAsyncTaskRunning(filterContactsTask)) {
                     filterContactsTask.cancel(true);
                 }
                 filterContactsTask = new FilterContactsTask();
@@ -385,6 +417,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
                 else {
                     setShareAdapterContacts(filteredContactsShare);
+                    if (queryPermissions) {
+                        waitingForPhoneContacts = true;
+                        filteredContactsShare.add(new ShareContactInfo());
+                        getPhoneContactsTask = new GetPhoneContactsTask();
+                        getPhoneContactsTask.execute();
+                    }
                 }
                 setTitleAB();
                 setRecyclersVisibility();
@@ -392,7 +430,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 visibilityFastScroller();
 
                 if (isConfirmAddShown) {
-                    if (queryIfContactSouldBeAddedTask != null && queryIfContactSouldBeAddedTask.getStatus() == AsyncTask.Status.RUNNING) {
+                    if (isAsyncTaskRunning(queryIfContactSouldBeAddedTask)) {
                         queryIfContactSouldBeAddedTask.cancel(true);
                     }
                     hideKeyboard(addContactActivityLollipop, 0);
@@ -508,7 +546,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             visibilityFastScroller();
 
             if (isConfirmAddShown) {
-                if (queryIfContactSouldBeAddedTask != null && queryIfContactSouldBeAddedTask.getStatus() == AsyncTask.Status.RUNNING) {
+                if (isAsyncTaskRunning(queryIfContactSouldBeAddedTask)) {
                     queryIfContactSouldBeAddedTask.cancel(true);
                 }
                 hideKeyboard(addContactActivityLollipop, 0);
@@ -635,7 +673,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             logDebug("onPostExecute RecoverContactsTask");
             setAddedAdapterContacts();
             if (searchExpand) {
-                if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
+                if (isAsyncTaskRunning(filterContactsTask)) {
                     filterContactsTask.cancel(true);
                 }
                 filterContactsTask = new FilterContactsTask();
@@ -658,7 +696,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 visibilityFastScroller();
 
                 if (isConfirmAddShown) {
-                    if (queryIfContactSouldBeAddedTask != null && queryIfContactSouldBeAddedTask.getStatus() == AsyncTask.Status.RUNNING) {
+                    if (isAsyncTaskRunning(queryIfContactSouldBeAddedTask)) {
                         queryIfContactSouldBeAddedTask.cancel(true);
                     }
                     hideKeyboard(addContactActivityLollipop, 0);
@@ -669,7 +707,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    private void getBothContacts() {
+    private void getDeviceContacts() {
         if (queryPermissions) {
             if (phoneContacts != null) {
                 phoneContacts.clear();
@@ -682,6 +720,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
         }
+    }
+
+    private void getBothContacts() {
+        getDeviceContacts();
         getVisibleMEGAContacts();
     }
 
@@ -1183,7 +1225,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 logDebug("onMenuItemActionExpand");
                 searchExpand = true;
                 typeContactEditText.getText().clear();
-                if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
+                if (isAsyncTaskRunning(filterContactsTask)) {
                     filterContactsTask.cancel(true);
                 }
                 filterContactsTask = new FilterContactsTask();
@@ -1198,7 +1240,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 searchExpand = false;
                 setSendInvitationVisibility();
                 setTitleAB();
-                if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING){
+                if (isAsyncTaskRunning(filterContactsTask)){
                     filterContactsTask.cancel(true);
                 }
                 return true;
@@ -1215,7 +1257,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             @Override
             public boolean onQueryTextChange(String newText) {
                 logDebug("onQueryTextChange searchView");
-                if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING){
+                if (isAsyncTaskRunning(filterContactsTask)){
                     filterContactsTask.cancel(true);
                 }
                 filterContactsTask = new FilterContactsTask();
@@ -1378,7 +1420,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         outState.putBoolean("isConfirmDeleteShown", isConfirmDeleteShown);
         outState.putString("confirmDeleteMail", confirmDeleteMail);
         outState.putBoolean(FROM_RECENT, comesFromRecent);
-        if (queryIfContactSouldBeAddedTask != null && queryIfContactSouldBeAddedTask.getStatus() == AsyncTask.Status.RUNNING){
+        if (isAsyncTaskRunning(queryIfContactSouldBeAddedTask)){
             isConfirmAddShown = true;
             queryIfContactSouldBeAddedTask.cancel(true);
         }
@@ -1394,35 +1436,39 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         saveContactsAdded(outState);
     }
 
+    private boolean isAsyncTaskRunning(AsyncTask asyncTask) {
+        return asyncTask != null && asyncTask.getStatus() == AsyncTask.Status.RUNNING;
+    }
+
     private void saveContactsAdded (Bundle outState) {
 
         boolean finished = true;
 
-        if (getContactsTask != null && getContactsTask.getStatus() == AsyncTask.Status.RUNNING){
+        if (isAsyncTaskRunning(getContactsTask)){
             getContactsTask.cancel(true);
             finished = false;
             if (contactType == CONTACT_TYPE_DEVICE) {
                 outState.putParcelableArrayList("addedContactsPhone", null);
                 outState.putParcelableArrayList("filteredContactsPhone", null);
                 outState.putParcelableArrayList("phoneContacts", null);
-            }
-            else {
+            } else {
                 outState.putStringArrayList("savedaddedContacts", null);
             }
-        }
-        else if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING){
+        } else if (isAsyncTaskRunning(getPhoneContactsTask)) {
+            getPhoneContactsTask.cancel(true);
+            finished = false;
+            outState.putStringArrayList("savedaddedContacts", null);
+        } else if (isAsyncTaskRunning(filterContactsTask)) {
             filterContactsTask.cancel(true);
             finished = true;
-        }
-        else if (recoverContactsTask != null && recoverContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
+        } else if (isAsyncTaskRunning(recoverContactsTask)) {
             recoverContactsTask.cancel(true);
             finished = false;
             if (contactType == CONTACT_TYPE_DEVICE) {
                 outState.putParcelableArrayList("addedContactsPhone", addedContactsPhone);
                 outState.putParcelableArrayList("filteredContactsPhone", filteredContactsPhone);
                 outState.putParcelableArrayList("phoneContacts", phoneContacts);
-            }
-            else {
+            } else {
                 outState.putStringArrayList("savedaddedContacts", savedaddedContacts);
             }
         }
@@ -1598,7 +1644,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         if (searchMenuItem != null) {
                             searchMenuItem.collapseActionView();
                         }
-                        if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
+                        if (isAsyncTaskRunning(filterContactsTask)) {
                             filterContactsTask.cancel(true);
                         }
                         filterContactsTask = new FilterContactsTask();
@@ -1814,19 +1860,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         else {
             isEKREnabled = false;
             ekrSwitch.setChecked(isEKREnabled);
-            if (contactType == CONTACT_TYPE_MEGA) {
-                setAddedAdapterContacts();
+            setAddedAdapterContacts();
 
+            if (contactType == CONTACT_TYPE_MEGA) {
                 progressBar.setVisibility(View.VISIBLE);
                 getContactsTask = new GetContactsTask();
                 getContactsTask.execute();
-            }
-            else if (contactType == CONTACT_TYPE_DEVICE){
-                setAddedAdapterContacts();
-                queryIfHasReadContactsPermissions();
-            }
-            else {
-                setAddedAdapterContacts();
+            } else {
                 queryIfHasReadContactsPermissions();
             }
         }
@@ -1841,8 +1881,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
 
         setGetChatLinkVisibility();
+
         if (comesFromRecent && !onNewGroup) {
-            if (getContactsTask != null && getContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
+            if (isAsyncTaskRunning(getContactsTask)) {
                 getContactsTask.cancel(true);
             }
             createNewChatLink = true;
@@ -1892,6 +1933,14 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
         }
+
+        if (waitingForPhoneContacts) {
+            filteredContactsShare.add(new ShareContactInfo());
+            getPhoneContactsTask = new GetPhoneContactsTask();
+            getPhoneContactsTask.execute();
+            return;
+        }
+
         setEmptyStateVisibility(true);
         progressBar.setVisibility(View.VISIBLE);
         getContactsTask = new GetContactsTask();
@@ -2529,40 +2578,41 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private ArrayList<PhoneContactInfo> getPhoneContacts() {
         logDebug("getPhoneContacts");
         ArrayList<PhoneContactInfo> contactList = new ArrayList<>();
-        logDebug("inputString empty");
-        String filter = ContactsContract.CommonDataKinds.Email.DATA + " NOT LIKE ''  AND " + ContactsContract.Contacts.IN_VISIBLE_GROUP + "=1";
+
+        ContentResolver cr = getContentResolver();
+        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME},
+                null,
+                null,
+                null);
 
         try {
-            ContentResolver cr = getBaseContext().getContentResolver();
-            String SORT_ORDER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? ContactsContract.Contacts.SORT_KEY_PRIMARY : ContactsContract.Contacts.DISPLAY_NAME;
+            while (cursor.moveToNext()) {
+                long id = cursor.getLong(0);
+                String name = cursor.getString(1);
 
-            Cursor c = cr.query(
-                    ContactsContract.Data.CONTENT_URI,
-                    null,filter,
-                    null, SORT_ORDER);
+                String emailAddress = null;
+                Cursor cursore = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
+                        new String[]{String.valueOf(id)},
+                        ContactsContract.Contacts.SORT_KEY_PRIMARY);
 
-            while (c.moveToNext()){
-                long id = c.getLong(c.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-                String name = c.getString(c.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
-                String emailAddress = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-                logDebug("ID: " + id + "___ NAME: " + name + "____ EMAIL: " + emailAddress);
+                if (cursore != null && cursore.moveToFirst()) {
+                    emailAddress = cursore.getString(cursore.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+                    cursore.close();
+                }
 
-                if ((!emailAddress.equalsIgnoreCase("")) && (emailAddress.contains("@")) && (!emailAddress.contains("s.whatsapp.net"))) {
-                    PhoneContactInfo contactPhone = new PhoneContactInfo(id, name, emailAddress, null);
-                    contactList.add(contactPhone);
+                if (emailAddress != null && !emailAddress.isEmpty() && emailAddress.contains("@") && !emailAddress.contains("s.whatsapp.net")) {
+                    contactList.add(new PhoneContactInfo(id, name, emailAddress, null));
                 }
             }
-            c.close();
-
-            logDebug("contactList.size() = " + contactList.size());
-
-            return contactList;
-
+            cursor.close();
         } catch (Exception e) {
-            logError("Exception", e);
+            logWarning("Exception getting phone contacts", e);
         }
 
-        return null;
+        return contactList;
     }
 
     @Override
@@ -2627,7 +2677,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         }
 
-        if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING){
+        if (isAsyncTaskRunning(filterContactsTask)){
             filterContactsTask.cancel(true);
         }
         filterContactsTask = new FilterContactsTask();
@@ -2682,7 +2732,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         hideKeyboard(addContactActivityLollipop, 0);
                     }
                 }
-                if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING){
+                if (isAsyncTaskRunning(filterContactsTask)){
                     filterContactsTask.cancel(true);
                 }
                 filterContactsTask = new FilterContactsTask();
@@ -2866,7 +2916,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
 
             final ShareContactInfo contact = adapterShareHeader.getItem(position);
-            if(contact == null || contact.isHeader()) {
+            if(contact == null || contact.isHeader() || contact.isProgress()) {
                 return;
             }
 
@@ -3183,7 +3233,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private void newGroup () {
         logDebug("newGroup");
 
-        if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
+        if (isAsyncTaskRunning(filterContactsTask)) {
             filterContactsTask.cancel(true);
         }
         onNewGroup = true;

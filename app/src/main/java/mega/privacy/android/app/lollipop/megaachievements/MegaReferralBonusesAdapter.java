@@ -259,7 +259,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 
 		}
 		else{
-			holderList.textViewDaysLeft.setText(context.getResources().getString(R.string.expired_achievement));
+			holderList.textViewDaysLeft.setText(context.getResources().getString(R.string.expired_label));
 		}
 
 //		holder.imageButtonThreeDots.setTag(holder);

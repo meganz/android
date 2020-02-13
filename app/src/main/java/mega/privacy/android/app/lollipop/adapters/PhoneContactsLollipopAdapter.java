@@ -44,8 +44,6 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneContactsLollipopAdapter.ViewHolderPhoneContactsLollipop> implements OnClickListener, SectionTitleProvider {
 
 	DatabaseHandler dbH = null;
-	public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
-	public static int MAX_WIDTH_CONTACT_NAME_PORT=200;
 
 	@Override
 	public String getSectionTitle(int position) {

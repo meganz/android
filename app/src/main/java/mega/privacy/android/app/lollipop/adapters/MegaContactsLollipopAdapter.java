@@ -57,10 +57,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	public static final int ITEM_VIEW_TYPE_LIST_ADD_CONTACT = 2;
 	public static final int ITEM_VIEW_TYPE_LIST_GROUP_CHAT = 3;
-	private static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
-	private static final int MAX_WIDTH_CONTACT_NAME_PORT = 200;
-	private static final int MAX_WIDTH_CONTACT_NAME_GRID_LAND = 150;
-	private static final int MAX_WIDTH_CONTACT_NAME_GRID_PORT = 120;
 	private Context context;
 	private int positionClicked;
 	private ArrayList<MegaContactAdapter> contacts;
