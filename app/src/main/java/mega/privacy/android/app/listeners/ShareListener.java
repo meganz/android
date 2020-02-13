@@ -76,7 +76,7 @@ public class ShareListener extends BaseListener {
         }
 
         if (numberPendingRequests == 0) {
-            showSnackBar(context, SNACKBAR_TYPE, message, (int) INVALID_HANDLE);
+            showSnackbar(context, message);
             sendManageSharesBroadcast();
         }
     }

@@ -157,12 +157,14 @@ public class Constants {
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;
     public static final int TYPE_ERROR_RECORD = 3;
-    
+
     public static final int FREE = 0;
     public static final int PRO_I = 1;
     public static final int PRO_II = 2;
     public static final int PRO_III = 3;
     public static final int PRO_LITE = 4;
+    public static final int BUSINESS = 100;
+
 
     public static final int COLOR_STATUS_BAR_ACCENT = 1;
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
@@ -243,6 +245,7 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ORDER = "INTENT_UPDATE_ORDER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_VIEW = "INTENT_UPDATE_VIEW";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
+    public static final String BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED = "INTENT_BUSINESS_EXPIRED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED = "INTENT_CHAT_ARCHIVED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP = "INTENT_CHAT_ARCHIVED_GROUP";
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";

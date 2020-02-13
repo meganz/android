@@ -1632,48 +1632,45 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			logDebug("Copy nodes request finished");
         }
-        else if (request.getType() == MegaRequest.TYPE_MOVE){
-            try {
-                statusDialog.dismiss();
-            }
-            catch (Exception ex) {}
-            
-            if(moveToRubbish){
+        else if (request.getType() == MegaRequest.TYPE_MOVE) {
+			try {
+				statusDialog.dismiss();
+			} catch (Exception ex) {
+			}
+
+			if (moveToRubbish) {
 				logDebug("Finish move to Rubbish!");
-                if (e.getErrorCode() == MegaError.API_OK){
-                    if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                        sharedFoldersFragment.clearSelections();
-                        sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish), -1);
-                    }
-                }
-                else{
-                    if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                        sharedFoldersFragment.clearSelections();
-                        sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-                    }
-                }
-            }
-            else{
-                if (e.getErrorCode() == MegaError.API_OK){
-                    if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                        sharedFoldersFragment.clearSelections();
-                        sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
-                    }
-                }
-                else{
-                    if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                        sharedFoldersFragment.clearSelections();
-                        sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-                    }
-                }
-            }
-            moveToRubbish=false;
+				if (e.getErrorCode() == MegaError.API_OK) {
+					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+						sharedFoldersFragment.clearSelections();
+						sharedFoldersFragment.hideMultipleSelect();
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish), -1);
+					}
+				} else {
+					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+						sharedFoldersFragment.clearSelections();
+						sharedFoldersFragment.hideMultipleSelect();
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
+					}
+				}
+			} else {
+				if (e.getErrorCode() == MegaError.API_OK) {
+					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+						sharedFoldersFragment.clearSelections();
+						sharedFoldersFragment.hideMultipleSelect();
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
+					}
+				} else {
+					if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
+						sharedFoldersFragment.clearSelections();
+						sharedFoldersFragment.hideMultipleSelect();
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
+					}
+				}
+			}
+			moveToRubbish = false;
 			logDebug("Move request finished");
-        } else if(request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
+		} else if(request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
 			logDebug("Contact removed");
 			finish();
 		}

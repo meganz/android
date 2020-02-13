@@ -32,6 +32,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
     int counter = 0;
     int error = 0;
+    int errorBusiness = 0;
     int max_items = 0;
     int actionListener = -1;
     String message;
@@ -67,6 +68,9 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
         counter--;
         if (e.getErrorCode() != MegaError.API_OK){
+            if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
+                errorBusiness++;
+            }
             error++;
         }
         int requestType = request.getType();
@@ -126,7 +130,11 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     if (actionListener==MULTIPLE_LEAVE_SHARE){
                         logDebug("Leave multi share");
                         if(error>0){
-                            message = context.getString(R.string.number_correctly_leaved, max_items-error) + context.getString(R.string.number_no_leaved, error);
+                            if (error == errorBusiness) {
+                                message = e.getErrorString();
+                            } else {
+                                message = context.getString(R.string.number_correctly_leaved, max_items - error) + context.getString(R.string.number_no_leaved, error);
+                            }
                         }
                         else{
                             message = context.getString(R.string.number_correctly_leaved, max_items);

@@ -554,14 +554,137 @@
 				android:background="@color/grid_item_separator"
 				android:orientation="horizontal" />
 
+			<!-- Business -->
 			<RelativeLayout
+				android:id="@+id/upgrade_business_layout"
+				android:layout_width="match_parent"
+				android:background="@color/white"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp"
+				android:paddingTop="8dp">
+
+				<RelativeLayout
+					android:id="@+id/upgrade_business_layout_content"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content">
+
+					<!-- Left side (image and title) -->
+					<RelativeLayout
+						android:id="@+id/upgrade_business_left_side"
+						android:layout_width="121dp"
+						android:layout_height="wrap_content"
+						android:gravity="center_horizontal">
+						<RelativeLayout
+							android:background="@android:color/transparent"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:paddingTop="4dp">
+							<ImageView
+								android:id="@+id/image_business"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:layout_centerHorizontal="true"
+								android:layout_marginBottom="5dp"
+								android:src="@drawable/ic_business_crest"/>
+
+							<TextView
+								android:id="@+id/upgrade_business_title_text"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:textColor="@color/business_color"
+								android:text="@string/business_label"
+								android:layout_below="@+id/image_business"
+								android:textAllCaps="true"
+								android:textSize="18sp"/>
+						</RelativeLayout>
+					</RelativeLayout>
+
+					<!-- Right side (price, storage and bandwidth)-->
+					<RelativeLayout
+						android:id="@+id/upgrade_business_right_side"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_toRightOf="@id/upgrade_business_left_side"
+						android:gravity="center_vertical"
+						android:layout_centerVertical="true">
+
+						<TableLayout
+							android:id="@+id/table_business"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_centerVertical="true">
+
+							<TableRow>
+								<RelativeLayout
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_gravity="left"
+									android:background="@drawable/border_business"
+									android:layout_marginBottom="6dp">
+									<TextView
+										android:id="@+id/month_business"
+										android:layout_width="wrap_content"
+										android:layout_height="wrap_content"
+										android:textStyle="bold"
+										android:textColor="@color/name_my_account"
+										android:textSize="15sp" />
+								</RelativeLayout>
+							</TableRow>
+							<TableRow>
+								<RelativeLayout
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_gravity="left"
+									android:paddingLeft="8dp"
+									android:layout_marginBottom="6dp">
+									<TextView
+										android:id="@+id/storage_business"
+										android:layout_width="wrap_content"
+										android:layout_height="wrap_content"
+										android:textColor="@color/black"
+										android:textSize="15sp"/>
+								</RelativeLayout>
+							</TableRow>
+							<TableRow>
+
+								<RelativeLayout
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_gravity="left"
+									android:paddingLeft="8dp"
+									android:layout_marginBottom="16dp">
+									<TextView
+										android:id="@+id/bandwidth_business"
+										android:layout_width="wrap_content"
+										android:layout_height="wrap_content"
+										android:textColor="@color/black"
+										android:textSize="15sp" />
+								</RelativeLayout>
+							</TableRow>
+						</TableLayout>
+					</RelativeLayout>
+				</RelativeLayout>
+				<LinearLayout
+					android:id="@+id/linear_divider_business"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:layout_marginLeft="16dp"
+					android:layout_marginRight="16dp"
+					android:layout_alignBottom="@id/upgrade_business_layout_content"
+					android:background="@color/grid_item_separator"
+					android:orientation="horizontal" />
+
+			</RelativeLayout>
+
+			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:background="@android:color/transparent"
 				android:layout_marginLeft="16dp"
 				android:layout_marginRight="16dp"
 				android:layout_marginTop="10dp"
-				android:layout_marginBottom="30dp">
+				android:layout_marginBottom="30dp"
+				android:orientation="vertical">
 				<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
@@ -569,7 +692,17 @@
 					android:textColor="@color/mail_my_account"
 					android:gravity="left"
 					android:textSize="12sp"/>
-			</RelativeLayout>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/business_account_clarification"
+					android:textColor="@color/mail_my_account"
+					android:gravity="left"
+					android:textSize="12sp"
+					android:layout_marginTop="4dp"/>
+
+			</LinearLayout>
 		</LinearLayout>
 
 	</ScrollView>

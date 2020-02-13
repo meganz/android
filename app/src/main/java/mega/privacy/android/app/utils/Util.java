@@ -35,6 +35,7 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.support.v7.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
@@ -42,6 +43,7 @@ import android.support.v4.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -540,15 +542,6 @@ public class Util {
 
         return sizeString;
     }
-
-	public static String getDateString(long date){
-		DateFormat datf = DateFormat.getDateTimeInstance();
-		String dateString = "";
-		
-		dateString = datf.format(new Date(date*1000));
-		
-		return dateString;
-	}
 
 	public static void setFileLoggerSDK(boolean fL){
 		fileLoggerSDK = fL;
@@ -1802,6 +1795,15 @@ public class Util {
             }
         }, 50);
     }
+
+    public static Spanned getSpannedHtmlText(String string) {
+
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
+		}
+
+		return Html.fromHtml(string);
+	}
 
 	/**
 	 * This method is to start camera from Activity

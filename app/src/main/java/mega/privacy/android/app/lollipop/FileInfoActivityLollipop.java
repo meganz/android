@@ -2341,8 +2341,9 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 logDebug("Remove request finished");
                 if (e.getErrorCode() == MegaError.API_OK){
                     finish();
-                }
-                else{
+                } else if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
+                    showSnackbar(SNACKBAR_TYPE, e.getErrorString(), -1);
+                } else{
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
                 }
             }

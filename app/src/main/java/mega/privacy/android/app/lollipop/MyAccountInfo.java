@@ -21,6 +21,7 @@ import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class MyAccountInfo {
@@ -49,6 +50,8 @@ public class MyAccountInfo {
     boolean inventoryFinished = false;
     boolean accountDetailsFinished = false;
     boolean getPaymentMethodsBoolean = false;
+    private boolean businessStatusReceived = false;
+    private boolean shouldShowBusinessAlert = false;
 
     MegaApplication app;
     MegaApiAndroid megaApi;
@@ -421,7 +424,7 @@ public class MyAccountInfo {
         for (int i = 0; i < p.getNumProducts(); i++) {
             logDebug("p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
 
-            Product account = new Product(p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
+            Product account = new Product(p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i), p.isBusinessType(i));
 
             productAccounts.add(account);
         }
@@ -568,6 +571,22 @@ public class MyAccountInfo {
 
     public long getUsedStorage() {
         return usedStorage;
+    }
+
+    public void setBusinessStatusReceived(boolean businessStatusReceived) {
+        this.businessStatusReceived = businessStatusReceived;
+    }
+
+    public boolean isBusinessStatusReceived() {
+        return businessStatusReceived;
+    }
+
+    public void setShouldShowBusinessAlert(boolean shouldShowBusinessAlert) {
+        this.shouldShowBusinessAlert = shouldShowBusinessAlert;
+    }
+
+    public boolean shouldShowBusinessAlert() {
+        return shouldShowBusinessAlert;
     }
 
     public Purchase getActiveGooglePlaySubscription() {
