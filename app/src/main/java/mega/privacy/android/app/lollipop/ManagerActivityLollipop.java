@@ -208,6 +208,7 @@ import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
@@ -260,7 +261,6 @@ import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -17659,10 +17659,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		logDebug("Level: " + level);
         if(level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL){
 			logWarning("Low memory");
-			isDeviceMemoryLow = true;
+			ThumbnailUtilsLollipop.isDeviceMemoryLow = true;
         }else{
 			logDebug("Memory OK");
-			isDeviceMemoryLow = false;
+			ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
         }
     }
 
