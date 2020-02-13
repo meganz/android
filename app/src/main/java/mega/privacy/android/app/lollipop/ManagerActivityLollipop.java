@@ -45,7 +45,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -1026,6 +1025,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							}
 							else if (actionType == SCROLL_TO_POSITION) {
 								outSFLol.updateScrollPosition(position + placeholderCount);
+							}
+						}
+					} else if (adapterType == LINKS_ADAPTER) {
+						if (isLinksAdded()) {
+							if (actionType == UPDATE_IMAGE_DRAG) {
+								imageDrag = lF.getImageDrag(position + placeholderCount);
+								if (lF.imageDrag != null) {
+									lF.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null) {
+									lF.imageDrag = imageDrag;
+									lF.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							if (actionType == SCROLL_TO_POSITION) {
+								lF.updateScrollPosition(position + placeholderCount);
 							}
 						}
 					}
@@ -6036,6 +6051,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             case SHARED_ITEMS: {
             	if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) inSFLol.checkScroll();
             	else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) outSFLol.checkScroll();
+            	else if (getTabItemShares() == OUTGOING_TAB && isLinksAdded()) lF.checkScroll();
                 break;
             }
             case CONTACTS: {
@@ -16646,22 +16662,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				case SHARED_ITEMS: {
 					if (viewPagerShares == null || sharesPageAdapter == null) break;
 
-					if (getTabItemShares() == 0) {
-						inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-						if (inSFLol != null && inSFLol.isAdded()) {
-							inSFLol.openFile(node, position, screenPosition, imageView);
-						}
-					} else if (getTabItemShares() == 1) {
-						outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-						if (outSFLol != null && outSFLol.isAdded()) {
-							outSFLol.openFile(node, position, screenPosition, imageView);
-						}
-					}
+					if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
+						inSFLol.openFile(node, INCOMING_SHARES_ADAPTER, position, screenPosition, imageView);
+					} else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) {
+						outSFLol.openFile(node, OUTGOING_SHARES_ADAPTER, position, screenPosition, imageView);
+					} else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) {
+					    lF.openFile(node, LINKS_ADAPTER, position, screenPosition, imageView);
+                    }
 					break;
 				}
 				case INBOX: {
-					iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
-					if (iFLol != null) {
+					if (getInboxFragment() != null) {
 						iFLol.openFile(node, position, screenPosition, imageView);
 					}
 					break;

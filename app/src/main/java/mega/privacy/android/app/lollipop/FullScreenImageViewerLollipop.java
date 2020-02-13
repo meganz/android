@@ -72,6 +72,7 @@ import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -232,6 +233,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 	ArrayList<File> zipFiles = new ArrayList<>();
 
 	private String downloadLocationDefaultPath = "";
+	private long parentNodeHandle = INVALID_HANDLE;
 
 	@Override
 	public void onDestroy(){
@@ -991,7 +993,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
         if(adapterType == RUBBISH_BIN_ADAPTER || adapterType == INBOX_ADAPTER ||
 				adapterType == INCOMING_SHARES_ADAPTER|| adapterType == OUTGOING_SHARES_ADAPTER ||
 				adapterType == SEARCH_ADAPTER || adapterType == FILE_BROWSER_ADAPTER ||
-				adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER) {
+				adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER ||
+				adapterType == LINKS_ADAPTER) {
             // only for the first time
             if(savedInstanceState == null) {
                 positionG -= placeholderCount;
@@ -1053,7 +1056,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 		imageHandles = new ArrayList<>();
 		paths = new ArrayList<>();
-		long parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
+		parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
 		fromShared = intent.getBooleanExtra("fromShared", false);
 		MegaNode parentNode;
 		bottomLayout = findViewById(R.id.image_viewer_layout_bottom);
@@ -1216,8 +1219,9 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
-		}
-		else{
+		} else if (adapterType == LINKS_ADAPTER && parentNodeHandle == INVALID_HANDLE) {
+			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
+		} else {
 			if (parentNodeHandle == -1){
 				switch(adapterType){
 					case FILE_BROWSER_ADAPTER:{
@@ -1372,6 +1376,10 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			if (ZipBrowserActivityLollipop.imageDrag != null) {
 				ZipBrowserActivityLollipop.imageDrag.setVisibility(visibility);
 			}
+		} else if (adapterType == LINKS_ADAPTER) {
+			if (LinksFragment.imageDrag != null) {
+				LinksFragment.imageDrag.setVisibility(visibility);
+			}
 		}
 	}
 
@@ -1430,6 +1438,10 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		else if (adapterType == ZIP_ADAPTER) {
 			if (ZipBrowserActivityLollipop.imageDrag != null) {
 				ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
+			}
+		} else if (adapterType == LINKS_ADAPTER) {
+			if (LinksFragment.imageDrag != null) {
+				LinksFragment.imageDrag.getLocationOnScreen(location);
 			}
 		}
 	}
@@ -1513,8 +1525,13 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		}
         else {
             Long handle = adapterMega.getImageHandle(positionG);
-            MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
+            ArrayList<MegaNode> listNodes;
+            if (adapterType == LINKS_ADAPTER && parentNodeHandle == INVALID_HANDLE) {
+            	listNodes = megaApi.getPublicLinks(orderGetChildren);
+			} else {
+				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+				listNodes = megaApi.getChildren(parentNode, orderGetChildren);
+			}
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
                     getImageView(i, -1);
@@ -1584,8 +1601,13 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		}
         else {
             Long handle = adapterMega.getImageHandle(positionG);
-            MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
+			ArrayList<MegaNode> listNodes;
+			if (adapterType == LINKS_ADAPTER && parentNodeHandle == INVALID_HANDLE) {
+				listNodes = megaApi.getPublicLinks(orderGetChildren);
+			} else {
+				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+				listNodes = megaApi.getChildren(parentNode, orderGetChildren);
+			}
 
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){

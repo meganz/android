@@ -154,7 +154,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
             logDebug("ParentHandle to find children: " + managerActivity.getParentHandleLinks());
 
-            nodes = megaApi.getChildren(parentNode, managerActivity.orderCloud);
+            nodes = megaApi.getChildren(parentNode, getLinksOrderCloud());
             addSectionTitle(nodes, adapter.getAdapterType());
             adapter.setNodes(nodes);
         }
@@ -166,7 +166,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
     }
 
     private void findNodes() {
-        setNodes(megaApi.getPublicLinks(managerActivity.orderCloud));
+        setNodes(megaApi.getPublicLinks(getLinksOrderCloud()));
     }
 
     @Override
@@ -233,7 +233,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 parentNodeLinks = megaApi.getParentNode(parentNodeLinks);
                 if (parentNodeLinks != null) {
                     managerActivity.setParentHandleLinks(parentNodeLinks.getHandle());
-                    setNodes(megaApi.getChildren(parentNodeLinks, managerActivity.orderCloud));
+                    setNodes(megaApi.getChildren(parentNodeLinks, getLinksOrderCloud()));
                 }
             }
         } else {
@@ -275,12 +275,12 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 managerActivity.supportInvalidateOptionsMenu();
                 managerActivity.setToolbarTitle();
 
-                setNodes(megaApi.getChildren(n, managerActivity.orderCloud));
+                setNodes(megaApi.getChildren(n, getLinksOrderCloud()));
                 recyclerView.scrollToPosition(0);
                 checkScroll();
                 managerActivity.showFabButton();
             } else {
-                //Is file
+                openFile(n, LINKS_ADAPTER, position, screenPosition, imageView);
             }
         }
     }
@@ -295,7 +295,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             findNodes();
         } else {
             MegaNode parentNodeLinks = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
-            setNodes(megaApi.getChildren(parentNodeLinks, managerActivity.orderCloud));
+            setNodes(megaApi.getChildren(parentNodeLinks, getLinksOrderCloud()));
         }
     }
 }
