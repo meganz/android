@@ -422,6 +422,10 @@ public class Constants {
     public static final String ID_MESSAGES = "ID_MESSAGES";
     public static final String USER_HANDLES = "USER_HANDLES";
 
+    public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
+    public static final int MAX_WIDTH_CONTACT_NAME_PORT = 200;
+    public static final int MAX_WIDTH_CONTACT_NAME_GRID_LAND = 150;
+    public static final int MAX_WIDTH_CONTACT_NAME_GRID_PORT = 120;
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;
     public static final int EMOJI_SIZE_HIGH = 30;
