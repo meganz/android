@@ -6,7 +6,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -15,7 +14,6 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -247,54 +245,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         message = context.getString(R.string.number_correctly_invitation_reply_sent, max_items);
                     }
                     break;
-                }
-                case MegaRequest.TYPE_SHARE:{
-                    logDebug("Multiple share request finished");
-                    if(actionListener==MULTIPLE_REMOVE_SHARING_CONTACTS){
-                        if(error>0){
-                            message = context.getString(R.string.context_no_removed_sharing_contacts);
-                        }
-                        else{
-                            message = context.getString(R.string.context_correctly_removed_sharing_contacts);
-                        }
-                    }
-                    else if(actionListener==MULTIPLE_CONTACTS_SHARE){
-                        //TODO change UI
-                        //One file shared with many contacts
-                        if(error>0){
-                            message = context.getString(R.string.number_contact_file_shared_correctly, max_items-error) + context.getString(R.string.number_contact_file_not_shared_, error);
-                        }
-                        else{
-                            message = context.getString(R.string.number_contact_file_shared_correctly, max_items);
-                        }
-                    }
-                    else if(actionListener==MULTIPLE_FILE_SHARE){
-                        //Many files shared with one contacts
-                        if(error>0){
-                            message = context.getString(R.string.number_correctly_shared, max_items-error) + context.getString(R.string.number_no_shared, error);
-                        }
-                        else{
-                            message = context.getString(R.string.context_correctly_shared);
-                        }
-                    }
-                    else{
-                        if(error>0){
-                            if(request.getAccess()== MegaShare.ACCESS_UNKNOWN){
-                                message = context.getString(R.string.context_no_shared_number_removed, error);
-                            }
-                            else{
-                                message = context.getString(R.string.context_no_shared_number, error);
-                            }
-                        }
-                        else{
-                            if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
-                                message = context.getString(R.string.context_correctly_shared_removed);
-                            }
-                            else{
-                                message = context.getString(R.string.context_correctly_shared);
-                            }
-                        }
-                    }
                 }
                 default:
                     break;

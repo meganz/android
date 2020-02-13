@@ -32,6 +32,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -83,7 +84,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         public ImageView savedOffline;
         public ImageView publicLinkImage;
         public TextView textViewFileName;
-        public TextView textViewMessageInfo;
+        public EmojiTextView textViewMessageInfo;
         public long document;
         public RelativeLayout itemLayout;
         String fullNameTitle;
@@ -351,7 +352,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             holderList.savedOffline = (ImageView)v.findViewById(R.id.file_list_saved_offline);
             holderList.publicLinkImage = (ImageView)v.findViewById(R.id.file_list_public_link);
             holderList.textViewFileName = (TextView)v.findViewById(R.id.file_list_filename);
-            holderList.textViewMessageInfo = (TextView)v.findViewById(R.id.file_list_filesize);
+            holderList.textViewMessageInfo = v.findViewById(R.id.file_list_filesize);
             holderList.threeDotsLayout = (RelativeLayout)v.findViewById(R.id.file_list_three_dots_layout);
             holderList.threeDotsImageView = (ImageView) v.findViewById(R.id.file_list_three_dots);
             holderList.versionsIcon = (ImageView) v.findViewById(R.id.file_list_versions_icon);
@@ -398,7 +399,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             holderGrid.textViewFileName = (TextView)v.findViewById(R.id.file_grid_filename);
             holderGrid.textViewFileNameForFile = (TextView)v.findViewById(R.id.file_grid_filename_for_file);
             holderGrid.imageButtonThreeDotsForFile = (ImageButton)v.findViewById(R.id.file_grid_three_dots_for_file);
-            holderGrid.textViewMessageInfo = (TextView)v.findViewById(R.id.file_grid_filesize);
+            holderGrid.textViewMessageInfo = v.findViewById(R.id.file_grid_filesize);
             holderGrid.imageButtonThreeDots = (ImageButton)v.findViewById(R.id.file_grid_three_dots);
             holderGrid.savedOffline = (ImageView)v.findViewById(R.id.file_grid_saved_offline);
             holderGrid.publicLinkImage = (ImageView)v.findViewById(R.id.file_grid_public_link);
