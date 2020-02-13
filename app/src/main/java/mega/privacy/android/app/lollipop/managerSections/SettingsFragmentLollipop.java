@@ -80,6 +80,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_SETTINGS;
 import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -2130,7 +2131,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             if (!hasPermissions(context,PERMISSIONS)) {
                 ActivityCompat.requestPermissions((ManagerActivityLollipop)context,PERMISSIONS,REQUEST_CAMERA_UPLOAD);
             } else {
-                enableCameraUpload();
+				((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_SETTINGS, false);
             }
         } else {
             disableCameraUpload();

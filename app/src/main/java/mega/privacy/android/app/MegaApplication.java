@@ -88,6 +88,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 
 public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
@@ -212,6 +213,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				MegaError e) {
 			logDebug("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
 
+			if (e.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
+				LocalBroadcastManager.getInstance(getApplicationContext())
+						.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+				return;
+			}
+
 			if (request.getType() == MegaRequest.TYPE_LOGOUT){
 				logDebug("Logout finished: " + e.getErrorString() + "(" + e.getErrorCode() +")");
 				if (e.getErrorCode() == MegaError.API_OK) {
@@ -234,7 +241,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					}
 				} else if (e.getErrorCode() == MegaError.API_ESID) {
 					logWarning("TYPE_LOGOUT:API_ESID");
-					myAccountInfo = new MyAccountInfo(getApplicationContext());
+					myAccountInfo = new MyAccountInfo();
 
 					esid = true;
 
@@ -371,9 +378,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						logDebug("onRequest TYPE_ACCOUNT_DETAILS: " + myAccountInfo.getUsedPerc());
 					}
 
-					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-					intent.putExtra("actionType", UPDATE_ACCOUNT_DETAILS);
-					LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+					sendBroadcastUpdateAccountDetails();
 				}
 			}
 		}
@@ -384,6 +389,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			logDebug("BackgroundRequestListener: onRequestTemporaryError: " + request.getRequestString());
 		}
 		
+	}
+
+	private void sendBroadcastUpdateAccountDetails() {
+		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+		intent.putExtra("actionType", UPDATE_ACCOUNT_DETAILS);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
 	public void launchExternalLogout(){
@@ -555,7 +566,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			megaApi.useHttpsOnly(useHttpsOnly);
 		}
 
-		myAccountInfo = new MyAccountInfo(this);
+		myAccountInfo = new MyAccountInfo();
 
 		if (dbH != null) {
 			dbH.resetExtendedAccountDetailsTimestamp();
@@ -1231,6 +1242,16 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		logWarning("onRequestTemporaryError (CHAT): "+e.getErrorString());
+	}
+
+	public void updateBusinessStatus() {
+		myAccountInfo.setBusinessStatusReceived(true);
+		int status = megaApi.getBusinessStatus();
+		if (status == BUSINESS_STATUS_EXPIRED
+				|| (megaApi.isMasterBusinessAccount() && status == BUSINESS_STATUS_GRACE_PERIOD)){
+			myAccountInfo.setShouldShowBusinessAlert(true);
+		}
+		sendBroadcastUpdateAccountDetails();
 	}
 
 	@Override

@@ -421,7 +421,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionRemoveLink.setVisibility(View.GONE);
                 }
 
-                if (node.isShared()) {
+                if (node.isShared() || megaApi.isPendingShare(node)) {
                     optionClearShares.setVisibility(View.VISIBLE);
                 } else {
                     counterShares--;
@@ -1187,7 +1187,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     if (node.isInShare()){
                         i.putExtra("imageId", R.drawable.ic_folder_incoming);
                     }
-                    else if (node.isOutShare()||megaApi.isPendingShare(node)){
+                    else if (node.isOutShare() || megaApi.isPendingShare(node)){
                         i.putExtra("imageId", R.drawable.ic_folder_outgoing);
                     }
                     else{
@@ -1227,7 +1227,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     logWarning("The selected node is NULL");
                     return;
                 }
-                if(node.isOutShare()||megaApi.isPendingShare(node)){
+                if(node.isOutShare() || megaApi.isPendingShare(node)){
                     Intent i = new Intent(context, FileContactListActivityLollipop.class);
                     i.putExtra("name", node.getHandle());
                     context.startActivity(i);

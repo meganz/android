@@ -35,6 +35,7 @@ import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import nz.mega.sdk.MegaApiAndroid;
@@ -46,6 +47,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CreateAccountFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, OnKeyboardVisibilityListener {
 
@@ -599,7 +601,20 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         createAccountProgressBar.setVisibility(View.VISIBLE);
         createAccountAndAcceptLayout.setVisibility(View.GONE);
 
-        megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
+        final String email = userEmail.getText() != null ? userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) : null;
+        final String password = userPassword.getText() != null ? userPassword.getText().toString() : null;
+        final String name = userName.getText() != null ? userName.getText().toString() : null;
+        final String lastName = userLastName.getText() != null ? userLastName.getText().toString() : null;
+
+        MegaAttributes attributes = MegaApplication.getInstance().getDbH().getAttributes();
+        final long lastPublicHandle = attributes != null ? attributes.getLastPublicHandle() : INVALID_HANDLE;
+
+        if (lastPublicHandle == INVALID_HANDLE) {
+            megaApi.createAccount(email, password, name, lastName, this);
+        } else {
+            megaApi.createAccount(email, password, name, lastName, lastPublicHandle,
+                    attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), this);
+        }
     }
 
     private boolean validateForm() {
@@ -690,20 +705,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             return getString(R.string.error_passwords_dont_match);
         }
         return null;
-    }
-
-    private void onKeysGenerated(final String privateKey, final String publicKey) {
-        if(!isOnline(context)){
-            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
-            return;
-        }
-
-        createAccountLayout.setVisibility(View.GONE);
-        creatingAccountLayout.setVisibility(View.VISIBLE);
-        creatingAccountTextView.setVisibility(View.VISIBLE);
-        createAccountProgressBar.setVisibility(View.VISIBLE);
-        megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
-//		megaApi.fastCreateAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), privateKey, userName.getText().toString().trim(), this);
     }
 
     @Override

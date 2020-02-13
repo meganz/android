@@ -256,7 +256,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	public void findNodes() {
 		logDebug("findNodes");
 		ArrayList<MegaShare> outNodeList = megaApi.getOutShares();
-		ArrayList<MegaShare> pendingNodeList = megaApi.getPendingOutShares();
 
 		nodes.clear();
 		long lastFolder = -1;
