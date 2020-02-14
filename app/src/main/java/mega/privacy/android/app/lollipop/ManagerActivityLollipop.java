@@ -2289,6 +2289,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		//TABS section Shared Items
 		tabLayoutShares =  (TabLayout) findViewById(R.id.sliding_tabs_shares);
 		viewPagerShares = (ViewPager) findViewById(R.id.shares_tabs_pager);
+		viewPagerShares.setOffscreenPageLimit(3);
 
 		viewPagerShares.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
