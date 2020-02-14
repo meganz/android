@@ -123,6 +123,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private static long openChatId = -1;
 
 	private static boolean closedChat = true;
+	private static HashMap<Long, Boolean> hashMapVideo = new HashMap<>();
 	private static HashMap<Long, Boolean> hashMapSpeaker = new HashMap<>();
 	private static HashMap<Long, Boolean> hashMapCallLayout = new HashMap<>();
 
@@ -1456,10 +1457,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
 					if (megaChatApi != null) {
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
-						if(callStatus == MegaChatCall.CALL_STATUS_RING_IN || callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+						if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
 							setAudioManagerValues(call);
 						}
-						if(callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING){
+						if(callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){
 							removeChatAudioManager();
 							clearIncomingCallNotification(call.getId());
 						}
@@ -1560,14 +1561,15 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					}
 					break;
 				}
-
 				case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION: {
-					hashMapSpeaker.remove(call.getChatid());
+					removeStatusVideoAndSpeaker(call.getChatid());
 					removeChatAudioManager();
 					break;
 				}
-
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
+					removeStatusVideoAndSpeaker(call.getChatid());
+					removeChatAudioManager();
+
 				    if(shouldNotify(this)) {
                         toSystemSettingNotification(this);
                     }
@@ -1575,9 +1577,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				    if(wakeLock != null && wakeLock.isHeld()) {
 				        wakeLock.release();
                     }
-					hashMapSpeaker.remove(call.getChatid());
+
 					clearIncomingCallNotification(call.getId());
-					removeChatAudioManager();
 
 					//Show missed call if time out ringing (for incoming calls)
 					try {
@@ -1730,6 +1731,11 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 	}
 
+	private void removeStatusVideoAndSpeaker(long chatId){
+		hashMapSpeaker.remove(chatId);
+		hashMapVideo.remove(chatId);
+	}
+
 	public void createChatAudioManager() {
 		if (chatAudioManager != null) return;
 		chatAudioManager = ChatAudioManager.create(getApplicationContext());
@@ -1870,6 +1876,18 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		hashMapSpeaker.put(chatId, speakerStatus);
 	}
 
+	public static boolean getVideoStatus(long chatId) {
+		boolean entryExists = hashMapVideo.containsKey(chatId);
+		if (entryExists) {
+			return hashMapVideo.get(chatId);
+		}
+		setVideoStatus(chatId, false);
+		return false;
+	}
+
+	public static void setVideoStatus(long chatId, boolean videoStatus) {
+		hashMapVideo.put(chatId, videoStatus);
+	}
 	public static boolean getCallLayoutStatus(long chatId) {
 		boolean entryExists = hashMapCallLayout.containsKey(chatId);
 		if (entryExists) {

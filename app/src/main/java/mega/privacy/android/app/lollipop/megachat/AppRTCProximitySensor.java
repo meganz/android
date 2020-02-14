@@ -8,14 +8,16 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package mega.privacy.android.app.lollipop.megachat.calls;
+package mega.privacy.android.app.lollipop.megachat;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
+import android.os.PowerManager;
 import android.util.Log;
 import org.webrtc.ThreadUtils;
 
@@ -40,7 +42,9 @@ public class AppRTCProximitySensor implements SensorEventListener {
   private final SensorManager sensorManager;
   private Sensor proximitySensor = null;
   private boolean lastStateReportIsNear = false;
-
+  private PowerManager powerManager;
+  private PowerManager.WakeLock wakeLock;
+  private int field = 0x00000020;
   /** Construction */
   static AppRTCProximitySensor create(Context context, Runnable sensorStateListener) {
     return new AppRTCProximitySensor(context, sensorStateListener);
@@ -50,6 +54,8 @@ public class AppRTCProximitySensor implements SensorEventListener {
     Log.d(TAG, "AppRTCProximitySensor" + AppRTCUtils.getThreadInfo());
     onSensorStateListener = sensorStateListener;
     sensorManager = ((SensorManager) context.getSystemService(Context.SENSOR_SERVICE));
+    powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+    wakeLock = powerManager.newWakeLock(field, context.getClass().getName());
   }
 
   /**
@@ -69,6 +75,7 @@ public class AppRTCProximitySensor implements SensorEventListener {
 
   /** Deactivate the proximity sensor. */
   public void stop() {
+    turnOnScreen();
     threadChecker.checkIsOnValidThread();
     Log.d(TAG, "stop" + AppRTCUtils.getThreadInfo());
     if (proximitySensor == null) {
@@ -158,5 +165,19 @@ public class AppRTCProximitySensor implements SensorEventListener {
       info.append(", isWakeUpSensor: ").append(proximitySensor.isWakeUpSensor());
     }
     Log.d(TAG, info.toString());
+  }
+
+
+  public void turnOnScreen() {
+    if (wakeLock != null && wakeLock.isHeld()) {
+      wakeLock.release();
+    }
+  }
+
+  @TargetApi(21) //Suppress lint error for PROXIMITY_SCREEN_OFF_WAKE_LOCK
+  public void turnOffScreen() {
+    if (wakeLock != null && !wakeLock.isHeld()) {
+      wakeLock.acquire();
+    }
   }
 }

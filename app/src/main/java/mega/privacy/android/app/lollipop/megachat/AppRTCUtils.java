@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package mega.privacy.android.app.lollipop.megachat.calls;
+package mega.privacy.android.app.lollipop.megachat;
 
 import android.os.Build;
 import android.util.Log;

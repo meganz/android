@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package mega.privacy.android.app.lollipop.megachat.calls;
+package mega.privacy.android.app.lollipop.megachat;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,24 +19,21 @@ import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
 import android.os.Build;
 import android.util.Log;
-
 import org.webrtc.ThreadUtils;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 /**
  * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
  */
 public class AppRTCAudioManager {
     private static final String TAG = "AppRTCAudioManager";
-    private static final String SPEAKERPHONE_AUTO = "auto";
-    private static final String SPEAKERPHONE_TRUE = "true";
-    private static final String SPEAKERPHONE_FALSE = "false";
     private final Context apprtcContext;
-    // Contains speakerphone setting: auto, true or false
-    private final String useSpeakerphone;
     // Handles all tasks related to Bluetooth headset devices.
     private final AppRTCBluetoothManager bluetoothManager;
     private AudioManager audioManager;
@@ -46,6 +43,9 @@ public class AppRTCAudioManager {
     private boolean savedIsSpeakerPhoneOn = false;
     private boolean savedIsMicrophoneMute = false;
     private boolean hasWiredHeadset = false;
+    private boolean isSpeakerOn = false;
+    private OnProximitySensorListener proximitySensorListener;
+
     // Default audio device; speaker phone for video calls or earpiece for audio
     // only calls.
     private AudioDevice defaultAudioDevice;
@@ -73,7 +73,7 @@ public class AppRTCAudioManager {
     // Callback method for changes in audio focus.
     private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
 
-    private AppRTCAudioManager(Context context, boolean isSpeakerOn) {
+    private AppRTCAudioManager(Context context, boolean statusSpeaker) {
         Log.d(TAG, "ctor");
         ThreadUtils.checkIsOnMainThread();
         apprtcContext = context;
@@ -81,83 +81,100 @@ public class AppRTCAudioManager {
         bluetoothManager = AppRTCBluetoothManager.create(context, this);
         wiredHeadsetReceiver = new WiredHeadsetReceiver();
         amState = AudioManagerState.UNINITIALIZED;
-        if (isSpeakerOn) {
-            useSpeakerphone = SPEAKERPHONE_AUTO;
-            defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
+        if (statusSpeaker) {
+            speakerElements(true);
         } else {
-            useSpeakerphone = SPEAKERPHONE_FALSE;
-            defaultAudioDevice = AudioDevice.EARPIECE;
-
+            speakerElements(false);
         }
-
-        // Create and initialize the proximity sensor.
-        // Tablet devices (e.g. Nexus 7) does not support proximity sensors.
-        // Note that, the sensor will not be active until start() has been called.
-//    proximitySensor = AppRTCProximitySensor.create(context, new Runnable() {
-        // This method will be called each time a state change is detected.
-        // Example: user holds his hand over the device (closer than ~5 cm),
-        // or removes his hand from the device.
-//      public void run() {
-//        onProximitySensorChangedState();
-//      }
-//    });
-
+        start(null);
+        if(apprtcContext instanceof ChatCallActivity) {
+            startProximitySensor();
+        }else{
+            registerProximitySensor();
+        }
         Log.d(TAG, "defaultAudioDevice: " + defaultAudioDevice);
         AppRTCUtils.logDeviceInfo(TAG);
     }
 
-    /**
-     * Construction.
-     */
-    static AppRTCAudioManager create(Context context, boolean isSpeakerOn) {
-        return new AppRTCAudioManager(context, isSpeakerOn);
+    public void setOnProximitySensorListener(OnProximitySensorListener proximitySensorListener) {
+        this.proximitySensorListener = proximitySensorListener;
+    }
+
+    public void registerProximitySensor() {
+        // Create and initialize the proximity sensor.
+        // Note that, the sensor will not be active until start() has been called.
+        //This method will be called each time a state change is detected.
+        if (proximitySensor != null) return;
+        proximitySensor = AppRTCProximitySensor.create(apprtcContext, new Runnable() {
+            public void run() {
+                onProximitySensorChangedState();
+            }
+        });
+    }
+
+    public void startProximitySensor() {
+        registerProximitySensor();
+        proximitySensor.start();
     }
 
     /**
      * This method is called when the proximity sensor reports a state change,
      * e.g. from "NEAR to FAR" or from "FAR to NEAR".
      */
-//  private void onProximitySensorChangedState() {
-//    if (!useSpeakerphone.equals(SPEAKERPHONE_AUTO)) {
-//      return;
-//    }
-//
-//    // The proximity sensor should only be activated when there are exactly two
-//    // available audio devices.
-//    if (audioDevices.size() == 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE)
-//        && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
-//      if (proximitySensor.sensorReportsNearState()) {
-//
-//        // Sensor reports that a "handset is being held up to a person's ear",
-//        // or "something is covering the light sensor".
-//        setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
-//      } else {
-//        // Sensor reports that a "handset is removed from a person's ear", or
-//        // "the light sensor is no longer covered".
-//        setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
-//      }
-//    }
-//  }
-    public void activateSpeaker(boolean activated) {
-        Log.d(TAG, "activateSpeaker() =  " + activated);
-//      useSpeakerphone = SPEAKERPHONE_AUTO;
-
-//    if (!useSpeakerphone.equals(SPEAKERPHONE_AUTO)) {
-//          return;
-//        }
-        if (audioDevices.size() == 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE) && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
-            if (activated) {
-                // Sensor reports that a "handset is removed from a person's ear", or
-                // "the light sensor is no longer covered".
-                defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
+    private void onProximitySensorChangedState() {
+        // The proximity sensor should only be activated when there are exactly two available audio devices.
+        if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
+            boolean isNear;
+            if (proximitySensor.sensorReportsNearState()) {
+                logDebug("Status of proximity sensor is: Near");
+                // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
+                proximitySensor.turnOffScreen();
+                if ((apprtcContext instanceof ChatCallActivity && isSpeakerOn) || apprtcContext instanceof ChatActivityLollipop) {
+                    logDebug("Disabling the speakerphone");
+                    defaultAudioDevice = AudioDevice.EARPIECE;
+                    updateSpeakerDeviceState();
+                    if (proximitySensorListener != null) proximitySensorListener.needToUpdate(true);
+                }
             } else {
-                // Sensor reports that a "handset is being held up to a person's ear",
-                // or "something is covering the light sensor".
-                defaultAudioDevice = AudioDevice.EARPIECE;
-
+                logDebug("Status of proximity sensor is: Far");
+                // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
+                proximitySensor.turnOnScreen();
+                if ((apprtcContext instanceof ChatCallActivity && isSpeakerOn) || apprtcContext instanceof ChatActivityLollipop) {
+                    logDebug("Enabling the speakerphone");
+                    defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
+                    updateSpeakerDeviceState();
+                    if (proximitySensorListener != null) proximitySensorListener.needToUpdate(false);
+                }
             }
-            updateAudioDeviceState();
+        }
+    }
 
+    public void unregisterProximitySensor() {
+        if (proximitySensor == null) return;
+        proximitySensor.stop();
+        proximitySensor = null;
+    }
+    private void speakerElements(boolean isOn){
+        if(isOn){
+            defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
+        }else{
+            defaultAudioDevice = AudioDevice.EARPIECE;
+        }
+        isSpeakerOn = isOn;
+    }
+
+    /**
+     * Construction.
+     */
+   public static AppRTCAudioManager create(Context context, boolean isSpeakerOn) {
+        return new AppRTCAudioManager(context, isSpeakerOn);
+    }
+
+    public void updateSpeakerStatus(boolean speakerStatus) {
+        logDebug("The speaker status is "+speakerStatus);
+        if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
+            speakerElements(speakerStatus);
+            updateSpeakerDeviceState();
         }
     }
 
@@ -167,8 +184,8 @@ public class AppRTCAudioManager {
             Log.e(TAG, "AudioManager is already active");
             return;
         }
-        // TODO(henrika): perhaps call new method called preInitAudio() here if UNINITIALIZED.
 
+        // TODO(henrika): perhaps call new method called preInitAudio() here if UNINITIALIZED.
         Log.d(TAG, "AudioManager starts...");
         this.audioManagerEvents = audioManagerEvents;
         amState = AudioManagerState.RUNNING;
@@ -185,7 +202,6 @@ public class AppRTCAudioManager {
             // The |focusChange| value indicates whether the focus was gained, whether the focus was lost,
             // and whether that loss is transient, or whether the new focus holder will hold it for an
             // unknown amount of time.
-            // TODO(henrika): possibly extend support of handling audio-focus changes. Only contains
             // logging for now.
             @Override
             public void onAudioFocusChange(int focusChange) {
@@ -221,20 +237,24 @@ public class AppRTCAudioManager {
         };
 
         // Request audio playout focus (without ducking) and install listener for changes in focus.
-        int result = audioManager.requestAudioFocus(audioFocusChangeListener,
-                AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+        int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             Log.d(TAG, "Audio focus request granted for VOICE_CALL streams");
         } else {
             Log.e(TAG, "Audio focus request failed");
         }
 
-        // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
-        // required to be in this mode when playout and/or recording starts for
-        // best possible VoIP performance.
-        // work around (bug13963): android 7 devices make big echo while mode set, so only apply it to other version of OS
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if(apprtcContext instanceof ChatCallActivity){
+            // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
+            // required to be in this mode when playout and/or recording starts for
+            // best possible VoIP performance.
+            // work around (bug13963): android 7 devices make big echo while mode set, so only apply it to other version of OS
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            }
+        }else if(apprtcContext instanceof ChatActivityLollipop){
             audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+
         }
 
         // Always disable microphone mute during a WebRTC call.
@@ -244,10 +264,6 @@ public class AppRTCAudioManager {
         userSelectedAudioDevice = AudioDevice.NONE;
         selectedAudioDevice = AudioDevice.NONE;
         audioDevices.clear();
-
-        if (proximitySensor != null) {
-            proximitySensor.start();
-        }
 
         // Initialize and start Bluetooth if a BT device is available or initiate
         // detection of new (enabled) BT devices.
@@ -283,20 +299,14 @@ public class AppRTCAudioManager {
         audioManager.setMode(savedAudioMode);
 
         // Abandon audio focus. Gives the previous focus owner, if any, focus.
-        audioManager.abandonAudioFocus(audioFocusChangeListener);
+        if(audioFocusChangeListener != null) audioManager.abandonAudioFocus(audioFocusChangeListener);
         audioFocusChangeListener = null;
         Log.d(TAG, "Abandoned audio focus for VOICE_CALL streams");
-
-        if (proximitySensor != null) {
-            proximitySensor.stop();
-            proximitySensor = null;
-        }
+        unregisterProximitySensor();
 
         audioManagerEvents = null;
         Log.d(TAG, "AudioManager stopped");
     }
-
-    ;
 
     /**
      * Changes selection of the currently active audio device.
@@ -304,7 +314,6 @@ public class AppRTCAudioManager {
     private void setAudioDeviceInternal(AudioDevice device) {
         Log.d(TAG, "setAudioDeviceInternal(device=" + device + ")");
         AppRTCUtils.assertIsTrue(audioDevices.contains(device));
-
         switch (device) {
             case SPEAKER_PHONE:
                 setSpeakerphoneOn(true);
@@ -323,6 +332,7 @@ public class AppRTCAudioManager {
                 break;
         }
         selectedAudioDevice = device;
+        logDebug("The currently selected device is "+selectedAudioDevice);
     }
 
     /**
@@ -448,13 +458,20 @@ public class AppRTCAudioManager {
         }
     }
 
+    private void updateSpeakerDeviceState(){
+        if(defaultAudioDevice == selectedAudioDevice){
+            return;
+        }
+        setAudioDeviceInternal(defaultAudioDevice);
+        if (audioManagerEvents != null) audioManagerEvents.onAudioDeviceChanged(selectedAudioDevice, audioDevices);
+    }
+
     /**
      * Updates list of possible audio devices and make new device selection.
      * TODO(henrika): add unit test to verify all state transitions.
      */
     public void updateAudioDeviceState() {
         Log.d(TAG, "updateAudioDeviceState()");
-
         ThreadUtils.checkIsOnMainThread();
         Log.d(TAG, "--- updateAudioDeviceState: "
                 + "wired headset=" + hasWiredHeadset + ", "
@@ -466,7 +483,6 @@ public class AppRTCAudioManager {
 
         // Check if any Bluetooth headset is connected. The internal BT state will
         // change accordingly.
-        // TODO(henrika): perhaps wrap required state into BT manager.
         if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
                 || bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE
                 || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_DISCONNECTING) {
@@ -493,10 +509,17 @@ public class AppRTCAudioManager {
                 newAudioDevices.add(AudioDevice.EARPIECE);
             }
         }
+        boolean audioDeviceSetUpdated;
         // Store state which is set to true if the device list has changed.
-        boolean audioDeviceSetUpdated = !audioDevices.equals(newAudioDevices);
-        // Update the existing audio device set.
-        audioDevices = newAudioDevices;
+        if(audioDevices.equals(newAudioDevices)){
+            //Equals
+            audioDeviceSetUpdated = false;
+        }else{
+            audioDevices.clear();
+            // Update the existing audio device set.
+            audioDevices = newAudioDevices;
+            audioDeviceSetUpdated = true;
+        }
         // Correct user selected audio devices if needed.
         if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE && userSelectedAudioDevice == AudioDevice.BLUETOOTH) {
             // If BT is not available, it can't be the user selection.
@@ -554,7 +577,6 @@ public class AppRTCAudioManager {
 
         // Update selected audio device.
         AudioDevice newAudioDevice = selectedAudioDevice;
-
         if (bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED) {
             // If a Bluetooth is connected, then it should be used as output audio
             // device. Note that it is not sufficient that a headset is available;
@@ -569,6 +591,7 @@ public class AppRTCAudioManager {
             // phone (on a tablet), or speaker phone and earpiece (on mobile phone).
             // |defaultAudioDevice| contains either AudioDevice.SPEAKER_PHONE or AudioDevice.EARPIECE
             // depending on the user's selection.
+            logDebug(" The new audio device connected is "+defaultAudioDevice);
             newAudioDevice = defaultAudioDevice;
         }
         // Switch to new device but only if there has been any changes.
