@@ -3,11 +3,6 @@ package mega.privacy.android.app.fragments.managerFragments;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -84,10 +79,10 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
                 menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
                 menu.findItem(R.id.cab_menu_edit_link).setVisible(showEditLink);
-                if(showLink){
+                if (showLink) {
                     menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
                     menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(SHOW_AS_ACTION_NEVER);
-                }else{
+                } else {
                     menu.findItem(R.id.cab_menu_share_link).setShowAsAction(SHOW_AS_ACTION_NEVER);
                     menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
                 }
@@ -116,32 +111,10 @@ public class LinksFragment extends MegaNodeBaseFragment {
             return null;
         }
 
-        View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
-
-        recyclerView = v.findViewById(R.id.file_list_view_browser);
-        recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
-        mLayoutManager = new LinearLayoutManager(context);
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setClipToPadding(false);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                checkScroll();
-            }
-        });
-        fastScroller = v.findViewById(R.id.fastscroll);
-        fastScroller.setRecyclerView(recyclerView);
-
-        emptyImageView = v.findViewById(R.id.file_list_empty_image);
-        emptyLinearLayout = v.findViewById(R.id.file_list_empty_text);
-        emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
+        View v = getListView(inflater, container);
 
         if (adapter == null) {
             adapter = new MegaNodeAdapter(context, this, nodes, managerActivity.getParentHandleLinks(), recyclerView, null, LINKS_ADAPTER, ITEM_VIEW_TYPE_LIST);
-        } else {
-            adapter.setAdapterType(ITEM_VIEW_TYPE_LIST);
         }
 
         adapter.setListFragment(recyclerView);
@@ -180,38 +153,15 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
     @Override
     protected void setEmptyView() {
-        String textToShow;
+        String textToShow = null;
 
         if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleOutgoing()
                 || managerActivity.getParentHandleOutgoing() == -1) {
             emptyImageView.setImageResource(R.drawable.ic_zero_data_public_links);
             textToShow = String.format(context.getString(R.string.context_empty_links));
-        } else {
-            if (isScreenInPortrait(context)) {
-                emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-            } else {
-                emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-            }
-            textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
         }
 
-        try {
-            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-            textToShow = textToShow.replace("[/B]", "</font>");
-        } catch (Exception e) {
-            logWarning("Exception formatting string", e);
-        }
-        Spanned result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
-        emptyTextViewFirst.setText(result);
-
-        checkEmptyView();
+        setFinalEmptyView(textToShow);
     }
 
     @Override
@@ -265,23 +215,19 @@ public class LinksFragment extends MegaNodeBaseFragment {
             if (selectedNodes.size() > 0) {
                 updateActionModeTitle();
             }
+        } else if (nodes.get(position).isFolder()) {
+            lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
+            managerActivity.increaseDeepBrowserTreeLinks();
+            managerActivity.setParentHandleLinks(nodes.get(position).getHandle());
+            managerActivity.supportInvalidateOptionsMenu();
+            managerActivity.setToolbarTitle();
+
+            setNodes(megaApi.getChildren(nodes.get(position), getLinksOrderCloud(managerActivity.orderCloud, managerActivity.isFirstNavigationLevel())));
+            recyclerView.scrollToPosition(0);
+            checkScroll();
+            managerActivity.showFabButton();
         } else {
-            MegaNode n = nodes.get(position);
-
-            if (n.isFolder()) {
-                lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
-                managerActivity.increaseDeepBrowserTreeLinks();
-                managerActivity.setParentHandleLinks(n.getHandle());
-                managerActivity.supportInvalidateOptionsMenu();
-                managerActivity.setToolbarTitle();
-
-                setNodes(megaApi.getChildren(n, getLinksOrderCloud(managerActivity.orderCloud, managerActivity.isFirstNavigationLevel())));
-                recyclerView.scrollToPosition(0);
-                checkScroll();
-                managerActivity.showFabButton();
-            } else {
-                openFile(n, LINKS_ADAPTER, position, screenPosition, imageView);
-            }
+            openFile(nodes.get(position), LINKS_ADAPTER, position, screenPosition, imageView);
         }
     }
 

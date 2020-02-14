@@ -8,12 +8,15 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -49,6 +52,7 @@ import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
+import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -59,6 +63,8 @@ import static nz.mega.sdk.MegaError.*;
 import static nz.mega.sdk.MegaShare.*;
 
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
+    private static int MARGIN_BOTTOM_LIST = 85;
+
     protected ManagerActivityLollipop managerActivity;
 
     public static ImageView imageDrag;
@@ -467,7 +473,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public ImageView getImageDrag(int position) {
         logDebug("Position: " + position);
         if (adapter != null) {
-            if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+            if (adapter.getAdapterType() == ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
                 View v = mLayoutManager.findViewByPosition(position);
                 if (v != null) {
                     return (ImageView) v.findViewById(R.id.file_list_thumbnail);
@@ -485,7 +491,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public void updateScrollPosition(int position) {
         logDebug("Position: " + position);
         if (adapter != null) {
-            if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+            if (adapter.getAdapterType() == ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
                 mLayoutManager.scrollToPosition(position);
             } else if (gridLayoutManager != null) {
                 gridLayoutManager.scrollToPosition(position);
@@ -875,5 +881,87 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             default:
                 return managerActivity.orderCloud;
         }
+    }
+
+    protected View getListView(LayoutInflater inflater, ViewGroup container) {
+        View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
+
+        recyclerView = v.findViewById(R.id.file_list_view_browser);
+        mLayoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(mLayoutManager);
+        fastScroller = v.findViewById(R.id.fastscroll);
+        setRecyclerView();
+
+        emptyImageView = v.findViewById(R.id.file_list_empty_image);
+        emptyLinearLayout = v.findViewById(R.id.file_list_empty_text);
+        emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
+
+        if (adapter != null) {
+            adapter.setAdapterType(ITEM_VIEW_TYPE_LIST);
+        }
+
+        return v;
+    }
+
+    protected View getGridView(LayoutInflater inflater, ViewGroup container) {
+        View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
+
+        recyclerView = v.findViewById(R.id.file_grid_view_browser);
+        gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+        fastScroller = v.findViewById(R.id.fastscroll);
+        setRecyclerView();
+
+        emptyImageView = v.findViewById(R.id.file_grid_empty_image);
+        emptyLinearLayout = v.findViewById(R.id.file_grid_empty_text);
+        emptyTextViewFirst = v.findViewById(R.id.file_grid_empty_text_first);
+
+        if (adapter != null) {
+            adapter.setAdapterType(ITEM_VIEW_TYPE_GRID);
+        }
+
+        return v;
+    }
+
+    private void setRecyclerView() {
+        recyclerView.setPadding(0, 0, 0, px2dp(MARGIN_BOTTOM_LIST, outMetrics));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setClipToPadding(false);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                checkScroll();
+            }
+        });
+        fastScroller.setRecyclerView(recyclerView);
+    }
+
+    protected String getGeneralEmptyView() {
+        if (isScreenInPortrait(context)) {
+            emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+        } else {
+            emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+        }
+
+        return String.format(context.getString(R.string.file_browser_empty_folder_new));
+    }
+
+    protected void setFinalEmptyView(String text) {
+        if (text == null) {
+            text = getGeneralEmptyView();
+        }
+
+        try {
+            text = text.replace("[A]", "<font color=\'#000000\'>");
+            text = text.replace("[/A]", "</font>");
+            text = text.replace("[B]", "<font color=\'#7a7a7a\'>");
+            text = text.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            logWarning("Exception formatting text", e);
+        }
+
+        emptyTextViewFirst.setText(getSpannedHtmlText(text));
+        checkEmptyView();
     }
 }
