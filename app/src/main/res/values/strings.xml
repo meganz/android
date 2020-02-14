@@ -2698,4 +2698,6 @@
 ">You do not have the permissions required to revert this file. In order to continue, we can create a new file with the reverted data. Would you like to proceed?</string>
     <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Permissions error</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
+    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]Call ended[/A]</string>
+
 </resources>
