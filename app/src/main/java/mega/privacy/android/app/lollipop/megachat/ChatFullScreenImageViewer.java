@@ -334,10 +334,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 
 		dbH = DatabaseHandler.getDbHandler(this);
 
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	    }
-
 		MegaApplication app = (MegaApplication)getApplication();
 
 		if(isOnline(this)){
@@ -405,8 +401,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 		});
 
 		viewPager.setPageMargin(40);
-
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		tB = findViewById(R.id.call_toolbar);
 		if (tB == null) {

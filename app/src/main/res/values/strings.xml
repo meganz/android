@@ -694,7 +694,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
 	<string name="verify_account_title" context="enter verification code page title">Verify your account</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been locked temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Country</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Your phone number</string>
     <string name="general_back_button" context="Button label - go to previous page">Back</string>
@@ -1819,7 +1819,7 @@
     <string name="pass_good" context="Password good">Good</string>
     <string name="pass_strong" context="Password strong">Strong</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Call in progress</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Call in progress</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Click to go back to the call</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Return to the call</string>
 
@@ -2324,7 +2324,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Contact request from [/B][A]%s [/A][B]was declined[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Your current account is [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Subject to your participation in our achievement program</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject to your participation in our achievements program.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Select payment method</string>
 
     <string name="billing_period_title" context="title of billing period">Billing period</string>
