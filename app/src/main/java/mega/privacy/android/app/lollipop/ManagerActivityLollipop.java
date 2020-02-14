@@ -209,6 +209,7 @@ import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragm
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
@@ -261,7 +262,6 @@ import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -4036,51 +4036,44 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void setProfileAvatar(){
+	public void setProfileAvatar() {
 		logDebug("setProfileAvatar");
 		File avatar = buildAvatarFile(this, megaApi.getMyEmail() + ".jpg");
-		Bitmap imBitmap = null;
-		if (isFileAvailable(avatar)){
-			if (avatar.length() > 0){
-				BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inJustDecodeBounds = true;
-				BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+		Bitmap imBitmap;
+		if (isFileAvailable(avatar) && avatar.length() > 0) {
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+			BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
 
-				// Calculate inSampleSize
-				options.inSampleSize = calculateInSampleSize(options, 250, 250);
+			// Calculate inSampleSize
+			options.inSampleSize = calculateInSampleSize(options, 250, 250);
 
-				// Decode bitmap with inSampleSize set
-				options.inJustDecodeBounds = false;
+			// Decode bitmap with inSampleSize set
+			options.inJustDecodeBounds = false;
 
-				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-				if (imBitmap == null) {
-					avatar.delete();
-                    megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
-                }
-				else{
-					Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+			imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+			if (imBitmap == null) {
+				avatar.delete();
+				megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
+			} else {
+				Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
-					BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
-					Paint paint = new Paint();
-					paint.setShader(shader);
+				BitmapShader shader = new BitmapShader(imBitmap, TileMode.CLAMP, TileMode.CLAMP);
+				Paint paint = new Paint();
+				paint.setShader(shader);
 
-					Canvas c = new Canvas(circleBitmap);
-					int radius;
-					if (imBitmap.getWidth() < imBitmap.getHeight())
-						radius = imBitmap.getWidth()/2;
-					else
-						radius = imBitmap.getHeight()/2;
+				Canvas c = new Canvas(circleBitmap);
+				int radius;
+				if (imBitmap.getWidth() < imBitmap.getHeight())
+					radius = imBitmap.getWidth() / 2;
+				else
+					radius = imBitmap.getHeight() / 2;
 
-					c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
-					nVPictureProfile.setImageBitmap(circleBitmap);
-				}
+				c.drawCircle(imBitmap.getWidth() / 2, imBitmap.getHeight() / 2, radius, paint);
+				nVPictureProfile.setImageBitmap(circleBitmap);
 			}
-			else{
-                megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyUser().getEmail() + ".jpg").getAbsolutePath(), this);
-			}
-		}
-		else{
-            megaApi.getUserAvatar(megaApi.getMyUser(),buildAvatarFile(this,megaApi.getMyUser().getEmail() + ".jpg").getAbsolutePath(),this);
+		} else {
+			megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
 		}
 	}
 
@@ -10960,7 +10953,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 		if (cFLol != null){
 			cFLol.sortBy();
-			cFLol.updateOrder();
 		}
 	}
 
@@ -13960,6 +13952,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if(e.getErrorCode() == MegaError.API_OK){
 				logDebug("Email changed");
 				updateMyEmail(request.getEmail());
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.email_changed, request.getEmail()), INVALID_HANDLE);
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXIST){
 				logWarning("The new mail already exists");
@@ -15050,12 +15043,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void pauseIndividualTransfer(MegaTransfer mT){
-		logDebug("pauseIndividualTransfer");
-		if(mT.getState()==MegaTransfer.STATE_PAUSED){
-			megaApi.pauseTransfer(mT, false, managerActivity);
+	public void pauseIndividualTransfer(MegaTransfer mT) {
+		if (mT == null) {
+			logWarning("Transfer object is null.");
+			return;
 		}
-		else{
+
+		if (mT.getState() == MegaTransfer.STATE_PAUSED) {
+			logDebug("Resume transfer - Node handle: " + mT.getNodeHandle());
+			megaApi.pauseTransfer(mT, false, managerActivity);
+		} else {
+			logDebug("Pause transfer - Node handle: " + mT.getNodeHandle());
 			megaApi.pauseTransfer(mT, true, managerActivity);
 		}
 	}
@@ -15760,6 +15758,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private boolean shouldShowFabWhenSearch() {
+		if (searchDrawerItem == null) {
+			return false;
+		}
+
 		switch (searchDrawerItem) {
 			case RUBBISH_BIN:
 			case INBOX:
@@ -16748,10 +16750,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		logDebug("Level: " + level);
         if(level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL){
 			logWarning("Low memory");
-			isDeviceMemoryLow = true;
+			ThumbnailUtilsLollipop.isDeviceMemoryLow = true;
         }else{
 			logDebug("Memory OK");
-			isDeviceMemoryLow = false;
+			ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
         }
     }
 

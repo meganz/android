@@ -2574,21 +2574,21 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
     public String getPdfFileName () {
         return pdfFileName;
     }
+
     public String getFileName(Uri uri) {
+        if (uri == null || uri.getScheme() == null) {
+            logWarning("URI is null");
+            return null;
+        }
+
         String result = null;
         if (uri.getScheme().equals("content")) {
-            Cursor cursor = null;
-            try {
-                cursor = getContentResolver().query(uri, null, null, null, null);
+            try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
             } catch (Exception e) {
-                logError("Exception getting pdf name", e);
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
+                logWarning("Exception getting PDF file name.", e);
             }
         }
         if (result == null) {
