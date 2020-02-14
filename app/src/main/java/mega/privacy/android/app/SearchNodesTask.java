@@ -21,7 +21,9 @@ import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
 import static mega.privacy.android.app.utils.SortUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
     private Context context;
@@ -130,20 +132,27 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                         break;
                     }
                     case SHARED_ITEMS: {
-                        if (managerA.getTabItemShares() == 0) {
-                            if (managerA.getParentHandleIncoming() == -1) {
+                        if (managerA.getSearchSharedTab() == 0) {
+                            if (managerA.getParentHandleIncoming() == INVALID_HANDLE) {
                                 nodes = filterInShares(query);
                                 return;
                             }
 
                             parent = megaApi.getNodeByHandle(managerA.getParentHandleIncoming());
-                        } else if (managerA.getTabItemShares() == 1) {
-                            if (managerA.getParentHandleOutgoing() == -1) {
+                        } else if (managerA.getSearchSharedTab() == 1) {
+                            if (managerA.getParentHandleOutgoing() == INVALID_HANDLE) {
                                 nodes = filterOutShares(query);
                                 return;
                             }
 
                             parent = megaApi.getNodeByHandle(managerA.getParentHandleOutgoing());
+                        } else if (managerA.getSearchSharedTab() == 2) {
+                            if (managerA.getParentHandleLinks() == INVALID_HANDLE) {
+                                nodes = filterLinks(query);
+                                return;
+                            }
+
+                            parent = megaApi.getNodeByHandle(managerA.getParentHandleLinks());
                         }
                         break;
                     }
@@ -214,12 +223,15 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
         ArrayList<MegaShare> outShares = megaApi.getOutShares();
         ArrayList<MegaNode> filteredOutShares = new ArrayList<>();
 
+        long lastHandle = -1;
+
         for (MegaShare outShare : outShares) {
             MegaNode node = megaApi.getNodeByHandle(outShare.getNodeHandle());
-            if (node == null) continue;
-
-            if (shouldNodeBeFilter(node, query)) {
-                filteredOutShares.add(node);
+            if (node != null && lastHandle != node.getHandle()) {
+                lastHandle = node.getHandle();
+                if (shouldNodeBeFilter(node, query)) {
+                    filteredOutShares.add(node);
+                }
             }
         }
 
@@ -233,12 +245,23 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
         return filteredOutShares;
     }
 
-    private boolean shouldNodeBeFilter(MegaNode node, String query) {
-        if (node.getName().toLowerCase().contains(query.toLowerCase())) {
-            return true;
+    private ArrayList<MegaNode> filterLinks(String query) {
+        ArrayList<MegaNode> links = megaApi.getPublicLinks(getLinksOrderCloud(managerA.orderCloud, managerA.isFirstNavigationLevel()));
+        ArrayList<MegaNode> filteredLinks = new ArrayList<>();
+
+        for (MegaNode node : links) {
+            if (node == null) continue;
+
+            if (shouldNodeBeFilter(node, query)) {
+                filteredLinks.add(node);
+            }
         }
 
-        return false;
+        return filteredLinks;
+    }
+
+    private boolean shouldNodeBeFilter(MegaNode node, String query) {
+        return node != null && node.getName().toLowerCase().contains(query.toLowerCase());
     }
 
     private boolean isSearchF() {

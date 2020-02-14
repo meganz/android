@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -862,7 +863,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private int getIntentOrder(int fragmentAdapter) {
         switch (fragmentAdapter) {
             case LINKS_ADAPTER:
-                return getLinksOrderCloud();
+                return getLinksOrderCloud(managerActivity.orderCloud, managerActivity.isFirstNavigationLevel());
 
             case INCOMING_SHARES_ADAPTER:
             case OUTGOING_SHARES_ADAPTER:
@@ -872,25 +873,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
             default:
                 return managerActivity.orderCloud;
-        }
-    }
-
-    protected int getLinksOrderCloud() {
-        int order = managerActivity.orderCloud;
-
-        if (!managerActivity.isFirstNavigationLevel()) {
-            return order;
-        }
-
-        switch (order) {
-            case ORDER_MODIFICATION_ASC:
-                return ORDER_CREATION_ASC;
-
-            case ORDER_MODIFICATION_DESC:
-                return ORDER_CREATION_DESC;
-
-            default:
-                return order;
         }
     }
 }

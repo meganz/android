@@ -5248,6 +5248,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void setSharesTabIcons(int tabSelected) {
+    	if (tabLayoutShares == null
+				|| tabLayoutShares.getTabAt(INCOMING_TAB) == null
+				|| tabLayoutShares.getTabAt(OUTGOING_TAB) == null
+				|| tabLayoutShares.getTabAt(LINKS_TAB) == null) {
+    		return;
+		}
+
 		switch (tabSelected) {
 			case OUTGOING_TAB:
 				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(managerActivity, R.drawable.ic_incoming_shares, R.color.mail_my_account));
@@ -5893,6 +5900,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     			drawerItem = DrawerItem.SEARCH;
 				if (getSearchFragment() == null) {
 					sFLol = SearchFragmentLollipop.newInstance();
+				} else {
+					refreshFragment(FragmentTag.SEARCH.getTag());
 				}
 
 				replaceFragment(sFLol, FragmentTag.SEARCH.getTag());
@@ -15769,11 +15778,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case CLOUD_DRIVE:
 				return true;
 			case SHARED_ITEMS:
-				if (searchSharedTab == 0) {
-					if (parentHandleIncoming == -1) return false;
+				if (isFirstNavigationLevel()) return false;
+
+				if (searchSharedTab == INCOMING_TAB) {
+					if (parentHandleIncoming == INVALID_HANDLE) return false;
 
 					MegaNode node;
-					if (parentHandleSearch == -1) {
+					if (parentHandleSearch == INVALID_HANDLE) {
 						node = megaApi.getNodeByHandle(parentHandleIncoming);
 					} else {
 						node = megaApi.getNodeByHandle(parentHandleSearch);
@@ -15784,7 +15795,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					if (accessLevel == MegaShare.ACCESS_FULL || accessLevel == MegaShare.ACCESS_OWNER || accessLevel == MegaShare.ACCESS_READWRITE) {
 						return true;
 					}
-				} else if (searchSharedTab == 1 && parentHandleOutgoing != -1) {
+				} else if ((searchSharedTab == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE)
+						|| (searchSharedTab == LINKS_TAB && parentHandleLinks != INVALID_HANDLE)) {
 					return true;
 				}
 			default:
@@ -17009,6 +17021,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public String getSearchQuery() {
 		return searchQuery;
+	}
+
+	public int getSearchSharedTab() {
+		return searchSharedTab;
 	}
 
 	public void setSearchQuery(String searchQuery) {
