@@ -946,6 +946,8 @@
 
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">You must be logged in to perform this action.</string>
+    <string name="change_email_not_logged_in" context="Error message when a user attempts to change their email without an active login session.">You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.</string>
+    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">Congratulations, your new email address for this MEGA account is: %1$s</string>
     <string name="invalid_string" context="Error when the user leaves empty the password field">Incorrect</string>
 
     <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Invalid email address</string>
