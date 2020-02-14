@@ -1943,7 +1943,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						case MegaChatMessage.END_CALL_REASON_ENDED:{
 
 							if(chat.isGroup()){
-								textToShow = context.getString(R.string.group_call_ended_message);
+								textToShow = context.getString(R.string.call_ended_no_duration_message);
 							}else {
 								int hours = duration / 3600;
 								int minutes = (duration % 3600) / 60;
