@@ -27,14 +27,14 @@ public class VideoCaptureUtils {
 
     public static void swapCamera(MegaChatApiAndroid megaChatApi){
         String currentCamera = megaChatApi.getVideoDeviceSelected();
-        String frontCamera;
+        String newCamera;
         if(isFrontCamera(currentCamera)){
-            frontCamera = VideoCaptureUtils.getBackCamera();
+            newCamera = VideoCaptureUtils.getBackCamera();
         }else {
-            frontCamera = VideoCaptureUtils.getFrontCamera();
+            newCamera = VideoCaptureUtils.getFrontCamera();
         }
-        if (frontCamera != null) {
-            megaChatApi.setChatVideoInDevice(frontCamera, null);
+        if (newCamera != null) {
+            megaChatApi.setChatVideoInDevice(newCamera, null);
         }
     }
 
