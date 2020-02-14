@@ -17,6 +17,7 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -1385,9 +1386,30 @@ public class NodeController {
 
         ShareListener shareListener = new ShareListener(context, REMOVE_SHARE_LISTENER, listShares.size());
 
-        for (int i = 0; i < listShares.size(); i++) {
-            String email = listShares.get(i).getUser();
+        for (MegaShare share : listShares) {
+            String email = share.getUser();
             if (email != null) {
+                removeShare(shareListener, node, email);
+            }
+        }
+    }
+
+    public void removeSeveralFolderShares(List<MegaNode> nodes) {
+        ArrayList<MegaShare> totalShares = new ArrayList<>();
+
+        for (MegaNode node : nodes) {
+            ArrayList<MegaShare> shares = megaApi.getOutShares(node);
+            if (shares != null && !shares.isEmpty()) {
+                totalShares.addAll(shares);
+            }
+        }
+
+        ShareListener shareListener = new ShareListener(context, REMOVE_SHARE_LISTENER, totalShares.size());
+
+        for (MegaShare megaShare : totalShares) {
+            MegaNode node = megaApi.getNodeByHandle(megaShare.getNodeHandle());
+            String email = megaShare.getUser();
+            if (node != null && email != null) {
                 removeShare(shareListener, node, email);
             }
         }

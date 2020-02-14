@@ -10485,6 +10485,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void showConfirmationRemoveAllSharingContacts(final List<MegaNode> shares) {
+		if (shares.size() == 1) {
+			showConfirmationRemoveAllSharingContacts(megaApi.getOutShares(shares.get(0)), shares.get(0));
+		}
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setMessage(getString(R.string.alert_remove_several_shares, shares.size()))
+				.setPositiveButton(R.string.general_remove, (dialog, which) -> nC.removeSeveralFolderShares(shares))
+				.setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
+				.show();
+	}
+
 	public void showConfirmationRemoveAllSharingContacts (final ArrayList<MegaShare> shareList, final MegaNode n){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		int size = shareList.size();

@@ -236,6 +236,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     break;
 
                 case R.id.cab_menu_remove_share:
+                    managerActivity.showConfirmationRemoveAllSharingContacts(selected);
                     break;
             }
 
