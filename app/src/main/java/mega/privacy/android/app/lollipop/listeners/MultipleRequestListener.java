@@ -6,7 +6,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -15,7 +14,6 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -34,6 +32,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
     int counter = 0;
     int error = 0;
+    int errorBusiness = 0;
     int max_items = 0;
     int actionListener = -1;
     String message;
@@ -69,6 +68,9 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
         counter--;
         if (e.getErrorCode() != MegaError.API_OK){
+            if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
+                errorBusiness++;
+            }
             error++;
         }
         int requestType = request.getType();
@@ -92,7 +94,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         if(context instanceof ManagerActivityLollipop) {
                             ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
                             managerActivity.refreshAfterMovingToRubbish();
-                            resetAccountDetailsTimeStamp(context);
+                            resetAccountDetailsTimeStamp();
                         }
                         else {
                             ((ContactFileListActivityLollipop) context).refreshAfterMovingToRubbish();
@@ -109,7 +111,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
                         ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
                         managerActivity.refreshAfterMovingToRubbish();
-                        resetAccountDetailsTimeStamp(context);
+                        resetAccountDetailsTimeStamp();
                     }
                     else{
                         logDebug("Move nodes request finished");
@@ -128,7 +130,11 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     if (actionListener==MULTIPLE_LEAVE_SHARE){
                         logDebug("Leave multi share");
                         if(error>0){
-                            message = context.getString(R.string.number_correctly_leaved, max_items-error) + context.getString(R.string.number_no_leaved, error);
+                            if (error == errorBusiness) {
+                                message = e.getErrorString();
+                            } else {
+                                message = context.getString(R.string.number_correctly_leaved, max_items - error) + context.getString(R.string.number_no_leaved, error);
+                            }
                         }
                         else{
                             message = context.getString(R.string.number_correctly_leaved, max_items);
@@ -145,7 +151,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
                         ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
                         managerActivity.refreshAfterRemoving();
-                        resetAccountDetailsTimeStamp(context);
+                        resetAccountDetailsTimeStamp();
                     }
 
                     break;
@@ -199,7 +205,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                             message = context.getString(R.string.number_correctly_copied, max_items);
                         }
 
-                        resetAccountDetailsTimeStamp(context);
+                        resetAccountDetailsTimeStamp();
                     }
                     break;
                 }
@@ -240,54 +246,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     }
                     break;
                 }
-                case MegaRequest.TYPE_SHARE:{
-                    logDebug("Multiple share request finished");
-                    if(actionListener==MULTIPLE_REMOVE_SHARING_CONTACTS){
-                        if(error>0){
-                            message = context.getString(R.string.context_no_removed_sharing_contacts);
-                        }
-                        else{
-                            message = context.getString(R.string.context_correctly_removed_sharing_contacts);
-                        }
-                    }
-                    else if(actionListener==MULTIPLE_CONTACTS_SHARE){
-                        //TODO change UI
-                        //One file shared with many contacts
-                        if(error>0){
-                            message = context.getString(R.string.number_contact_file_shared_correctly, max_items-error) + context.getString(R.string.number_contact_file_not_shared_, error);
-                        }
-                        else{
-                            message = context.getString(R.string.number_contact_file_shared_correctly, max_items);
-                        }
-                    }
-                    else if(actionListener==MULTIPLE_FILE_SHARE){
-                        //Many files shared with one contacts
-                        if(error>0){
-                            message = context.getString(R.string.number_correctly_shared, max_items-error) + context.getString(R.string.number_no_shared, error);
-                        }
-                        else{
-                            message = context.getString(R.string.context_correctly_shared);
-                        }
-                    }
-                    else{
-                        if(error>0){
-                            if(request.getAccess()== MegaShare.ACCESS_UNKNOWN){
-                                message = context.getString(R.string.context_no_shared_number_removed, error);
-                            }
-                            else{
-                                message = context.getString(R.string.context_no_shared_number, error);
-                            }
-                        }
-                        else{
-                            if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
-                                message = context.getString(R.string.context_correctly_shared_removed);
-                            }
-                            else{
-                                message = context.getString(R.string.context_correctly_shared);
-                            }
-                        }
-                    }
-                }
                 default:
                     break;
             }
@@ -300,9 +258,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
             }
             else if(context instanceof ContactAttachmentActivityLollipop){
                 ((ContactAttachmentActivityLollipop) context).showSnackbar(message);
-            }
-            else if(context instanceof AchievementsActivity){
-                ((AchievementsActivity) context).showInviteConfirmationDialog();
             }
             else if(context instanceof AddContactActivityLollipop){
                 ((AddContactActivityLollipop) context).showSnackbar(message);

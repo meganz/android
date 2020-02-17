@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_layout_add"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp">
+    <RelativeLayout
+        android:id="@+id/chip_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="11dp"
+        android:layout_marginRight="11dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="8dp">
+        <mega.privacy.android.app.components.RoundedImageView
+            android:id="@+id/add_rounded_avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            rounded:corner_radius="20dp"/>
+        <TextView
+            android:id="@+id/contact_list_initial_letter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="invisible"
+            android:gravity="center_horizontal|center_vertical"/>
+        <ImageView
+            android:id="@+id/add_icon_chip"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignRight="@+id/add_rounded_avatar"
+            android:layout_alignBottom="@+id/add_rounded_avatar"
+            android:layout_marginRight="-3dp"
+            android:layout_marginBottom="-3dp"
+            android:contentDescription="@null"
+            android:paddingLeft="24dp"
+            android:paddingTop="24dp"
+            android:src="@drawable/ic_add_avatar"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/name_chip"
+        style="@style/TransparentBlackTextView"
+        android:layout_below="@+id/chip_layout"
+        android:layout_centerHorizontal="true"
+        android:ellipsize="middle"
+        android:fontFamily="roboto"
+        android:gravity="center"
+        android:maxWidth="60dp"
+        android:singleLine="true"
+        android:textSize="12sp" />
+</RelativeLayout>

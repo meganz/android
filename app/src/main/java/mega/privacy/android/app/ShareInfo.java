@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
@@ -19,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,21 +29,24 @@ import java.util.List;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 
 /*
  * Helper class to process shared files from other activities
  */
-public class ShareInfo {
+public class ShareInfo implements Serializable {
 
 	public String title = null;
 	private long lastModified;
-	public InputStream inputStream = null;
+	public transient InputStream inputStream = null;
 	public long size = -1;
 	private File file = null;
 	public boolean isContact = false;
 	public Uri contactUri = null;
+
+	private static Intent mIntent;
 	
 	/*
 	 * Get ShareInfo from File
@@ -93,6 +96,9 @@ public class ShareInfo {
 		if (context == null) {
 			return null;
 		}
+
+		mIntent = intent;
+
 		// Process multiple items
 		if (Intent.ACTION_SEND_MULTIPLE.equals(intent.getAction())) {
 			logDebug("Multiple!");
@@ -144,12 +150,7 @@ public class ShareInfo {
 			logWarning("Share info file is null");
 			return null;
 		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
-		else{
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
 		
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
 		result.add(shareInfo);
@@ -186,12 +187,7 @@ public class ShareInfo {
 			return null;
 		}
 		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
-		else{
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		}
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
 		
 		return result;
 	}
@@ -316,11 +312,9 @@ public class ShareInfo {
                 return;
             }
 			logDebug("Internal No path traversal: " + title);
-            if (context instanceof PdfViewerActivityLollipop) {
-				logDebug("context of PdfViewerActivityLollipop");
-                if (!title.endsWith(".pdf")) {
-                    title += ".pdf";
-                }
+            if (context instanceof PdfViewerActivityLollipop
+					|| (mIntent != null && mIntent.getType() != null && mIntent.getType().equals("application/pdf"))) {
+				title = addPdfFileExtension(title);
             }
             file = new File(context.getCacheDir(), title);
 
@@ -399,25 +393,29 @@ public class ShareInfo {
 	 */
 	private void processContent(Uri uri, Context context) {
 		logDebug("processContent: " + uri);
-		ContentProviderClient client = null;
 
-		client = context.getContentResolver().acquireContentProviderClient(uri);
+		ContentProviderClient client = null;
 		Cursor cursor = null;
 		try {
-			cursor = client.query(uri, null, null, null, null);
-		} catch (Exception e1) {
-			logError("cursor EXCEPTION!!!", e1);
-		}
-		if(cursor!=null){
-			if(cursor.getCount()==0){
-				logDebug("RETURN - Cursor get count is 0");
-				return;
+			client = context.getContentResolver().acquireContentProviderClient(uri);
+			if (client != null) {
+				cursor = client.query(uri, null, null, null, null);
 			}
+		} catch (Exception e) {
+			logError("client or cursor EXCEPTION: ", e);
 		}
-		else{
-			logWarning("RETURN - Cursor is NULL");
+
+		if (cursor == null || cursor.getCount() == 0) {
+			logWarning("Error with cursor: null or count is 0");
+			if (cursor != null) {
+				cursor.close();
+			}
+			if (client != null) {
+				client.close();
+			}
 			return;
 		}
+
 		cursor.moveToFirst();
 		int displayIndex = cursor.getColumnIndex("_display_name");
 		if(displayIndex != -1)
@@ -477,8 +475,10 @@ public class ShareInfo {
 		else{
 			logWarning("Nothing done!");
 		}
-	
-		client.release();
+
+		cursor.close();
+		client.close();
+
 		logDebug("---- END process content----");
 	}
 	

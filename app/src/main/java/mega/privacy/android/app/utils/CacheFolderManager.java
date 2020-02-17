@@ -44,8 +44,6 @@ public final class CacheFolderManager {
             cacheFolder = new File(context.getCacheDir(), folderName);
         }
 
-        if (cacheFolder == null) return null;
-
         if (cacheFolder.exists()) return cacheFolder;
 
         if (cacheFolder.mkdir()) {

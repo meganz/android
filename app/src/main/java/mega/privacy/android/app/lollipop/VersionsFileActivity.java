@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
@@ -19,12 +18,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -60,8 +56,12 @@ import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaShare.*;
 
-public class VersionsFileActivity extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaGlobalListenerInterface {
+public class VersionsFileActivity extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, MegaGlobalListenerInterface {
+	private static final String IS_CHECKING_REVERT_VERSION = "IS_CHECKING_REVERT_VERSION";
+	private static final String SELECTED_NODE_HANDLE = "SELECTED_NODE_HANDLE";
 
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
@@ -70,13 +70,13 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	VersionsFileActivity versionsFileActivity = this;
 
 	MegaNode selectedNode;
+	private long selectedNodeHandle;
 
 	int selectedPosition;
 
 	RelativeLayout container;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
-	GestureDetectorCompat detector;
 	ImageView emptyImage;
 	TextView emptyText;
 
@@ -87,7 +87,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	VersionsFileAdapter adapter;
 	public String versionsSize = null;
 	
-	long parentHandle = -1;
+	long parentHandle = INVALID_HANDLE;
 
 	private ActionMode actionMode;
 	
@@ -108,6 +108,9 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	private VersionBottomSheetDialogFragment bottomSheetDialogFragment;
 
+	private int accessLevel;
+
+	private boolean ischeckingRevertVersion;
 	private class GetVersionsSizeTask extends AsyncTask<String, Void, String> {
 
 		@Override
@@ -131,32 +134,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		}
 	}
 
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
-
-	    public void onLongPress(MotionEvent e) {
-			logDebug("onLongPress -- RecyclerViewOnGestureListener");
-
-			View view = listView.findChildViewUnder(e.getX(), e.getY());
-			int position = listView.getChildLayoutPosition(view);
-
-			if (!adapter.isMultipleSelect()){
-
-				if(position<0){
-					logDebug("Position not valid: " + position);
-				}
-				else{
-					adapter.setMultipleSelect(true);
-
-					actionMode = startSupportActionMode(new ActionBarCallBack());
-
-					itemClick(position);
-				}
-			}
-
-			super.onLongPress(e);
-	    }
-	}
-	
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -194,7 +171,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				case R.id.action_revert_version:{
 					if (nodes.size() == 1) {
 						selectedNode = nodes.get(0);
-						revertVersion();
+						selectedNodeHandle = selectedNode.getHandle();
+						checkRevertVersion();
 						clearSelections();
 						actionMode.invalidate();
 					}
@@ -245,7 +223,11 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				}
 
 				if (selected.size() == 1) {
-					menu.findItem(R.id.action_revert_version).setVisible(true);
+					if (getSelectedPosition() == 0) {
+						menu.findItem(R.id.action_revert_version).setVisible(false);
+					} else {
+						menu.findItem(R.id.action_revert_version).setVisible(true);
+					}
 					menu.findItem(R.id.action_download_versions).setVisible(true);
 				}
 				else {
@@ -279,7 +261,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		if(megaApi==null||megaApi.getRootNode()==null){
 			logDebug("Refresh session - sdk");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
@@ -293,7 +275,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
 				logDebug("Refresh session - karere");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment", LOGIN_FRAGMENT);
+				intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();
@@ -324,15 +306,12 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 		container = (RelativeLayout) findViewById(R.id.versions_main_layout);
 
-		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
-
 		listView = (RecyclerView) findViewById(R.id.recycler_view_versions_file);
 		listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 		listView.setClipToPadding(false);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator());
 		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
@@ -347,21 +326,24 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		emptyImage.setImageResource(R.drawable.ic_empty_contacts);
 		emptyText.setText(R.string.contacts_list_empty_text);
 
-		long nodeHandle = -1;
+		long nodeHandle = INVALID_HANDLE;
 
 		if (savedInstanceState != null){
-			nodeHandle = savedInstanceState.getLong(EXTRA_NODE_HANDLE, -1);
+			nodeHandle = savedInstanceState.getLong(EXTRA_NODE_HANDLE, INVALID_HANDLE);
+			ischeckingRevertVersion = savedInstanceState.getBoolean(IS_CHECKING_REVERT_VERSION, false);
+			selectedNodeHandle = savedInstanceState.getLong(SELECTED_NODE_HANDLE, INVALID_HANDLE);
 		}
 
 	    Bundle extras = getIntent().getExtras();
 		if (extras != null){
-			if(nodeHandle==-1){
+			if(nodeHandle == INVALID_HANDLE){
 				nodeHandle = extras.getLong("handle");
 			}
 
 			node=megaApi.getNodeByHandle(nodeHandle);
 
 			if(node!=null){
+				accessLevel = megaApi.getAccess(node);
 				nodeVersions = megaApi.getVersions(node);
 
 				GetVersionsSizeTask getVersionsSizeTask = new GetVersionsSizeTask();
@@ -385,7 +367,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				}
 				else{
 					adapter.setNodes(nodeVersions);
-					//adapter.setParentHandle(-1);
 				}
 
 				adapter.setMultipleSelect(false);
@@ -394,6 +375,13 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			}
 			else{
 				logError("ERROR: node is NULL");
+			}
+		}
+
+		if (ischeckingRevertVersion) {
+			selectedNode = megaApi.getNodeByHandle(selectedNodeHandle);
+			if (selectedNode != null) {
+				checkRevertVersion();
 			}
 		}
 	}
@@ -425,6 +413,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
 		selectedNode = sNode;
+		selectedNodeHandle = selectedNode.getHandle();
 		selectedPosition = sPosition;
 		bottomSheetDialogFragment = new VersionBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
@@ -460,8 +449,22 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		selectMenuItem.setVisible(true);
-		unSelectMenuItem.setVisible(false);
+
+		switch (accessLevel) {
+			case ACCESS_FULL:
+			case ACCESS_OWNER:
+				selectMenuItem.setVisible(true);
+				unSelectMenuItem.setVisible(false);
+				deleteVersionsMenuItem.setVisible(true);
+				break;
+
+			default:
+				selectMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				deleteVersionsMenuItem.setVisible(false);
+
+		}
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -490,25 +493,12 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	void showDeleteVersionHistoryDialog () {
 		logDebug("showDeleteVersionHistoryDialog");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						deleteVersionHistory();
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.title_delete_version_history);
-		builder.setMessage(R.string.text_delete_version_history).setPositiveButton(R.string.context_delete, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(R.string.title_delete_version_history)
+				.setMessage(R.string.text_delete_version_history)
+				.setPositiveButton(R.string.context_delete, (dialog, which) -> deleteVersionHistory())
+				.setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
+				.show();
 	}
 
 	void deleteVersionHistory () {
@@ -592,7 +582,11 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		else if(request.getType() == MegaRequest.TYPE_RESTORE){
 			logDebug("MegaRequest.TYPE_RESTORE");
 			if (e.getErrorCode() == MegaError.API_OK) {
-				showSnackbar(getString(R.string.version_restored));
+				if (getAccessLevel() <= ACCESS_READWRITE) {
+					showSnackbar(getString(R.string.version_as_new_file_created));
+				} else {
+					showSnackbar(getString(R.string.version_restored));
+				}
 			}
 			else {
 				showSnackbar(getString(R.string.general_text_error));
@@ -809,14 +803,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			GetVersionsSizeTask getVersionsSizeTask = new GetVersionsSizeTask();
 			getVersionsSizeTask.execute();
 		}
-
-//		for(int i=0; i<nodes.size();i++){
-//			MegaNode node = nodes.get(i);
-//			if(node.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
-//				for(int j=0; i<node)
-//			}
-//		}
-
 	}
 
 	@Override
@@ -844,63 +830,22 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		
 	}
 
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
+	public void checkRevertVersion() {
+		if (getAccessLevel() <= ACCESS_READWRITE) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			builder.setCancelable(false)
+					.setTitle(R.string.permissions_error_label)
+					.setMessage(R.string.alert_not_enough_permissions_revert)
+					.setPositiveButton(R.string.create_new_file_action, (dialog, which) -> revertVersion())
+					.setNegativeButton(R.string.general_cancel, ((dialog, which) -> ischeckingRevertVersion = false))
+					.show();
+			ischeckingRevertVersion = true;
+		} else {
+			revertVersion();
+		}
 	}
 
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void revertVersion(){
+	private void revertVersion(){
 		logDebug("revertVersion");
 		megaApi.restoreVersion(selectedNode, this);
 	}
@@ -943,63 +888,34 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		this.selectedPosition = selectedPosition;
 	}
 
-	public void showConfirmationRemoveVersion(){
-		logDebug("showConfirmationRemoveContact");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						removeVersion();
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getResources().getQuantityString(R.plurals.title_dialog_delete_version, 1));
-		builder.setMessage(getString(R.string.content_dialog_delete_version)).setPositiveButton(R.string.context_delete, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
+	public void showConfirmationRemoveVersion() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getResources().getQuantityString(R.plurals.title_dialog_delete_version, 1))
+				.setMessage(getString(R.string.content_dialog_delete_version))
+				.setPositiveButton(R.string.context_delete, (dialog, which) -> removeVersion())
+				.setNegativeButton(R.string.general_cancel, (dialog, which) -> {
+				})
+				.show();
 	}
 
-	public void showConfirmationRemoveVersions(final List<MegaNode> removeNodes){
-		logDebug("showConfirmationRemoveContactRequests");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						removeVersions(removeNodes);
-						break;
+	public void showConfirmationRemoveVersions(final List<MegaNode> removeNodes) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		String message;
+		String title;
 
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		String message="";
-		String title="";
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		if(removeNodes.size()==1){
-
+		if (removeNodes.size() == 1) {
 			title = getResources().getQuantityString(R.plurals.title_dialog_delete_version, 1);
-
-			message= getResources().getString(R.string.content_dialog_delete_version);
-		}else{
+			message = getResources().getString(R.string.content_dialog_delete_version);
+		} else {
 			title = getResources().getQuantityString(R.plurals.title_dialog_delete_version, removeNodes.size());
-			message= getResources().getString(R.string.content_dialog_delete_multiple_version,removeNodes.size());
+			message = getResources().getString(R.string.content_dialog_delete_multiple_version, removeNodes.size());
 		}
-		builder.setTitle(title);
-		builder.setMessage(message).setPositiveButton(R.string.context_delete, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
+		builder.setTitle(title)
+				.setMessage(message)
+				.setPositiveButton(R.string.context_delete, (dialog, which) -> removeVersions(removeNodes))
+				.setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
+				.show();
 	}
 
 	@Override
@@ -1007,6 +923,17 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		logDebug("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
 		outState.putLong(EXTRA_NODE_HANDLE, node.getHandle());
+		outState.putBoolean(IS_CHECKING_REVERT_VERSION, ischeckingRevertVersion);
+		outState.putLong(SELECTED_NODE_HANDLE, selectedNodeHandle);
+	}
+
+	public int getAccessLevel() {
+		return accessLevel;
+	}
+
+	public void startActionMode(int position) {
+		actionMode = startSupportActionMode(new ActionBarCallBack());
+		itemClick(position);
 	}
 }
 

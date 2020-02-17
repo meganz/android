@@ -141,9 +141,9 @@ public class ChatAudioManager {
     }
 
     public void stopAudioSignals() {
+        if(audioManager != null) audioManager = null;
         stopSound();
         stopVibration();
-        audioManager.setMode(AudioManager.MODE_NORMAL);
     }
 
     private void stopSound() {

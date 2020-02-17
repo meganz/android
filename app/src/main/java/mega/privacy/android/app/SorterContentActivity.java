@@ -43,6 +43,9 @@ public class SorterContentActivity extends PinActivityLollipop {
         TextView sortBySizeTV = dialoglayout.findViewById(R.id.sortby_dialog_size_text);
         sortBySizeTV.setText(context.getString(R.string.sortby_size));
 
+        TextView sortByTypeTV = dialoglayout.findViewById(R.id.sortby_dialog_type_text);
+        sortByTypeTV.setText(getString(R.string.sortby_type));
+
         final CheckedTextView ascendingCheck = dialoglayout.findViewById(R.id.sortby_dialog_ascending_check);
         ascendingCheck.setText(context.getString(R.string.sortby_name_ascending));
 
@@ -60,6 +63,17 @@ public class SorterContentActivity extends PinActivityLollipop {
 
         final CheckedTextView smallestCheck = dialoglayout.findViewById(R.id.sortby_dialog_smallest_first_check);
         smallestCheck.setText(context.getString(R.string.sortby_size_smallest_first));
+
+        final CheckedTextView photoCheck = dialoglayout.findViewById(R.id.sortby_dialog_photo_check);
+        photoCheck.setText(getString(R.string.sortby_type_photo_first));
+
+        final CheckedTextView videoCheck = dialoglayout.findViewById(R.id.sortby_dialog_video_check);
+        videoCheck.setText(getString(R.string.sortby_type_video_first));
+
+        //only for camera upload fragment
+        sortByTypeTV.setVisibility(View.GONE);
+        photoCheck.setVisibility(View.GONE);
+        videoCheck.setVisibility(View.GONE);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setView(dialoglayout);
@@ -80,6 +94,8 @@ public class SorterContentActivity extends PinActivityLollipop {
         boolean oldest = false;
         boolean largest = false;
         boolean smallest = false;
+        boolean photoFirst = false;
+        boolean videoFirst = false;
         int order = MegaApiJava.ORDER_DEFAULT_ASC;
 
         if (context instanceof ManagerActivityLollipop) {
@@ -87,19 +103,8 @@ public class SorterContentActivity extends PinActivityLollipop {
                 case CONTACTS: {
                     order = ((ManagerActivityLollipop) context).getOrderContacts();
 
-                    sortByDateTV.setText(context.getString(R.string.sortby_date));
-                    sortBySizeTV.setVisibility(View.GONE);
-                    largestCheck.setVisibility(View.GONE);
-                    smallestCheck.setVisibility(View.GONE);
+                    sortByDateTV.setText(R.string.sortby_date);
 
-                    break;
-                }
-                case SAVED_FOR_OFFLINE: {
-                    order = ((ManagerActivityLollipop) context).getOrderOthers();
-
-                    sortByDateTV.setVisibility(View.GONE);
-                    newestCheck.setVisibility(View.GONE);
-                    oldestCheck.setVisibility(View.GONE);
                     sortBySizeTV.setVisibility(View.GONE);
                     largestCheck.setVisibility(View.GONE);
                     smallestCheck.setVisibility(View.GONE);
@@ -108,8 +113,8 @@ public class SorterContentActivity extends PinActivityLollipop {
                 }
                 case SHARED_ITEMS: {
                     int index = ((ManagerActivityLollipop) context).getTabItemShares();
-                    if((index==1 && ((ManagerActivityLollipop) context).parentHandleOutgoing == -1)
-                            || (index != 1 && ((ManagerActivityLollipop) context).parentHandleIncoming == -1)){
+                    if((index==1 && ((ManagerActivityLollipop) context).getParentHandleOutgoing() == -1)
+                            || (index != 1 && ((ManagerActivityLollipop) context).getParentHandleIncoming() == -1)){
                         order = ((ManagerActivityLollipop) context).getOrderOthers();
                     }
                     else{
@@ -149,6 +154,9 @@ public class SorterContentActivity extends PinActivityLollipop {
                     largestCheck.setVisibility(View.GONE);
                     smallestCheck.setVisibility(View.GONE);
 
+                    sortByTypeTV.setVisibility(View.VISIBLE);
+                    photoCheck.setVisibility(View.VISIBLE);
+                    videoCheck.setVisibility(View.VISIBLE);
                     break;
                 }
                 default: {
@@ -229,6 +237,14 @@ public class SorterContentActivity extends PinActivityLollipop {
                 largest = true;
                 break;
             }
+            case MegaApiJava.ORDER_PHOTO_DESC: {
+                photoFirst = true;
+                break;
+            }
+            case MegaApiJava.ORDER_VIDEO_DESC: {
+                videoFirst = true;
+                break;
+            }
         }
 
         ascendingCheck.setChecked(ascending);
@@ -237,6 +253,8 @@ public class SorterContentActivity extends PinActivityLollipop {
         oldestCheck.setChecked(oldest);
         largestCheck.setChecked(largest);
         smallestCheck.setChecked(smallest);
+        photoCheck.setChecked(photoFirst);
+        videoCheck.setChecked(videoFirst);
 
         final ManagerActivityLollipop.DrawerItem finalDrawerItem = drawerItem;
         View.OnClickListener clickListener = new View.OnClickListener() {
@@ -248,6 +266,8 @@ public class SorterContentActivity extends PinActivityLollipop {
                 boolean oldest = false;
                 boolean largest = false;
                 boolean smallest = false;
+                boolean photoFirst = false;
+                boolean videoFirst = false;
                 int order = MegaApiJava.ORDER_DEFAULT_ASC;
 
                 switch (v.getId()) {
@@ -292,6 +312,16 @@ public class SorterContentActivity extends PinActivityLollipop {
                         order = MegaApiJava.ORDER_SIZE_ASC;
                         break;
                     }
+                    case R.id.sortby_dialog_photo_check: {
+                        photoFirst = true;
+                        order = MegaApiJava.ORDER_PHOTO_DESC;
+                        break;
+                    }
+                    case R.id.sortby_dialog_video_check: {
+                        videoFirst = true;
+                        order = MegaApiJava.ORDER_VIDEO_DESC;
+                        break;
+                    }
                 }
 
                 ascendingCheck.setChecked(ascending);
@@ -300,14 +330,12 @@ public class SorterContentActivity extends PinActivityLollipop {
                 oldestCheck.setChecked(oldest);
                 largestCheck.setChecked(largest);
                 smallestCheck.setChecked(smallest);
+                photoCheck.setChecked(photoFirst);
+                videoCheck.setChecked(videoFirst);
 
                 switch (finalDrawerItem) {
                     case CONTACTS: {
                         ((ManagerActivityLollipop) context).selectSortByContacts(order);
-                        break;
-                    }
-                    case SAVED_FOR_OFFLINE: {
-                        ((ManagerActivityLollipop) context).selectSortByOffline(order);
                         break;
                     }
                     case SHARED_ITEMS: {
@@ -361,6 +389,8 @@ public class SorterContentActivity extends PinActivityLollipop {
         oldestCheck.setOnClickListener(clickListener);
         largestCheck.setOnClickListener(clickListener);
         smallestCheck.setOnClickListener(clickListener);
+        photoCheck.setOnClickListener(clickListener);
+        videoCheck.setOnClickListener(clickListener);
     }
 
     void updateManagerOrder (boolean cloudOrder, int order) {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navigation_drawer_account_view"
@@ -57,6 +57,7 @@
                 android:layout_below="@id/navigation_drawer_user_account_relative_layout_profile_avatar"
                 android:gravity="center_vertical"
                 android:layout_marginTop="16dp"
+                android:layout_marginBottom="20dp"
                 android:orientation="vertical">
 
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -64,10 +65,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    rounded:emojiSize="14sp"
                     android:textColor="@color/name_my_account"
                     android:text="User Name"
                     android:singleLine="true"
-                    android:ellipsize="end"
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"/>
 
@@ -76,11 +77,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="@color/name_my_account"
                     android:text="email@domain.com"
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:fontFamily="roboto"/>
+
+				<TextView
+					android:id="@+id/business_label"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textSize="12sp"
+					android:textAllCaps="true"
+					android:text="@string/business_label"
+					android:textColor="@color/business_color"
+					android:layout_below="@id/navigation_drawer_account_information"
+					android:layout_marginTop="7dp"/>
 
             </LinearLayout>
 
@@ -96,8 +108,7 @@
                     android:id="@+id/manager_used_space_bar"
                     style="@style/UsedSpaceProgressBar"
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginTop="20dp"/>
+                    android:layout_height="2dp"/>
 
                 <TextView
                     android:id="@+id/navigation_drawer_space"
@@ -109,13 +120,6 @@
                     android:textStyle="bold"
                     android:textSize="13sp"/>
             </RelativeLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@+id/nv_used_space_layout"
-                android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account"/>
 
         </RelativeLayout>
         
@@ -135,7 +139,6 @@
                 android:textStyle="bold"
                 android:textColor="@color/name_my_account"
                 android:text="@string/section_account"/>
-
 
             <View
                 android:layout_width="match_parent"
@@ -245,6 +248,7 @@
 
 
             <View
+                android:id="@+id/settings_separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="16dp"
@@ -262,7 +266,7 @@
             android:textColor="@color/accentColor"
             android:fontFamily="sans-serif-light"
             android:textStyle="bold"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="100dp"
             android:layout_marginLeft="1dp"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
@@ -274,4 +278,47 @@
 
     </LinearLayout>
 
-</FrameLayout>
+	<LinearLayout android:id="@+id/navigation_drawer_add_phone_number_container"
+	              android:layout_width="match_parent"
+	              android:layout_height="wrap_content"
+	              android:paddingBottom="16dp"
+	              android:layout_marginTop="20dp"
+	              android:paddingRight="16dp"
+	              android:background="#FFF9F9F9"
+	              android:layout_gravity="bottom"
+	              android:layout_alignParentBottom="true"
+	              android:visibility="gone"
+	              android:orientation="vertical">
+		<LinearLayout android:layout_width="match_parent"
+		              android:layout_height="wrap_content"
+		              android:paddingLeft="16dp"
+		              android:paddingTop="10dp"
+		              android:paddingBottom="5dp">
+			<ImageView android:id="@+id/navigation_drawer_add_phone_number_icon"
+			           android:layout_width="40dp"
+			           android:layout_height="40dp"
+			           android:src="@drawable/il_verify_phone_drawer"/>
+			<TextView android:id="@+id/navigation_drawer_add_phone_number_button"
+			          android:layout_width="wrap_content"
+			          android:layout_height="wrap_content"
+			          android:layout_marginLeft="16dp"
+			          android:background="@drawable/background_button_border_accent"
+			          android:gravity="center"
+			          android:paddingLeft="16dp"
+			          android:paddingTop="10dp"
+			          android:paddingRight="16dp"
+			          android:paddingBottom="10dp"
+			          android:text="@string/add_phone_number_label"
+			          android:textAllCaps="true"
+			          android:textColor="@color/accentColor"
+			          android:textSize="14sp"
+			          android:textStyle="bold"/>
+		</LinearLayout>
+		<TextView android:id="@+id/navigation_drawer_add_phone_number_label"
+		          android:layout_width="wrap_content"
+		          android:layout_height="wrap_content"
+		          android:layout_marginLeft="72dp"
+		          android:textSize="11sp"/>
+	</LinearLayout>
+
+</RelativeLayout>

@@ -7,6 +7,7 @@ import android.view.View;
 
 import java.io.File;
 
+import mega.privacy.android.app.lollipop.adapters.ContactsHorizontalAdapter;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -51,7 +52,6 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
                         if (bitmap == null) {
                             avatar.delete();
                         } else {
-//								holder.imageView.setImageBitmap(bitmap);
                             if (holder instanceof MegaContactsLollipopAdapter.ViewHolderContactsGrid) {
                                 bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,bitmap,3);
                                 ((MegaContactsLollipopAdapter.ViewHolderContactsGrid)holder).imageView.setImageBitmap(bitmap);
@@ -59,8 +59,10 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
                                 ((MegaContactsLollipopAdapter.ViewHolderContactsList)holder).imageView.setImageBitmap(bitmap);
                             } else if (holder instanceof LastContactsAdapter.ViewHolder) {
                                 ((LastContactsAdapter.ViewHolder)holder).avatarImage.setImageBitmap(bitmap);
+                            } else if (holder instanceof ContactsHorizontalAdapter.ContactViewHolder) {
+                                ((ContactsHorizontalAdapter.ContactViewHolder) holder).avatar.setImageBitmap(bitmap);
+                                ((ContactsHorizontalAdapter.ContactViewHolder) holder).textViewInitialLetter.setVisibility(View.INVISIBLE);
                             }
-                            holder.contactInitialLetter.setVisibility(View.GONE);
                         }
                     }
                 }

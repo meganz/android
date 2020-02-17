@@ -111,9 +111,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Küçük resim görünümü</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Liste görünümü</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Kurtarma Anahtarını yedekle</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Kurtarma Anahtarını sil</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Aboneliği iptal et</string>
-    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">Kurtarma Anahtarı dosyası silindi</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Abonelik doğru bir şekilde iptal edildi</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Aboneliğinizi iptal edemiyoruz. Lütfen yardım için support&#64;mega.nz adresine ulaşın</string>
     <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Diğer oturumları kapat</string>
@@ -2264,9 +2262,6 @@
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">YENİ</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">dosya adı</string>
-
-    <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">Otomatik dışarıda değeri geçersiz, 0\'dan yüksek olmalı.</string>
-
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Son görülmeyi göster</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Kişilerinizin MEGA\'daki son etkinlik zamanınızı görmesine izin verin.</string>
 
