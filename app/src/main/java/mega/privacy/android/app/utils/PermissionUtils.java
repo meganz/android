@@ -4,10 +4,12 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 
 import mega.privacy.android.app.R;
@@ -49,5 +51,39 @@ public class PermissionUtils {
                 Util.showSnackbar(context, context.getString(R.string.on_permanently_denied));
             }
         };
+    }
+
+    /**
+     * Check permissions whether are granted
+     * @param context Context
+     * @param permissions one or more permission strings
+     * @return whether permissions has ben granted
+     */
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Ask permissions
+     * @param activity The activity
+     * @param requestCode request code of permission asking
+     * @param permission requested permissions
+     */
+    public static void requestPermission(Activity activity, int requestCode, String... permission) {
+        ActivityCompat.requestPermissions(activity,
+                permission,
+                requestCode);
     }
  }

@@ -1689,10 +1689,6 @@ public class Util {
 
 	}
 
-	public static boolean isPermissionGranted(Context context, String permission){
-        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
-    }
-
 	public static boolean isScreenInPortrait(Context context) {
 		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			return true;
@@ -1766,28 +1762,6 @@ public class Util {
 
 		logDebug("URL decoded: " + url);
 		return url;
-	}
-
-    public static boolean hasPermissions(Context context, String... permissions) {
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-			return true;
-		}
-
-		if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-	public static void requestPermission(Activity activity, int requestCode, String... permission) {
-		ActivityCompat.requestPermissions(activity,
-				permission,
-				requestCode);
 	}
 
     /**
