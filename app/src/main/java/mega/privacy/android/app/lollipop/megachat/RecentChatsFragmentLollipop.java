@@ -85,7 +85,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private static final String COLOR_START = "\'#000000\'";
     private static final String COLOR_END = "\'#7a7a7a\'";
 
-    // the designer says the snackbar should last for 4s.
+    /** DURATION is the time duration of snack bar display, deisgned by designer
+     *  MAX_LINES is the max line setting of the snack bar */
     public static final int DURATION = 4000;
     public static final int MAX_LINES = 3;
 
