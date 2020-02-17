@@ -102,6 +102,8 @@ import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
+import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
+import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -401,6 +403,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private ActionMode actionMode;
 
+    private AppRTCAudioManager rtcAudioManager = null;
+    private boolean speakerWasActivated = true;
+
     // Data being stored when My Chat Files folder does not exist
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
     private ArrayList<MegaChatMessage> preservedMsgSelected;
@@ -611,7 +616,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         LocalBroadcastManager.getInstance(this).registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
         LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
         LocalBroadcastManager.getInstance(this).registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
-
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
         setContentView(R.layout.activity_chat);
@@ -630,7 +634,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         aB.setTitle(null);
         aB.setSubtitle(null);
         tB.setOnClickListener(this);
-
         toolbarElementsInside = tB.findViewById(R.id.toolbar_elements_inside);
         titleToolbar = tB.findViewById(R.id.title_toolbar);
         iconStateToolbar = tB.findViewById(R.id.state_icon_toolbar);
@@ -7139,7 +7142,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     @Override
     protected void onDestroy() {
         logDebug("onDestroy()");
-
+        destroySpeakerAudioManger();
         cleanBuffers();
         if (handlerEmojiKeyboard != null){
             handlerEmojiKeyboard.removeCallbacksAndMessages(null);
@@ -7616,6 +7619,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             MegaApplication.setOpenChatId(idChat);
 
             supportInvalidateOptionsMenu();
+            createSpeakerAudioManger();
 
             int chatConnection = megaChatApi.getChatConnectionState(idChat);
             logDebug("Chat connection (" + idChat+ ") is: " + chatConnection);
@@ -7780,8 +7784,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     protected void onPause(){
         logDebug("onPause");
         super.onPause();
+        if (rtcAudioManager != null)
+            rtcAudioManager.unregisterProximitySensor();
         hideKeyboard();
-
         activityVisible = false;
         MegaApplication.setOpenChatId(-1);
     }
@@ -8432,6 +8437,53 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         }
     }
+
+    private void createSpeakerAudioManger(){
+        if(rtcAudioManager != null) return;
+        speakerWasActivated = true;
+        rtcAudioManager = AppRTCAudioManager.create(this, speakerWasActivated);
+        rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
+            @Override
+            public void needToUpdate(boolean isNear) {
+                if(!speakerWasActivated && !isNear){
+                    adapter.pausePlaybackInProgress();
+                }else if(speakerWasActivated && isNear){
+                    speakerWasActivated = false;
+                }
+            }
+        });
+    }
+
+    public void startProximitySensor(){
+        logDebug("Starting proximity sensor");
+        createSpeakerAudioManger();
+        rtcAudioManager.startProximitySensor();
+    }
+    private void activateSpeaker(){
+        if(!speakerWasActivated){
+            speakerWasActivated = true;
+        }
+        if(rtcAudioManager != null){
+            rtcAudioManager.updateSpeakerStatus(true);
+        }
+    }
+
+    public void stopProximitySensor(){
+        if(rtcAudioManager == null) return;
+        activateSpeaker();
+        rtcAudioManager.unregisterProximitySensor();
+    }
+
+    private void destroySpeakerAudioManger(){
+        if (rtcAudioManager == null) return;
+        try {
+            rtcAudioManager.stop();
+            rtcAudioManager = null;
+        } catch (Exception e) {
+            logError("Exception stopping speaker audio manager", e);
+        }
+    }
+
 
     public void setShareLinkDialogDismissed (boolean dismissed) {
         isShareLinkDialogDismissed = dismissed;
