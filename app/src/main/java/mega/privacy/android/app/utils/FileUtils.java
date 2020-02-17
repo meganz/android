@@ -37,7 +37,9 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class FileUtils {
 
@@ -113,7 +115,7 @@ public class FileUtils {
             return true;
         }
 
-        ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
         return false;
     }
 
@@ -126,10 +128,10 @@ public class FileUtils {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         activityManager.getMemoryInfo(mi);
 
-        if (mi.totalMem > Constants.BUFFER_COMP) {
-            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+        if (mi.totalMem > BUFFER_COMP) {
+            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
         } else {
-            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
         }
 
         String url = megaApi.httpServerGetLocalLink(node);
@@ -141,7 +143,7 @@ public class FileUtils {
             }
         }
 
-        ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
         return false;
     }
 
@@ -632,6 +634,8 @@ public class FileUtils {
         return result;
     }
 
+
+
     /**
      * @param fileName The original file name
      * @return the file name without extension. For example, 1.jpg would return 1
@@ -658,6 +662,84 @@ public class FileUtils {
             title += ".pdf";
         }
         return title;
+    }
+
+    /**
+     * Checks if the node is already downloaded in the current selected folder
+     *
+     * @param node file to check
+     * @param localPath path of the local file already downloaded
+     * @param currenParentPath path of the current selected folder where the file is going to be downloaded
+     * @return true if the file is already downloaded in the selected folder, false otherwise
+     */
+
+    public static boolean isAlreadyDownloadedInCurrentPath(MegaNode node, String localPath, String currenParentPath, boolean downloadToSDCard, SDCardOperator sdCardOperator) {
+        File file = new File(localPath);
+
+        if (isFileAvailable(file) && !file.getParent().equals(currenParentPath)) {
+            try {
+                new Thread(new CopyFileThread(downloadToSDCard, localPath, currenParentPath, node.getName(), sdCardOperator)).start();
+                copyFile(file, new File(currenParentPath, node.getName()));
+            } catch (Exception e) {
+                logWarning("Exception copying file", e);
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Shows an snackbar to alert if:
+     *      only one file has to be downloaded and is not downloaded yet
+     *      several files have to be downloaded and some of them are already downloaded
+     *
+     * @param context activity where the snackbar has to be shown
+     * @param numberOfNodesToDownload total of downloads
+     * @param numberOfNodesPending pending downloads
+     * @param numberOfNodesAlreadyDownloaded files already downloaded
+     */
+    public static void showSnackBarWhenDownloading(Context context, int numberOfNodesToDownload, int numberOfNodesPending, int numberOfNodesAlreadyDownloaded) {
+        logDebug("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
+
+        if (numberOfNodesToDownload == numberOfNodesPending && numberOfNodesToDownload == 1) {
+            showSnackbar(context, context.getString(R.string.download_began));
+        } else if (numberOfNodesAlreadyDownloaded > 0) {
+            String msg;
+            msg = context.getResources().getQuantityString(R.plurals.file_already_downloaded, numberOfNodesAlreadyDownloaded, numberOfNodesAlreadyDownloaded);
+            if (numberOfNodesPending > 0) {
+                msg = msg + context.getResources().getQuantityString(R.plurals.file_pending_download, numberOfNodesPending, numberOfNodesPending);
+            }
+            showSnackbar(context, msg);
+        }
+    }
+
+
+    /**
+     * Shows a snackbar to alert the file was already downloaded and creates the video thumbnail if needed.
+     *
+     * @param context activity where the snackbar has to be shown
+     * @param node file to download
+     * @param localPath path where the file was already downloaded
+     * @param parentPath path where the file has to be downloaded this time
+     */
+    public static void checkDownload (Context context, MegaNode node, String localPath, String parentPath, boolean checkVideo, boolean downloadToSDCard, SDCardOperator sdCardOperator){
+        if (isAlreadyDownloadedInCurrentPath(node, localPath, parentPath, downloadToSDCard, sdCardOperator)) {
+            showSnackbar(context, context.getString(R.string.general_already_downloaded));
+        } else {
+            showSnackbar(context, context.getString(R.string.copy_already_downloaded));
+        }
+
+        if (!checkVideo) return;
+
+        if (isVideoFile(parentPath + "/" + node.getName()) && node != null && !node.hasThumbnail()) {
+            MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+            try {
+                ThumbnailUtilsLollipop.createThumbnailVideo(context, localPath, megaApi, node.getHandle());
+            } catch (Exception e) {
+                logWarning("Exception creating video thumbnail", e);
+            }
+        }
     }
 }
 

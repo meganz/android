@@ -1710,249 +1710,218 @@ public class ChatController {
             }
         }
 
-        if (nodeList != null){
-            if(nodeList.size() == 1){
-                logDebug("hashes.length == 1");
-                MegaNode tempNode = nodeList.get(0);
-                if (context instanceof ChatActivityLollipop) {
-                    tempNode = authorizeNodeIfPreview(tempNode, ((ChatActivityLollipop) context).getChatRoom());
-                }
-                else if (context instanceof NodeAttachmentHistoryActivity) {
-                    tempNode = authorizeNodeIfPreview(tempNode, ((NodeAttachmentHistoryActivity) context).getChatRoom());
-                }
-                if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-                    logDebug("ISFILE");
-                    String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+        if (nodeList == null) {
+            return;
+        }
 
-                    //Check if the file is already downloaded
-                    MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
-                    if(localPath != null){
-                        logDebug("localPath != null");
-                        try {
-                            logDebug("Call to copyFile: localPath: ");
-                            copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+        long size = 0;
+        for (int i = 0; i < nodeList.size(); i++) {
+            size += nodeList.get(i).getSize();
+        }
 
-                            if(isVideoFile(parentPath+"/"+tempNode.getName())){
-                                logDebug("Is video!!!");
-                                if (tempNode != null){
-                                    if(!tempNode.hasThumbnail()){
-                                        logWarning("The video has not thumb");
-                                        createThumbnailVideo(context, localPath, megaApi, tempNode.getHandle());
-                                    }
-                                }
-                            }
-                            else{
-                                logDebug("NOT video!");
-                            }
-                        }
-                        catch(Exception e) {
-                            logError("Exception!!", e);
-                        }
-                        boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
-                        if(!autoPlayEnabled){
-                            logDebug("Auto play disabled");
-                            showSnackbar(context, context.getString(R.string.general_already_downloaded));
-                            return;
-                        }
+        ArrayList<String> serializedNodes = serializeNodes(nodeList);
+        boolean downloadToSDCard = false;
+        String downloadRoot = null;
+        SDCardOperator sdCardOperator = null;
+        if(SDCardOperator.isSDCardPath(parentPath)) {
+            DownloadChecker checker = new DownloadChecker(context, parentPath, SelectDownloadLocationDialog.From.CHAT);
+            checker.setChatController(this);
+            checker.setSize(size);
+            checker.setNodeList(nodeList);
+            checker.setSerializedNodes(serializedNodes);
+            if (checker.check()) {
+                downloadRoot = checker.getDownloadRoot();
+                downloadToSDCard = downloadRoot != null;
+                sdCardOperator = checker.getSdCardOperator();
+            } else {
+                return;
+            }
+        }
 
-                        if(isVoiceClip(nodeList.get(0).getName())) return;
+        if(nodeList.size() == 1) {
+            logDebug("hashes.length == 1");
+            MegaNode tempNode = nodeList.get(0);
+            if (context instanceof ChatActivityLollipop) {
+                tempNode = authorizeNodeIfPreview(tempNode, ((ChatActivityLollipop) context).getChatRoom());
+            } else if (context instanceof NodeAttachmentHistoryActivity) {
+                tempNode = authorizeNodeIfPreview(tempNode, ((NodeAttachmentHistoryActivity) context).getChatRoom());
+            }
+            if ((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE) {
+                logDebug("ISFILE");
+                String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
 
-                        if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
-                            logDebug("MimeTypeList ZIP");
-                            File zipFile = new File(localPath);
+                //Check if the file is already downloaded
+                MegaApplication app = MegaApplication.getInstance();
+                if (localPath != null) {
+                    checkDownload(context, tempNode, localPath, parentPath, true, downloadToSDCard, sdCardOperator);
 
-                            Intent intentZip = new Intent();
-                            intentZip.setClass(context, ZipBrowserActivityLollipop.class);
-                            intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
-                            intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, tempNode.getHandle());
-
-                            context.startActivity(intentZip);
-
-                        }
-                        else if (MimeTypeList.typeForName(tempNode.getName()).isVideoReproducible() || MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
-                            logDebug("Video/Audio file");
-                            if (context instanceof AudioVideoPlayerLollipop){
-                                ((AudioVideoPlayerLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
-                            }
-                            else {
-                                File mediaFile = new File(localPath);
-
-                                Intent mediaIntent;
-                                boolean internalIntent;
-                                boolean opusFile = false;
-                                if (MimeTypeList.typeForName(tempNode.getName()).isVideoNotSupported() || MimeTypeList.typeForName(tempNode.getName()).isAudioNotSupported()){
-                                    mediaIntent = new Intent(Intent.ACTION_VIEW);
-                                    internalIntent = false;
-                                    String[] s = tempNode.getName().split("\\.");
-                                    if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
-                                        opusFile = true;
-                                    }
-                                }
-                                else {
-                                    internalIntent = true;
-                                    mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-                                }
-                                mediaIntent.putExtra(IS_PLAYLIST, false);
-                                mediaIntent.putExtra("HANDLE", tempNode.getHandle());
-                                mediaIntent.putExtra("adapterType", FROM_CHAT);
-                                mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                                    mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                }
-                                else{
-                                    mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                }
-                                mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                if (opusFile){
-                                    mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
-                                }
-                                if (internalIntent) {
-                                    context.startActivity(mediaIntent);
-                                }
-                                else {
-                                    if (isIntentAvailable(context, mediaIntent)){
-                                        context.startActivity(mediaIntent);
-                                    }
-                                    else {
-                                        showSnackbar(context, context.getString(R.string.intent_not_available));
-                                        Intent intentShare = new Intent(Intent.ACTION_SEND);
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                                            intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                        }
-                                        else {
-                                            intentShare.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                        }
-                                        intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        if (isIntentAvailable(context, intentShare)) {
-                                            logDebug("Call to startActivity(intentShare)");
-                                            context.startActivity(intentShare);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
-                            logDebug("Pdf file");
-                            if (context instanceof PdfViewerActivityLollipop){
-                                ((PdfViewerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
-                            }
-                            else {
-                                File pdfFile = new File(localPath);
-
-                                Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-                                pdfIntent.putExtra("inside", true);
-                                pdfIntent.putExtra("HANDLE", tempNode.getHandle());
-                                pdfIntent.putExtra("adapterType", FROM_CHAT);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                                    pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                }
-                                else{
-                                    pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                }
-                                pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                context.startActivity(pdfIntent);
-                            }
-                        }
-                        else {
-                            logDebug("MimeTypeList other file");
-
-                            if(context instanceof ChatFullScreenImageViewer){
-                                ((ChatFullScreenImageViewer) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
-                            }
-                            else {
-                                try {
-                                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                    } else {
-                                        viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                    }
-                                    viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                    if (isIntentAvailable(context, viewIntent)) {
-                                        logDebug("IF isIntentAvailable");
-                                        context.startActivity(viewIntent);
-                                    } else {
-                                        logDebug("ELSE isIntentAvailable");
-                                        Intent intentShare = new Intent(Intent.ACTION_SEND);
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                            intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                        } else {
-                                            intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                        }
-                                        intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        if (isIntentAvailable(context, intentShare)) {
-                                            logDebug("Call to startActivity(intentShare)");
-                                            context.startActivity(intentShare);
-                                        }
-                                        showSnackbar(context, context.getString(R.string.general_already_downloaded));
-                                    }
-                                }
-                                catch (Exception e){
-                                    showSnackbar(context, context.getString(R.string.general_already_downloaded));
-                                }
-                            }
-
-                        }
+                    if (!Boolean.parseBoolean(dbH.getAutoPlayEnabled()) || isVoiceClip(nodeList.get(0).getName())) {
                         return;
-                    }//localPath found
-                    else{
-                        logWarning("localPath is NULL");
                     }
-                }
-            }
 
-            long size = 0;
-            for (int i = 0; i < nodeList.size(); i++) {
-                size += nodeList.get(i).getSize();
-            }
-            ArrayList<String> serializedNodes = serializeNodes(nodeList);
-            boolean downloadToSDCard = false;
-            String downloadRoot = null;
-            if(SDCardOperator.isSDCardPath(parentPath)) {
-                DownloadChecker checker = new DownloadChecker(context, parentPath, SelectDownloadLocationDialog.From.CHAT);
-                checker.setChatController(this);
-                checker.setSize(size);
-                checker.setNodeList(nodeList);
-                checker.setSerializedNodes(serializedNodes);
-                if (checker.check()) {
-                    downloadRoot = checker.getDownloadRoot();
-                    downloadToSDCard = (downloadRoot != null);
-                } else {
+                    if (MimeTypeList.typeForName(tempNode.getName()).isZip()) {
+                        logDebug("MimeTypeList ZIP");
+                        File zipFile = new File(localPath);
+
+                        Intent intentZip = new Intent();
+                        intentZip.setClass(context, ZipBrowserActivityLollipop.class);
+                        intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
+                        intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, tempNode.getHandle());
+
+                        context.startActivity(intentZip);
+
+                    } else if (MimeTypeList.typeForName(tempNode.getName()).isVideoReproducible() || MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
+                        logDebug("Video/Audio file");
+
+                        File mediaFile = new File(localPath);
+
+                        Intent mediaIntent;
+                        boolean internalIntent;
+                        boolean opusFile = false;
+                        if (MimeTypeList.typeForName(tempNode.getName()).isVideoNotSupported() || MimeTypeList.typeForName(tempNode.getName()).isAudioNotSupported()) {
+                            mediaIntent = new Intent(Intent.ACTION_VIEW);
+                            internalIntent = false;
+                            String[] s = tempNode.getName().split("\\.");
+                            if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) {
+                                opusFile = true;
+                            }
+                        } else {
+                            internalIntent = true;
+                            mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                        }
+                        mediaIntent.putExtra(IS_PLAYLIST, false);
+                        mediaIntent.putExtra("HANDLE", tempNode.getHandle());
+                        mediaIntent.putExtra("adapterType", FROM_CHAT);
+                        mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY, app.isActivityVisible());
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                            mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                        } else {
+                            mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                        }
+                        mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        if (opusFile) {
+                            mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+                        }
+                        if (internalIntent) {
+                            context.startActivity(mediaIntent);
+                        } else {
+                            if (isIntentAvailable(context, mediaIntent)) {
+                                context.startActivity(mediaIntent);
+                            } else {
+                                showSnackbar(context, context.getString(R.string.intent_not_available));
+                                Intent intentShare = new Intent(Intent.ACTION_SEND);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                    intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                } else {
+                                    intentShare.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                }
+                                intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                if (isIntentAvailable(context, intentShare)) {
+                                    logDebug("Call to startActivity(intentShare)");
+                                    context.startActivity(intentShare);
+                                }
+                            }
+                        }
+                    } else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()) {
+                        logDebug("Pdf file");
+
+                        File pdfFile = new File(localPath);
+                        Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+                        pdfIntent.putExtra("inside", true);
+                        pdfIntent.putExtra("HANDLE", tempNode.getHandle());
+                        pdfIntent.putExtra("adapterType", FROM_CHAT);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                            pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                        } else {
+                            pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                        }
+                        pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        context.startActivity(pdfIntent);
+                    } else {
+                        logDebug("MimeTypeList other file");
+                        try {
+                            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            } else {
+                                viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            if (isIntentAvailable(context, viewIntent)) {
+                                logDebug("IF isIntentAvailable");
+                                context.startActivity(viewIntent);
+                            } else {
+                                logDebug("ELSE isIntentAvailable");
+                                Intent intentShare = new Intent(Intent.ACTION_SEND);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                } else {
+                                    intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                }
+                                intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                if (isIntentAvailable(context, intentShare)) {
+                                    logDebug("Call to startActivity(intentShare)");
+                                    context.startActivity(intentShare);
+                                }
+                                showSnackbar(context, context.getString(R.string.general_already_downloaded));
+                            }
+                        } catch (Exception e) {
+                            showSnackbar(context, context.getString(R.string.general_already_downloaded));
+                        }
+                    }
                     return;
                 }
             }
+        }
 
-            for (int i=0; i<nodeList.size();i++) {
-                MegaNode nodeToDownload = nodeList.get(i);
-                if(nodeToDownload != null){
-                    logDebug("Node NOT null is going to donwload");
-                    Map<MegaNode, String> dlFiles = new HashMap<>();
-                    Map<Long, String> targets = new HashMap<>();
+        int numberOfNodesToDownload = 0;
+        int numberOfNodesAlreadyDownloaded = 0;
+        int numberOfNodesPending = 0;
 
-                    if (downloadToSDCard) {
-                        targets.put(nodeToDownload.getHandle(), parentPath);
-                        dlFiles.put(nodeToDownload, downloadRoot);
+        for (int i=0; i<nodeList.size();i++) {
+            MegaNode nodeToDownload = nodeList.get(i);
+            if(nodeToDownload != null){
+                logDebug("Node NOT null is going to donwload");
+                Map<MegaNode, String> dlFiles = new HashMap<>();
+                Map<Long, String> targets = new HashMap<>();
+
+                if (downloadToSDCard) {
+                    targets.put(nodeToDownload.getHandle(), parentPath);
+                    dlFiles.put(nodeToDownload, downloadRoot);
+                } else {
+                    dlFiles.put(nodeToDownload, parentPath);
+                }
+
+                for (MegaNode document : dlFiles.keySet()) {
+                    numberOfNodesToDownload++;
+                    String path = dlFiles.get(document);
+                    String targetPath = targets.get(document.getHandle());
+
+                    File destDir = new File(path);
+                    File destFile;
+                    destDir.mkdirs();
+                    if (destDir.isDirectory()) {
+                        destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
                     } else {
-                        dlFiles.put(nodeToDownload, parentPath);
+                        destFile = destDir;
                     }
 
-                    for (MegaNode document : dlFiles.keySet()) {
-                        String path = dlFiles.get(document);
-                        String targetPath = targets.get(document.getHandle());
-
+                    if (isFileAvailable(destFile) && document.getSize() == destFile.length()) {
+                        numberOfNodesAlreadyDownloaded++;
+                    } else {
+                        numberOfNodesPending++;
                         Intent service = new Intent(context, DownloadService.class);
                         if (context instanceof ChatActivityLollipop) {
                             nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((ChatActivityLollipop) context).getChatRoom());
-                        }
-                        else if (context instanceof NodeAttachmentHistoryActivity) {
+                        } else if (context instanceof NodeAttachmentHistoryActivity) {
                             nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((NodeAttachmentHistoryActivity) context).getChatRoom());
                         }
                         String serializeString = nodeToDownload.serialize();
 
-                        if(isVoiceClip(nodeList.get(0).getName())){
+                        if (isVoiceClip(nodeList.get(0).getName())) {
                             service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
-                            service.putExtra(EXTRA_TRANSFER_TYPE, EXTRA_VOICE_CLIP );
-                        }else if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
+                            service.putExtra(EXTRA_TRANSFER_TYPE, EXTRA_VOICE_CLIP);
+                        } else if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer) {
                             service.putExtra("fromMV", true);
                         }
                         if (downloadToSDCard) {
@@ -1966,11 +1935,14 @@ public class ChatController {
                         context.startService(service);
                     }
                 }
-                else {
-                    logWarning("Node NOT fOUND!!!!!");
-                }
             }
         }
+
+        if (numberOfNodesToDownload == 1 && isVoiceClip(nodeList.get(0).getName())) {
+            return;
+        }
+
+        showSnackBarWhenDownloading(context, numberOfNodesToDownload, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
     }
 
     public void importNode(long idMessage, long idChat) {

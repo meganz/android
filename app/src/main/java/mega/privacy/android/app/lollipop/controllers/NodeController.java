@@ -335,7 +335,47 @@ public class NodeController {
                 return;
             }
         }
-        prepareForDownloadLollipop(handleList, highPriority);
+
+        logDebug("prepareForDownload: " + handleList.size() + " files to download");
+        long size = 0;
+        long[] hashes = new long[handleList.size()];
+        for (int i = 0; i < handleList.size(); i++) {
+            hashes[i] = handleList.get(i);
+            MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
+
+            if (nodeTemp != null) {
+                if (nodeTemp.isFile()) {
+                    size += nodeTemp.getSize();
+                }
+            } else {
+                logWarning("Error - nodeTemp is NULL");
+            }
+
+        }
+        logDebug("Number of files: " + hashes.length);
+
+        if (dbH == null) {
+            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+        }
+
+        boolean askMe = askMe(context);
+        String downloadLocationDefaultPath = getDownloadLocation(context);
+
+        if (askMe) {
+            logDebug("askMe");
+            File[] fs = context.getExternalFilesDirs(null);
+            final DownloadInfo downloadInfo = new DownloadInfo(highPriority, size, hashes);
+            if (fs.length <= 1 || fs[1] == null) {
+                requestLocalFolder(downloadInfo, null, null);
+            } else {
+                showSelectDownloadLocationDialog(downloadInfo);
+            }
+        } else {
+            logDebug("NOT askMe");
+            File defaultPathF = new File(downloadLocationDefaultPath);
+            defaultPathF.mkdirs();
+            checkSizeBeforeDownload(downloadLocationDefaultPath, null, size, hashes, highPriority);
+        }
     }
 
     public void requestLocalFolder (DownloadInfo downloadInfo,String sdRoot,String prompt) {
@@ -376,50 +416,6 @@ public class NodeController {
         }
     }
 
-    //Old onFileClick
-    public void prepareForDownloadLollipop(ArrayList<Long> handleList, final boolean highPriority){
-        logDebug("prepareForDownload: " + handleList.size() + " files to download");
-        long size = 0;
-        long[] hashes = new long[handleList.size()];
-        for (int i=0;i<handleList.size();i++){
-            hashes[i] = handleList.get(i);
-            MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
-
-            if (nodeTemp != null){
-                if (nodeTemp.isFile()){
-                    size += nodeTemp.getSize();
-                }
-            }
-            else{
-                logWarning("Error - nodeTemp is NULL");
-            }
-
-        }
-        logDebug("Number of files: " + hashes.length);
-
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-        }
-
-        boolean askMe = askMe(context);
-        String downloadLocationDefaultPath = getDownloadLocation(context);
-
-        if (askMe) {
-            logDebug("askMe");
-            File[] fs = context.getExternalFilesDirs(null);
-            final DownloadInfo downloadInfo = new DownloadInfo(highPriority, size, hashes);
-            if (fs.length <= 1 || fs[1] == null) {
-                requestLocalFolder(downloadInfo, null, null);
-            } else {
-                showSelectDownloadLocationDialog(downloadInfo);
-            }
-        } else {
-            logDebug("NOT askMe");
-            File defaultPathF = new File(downloadLocationDefaultPath);
-            defaultPathF.mkdirs();
-            checkSizeBeforeDownload(downloadLocationDefaultPath, null, size, hashes, highPriority);
-        }
-    }
 
     //Old downloadTo
     public void checkSizeBeforeDownload(String parentPath, String url, long size, long [] hashes, boolean highPriority){
@@ -672,41 +668,17 @@ public class NodeController {
                     logDebug("ISFILE");
                     String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded, and downloaded file is the latest version
-                    MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
+                    MegaApplication app = MegaApplication.getInstance();
                     if (localPath != null
                             && isFileDownloadedLatest(new File(localPath), tempNode)) {
                         logDebug("localPath != null");
-                        try {
-                            final File file = new File(localPath);
-                            if (file.getParent().equals(parentPath)) {
-                                showSnackbar(context, context.getString(R.string.general_already_downloaded));
-                            } else {
-                                showSnackbar(context, context.getString(R.string.copy_already_downloaded));
-                                //copy file.
-                                new Thread(new CopyFileThread(downloadToSDCard,localPath,parentPath,tempNode.getName(),sdCardOperator)).start();
-                            }
-                            if(isVideoFile(parentPath+"/"+tempNode.getName())){
-                                logDebug("Is video!!!");
-                                if (tempNode != null){
-                                    if(!tempNode.hasThumbnail()){
-                                        logWarning("The video has not thumb");
-                                        createThumbnailVideo(context, localPath, megaApi, tempNode.getHandle());
-                                    }
-                                }
-                            }
-                            else{
-                                logDebug("NOT video!");
-                            }
-                        }
-                        catch(Exception e) {
-                            logError("Exception!!", e);
-                        }
-    
-                        boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
-                        if (!autoPlayEnabled) {
-                            logDebug("Auto play disabled");
+
+                        checkDownload(context, tempNode, localPath, parentPath, true, downloadToSDCard, sdCardOperator);
+
+                        if (!Boolean.parseBoolean(dbH.getAutoPlayEnabled())) {
                             return;
                         }
+
                         if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
                             logDebug("MimeTypeList ZIP");
                             File zipFile = new File(localPath);
@@ -892,8 +864,8 @@ public class NodeController {
                             destFile = destDir;
                         }
 
-                        if (destFile.exists()
-                                && (document.getSize() == destFile.length())
+                        if (isFileAvailable(destFile)
+                                && document.getSize() == destFile.length()
                                 && isFileDownloadedLatest(destFile, document)) {
                             numberOfNodesAlreadyDownloaded++;
                             logWarning(destFile.getAbsolutePath() + " already downloaded");
@@ -943,15 +915,8 @@ public class NodeController {
                     logWarning("Node NOT fOUND!!!!!");
                 }
             }
-            logDebug("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
-            if (numberOfNodesAlreadyDownloaded > 0) {
-                String msg;
-                msg = context.getResources().getQuantityString(R.plurals.file_already_downloaded,numberOfNodesAlreadyDownloaded,numberOfNodesAlreadyDownloaded);
-                if (numberOfNodesPending > 0) {
-                    msg = msg + context.getResources().getQuantityString(R.plurals.file_pending_download,numberOfNodesPending,numberOfNodesPending);
-                }
-                showSnackbar(context, msg);
-            }
+
+            showSnackBarWhenDownloading(context, numberOfNodesToDownload, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
         }
     }
 
@@ -1643,16 +1608,8 @@ public class NodeController {
             logDebug("is file");
             final String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
             if(localPath != null){
-                final File file = new File(localPath);
-                if (file.getParent().equals(parentPath)) {
-                    showSnackbar(context, context.getString(R.string.general_already_downloaded));
-                } else {
-                    showSnackbar(context, context.getString(R.string.copy_already_downloaded));
-                    //copy file.
-                    new Thread(new CopyFileThread(downloadToSDCard,localPath,parentPath,tempNode.getName(),sdCardOperator)).start();
-                }
-            }
-            else{
+                checkDownload(context, tempNode, localPath, parentPath, false, downloadToSDCard, sdCardOperator);
+            } else{
                 logDebug("LocalPath is NULL");
                 showSnackbar(context, context.getString(R.string.download_began));
 

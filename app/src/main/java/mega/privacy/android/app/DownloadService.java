@@ -455,6 +455,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			errorEBloqued = 0;
 			errorCount = 0;
 			alreadyDownloaded = 0;
+			Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_DOWNLOAD_FINISHED);
+			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 		}
 	}
 

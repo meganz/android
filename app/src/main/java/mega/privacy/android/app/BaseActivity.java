@@ -115,6 +115,9 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(downloadFinishedReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_DOWNLOAD_FINISHED));
+
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
             if (isExpiredBusinessAlertShown) {
@@ -161,6 +164,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(downloadFinishedReceiver);
 
         super.onDestroy();
     }
@@ -258,6 +262,16 @@ public class BaseActivity extends AppCompatActivity {
             logDebug("BROADCAST INFORM THERE ARE TAKEN DOWN FILES IMPLIED IN ACTION");
             int numberFiles = intent.getIntExtra(NUMBER_FILES, 1);
             Util.showSnackbar(baseActivity, getResources().getQuantityString(R.plurals.alert_taken_down_files, numberFiles, numberFiles));
+        }
+    };
+
+    /**
+     * Broadcast to show a snackbar when all the downloads finish
+     */
+    private BroadcastReceiver downloadFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Util.showSnackbar(baseActivity, getString(R.string.download_finish));
         }
     };
 
