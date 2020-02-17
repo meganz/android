@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -33,7 +35,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -62,6 +63,7 @@ import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
+import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -81,6 +83,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
     private static final String COLOR_START = "\'#000000\'";
     private static final String COLOR_END = "\'#7a7a7a\'";
+
+    // the designer says the snackbar should last for 4s.
+    public static final int DURATION = 4000;
+    public static final int MAX_LINES = 3;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -146,6 +152,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     Display display;
 
     private ActionMode actionMode;
+
+    private boolean isExplanationDialogShowing;
+    private AlertDialog explanationDialog;
+    private static final String KEY_DIALOG_IS_SHOWING = "dialog_is_showing";
 
     private AskForDisplayOverDialog askForDisplayOverDialog;
 
@@ -1606,6 +1616,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if (listView.getLayoutManager() != null) {
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
         }
+        outState.putBoolean(KEY_DIALOG_IS_SHOWING, isExplanationDialogShowing);
     }
 
     @Override
@@ -1621,6 +1632,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         super.onDestroy();
         if(askForDisplayOverDialog != null) {
             askForDisplayOverDialog.recycle();
+        }
+        if(explanationDialog != null) {
+            explanationDialog.cancel();
         }
     }
 
@@ -1679,6 +1693,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if (savedInstanceState != null) {
             Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
             listView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+            isExplanationDialogShowing = savedInstanceState.getBoolean(KEY_DIALOG_IS_SHOWING);
+            if(isExplanationDialogShowing) {
+                showExplanationDialog();
+            }
         }
     }
 
@@ -1781,10 +1799,27 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     logDebug("read contacts permission denied!");
                     showPermissionDeniedView();
                     grantedContactPermission = false;
+                    boolean should = PermissionUtils.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_CONTACTS);
+                    if (should) {
+                        showExplanationDialog();
+                    } else {
+                        // the system request permission dialog can no longer show.
+                        Snackbar snackbar = Snackbar.make(bannerContainer, getString(R.string.on_permanently_denied), Snackbar.LENGTH_LONG)
+                                .setAction(getString(R.string.action_settings), PermissionUtils.toAppInfo(getContext()))
+                                .setDuration(DURATION);
+                        TextView snackbarTextView = snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+                        snackbarTextView.setMaxLines(MAX_LINES);
+                        snackbar.show();
+                    }
                 }
                 break;
             }
         }
+    }
+
+    private void showExplanationDialog() {
+        isExplanationDialogShowing = true;
+        explanationDialog = showAlert(getContext(), getString(R.string.explanation_for_contacts_permission), null, dialog -> isExplanationDialogShowing = false);
     }
 
     @Override
