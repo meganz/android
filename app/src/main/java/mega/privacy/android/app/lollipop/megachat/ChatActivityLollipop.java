@@ -196,6 +196,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private final static int TITLE_TOOLBAR_PORT = 140;
     private final static int TITLE_TOOLBAR_LAND = 250;
     private final static int TITLE_TOOLBAR_IND_PORT = 100;
+    private final static int HINT_LAND = 550;
+    private final static int HINT_PORT = 250;
 
     public static int MEGA_FILE_LINK = 1;
     public static int MEGA_FOLDER_LINK = 2;
@@ -419,6 +421,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private BottomSheetDialogFragment bottomSheetDialogFragment;
 
     private MegaNode myChatFilesFolder;
+    private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
+
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -1183,12 +1187,19 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         refreshTextInput();
     }
 
-    private SpannableStringBuilder transformEmojis(String textToTransform, float sizeText){
+    private CharSequence transformEmojis(String textToTransform, float sizeText){
         CharSequence text = textToTransform == null ? "" : textToTransform;
-        String resultText = EmojiUtilsShortcodes.emojify(text.toString());
+        String resultText = converterShortCodes(text.toString());
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(resultText);
         EmojiManager.getInstance().replaceWithImages(this, spannableStringBuilder, sizeText, sizeText);
-        return spannableStringBuilder;
+        int maxWidth;
+        if(isScreenInPortrait(this)){
+            maxWidth = HINT_PORT;
+        }else{
+            maxWidth = HINT_LAND;
+        }
+        CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, textChat.getPaint(), px2dp(maxWidth, outMetrics), typeEllipsize);
+        return textF;
     }
 
     private void refreshTextInput() {
@@ -1199,6 +1210,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (chatRoom != null) {
             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
             String title;
+            setSizeInputText(true);
             if (chatRoom.hasCustomTitle()) {
                 title = getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle());
             } else {
@@ -1206,7 +1218,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
             textChat.setHint(transformEmojis(title, textChat.getTextSize()));
         }
-        setSizeInputText(true);
     }
 
     public void showChat(String textSnackbar){
@@ -3038,10 +3049,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         textChat.setMinLines(1);
         if(isEmpty){
             textChat.setMaxLines(1);
-        }else if(textChat.getMaxLines() < MAX_LINES_INPUT_TEXT && textChat.getLineCount() == textChat.getMaxLines()){
-            textChat.setMaxLines(textChat.getLineCount() + 1);
-        }else{
-            textChat.setMaxLines(MAX_LINES_INPUT_TEXT);
+        }else {
+            int maxLines;
+            if (textChat.getMaxLines() < MAX_LINES_INPUT_TEXT && textChat.getLineCount() == textChat.getMaxLines()) {
+                maxLines = textChat.getLineCount() + 1;
+            } else {
+                maxLines = MAX_LINES_INPUT_TEXT;
+            }
+            textChat.setEllipsize(null);
+            textChat.setMaxLines(maxLines);
         }
     }
     private void endCall(long chatHang){
