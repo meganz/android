@@ -254,10 +254,10 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
         switch (order) {
             case ORDER_MODIFICATION_ASC:
-                return ORDER_CREATION_ASC;
+                return ORDER_LINK_CREATION_ASC;
 
             case ORDER_MODIFICATION_DESC:
-                return ORDER_CREATION_DESC;
+                return ORDER_LINK_CREATION_DESC;
 
             default:
                 return order;

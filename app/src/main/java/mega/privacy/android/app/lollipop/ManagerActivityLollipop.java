@@ -11015,10 +11015,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		//Refresh Rubbish Fragment
 		refreshRubbishBin();
 
-		refreshSharesPageAdapter();
+		onNodesSharedUpdate();
 
-		iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
-		if (iFLol != null){
+		if (getInboxFragment() != null){
 			MegaNode inboxNode = megaApi.getInboxNode();
 			if(inboxNode!=null){
 				ArrayList<MegaNode> nodes = megaApi.getChildren(inboxNode, orderCloud);
@@ -11027,8 +11026,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		}
 
-		oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-		if (oFLol != null){
+		if (getOfflineFragment() != null){
 			oFLol.setOrder(orderCloud);
 		}
 	}
