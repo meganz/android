@@ -70,7 +70,6 @@ import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
-import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -1735,7 +1734,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				if(parentNode == null){
 					parentNode = megaApi.getRootNode();
 				}
-				showSnackbar(getString(R.string.upload_began));
+
 				for (ShareInfo info : infos) {
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -1954,7 +1953,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private void backToCloud(long handle){
 		logDebug("handle: " + handle);
 
-		Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
+		Intent startIntent = new Intent(this, ManagerActivityLollipop.class)
+				.putExtra(SHOW_MESSAGE_UPLOAD_STARTED, true);
 		if(handle!=-1){
 			startIntent.setAction(ACTION_OPEN_FOLDER);
 			startIntent.putExtra("PARENT_HANDLE", handle);
@@ -1975,7 +1975,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			file = createTemporalTextFile(this, name, data);
 		}
 		if(file!=null){
-			showSnackbar(getString(R.string.upload_began));
 			Intent intent = new Intent(this, UploadService.class);
 			intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
 			intent.putExtra(UploadService.EXTRA_NAME, file.getName());

@@ -2629,6 +2629,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						boolean locationFileInfo = getIntent().getBooleanExtra("locationFileInfo", false);
 						long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
 
+						if (getIntent().getBooleanExtra(SHOW_MESSAGE_UPLOAD_STARTED, false)) {
+							showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began), -1);
+						}
+
 						if (locationFileInfo){
 							boolean offlineAdapter = getIntent().getBooleanExtra("offline_adapter", false);
 							if (offlineAdapter){
@@ -3838,6 +3842,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
 					logDebug("Open after LauncherFileExplorerActivityLollipop ");
 					long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
+
+					if (getIntent().getBooleanExtra(SHOW_MESSAGE_UPLOAD_STARTED, false)) {
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began), -1);
+					}
+
 					actionOpenFolder(handleIntent);
 					selectDrawerItemLollipop(drawerItem);
 				}
