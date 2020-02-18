@@ -134,6 +134,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
+import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
@@ -9974,6 +9975,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void openLink (String link) {
+		// Password link
+		if (matchRegexs(link, PASSWORD_LINK_REGEXS)) {
+			dismissOpenLinkDialog();
+			Intent openLinkIntent = new Intent(this, OpenPasswordLinkActivity.class);
+			openLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openLinkIntent.setData(Uri.parse(link));
+			startActivity(openLinkIntent);
+			return;
+		}
+
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 			int error = nC.importLink(link);
 			if (openLinkError.getVisibility() == View.VISIBLE) {
@@ -10041,10 +10052,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				if (!matchRegexs(s.toString(), FILE_LINK_REGEXS) &&
-						!matchRegexs(s.toString(), FOLDER_LINK_REGEXS)) {
-					showOpenLinkError(false, 0);
-				}
+				showOpenLinkError(false, 0);
 			}
 		});
 
