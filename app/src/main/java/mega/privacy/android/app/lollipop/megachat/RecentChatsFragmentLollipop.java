@@ -788,11 +788,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                             if (megaApi.isLoggedIn() == 0) {
                                 ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);
                             } else {
-                                ChatController chatController = new ChatController(context);
-                                logDebug("Enable Chat");
-                                chatController.enableChat();
                                 getActivity().invalidateOptionsMenu();
-                                ((ManagerActivityLollipop) context).enableChat();
                             }
                         } else {
                             ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);

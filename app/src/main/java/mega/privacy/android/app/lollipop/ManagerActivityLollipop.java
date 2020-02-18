@@ -16822,43 +16822,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		this.displayedAccountType = displayedAccountType;
 	}
 
-	public void enableChat(){
-
-		((MegaApplication) getApplication()).enableChat();
-
-		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-		intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-		intent.setAction(ACTION_ENABLE_CHAT);
-		startActivity(intent);
-		finish();
-//		UserCredentials credentials = dbH.getCredentials();
-//		String gSession = credentials.getSession();
-//		int ret = megaChatApi.init(gSession);
-//		megaApi.fetchNodes(this);
-	}
-
-	public void disableChat(){
-		logDebug("disableChat");
-
-		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-		if (cFLol != null){
-			cFLol.notifyDataSetChanged();
-		}
-
-		drawerItem = DrawerItem.SETTINGS;
-		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-
-		if (megaChatApi != null){
-			megaChatApi.removeChatListener(this);
-		}
-
-		megaChatApi.logout(this);
-		app.disableMegaChatApi();
-		megaChatApi=null;
-
-		updateNavigationToolbarIcon();
-	}
-
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
 		if (item != null){

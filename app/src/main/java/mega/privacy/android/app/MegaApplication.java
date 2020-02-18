@@ -759,13 +759,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		catch (Exception e){}
 	}
 
-	public void enableChat(){
-		logDebug("enableChat");
-		if(isChatEnabled()){
-			megaChatApi = getMegaChatApi();
-		}
-	}
-
 	public MegaApiAndroid getMegaApi()
 	{
 		if(megaApi == null)
