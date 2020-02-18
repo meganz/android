@@ -62,6 +62,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.constants.SettingsConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -1885,7 +1886,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private void refreshSettingsFragment() {
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
-		intent.setAction(SettingsFragmentLollipop.ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
+		intent.setAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 }
