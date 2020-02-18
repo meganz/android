@@ -677,7 +677,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Afficher les appareils avancés (SD externe)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Ajouter un numéro de téléphone</string>
 	<string name="verify_account_title" context="enter verification code page title">Confirmer votre compte</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Votre compte a temporairement été désactivé en raison d\'un abus potentiel. Veuillez confirmer votre numéro de téléphone pour déverrouiller votre compte.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Votre compte a temporairement été verrouillé en raison d\'un abus potentiel. Veuillez confirmer votre numéro de téléphone pour déverrouiller votre compte.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Pays</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Votre numéro de téléphone</string>
     <string name="general_back_button" context="Button label - go to previous page">Retour</string>
@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Un assaillant externe ne peut pas accéder à votre compte avec seulement votre clé. Une réinitialisation du mot de passe exige à la fois la clé et l\'accès à votre compte de courriel.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copier la clé de récupération dans le presse-papiers ou l\'enregistrer comme fichier texte.</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">Enregistrer</string>
+    <string name="save_action" context="Action of a button to save something">Enregistrer</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">La clé de récupération a été copiée avec succès</string>
 
     <string name="change_pass" context="Button to change the password">Changer</string>
@@ -936,7 +936,7 @@
     <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">Réinitialisation du mot de passe</string>
     <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Veuillez saisir votre clé de récupération ci-dessous</string>
 
-    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Mot de passe changé !</string>
+    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Le mot de passe a été changé</string>
 
     <string name="park_account_dialog_title" context="Title of the dialog to park an account">Remiser le compte</string>
     <string name="park_account_button" context="Button to park an account">Remiser</string>
@@ -1274,7 +1274,7 @@
 
     <string name="messages_copied_clipboard" context="success alert when the user copy some messages to the clipboard">A été copié dans le presse-papiers</string>
 
-    <string name="chat_error_open_title" context="Title of the error dialog when opening a chat">Erreur de dialogue en ligne !</string>
+    <string name="chat_error_open_title" context="Title of the error dialog when opening a chat">Erreur de dialogue en ligne</string>
     <string name="chat_error_open_message" context="Message of the error dialog when opening a chat">Il n\'a pas été possible d\'ouvrir la conversation avec succès</string>
 
     <string name="menu_choose_contact" context="Menu option to add a contact to your contact list.">Choisir un contact</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">Choisissez des contacts de la liste de contacts de votre téléphone ou saisissez plusieurs adresses courriel.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">Inviter des amis à MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">Merci ! L\'invitation a été envoyée par courriel</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">L\'invitation a été envoyée</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Encouragez vos amis à s\'inscrire et à installer une appli MEGA. Tant que votre ami utilisera la même adresse courriel que celle que vous avez saisie, vous recevrez votre récompense en quota de transfert.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">L\'adresse courriel est mal formée</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">Bon</string>
     <string name="pass_strong" context="Password strong">Robuste</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Appel en cours</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Appel en cours</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Cliquer pour retourner vers l\'appel</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Retourner vers l\'appel</string>
 
@@ -1994,13 +1994,13 @@
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">La prochaine fois que vous vous connecterez à votre compte, un code à 6 chiffres fourni par votre appli d\'authentification vous sera demandé.</string>
     <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Sauvegarder votre clé de récupération</b></string>
     <string name="pin_error_2fa" context="Error shown when it is scanning a QR code and it is invalid">Le code est invalide</string>
-    <string name="lost_your_authenticator_device" context="Title of screen Lost authenticator decive">Appareil d\'authentification perdu ?</string>
+    <string name="lost_your_authenticator_device" context="Title of screen Lost authenticator decive">Avez-vous perdu votre appareil d\'authentification ?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Vérification de la connexion</string>
     <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">Authentification à deux facteurs\nChanger le mot de passe</string>
     <string name="cancel_account_verification" context="Title of screen Cancel account verification with Two-Factor Authentication">Authentification à deux facteurs\nAnnuler le compte</string>
     <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">Authentification à deux facteurs\nChanger l\'adresse courriel</string>
     <string name="disable_2fa_verification" context="Title of screen Disable Two-Factor Authentication">Désactiver l\'authentification à deux facteurs</string>
-    <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">Appareil d\'authentification perdu ?</string>
+    <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">Avez-vous perdu votre appareil d\'authentification ?</string>
     <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">Une erreur est survenue en tentant de désactiver l\'authentification à deux facteurs. Veuillez ressayer.</string>
     <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">Une erreur est survenue en tentant d\'activer l\'authentification à deux facteurs. Veuillez ressayer.</string>
     <string name="title_enable_2fa" context="Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication">Activer l\'authentification à deux facteurs</string>
@@ -2074,7 +2074,7 @@
     <string name="success_archive_chat" context="Message shown when a chat is successfully archived, it shows the name of the chat">%s conversation a été archivée</string>
     <string name="error_archive_chat" context="Error message shown when a chat has not be archived, it shows the name of the chat">Erreur. %s conversation n\'a pas été archivée</string>
 
-    <string name="success_unarchive_chat" context="Message shown when a chat is successfully unarchived, it shows the name of the chat">%s conversation a été désarchivée</string>
+    <string name="success_unarchive_chat" context="Message shown when a chat is successfully unarchived, it shows the name of the chat">La conversation %s a été désarchivée</string>
     <string name="error_unarchive_chat" context="Error message shown when a chat has not be unarchived, it shows the name of the chat">Erreur. Il a été impossible de désarchiver %s conversation</string>
 
     <string name="archived_chats_empty" context="Message shown when the user has no archived chats">[A]Aucune[/A] [B]conversation n\'est archivée[/B]</string>
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]La demande de contact de [/B][A]%s [/A][B]a été refusée[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Votre compte actuel est [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Sous réserve de votre participation à notre programme d\'objectifs</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Sous réserve de votre participation à notre programme d\'objectifs.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Sélectionner un mode de paiement</string>
 
     <string name="billing_period_title" context="title of billing period">Cycle de facturation</string>

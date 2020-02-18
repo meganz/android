@@ -677,7 +677,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">アドバンス・デバイス（外部SD）表示</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">電話番号を追加</string>
 	<string name="verify_account_title" context="enter verification code page title">アカウントを検証する</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">不正使用の可能性があるため、あなたのアカウントは一時的に凍結されています。アカウントのロックを解除するには、電話番号を検証してください。</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">不正使用の可能性があるため、あなたのアカウントは一時的にロックされています。アカウントのロックを解除するには、電話番号を検証してください。</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">国</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">あなたの電話番号</string>
     <string name="general_back_button" context="Button label - go to previous page">戻る</string>
@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">外部攻撃者があなたの鍵を手に入れてもあなたのアカウントにはアクセスできません。パスワードをリセットするには親鍵とあなたのメールへのアクセスとの両方が必要です。</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">回復キーをクリップボードにコピーするかテキストファイルとして保存します</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">保存</string>
+    <string name="save_action" context="Action of a button to save something">保存</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">回復キーは正常にコピーされました</string>
 
     <string name="change_pass" context="Button to change the password">変更する</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">あなたの電話の連絡先リストから連絡先を選択するか、複数のメールアドレスを入力します。</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">友人をMEGAに招待</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">ありがとうございます！　招待状がメールで送信されました</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">招待状が送信されました</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">ご友人に、登録してMEGAアプリをインストールするようにお勧めください。ご友人があなたがご入力されたものと同じメールアドレスをご使用の場合、あなたに転送容量報酬を贈呈いたします。</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">メールが不正です</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">良好</string>
     <string name="pass_strong" context="Password strong">強い</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">通話中</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">通話中</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">通話に戻るにはクリックしてください</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">通話に戻る</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B][A]%s [/A]さんからのコンタクト要求[/B]は[B]拒否されました[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">あなたの現在のアカウントは[A]%s[/A]です</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* 当社の達成プログラムにご参加いただくことを条件とします</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">当社の達成プログラムにご参加いただくことを条件とします。</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">支払い方法選択</string>
 
     <string name="billing_period_title" context="title of billing period">お支払い請求期間</string>

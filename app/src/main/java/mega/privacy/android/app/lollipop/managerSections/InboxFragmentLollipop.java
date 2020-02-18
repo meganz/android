@@ -127,6 +127,10 @@ public class InboxFragmentLollipop extends RotatableFragment{
 		adapter.toggleSelection(position);
 	}
 
+	@Override
+	public void reselectUnHandledSingleItem(int position) {
+	}
+
 	public void updateScrollPosition(int position) {
 		logDebug("Position: " + position);
 		if (adapter != null) {

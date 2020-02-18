@@ -677,7 +677,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Toon geavanceerde apparaten (externe SD)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Telefoonnummer toevoegen</string>
 	<string name="verify_account_title" context="enter verification code page title">Uw account verifiëren</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Uw account is tijdelijk opgeschort vanwege mogelijk misbruik. Verifieer uw telefoonnummer om uw account te ontgrendelen.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Uw account is tijdelijk geblokkeerd door potentieel misbruik. Verifieer uw telefoonnummer om uw account te ontgrendelen.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Land</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Uw telefoonnummer</string>
     <string name="general_back_button" context="Button label - go to previous page">Terug</string>
@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Een externe aanvaller kan geen toegang krijgen tot uw account met alleen de master sleutel. Om het wachtwoord te wijzigen is toegang tot de master sleutel én uw e-mail vereist.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Kopieer de Herstelsleutel naar het klembord om het op te slaan als tekstbestand</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">Opslaan</string>
+    <string name="save_action" context="Action of a button to save something">Opslaan</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">De Herstelsleutel was succesvol gekopieerd</string>
 
     <string name="change_pass" context="Button to change the password">Wijzig</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">Selecteer contacten vanuit de contactlijst op uw telefoon of voer meerdere email-adressen in.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">Nodig vrienden uit bij MEGa</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">Bedankt! Uitnodiging was verzonden per email</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">Verzend Uitnodiging</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Moedig uw vrienden aan tot het registreren en installeren van een MEGA app. Zolang als uw vriend dezelfde e-mailadres gebruikt als degene die u heeft ingevoerd, ontvangt u uw overdracht tegoed.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">Email is misvormed</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">Goed</string>
     <string name="pass_strong" context="Password strong">Sterk</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Gesprek in behandeling</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Gesprek in behandeling</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Klik om terug te gaan naar het gesprek</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Teruggaan naar het gesprek</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Contact verzoek van [/B][A]%s [/A][B]was afgewezen[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Uw huidige account is [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">*Onderwerp naar uw participatie in ons beloningsprogramma</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Afhankelijk aan uw participatie in ons beloningsprogramma.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Selecteer betalingsmethode</string>
 
     <string name="billing_period_title" context="title of billing period">Betaal periode</string>

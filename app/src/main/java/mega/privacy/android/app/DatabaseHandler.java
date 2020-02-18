@@ -3572,6 +3572,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void clearCredentials(){
+	    logWarning("Clear local credentials!");
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);
         onCreate(db);
 	}
@@ -3601,10 +3602,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             lastPublicHandle = attributes.getLastPublicHandle();
             lastPublicHandleTimeStamp = attributes.getLastPublicHandleTimeStamp();
             lastPublicHandleType = attributes.getLastPublicHandleType();
-        }
-        catch(Exception e){
-            lastPublicHandle = MegaApiJava.INVALID_HANDLE;
-        }
+		} catch (Exception e) {
+			logWarning("EXCEPTION getting last public handle info.", e);
+			lastPublicHandle = MegaApiJava.INVALID_HANDLE;
+		}
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
 		onCreate(db);
 		if (lastPublicHandle != MegaApiJava.INVALID_HANDLE) {
@@ -3612,8 +3613,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		        setLastPublicHandle(lastPublicHandle);
 		        setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp);
 				setLastPublicHandleType(lastPublicHandleType);
-            }
-            catch (Exception e){}
+			} catch (Exception e) {
+				logWarning("EXCEPTION saving last public handle info.", e);
+			}
         }
 	}
 
