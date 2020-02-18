@@ -1886,7 +1886,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">Îți mai aduci aminte parola?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">Ești pe cale să te deconectezi, te rugăm să îți testezi parola pentru a te asigura că ți-o aduci aminte.\nDacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Te rugăm să îți testezi parola mai jos pentru a te asigura că ți-o aduci aminte. Dacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
-    <string name="remember_pwd_dialog_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">Nu-mi afișa din nou</string>
+    <string name="general_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">Nu-mi afișa din nou</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Testează parola</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Testează-ți parola</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Parolă acceptată</string>

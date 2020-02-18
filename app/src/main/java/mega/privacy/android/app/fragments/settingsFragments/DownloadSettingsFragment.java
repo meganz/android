@@ -55,8 +55,8 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
         }
 
         if (prefs.getStorageAskAlways() == null) {
-            askMe = false;
-            dbH.setStorageAskAlways(false);
+            askMe = true;
+            dbH.setStorageAskAlways(true);
         } else {
             askMe = Boolean.parseBoolean(prefs.getStorageAskAlways());
         }
@@ -103,7 +103,6 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
 
     private void setDownloadLocation() {
         if (downloadLocation != null) {
-            downloadLocation.setEnabled(!askMe);
             downloadLocation.setSummary(prefs.getStorageDownloadLocation());
         }
     }

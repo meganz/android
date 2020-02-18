@@ -1376,7 +1376,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.setFirstTime(false);
 //		dbH.setCamSyncEnabled(false);
-		dbH.setStorageAskAlways(false);
+		dbH.setStorageAskAlways(true);
 		File defaultDownloadLocation = buildDefaultDownloadDir(context);
 		defaultDownloadLocation.mkdirs();
 		

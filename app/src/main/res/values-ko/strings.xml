@@ -1886,7 +1886,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">비밀번호가 기억났나요?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">당신이 비밀번호를 기억하는지 확실하게 하기 위해 비밀번호를 시험해보세요. 만약 비밀번호를 잊으면, 당신의 MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
-    <string name="remember_pwd_dialog_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">다시 보여주지 마세요</string>
+    <string name="general_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">다시 보여주지 마세요</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">비밀번호 시험</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">비밀번호를 시험하세요</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">비밀번호 확인됨</string>

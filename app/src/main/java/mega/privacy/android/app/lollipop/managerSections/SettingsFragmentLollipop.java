@@ -379,7 +379,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 		if (prefs == null){
 			logWarning("pref is NULL");
-			dbH.setStorageAskAlways(false);
+			dbH.setStorageAskAlways(true);
 
 			File defaultDownloadLocation = buildDefaultDownloadDir(context);
 			defaultDownloadLocation.mkdirs();
