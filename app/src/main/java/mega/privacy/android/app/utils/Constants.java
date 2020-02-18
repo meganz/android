@@ -458,6 +458,8 @@ public class Constants {
     public static final String[] FOLDER_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#F!.+$",
             "^https://mega\\.nz/.*#F!.+$",
+            "^https://mega\\.co\\.nz/.*#P!.+$",
+            "^https://mega\\.nz/.*#P!.+$",
             "^https://mega\\.co\\.nz/folder/.+$",
             "^https://mega\\.nz/folder/.+$"
     };

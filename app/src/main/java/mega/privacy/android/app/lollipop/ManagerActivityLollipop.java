@@ -10041,7 +10041,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				showOpenLinkError(false, 0);
+				if (!matchRegexs(s.toString(), FILE_LINK_REGEXS) &&
+						!matchRegexs(s.toString(), FOLDER_LINK_REGEXS)) {
+					showOpenLinkError(false, 0);
+				}
 			}
 		});
 
