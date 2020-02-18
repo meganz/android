@@ -12,8 +12,6 @@ package org.webrtc;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Matrix;
-import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -30,6 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.webrtc.CameraEnumerationAndroid.CaptureFormat;
+
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 @TargetApi(21)
 class Camera2Session implements CameraSession {
@@ -196,7 +196,6 @@ class Camera2Session implements CameraSession {
               (int) TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - constructionTimeNs);
           camera2StartTimeMsHistogram.addSample(startTimeMs);
         }
-
         // Undo the mirror that the OS "helps" us with.
         // http://developer.android.com/reference/android/hardware/Camera.html#setDisplayOrientation(int)
         // Also, undo camera orientation, we report it as rotation instead.

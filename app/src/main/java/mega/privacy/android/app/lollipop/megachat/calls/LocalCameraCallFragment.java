@@ -20,7 +20,6 @@ import nz.mega.sdk.MegaChatVideoListenerInterface;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 
-
 public class LocalCameraCallFragment extends Fragment implements MegaChatVideoListenerInterface {
 
     private SurfaceView localSurfaceView = null;
@@ -95,7 +94,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
                         holderHeight = viewHeight;
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
-                    this.bitmap = localRenderer.CreateBitmap(width, height);
+                    this.bitmap = localRenderer.createBitmap(width, height);
                     holder.setFixedSize(holderWidth, holderHeight);
                 } else {
                     this.width = -1;
@@ -106,9 +105,11 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         }
 
         if (bitmap == null) return;
-        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-        localRenderer.DrawBitmap(true, true);
 
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+        if(MegaApplication.isAllowedToShowVideo()) {
+            localRenderer.drawBitmap(true, true);
+        }
     }
 
     @Override

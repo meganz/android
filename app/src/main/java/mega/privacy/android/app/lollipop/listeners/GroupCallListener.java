@@ -6,6 +6,7 @@ import android.view.TextureView;
 
 import java.nio.ByteBuffer;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
@@ -47,15 +48,8 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
             int viewWidth = myTexture.getWidth();
             int viewHeight = myTexture.getHeight();
 
-            if ((viewWidth != 0) && (viewHeight != 0)) {
-                int holderWidth = viewWidth < width ? viewWidth : width;
-                int holderHeight = holderWidth * viewHeight / viewWidth;
-                if (holderHeight > viewHeight) {
-
-                    holderHeight = viewHeight;
-                    holderWidth = holderHeight * viewWidth / viewHeight;
-                }
-                this.bitmap = localRenderer.CreateBitmap(width, height);
+            if (viewWidth != 0 && viewHeight != 0) {
+                this.bitmap = localRenderer.createBitmap(width, height);
             }else{
                 this.width = -1;
                 this.height = -1;
@@ -63,11 +57,15 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
 
         }
 
-        if (bitmap != null) {
-            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-            // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
-            // The renderer has been modified a bit and an update of WebRTC could break our app
-            localRenderer.DrawBitmap(false, isLocal);
+        if (bitmap == null) return;
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+        // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
+        // The renderer has been modified a bit and an update of WebRTC could break our app
+
+        if(isLocal && MegaApplication.isAllowedToShowVideo()){
+            localRenderer.drawBitmap(isLocal);
+        }else if(!isLocal){
+            localRenderer.drawBitmap(isLocal);
         }
     }
 

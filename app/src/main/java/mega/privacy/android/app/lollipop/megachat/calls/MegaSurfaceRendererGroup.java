@@ -25,6 +25,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.MegaApplication;
+
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 // The following four imports are needed saveBitmapToJPEG which
@@ -90,7 +92,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         }
     }
 
-    public Bitmap CreateBitmap(int width, int height) {
+    public Bitmap createBitmap(int width, int height) {
         logDebug("width = " + width + ", height = " + height);
         Logging.d(TAG, "CreateByteBitmap " + width + ":" + height);
         if (bitmap == null) {
@@ -128,25 +130,16 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         return bitmap;
     }
 
-    public void DrawBitmap(boolean flag, boolean isLocal) {
+    public void drawBitmap(boolean isLocal) {
         if (bitmap == null || myTexture == null) return;
 
         Canvas canvas = myTexture.lockCanvas();
         if (canvas == null) return;
-        if (isLocal) {
+        if (isLocal && MegaApplication.isFrontCamera()) {
             canvas.scale(-1, 1);
             canvas.translate(-canvas.getWidth(), 0);
         }
-
-        if (flag) {
-            paint.reset();
-            paint.setXfermode(modesrcover);
-            canvas.drawRoundRect(dstRectf, 20, 20, paint);
-            paint.setXfermode(modesrcin);
-            canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
-        } else {
-            canvas.drawBitmap(bitmap, srcRect, dstRect, null);
-        }
+        canvas.drawBitmap(bitmap, srcRect, dstRect, null);
         myTexture.unlockCanvasAndPost(canvas);
 
     }

@@ -151,6 +151,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     private static boolean isBlockedDueToWeakAccount = false;
     private static boolean isWebOpenDueToEmailVerification = false;
 
+	private static boolean allowToShowVideo = true;
+	private static boolean frontCamera = true;
+
 	MegaChatApiAndroid megaChatApi = null;
 
 	private NetworkStateReceiver networkStateReceiver;
@@ -1898,5 +1901,17 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public static boolean isWebOpenDueToEmailVerification() {
 		return isWebOpenDueToEmailVerification;
+	}
+
+	public static boolean isAllowedToShowVideo() {
+		return allowToShowVideo;
+	}
+	public static boolean isFrontCamera() {
+		return frontCamera;
+	}
+
+	public static void setIsAllowedToShowVideo(boolean allowToShowVideo, boolean isFrontCamera) {
+		MegaApplication.allowToShowVideo = allowToShowVideo;
+		MegaApplication.frontCamera =  isFrontCamera;
 	}
 }

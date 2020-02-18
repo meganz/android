@@ -8,11 +8,11 @@ import org.webrtc.CapturerObserver;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaChatApiAndroid;
-
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class VideoCaptureUtils {
+public class VideoCaptureUtils{
 
     static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator, String deviceName) {
         logDebug("createCameraCapturer: " + deviceName);
@@ -25,7 +25,7 @@ public class VideoCaptureUtils {
         return enumerator.getDeviceNames();
     }
 
-    public static void swapCamera(MegaChatApiAndroid megaChatApi){
+    public static void swapCamera(MegaChatApiAndroid megaChatApi, Context context){
         String currentCamera = megaChatApi.getVideoDeviceSelected();
         String newCamera;
         if(isFrontCamera(currentCamera)){
@@ -34,7 +34,8 @@ public class VideoCaptureUtils {
             newCamera = VideoCaptureUtils.getFrontCamera();
         }
         if (newCamera != null) {
-            megaChatApi.setChatVideoInDevice(newCamera, null);
+            MegaApplication.setIsAllowedToShowVideo(false, isFrontCamera(newCamera));
+            megaChatApi.setChatVideoInDevice(newCamera, ((ChatCallActivity)context));
         }
     }
 
@@ -124,4 +125,5 @@ public class VideoCaptureUtils {
         videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
         logDebug("Start Capture");
     }
+
 }

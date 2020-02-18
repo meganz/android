@@ -91,7 +91,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
-
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
 
     final private static int REMOTE_VIDEO_NOT_INIT = -1;
@@ -231,11 +230,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private boolean isNecessaryToShowSwapCameraOption(){
         if(callChat == null) return false;
-
         int callStatus = callChat.getStatus();
-        if(callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || callStatus < MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM || (callStatus > MegaChatCall.CALL_STATUS_IN_PROGRESS && callStatus != MegaChatCall.CALL_STATUS_RECONNECTING))
-            return false;
-
+        if(callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || callStatus < MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM || (callStatus > MegaChatCall.CALL_STATUS_IN_PROGRESS && callStatus != MegaChatCall.CALL_STATUS_RECONNECTING)) return false;
         return true;
     }
 
@@ -250,7 +246,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 break;
             }
             case R.id.cab_menu_camera_swap:{
-                swapCamera(megaChatApi);
+                swapCamera(megaChatApi, this);
                 break;
             }
         }
@@ -1039,7 +1035,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         logDebug("Type: " + request.getType());
 
-        if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
+        if (request.getType() == MegaChatRequest.TYPE_CHANGE_VIDEO_STREAM && e.getErrorCode() == MegaError.API_OK) {
+            MegaApplication.setIsAllowedToShowVideo(true, isFrontCamera(request.getText()));
+
+        }else if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
             logDebug("TYPE_HANG_CHAT_CALL");
             if (mSensorManager != null) {
                 mSensorManager.unregisterListener(this);
@@ -1101,6 +1100,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             switch (callStatus) {
                 case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM: {
                     updateLocalAV();
+                    invalidateOptionsMenu();
                     break;
                 }
                 case MegaChatCall.CALL_STATUS_JOINING:

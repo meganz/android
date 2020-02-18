@@ -11,11 +11,8 @@
 package org.webrtc;
 
 import android.content.Context;
-import android.graphics.Matrix;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
-import android.view.Surface;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -263,15 +260,10 @@ class Camera1Session implements CameraSession {
         camera1StartTimeMsHistogram.addSample(startTimeMs);
         firstFrameReported = true;
       }
-
       // Undo the mirror that the OS "helps" us with.
       // http://developer.android.com/reference/android/hardware/Camera.html#setDisplayOrientation(int)
       final VideoFrame modifiedFrame = new VideoFrame(
-          CameraSession.createTextureBufferWithModifiedTransformMatrix(
-              (TextureBufferImpl) frame.getBuffer(),
-              /* mirror= */ info.facing == android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT,
-              /* rotation= */ 0),
-          /* rotation= */ getFrameOrientation(), frame.getTimestampNs());
+          CameraSession.createTextureBufferWithModifiedTransformMatrix((TextureBufferImpl) frame.getBuffer(), info.facing == android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT, 0), getFrameOrientation(), frame.getTimestampNs());
       events.onFrameCaptured(Camera1Session.this, modifiedFrame);
       modifiedFrame.release();
     });
