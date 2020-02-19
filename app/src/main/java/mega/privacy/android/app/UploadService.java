@@ -45,6 +45,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -315,7 +316,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         stopSelf();
 		logDebug("After stopSelf");
 
-        if (isPermissionGranted(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 			deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
         }
 
