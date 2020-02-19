@@ -24,12 +24,12 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Range;
 import android.view.Surface;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.webrtc.CameraEnumerationAndroid.CaptureFormat;
 
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import org.webrtc.CameraEnumerationAndroid.CaptureFormat;
 
 @TargetApi(21)
 class Camera2Session implements CameraSession {
@@ -196,6 +196,7 @@ class Camera2Session implements CameraSession {
               (int) TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - constructionTimeNs);
           camera2StartTimeMsHistogram.addSample(startTimeMs);
         }
+
         // Undo the mirror that the OS "helps" us with.
         // http://developer.android.com/reference/android/hardware/Camera.html#setDisplayOrientation(int)
         // Also, undo camera orientation, we report it as rotation instead.

@@ -23,10 +23,13 @@ import android.graphics.RectF;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+
 import org.webrtc.Logging;
+
 import java.nio.ByteBuffer;
-import mega.privacy.android.app.MegaApplication;
+
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
 public class MegaSurfaceRenderer implements Callback {
 
@@ -172,15 +175,20 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
 
-    public void drawBitmap(boolean isOutgoingCall, boolean isLocal) {
+    /**
+     * Draw video frames.
+     * @param inProgressCall Indicates if the call is in progress.
+     * @param isLocal Indicates if the frames are from the local camera.
+     */
+    public void drawBitmap(boolean inProgressCall, boolean isLocal) {
         if (bitmap == null || surfaceHolder == null) return;
         Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas == null) return;
-        if (isLocal && MegaApplication.isFrontCamera()) {
+        if (isLocal && isFrontCameraInUse()) {
             canvas.scale(-1, 1);
             canvas.translate(-canvas.getWidth(), 0);
         }
-        if (isOutgoingCall) {
+        if (inProgressCall) {
             paint.reset();
             paint.setXfermode(modesrcover);
             canvas.drawRoundRect(dstRectf, 20, 20, paint);

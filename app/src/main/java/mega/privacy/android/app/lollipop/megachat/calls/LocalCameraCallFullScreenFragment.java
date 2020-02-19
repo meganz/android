@@ -10,14 +10,18 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+
 import java.nio.ByteBuffer;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
+
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
 public class LocalCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface {
 
@@ -26,9 +30,9 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     private int height = 0;
     private Bitmap bitmap;
     private MegaChatApiAndroid megaChatApi;
+    private Context context;
     private long chatId;
     private MegaSurfaceRenderer localRenderer;
-    private Context context;
 
     public static LocalCameraCallFullScreenFragment newInstance(long chatId) {
         logDebug("Chat id: " + chatId);
@@ -96,10 +100,11 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         }
         if (bitmap == null) return;
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-        if(MegaApplication.isAllowedToShowVideo()) {
+        if (isVideoAllowed()) {
             localRenderer.drawBitmap(false, true);
         }
     }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

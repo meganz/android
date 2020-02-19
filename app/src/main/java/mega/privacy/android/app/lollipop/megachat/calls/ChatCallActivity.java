@@ -2,16 +2,11 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.hardware.SensorEventListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -50,7 +45,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -60,6 +54,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
@@ -240,7 +235,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 break;
             }
             case R.id.cab_menu_camera_swap:{
-                swapCamera(megaChatApi, this);
+                swapCamera(new ChatChangeVideoStreamListener(getApplicationContext()));
                 break;
             }
         }
@@ -1012,10 +1007,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         logDebug("Type: " + request.getType());
 
-        if (request.getType() == MegaChatRequest.TYPE_CHANGE_VIDEO_STREAM && e.getErrorCode() == MegaError.API_OK) {
-            MegaApplication.setIsAllowedToShowVideo(true, isFrontCamera(request.getText()));
-
-        }else if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
+        if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
             logDebug("TYPE_HANG_CHAT_CALL");
             if (getCall() == null) return;
             application.setSpeakerStatus(callChat.getChatid(), false);

@@ -25,9 +25,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
-
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
 // The following four imports are needed saveBitmapToJPEG which
 // is for debug only
@@ -135,7 +134,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
         Canvas canvas = myTexture.lockCanvas();
         if (canvas == null) return;
-        if (isLocal && MegaApplication.isFrontCamera()) {
+        if (isLocal && isFrontCameraInUse()) {
             canvas.scale(-1, 1);
             canvas.translate(-canvas.getWidth(), 0);
         }

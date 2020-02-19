@@ -6,12 +6,12 @@ import android.view.TextureView;
 
 import java.nio.ByteBuffer;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
 public class GroupCallListener implements MegaChatVideoListenerInterface {
 
@@ -59,12 +59,10 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
 
         if (bitmap == null) return;
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+
         // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
         // The renderer has been modified a bit and an update of WebRTC could break our app
-
-        if(isLocal && MegaApplication.isAllowedToShowVideo()){
-            localRenderer.drawBitmap(isLocal);
-        }else if(!isLocal){
+        if (!isLocal || isVideoAllowed()) {
             localRenderer.drawBitmap(isLocal);
         }
     }
