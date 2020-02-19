@@ -385,9 +385,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             setCustomisedActionBar();
         } else {
             logDebug("Chat DISABLED");
-            if (isOnline(context)) {
-                showDisableChatScreen();
-            } else {
+            if (!isOnline(context)) {
                 showNoConnectionScreen();
             }
             resetActionBar(aB);
@@ -582,16 +580,13 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     showConnectingChatScreen();
                 }
             } else {
-                if (isOnline(context)) {
-                    showDisableChatScreen();
-                } else {
+                if (!isOnline(context)) {
                     showNoConnectionScreen();
                 }
                 resetActionBar(aB);
             }
         }
     }
-
 
     private void sortChats(ArrayList<MegaChatListItem> chatsToSort) {
         Collections.sort(chatsToSort, new Comparator<MegaChatListItem>() {
@@ -660,49 +655,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         return result;
     }
 
-    public void showDisableChatScreen() {
-        logDebug("showDisableChatScreen");
-
-        listView.setVisibility(View.GONE);
-        if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).hideFabButton();
-        }
-
-        String textToShow = String.format(context.getString(R.string.recent_chat_empty_enable_chat));
-
-        try {
-            textToShow = textToShow.replace("[A]", "<br />");
-            textToShow = textToShow.replace("[B]", "<font color=" + COLOR_START + ">");
-            textToShow = textToShow.replace("[/B]", "</font>");
-            textToShow = textToShow.replace("[C]", "<font color=" + COLOR_END + ">");
-            textToShow = textToShow.replace("[/C]", "</font>");
-
-        } catch (Exception e) {
-        }
-        Spanned result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-
-        }
-        emptyTextViewInvite.setText(result);
-        emptyTextViewInvite.setVisibility(View.VISIBLE);
-
-        inviteButton.setText(getString(R.string.recent_chat_enable_chat_button));
-        inviteButton.setVisibility(View.VISIBLE);
-
-        emptyTextView.setText(R.string.recent_chat_enable_chat);
-        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            adjustLandscape();
-            emptyTextView.setVisibility(View.GONE);
-        } else {
-            addMarginTop();
-            emptyTextView.setVisibility(View.VISIBLE);
-        }
-        emptyLayout.setVisibility(View.VISIBLE);
-    }
-
     private void addMarginTop() {
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         layoutParams.setMargins(0, scaleHeightPx(60, outMetrics), 0, 0);
@@ -751,14 +703,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         emptyTextViewInvite.setText(getString(R.string.error_server_connection_problem));
         emptyTextViewInvite.setVisibility(View.VISIBLE);
         inviteButton.setVisibility(View.GONE);
-
-        emptyTextView.setText(R.string.recent_chat_empty_no_connection_text);
-        if (isChatEnabled()) {
-            emptyTextView.setVisibility(View.GONE);
-        } else {
-            emptyTextView.setVisibility(View.VISIBLE);
-        }
-
         emptyLayout.setVisibility(View.VISIBLE);
     }
 
