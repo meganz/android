@@ -391,7 +391,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			dbH.setSecondaryUploadEnabled(false);
 			dbH.setPinLockEnabled(false);
 			dbH.setPinLockCode("");
-			dbH.setStorageAdvancedDevices(false);
 			cameraUpload = false;
 			charging = true;
 			fileNames = false;

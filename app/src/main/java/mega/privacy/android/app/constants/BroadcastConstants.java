@@ -1,4 +1,4 @@
-package mega.privacy.android.app.utils;
+package mega.privacy.android.app.constants;
 
 public class BroadcastConstants {
 

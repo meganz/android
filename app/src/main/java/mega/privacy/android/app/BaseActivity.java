@@ -39,7 +39,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
-import static mega.privacy.android.app.utils.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;

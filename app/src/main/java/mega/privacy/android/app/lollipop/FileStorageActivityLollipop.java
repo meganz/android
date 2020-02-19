@@ -700,7 +700,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                     dbH.setLastUploadFolder(path.getAbsolutePath());
                 }
 				if (mode == Mode.PICK_FOLDER) {
-					if (prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways())) {
+					if ((prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways()))
+							&& dbH.getAskSetDownloadLocation()) {
 						showConfirmationSaveInSameLocation();
 					} else {
 						finishPickFolder();
@@ -786,27 +787,20 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		checkBoxLayout.setOnClickListener(v1 -> {
 			checkBox.setChecked(!checkBox.isChecked());
 
-			if (checkBox.isChecked()) {
-				confirmationChecked = true;
+			confirmationChecked = checkBox.isChecked();
+			confirmationButton.setEnabled(!confirmationChecked);
+
+			if (confirmationChecked) {
 				confirmationButton.setAlpha(0.5f);
-				confirmationButton.setEnabled(false);
 			} else {
-				confirmationChecked = false;
 				confirmationButton.setAlpha(1);
-				confirmationButton.setEnabled(true);
 			}
 		});
 
 		builder.setCancelable(false);
 		builder.setOnDismissListener(dialog -> {
 			isSetDownloadLocationShown = false;
-
-			if (checkBox.isChecked()) {
-
-			} else {
-
-			}
-
+			dbH.setAskSetDownloadLocation(!checkBox.isChecked());
 			finishPickFolder();
 		});
 		setDownloadLocationDialog = builder.create();
