@@ -187,15 +187,6 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
                     } else if (ret == MegaChatApi.INIT_ERROR) {
                         logDebug("condition ret == MegaChatApi.INIT_ERROR");
-                        if (chatSettings == null) {
-                            logWarning("ERROR----> Switch OFF chat");
-                            chatSettings = new ChatSettings();
-                            chatSettings.setEnabled(false + "");
-                            dbH.setChatSettings(chatSettings);
-                        } else {
-                            logWarning("ERROR----> Switch OFF chat");
-                            dbH.setEnabledChat(false + "");
-                        }
                         megaChatApi.logout(this);
                     } else {
                         logDebug("Chat correctly initialized");

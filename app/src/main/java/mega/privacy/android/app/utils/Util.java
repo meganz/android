@@ -1262,28 +1262,7 @@ public class Util {
 	}
 
 	public static boolean isChatEnabled (){
-		logDebug("isChatEnabled");
-		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-		ChatSettings chatSettings = dbH.getChatSettings();
-		boolean chatEnabled;
-
-		if(chatSettings!=null){
-			if(chatSettings.getEnabled()!=null){
-				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-				logDebug("A - chatEnabled: " + chatEnabled);
-				return chatEnabled;
-			}
-			else{
-				chatEnabled=true;
-				logDebug("B - chatEnabled: " + chatEnabled);
-				return chatEnabled;
-			}
-		}
-		else{
-			chatEnabled=true;
-			logDebug("C - chatEnabled: " + chatEnabled);
-			return chatEnabled;
-		}
+		return true;
 	}
 
 	public static boolean canVoluntaryVerifyPhoneNumber() {

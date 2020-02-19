@@ -836,12 +836,9 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 
-		if(chatSettings==null){
-			dbH.setEnabledChat(true+"");
-			dbH.setNotificationEnabledChat(true+"");
-			dbH.setVibrationEnabledChat(true+"");
-		} else if (chatSettings.getEnabled() == null) {
-			dbH.setEnabledChat(true+"");
+		if (chatSettings == null) {
+			dbH.setNotificationEnabledChat(true + "");
+			dbH.setVibrationEnabledChat(true + "");
 		}
 
 		//Get chat status

@@ -1501,7 +1501,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String vibrationEnabled = decrypt(cursor.getString(4));
 			String chatStatus = decrypt(cursor.getString(5));
 			String sendOriginalAttachments = decrypt(cursor.getString(6));
-			chatSettings = new ChatSettings(enabled, notificationsEnabled, notificationSound, vibrationEnabled, sendOriginalAttachments);
+			chatSettings = new ChatSettings(notificationsEnabled, notificationSound, vibrationEnabled, sendOriginalAttachments);
 		}
 		cursor.close();
 
@@ -1514,7 +1514,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + TABLE_CHAT_SETTINGS);
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_ENABLED, encrypt(chatSettings.getEnabled()));
+		values.put(KEY_CHAT_ENABLED, encrypt("true"));
 		values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, encrypt(chatSettings.getNotificationsEnabled()));
 		values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(chatSettings.getNotificationsSound()));
 		values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(chatSettings.getVibrationEnabled()));
@@ -1522,24 +1522,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(chatSettings.getSendOriginalAttachments()));
 
 		db.insert(TABLE_CHAT_SETTINGS, null, values);
-	}
-
-	public void setEnabledChat(String enabled){
-        logDebug("setEnabledChat");
-
-		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
-		ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_ENABLED + "= '" + encrypt(enabled) + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-			values.put(KEY_CHAT_ENABLED, encrypt(enabled));
-			db.insert(TABLE_CHAT_SETTINGS, null, values);
-		}
-		cursor.close();
 	}
 
 	public void setSendOriginalAttachments(String originalAttachments){

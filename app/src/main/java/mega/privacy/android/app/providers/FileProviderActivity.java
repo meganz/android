@@ -356,27 +356,12 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 							ret = megaChatApi.init(gSession);
 							logDebug("Result of init ---> " + ret);
 							chatSettings = dbH.getChatSettings();
-							if (ret == MegaChatApi.INIT_NO_CACHE)
-							{
+							if (ret == MegaChatApi.INIT_NO_CACHE) {
 								logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
-
-							}
-							else if (ret == MegaChatApi.INIT_ERROR)
-							{
+							} else if (ret == MegaChatApi.INIT_ERROR) {
 								logWarning("Condition ret == MegaChatApi.INIT_ERROR");
-								if(chatSettings==null) {
-									logWarning("1 - ERROR----> Switch OFF chat");
-									chatSettings = new ChatSettings();
-									chatSettings.setEnabled(false+"");
-									dbH.setChatSettings(chatSettings);
-								}
-								else{
-									logWarning("2 - ERROR----> Switch OFF chat");
-									dbH.setEnabledChat(false + "");
-								}
 								megaChatApi.logout(this);
-							}
-							else{
+							} else {
 								logDebug("Chat correctly initialized");
 							}
 						}
@@ -1787,37 +1772,19 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				
 				setContentView(R.layout.activity_file_provider);
 				tabShown = CLOUD_TAB;
-				logDebug("megaApi.getRootNode() NOT null");
 
-				chatSettings = dbH.getChatSettings();
-				if(chatSettings!=null) {
-					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-					if(chatEnabled){
-						logDebug("Chat enabled-->connect");
-						if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
-							logDebug("Connection goes!!!");
-							megaChatApi.connect(this);
-						}
-						else{
-							logDebug("Not launch connect: " + megaChatApi.getInitState());
-						}
-
-						MegaApplication.setLoggingIn(false);
-                        afterFetchNodes();
-
-                        changeStatusBarColor(this, this.getWindow(), R.color.lollipop_dark_primary_color);
-					}
-					else{
-						logWarning("Chat NOT enabled - readyToManager");
-						MegaApplication.setLoggingIn(false);
-						afterFetchNodes();
-					}
+				logDebug("Chat --> connect");
+				if ((megaChatApi.getInitState() != MegaChatApi.INIT_ERROR)) {
+					logDebug("Connection goes!!!");
+					megaChatApi.connect(this);
+				} else {
+					logDebug("Not launch connect: " + megaChatApi.getInitState());
 				}
-				else{
-					logWarning("chatSettings NULL - readyToManager");
-					MegaApplication.setLoggingIn(false);
-					afterFetchNodes();
-				}
+
+				MegaApplication.setLoggingIn(false);
+				afterFetchNodes();
+
+				changeStatusBarColor(this, this.getWindow(), R.color.lollipop_dark_primary_color);
 			}
 		}
 	}

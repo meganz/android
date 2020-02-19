@@ -982,15 +982,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
                                                 } else if (ret == MegaChatApi.INIT_ERROR) {
                                                     logDebug("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
-                                                    if (chatSettings == null) {
-                                                        logWarning("shouldRun: ERROR----> Switch OFF chat");
-                                                        chatSettings = new ChatSettings();
-                                                        chatSettings.setEnabled(false + "");
-                                                        dbH.setChatSettings(chatSettings);
-                                                    } else {
-                                                        logWarning("shouldRun: ERROR----> Switch OFF chat");
-                                                        dbH.setEnabledChat(false + "");
-                                                    }
                                                     megaChatApi.logout(CameraUploadsService.this);
                                                 } else {
                                                     logDebug("shouldRun: Chat correctly initialized");
@@ -1390,18 +1381,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("Fetch nodes ok");
-                chatSettings = dbH.getChatSettings();
-                if (chatSettings != null) {
-                    boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-                    if (chatEnabled) {
-                        logDebug("Chat enabled-->connect");
-                        megaChatApi.connectInBackground(this);
-                    } else {
-                        logWarning("Chat NOT enabled - readyToManager");
-                    }
-                } else {
-                    logWarning("chatSettings NULL - readyToManager");
-                }
+                logDebug("Chat --> connect");
+                megaChatApi.connectInBackground(this);
                 setLoginState(false);
     
                 try {

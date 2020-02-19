@@ -2649,35 +2649,15 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
 
                 dbH.saveCredentials(credentials);
 
-                chatSettings = dbH.getChatSettings();
-                if(chatSettings!=null) {
-
-                    boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-                    if(chatEnabled){
-
-                        logDebug("Chat enabled-->connect");
-                        if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
-                            logDebug("Connection goes!!!");
-                            megaChatApi.connect(this);
-                        }
-                        else{
-                            logDebug("Not launch connect: " + megaChatApi.getInitState());
-                        }
-                        MegaApplication.setLoggingIn(false);
-                        download();
-                    }
-                    else{
-
-                        logWarning("Chat NOT enabled - readyToManager");
-                        MegaApplication.setLoggingIn(false);
-                        download();
-                    }
+                logDebug("Chat enabled-->connect");
+                if ((megaChatApi.getInitState() != MegaChatApi.INIT_ERROR)) {
+                    logDebug("Connection goes!!!");
+                    megaChatApi.connect(this);
+                } else {
+                    logDebug("Not launch connect: " + megaChatApi.getInitState());
                 }
-                else{
-                    logWarning("chatSettings NULL - readyToManager");
-                    MegaApplication.setLoggingIn(false);
-                    download();
-                }
+                MegaApplication.setLoggingIn(false);
+                download();
             }
         }
         else if (request.getType() == MegaRequest.TYPE_RENAME){
