@@ -1261,10 +1261,6 @@ public class Util {
 		return cal;
 	}
 
-	public static boolean isChatEnabled (){
-		return true;
-	}
-
 	public static boolean canVoluntaryVerifyPhoneNumber() {
         MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
 	    boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;

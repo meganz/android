@@ -265,25 +265,23 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					isLoggingIn = true;
 					MegaApplication.setLoggingIn(isLoggingIn);
 
-					if (isChatEnabled()) {
-						if (megaChatApi == null) {
-							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-						}
+					if (megaChatApi == null) {
+						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+					}
 
-						int ret = megaChatApi.getInitState();
+					int ret = megaChatApi.getInitState();
 
-						if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
-							ret = megaChatApi.init(gSession);
-							logDebug("result of init ---> " + ret);
-							chatSettings = dbH.getChatSettings();
-							if (ret == MegaChatApi.INIT_NO_CACHE) {
-								logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-							} else if (ret == MegaChatApi.INIT_ERROR) {
-								logDebug("condition ret == MegaChatApi.INIT_ERROR");
-								megaChatApi.logout(this);
-							} else {
-								logDebug("Chat correctly initialized");
-							}
+					if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+						ret = megaChatApi.init(gSession);
+						logDebug("result of init ---> " + ret);
+						chatSettings = dbH.getChatSettings();
+						if (ret == MegaChatApi.INIT_NO_CACHE) {
+							logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
+						} else if (ret == MegaChatApi.INIT_ERROR) {
+							logDebug("condition ret == MegaChatApi.INIT_ERROR");
+							megaChatApi.logout(this);
+						} else {
+							logDebug("Chat correctly initialized");
 						}
 					}
 

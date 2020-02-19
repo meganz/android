@@ -2428,9 +2428,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			statusConfig = config;
 		}
 
-		if(isChatEnabled()){
-			showPresenceChatConfig();
-		}
+		showPresenceChatConfig();
 	}
 
 	public void updateEnabledRichLinks(){

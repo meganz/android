@@ -964,30 +964,28 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                                     if (!isLoggingIn) {
     
                                         setLoginState(true);
-    
-                                        if (isChatEnabled()) {
-                                            logWarning("shouldRun: Chat is ENABLED");
-                                            if (megaChatApi == null) {
-                                                megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
-                                            }
-                                            
-                                            int ret = megaChatApi.getInitState();
 
-                                            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-                                                ret = megaChatApi.init(gSession);
-                                                logDebug("shouldRun: result of init ---> " + ret);
-                                                chatSettings = dbH.getChatSettings();
-                                                if (ret == MegaChatApi.INIT_NO_CACHE) {
-                                                    logDebug("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
+                                        if (megaChatApi == null) {
+                                            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+                                        }
 
-                                                } else if (ret == MegaChatApi.INIT_ERROR) {
-                                                    logDebug("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
-                                                    megaChatApi.logout(CameraUploadsService.this);
-                                                } else {
-                                                    logDebug("shouldRun: Chat correctly initialized");
-                                                }
+                                        int ret = megaChatApi.getInitState();
+
+                                        if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+                                            ret = megaChatApi.init(gSession);
+                                            logDebug("shouldRun: result of init ---> " + ret);
+                                            chatSettings = dbH.getChatSettings();
+                                            if (ret == MegaChatApi.INIT_NO_CACHE) {
+                                                logDebug("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
+
+                                            } else if (ret == MegaChatApi.INIT_ERROR) {
+                                                logDebug("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
+                                                megaChatApi.logout(CameraUploadsService.this);
+                                            } else {
+                                                logDebug("shouldRun: Chat correctly initialized");
                                             }
                                         }
+
                                         logDebug("Camera upload start fast login");
                                         megaApi.fastLogin(gSession,CameraUploadsService.this);
                                     } else {

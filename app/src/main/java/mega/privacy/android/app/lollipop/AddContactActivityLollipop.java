@@ -1576,20 +1576,19 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             finish();
             return;
         }
-        if(isChatEnabled()){
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-            }
 
-            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-                logDebug("Refresh session - karere");
-                Intent intent = new Intent(this, LoginActivityLollipop.class);
-                intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
-                return;
-            }
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+        }
+
+        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+            logDebug("Refresh session - karere");
+            Intent intent = new Intent(this, LoginActivityLollipop.class);
+            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
         }
 
         addContactActivityLollipop = this;

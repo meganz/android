@@ -267,23 +267,21 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			return;
 		}
 
-		if(isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
-
-			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				logDebug("Refresh session - karere");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
-				return;
-			}
-
-			megaChatApi.addChatListener(this);
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 		}
+
+		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+			logDebug("Refresh session - karere");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
+		}
+
+		megaChatApi.addChatListener(this);
 
 		handler = new Handler();
 		cC = new ContactController(this);
@@ -476,36 +474,31 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					}
 				}
 
-				//Find chat with this contact
-				if(isChatEnabled()){
-					chat = megaChatApi.getChatRoomByUser(user.getHandle());
+				chat = megaChatApi.getChatRoomByUser(user.getHandle());
 
-					if(chat!=null){
-						chatHandle = chat.getChatId();
-						if(chatHandle==-1){
-							notificationsLayout.setVisibility(View.GONE);
-							dividerNotificationsLayout.setVisibility(View.GONE);
-
-							sharedFilesLayout.setVisibility(View.GONE);
-							dividerSharedFilesLayout.setVisibility(View.GONE);
-						}
-						else{
-							chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
-						}
-					}
-					else{
+				if (chat != null) {
+					chatHandle = chat.getChatId();
+					if (chatHandle == -1) {
 						notificationsLayout.setVisibility(View.GONE);
 						dividerNotificationsLayout.setVisibility(View.GONE);
 
 						sharedFilesLayout.setVisibility(View.GONE);
 						dividerSharedFilesLayout.setVisibility(View.GONE);
+					} else {
+						chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 					}
+				} else {
+					notificationsLayout.setVisibility(View.GONE);
+					dividerNotificationsLayout.setVisibility(View.GONE);
 
-					if (megaChatApi == null){
-						megaChatApi = ((MegaApplication) this.getApplication()).getMegaChatApi();
-					}
-
+					sharedFilesLayout.setVisibility(View.GONE);
+					dividerSharedFilesLayout.setVisibility(View.GONE);
 				}
+
+				if (megaChatApi == null) {
+					megaChatApi = ((MegaApplication) this.getApplication()).getMegaChatApi();
+				}
+
 				setDefaultAvatar(fullName);
 			}
 
@@ -521,30 +514,19 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
                     setFoldersButtonText(nodes);
 					emailText.setText(user.getEmail());
 
-					if(isChatEnabled()){
-						if(chat!=null){
-							clearChatLayout.setVisibility(View.VISIBLE);
-							dividerClearChatLayout.setVisibility(View.VISIBLE);
-						}
-						else{
-							clearChatLayout.setVisibility(View.GONE);
-							dividerClearChatLayout.setVisibility(View.GONE);
-						}
-
-						shareContactLayout.setVisibility(View.VISIBLE);
-						dividerShareContactLayout.setVisibility(View.VISIBLE);
-
-						chatOptionsLayout.setVisibility(View.VISIBLE);
-						dividerChatOptionsLayout.setVisibility(View.VISIBLE);
-					}
-					else{
+					if (chat != null) {
+						clearChatLayout.setVisibility(View.VISIBLE);
+						dividerClearChatLayout.setVisibility(View.VISIBLE);
+					} else {
 						clearChatLayout.setVisibility(View.GONE);
 						dividerClearChatLayout.setVisibility(View.GONE);
-						shareContactLayout.setVisibility(View.GONE);
-						dividerShareContactLayout.setVisibility(View.GONE);
-						chatOptionsLayout.setVisibility(View.GONE);
-						dividerChatOptionsLayout.setVisibility(View.GONE);
 					}
+
+					shareContactLayout.setVisibility(View.VISIBLE);
+					dividerShareContactLayout.setVisibility(View.VISIBLE);
+
+					chatOptionsLayout.setVisibility(View.VISIBLE);
+					dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 				}
 				else{
 					sharedFoldersLayout.setVisibility(View.GONE);
@@ -552,26 +534,17 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					chatOptionsLayout.setVisibility(View.GONE);
 					dividerChatOptionsLayout.setVisibility(View.GONE);
 
-					if(isChatEnabled()){
-						if(chat!=null){
-							emailText.setText(user.getEmail());
-							clearChatLayout.setVisibility(View.VISIBLE);
-							dividerClearChatLayout.setVisibility(View.VISIBLE);
-						}
-						else{
-							clearChatLayout.setVisibility(View.GONE);
-							dividerClearChatLayout.setVisibility(View.GONE);
-						}
-
-						shareContactLayout.setVisibility(View.VISIBLE);
-						dividerShareContactLayout.setVisibility(View.VISIBLE);
-					}
-					else{
+					if (chat != null) {
+						emailText.setText(user.getEmail());
+						clearChatLayout.setVisibility(View.VISIBLE);
+						dividerClearChatLayout.setVisibility(View.VISIBLE);
+					} else {
 						clearChatLayout.setVisibility(View.GONE);
 						dividerClearChatLayout.setVisibility(View.GONE);
-						shareContactLayout.setVisibility(View.GONE);
-						dividerShareContactLayout.setVisibility(View.GONE);
 					}
+
+					shareContactLayout.setVisibility(View.VISIBLE);
+					dividerShareContactLayout.setVisibility(View.VISIBLE);
 				}
 			}
 			else{
@@ -593,42 +566,30 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 			}
 
-			if(isChatEnabled()){
+			chatSettings = dbH.getChatSettings();
+			if (chatSettings == null) {
+				logDebug("Chat settings null - notifications ON");
+				setUpIndividualChatNotifications();
+			} else {
+				logDebug("There is chat settings");
+				if (chatSettings.getNotificationsEnabled() == null) {
+					generalChatNotifications = true;
 
-				chatSettings = dbH.getChatSettings();
-				if(chatSettings==null){
-					logDebug("Chat settings null - notifications ON");
+				} else {
+					generalChatNotifications = Boolean.parseBoolean(chatSettings.getNotificationsEnabled());
+				}
+
+				if (generalChatNotifications) {
 					setUpIndividualChatNotifications();
+
+				} else {
+					logDebug("General notifications OFF");
+					boolean notificationsEnabled = false;
+					notificationsSwitch.setChecked(notificationsEnabled);
+
+					notificationsLayout.setVisibility(View.VISIBLE);
+					dividerNotificationsLayout.setVisibility(View.VISIBLE);
 				}
-				else {
-					logDebug("There is chat settings");
-					if (chatSettings.getNotificationsEnabled() == null) {
-						generalChatNotifications = true;
-
-					} else {
-						generalChatNotifications = Boolean.parseBoolean(chatSettings.getNotificationsEnabled());
-					}
-
-					if (generalChatNotifications) {
-						setUpIndividualChatNotifications();
-
-					} else {
-						logDebug("General notifications OFF");
-						boolean notificationsEnabled = false;
-						notificationsSwitch.setChecked(notificationsEnabled);
-
-						notificationsLayout.setVisibility(View.VISIBLE);
-						dividerNotificationsLayout.setVisibility(View.VISIBLE);
-					}
-				}
-
-			}else{
-
-				notificationsLayout.setVisibility(View.GONE);
-				dividerNotificationsLayout.setVisibility(View.GONE);
-
-				sharedFilesLayout.setVisibility(View.GONE);
-				dividerSharedFilesLayout.setVisibility(View.GONE);
 			}
 
 		} else {
@@ -742,14 +703,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		sendFileMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
 
 		if(isOnline(this)){
-			if(isChatEnabled() && fromContacts){
-				sendFileMenuItem.setVisible(true);
-			}
-			else{
-				sendFileMenuItem.setVisible(false);
-			}
-		}
-		else{
+			sendFileMenuItem.setVisible(fromContacts);
+		} else {
 			logDebug("Hide all - no network connection");
 			shareMenuItem.setVisible(false);
 			sendFileMenuItem.setVisible(false);
@@ -1716,15 +1671,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		logDebug("onResume");
 		super.onResume();
 
-		if(isChatEnabled()){
-			setContactPresenceStatus();
-		} else{
-			contactStateIcon.setVisibility(View.GONE);
-		}
-
-		if(isChatEnabled()){
-			requestLastGreen(-1);
-		}
+		setContactPresenceStatus();
+		requestLastGreen(-1);
 	}
 
 	@Override

@@ -171,26 +171,24 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
             isLoggingIn = true;
             MegaApplication.setLoggingIn(isLoggingIn);
 
-            if (isChatEnabled()) {
-                if (megaChatApi == null) {
-                    megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-                }
+            if (megaChatApi == null) {
+                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+            }
 
-                int ret = megaChatApi.getInitState();
+            int ret = megaChatApi.getInitState();
 
-                if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-                    ret = megaChatApi.init(gSession);
-                    logDebug("result of init ---> " + ret);
-                    chatSettings = dbH.getChatSettings();
-                    if (ret == MegaChatApi.INIT_NO_CACHE) {
-                        logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
+            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+                ret = megaChatApi.init(gSession);
+                logDebug("result of init ---> " + ret);
+                chatSettings = dbH.getChatSettings();
+                if (ret == MegaChatApi.INIT_NO_CACHE) {
+                    logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
 
-                    } else if (ret == MegaChatApi.INIT_ERROR) {
-                        logDebug("condition ret == MegaChatApi.INIT_ERROR");
-                        megaChatApi.logout(this);
-                    } else {
-                        logDebug("Chat correctly initialized");
-                    }
+                } else if (ret == MegaChatApi.INIT_ERROR) {
+                    logDebug("condition ret == MegaChatApi.INIT_ERROR");
+                    megaChatApi.logout(this);
+                } else {
+                    logDebug("Chat correctly initialized");
                 }
             }
 
@@ -228,13 +226,8 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
             MegaApplication.setLoggingIn(isLoggingIn);
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("OK fetch nodes");
-                if (isChatEnabled()) {
-                    logDebug("Chat enabled-->connectInBackground");
-//                    MegaApplication.isFireBaseConnection=true;
-                    megaChatApi.connectInBackground(this);
-                } else {
-                    logDebug("Chat NOT enabled - sendNotification");
-                }
+                logDebug("Chat --> connectInBackground");
+                megaChatApi.connectInBackground(this);
             } else {
                 logError("ERROR: " + e.getErrorString());
             }

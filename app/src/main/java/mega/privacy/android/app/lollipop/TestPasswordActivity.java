@@ -500,31 +500,8 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
                     logError("Error: MegaRequest.TYPE_SET_ATTR_USER | MegaApiJava.USER_ATTR_PWD_REMINDER " + e.getErrorString());
                 }
             }
-        }
-        else if (request.getType() == MegaRequest.TYPE_LOGOUT){
-            logDebug("Logout finished");
-
-            if(isChatEnabled()){
-                logDebug("END logout sdk request - wait chat logout");
-            }
-            else{
-                logDebug("END logout sdk request - chat disabled");
-                if (dbH == null){
-                    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                }
-                if (dbH != null){
-                    dbH.clearEphemeral();
-                }
-
-                AccountController aC = new AccountController(this);
-                aC.logoutConfirmed(this);
-
-                Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-                tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                this.startActivity(tourIntent);
-
-                finish();
-            }
+        } else if (request.getType() == MegaRequest.TYPE_LOGOUT) {
+            logDebug("END logout sdk request - wait chat logout");
         }
     }
 
