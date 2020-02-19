@@ -312,7 +312,8 @@ public class ShareInfo implements Serializable {
                 return;
             }
 			logDebug("Internal No path traversal: " + title);
-            if (context instanceof PdfViewerActivityLollipop || mIntent.getType().equals("application/pdf")) {
+            if (context instanceof PdfViewerActivityLollipop
+					|| (mIntent != null && mIntent.getType() != null && mIntent.getType().equals("application/pdf"))) {
 				title = addPdfFileExtension(title);
             }
             file = new File(context.getCacheDir(), title);
@@ -392,24 +393,27 @@ public class ShareInfo implements Serializable {
 	 */
 	private void processContent(Uri uri, Context context) {
 		logDebug("processContent: " + uri);
+
 		ContentProviderClient client = null;
 		Cursor cursor = null;
 		try {
-            client = context.getContentResolver().acquireContentProviderClient(uri);
-			cursor = client.query(uri, null, null, null, null);
-		} catch (Exception e) {
-			logError("cursor EXCEPTION!!!", e);
-		} finally {
-			if (cursor == null || cursor.getCount() == 0) {
-				logWarning("Error with cursor");
-				if (cursor != null) {
-					cursor.close();
-				}
-				if (client != null) {
-					client.close();
-				}
-				return;
+			client = context.getContentResolver().acquireContentProviderClient(uri);
+			if (client != null) {
+				cursor = client.query(uri, null, null, null, null);
 			}
+		} catch (Exception e) {
+			logError("client or cursor EXCEPTION: ", e);
+		}
+
+		if (cursor == null || cursor.getCount() == 0) {
+			logWarning("Error with cursor: null or count is 0");
+			if (cursor != null) {
+				cursor.close();
+			}
+			if (client != null) {
+				client.close();
+			}
+			return;
 		}
 
 		cursor.moveToFirst();
@@ -472,13 +476,9 @@ public class ShareInfo implements Serializable {
 			logWarning("Nothing done!");
 		}
 
-		if (cursor != null) {
-			cursor.close();
-		}
+		cursor.close();
+		client.close();
 
-		if (client != null) {
-			client.close();
-		}
 		logDebug("---- END process content----");
 	}
 	

@@ -79,6 +79,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class ContactsFragmentLollipop extends Fragment implements MegaRequestListenerInterface, View.OnClickListener{
 
@@ -175,6 +176,10 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				myEmail = request.getEmail();
 				handleContactLink = request.getNodeHandle();
 				contactNameContent = request.getName() + " " + request.getText();
+
+				dbH.setLastPublicHandle(handleContactLink);
+				dbH.setLastPublicHandleTimeStamp();
+				dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CONTACT);
 
 				userQuery = queryIfIsContact();
 				showInviteDialog();
@@ -1282,10 +1287,9 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public void sortBy(){
 		logDebug("sortBy");
 
-		if(((ManagerActivityLollipop)context).orderContacts == MegaApiJava.ORDER_DEFAULT_DESC){
-			Collections.sort(visibleContacts,  Collections.reverseOrder(new Comparator<MegaContactAdapter>(){
-
-				public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
+		switch (((ManagerActivityLollipop)context).orderContacts) {
+			case ORDER_DEFAULT_DESC:
+				Collections.sort(visibleContacts,  Collections.reverseOrder((c1, c2) -> {
 					String name1 = c1.getFullName();
 					String name2 = c2.getFullName();
 					int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
@@ -1293,37 +1297,31 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 						res = name1.compareTo(name2);
 					}
 					return res;
-				}
-			}));
-		}
-		else if(((ManagerActivityLollipop)context).orderContacts == MegaApiJava.ORDER_CREATION_ASC){
-			Collections.sort(visibleContacts,  new Comparator<MegaContactAdapter>(){
+				}));
+				break;
 
-				public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
+			case ORDER_CREATION_ASC:
+				Collections.sort(visibleContacts, (c1, c2) -> {
 					long timestamp1 = c1.getMegaUser().getTimestamp();
 					long timestamp2 = c2.getMegaUser().getTimestamp();
 
 					long result = timestamp2 - timestamp1;
 					return (int)result;
-				}
-			});
-		}
-		else if(((ManagerActivityLollipop)context).orderContacts == MegaApiJava.ORDER_CREATION_DESC){
-			Collections.sort(visibleContacts,  Collections.reverseOrder(new Comparator<MegaContactAdapter>(){
+				});
+				break;
 
-				public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
+			case ORDER_CREATION_DESC:
+				Collections.sort(visibleContacts,  Collections.reverseOrder((c1, c2) -> {
 					long timestamp1 = c1.getMegaUser().getTimestamp();
 					long timestamp2 = c2.getMegaUser().getTimestamp();
 
 					long result = timestamp2 - timestamp1;
 					return (int)result;
-				}
-			}));
-		}
-		else{
-			Collections.sort(visibleContacts, new Comparator<MegaContactAdapter>(){
+				}));
+				break;
 
-				public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
+			default:
+				Collections.sort(visibleContacts, (c1, c2) -> {
 					String name1 = c1.getFullName();
 					String name2 = c2.getFullName();
 					int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
@@ -1331,17 +1329,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 						res = name1.compareTo(name2);
 					}
 					return res;
-				}
-			});
+				});
+				break;
 		}
-	}
 
-	public void updateOrder(){
-
-//		for(int i=0; i<visibleContacts.size();i++){
-//			log("contact ordered "+i+ " "+visibleContacts.get(i).getFullName());
-//		}
-		if(isAdded()){
+		if (isAdded() && adapter != null) {
 			adapter.notifyDataSetChanged();
 		}
 	}

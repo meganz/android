@@ -141,6 +141,7 @@ public class ChatAudioManager {
     }
 
     public void stopAudioSignals() {
+        if(audioManager != null) audioManager = null;
         stopSound();
         stopVibration();
     }

@@ -134,6 +134,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/separator_revert"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
@@ -171,7 +172,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/separator_revert"
+                android:id="@+id/separator_delete"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"

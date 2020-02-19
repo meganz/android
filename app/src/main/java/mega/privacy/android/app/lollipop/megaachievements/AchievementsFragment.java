@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -50,14 +49,12 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	private MegaApiAndroid megaApi;
 	private MegaChatApiAndroid megaChatApi;
 
-	private CardView inviteFriendsCard;
-
 	private RelativeLayout referralBonusesLayout;
 
+	private RelativeLayout addPhoneLayout;
 	private RelativeLayout registrationLayout;
 	private RelativeLayout installAppLayout;
 	private RelativeLayout installDesktopLayout;
-    private RelativeLayout addPhoneLayout;
 
 	private LinearLayout figuresInstallAppLayout;
 	private TextView zeroFiguresInstallAppText;
@@ -75,17 +72,15 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	private LinearLayout figuresAddPhoneLayout;
 	private TextView zeroFiguresAddPhoneText;
 
-	private TextView titleCardInvite;
-
 	private ImageView installAppIcon;
 	private ImageView installDesktopIcon;
 	private ImageView registrationIcon;
 	private ImageView addPhoneIcon;
 	private ImageView referralBonusIcon;
 
-	private TextView figureUnlockedRewardStorage;
+	private TextView figureUnlockedRewardStorage, figureUnlockedRewardStorageUnit;
 	private long storageQuota = 0;
-	private TextView figureUnlockedRewardTransfer;
+	private TextView figureUnlockedRewardTransfer, figureUnlockedRewardTransferUnit;
 
 	private TextView titleReferralBonuses;
 	private TextView figureReferralBonusesStorage;
@@ -181,11 +176,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.main_linear_layout_achievements);
 
-		titleCardInvite = (TextView) (TextView) v.findViewById(R.id.title_card);
-
-		inviteFriendsCard = (CardView) v.findViewById(R.id.card_view_invite_friends);
 		inviteFriendsButton = (Button) v.findViewById(R.id.invite_button);
-		inviteFriendsCard.setOnClickListener(this);
 		inviteFriendsButton.setOnClickListener(this);
 
 		referralBonusesLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_layout);
@@ -274,7 +265,9 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		storageQuotaString = storageQuotaString.toLowerCase(Locale.getDefault());
 
 		figureUnlockedRewardStorage = (TextView) v.findViewById(R.id.unlocked_storage_text);
+		figureUnlockedRewardStorageUnit = v.findViewById(R.id.unlocked_storage_unit);
 		figureUnlockedRewardTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_text);
+        figureUnlockedRewardTransferUnit = v.findViewById(R.id.unlocked_transfer_unit);
 
 		figureUnlockedRewardStorage.setText(getSizeString(0));
 		figureUnlockedRewardTransfer.setText(getSizeString(0));
@@ -393,6 +386,10 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	@Override
 	public void onClick(View v) {
 		logDebug("onClick");
+		// wait for TYPE_GET_ACHIEVEMENTS has compeleted.
+        if(((AchievementsActivity)context).megaAchievements == null) {
+            return;
+        }
 		switch (v.getId()) {
 
 			case R.id.referral_bonuses_layout:{
@@ -425,7 +422,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 				((AchievementsActivity)context).showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
 				break;
 			}
-			case R.id.card_view_invite_friends:
 			case R.id.invite_button:{
 				logDebug("Invite friends");
 				((AchievementsActivity)context).showFragment(INVITE_FRIENDS_FRAGMENT, -1);
@@ -455,8 +451,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
         long addPhoneTransferValue = ((AchievementsActivity)context).megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
 		long installDesktopStorageValue = ((AchievementsActivity)context).megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
 		long installDesktopTransferValue = ((AchievementsActivity)context).megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
-
-		titleCardInvite.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue), getSizeString(referralsTransferValue)));
 
 		if(transferReferrals>0||storageReferrals>0){
 
@@ -561,7 +555,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					figuresInstallAppLayout.setAlpha(0.5f);
 					installAppIcon.setAlpha(0.5f);
 					daysLeftInstallAppText.setPadding(scaleWidthPx(8,outMetrics), scaleHeightPx(4,outMetrics),scaleWidthPx(8,outMetrics),scaleHeightPx(4,outMetrics));
-					daysLeftInstallAppText.setText(context.getResources().getString(R.string.expired_achievement));
+					daysLeftInstallAppText.setText(context.getResources().getString(R.string.expired_label));
 				}
 
 			}else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
@@ -620,7 +614,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
                     figuresAddPhoneLayout.setAlpha(0.5f);
                     addPhoneIcon.setAlpha(0.5f);
                     daysLeftAddPhoneText.setPadding(scaleWidthPx(8,outMetrics), scaleHeightPx(4,outMetrics),scaleWidthPx(8,outMetrics),scaleHeightPx(4,outMetrics));
-                    daysLeftAddPhoneText.setText(context.getResources().getString(R.string.expired_achievement));
+                    daysLeftAddPhoneText.setText(context.getResources().getString(R.string.expired_label));
                 }
             }
 			else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL){
@@ -679,7 +673,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					figuresInstallDesktopLayout.setAlpha(0.5f);
 					installDesktopIcon.setAlpha(0.5f);
 					daysLeftInstallDesktopText.setPadding(scaleWidthPx(8,outMetrics), scaleHeightPx(4,outMetrics),scaleWidthPx(8,outMetrics),scaleHeightPx(4,outMetrics));
-					daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.expired_achievement));
+					daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.expired_label));
 				}
 
 			}
@@ -734,7 +728,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					figuresRegistrationLayout.setAlpha(0.5f);
 					registrationIcon.setAlpha(0.5f);
 					daysLeftRegistrationText.setPadding(scaleWidthPx(8,outMetrics), scaleHeightPx(4,outMetrics),scaleWidthPx(8,outMetrics),scaleHeightPx(4,outMetrics));
-					daysLeftRegistrationText.setText(context.getResources().getString(R.string.expired_achievement));
+					daysLeftRegistrationText.setText(context.getResources().getString(R.string.expired_label));
 				}
 			}
 			else{
@@ -745,11 +739,21 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		storageQuota = ((AchievementsActivity)context).megaAchievements.currentStorage();
 
 		logDebug("My calculated totalTransfer: " + totalStorage);
-		figureUnlockedRewardStorage.setText(getSizeString(storageQuota));
+		String sizeString = getSizeString(storageQuota);
+		figureUnlockedRewardStorage.setText(getNumberAndUnit(sizeString)[0]);
+		figureUnlockedRewardStorageUnit.setText(getNumberAndUnit(sizeString)[1]);
 
 		transferQuota = ((AchievementsActivity)context).megaAchievements.currentTransfer();
-
+        sizeString = getSizeString(transferQuota);
 		logDebug("My calculated totalTransfer: " + totalTransfer);
-		figureUnlockedRewardTransfer.setText(getSizeString(transferQuota));
+        figureUnlockedRewardTransfer.setText(getNumberAndUnit(sizeString)[0]);
+        figureUnlockedRewardTransferUnit.setText(getNumberAndUnit(sizeString)[1]);
 	}
+
+    private String[] getNumberAndUnit(String sizeString) {
+        if (sizeString == null || !sizeString.contains(" ")) {
+            return new String[]{"", ""};
+        }
+        return sizeString.split(" ");
+    }
 }

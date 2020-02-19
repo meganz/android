@@ -1,9 +1,7 @@
 package mega.privacy.android.app.utils;
 
-
-import android.content.Context;
-
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 
@@ -11,12 +9,12 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class DBUtil {
 
-    static DatabaseHandler dbH;
-    static MegaAttributes attributes;
+    private static DatabaseHandler dbH;
+    private static MegaAttributes attributes;
 
-    public static boolean callToPricing (Context context){
+    public static boolean callToPricing (){
         logDebug("callToPricing");
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = MegaApplication.getInstance().getDbH();
 
         if(dbH!=null){
             attributes = dbH.getAttributes();
@@ -56,9 +54,9 @@ public class DBUtil {
         }
     }
 
-    public static boolean callToPaymentMethods (Context context) {
+    public static boolean callToPaymentMethods () {
         logDebug("callToPaymentMethods");
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = MegaApplication.getInstance().getDbH();
 
         if(dbH!=null){
             attributes = dbH.getAttributes();
@@ -92,9 +90,9 @@ public class DBUtil {
         }
     }
 
-    public static boolean callToAccountDetails (Context context) {
+    public static boolean callToAccountDetails () {
         logDebug("callToAccountDetails");
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = MegaApplication.getInstance().getDbH();
 
         if(dbH!=null){
             attributes = dbH.getAttributes();
@@ -128,16 +126,16 @@ public class DBUtil {
         }
     }
 
-    public static void resetAccountDetailsTimeStamp(Context context) {
+    public static void resetAccountDetailsTimeStamp() {
         logDebug("resetAccountDetailsTimeStamp");
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = MegaApplication.getInstance().getDbH();
         if(dbH == null) return;
         dbH.resetAccountDetailsTimeStamp();
     }
 
-    public static boolean callToExtendedAccountDetails (Context context) {
+    public static boolean callToExtendedAccountDetails () {
         logDebug("callToExtendedAccountDetails");
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = MegaApplication.getInstance().getDbH();
 
         if(dbH!=null){
             attributes = dbH.getAttributes();
@@ -177,9 +175,9 @@ public class DBUtil {
         }
     }
 
-    public static boolean isSendOriginalAttachments (Context context){
+    public static boolean isSendOriginalAttachments (){
         logDebug("isSendOriginalAttachments");
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = MegaApplication.getInstance().getDbH();
 
         if(dbH!=null){
             ChatSettings chatSettings = dbH.getChatSettings();

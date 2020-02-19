@@ -20,6 +20,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.RemoteViews;
 
 import com.shockwave.pdfium.PdfDocument;
@@ -305,7 +306,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 
 			if (pendingMsg != null) {
-				sendOriginalAttachments = isSendOriginalAttachments(this);
+				sendOriginalAttachments = isSendOriginalAttachments();
 				logDebug("sendOriginalAttachments is " + sendOriginalAttachments);
 
 				if (chatId != -1) {
@@ -1034,6 +1035,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,MegaError error) {
+
+		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
+			LocalBroadcastManager.getInstance(getApplicationContext())
+					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+		}
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 			logDebug("onTransferFinish: " + transfer.getNodeHandle());

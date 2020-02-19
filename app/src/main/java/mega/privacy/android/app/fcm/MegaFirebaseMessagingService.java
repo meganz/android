@@ -20,8 +20,6 @@ package mega.privacy.android.app.fcm;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.PowerManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -48,6 +46,8 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
+    public static final String SILENT = "silent";
+    public static final String NO_BEEP = "1";
     MegaApplication app;
     MegaApiAndroid megaApi;
     DatabaseHandler dbH;
@@ -61,11 +61,9 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     String remoteMessageType = "";
 
-    private ChatAdvancedNotificationBuilder chatNotificationBuilder;
-
-    Handler h;
-
     PowerManager.WakeLock wl;
+
+    private static final int AWAKE_CPU_FOR = 60 * 1000;
 
     @Override
     public void onCreate() {
@@ -86,6 +84,28 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     public void onDestroy() {
         logDebug("onDestroyFCM");
         super.onDestroy();
+    }
+
+    private void awakeCpu(RemoteMessage remoteMessage) {
+        PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        if(pm != null) {
+            logDebug("wake lock acquire");
+            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wake:MegaIncomingMessageCallLock");
+            wl.setReferenceCounted(false);
+            wl.acquire(AWAKE_CPU_FOR);
+        }
+        if(shouldBeep(remoteMessage)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(new Intent(this, KeepAliveService.class));
+            } else {
+                startService(new Intent(this, KeepAliveService.class));
+            }
+        }
+    }
+
+    private boolean shouldBeep(RemoteMessage message) {
+        String silent = message.getData().get(SILENT);
+        return !NO_BEEP.equals(silent);
     }
 
     /**
@@ -123,7 +143,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 return;
             }
             else{
-
                 if(remoteMessageType.equals("1")){
                     logDebug("Show SharedFolder Notification");
                     //Leave the flag showMessageNotificationAfterPush as it is
@@ -213,58 +232,15 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 }
                 else if(remoteMessageType.equals("2")){
                     logDebug("CHAT notification");
-    
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                        boolean isIdle = pm.isDeviceIdleMode();
-                        logDebug("isActivityVisible: " + app.isActivityVisible());
-                        logDebug("isIdle: " + isIdle);
-                        wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingMessageCallLock:");
-                        wl.acquire();
-                        wl.release();
-                        if((!app.isActivityVisible() && megaApi.getRootNode() == null )|| isIdle) {
-
-                            logDebug("Launch foreground service!");
-                            Intent intent = new Intent(this,IncomingMessageService.class);
-                            intent.putExtra("remoteMessage", remoteMessage);
-                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                                startForegroundService(intent);
-                            }else{
-                                startService(intent);
-                            }
-                            return;
-                        }
-                    }
-
-                    if(app.isActivityVisible()){
+                    if(MegaApplication.isActivityVisible()){
                         logDebug("App on foreground --> return");
                         retryPendingConnections();
                         return;
                     }
 
                     if(isChatEnabled()){
-
-                        try{
-                            String silent = remoteMessage.getData().get("silent");
-                            logDebug("Silent payload: " + silent);
-
-                            if(silent!=null){
-                                if(silent.equals("1")){
-                                    beep = false;
-                                }
-                                else{
-                                    beep = true;
-                                }
-                            }
-                            else{
-                                logWarning("NO DATA on the PUSH");
-                                beep = true;
-                            }
-                        }
-                        catch(Exception e){
-                            logError("ERROR:remoteSilentParameter", e);
-                            beep = true;
-                        }
+                        awakeCpu(remoteMessage);
+                        beep = shouldBeep(remoteMessage);
 
                         logDebug("Notification should beep: "+ beep);
                         showMessageNotificationAfterPush = true;
@@ -272,28 +248,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         String gSession = credentials.getSession();
                         if (megaApi.getRootNode() == null){
                             logWarning("RootNode = null");
-
                             performLoginProccess(gSession);
-
-                            chatNotificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-
-                            h = new Handler(Looper.getMainLooper());
-                            h.postDelayed(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            boolean shown = ((MegaApplication) getApplication()).isChatNotificationReceived();
-                                            if(!shown){
-                                                logDebug("Show simple notification - no connection finished");
-                                                chatNotificationBuilder.showSimpleNotification();
-                                            }
-                                            else{
-                                                logDebug("Notification already shown");
-                                            }
-                                        }
-                                    },
-                                    12000
-                            );
                         }
                         else{
                             //Leave the flag showMessageNotificationAfterPush as it is
@@ -303,26 +258,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             logDebug("Call to pushReceived");
                             megaChatApi.pushReceived(beep);
                             beep = false;
-
-                            chatNotificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-
-                            h = new Handler(Looper.getMainLooper());
-                            h.postDelayed(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            boolean shown = ((MegaApplication) getApplication()).isChatNotificationReceived();
-                                            if(!shown){
-                                                logDebug("Show simple notification - no connection finished");
-                                                chatNotificationBuilder.showSimpleNotification();
-                                            }
-                                            else{
-                                                logDebug("Notification already shown");
-                                            }
-                                        }
-                                    },
-                                    12000
-                            );
                         }
                     }
                 }

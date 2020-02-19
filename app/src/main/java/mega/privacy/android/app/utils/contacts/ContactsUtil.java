@@ -29,9 +29,10 @@ public class ContactsUtil {
 
         private List<String> emailList = new ArrayList<>();
 
-        public LocalContact(long id, String name) {
+        private LocalContact(long id, String name) {
             this.id = id;
-            this.name = name;
+            //If contact name has double quotes replace by single quotes to avoid JSON parse error of the string
+            this.name = name == null ? "" : name.replaceAll("\"","''");
         }
 
         public long getId() {

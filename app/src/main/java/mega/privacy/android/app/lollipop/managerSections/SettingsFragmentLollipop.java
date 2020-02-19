@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -54,6 +55,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
@@ -78,6 +80,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_SETTINGS;
 import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -887,7 +890,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				waitPresenceConfig();
 			}
 
-			boolean sendOriginalAttachment = isSendOriginalAttachments(context);
+			boolean sendOriginalAttachment = isSendOriginalAttachments();
 			if(sendOriginalAttachment){
 				chatAttachmentsChatListPreference.setValue(1+"");
 			}
@@ -1453,12 +1456,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 showSelectDownloadLocationDialog();
             }
         } else {
-            showSnackBar(context, SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+            showSnackbar(context, getString(R.string.download_requires_permission));
         }
     }
 
     private void onCannotWriteOnSDCard() {
-        showSnackBar(context, SNACKBAR_TYPE, getString(R.string.no_external_SD_card_detected), -1);
+        showSnackbar(context, getString(R.string.no_external_SD_card_detected));
         new Handler().postDelayed(new Runnable() {
 
             @Override
@@ -1902,9 +1905,20 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0){
-			//Intent to new activity Chat Settings
-			Intent i = new Intent(context, ChatPreferencesActivity.class);
-			startActivity(i);
+		    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+		        //create default chat summary channel
+                ChatAdvancedNotificationBuilder.createChatSummaryChannel(context);
+		        //to system channel settings page
+                Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
+                intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
+                // change the setting of chat summary channel
+                intent.putExtra(Settings.EXTRA_CHANNEL_ID, NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2);
+                startActivity(intent);
+            } else {
+                //Intent to new activity Chat Settings
+                Intent i = new Intent(context, ChatPreferencesActivity.class);
+                startActivity(i);
+            }
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN
@@ -2117,7 +2131,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             if (!hasPermissions(context,PERMISSIONS)) {
                 ActivityCompat.requestPermissions((ManagerActivityLollipop)context,PERMISSIONS,REQUEST_CAMERA_UPLOAD);
             } else {
-                enableCameraUpload();
+				((ManagerActivityLollipop) context).checkIfShouldShowBusinessCUAlert(BUSINESS_CU_FRAGMENT_SETTINGS, false);
             }
         } else {
             disableCameraUpload();
@@ -2178,7 +2192,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 logDebug("intent NULL");
                 if(requestCode != Activity.RESULT_OK) {
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        showSnackBar(context, SNACKBAR_TYPE, getString(R.string.download_requires_permission), -1);
+                        showSnackbar(context, getString(R.string.download_requires_permission));
                     }
                 } else {
                     onCannotWriteOnSDCard();
@@ -2390,7 +2404,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		//Check if the call is recently
 		logDebug("Check the last call to getAccountDetails");
 		MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
-		if(callToAccountDetails(context) || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
+		if(callToAccountDetails() || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
 			logDebug("megaApi.getAccountDetails SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
 		}
