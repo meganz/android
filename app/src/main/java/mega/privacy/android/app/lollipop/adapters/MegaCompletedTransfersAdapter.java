@@ -110,8 +110,6 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		holder.imageView = (ImageView) v.findViewById(R.id.transfers_list_thumbnail);
 		holder.iconDownloadUploadView = (ImageView) v.findViewById(R.id.transfers_list_small_icon);
 		holder.textViewFileName = (TextView) v.findViewById(R.id.transfers_list_filename);
-		holder.textViewFileName.setSingleLine(true);
-		holder.textViewFileName.setEllipsize(TruncateAt.MIDDLE);
 		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 		holder.textViewFileName.getLayoutParams().width = px2dp((150*scaleW), outMetrics);
 		holder.imageViewCompleted = (ImageView) v.findViewById(R.id.transfers_list_completed_image);
@@ -202,7 +200,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		logDebug("State of the transfer: " + state);
 		switch (state){
 			case MegaTransfer.STATE_COMPLETED:{
-				holder.textViewCompleted.setText(context.getResources().getString(R.string.title_tab_completed_transfers));
+				holder.textViewCompleted.setText(transfer.getPath());
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_complete_transfer);
 
 				break;

@@ -16086,7 +16086,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		logDebug("Node Handle: " + transfer.getNodeHandle());
 
 		String size = getSizeString(transfer.getTotalBytes());
-		AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
+		AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"", transfer.getParentPath());
 
 		completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 		if(completedTFLol!=null){

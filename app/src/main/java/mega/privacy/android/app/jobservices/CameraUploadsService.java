@@ -1541,7 +1541,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
             String size = getSizeString(transfer.getTotalBytes());
-            AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
+            AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "", transfer.getParentPath());
             dbH.setCompletedTransfer(completedTransfer);
         }
 
