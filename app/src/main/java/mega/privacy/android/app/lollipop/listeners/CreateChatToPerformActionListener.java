@@ -52,7 +52,6 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
     int totalCounter;
     long idChat;
 
-    MegaChatApiAndroid megaChatApi;
     MegaApplication application;
 
     public CreateChatToPerformActionListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, long fileHandle, Context context, int action) {
@@ -63,10 +62,8 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
         this.usersNoChat = usersNoChat;
         this.fileHandle = fileHandle;
         this.action = action;
-        application = ((MegaApplication) ((Activity)context).getApplication());
-        if (megaChatApi == null) {
-            megaChatApi = application.getMegaChatApi();
-        }
+        application = MegaApplication.getInstance();
+
     }
 
     public CreateChatToPerformActionListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, long[] handles, Context context, int action, long idChat) {
@@ -84,11 +81,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
         this.handles = handles;
         this.action = action;
         this.idChat = idChat;
-        application = ((MegaApplication) ((Activity)context).getApplication());
-
-        if (megaChatApi == null) {
-            megaChatApi = application.getMegaChatApi();
-        }
+        application = MegaApplication.getInstance();
     }
 
     @Override
@@ -118,7 +111,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     if(chats==null){
                         chats = new ArrayList<MegaChatRoom>();
                     }
-                    MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
+                    MegaChatRoom chat = api.getChatRoom(request.getChatHandle());
                     if(chat!=null){
                         chats.add(chat);
                     }
@@ -177,10 +170,10 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     if (e.getErrorCode() != MegaError.API_OK) {
                         ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
                     } else {
-                        MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
+                        MegaChatRoom chat = api.getChatRoom(request.getChatHandle());
                         if (chat != null) {
                             application.setSpeakerStatus(chat.getChatId(), false);
-                            megaChatApi.startChatCall(chat.getChatId(), false, (ContactInfoActivityLollipop) context);
+                            api.startChatCall(chat.getChatId(), false, (ContactInfoActivityLollipop) context);
                         } else {
                             logWarning("Chatroom not recovered");
                         }
@@ -192,11 +185,11 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     if (e.getErrorCode() != MegaError.API_OK) {
                         ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
                     } else {
-                        MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
+                        MegaChatRoom chat = api.getChatRoom(request.getChatHandle());
                         if (chat != null) {
                             application.setSpeakerStatus(chat.getChatId(), true);
                             application.manuallyActivatedLocalCamera();
-                            megaChatApi.startChatCall(chat.getChatId(), true, (ContactInfoActivityLollipop) context);
+                            api.startChatCall(chat.getChatId(), true, (ContactInfoActivityLollipop) context);
                         } else {
                             logWarning("Chatroom not recovered");
                         }
@@ -214,7 +207,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     if(chats==null){
                         chats = new ArrayList<MegaChatRoom>();
                     }
-                    MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
+                    MegaChatRoom chat = api.getChatRoom(request.getChatHandle());
                     if(chat!=null){
                         chats.add(chat);
                     }
@@ -252,7 +245,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     if(chats==null){
                         chats = new ArrayList<MegaChatRoom>();
                     }
-                    MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
+                    MegaChatRoom chat = api.getChatRoom(request.getChatHandle());
                     if(chat!=null){
                         chats.add(chat);
                     }
@@ -286,7 +279,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     if(chats==null){
                         chats = new ArrayList<MegaChatRoom>();
                     }
-                    MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
+                    MegaChatRoom chat = api.getChatRoom(request.getChatHandle());
                     if(chat!=null){
                         chats.add(chat);
                     }
@@ -311,7 +304,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                             chatHandles[i] = chats.get(i).getChatId();
                         }
                         MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(context, chatHandles, handles, idChat);
-                        forwardChatProcessor.forward(megaChatApi.getChatRoom(idChat));
+                        forwardChatProcessor.forward(api.getChatRoom(idChat));
                     }
                 }
             }
@@ -326,7 +319,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     if(chats==null){
                         chats = new ArrayList<MegaChatRoom>();
                     }
-                    MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
+                    MegaChatRoom chat = api.getChatRoom(request.getChatHandle());
                     if(chat!=null){
                         chats.add(chat);
                     }

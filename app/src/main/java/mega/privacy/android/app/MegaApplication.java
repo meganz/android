@@ -181,39 +181,38 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	private void checkDeviceCamera() {
 		if(cameraManager != null) return;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			cameraManager = (CameraManager) getApplicationContext().getSystemService(Context.CAMERA_SERVICE);
-			if(cameraHandler == null) cameraHandler = new Handler();
+		cameraManager = (CameraManager) getApplicationContext().getSystemService(Context.CAMERA_SERVICE);
+		if(cameraHandler == null) cameraHandler = new Handler();
 
-			if(cameraCallback == null) {
-				cameraCallback = new CameraManager.AvailabilityCallback() {
-					@Override
-					public void onCameraAvailable(String cameraId) {
-						super.onCameraAvailable(cameraId);
+		if(cameraCallback == null) {
+			cameraCallback = new CameraManager.AvailabilityCallback() {
+				@Override
+				public void onCameraAvailable(String cameraId) {
+					super.onCameraAvailable(cameraId);
+				}
+
+				@Override
+				public void onCameraUnavailable(String cameraId) {
+					super.onCameraUnavailable(cameraId);
+					/*Find the call in progress that has video enabled and disable the video*/
+					if(localCameraEnabled){
+						localCameraEnabled = false;
+						return;
 					}
-
-					@Override
-					public void onCameraUnavailable(String cameraId) {
-						super.onCameraUnavailable(cameraId);
-						/*Find the call in progress that has video enabled and disable the video*/
-						if(localCameraEnabled){
-							localCameraEnabled = false;
-							return;
-						}
-						if (megaChatApi != null) {
-							long chatIdCallInProgress = getChatCallInProgress(megaChatApi);
-							MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
-							if (callInProgress != null && callInProgress.hasLocalVideo()) {
-								logDebug("Disabling local video ... the camera is using by other app");
-								megaChatApi.disableVideo(chatIdCallInProgress, null);
-							}
+					if (megaChatApi != null) {
+						long chatIdCallInProgress = getChatCallInProgress(megaChatApi);
+						MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
+						if (callInProgress != null && callInProgress.hasLocalVideo()) {
+							logDebug("Disabling local video ... the camera is using by other app");
+							megaChatApi.disableVideo(chatIdCallInProgress, null);
 						}
 					}
-				};
-			}
-
-			cameraManager.registerAvailabilityCallback((CameraManager.AvailabilityCallback) cameraCallback, cameraHandler);
+				}
+			};
 		}
+
+		cameraManager.registerAvailabilityCallback((CameraManager.AvailabilityCallback) cameraCallback, cameraHandler);
+
 	}
 
 	public void manuallyActivatedLocalCamera(){
