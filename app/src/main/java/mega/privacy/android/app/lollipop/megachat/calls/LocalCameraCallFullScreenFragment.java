@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
@@ -22,6 +21,7 @@ import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
 public class LocalCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface {
 
@@ -76,8 +76,6 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
         if ((width == 0) || (height == 0)) return;
-
-
         if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
@@ -92,19 +90,19 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
                         holderHeight = viewHeight;
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
-                    this.bitmap = localRenderer.CreateBitmap(width, height);
+                    this.bitmap = localRenderer.createBitmap(width, height);
                     holder.setFixedSize(holderWidth, holderHeight);
                 } else {
                     this.width = -1;
                     this.height = -1;
                 }
             }
-
         }
         if (bitmap == null) return;
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-        localRenderer.DrawBitmap(false, true);
-
+        if (isVideoAllowed()) {
+            localRenderer.drawBitmap(false, true);
+        }
     }
 
     @Override
