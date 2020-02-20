@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Un attaccante esterno non può accedere al tuo account solo con la chiave. Un reset della password richiede sia la chiave e l\'accesso alla tua e-mail.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copia la tua Chiave di Recupero negli appunti o salvala come file di testo</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">Salva</string>
+    <string name="save_action" context="Action of a button to save something">Salva</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">La Chiave di Recupero è stata copiata con successo</string>
 
     <string name="change_pass" context="Button to change the password">Cambia</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">Seleziona i contatti dalla lista dei contatti del tuo telefono oppure inserisci più indirizzi email.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">Invita degli amici su MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">Grazie! L\'invito è stato inviato per email</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">Invito spedito</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Incoraggia i tuoi amici a registrarsi e ad installare un\'app MEGA. Se il tuo amico utilizza la stessa email che hai inserito, riceverai una ricompensa in banda di trasferimento.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">L\'email è errata</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">Buono</string>
     <string name="pass_strong" context="Password strong">Sicura</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Chiamata in corso</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Chiamata in corso</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Clicca per tornare alla chiamata</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Ritorna alla chiamata</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]La richiesta di contatto di[/B] [A]%s[/A] [B]è stata declinata[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Il tuo account corrente è [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Soggetto alla tua partecipazione al nostro programma ad obiettivi.</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Soggetto alla tua partecipazione nel nostro programma di obiettivi.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Scegli metodo di pagamento</string>
 
     <string name="billing_period_title" context="title of billing period">Periodo di fatturazione</string>

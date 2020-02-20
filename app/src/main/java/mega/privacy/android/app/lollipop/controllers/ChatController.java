@@ -764,7 +764,8 @@ public class ChatController {
                             int minutes = (message.getDuration() % 3600) / 60;
                             int seconds = message.getDuration() % 60;
 
-                            textToShow = context.getString(R.string.call_ended_message);
+                            textToShow = chatRoom.isGroup() ? context.getString(R.string.group_call_ended_message) :
+                                    context.getString(R.string.call_ended_message);
 
                             if(hours != 0){
                                 String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
@@ -953,7 +954,8 @@ public class ChatController {
                             int minutes = (message.getDuration() % 3600) / 60;
                             int seconds = message.getDuration() % 60;
 
-                            textToShow = context.getString(R.string.call_ended_message);
+                            textToShow = chatRoom.isGroup() ? context.getString(R.string.group_call_ended_message) :
+                                    context.getString(R.string.call_ended_message);
 
                             if(hours != 0){
                                 String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);

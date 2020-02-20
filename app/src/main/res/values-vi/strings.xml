@@ -677,7 +677,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Hiện các thiết bị nâng cao (thẻ nhớ SD ngoài)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
 	<string name="verify_account_title" context="enter verification code page title">Xác thực tài khoản</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been locked temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Quốc gia</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Số điện thoại của bạn</string>
     <string name="general_back_button" context="Button label - go to previous page">Quay lại</string>
@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Các kẻ tấn công không thể nào truy cập vào tài khoản của bạn chỉ với mã-khóa không thôi. Thủ tục đặt lại mật khẩu yêu cầu bạn phải có mã-khóa master và quyền truy cập vào email của bạn.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Sao chép Mã Khóa Phục Hồi vào bộ ghi nhớ hoặc lưu lại mã dưới dạng tệp tin chữ</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">Lưu</string>
+    <string name="save_action" context="Action of a button to save something">Lưu</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Mã Khóa Phục Hồi đã được lưu lại vào bộ nhớ</string>
 
     <string name="change_pass" context="Button to change the password">Thay đổi</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">Chọn những tên trong danh bạ điện thoại hoặc điền vào các địa chỉ email.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">Mời giới thiệu bạn bè dùng MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">Cảm ơn! Lời mời đã được gửi đi bằng email</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">Lời Mời Đã Gửi</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Khuyên bạn bè đăng ký, cài và sử dụng MEGA. Chỉ cần người bạn được mời sử dụng địa chỉ email trùng với email trong thư mời đã nhập, phần thưởng sẽ xuất hiện trong tài khoản.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">Địa chỉ email không đúng cú pháp</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">Được</string>
     <string name="pass_strong" context="Password strong">Tốt</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Cuộc gọi đang diễn ra</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Cuộc gọi đang diễn ra</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Chạm để quay trở lại cuộc gọi</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Quay trở lại cuộc gọi</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Lời yêu cầu thêm vào danh bạ từ [/B][A]%s [/A][B]đã bị từ chối[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Hạng của tài khoản bây giờ là [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Tùy thuộc vào cách người sử dụng tham gia vào chương trình làm nhiệm vụ thưởng</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Tùy thuộc vào việc tham gia của người sử dụng dịch vụ khi thực hiện các nhiệm vụ phần thưởng thành tích.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Chọn phương thức thanh toán</string>
 
     <string name="billing_period_title" context="title of billing period">Chu kỳ thanh toán</string>

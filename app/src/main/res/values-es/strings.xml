@@ -62,7 +62,7 @@
     -->
     <string name="general_show_info" context="Hint how to cancel the download">Más información</string>
 
-    <string name="error_general_nodes" context="Error getting the root node">Error. Por favor, inténtalo de nuevo.</string>
+    <string name="error_general_nodes" context="Error getting the root node">Error. Inténtalo de nuevo.</string>
 
     <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-CLAVEDERECUPERACION</string>
 
@@ -351,7 +351,7 @@
 
     <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Abandonar</string>
     <string name="alert_leave_share" context="Title alert before leaving a share.">Abandonar compartición</string>
-    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">No compartir</string>
+    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Dejar de compartir</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Eliminar enlace</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">El enlace público se eliminará.</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renombrar</string>
@@ -621,7 +621,7 @@
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">La vista previa todavía no se ha descargado, por favor espera</string>
     <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">No se ha podido cargar la vista previa porque no hay suficiente memoria disponible. Por favor, inténtalo de nuevo más tarde.</string>
 
-    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Por favor, cierra sesión antes de crear la cuenta</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">Cierra sesión antes de crear la cuenta</string>
 
     <!--
     <string name="import_correct" context="success message after import a file">Imported successfully</string>
@@ -660,7 +660,7 @@
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Almacenamiento</string>
     <string name="settings_pin_lock" context="settings of the pin lock">Bloqueo con PIN</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compresión de vídeos consume mucha energía, por eso MEGA te recordará que dejes tu dispositivo cargando si los videos a comprimir son superiores a %s.</string>
-	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Si lo activas, cargarás información sobre dónde se tomaron tus fotos, así que ten cuidado al compartirlas.</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Si activas está opción, se subirá información sobre dónde se tomaron tus fotos, así que ten cuidado al compartirlas.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Avanzado</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Borrar caché</string>
@@ -676,7 +676,7 @@
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Preguntar siempre la ruta de descarga</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Mostrar dispositivos avanzados (SD externa)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Añadir el número de teléfono</string>
-	<string name="verify_account_title" context="enter verification code page title">Verifica tu cuenta</string>
+	<string name="verify_account_title" context="enter verification code page title">Confirma tu cuenta</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Tu cuenta ha sido temporalmente suspendida debido a un posible mal uso de la misma. Confirma tu número de teléfono para desbloquear tu cuenta.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">País</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Tu número de teléfono</string>
@@ -687,7 +687,7 @@
     <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">No se han podido recuperar los códigos de país.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Por favor, indica un número de teléfono válido.</string>
 	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Introduce el código de verificación enviado al</string>
-	<string name="verify_account_enter_code_title" context="enter verification code page title">Verifica tu cuenta</string>
+	<string name="verify_account_enter_code_title" context="enter verification code page title">Confirma tu cuenta</string>
 	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Código erróneo. Prueba de nuevo o vuelve a enviarlo.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">¿No has recibido el código?</string>
     <string name="general_resend_button" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">Reenviar</string>
@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Un atacante externo no puede acceder a tu cuenta solo con tu clave. Para restablecer la contraseña necesitaría tanto la clave como el acceso a tu correo electrónico.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copia la Clave de recuperación en el portapapeles o guárdala como archivo de texto</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">Guardar</string>
+    <string name="save_action" context="Action of a button to save something">Guardar</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Clave de recuperación copiada</string>
 
     <string name="change_pass" context="Button to change the password">Cambiar</string>
@@ -950,7 +950,7 @@
     <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">Introduce una nueva contraseña</string>
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">Este enlace de recuperación ha caducado, por favor inténtalo de nuevo.</string>
 
-    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Tu Clave de recuperación se utilizará para restablecer la contraseña. Por favor, escribe tu nueva contraseña.</string>
+    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Tu Clave de recuperación se utilizará para restablecer la contraseña. Escribe tu nueva contraseña.</string>
     <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Recibirás un enlace de recuperación que te permitirá restablecer tu contraseña.</string>
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Ampliar</string>
@@ -1023,14 +1023,14 @@
     </plurals>
 
     <plurals name="confirmation_remove_outgoing_shares">
-        <item context="Confirmation before removing the outgoing shares of a folder" quantity="one">La carpeta está compartida con %1$d contacto. ¿Eliminar la compartición?</item>
+        <item context="Confirmation before removing the outgoing shares of a folder" quantity="one">La carpeta está compartida con %1$d contacto. ¿Dejar de compartir?</item>
         <item context="Confirmation before removing the outgoing shares of a folder" quantity="other">La carpeta está compartida con %1$d contactos. ¿Eliminar la compartición?</item>
     </plurals>
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">Correo electrónico y/o contraseña incorrectos. Vuelve a intentarlo.</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Tu cuenta ha sido suspendida por infringir nuestros Términos de servicio. Por favor, ponte en contacto con support&#64;mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Demasiados intentos de acceso incorréctos. Vuelve a intentarlo en una hora.</string>
-    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Todavía no has confirmado la cuenta. Por favor, revisa tu correo electrónico.</string>
+    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Todavía no has confirmado la cuenta. Revisa tu correo electrónico.</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn’t exist">Enlace de la carpeta no disponible</string>
     <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">El enlace de la carpeta ha sido eliminado por infringir nuestros Términos de servicio.</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">Selecciona contactos de tu agenda o introduce direcciones de correo electrónico.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">Invita a tus amigos a MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">¡Gracias! La invitación se ha enviado por correo electrónico</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">Invitación enviada</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Anima a tus amigos a registrarse e instalar una aplicación MEGA. Siempre que tu amigo use la misma dirección de correo electrónico que has invitado, recibirás el bono de cuota de transferencia.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">Correo electrónico no válido</string>
@@ -1657,7 +1657,7 @@
     <string name="settings_help" context="Settings category title for Help">Ayuda</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Enviar valoración</string>
     <string name="setting_feedback_subject" context="mail subject">Feedback Android</string>
-    <string name="setting_feedback_body" context="mail body">Por favor, escribe tus comentarios:</string>
+    <string name="setting_feedback_body" context="mail body">Escribe tus comentarios:</string>
     <string name="settings_feedback_body_device_model" context="mail body">Modelo del dispositivo</string>
     <string name="settings_feedback_body_android_version" context="mail body">Versión de Android</string>
 
@@ -1731,13 +1731,13 @@
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Enlace copiado al portapapeles</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">El código QR se ha restablecido</string>
     <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">El código QR se ha eliminado</string>
-    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">No se ha podido restablecer el código QR. Inténtalo de nuevo.</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">No se ha podido restablecer el código QR. Inténtalo de nuevo</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">No se ha podido eliminar el código QR. Inténtalo de nuevo.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invitación enviada.</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">El usuario %s ha sido invitado y aparecerá en tu lista de contactos en cuanto acepte la invitación.</string>
-    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">No se ha podido compartir el archivo del QR. Es posible que el archivo no exista. Por favor, inténtalo de nuevo más tarde.</string>
-    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">No se ha podido subir el archivo del QR. Es posible que el archivo no exista. Por favor, inténtalo de nuevo más tarde.</string>
-    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">No se ha podido descargar el archivo del QR. Es posible que el archivo no exista. Por favor, inténtalo de nuevo más tarde.</string>
+    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">No se ha podido compartir el archivo del QR. Es posible que el archivo no exista. Inténtalo de nuevo más tarde.</string>
+    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">No se ha podido subir el archivo del QR. Es posible que el archivo no exista. Inténtalo de nuevo más tarde.</string>
+    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">archivo no exista. Inténtalo de nuevo más tarde.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">El código QR se ha descargado en el %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Invitación no enviada</string>
     <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">El código QR o el enlace de contacto no son válidos. Intenta escanear un código válido o abrir un enlace válido.</string>
@@ -1756,7 +1756,7 @@
 
     <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">Compartir usando</string>
 
-    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">Por favor, inicia sesión antes de activar el chat</string>
+    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">Inicia sesión antes de activar el chat</string>
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Buscar por periodo de tiempo</string>
 
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">Buena</string>
     <string name="pass_strong" context="Password strong">Fuerte</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Llamada en curso</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Llamada en curso</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Toca para volver a la llamada</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Volver a la llamada</string>
 
@@ -1987,7 +1987,7 @@
     <string name="explain_qr_seed_2fa_1" context="Text that explain how to do with Two-Factor Authentication QR">Escanea o copia la clave en tu aplicación de autenticación.</string>
     <string name="explain_qr_seed_2fa_2" context="Text that explain how to do with Two-Factor Authentication seed">Asegúrate de guardar la clave en un lugar seguro en caso de que pierdas tu dispositivo.</string>
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Introduce el código de 6 dígitos generado por tu aplicación de autenticación.</string>
-    <string name="general_verify" context="Text button">Verificar</string>
+    <string name="general_verify" context="Text button">Confirmar</string>
     <string name="general_next" context="Text button">Siguiente</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">No se ha podido generar la clave o el código QR, inténtalo de nuevo.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Autenticación de dos factores activada</string>
@@ -2129,11 +2129,11 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Código no valido</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Tu Nube está casi llena. Amplía tu cuenta y obtén hasta 8 TB de almacenamiento y 16 TB de cuota de transferencia.</string>
-    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Tu Nube está casi llena. Amplía tu cuenta y obtén hasta 8 TB de almacenamiento y 16 TB de cuota de transferencia.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Tu Nube está casi llena. Amplía tu cuenta y obtén hasta %1$s de almacenamiento y %2$s de cuota de transferencia.</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Tu Nube está casi llena. Amplía tu cuenta y obtén hasta %1$s de almacenamiento y %2$s de cuota de transferencia.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Tu Nube está casi llena. Si necesitas más almacenamiento, ponte en contacto con el servicio de asistencia de MEGA para obtener un plan personalizado.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Tu Nube está llena. Amplía tu cuenta y obtén hasta 8 TB de almacenamiento y 16 TB de cuota de transferencia.</string>
-    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Tu Nube está llena. Amplía tu cuenta y obtén hasta 8 TB de almacenamiento y 16 TB de cuota de transferencia.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Tu Nube está llena. Amplía tu cuenta y obtén hasta %1$s de almacenamiento y %2$sde cuota de transferencia.</string>
+    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Tu Nube está llena. Amplía tu cuenta y obtén hasta %1$s de almacenamiento y %2$s de cuota de transferencia.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Tu Nube está llena. Si necesitas más almacenamiento, ponte en contacto con el servicio de asistencia de MEGA para obtener un plan personalizado.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">Ver planes</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Plan personalizado</string>
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]La solicitud de contacto de [/B][A]%s [/A][B]ha sido rechazada[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Tu cuenta es [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Sujeto a la participación en nuestro programa de logros</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Sujeto a la participación en nuestro programa de logros.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Selecciona el método de pago</string>
 
     <string name="billing_period_title" context="title of billing period">Período de facturación</string>
@@ -2607,7 +2607,7 @@
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Nombre desconocido</string>
 
-    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Por favor, selecciona uno o más contactos.</string>
+    <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Selecciona uno o más contactos</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s contactos enviados.</string>
 </resources>

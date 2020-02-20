@@ -677,7 +677,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Отображать дополнительные устройства (внешняя SD-карта)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Добавить номер телефона</string>
 	<string name="verify_account_title" context="enter verification code page title">Подтвердить аккаунт</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Ваш аккаунт был временно приостановлен из-за возможного злоупотребления. Пожалуйста, подтвердите номер телефона, чтобы разблокировать аккаунт.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Ваш аккаунт был временно заблокирован из-за возможного злоупотребления. Пожалуйста, подтвердите номер телефона, чтобы разблокировать аккаунт.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Страна</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Ваш телефонный номер</string>
     <string name="general_back_button" context="Button label - go to previous page">Назад</string>
@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Внешний злоумышленник не сможет получить доступ к вашему аккаунту при наличии только ключа. Сброс пароля требует и ключ, и доступ к вашей электронной почте.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Скопируйте ключ восстановления  в буфер обмена или сохраните как текстовый файл</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">Сохранить</string>
+    <string name="save_action" context="Action of a button to save something">Сохранить</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Ключ восстановления успешно скопирован</string>
 
     <string name="change_pass" context="Button to change the password">Изменить</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">Выберите контакты из телефонного списка контактов или введите адреса электронной почты.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">Пригласить друзей в MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">Спасибо! Приглашение отправлено по электронной почте</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">Приглашение отправлено</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Убедите друзей зарегистрироваться и установить приложение MEGA. Если ваш друг использует тот же адрес e-mail, что вы указали, ваша квота передач будет увеличена.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">Неверный адрес</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">Хороший</string>
     <string name="pass_strong" context="Password strong">Надёжный</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Идёт вызов</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Идёт вызов</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Нажмите, чтобы вернуться к вызову.</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Вернуться к вызову</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Запрос от [/B][A]%s [/A][B]отклонён[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Ваш текущий аккаунт — [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* При условии участия в нашей программе достижений</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">При условии вашего участия в программе достижений.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Выберите способ оплаты</string>
 
     <string name="billing_period_title" context="title of billing period">Расчётный период</string>

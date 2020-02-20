@@ -134,6 +134,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
+import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
@@ -245,6 +246,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
@@ -3986,51 +3988,44 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void setProfileAvatar(){
+	public void setProfileAvatar() {
 		logDebug("setProfileAvatar");
 		File avatar = buildAvatarFile(this, megaApi.getMyEmail() + ".jpg");
-		Bitmap imBitmap = null;
-		if (isFileAvailable(avatar)){
-			if (avatar.length() > 0){
-				BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inJustDecodeBounds = true;
-				BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+		Bitmap imBitmap;
+		if (isFileAvailable(avatar) && avatar.length() > 0) {
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+			BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
 
-				// Calculate inSampleSize
-				options.inSampleSize = calculateInSampleSize(options, 250, 250);
+			// Calculate inSampleSize
+			options.inSampleSize = calculateInSampleSize(options, 250, 250);
 
-				// Decode bitmap with inSampleSize set
-				options.inJustDecodeBounds = false;
+			// Decode bitmap with inSampleSize set
+			options.inJustDecodeBounds = false;
 
-				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-				if (imBitmap == null) {
-					avatar.delete();
-                    megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
-                }
-				else{
-					Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+			imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+			if (imBitmap == null) {
+				avatar.delete();
+				megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
+			} else {
+				Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
-					BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
-					Paint paint = new Paint();
-					paint.setShader(shader);
+				BitmapShader shader = new BitmapShader(imBitmap, TileMode.CLAMP, TileMode.CLAMP);
+				Paint paint = new Paint();
+				paint.setShader(shader);
 
-					Canvas c = new Canvas(circleBitmap);
-					int radius;
-					if (imBitmap.getWidth() < imBitmap.getHeight())
-						radius = imBitmap.getWidth()/2;
-					else
-						radius = imBitmap.getHeight()/2;
+				Canvas c = new Canvas(circleBitmap);
+				int radius;
+				if (imBitmap.getWidth() < imBitmap.getHeight())
+					radius = imBitmap.getWidth() / 2;
+				else
+					radius = imBitmap.getHeight() / 2;
 
-					c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
-					nVPictureProfile.setImageBitmap(circleBitmap);
-				}
+				c.drawCircle(imBitmap.getWidth() / 2, imBitmap.getHeight() / 2, radius, paint);
+				nVPictureProfile.setImageBitmap(circleBitmap);
 			}
-			else{
-                megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyUser().getEmail() + ".jpg").getAbsolutePath(), this);
-			}
-		}
-		else{
-            megaApi.getUserAvatar(megaApi.getMyUser(),buildAvatarFile(this,megaApi.getMyUser().getEmail() + ".jpg").getAbsolutePath(),this);
+		} else {
+			megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
 		}
 	}
 
@@ -9981,6 +9976,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void openLink (String link) {
+		// Password link
+		if (matchRegexs(link, PASSWORD_LINK_REGEXS)) {
+			dismissOpenLinkDialog();
+			Intent openLinkIntent = new Intent(this, OpenPasswordLinkActivity.class);
+			openLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openLinkIntent.setData(Uri.parse(link));
+			startActivity(openLinkIntent);
+			return;
+		}
+
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 			int error = nC.importLink(link);
 			if (openLinkError.getVisibility() == View.VISIBLE) {
@@ -11828,7 +11833,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 		if (cFLol != null){
 			cFLol.sortBy();
-			cFLol.updateOrder();
 		}
 	}
 
@@ -14857,6 +14861,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if(e.getErrorCode() == MegaError.API_OK){
 				logDebug("Email changed");
 				updateMyEmail(request.getEmail());
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.email_changed, request.getEmail()), INVALID_HANDLE);
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXIST){
 				logWarning("The new mail already exists");
@@ -15947,12 +15952,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void pauseIndividualTransfer(MegaTransfer mT){
-		logDebug("pauseIndividualTransfer");
-		if(mT.getState()==MegaTransfer.STATE_PAUSED){
-			megaApi.pauseTransfer(mT, false, managerActivity);
+	public void pauseIndividualTransfer(MegaTransfer mT) {
+		if (mT == null) {
+			logWarning("Transfer object is null.");
+			return;
 		}
-		else{
+
+		if (mT.getState() == MegaTransfer.STATE_PAUSED) {
+			logDebug("Resume transfer - Node handle: " + mT.getNodeHandle());
+			megaApi.pauseTransfer(mT, false, managerActivity);
+		} else {
+			logDebug("Pause transfer - Node handle: " + mT.getNodeHandle());
 			megaApi.pauseTransfer(mT, true, managerActivity);
 		}
 	}
@@ -16630,6 +16640,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private boolean shouldShowFabWhenSearch() {
+		if (searchDrawerItem == null) {
+			return false;
+		}
+
 		switch (searchDrawerItem) {
 			case RUBBISH_BIN:
 			case INBOX:

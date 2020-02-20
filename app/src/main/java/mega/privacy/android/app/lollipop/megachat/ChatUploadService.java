@@ -305,7 +305,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				pendingMsg = dbH.findPendingMessageById(idPendMsg);
 			}
 
-			if (pendingMsg!=null) {
+			if (pendingMsg != null) {
 				sendOriginalAttachments = isSendOriginalAttachments();
 				logDebug("sendOriginalAttachments is " + sendOriginalAttachments);
 

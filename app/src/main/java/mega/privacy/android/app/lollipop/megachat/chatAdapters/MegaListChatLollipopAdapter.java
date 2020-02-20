@@ -1942,32 +1942,32 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					switch(termCode){
 						case MegaChatMessage.END_CALL_REASON_ENDED:{
 
-							int hours = duration / 3600;
-							int minutes = (duration % 3600) / 60;
-							int seconds = duration % 60;
-
-							textToShow = context.getString(R.string.call_ended_message);
-
-                            if(hours != 0){
-                                String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
-                                textToShow = textToShow + textHours;
-                                if((minutes != 0)||(seconds != 0)){
-                                    textToShow = textToShow+", ";
-                                }
-                            }
-
-                            if(minutes != 0){
-                                String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
-                                textToShow = textToShow + textMinutes;
-                                if(seconds != 0){
-                                    textToShow = textToShow+", ";
-                                }
-                            }
-
-                            if(seconds != 0){
-                                String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
-                                textToShow = textToShow + textSeconds;
-                            }
+							if(chat.isGroup()){
+								textToShow = context.getString(R.string.group_call_ended_no_duration_message);
+							}else {
+								int hours = duration / 3600;
+								int minutes = (duration % 3600) / 60;
+								int seconds = duration % 60;
+								textToShow = context.getString(R.string.call_ended_message);
+								if (hours != 0) {
+									String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
+									textToShow = textToShow + textHours;
+									if ((minutes != 0) || (seconds != 0)) {
+										textToShow = textToShow + ", ";
+									}
+								}
+								if (minutes != 0) {
+									String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
+									textToShow = textToShow + textMinutes;
+									if (seconds != 0) {
+										textToShow = textToShow + ", ";
+									}
+								}
+								if (seconds != 0) {
+									String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
+									textToShow = textToShow + textSeconds;
+								}
+							}
 
 							try{
 								textToShow = textToShow.replace("[A]", "");
