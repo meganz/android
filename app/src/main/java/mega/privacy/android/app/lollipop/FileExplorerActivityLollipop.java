@@ -758,10 +758,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						mTabsAdapterExplorer.setTabRemoved(true);
 						tabLayoutExplorer.removeTabAt(2);
 						mTabsAdapterExplorer.notifyDataSetChanged();
-					} else if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2) {
-						mTabsAdapterExplorer.setTabRemoved(true);
-						tabLayoutExplorer.removeTabAt(2);
-						mTabsAdapterExplorer.notifyDataSetChanged();
 					}
 				}
 
