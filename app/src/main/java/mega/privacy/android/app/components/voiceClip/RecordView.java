@@ -184,17 +184,22 @@ public class RecordView extends RelativeLayout {
         animationHelper.setStartRecorded(false);
     }
 
+    private void forceShowLock(int duration){
+        isPadlockShouldBeShown = false;
+        countShow ++;
+        countHide = 0;
+        imageArrow.setVisibility(VISIBLE);
+        imageLock.setVisibility(VISIBLE);
+        createAnimation(px2dp(175, outMetrics), duration);
+
+    }
+
     private void showLock(boolean needToShow) {
         if (needToShow) {
             if(isLockShown || layoutLock.getVisibility() == VISIBLE || countShow > 0) return;
             logDebug("Showing recording lock");
-            countShow ++;
-            countHide = 0;
-            imageArrow.setVisibility(VISIBLE);
-            imageLock.setVisibility(VISIBLE);
-            isPadlockShouldBeShown = false;
             initializeHeight();
-            createAnimation(px2dp(175, outMetrics), DURATION_EXPAND);
+            forceShowLock(DURATION_EXPAND);
         } else {
             if(!isLockShown || layoutLock.getVisibility() == View.GONE || countHide > 0) return;
             logDebug("Hiding recording lock");
@@ -397,9 +402,6 @@ public class RecordView extends RelativeLayout {
         paramsSlide.setMargins(px2dp(20, outMetrics), 0, 0, 0);
         slideToCancelLayout.setLayoutParams(paramsSlide);
         slideToCancelLayout.setShimmerColor(Color.WHITE);
-        slideToCancelLayout.setShimmerAnimationDuration(TIME_ANIMATION);
-        slideToCancelLayout.setAnimationReversed(true);
-        slideToCancelLayout.startShimmerAnimation();
     }
 
     protected void onActionDown(RelativeLayout recordBtnLayout, MotionEvent motionEvent) {
@@ -427,7 +429,6 @@ public class RecordView extends RelativeLayout {
         slideToCancelLayout.setTranslationX(translationX);
         slideToCancelLayout.setTranslationY(0);
         if (translationX == 0) {
-            slideToCancelLayout.stopShimmerAnimation();
             slideToCancelLayout.setVisibility(GONE);
         }
     }
@@ -440,9 +441,7 @@ public class RecordView extends RelativeLayout {
     }
 
     protected void onActionMove(RelativeLayout recordBtnLayout, MotionEvent motionEvent) {
-        logDebug("onActionMove()");
         if (isSwiped) return;
-
         float motionX = Math.abs(firstX - motionEvent.getRawX());
         float motionY = Math.abs(firstY - motionEvent.getRawY());
 
@@ -450,14 +449,13 @@ public class RecordView extends RelativeLayout {
             if(direction != UserBehaviour.CANCELING){
                 direction = UserBehaviour.CANCELING;
             }
-        } else if (motionY > motionX && lastY < firstY) {
+        } else if (motionY > motionX && lastY <= firstY) {
             if(direction != UserBehaviour.LOCKING){
                 direction = UserBehaviour.LOCKING;
             }
         } else if(direction != UserBehaviour.NONE){
             direction = UserBehaviour.NONE;
         }
-
         if (isRecordingNow && direction == UserBehaviour.CANCELING && (userBehaviour != UserBehaviour.CANCELING || ((motionEvent.getRawY() + (recordBtnLayout.getWidth() / 2)) > firstY)) && slideToCancelLayout.getVisibility() == VISIBLE && counterTime.getVisibility() == VISIBLE && recordListener != null) {
             if (slideToCancelLayout.getX() < counterTime.getLeft()) {
                 logDebug("Canceling voice clip ");
@@ -484,9 +482,10 @@ public class RecordView extends RelativeLayout {
             slideToCancelTranslation(valueToTranslation);
             recordButtonTranslation(recordBtnLayout, valueToTranslation, 0);
 
-
-        } else if (isRecordingNow && direction == UserBehaviour.LOCKING && (userBehaviour != UserBehaviour.LOCKING || ((motionEvent.getRawX() + (recordBtnLayout.getWidth() / 2)) > firstX)) && layoutLock.getVisibility() == VISIBLE && isLockShown && recordListener != null) {
-            if (((firstY - motionEvent.getRawY()) >= (layoutLock.getHeight() - (recordBtnLayout.getHeight() / 2)))) {
+        } else if (isRecordingNow && direction == UserBehaviour.LOCKING && (userBehaviour != UserBehaviour.LOCKING || ((motionEvent.getRawX() + (recordBtnLayout.getWidth() / 2)) >= firstX))  && recordListener != null) {
+            if(!isLockShown){
+                forceShowLock(0);
+            }else if (((firstY - motionEvent.getRawY()) >= (layoutLock.getHeight() - (recordBtnLayout.getHeight() / 2)))) {
                 logDebug("Locking voice clip");
                 userBehaviour = UserBehaviour.LOCKING;
                 recordListenerOptions(LOCK_RECORD, 0);
@@ -499,7 +498,6 @@ public class RecordView extends RelativeLayout {
             float valueToTranslation = -(firstY - motionEvent.getRawY());
             recordButtonTranslation(recordBtnLayout, 0, valueToTranslation);
         }
-
         lastX = motionEvent.getRawX();
         lastY = motionEvent.getRawY();
     }
