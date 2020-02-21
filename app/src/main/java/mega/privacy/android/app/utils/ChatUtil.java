@@ -40,6 +40,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 
@@ -452,6 +453,26 @@ public class ChatUtil {
             brandAlertDialog(dialog);
         }catch(Exception ex){
             showToast(activity, message);
+        }
+    }
+
+    public static String sessionStatusToString(int status) {
+        switch (status) {
+            case MegaChatSession.SESSION_STATUS_INVALID: {
+                return "SESSION_STATUS_INVALID";
+            }
+            case MegaChatSession.SESSION_STATUS_INITIAL: {
+                return "SESSION_STATUS_INITIAL";
+            }
+            case MegaChatSession.SESSION_STATUS_IN_PROGRESS: {
+                return "SESSION_STATUS_IN_PROGRESS";
+            }
+            case MegaChatSession.SESSION_STATUS_DESTROYED: {
+                return "SESSION_STATUS_DESTROYED";
+            }
+
+            default:
+                return String.valueOf(status);
         }
     }
 

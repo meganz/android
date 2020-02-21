@@ -152,6 +152,8 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
+import nz.mega.sdk.MegaChatSession;
+import nz.mega.sdk.MegaChatSessionListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
@@ -175,7 +177,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ChatActivityLollipop extends DownloadableActivity implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
+public class ChatActivityLollipop extends DownloadableActivity implements MegaChatSessionListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -448,6 +450,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         preservedMsgSelected = messagesSelected;
         preservedMsgToImport = messagesToImport;
     }
+
+
 
     private class UserTyping {
         MegaChatParticipant participantTyping;
@@ -8055,6 +8059,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     @Override
+    public void onChatSessionUpdate(MegaChatApiJava api, long chatid, long callid, MegaChatSession session) {
+        if (session != null && session.hasChanged(MegaChatSession.CHANGE_TYPE_REMOTE_AVFLAGS)) {
+            logDebug("Changes in remote av flags or in the call composition");
+            usersWithVideo();
+        }
+    }
+
+    @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 
         if((call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) && (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
@@ -8090,11 +8102,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     default:
                         break;
                 }
-
-            } else if ((call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS)) || (call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)) || (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION))) {
-                logDebug("Changes in remote/local av flags or in the call composition");
+            } else if ((call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)) || (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION))) {
+                logDebug("Changes in local av flags or in the call composition");
                 usersWithVideo();
-
             }
         } else {
             logDebug("Different chat");
