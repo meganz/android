@@ -2069,10 +2069,11 @@ public class ChatController {
         else{
             if (context instanceof ChatActivityLollipop) {
                 ((ChatActivityLollipop) context).storedUnhandledData(messagesSelected, messagesToImport);
+                ((ChatActivityLollipop) context).handleStoredData();
             } else if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
+                megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
             }
-            megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
         }
     }
 
