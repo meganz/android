@@ -51,7 +51,6 @@ public class Constants {
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
     public static final String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
-    public static final String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
     public static final String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";

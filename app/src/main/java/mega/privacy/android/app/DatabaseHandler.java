@@ -33,7 +33,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 52;
+	private static final int DATABASE_VERSION = 53;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -138,11 +138,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_NONCONTACT_LASTNAME = "noncontactlastname";
 	private static final String KEY_NONCONTACT_EMAIL = "noncontactemail";
 
-	private static final String KEY_CHAT_ENABLED = "chatenabled";
 	private static final String KEY_CHAT_NOTIFICATIONS_ENABLED = "chatnotifications";
 	private static final String KEY_CHAT_SOUND_NOTIFICATIONS = "chatnotificationsound";
 	private static final String KEY_CHAT_VIBRATION_ENABLED = "chatvibrationenabled";
-	private static final String KEY_CHAT_STATUS = "chatstatus";
 	private static final String KEY_CHAT_SEND_ORIGINALS = "sendoriginalsattachments";
 
 	private static final String KEY_INVALIDATE_SDK_CACHE = "invalidatesdkcache";
@@ -350,8 +348,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_NONCONTACT_TABLE);
 
 		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_ENABLED + " BOOLEAN, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
-				KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN, "+ KEY_CHAT_STATUS + " TEXT, "+ KEY_CHAT_SEND_ORIGINALS + " BOOLEAN"+")";
+				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " + KEY_CHAT_SOUND_NOTIFICATIONS + " TEXT, "
+				+ KEY_CHAT_VIBRATION_ENABLED + " BOOLEAN, " + KEY_CHAT_SEND_ORIGINALS + " BOOLEAN" + ")";
 		db.execSQL(CREATE_CHAT_TABLE);
 
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
@@ -586,7 +584,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL(CREATE_NONCONTACT_TABLE);
 
 			String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
-					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_ENABLED + " BOOLEAN, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
+					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
 					KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN"+")";
 			db.execSQL(CREATE_CHAT_TABLE);
 		}
@@ -597,11 +595,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 			db.execSQL("ALTER TABLE " + TABLE_CREDENTIALS + " ADD COLUMN " + KEY_LAST_NAME + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_LAST_NAME + " = '" + encrypt("") + "';");
-		}
-
-		if (oldVersion <= 24){
-			db.execSQL("ALTER TABLE " + TABLE_CHAT_SETTINGS + " ADD COLUMN " + KEY_CHAT_STATUS + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_STATUS + " = '" + encrypt(MegaChatApi.STATUS_ONLINE+"") + "';");
 		}
 
 		if (oldVersion <= 25){
@@ -766,6 +759,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 51) {
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_LAST_PUBLIC_HANDLE_TYPE + " = '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "';");
+		}
+
+		if (oldVersion <= 52) {
+			ChatSettings chatSettings = getChatSettingsFromDBv52(db);
+			db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
+			onCreate(db);
+			setChatSettings(db, chatSettings);
 		}
 	}
 
@@ -1487,7 +1487,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return prefs;
 	}
 
-	public ChatSettings getChatSettings(){
+	/**
+	 * Get chat settings from the DB v52 (previous to remove the setting to enable/disable the chat).
+	 * KEY_CHAT_ENABLED and KEY_CHAT_STATUS have been removed in DB v53.
+	 * @return Chat settings.
+	 */
+	private ChatSettings getChatSettingsFromDBv52(SQLiteDatabase db){
         logDebug("getChatSettings");
 		ChatSettings chatSettings = null;
 
@@ -1501,45 +1506,60 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String vibrationEnabled = decrypt(cursor.getString(4));
 			String chatStatus = decrypt(cursor.getString(5));
 			String sendOriginalAttachments = decrypt(cursor.getString(6));
-			chatSettings = new ChatSettings(enabled, notificationsEnabled, notificationSound, vibrationEnabled, sendOriginalAttachments);
+			chatSettings = new ChatSettings(notificationsEnabled, notificationSound, vibrationEnabled, sendOriginalAttachments);
 		}
 		cursor.close();
 
 		return chatSettings;
 	}
 
-	public void setChatSettings(ChatSettings chatSettings){
-        logDebug("setChatSettings");
+	/**
+	 * Get chat settings from the current DB.
+	 * @return Chat settings.
+	 */
+	public ChatSettings getChatSettings(){
+		logDebug("getChatSettings");
+		ChatSettings chatSettings = null;
 
-        db.execSQL("DELETE FROM " + TABLE_CHAT_SETTINGS);
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String notificationsEnabled = decrypt(cursor.getString(1));
+			String notificationSound = decrypt(cursor.getString(2));
+			String vibrationEnabled = decrypt(cursor.getString(3));
+			String sendOriginalAttachments = decrypt(cursor.getString(4));
+			chatSettings = new ChatSettings(notificationsEnabled, notificationSound, vibrationEnabled, sendOriginalAttachments);
+		}
+		cursor.close();
+
+		return chatSettings;
+	}
+
+	/**
+	 * Save chat settings in the current DB.
+	 * @param chatSettings Chat settings to save.
+	 */
+	public void setChatSettings(ChatSettings chatSettings){
+		setChatSettings(db, chatSettings);
+	}
+
+	/**
+	 * Save chat settings in the DB.
+	 * @param db DB object to save the settings.
+	 * @param chatSettings Chat settings to save.
+	 */
+	private void setChatSettings(SQLiteDatabase db, ChatSettings chatSettings) {
+		logDebug("setChatSettings");
+
+		db.execSQL("DELETE FROM " + TABLE_CHAT_SETTINGS);
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_ENABLED, encrypt(chatSettings.getEnabled()));
 		values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, encrypt(chatSettings.getNotificationsEnabled()));
 		values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(chatSettings.getNotificationsSound()));
 		values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(chatSettings.getVibrationEnabled()));
-
 		values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(chatSettings.getSendOriginalAttachments()));
 
 		db.insert(TABLE_CHAT_SETTINGS, null, values);
-	}
-
-	public void setEnabledChat(String enabled){
-        logDebug("setEnabledChat");
-
-		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
-		ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_ENABLED + "= '" + encrypt(enabled) + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-			values.put(KEY_CHAT_ENABLED, encrypt(enabled));
-			db.insert(TABLE_CHAT_SETTINGS, null, values);
-		}
-		cursor.close();
 	}
 
 	public void setSendOriginalAttachments(String originalAttachments){

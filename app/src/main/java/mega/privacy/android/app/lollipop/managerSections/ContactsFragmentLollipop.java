@@ -696,23 +696,16 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				if (isChatEnabled()) {
-					menu.findItem(R.id.cab_menu_send_file).setVisible(true);
-					menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				menu.findItem(R.id.cab_menu_send_file).setVisible(true);
+				menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-					menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
-					menu.findItem(R.id.cab_menu_start_conversation).setIcon(mutateIconSecondary(context, R.drawable.ic_chat, R.color.white));
-					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
+				menu.findItem(R.id.cab_menu_start_conversation).setIcon(mutateIconSecondary(context, R.drawable.ic_chat, R.color.white));
+				menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-					menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
-					menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(getContext(), R.drawable.ic_share_contact, R.color.white));
-					menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-				}
-				else {
-					menu.findItem(R.id.cab_menu_send_file).setVisible(false);
-					menu.findItem(R.id.cab_menu_start_conversation).setVisible(false);
-					menu.findItem(R.id.cab_menu_send_to_chat).setVisible(false);
-				}
+				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
+				menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(getContext(), R.drawable.ic_share_contact, R.color.white));
+				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -816,13 +809,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
-		if(isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-			}
-		}
-		else{
-			logWarning("Chat not enabled!");
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
@@ -1092,14 +1080,12 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 		sortBy();
 
-		if(isChatEnabled()){
-			if(!visibleContacts.isEmpty()){
-				for (int i=0;i<visibleContacts.size();i++){
-					int userStatus = megaChatApi.getUserOnlineStatus(visibleContacts.get(i).getMegaUser().getHandle());
-					if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-						logDebug("Request last green for user");
-						megaChatApi.requestLastGreen(visibleContacts.get(i).getMegaUser().getHandle(), null);
-					}
+		if (!visibleContacts.isEmpty()) {
+			for (int i = 0; i < visibleContacts.size(); i++) {
+				int userStatus = megaChatApi.getUserOnlineStatus(visibleContacts.get(i).getMegaUser().getHandle());
+				if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
+					logDebug("Request last green for user");
+					megaChatApi.requestLastGreen(visibleContacts.get(i).getMegaUser().getHandle(), null);
 				}
 			}
 		}

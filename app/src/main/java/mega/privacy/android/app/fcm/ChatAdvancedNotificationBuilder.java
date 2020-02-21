@@ -9,11 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -26,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -51,9 +48,9 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNodeList;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -371,8 +368,7 @@ public final class ChatAdvancedNotificationBuilder {
             title = chat.getTitle();
         }
 
-//        Spanned notificationContent;
-
+        title = converterShortCodes(title);
         NotificationCompat.Builder notificationBuilderO = null;
         Notification.Builder notificationBuilder = null;
         Notification.MessagingStyle messagingStyleContent = null;
@@ -392,7 +388,6 @@ public final class ChatAdvancedNotificationBuilder {
                     .setShowWhen(true)
                     .setGroup(groupKey)
                     .setColor(ContextCompat.getColor(context, R.color.mega));
-
             messagingStyleContentO = new NotificationCompat.MessagingStyle(chat.getTitle());
         } else {
             notificationBuilder = new Notification.Builder(context)
@@ -440,7 +435,6 @@ public final class ChatAdvancedNotificationBuilder {
                     }
                 } else if (msg.getType() == MegaChatMessage.TYPE_TRUNCATE) {
                     logDebug("TYPE_TRUNCATE");
-
                     messageContent = context.getString(R.string.history_cleared_message);
                 } else if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
                     logDebug("TYPE_CONTAINS_META");
@@ -448,11 +442,12 @@ public final class ChatAdvancedNotificationBuilder {
 
                 } else {
                     logDebug("OTHER");
-
                     messageContent = msg.getContent();
                 }
 
+                messageContent = converterShortCodes(messageContent);
                 String sender = chat.getPeerFirstnameByHandle(msg.getUserHandle());
+                sender = converterShortCodes(sender);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     messagingStyleContentO.addMessage(messageContent, msg.getTimestamp(), sender);
@@ -574,39 +569,18 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    public Bitmap setUserAvatar(MegaChatRoom chat){
+    private Bitmap setUserAvatar(MegaChatRoom chat){
         logDebug("Chat ID: " + chat.getChatId());
-
-        if(chat.isGroup()){
-            return createDefaultAvatar(chat);
-        }
-        else{
-
-            String contactMail = chat.getPeerEmail(0);
-
-            File avatar = buildAvatarFile(context, contactMail + ".jpg");
-            Bitmap bitmap = null;
-            if (isFileAvailable(avatar)){
-                if (avatar.length() > 0){
-                    BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                    bOpts.inPurgeable = true;
-                    bOpts.inInputShareable = true;
-                    bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                    if (bitmap == null) {
-                        return createDefaultAvatar(chat);
-                    }
-                    else{
-                        return getCircleBitmap(bitmap);
-                    }
-                }
-                else{
-                    return createDefaultAvatar(chat);
-                }
-            }
-            else{
-                return createDefaultAvatar(chat);
+        if(!chat.isGroup()) {
+            File avatar = buildAvatarFile(context, chat.getPeerEmail(0) + ".jpg");
+            if (isFileAvailable(avatar) && avatar.length() > 0) {
+                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                if (bitmap != null)
+                    return getCircleBitmap(bitmap);
             }
         }
+        return createDefaultAvatar(chat);
     }
 
     private Bitmap createDefaultAvatar(MegaChatRoom chat){
@@ -618,7 +592,7 @@ public final class ChatAdvancedNotificationBuilder {
         }else{
             color = getColorAvatar(context, megaApi, chat.getPeerHandle(0));
         }
-        return getDefaultAvatar(context, color, chat.getTitle(), AVATAR_SIZE, true, false);
+        return getDefaultAvatar(context, color, chat.getTitle(), AVATAR_SIZE, true, true);
     }
 
     @TargetApi(Build.VERSION_CODES.O)

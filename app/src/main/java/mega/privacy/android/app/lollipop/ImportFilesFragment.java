@@ -137,13 +137,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
 
         chatButton = (RelativeLayout) v.findViewById(R.id.chat_layout);
         chatButton.setOnClickListener(this);
-
-        if (isChatEnabled()) {
-            chatButton.setVisibility(View.VISIBLE);
-        }
-        else {
-            chatButton.setVisibility(View.GONE);
-        }
+        chatButton.setVisibility(View.VISIBLE);
 
         showMoreLayout = (RelativeLayout) v.findViewById(R.id.show_more_layout);
         showMoreLayout.setOnClickListener(this);
