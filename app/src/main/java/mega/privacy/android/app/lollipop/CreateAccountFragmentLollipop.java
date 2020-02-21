@@ -84,9 +84,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     private TextView creatingAccountTextView;
     private ProgressBar createAccountProgressBar;
 
-    private ImageView toggleButtonPasswd;
-    private ImageView toggleButtonConfirmPasswd;
-    private boolean passwdVisibility;
     private LinearLayout containerPasswdElements;
     private ImageView firstShape;
     private ImageView secondShape;
@@ -147,11 +144,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         userPasswordConfirmError = v.findViewById(R.id.create_account_password_text_confirm_error_icon);
         userPasswordConfirmError.setVisibility(View.GONE);
 
-        toggleButtonPasswd = v.findViewById(R.id.toggle_button_passwd);
-        toggleButtonPasswd.setOnClickListener(this);
-        toggleButtonConfirmPasswd = v.findViewById(R.id.toggle_button_confirm_passwd);
-        toggleButtonConfirmPasswd.setOnClickListener(this);
-        passwdVisibility = false;
         passwdValid = false;
 
         userName.requestFocus();
@@ -237,20 +229,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         });
 
-        userPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    toggleButtonPasswd.setVisibility(View.VISIBLE);
-                    toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-                }
-                else {
-                    toggleButtonPasswd.setVisibility(View.GONE);
-                    passwdVisibility = false;
-                    showHidePassword(false);
-                }
-            }
-        });
+        userPassword.setOnFocusChangeListener((v1, hasFocus) -> setPasswordToggle(userPasswordLayout, hasFocus));
 
         userPasswordConfirm.addTextChangedListener(new TextWatcher() {
             @Override
@@ -269,20 +248,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         });
 
-        userPasswordConfirm.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    toggleButtonConfirmPasswd.setVisibility(View.VISIBLE);
-                    toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-                }
-                else {
-                    toggleButtonConfirmPasswd.setVisibility(View.GONE);
-                    passwdVisibility = false;
-                    showHidePassword(true);
-                }
-            }
-        });
+        userPasswordConfirm.setOnFocusChangeListener((v12, hasFocus) -> setPasswordToggle(userPasswordConfirmLayout, hasFocus));
 
         TextView tos = (TextView)v.findViewById(R.id.tos);
 
@@ -455,56 +421,19 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         userPasswordLayout.setError(" ");
     }
 
-    public void showHidePassword (boolean confirm) {
-        if(!passwdVisibility){
-            if (!confirm){
-                userPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                userPassword.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
-                userPassword.setSelection(userPassword.getText().length());
-            }
-            else {
-                userPasswordConfirm.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                userPasswordConfirm.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
-                userPasswordConfirm.setSelection(userPasswordConfirm.getText().length());
-            }
-        }else{
-            if (!confirm){
-                userPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                userPassword.setSelection(userPassword.getText().length());
-            }
-            else {
-                userPasswordConfirm.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                userPasswordConfirm.setSelection(userPasswordConfirm.getText().length());
-            }
-        }
-    }
-
-    void hidePasswordIfVisible () {
-        if (passwdVisibility) {
-            passwdVisibility = false;
-            toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-            showHidePassword(false);
-            toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-            showHidePassword(true);
-        }
-    }
-
     @Override
     public void onClick(View v) {
         logDebug("onClick");
 
         switch (v.getId()) {
             case R.id.create_account_chkTOS:
-                hidePasswordIfVisible();
                 break;
 
             case R.id.button_create_account_create:
-                hidePasswordIfVisible();
                 submitForm();
                 break;
 
             case R.id.button_login_create:
-                hidePasswordIfVisible();
                 ((LoginActivityLollipop) context).showFragment(LOGIN_FRAGMENT);
                 break;
 
@@ -515,7 +444,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //				browserIntent.setDataAndType(Uri.parse("http://www.google.es"), "text/html");
 //				browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
 //				startActivity(browserIntent);
-                hidePasswordIfVisible();
                 try {
                     String url = "https://mega.nz/terms";
                     Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
@@ -532,7 +460,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 break;
             case R.id.top:
                 logDebug("Show terms of password");
-                hidePasswordIfVisible();
                 try {
                     Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -545,31 +472,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     startActivity(viewIntent);
                 }
 
-                break;
-            case R.id.toggle_button_passwd:
-                if (passwdVisibility) {
-                    toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-                    passwdVisibility = false;
-                    showHidePassword(false);
-                }
-                else {
-                    toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_see));
-                    passwdVisibility = true;
-                    showHidePassword(false);
-                }
-                break;
-
-            case R.id.toggle_button_confirm_passwd:
-                if (passwdVisibility) {
-                    toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-                    passwdVisibility = false;
-                    showHidePassword(true);
-                }
-                else {
-                    toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_see));
-                    passwdVisibility = true;
-                    showHidePassword(true);
-                }
                 break;
         }
     }
