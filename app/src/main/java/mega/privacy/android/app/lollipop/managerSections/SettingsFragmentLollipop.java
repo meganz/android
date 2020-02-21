@@ -133,8 +133,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	public final static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
 	public final static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
 
-	public final static String KEY_CHAT_ENABLE = "settings_chat_enable";
-
 	public final static String KEY_RICH_LINKS_ENABLE = "settings_rich_links_enable";
 
 	public final static String CATEGORY_AUTOAWAY_CHAT = "settings_autoaway_chat";
@@ -225,7 +223,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	PreferenceCategory fileManagementCategory;
 
 	SwitchPreferenceCompat pinLockEnableSwitch;
-	SwitchPreferenceCompat chatEnableSwitch;
 	SwitchPreferenceCompat richLinksSwitch;
 
 	SwitchPreferenceCompat enableLastGreenChatSwitch;
@@ -293,7 +290,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	boolean charging = false;
 	boolean includeGPS;
 	boolean pinLock = false;
-	boolean chatEnabled = false;
 	boolean askMe = false;
 	boolean fileNames = false;
 	boolean advancedDevices = false;
@@ -370,9 +366,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		fileManagementCategory = (PreferenceCategory) findPreference(CATEGORY_FILE_MANAGEMENT);
 		pinLockEnableSwitch = (SwitchPreferenceCompat) findPreference(KEY_PIN_LOCK_ENABLE);
 		pinLockEnableSwitch.setOnPreferenceClickListener(this);
-
-		chatEnableSwitch = (SwitchPreferenceCompat) findPreference(KEY_CHAT_ENABLE);
-		chatEnableSwitch.setOnPreferenceClickListener(this);
 
 		richLinksSwitch = (SwitchPreferenceCompat) findPreference(KEY_RICH_LINKS_ENABLE);
 		richLinksSwitch.setOnPreferenceClickListener(this);
@@ -844,74 +837,43 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 
-		if(chatSettings==null){
-			dbH.setEnabledChat(true+"");
-			dbH.setNotificationEnabledChat(true+"");
-			dbH.setVibrationEnabledChat(true+"");
-			chatEnabled=true;
-			chatEnableSwitch.setChecked(chatEnabled);
-
-
-		}
-		else{
-			if (chatSettings.getEnabled() == null){
-				dbH.setEnabledChat(true+"");
-				chatEnabled = true;
-				chatEnableSwitch.setChecked(chatEnabled);
-			}
-			else{
-				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-				chatEnableSwitch.setChecked(chatEnabled);
-			}
+		if (chatSettings == null) {
+			dbH.setNotificationEnabledChat(true + "");
+			dbH.setVibrationEnabledChat(true + "");
 		}
 
-		if(chatEnabled){
-			//Get chat status
-			statusConfig = megaChatApi.getPresenceConfig();
-			if(statusConfig!=null){
+		//Get chat status
+		statusConfig = megaChatApi.getPresenceConfig();
+		if (statusConfig != null) {
+			logDebug("SETTINGS chatStatus pending: " + statusConfig.isPending());
+			logDebug("Status: " + statusConfig.getOnlineStatus());
 
-				logDebug("SETTINGS chatStatus pending: " + statusConfig.isPending());
-				logDebug("Status: " + statusConfig.getOnlineStatus());
-
-				statusChatListPreference.setValue(statusConfig.getOnlineStatus()+"");
-				if(statusConfig.getOnlineStatus()==MegaChatApi.STATUS_INVALID){
-					statusChatListPreference.setSummary(getString(R.string.recovering_info));
-				}
-				else{
-					statusChatListPreference.setSummary(statusChatListPreference.getEntry());
-				}
-
-				showPresenceChatConfig();
-
-				if(megaChatApi.isSignalActivityRequired()){
-					megaChatApi.signalPresenceActivity();
-				}
-			}
-			else{
-				waitPresenceConfig();
+			statusChatListPreference.setValue(statusConfig.getOnlineStatus() + "");
+			if (statusConfig.getOnlineStatus() == MegaChatApi.STATUS_INVALID) {
+				statusChatListPreference.setSummary(getString(R.string.recovering_info));
+			} else {
+				statusChatListPreference.setSummary(statusChatListPreference.getEntry());
 			}
 
-			boolean sendOriginalAttachment = isSendOriginalAttachments();
-			if(sendOriginalAttachment){
-				chatAttachmentsChatListPreference.setValue(1+"");
-			}
-			else{
-				chatAttachmentsChatListPreference.setValue(0+"");
-			}
-			chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
+			showPresenceChatConfig();
 
-			boolean richLinks = MegaApplication.isEnabledRichLinks();
-			richLinksSwitch.setChecked(richLinks);
+			if (megaChatApi.isSignalActivityRequired()) {
+				megaChatApi.signalPresenceActivity();
+			}
+		} else {
+			waitPresenceConfig();
 		}
-		else{
-			preferenceScreen.removePreference(chatNotificationsCategory);
-			preferenceScreen.removePreference(autoawayChatCategory);
-			preferenceScreen.removePreference(persistenceChatCategory);
-			chatEnabledCategory.removePreference(richLinksSwitch);
-			chatEnabledCategory.removePreference(enableLastGreenChatSwitch);
-			chatEnabledCategory.removePreference(statusChatListPreference);
-			chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
+
+		boolean sendOriginalAttachment = isSendOriginalAttachments();
+		if (sendOriginalAttachment) {
+			chatAttachmentsChatListPreference.setValue(1 + "");
+		} else {
+			chatAttachmentsChatListPreference.setValue(0 + "");
 		}
+		chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
+
+		boolean richLinks = MegaApplication.isEnabledRichLinks();
+		richLinksSwitch.setChecked(richLinks);
 
 		cacheAdvancedOptions.setSummary(getString(R.string.settings_advanced_features_calculating));
 		offlineFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
@@ -1748,36 +1710,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 //				pinLockEnableSwitch.setTitle(getString(R.string.settings_pin_lock_on));
 				pinLockCategory.removePreference(pinLockCode);
 			}
-		}
-		else if (preference.getKey().compareTo(KEY_CHAT_ENABLE) == 0){
-			logDebug("KEY_CHAT_ENABLE");
-
-			if (!isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-				chatEnableSwitch.setChecked(chatEnabled);
-				return false;
-			}
-
-			chatEnabled = !chatEnabled;
-			if (chatEnabled){
-				logDebug("CONNECT CHAT!!!");
-				dbH.setEnabledChat(true+"");
-				((ManagerActivityLollipop)context).enableChat();
-				preferenceScreen.addPreference(chatNotificationsCategory);
-				preferenceScreen.addPreference(chatAutoAwayPreference);
-				chatEnabledCategory.addPreference(chatAttachmentsChatListPreference);
-				chatEnabledCategory.addPreference(richLinksSwitch);
-				chatEnabledCategory.addPreference(enableLastGreenChatSwitch);
-				chatEnabledCategory.addPreference(statusChatListPreference);
-			}
-			else{
-				logDebug("DISCONNECT CHAT!!!");
-				dbH.setEnabledChat(false+"");
-				((ManagerActivityLollipop)context).disableChat();
-				hidePreferencesChat();
-			}
-		}
-		else if (preference.getKey().compareTo(KEY_AUTOAWAY_ENABLE) == 0){
+		} else if (preference.getKey().compareTo(KEY_AUTOAWAY_ENABLE) == 0) {
 			logDebug("KEY_AUTOAWAY_ENABLE");
 			if (!isOnline(context)){
 				((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
@@ -2496,9 +2429,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			statusConfig = config;
 		}
 
-		if(isChatEnabled()){
-			showPresenceChatConfig();
-		}
+		showPresenceChatConfig();
 	}
 
 	public void updateEnabledRichLinks(){

@@ -393,10 +393,6 @@ public class ChatController {
         }
     }
 
-    public void enableChat(){
-        dbH.setEnabledChat(true+"");
-    }
-
     public String createSingleManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
         logDebug("Message ID: " + androidMessage.getMessage().getMsgId() + ", Chat ID: " + chatRoom.getChatId());
 

@@ -265,34 +265,23 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					isLoggingIn = true;
 					MegaApplication.setLoggingIn(isLoggingIn);
 
-					if (isChatEnabled()) {
-						if (megaChatApi == null) {
-							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-						}
+					if (megaChatApi == null) {
+						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+					}
 
-						int ret = megaChatApi.getInitState();
+					int ret = megaChatApi.getInitState();
 
-						if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
-							ret = megaChatApi.init(gSession);
-							logDebug("result of init ---> " + ret);
-							chatSettings = dbH.getChatSettings();
-							if (ret == MegaChatApi.INIT_NO_CACHE) {
-								logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-							} else if (ret == MegaChatApi.INIT_ERROR) {
-								logDebug("condition ret == MegaChatApi.INIT_ERROR");
-								if (chatSettings == null) {
-									logError("ERROR----> Switch OFF chat");
-									chatSettings = new ChatSettings();
-									chatSettings.setEnabled(false+"");
-									dbH.setChatSettings(chatSettings);
-								} else {
-									logError("ERROR----> Switch OFF chat");
-									dbH.setEnabledChat(false + "");
-								}
-								megaChatApi.logout(this);
-							} else {
-								logDebug("Chat correctly initialized");
-							}
+					if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+						ret = megaChatApi.init(gSession);
+						logDebug("result of init ---> " + ret);
+						chatSettings = dbH.getChatSettings();
+						if (ret == MegaChatApi.INIT_NO_CACHE) {
+							logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
+						} else if (ret == MegaChatApi.INIT_ERROR) {
+							logDebug("condition ret == MegaChatApi.INIT_ERROR");
+							megaChatApi.logout(this);
+						} else {
+							logDebug("Chat correctly initialized");
 						}
 					}
 
@@ -1759,26 +1748,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (e.getErrorCode() == MegaError.API_OK){
-				chatSettings = dbH.getChatSettings();
-				if(chatSettings!=null) {
-					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-					if(chatEnabled){
-						logDebug("Chat enabled-->connect");
-						megaChatApi.connectInBackground(this);
-						isLoggingIn = false;
-						MegaApplication.setLoggingIn(isLoggingIn);
-					}
-					else{
-						logDebug("Chat NOT enabled - readyToManager");
-						isLoggingIn = false;
-						MegaApplication.setLoggingIn(isLoggingIn);
-					}
-				}
-				else{
-					logWarning("chatSettings NULL - readyToManager");
-					isLoggingIn = false;
-					MegaApplication.setLoggingIn(isLoggingIn);
-				}
+				logDebug("Chat --> connect");
+				megaChatApi.connectInBackground(this);
+				isLoggingIn = false;
+				MegaApplication.setLoggingIn(isLoggingIn);
 
 				for (int i=0;i<pendingIntents.size();i++){
 					onHandleIntent(pendingIntents.get(i));

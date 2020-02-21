@@ -1278,31 +1278,6 @@ public class Util {
 		return cal;
 	}
 
-	public static boolean isChatEnabled (){
-		logDebug("isChatEnabled");
-		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-		ChatSettings chatSettings = dbH.getChatSettings();
-		boolean chatEnabled;
-
-		if(chatSettings!=null){
-			if(chatSettings.getEnabled()!=null){
-				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-				logDebug("A - chatEnabled: " + chatEnabled);
-				return chatEnabled;
-			}
-			else{
-				chatEnabled=true;
-				logDebug("B - chatEnabled: " + chatEnabled);
-				return chatEnabled;
-			}
-		}
-		else{
-			chatEnabled=true;
-			logDebug("C - chatEnabled: " + chatEnabled);
-			return chatEnabled;
-		}
-	}
-
 	public static boolean canVoluntaryVerifyPhoneNumber() {
         MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
 	    boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;

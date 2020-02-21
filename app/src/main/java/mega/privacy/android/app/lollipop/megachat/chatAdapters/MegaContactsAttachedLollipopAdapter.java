@@ -380,30 +380,22 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		holder.contactMail = contact.getMail();
 		logDebug("Contact: " + contact.getMail() + ", Handle: " + contact.getHandle());
 
-		if(isChatEnabled()){
-			holder.contactStateIcon.setVisibility(View.VISIBLE);
-			if (megaChatApi != null){
-				int userStatus = megaChatApi.getUserOnlineStatus(megaApi.base64ToUserHandle(contact.getHandle()));
-				if(userStatus == MegaChatApi.STATUS_ONLINE){
-					logDebug("This user is connected");
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-				}
-				else if(userStatus == MegaChatApi.STATUS_AWAY){
-					logDebug("This user is away");
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
-				}
-				else if(userStatus == MegaChatApi.STATUS_BUSY){
-					logDebug("This user is busy");
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
-				}
-				else{
-					logDebug("This user status is: " + userStatus);
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-				}
+		holder.contactStateIcon.setVisibility(View.VISIBLE);
+		if (megaChatApi != null) {
+			int userStatus = megaChatApi.getUserOnlineStatus(MegaApiJava.base64ToUserHandle(contact.getHandle()));
+			if (userStatus == MegaChatApi.STATUS_ONLINE) {
+				logDebug("This user is connected");
+				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+			} else if (userStatus == MegaChatApi.STATUS_AWAY) {
+				logDebug("This user is away");
+				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+			} else if (userStatus == MegaChatApi.STATUS_BUSY) {
+				logDebug("This user is busy");
+				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+			} else {
+				logDebug("This user status is: " + userStatus);
+				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
 			}
-		}
-		else{
-			holder.contactStateIcon.setVisibility(View.GONE);
 		}
 
 		holder.textViewContactName.setText(contact.getName());
