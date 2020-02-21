@@ -143,7 +143,6 @@ public class BaseActivity extends AppCompatActivity {
         setAppFontSize(this);
 
         checkMegaObjects();
-        megaChatApi.retryPendingConnections(false, null);
         isPaused = false;
 
         retryConnectionsAndSignalPresence();

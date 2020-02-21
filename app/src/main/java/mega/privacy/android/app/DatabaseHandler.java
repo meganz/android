@@ -1524,7 +1524,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
-			int id = Integer.parseInt(cursor.getString(0));
 			String notificationsEnabled = decrypt(cursor.getString(1));
 			String notificationSound = decrypt(cursor.getString(2));
 			String vibrationEnabled = decrypt(cursor.getString(3));
