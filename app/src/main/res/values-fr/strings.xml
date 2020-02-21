@@ -104,7 +104,7 @@
     <string name="action_settings" context="Menu item">Paramètres</string>
     <string name="action_search" context="Search button">Recherche</string>
     <string name="action_search_country" context="Select country page title">Sélectionner un pays</string>
-    <string name="action_play" context="Search button">Play</string>
+    <string name="action_play" context="Search button">Lire</string>
     <string name="action_pause" context="Search button">Mettre en pause</string>
     <string name="action_refresh" context="Menu item">Actualiser</string>
     <string name="action_sort_by" context="Menu item">Trier par</string>
@@ -685,18 +685,18 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Emplacement de téléchargement par défaut</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Toujours demander l\'emplacement de téléchargement</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Afficher les appareils avancés (SD externe)</string>
-	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Ajouter un numéro de téléphone</string>
+	<string name="add_phone_number_label" context="Label of button on account page that ask user to add their phone number">Ajouter un numéro de téléphone</string>
 	<string name="verify_account_title" context="enter verification code page title">Confirmer votre compte</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Votre compte a temporairement été verrouillé en raison d\'un abus potentiel. Veuillez confirmer votre numéro de téléphone pour déverrouiller votre compte.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Pays</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Votre numéro de téléphone</string>
-    <string name="general_back_button" context="Button label - go to previous page">Retour</string>
+    <string name="general_back_button" context="Button label - go to previous page">Précédent</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Pas maintenant</string>
     <string name="general_confirm_button" context="Button label - confirm some action">Confirmer</string>
 	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Veuillez saisir un indicatif de pays</string>
     <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Les indicatifs de pays n\'ont pas pu être récupérés.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Veuillez indiquer un numéro de téléphone valide.</string>
-	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Veuillez saisir le code de confirmation envoyé à</string>
+	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">Veuillez saisir le code de confirmation envoyé à</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Confirmer votre compte</string>
 	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Le code est erroné. Veuillez essayer et envoyer de nouveau.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">N\'avez-vous pas reçu un code ?</string>
@@ -814,7 +814,7 @@
     <string name="my_account_title" context="title of the My Account screen">Type de compte</string>
     <string name="renews_on" context="title of the Expiration Date">Se renouvelle le&#160;</string>
     <string name="expires_on" context="title of the Expiration Date">Expire le &#160;</string>
-    <string name="free_account">GRATUIT</string>
+    <string name="free_account">Gratuit</string>
 
     <!--
     <string name="free_storage" context="Not translate">50 GB</string>
@@ -1513,7 +1513,7 @@
 
     <string name="copyright_alert_title" context="text_copyright_alert_title">Avertissement sur le droit d\'auteur à tous les utilisateurs</string>
     <string name="copyright_alert_first_paragraph" context="text_copyright_alert_first_paragraph">MEGA respecte le droit d\'auteur d\'autrui et exige que les utilisateurs du service nuagique de MEGA se conforment aux lois sur le droit d\'auteur.</string>
-    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">Il vous est strictement interdit d\'utiliser le service nuagique de MEGA pour enfreindre le droit d\'auteur. Vous ne pouvez pas téléverser, télécharger, stocker, partager, afficher, lire en continu, distribuer, envoyer par courriel, créer de liens vers, transmettre ou proposer de quelque façon des fichiers, des données ou du contenu qui enfreignent le droit d\'auteur ou autre droit de propriété de quelque personne ou entité.</string>
+    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">Il vous est strictement interdit d\'utiliser le service nuagique de MEGA pour enfreindre le droit d\'auteur. Vous ne pouvez pas téléverser, télécharger, stocker, partager, afficher, diffuser en continu, distribuer, envoyer par courriel, créer de liens vers, transmettre ou proposer de quelque façon des fichiers, des données ou du contenu qui enfreignent le droit d\'auteur ou autre droit de propriété de quelque personne ou entité.</string>
     <string name="copyright_alert_agree_button" context="text of the Agree button">Accepter</string>
     <string name="copyright_alert_disagree_button" context="text of the Disagree button">Ne pas accepter</string>
 
@@ -1625,7 +1625,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">Primes de parrainage</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">Installer une appli mobile</string>
-    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">Ajouter un téléphone mobile</string>
+    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">Ajouter un téléphone mobile</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Prime d\'inscription</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Installer l\'appli MEGA pour ordinateur</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Quota de base du compte</string>
@@ -1703,7 +1703,7 @@
 
     <string name="invalid_characters" context="Error when the user writes a character not allowed">Caractères non autorisés</string>
 
-    <string name="audio_play" context="Label shown when audio file is playing">Fichier audio</string>
+    <string name="audio_play" context="Label shown when audio file is playing">Fichier son</string>
 
     <string name="corrupt_pdf_dialog_text" context="when open PDF Viewer, the pdf that it try to open is damaged or does not exist">Erreur. Le fichier PDF est corrompu ou n\'existe pas.</string>
 
@@ -2037,7 +2037,7 @@
     <string name="number_no_imported_from_chat" context="error message when importing multiple files from chat">%d fichiers n\'ont pas été partagés</string>
     <string name="preview_content" context="button’s text to open a full screen image">Aperçu du contenu</string>
 
-    <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">La lecture en continu ne peut pas avoir lieu et le fichier n\'a pas été téléchargé</string>
+    <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">La diffusion en continu ne peut pas avoir lieu et le fichier n\'a pas été téléchargé</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">Le fichier existe déjà dans Enregistré Hors ligne</string>
 
     <plurals name="error_forwarding_messages">
@@ -2396,7 +2396,7 @@
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Le fichier joint a déjà été envoyé</string>
 
-    <string name="call_ended_message" context="Message shown when a call ends.">[A]L\'appel est terminé[/A][C]. Durée : [/C]</string>
+    <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]L\'appel est terminé[/A][C]. Durée : [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s heure[/B]</item>
         <item context="Message that shows the hours of a call when it ends, more hours" quantity="other">[B]%1$s heures[/B]</item>
@@ -2470,7 +2470,7 @@
         <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d contact a été trouvé sur MEGA</item>
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacts ont été trouvés sur MEGA</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Inviter un contact maintenant ?</string>
+    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user&#039;s phone contacts have a MEGA account. In other case here would appear all the user&#039;s phone contacts that have a MEGA account.">Inviter un contact maintenant ?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Voyez qui se trouve déjà sur MEGA</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Chargement des contacts sur MEGA&#8230;</string>
 
@@ -2505,11 +2505,11 @@
     <string name="title_tour_one" context="Title of first tour screen">Vous détenez les clés</string>
     <string name="content_tour_one" cotext="Content of first tour screen">La sécurité est notre raison d\'être. Avec nous, vos fichiers sont en sécurité, protégés par un système de chiffrement efficace dans lequel vous seul avez accès à vos fichiers.</string>
     <string name="title_tour_two" cotext="Title of second tour screen">Dialogue en ligne chiffré</string>
-    <string name="content_tour_two" cotext="Content of second tour screen">Le dialogue en ligne est entièrement chiffré et offre des appels voix, des appels vidéo, une messagerie de groupe et le partage de fichiers tous intégrés à votre disque nuagique.</string>
-    <string name="title_tour_three" cotext="Title of third tour screen">Créer votre réseau</string>
+    <string name="content_tour_two" cotext="Content of second tour screen">Le dialogue en ligne est entièrement chiffré et offre des appels voix et vidéo, une messagerie de groupe et le partage de fichiers, tous intégrés à votre disque nuagique.</string>
+    <string name="title_tour_three" cotext="Title of third tour screen">Créez votre réseau</string>
     <string name="content_tour_three" cotext="Content of third tour screen">Ajoutez des contacts, créez un réseau, collaborez et faites des appels voix ou vidéo sans jamais quitter MEGA</string>
     <string name="title_tour_four" cotext="Title of fourth tour screen">Vos photos dans le nuage</string>
-    <string name="content_tour_four" cotext="Content of fourth tour screen">Téléversements de l\'appareil photo est une fonction essentielle de tout appareil mobile et nous nous en occupons pour vous. Créez votre compte maintenant.</string>
+    <string name="content_tour_four" cotext="Content of fourth tour screen">Le téléversement de l\'appareil photo est une fonction essentielle de tout appareil mobile et nous nous en occupons pour vous. Créez votre compte maintenant.</string>
 
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Saisir votre mot de passe</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s est un document PDF protégé par mot de passe. Veuillez saisir le mot de passe pour ouvrir le PDF.</string>
@@ -2563,7 +2563,7 @@
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">Invitez des contacts et commencez à dialoguer en toute sécurité avec le dialogue en ligne chiffré de MEGA.</string>
     <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">Commencez à discuter en toute sécurité avec vos contacts grâce au chiffrement de bout en bout</string>
 
-    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Bonjour. Converse avec moi en toute sécurité sur MEGA et obtiens jusqu\'à 50 Go d\'espace de stockage gratuits. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Bonjour. Conversez avec moi en toute sécurité sur MEGA et obtenez jusqu\'à 50 Go d\'espace de stockage gratuits. %1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it.">Aucun lien de conversation n\'est disponible.</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Le lien de conversation a été supprimé avec succès.</string>
@@ -2621,9 +2621,9 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Chargement</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Veuillez patienter&#8230;</string>
 
-    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">Quand vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil.</string>
-    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">Quand vous vous déconnectez, les transferts en cours sont annulés.</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">Vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil et les transferts en cours sont annulés.</string>
+    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Quand vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil.</string>
+    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Quand vous vous déconnectez, les transferts en cours sont annulés.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">Vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil et les transferts en cours sont annulés.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Nom inconnu</string>
 
@@ -2645,5 +2645,5 @@
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Votre mot de passe a été divulgué et est maintenant utilisé par des personnes malveillantes pour se connecter à vos comptes dont, mais sans s\'y limiter, à votre compte MEGA.</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnexion</string>
-    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Vous êtes de retour.</string>
 </resources>

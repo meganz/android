@@ -685,7 +685,7 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">ตำแหน่งดาวน์โหลดเริ่มต้น</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">ถามที่เก็บไฟล์ดาวน์โหลดเสมอ</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">อุปกรณ์แสดงผลขั้นสูง (SD ภายนอก)</string>
-	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">เพิ่มหมายเลขโทรศัพท์</string>
+	<string name="add_phone_number_label" context="Label of button on account page that ask user to add their phone number">เพิ่มหมายเลขโทรศัพท์</string>
 	<string name="verify_account_title" context="enter verification code page title">ตรวจสอบบัญชีของคุณ</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">บัญชีของคุณถูกล็อกชั่วคราวเนื่องจากอาจมีการละเมิด กรุณายืนยันหมายเลขโทรศัพท์เพื่อปลดล็อกบัญชีของคุณ</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">ประเทศ</string>
@@ -696,7 +696,7 @@
 	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">กรุณาเลือกรหัสประเทศ</string>
     <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">ไม่สามารถดึงรหัสประเทศได้</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">กรุณากรอกหมายเลขโทรศัพท์ให้ถูกต้อง</string>
-	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">กรุณาพิมพ์รหัสยืนยันที่ส่งถึง</string>
+	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">กรุณากรอกรหัสยืนยันที่ส่งถึง</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">ตรวจสอบบัญชีของคุณ</string>
 	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">รหัสไม่ถูกต้อง กรุณาลองใหม่หรือส่งอีกครั้ง</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">คุณไม่ได้รับรหัสใช่ไหม</string>
@@ -1625,7 +1625,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">โบนัสการแนะนำ</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">ติดตั้งแอปบนมือถือ</string>
-    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">เพิ่มโทรศัพท์มือถือ</string>
+    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">เพิ่มโทรศัพท์มือถือ</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">โบนัสการลงทะเบียน</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">ติดตั้งแอป MEGA บนเดสก์ท็อป</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">โควต้าบัญชีพื้นฐาน</string>
@@ -1804,7 +1804,7 @@
     <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">รหัสผ่านของคุณอาจคาดเดาได้ง่าย ลองใช้รหัสผ่านของคุณให้ยาวขึ้นกว่าเดิม รวมไปถึงใช้ตัวอักษรตัวพิมพ์ใหญ่และตัวพิมพ์เล็ก เพิ่มตัวอักษรพิเศษเข้าไปด้วย ที่สำคัญอย่าใช้ชื่อหรือคำที่มีในพจนานุกรม</string>
     <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">รหัสผ่านของคุณพร้อมที่จะดำเนินการต่อไปแล้ว แต่เราก็ยังคงแนะนำให้คุณใช้รหัสผ่านที่คาดเดาได้ยากต่อไปอีก</string>
     <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">รหัสผ่านนี้จะสามารถป้องกันการโจมตีแบบ brute-force ได้ กรุณาตรวจสอบอีกครั้งว่าคุณจะสามารถจำรหัสผ่านเหล่านี้ได้</string>
-    <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">รหัสผ่านนี้จะสามารถป้องกันการโจมตีแบบ brute-force ที่มีความซับซ้อนได้ กรุณาตรวจสอบอีกครั้งว่าคุณจะสามารถจำรหัสผ่านเหล่านี้ได้</string>
+    <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">รหัสผ่านนี้จะสามารถป้องกันการโจมตีแบบ Brute-Force ที่มีความซับซ้อนได้ กรุณาตรวจสอบอีกครั้งว่าคุณจะสามารถจำรหัสผ่านเหล่านี้ได้</string>
     <string name="pass_very_weak" context="Password very weak">คาดเดาได้ง่ายมาก</string>
     <string name="pass_weak" context="Password weak">คาดเดาได้ง่าย</string>
     <string name="pass_medium" context="Password medium">ปานกลาง</string>
@@ -2396,7 +2396,7 @@
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">เอกสารแนบที่ส่งไปแล้ว</string>
 
-    <string name="call_ended_message" context="Message shown when a call ends.">[A]วางสายแล้ว[/A][C] ระยะเวลา: [/C]</string>
+    <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]วางสายแล้ว[/A][C] ระยะเวลา: [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s ชั่วโมง[/B]</item>
         <item context="Message that shows the hours of a call when it ends, more hours" quantity="other">[B]%1$s ชั่วโมง[/B]</item>
@@ -2470,7 +2470,7 @@
         <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">พบ %d ผู้ติดต่อใน MEGA</item>
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">พบ %d ผู้ติดต่อใน MEGA</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">เชิญผู้ติดต่อตอนนี้หรือไม่</string>
+    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user&#039;s phone contacts have a MEGA account. In other case here would appear all the user&#039;s phone contacts that have a MEGA account.">เชิญผู้ติดต่อตอนนี้หรือไม่</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">ดูว่าใครอยู่ใน MEGA แล้ว</string>
     <string name="get_registered_contacts" context="Getting registered contacts">กำลังโหลดผู้ติดต่อใน MEGA&#8230;</string>
 
@@ -2563,7 +2563,7 @@
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">เชิญผู้ติดต่อและเริ่มแชทอย่างปลอดภัยด้วยการแชทที่เข้ารหัสของ MEGA</string>
     <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">เริ่มแชทอย่างปลอดภัยกับผู้ติดต่อของคุณโดยใช้การเข้ารหัสแบบต้นทางถึงปลายทาง</string>
 
-    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">สวัสดีจ้า! สนทนาได้อย่างปลอดภัยบน MEGA กับฉัน พร้อมรับพื้นที่เก็บข้อมูลฟรีสูงสุด 50GB %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">สวัสดีจ้า! สนทนาได้อย่างปลอดภัยบน MEGA กับฉัน พร้อมรับพื้นที่เก็บข้อมูลฟรีสูงสุด 50 GB %1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it.">ไม่มีลิงก์แชท</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">ลบลิงก์แชทสำเร็จแล้ว</string>
@@ -2621,9 +2621,9 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">กำลังโหลด</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">กรุณารอสักครู่&#8230;</string>
 
-    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">เมื่อคุณออกจากระบบ ไฟล์จากส่วนออฟไลน์ของคุณจะถูกลบออกจากอุปกรณ์</string>
-    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">เมื่อคุณออกจากระบบ การถ่ายโอนที่กำลังดำเนินการอยู่จะถูกยกเลิกด้วย</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">เมื่อคุณออกจากระบบ ไฟล์จากส่วนออฟไลน์ของคุณจะถูกลบออกจากอุปกรณ์ และการถ่ายโอนที่กำลังดำเนินการอยู่จะถูกยกเลิกด้วยเช่นกัน</string>
+    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">เมื่อคุณออกจากระบบ ไฟล์จากส่วนออฟไลน์ของคุณจะถูกลบออกจากอุปกรณ์</string>
+    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">เมื่อคุณออกจากระบบ การถ่ายโอนที่กำลังดำเนินการอยู่จะถูกยกเลิกด้วย</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">เมื่อคุณออกจากระบบ ไฟล์จากส่วนออฟไลน์ของคุณจะถูกลบออกจากอุปกรณ์ และการถ่ายโอนที่กำลังดำเนินการอยู่จะถูกยกเลิกด้วยเช่นกัน</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">ชื่อที่ไม่รู้จัก</string>
 
@@ -2645,5 +2645,5 @@
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">รหัสผ่านของคุณรั่วไหลและกำลังถูกใช้โดยผู้ไม่หวังดีเพื่อเข้าสู่บัญชีของคุณ รวมไปถึง การไม่จำกัดบัญชี MEGA ของคุณ</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">กำลังเชื่อมต่อใหม่</string>
-    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">คุณกลับมาแล้ว</string>
 </resources>

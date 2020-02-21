@@ -685,7 +685,7 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">기본 다운로드 위치</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">항상 다운로드 위치 묻기</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">고급 장치 표시 (외부 SD)</string>
-	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">전화번호 추가</string>
+	<string name="add_phone_number_label" context="Label of button on account page that ask user to add their phone number">전화번호 추가</string>
 	<string name="verify_account_title" context="enter verification code page title">계정을 인증하세요</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">당신의 계정은 잠재적 남용을 방지하기 위해 일시적으로 잠겼습니다. 계정을 해제하려면 전화번호를 인증하세요.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">국가</string>
@@ -696,7 +696,7 @@
 	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">국가 코드를 선택하세요</string>
     <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">국가 코드를 얻어올 수 없었습니다.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">유효한 전화번호를 입력하세요.</string>
-	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">다음으로 전송된 코드를 입력하세요</string>
+	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">다음으로 전송된 코드를 입력하세요</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">계정을 인증하세요</string>
 	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">잘못된 코드. 다시 시도하거나 재발송하세요.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">코드를 받지 못했나요?</string>
@@ -1625,7 +1625,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">초대 보너스</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">모바일 앱 설치</string>
-    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">휴대전화번호 추가</string>
+    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">휴대전화번호 추가</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">가입 보너스</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">MEGA 데스크톱 앱 설치</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">계정 기본 할당량</string>
@@ -2396,7 +2396,7 @@
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">첨부물이 이미 발송됨</string>
 
-    <string name="call_ended_message" context="Message shown when a call ends.">[A]통화 종료[/A][C]. 시간: [/C]</string>
+    <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]통화 종료[/A][C]. 시간: [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s 시간[/B]</item>
         <item context="Message that shows the hours of a call when it ends, more hours" quantity="other">[B]%1$s 시간[/B]</item>
@@ -2470,7 +2470,7 @@
         <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">MEGA에서 %d개의 연락처 찾음</item>
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">MEGA에서 %d개의 연락처 찾음</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">지금 연락처를 초대할까요?</string>
+    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user&#039;s phone contacts have a MEGA account. In other case here would appear all the user&#039;s phone contacts that have a MEGA account.">지금 연락처를 초대할까요?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">누가 MEGA를 사용중인지 보기</string>
     <string name="get_registered_contacts" context="Getting registered contacts">MEGA에서 연락처 불러오는 중&#8230;</string>
 
@@ -2621,9 +2621,9 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">불러오는중</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">잠시만 기다리세요&#8230;</string>
 
-    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">로그아웃하면 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
-    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">로그아웃하면, 진행중인 전송은 취소됩니다.</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">로그아웃하면, 기기의 오프라인 섹션의 파일들이 삭제되고 진행중인 전송이 취소됩니다.</string>
+    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">로그아웃하면 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
+    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">로그아웃하면, 진행중인 전송은 취소됩니다.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">로그아웃하면, 기기의 오프라인 섹션의 파일들이 삭제되고 진행중인 전송이 취소됩니다.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">알 수 없는 이름</string>
 
@@ -2645,5 +2645,5 @@
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">당신의 비밀번호가 유출되어서 MEGA 계정뿐만 아니라 당신의 계정에 접속하려는 나쁜 사람들에게 이용되고 있습니다.</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">다시 연결중</string>
-    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">돌아왔습니다.</string>
 </resources>

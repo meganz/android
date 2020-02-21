@@ -685,7 +685,7 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Папка для скачивания по умолчанию</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Всегда выбирать папку загрузки</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Отображать дополнительные устройства (внешняя SD-карта)</string>
-	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Добавить номер телефона</string>
+	<string name="add_phone_number_label" context="Label of button on account page that ask user to add their phone number">Добавить номер телефона</string>
 	<string name="verify_account_title" context="enter verification code page title">Подтвердить аккаунт</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Ваш аккаунт был временно заблокирован из-за возможного злоупотребления. Пожалуйста, подтвердите номер телефона, чтобы разблокировать аккаунт.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Страна</string>
@@ -696,7 +696,7 @@
 	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Пожалуйста, выберите код страны</string>
     <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Коды стран не могут быть получены.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Пожалуйста, укажите действительный номер телефона.</string>
-	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Пожалуйста, введите отправленный проверочный код</string>
+	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">Пожалуйста, введите отправленный проверочный код</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Подтвердить аккаунт</string>
 	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Неправильный код. Пожалуйста, попробуйте ещё раз или отправьте повторно.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">Не получили код?</string>
@@ -814,7 +814,7 @@
     <string name="my_account_title" context="title of the My Account screen">Тип учётной записи</string>
     <string name="renews_on" context="title of the Expiration Date">Продлевается &#160;</string>
     <string name="expires_on" context="title of the Expiration Date">Истекает &#160;</string>
-    <string name="free_account">БЕСПЛАТНЫЙ</string>
+    <string name="free_account">Бесплатно</string>
 
     <!--
     <string name="free_storage" context="Not translate">50 GB</string>
@@ -1625,7 +1625,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">Бонусы за приглашения</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">Установить мобильное приложение</string>
-    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">Добавить номер телефона</string>
+    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">Добавить номер телефона</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Бонусы за регистрацию</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Установите MEGA на ПК</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Базовая квота</string>
@@ -2396,7 +2396,7 @@
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Вложение уже отправлено</string>
 
-    <string name="call_ended_message" context="Message shown when a call ends.">[A]Вызов завершён[/A][C]. Продолжительность: [/C]</string>
+    <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]Вызов завершён[/A][C]. Продолжительность: [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s час[/B]</item>
         <item context="Message that shows the hours of a call when it ends, more hours" quantity="other">[B]%1$s ч.[/B]</item>
@@ -2470,7 +2470,7 @@
         <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d контакт найден в MEGA</item>
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">Найдено контактов в MEGA: %d</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Пригласить контакт сейчас?</string>
+    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user&#039;s phone contacts have a MEGA account. In other case here would appear all the user&#039;s phone contacts that have a MEGA account.">Пригласить контакт сейчас?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Посмотреть, кто уже в MEGA</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Загрузка контактов в MEGA&#8230;</string>
 
@@ -2621,9 +2621,9 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Загрузка</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Пожалуйста, подождите&#8230;</string>
 
-    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">При выходе из системы файлы из раздела «Оффлайн» будут удалены с вашего устройства.</string>
-    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">При выходе из системы текущие передачи будут отменены.</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">Когда вы выйдете из системы, файлы из раздела «Оффлайн» будут удалены с вашего устройства, а текущие передачи будут отменены.</string>
+    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">При выходе из системы файлы из раздела «Оффлайн» будут удалены с вашего устройства.</string>
+    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">При выходе из системы текущие передачи будут отменены.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">Когда вы выйдете из системы, файлы из раздела «Оффлайн» будут удалены с вашего устройства, а текущие передачи будут отменены.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Неизвестное имя</string>
 
@@ -2645,5 +2645,5 @@
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Ваш пароль утёк и теперь используется плохими игроками для входа в ваши аккаунты, включая, но не ограничиваясь аккаунтом MEGA.</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Переподключение</string>
-    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Вы вернулись.</string>
 </resources>

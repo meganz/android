@@ -685,7 +685,7 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Standaard download locatie</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Altijd vragen naar downloadlocatie</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Toon geavanceerde apparaten (externe SD)</string>
-	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Telefoonnummer toevoegen</string>
+	<string name="add_phone_number_label" context="Label of button on account page that ask user to add their phone number">Telefoonnummer toevoegen</string>
 	<string name="verify_account_title" context="enter verification code page title">Uw account verifiëren</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Uw account is tijdelijk geblokkeerd door potentieel misbruik. Verifieer uw telefoonnummer om uw account te ontgrendelen.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Land</string>
@@ -696,7 +696,7 @@
 	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Selecteer een landnummer</string>
     <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Landnummer konden niet worden opgehaald.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Vul alstublieft een geldig telefoonnummer in.</string>
-	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Voer de verificatiecode in die is verzonden naar</string>
+	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">Voer de verificatiecode in die is verzonden naar</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Uw account verifiëren</string>
 	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Onjuiste code. Probeer nogmaals of verstuur opnieuw.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">U heeft geen code ontvangen?</string>
@@ -814,7 +814,7 @@
     <string name="my_account_title" context="title of the My Account screen">Account Soort</string>
     <string name="renews_on" context="title of the Expiration Date">Vernieuwd op &#160;</string>
     <string name="expires_on" context="title of the Expiration Date">Vervalt op&#160;</string>
-    <string name="free_account">GRATIS</string>
+    <string name="free_account">Gratis</string>
 
     <!--
     <string name="free_storage" context="Not translate">50 GB</string>
@@ -1625,7 +1625,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">Verwijzing Bonussen</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">Installeer een mobiele applicatie</string>
-    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">Mobiele nummer toevoegen</string>
+    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">Mobiele nummer toevoegen</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Registratie bonus</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Installeer de MEGA desktop applicatie</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Account Basis Tegoed</string>
@@ -2396,7 +2396,7 @@
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Bijlage al verzonden</string>
 
-    <string name="call_ended_message" context="Message shown when a call ends.">[A]Oproep beëindigd[/A][C]. Duur: [/C]</string>
+    <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]Oproep beëindigd[/A][C]. Duur: [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s uur[/B]</item>
         <item context="Message that shows the hours of a call when it ends, more hours" quantity="other">[B]%1$s uren[/B]</item>
@@ -2470,7 +2470,7 @@
         <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d contact op mega gevonden</item>
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacten op MEGA gevonden</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Contact nu uitnodigen?</string>
+    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user&#039;s phone contacts have a MEGA account. In other case here would appear all the user&#039;s phone contacts that have a MEGA account.">Contact nu uitnodigen?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Bekijk wie al op MEGA zit.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Contacten laden op MEGA&#8230;</string>
 
@@ -2563,7 +2563,7 @@
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">Nodig contacten uit en begin een veilig gesprek met MEGA\'s gecodeerde chat.</string>
     <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">Begin met veilig chatten met uw contacten door gebruik van eind-tot-eind codering</string>
 
-    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hoi! Voer veilige gesprekken op MEGA met mij en krijg tot 50 GB gratis opslagruimte. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hoi! Houd veilige gesprekken op MEGA met mij en krijg tot 50 GB gratis opslag. %1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it.">Geen Gesprekslink beschikbaar.</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Gesprek link succesvol verwijderd.</string>
@@ -2621,9 +2621,9 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Laden</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Een ogenblik geduld a.u.b&#8230;</string>
 
-    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">Wanneer u uitlogt, worden bestanden van uw Offline sectie verwijderd van uw apparaat.</string>
-    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">Wanneer u uitlogt, worden voortgaande overdrachten geannuleerd.</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">Wanneer u uitlogt, worden bestanden van uw Offline sectie verwijderd van uw apparaat en voortgaande overdrachten worden geannuleerd.</string>
+    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Wanneer u uitlogt, worden bestanden van uw Offline sectie verwijderd van uw apparaat.</string>
+    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Wanneer u uitlogt, worden voortgaande overdrachten geannuleerd.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">Wanneer u uitlogt, worden bestanden van uw Offline sectie verwijderd van uw apparaat en voortgaande overdrachten worden geannuleerd.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Onbekende naam</string>
 
@@ -2645,5 +2645,5 @@
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Uw wachtwoord is gelekt en wordt nu door slechte personen gebruikt om in te loggen op uw accounts, inclusief, maar niet beperkt tot, uw MEGA-account.</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Opnieuw verbinden</string>
-    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back!</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">U bent terug.</string>
 </resources>
