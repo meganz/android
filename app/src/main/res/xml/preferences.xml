@@ -146,14 +146,6 @@
 		app:allowDividerBelow="false">
 		<!--        android:textColor="@color/pressed_mega">  -->
 
-		<android.support.v7.preference.SwitchPreferenceCompat
-			android:key="settings_chat_enable"
-			android:title="@string/section_chat"
-			android:defaultValue="true"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
 		<android.support.v7.preference.ListPreference
 			android:key="settings_chat_list_status"
 			android:title="@string/set_status_option_label"

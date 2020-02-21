@@ -1613,22 +1613,8 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		logDebug("onRequestFinish");
-		if(request.getType() == MegaRequest.TYPE_LOGOUT){
-			if(Util.isChatEnabled()){
-				logDebug("END logout sdk request - wait chat logout");
-			}
-			else{
-				logDebug("END logout sdk request - chat disabled");
-
-				AccountController aC = new AccountController(this);
-				aC.logoutConfirmed(this);
-
-				Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-				tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				this.startActivity(tourIntent);
-				finish();
-			}
+		if (request.getType() == MegaRequest.TYPE_LOGOUT) {
+			logDebug("END logout sdk request - wait chat logout");
 		}
 	}
 

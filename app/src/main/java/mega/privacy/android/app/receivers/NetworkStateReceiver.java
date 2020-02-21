@@ -48,13 +48,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             logDebug("Network state: CONNECTED");
 
             megaApi = mApplication.getMegaApi();
-
-            if(isChatEnabled()){
-                megaChatApi = mApplication.getMegaChatApi();
-            }
-            else{
-                megaChatApi=null;
-            }
+            megaChatApi = mApplication.getMegaChatApi();
 
             String previousIP = mApplication.getLocalIpAddress();
             String currentIP = getLocalIpAddress(context);

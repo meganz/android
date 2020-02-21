@@ -468,10 +468,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		megaApi.addGlobalListener(this);
 
-		if (isChatEnabled()) {
-			if (megaChatApi == null) {
-				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
-			}
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 		}
 		
 		setContentView(R.layout.activity_file_explorer);
@@ -531,34 +529,19 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				prepareNodesText.setVisibility(View.GONE);
 				gSession = credentials.getSession();
 
-				if(isChatEnabled()){
-					logDebug("Chat is ENABLED");
+				int ret = megaChatApi.getInitState();
 
-					int ret = megaChatApi.getInitState();
-
-					if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
-						ret = megaChatApi.init(gSession);
-						logDebug("Result of init ---> " + ret);
-						chatSettings = dbH.getChatSettings();
-						if (ret == MegaChatApi.INIT_NO_CACHE) {
-							logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
-						}
-						else if (ret == MegaChatApi.INIT_ERROR) {
-							logDebug("Condition ret == MegaChatApi.INIT_ERROR");
-							if(chatSettings == null) {
-								logWarning("ERROR----> Switch OFF chat");
-								chatSettings = new ChatSettings();
-								chatSettings.setEnabled(false+"");
-								dbH.setChatSettings(chatSettings);
-							} else{
-								logWarning("ERROR----> Switch OFF chat");
-								dbH.setEnabledChat(false + "");
-							}
-							megaChatApi.logout(this);
-						}
-						else{
-							logDebug("onCreate: Chat correctly initialized");
-						}
+				if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+					ret = megaChatApi.init(gSession);
+					logDebug("Result of init ---> " + ret);
+					chatSettings = dbH.getChatSettings();
+					if (ret == MegaChatApi.INIT_NO_CACHE) {
+						logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
+					} else if (ret == MegaChatApi.INIT_ERROR) {
+						logDebug("Condition ret == MegaChatApi.INIT_ERROR");
+						megaChatApi.logout(this);
+					} else {
+						logDebug("onCreate: Chat correctly initialized");
 					}
 				}
 
@@ -717,9 +700,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				if(isChatFirst){
 					aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 					setView(SHOW_TABS, true, -1);
-					if (!isChatEnabled()) {
-						isChatFirst = false;
-					}
 				}
 				else{
 					aB.setTitle(getString(R.string.title_upload_explorer).toUpperCase());
@@ -765,21 +745,15 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				if (mTabsAdapterExplorer == null){
 					tabLayoutExplorer.setVisibility(View.VISIBLE);
 					viewPagerExplorer.setVisibility(View.VISIBLE);
-					if (isChatFirst && isChatEnabled()) {
-						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
-					}
-					else {
-						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
+					if (isChatFirst) {
+						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this, true);
+					} else {
+						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this);
 					}
 					viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 					tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
 					if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2 && !isChatFirst && tabToRemove == CHAT_TAB) {
-						mTabsAdapterExplorer.setTabRemoved(true);
-						tabLayoutExplorer.removeTabAt(2);
-						mTabsAdapterExplorer.notifyDataSetChanged();
-					}
-					else if (!isChatEnabled() && mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2) {
 						mTabsAdapterExplorer.setTabRemoved(true);
 						tabLayoutExplorer.removeTabAt(2);
 						mTabsAdapterExplorer.notifyDataSetChanged();
@@ -2144,33 +2118,17 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				
 				loginLoggingIn.setVisibility(View.GONE);
 
-				chatSettings = dbH.getChatSettings();
-				if(chatSettings!=null) {
-
-					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-					if(chatEnabled){
-
-						logDebug("Chat enabled-->connect");
-						if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
-							logDebug("Connection goes!!!");
-							megaChatApi.connect(this);
-						} else{
-							logWarning("Not launch connect: " + megaChatApi.getInitState());
-						}
-						MegaApplication.setLoggingIn(false);
-						afterLoginAndFetch();
-					} else{
-						logWarning("Chat NOT enabled - readyToManager");
-						MegaApplication.setLoggingIn(false);
-						afterLoginAndFetch();
-					}
-				} else{
-					logWarning("chatSettings NULL - readyToManager");
-					MegaApplication.setLoggingIn(false);
-					afterLoginAndFetch();
-
+				logDebug("Chat --> connect");
+				if ((megaChatApi.getInitState() != MegaChatApi.INIT_ERROR)) {
+					logDebug("Connection goes!!!");
+					megaChatApi.connect(this);
+				} else {
+					logWarning("Not launch connect: " + megaChatApi.getInitState());
 				}
-			}	
+
+				MegaApplication.setLoggingIn(false);
+				afterLoginAndFetch();
+			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY) {
 			filesChecked++;
@@ -3196,9 +3154,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private ChatExplorerFragment getChatExplorerFragment () {
 
-		if (!isChatEnabled()) {
-			return null;
-		}
 		ChatExplorerFragment c;
 
 		if (importFileF) {

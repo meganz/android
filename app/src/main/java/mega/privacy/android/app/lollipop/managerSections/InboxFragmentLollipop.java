@@ -387,16 +387,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 					}
 				}
 
-				if(allFiles){
-					if (isChatEnabled()) {
-						showSendToChat = true;
-					}
-					else {
-						showSendToChat = false;
-					}
-				}else{
-					showSendToChat = false;
-				}
+				showSendToChat = allFiles;
 			}
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);

@@ -2,15 +2,11 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +25,7 @@ import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -48,7 +45,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -58,6 +54,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
@@ -85,6 +82,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback {
@@ -188,19 +186,42 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private LocalCameraCallFullScreenFragment localCameraFragmentFS = null;
     private RemoteCameraCallFullScreenFragment remoteCameraFragmentFS = null;
     private BigCameraGroupCallFragment bigCameraGroupCallFragment = null;
+    private MenuItem cameraSwapMenuItem;
     private MegaApplication application =  MegaApplication.getInstance();
     private boolean inTemporaryState = false;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         logDebug("onCreateOptionsMenu");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.call_action, menu);
+        cameraSwapMenuItem = menu.findItem(R.id.cab_menu_camera_swap);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        logDebug("onPrepareOptionsMenu");
+        if(isNecessaryToShowSwapCameraOption()){
+            cameraSwapMenuItem.setVisible(true);
+            if(callChat.hasLocalVideo()){
+                cameraSwapMenuItem.setEnabled(true);
+                cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.background_chat));
+            }else{
+                cameraSwapMenuItem.setEnabled(false);
+                cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.white_50_opacity));
+            }
+        }else{
+            cameraSwapMenuItem.setVisible(false);
+        }
+
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private boolean isNecessaryToShowSwapCameraOption(){
+        if(callChat == null) return false;
+        int callStatus = callChat.getStatus();
+        if(callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || callStatus < MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM || (callStatus > MegaChatCall.CALL_STATUS_IN_PROGRESS && callStatus != MegaChatCall.CALL_STATUS_RECONNECTING)) return false;
+        return true;
     }
 
     @Override
@@ -211,6 +232,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         switch (id) {
             case android.R.id.home: {
                 onBackPressed();
+                break;
+            }
+            case R.id.cab_menu_camera_swap:{
+                swapCamera(new ChatChangeVideoStreamListener(getApplicationContext()));
                 break;
             }
         }
@@ -684,7 +709,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         logDebug("Type: " + request.getType());
-
         if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER && e.getErrorCode() != MegaError.API_OK) {
             logDebug("TYPE_GET_ATTR_USER: OK");
 
@@ -1041,6 +1065,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             switch (callStatus) {
                 case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM: {
                     updateLocalAV();
+                    invalidateOptionsMenu();
                     break;
                 }
                 case MegaChatCall.CALL_STATUS_JOINING:
@@ -1251,6 +1276,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             logDebug("CHANGE_TYPE_LOCAL_AVFLAGS");
             updateLocalAV();
             updateSubtitleNumberOfVideos();
+            invalidateOptionsMenu();
 
         } else if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION)) {
             logDebug("CHANGE_TYPE_CALL_COMPOSITION: Call Status " + call.getStatus()+", Number of participants "+call.getPeeridParticipants().size());
