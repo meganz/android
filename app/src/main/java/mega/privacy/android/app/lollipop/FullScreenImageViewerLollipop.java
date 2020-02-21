@@ -415,13 +415,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			renameIcon.setVisible(true);
 			moveIcon.setVisible(true);
 			copyIcon .setVisible(true);
-
-			if(isChatEnabled()){
-				chatIcon.setVisible(true);
-			}
-			else{
-				chatIcon.setVisible(false);
-			}
+			chatIcon.setVisible(true);
 
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 			final long handle = node.getHandle();
@@ -442,12 +436,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		else if (adapterType == INCOMING_SHARES_ADAPTER || fromIncoming) {
 			propertiesIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			if(isChatEnabled()){
-				chatIcon.setVisible(true);
-			}
-			else{
-				chatIcon.setVisible(false);
-			}
+
+			chatIcon.setVisible(true);
 			copyIcon.setVisible(true);
 			removeIcon.setVisible(false);
 			getlinkIcon.setVisible(false);
@@ -610,12 +600,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 							renameIcon.setVisible(true);
 							moveIcon.setVisible(true);
 							moveToTrashIcon.setVisible(true);
-							if(isChatEnabled()){
-								chatIcon.setVisible(true);
-							}
-							else{
-								chatIcon.setVisible(false);
-							}
+							chatIcon.setVisible(true);
 							break;
 						}
 						case MegaShare.ACCESS_READWRITE:
@@ -629,12 +614,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 					}
 
 				}else{
-					if(isChatEnabled()){
-						chatIcon.setVisible(true);
-					}
-					else{
-						chatIcon.setVisible(false);
-					}
+					chatIcon.setVisible(true);
 					renameIcon.setVisible(true);
 					moveIcon.setVisible(true);
 
@@ -1019,20 +999,16 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 
-		if(isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
-			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-				intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intentLogin);
-				finish();
-				return;
-			}
-		}else{
-			megaChatApi=null;
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+		}
+		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+			Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+			intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+			intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intentLogin);
+			finish();
+			return;
 		}
 
 		dbH = DatabaseHandler.getDbHandler(this);

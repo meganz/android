@@ -305,13 +305,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 } else {
                     nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                 }
-                if (isChatEnabled()) {
-                    optionSendChat.setVisibility(View.VISIBLE);
-                }
-                else {
-                    counterShares--;
-                    optionSendChat.setVisibility(View.GONE);
-                }
+
+                optionSendChat.setVisibility(View.VISIBLE);
             }
         }
 
@@ -335,12 +330,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionOfflineText.setText(getString(R.string.save_for_offline));
                     }
 
-                    if (isChatEnabled()) {
-                        optionSendChat.setVisibility(View.VISIBLE);
-                    } else {
-                        counterShares--;
-                        optionSendChat.setVisibility(View.GONE);
-                    }
+                    optionSendChat.setVisibility(View.VISIBLE);
 
                     counterRemove--;
                     optionRemove.setVisibility(View.GONE);
@@ -577,14 +567,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionSendChat.setVisibility(View.GONE);
                     } else {
                         optionInfoText.setText(R.string.general_file_info);
-
-                        if (isChatEnabled()) {
-                            optionSendChat.setVisibility(View.VISIBLE);
-                        }
-                        else {
-                            counterShares--;
-                            optionSendChat.setVisibility(View.GONE);
-                        }
+                        optionSendChat.setVisibility(View.VISIBLE);
                     }
 
                     nodeIconLayout.setVisibility(View.VISIBLE);
@@ -861,12 +844,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionSendChat.setVisibility(View.GONE);
                     } else {
                         optionInfoText.setText(R.string.general_file_info);
-                        if (isChatEnabled()) {
-                            optionSendChat.setVisibility(View.VISIBLE);
-                        } else {
-                            counterShares--;
-                            optionSendChat.setVisibility(View.GONE);
-                        }
+                        optionSendChat.setVisibility(View.VISIBLE);
                     }
 
                     nodeIconLayout.setVisibility(View.VISIBLE);

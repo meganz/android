@@ -83,6 +83,7 @@ import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
@@ -523,20 +524,18 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			return;
 		}
 
-		if (isChatEnabled()) {
-			if (megaChatApi == null) {
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+		}
 
-			if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-				logDebug("Refresh session - karere");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
-				return;
-			}
+		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+			logDebug("Refresh session - karere");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
 		}
 
 		megaApi.addGlobalListener(this);

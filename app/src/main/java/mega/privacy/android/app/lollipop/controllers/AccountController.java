@@ -445,7 +445,6 @@ public class AccountController implements View.OnClickListener{
         dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 
         dbH.clearChatSettings();
-        dbH.setEnabledChat(true + "");
 
         //clear mega contacts and reset last sync time.
         dbH.clearMegaContacts();

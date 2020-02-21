@@ -115,7 +115,7 @@ public class ChatUtil {
     /*Method to show or hide the "Tap to return to call" banner*/
     public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
         if (megaChatApi == null || callInProgressLayout == null) return;
-        if (!isChatEnabled() || !participatingInACall(megaChatApi)) {
+        if (!participatingInACall(megaChatApi)) {
             callInProgressLayout.setVisibility(View.GONE);
             activateChrono(false, callInProgressChrono, null);
             return;

@@ -740,20 +740,19 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 finish();
                 return;
             }
-            if(isChatEnabled()) {
-                if (megaChatApi == null) {
-                    megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-                }
 
-                if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-                    logDebug("Refresh session - karere");
-                    Intent intent = new Intent(this, LoginActivityLollipop.class);
-                    intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                    finish();
-                    return;
-                }
+            if (megaChatApi == null) {
+                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+            }
+
+            if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+                logDebug("Refresh session - karere");
+                Intent intent = new Intent(this, LoginActivityLollipop.class);
+                intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+                return;
             }
 
             megaApi.addGlobalListener(this);
@@ -914,43 +913,33 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         return translated;
     }
 
-	void setOwnerState (long userHandle) {
-        if(isChatEnabled()){
-            ownerState.setVisibility(View.VISIBLE);
-            if (megaChatApi != null){
-                int userStatus = megaChatApi.getUserOnlineStatus(userHandle);
-                if(userStatus == MegaChatApi.STATUS_ONLINE){
-                    logDebug("This user is connected");
-                    ownerState.setVisibility(View.VISIBLE);
-                    ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_online));
-                }
-                else if(userStatus == MegaChatApi.STATUS_AWAY){
-                    logDebug("This user is away");
-                    ownerState.setVisibility(View.VISIBLE);
-                    ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_away));
-                }
-                else if(userStatus == MegaChatApi.STATUS_BUSY){
-                    logDebug("This user is busy");
-                    ownerState.setVisibility(View.VISIBLE);
-                    ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_busy));
-                }
-                else if(userStatus == MegaChatApi.STATUS_OFFLINE){
-                    logDebug("This user is offline");
-                    ownerState.setVisibility(View.VISIBLE);
-                    ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_offline));
-                }
-                else if(userStatus == MegaChatApi.STATUS_INVALID){
-                    logWarning("INVALID status: " + userStatus);
-                    ownerState.setVisibility(View.GONE);
-                }
-                else{
-                    logDebug("This user status is: " + userStatus);
-                    ownerState.setVisibility(View.GONE);
-                }
+    void setOwnerState(long userHandle) {
+        ownerState.setVisibility(View.VISIBLE);
+        if (megaChatApi != null) {
+            int userStatus = megaChatApi.getUserOnlineStatus(userHandle);
+            if (userStatus == MegaChatApi.STATUS_ONLINE) {
+                logDebug("This user is connected");
+                ownerState.setVisibility(View.VISIBLE);
+                ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_online));
+            } else if (userStatus == MegaChatApi.STATUS_AWAY) {
+                logDebug("This user is away");
+                ownerState.setVisibility(View.VISIBLE);
+                ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_away));
+            } else if (userStatus == MegaChatApi.STATUS_BUSY) {
+                logDebug("This user is busy");
+                ownerState.setVisibility(View.VISIBLE);
+                ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_busy));
+            } else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
+                logDebug("This user is offline");
+                ownerState.setVisibility(View.VISIBLE);
+                ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_offline));
+            } else if (userStatus == MegaChatApi.STATUS_INVALID) {
+                logWarning("INVALID status: " + userStatus);
+                ownerState.setVisibility(View.GONE);
+            } else {
+                logDebug("This user status is: " + userStatus);
+                ownerState.setVisibility(View.GONE);
             }
-        }
-        else{
-            ownerState.setVisibility(View.GONE);
         }
     }
 
@@ -1033,11 +1022,10 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                     leaveMenuItem.setVisible(false);
                 } else {
 
-                    if (node.isFolder() || !isChatEnabled()) {
+                    if (node.isFolder()) {
                         sendToChatMenuItem.setVisible(false);
                         menu.findItem(R.id.cab_menu_file_info_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-                    }
-                    else {
+                    } else {
                         sendToChatMenuItem.setVisible(true);
                         menu.findItem(R.id.cab_menu_file_info_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
                     }

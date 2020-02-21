@@ -289,7 +289,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 }
             }
 
-            if(!allFiles || !isChatEnabled()){
+            if(!allFiles){
                 showSendToChat = false;
             }
 

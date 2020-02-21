@@ -29,8 +29,6 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
-	boolean allFiles = true;
-
 	@Override
 	public void activateActionMode() {
 		super.activateActionMode();

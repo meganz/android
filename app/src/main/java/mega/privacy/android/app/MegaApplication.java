@@ -123,6 +123,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private static long openChatId = -1;
 
 	private static boolean closedChat = true;
+	private static HashMap<Long, Boolean> hashMapVideo = new HashMap<>();
 	private static HashMap<Long, Boolean> hashMapSpeaker = new HashMap<>();
 	private static HashMap<Long, Boolean> hashMapCallLayout = new HashMap<>();
 
@@ -222,17 +223,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			if (request.getType() == MegaRequest.TYPE_LOGOUT){
 				logDebug("Logout finished: " + e.getErrorString() + "(" + e.getErrorCode() +")");
 				if (e.getErrorCode() == MegaError.API_OK) {
-					if (isChatEnabled()) {
-						logDebug("END logout sdk request - wait chat logout");
-					} else {
-						logDebug("END logout sdk request - chat disabled");
-						DatabaseHandler.getDbHandler(getApplicationContext()).clearEphemeral();
-						AccountController.logoutConfirmed(getApplicationContext());
-
-						Intent tourIntent = new Intent(getApplicationContext(), LoginActivityLollipop.class);
-						tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-						startActivity(tourIntent);
-					}
+					logDebug("END logout sdk request - wait chat logout");
 				} else if (e.getErrorCode() == MegaError.API_EINCOMPLETE) {
 					if (request.getParamType() == MegaError.API_ESSL) {
 						logWarning("SSL verification failed");
@@ -244,13 +235,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					myAccountInfo = new MyAccountInfo();
 
 					esid = true;
-
-					if(!isChatEnabled()){
-						logWarning("Chat is not enable - proceed to show login");
-						if(activityVisible){
-							launchExternalLogout();
-						}
-					}
 
 					AccountController.localLogoutApp(getApplicationContext());
 				} else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
@@ -395,13 +379,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
 		intent.putExtra("actionType", UPDATE_ACCOUNT_DETAILS);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-	}
-
-	public void launchExternalLogout(){
-		logDebug("launchExternalLogout");
-		Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-		loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-		startActivity(loginIntent);
 	}
 
 	private final int interval = 3000;
@@ -758,13 +735,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		catch (Exception e){}
 	}
 
-	public void enableChat(){
-		logDebug("enableChat");
-		if(isChatEnabled()){
-			megaChatApi = getMegaChatApi();
-		}
-	}
-
 	public MegaApiAndroid getMegaApi()
 	{
 		if(megaApi == null)
@@ -799,17 +769,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 			megaApi.addGlobalListener(new GlobalListener());
 
-//			DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-//			if (dbH.getCredentials() != null){
-//				megaChatApi = new MegaChatApiAndroid(megaApi, true);
-//			}
-//			else{
-//				megaChatApi = new MegaChatApiAndroid(megaApi, false);
-//			}
-
-			if(isChatEnabled()){
-				megaChatApi = getMegaChatApi();
-			}
+			megaChatApi = getMegaChatApi();
 
 			String language = Locale.getDefault().toString();
 			boolean languageString = megaApi.setLanguage(language);
@@ -1120,11 +1080,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public void sendSignalPresenceActivity(){
 		logDebug("sendSignalPresenceActivity");
-		if(isChatEnabled()){
-			if (megaChatApi != null){
-				if(megaChatApi.isSignalActivityRequired()){
-					megaChatApi.signalPresenceActivity();
-				}
+		if (megaChatApi != null) {
+			if (megaChatApi.isSignalActivityRequired()) {
+				megaChatApi.signalPresenceActivity();
 			}
 		}
 	}
@@ -1303,7 +1261,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 
 		int chatUnread = 0;
-		if(isChatEnabled() && megaChatApi != null) {
+		if (megaChatApi != null) {
 			chatUnread = megaChatApi.getUnreadChats();
 		}
 
@@ -1456,10 +1414,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
 					if (megaChatApi != null) {
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
-						if(callStatus == MegaChatCall.CALL_STATUS_RING_IN || callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+						if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
 							setAudioManagerValues(call);
 						}
-						if(callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING){
+						if(callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){
 							removeChatAudioManager();
 							clearIncomingCallNotification(call.getId());
 						}
@@ -1560,14 +1518,15 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					}
 					break;
 				}
-
 				case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION: {
-					hashMapSpeaker.remove(call.getChatid());
+					removeStatusVideoAndSpeaker(call.getChatid());
 					removeChatAudioManager();
 					break;
 				}
-
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
+					removeStatusVideoAndSpeaker(call.getChatid());
+					removeChatAudioManager();
+
 				    if(shouldNotify(this)) {
                         toSystemSettingNotification(this);
                     }
@@ -1575,9 +1534,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				    if(wakeLock != null && wakeLock.isHeld()) {
 				        wakeLock.release();
                     }
-					hashMapSpeaker.remove(call.getChatid());
+
 					clearIncomingCallNotification(call.getId());
-					removeChatAudioManager();
 
 					//Show missed call if time out ringing (for incoming calls)
 					try {
@@ -1730,6 +1688,11 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 	}
 
+	private void removeStatusVideoAndSpeaker(long chatId){
+		hashMapSpeaker.remove(chatId);
+		hashMapVideo.remove(chatId);
+	}
+
 	public void createChatAudioManager() {
 		if (chatAudioManager != null) return;
 		chatAudioManager = ChatAudioManager.create(getApplicationContext());
@@ -1870,6 +1833,18 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		hashMapSpeaker.put(chatId, speakerStatus);
 	}
 
+	public static boolean getVideoStatus(long chatId) {
+		boolean entryExists = hashMapVideo.containsKey(chatId);
+		if (entryExists) {
+			return hashMapVideo.get(chatId);
+		}
+		setVideoStatus(chatId, false);
+		return false;
+	}
+
+	public static void setVideoStatus(long chatId, boolean videoStatus) {
+		hashMapVideo.put(chatId, videoStatus);
+	}
 	public static boolean getCallLayoutStatus(long chatId) {
 		boolean entryExists = hashMapCallLayout.containsKey(chatId);
 		if (entryExists) {

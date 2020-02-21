@@ -30,11 +30,7 @@ public class BaseFragment extends Fragment {
         app = MegaApplication.getInstance();
         megaApi = app.getMegaApi();
         megaApiFolder = app.getMegaApiFolder();
-
-        if (isChatEnabled()) {
-            megaChatApi = app.getMegaChatApi();
-        }
-
+        megaChatApi = app.getMegaChatApi();
         dbH = app.getDbH();
     }
 

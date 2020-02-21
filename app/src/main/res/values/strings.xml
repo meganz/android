@@ -1096,15 +1096,12 @@
     <!--
     <string name="archive_chat_empty" context="Message shown when the user has no archived chats">No archived conversations</string>
     -->
-    <string name="recent_chat_enable_chat" context="Message shown when the user has no archived chats">Chat is disabled</string>
-    <string name="recent_chat_enable_chat_button" context="Message shown when the user has no archived chats">Enable chat</string>
 
     <!--
     <string name="get_started_button" context="Button to start using the chat">Get started</string>
     -->
 
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invite your friends to join you on Chat and enjoy our encrypted platform with privacy and security.</string>
-    <!--<string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat[A]and enjoy our encrypted platform with privacy and security.</string>-->
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
@@ -1362,8 +1359,6 @@
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section. Please, keep the placeholders, the first one is for the space consumed and the second one is for the total space available. For instance: 144.44 GB of 200 GB. Please, keep the markers ([A]...[/A], [B]...[/B]), they are for formatting the string setting a font style">[A]%1$s[/A] [B]of %2$s[/B]</string>
 
     <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Remove from Save for Offline?</string>
-
-    <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without a connection.</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
@@ -1799,7 +1794,6 @@
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Set period</string>
 
     <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security.[/B]</string>
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">[C]Enable [/C][B]Chat[/B][A][C] and enjoy our encrypted platform with privacy and security.[/C]</string>
 
     <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]No media on [/B][A]Camera Uploads[/A][B].[/B]</string>
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Empty [/B][A]Rubbish Bin[/A][B].[/B]</string>
@@ -2433,6 +2427,7 @@
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
 
     <string name="call_ended_message" context="Message shown when a call ends.">[A]Call ended[/A][C]. Duration: [/C]</string>
+    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]Group call ended[/A][C]. Duration: [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s hour[/B]</item>
         <item context="Message that shows the hours of a call when it ends, more hours" quantity="other">[B]%1$s hours[/B]</item>
@@ -2445,6 +2440,8 @@
         <item context="Message that shows the seconds of a call when it ends, one second" quantity="one">[B]%1$d second[/B]</item>
         <item context="Message that shows the seconds of a call when it ends, more seconds" quantity="other">[B]%1$d seconds[/B]</item>
     </plurals>
+    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]Call ended[/A]</string>
+    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]Group call ended[/A]</string>
 
     <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]Last seen [/A]today %1$s</string>
     <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user">[A]Last seen [/A]a long time ago</string>
@@ -2478,6 +2475,9 @@
     <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">Would you like to open the location settings?</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
+
+    <string name="on_permanently_denied" context="After the user ticketed \'Don\'t ask again' on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions on your device\’s settings</string>
+    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won\'t contact them.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
         <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">Message forwarded</item>

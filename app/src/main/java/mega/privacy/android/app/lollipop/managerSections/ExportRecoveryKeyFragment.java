@@ -1,9 +1,12 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
@@ -23,6 +26,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import nz.mega.sdk.MegaApiAndroid;
 
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -157,10 +161,38 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
                 break;
             }
             case R.id.save_MK_button:{
-                hideMKLayout();
-                AccountController aC = new AccountController(context);
-                aC.saveRkToFileSystem();
+                if (checkStoragePermission()) {
+                    toFileSystem();
+                }
                 break;
+            }
+        }
+    }
+
+    private void toFileSystem() {
+        hideMKLayout();
+        AccountController aC = new AccountController(context);
+        aC.saveRkToFileSystem();
+    }
+
+    private boolean checkStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_WRITE_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                toFileSystem();
+            } else {
+                logWarning("Don't grant the write storage permission when export RK.");
             }
         }
     }

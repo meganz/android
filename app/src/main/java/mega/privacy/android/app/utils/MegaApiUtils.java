@@ -279,36 +279,34 @@ public class MegaApiUtils {
 
         ArrayList<MegaUser> lastContacted = new ArrayList<MegaUser>();
 
-        if(Util.isChatEnabled()){
-            MegaChatApiAndroid megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        MegaChatApiAndroid megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
 
-            ArrayList<MegaChatListItem> chats = megaChatApi.getActiveChatListItems();
+        ArrayList<MegaChatListItem> chats = megaChatApi.getActiveChatListItems();
 
-            //Order by last interaction
-            Collections.sort(chats, new Comparator<MegaChatListItem>(){
+        //Order by last interaction
+        Collections.sort(chats, new Comparator<MegaChatListItem>() {
 
-                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                    long timestamp1 = c1.getLastTimestamp();
-                    long timestamp2 = c2.getLastTimestamp();
+            public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+                long timestamp1 = c1.getLastTimestamp();
+                long timestamp2 = c2.getLastTimestamp();
 
-                    long result = timestamp2 - timestamp1;
-                    return (int)result;
+                long result = timestamp2 - timestamp1;
+                return (int) result;
+            }
+        });
+
+        for (int i = 0; i < chats.size(); i++) {
+            MegaChatListItem chatItem = chats.get(i);
+            if (!chatItem.isGroup()) {
+                long peer = chatItem.getPeerHandle();
+                MegaUser user = megaApi.getContact(MegaApiJava.userHandleToBase64(peer));
+                if (user != null && user.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+                    lastContacted.add(user);
                 }
-            });
+            }
 
-            for(int i=0; i<chats.size(); i++){
-                MegaChatListItem chatItem = chats.get(i);
-                if(!chatItem.isGroup()){
-                    long peer = chatItem.getPeerHandle();
-                    MegaUser user = megaApi.getContact(MegaApiJava.userHandleToBase64(peer));
-                    if(user!=null && user.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-                        lastContacted.add(user);
-                    }
-                }
-
-                if(lastContacted.size() >= 6){
-                    return lastContacted;
-                }
+            if (lastContacted.size() >= 6) {
+                return lastContacted;
             }
         }
 

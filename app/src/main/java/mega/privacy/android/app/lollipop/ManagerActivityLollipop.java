@@ -133,6 +133,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
+import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
@@ -246,6 +247,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
@@ -1888,15 +1890,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		managerActivity = this;
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
-		if(isChatEnabled()){
-			megaChatApi = app.getMegaChatApi();
-			logDebug("addChatListener");
-			megaChatApi.addChatListener(this);
-			megaChatApi.addChatCallListener(this);
-		}
-		else{
-			megaChatApi=null;
-		}
+		megaChatApi = app.getMegaChatApi();
+		logDebug("addChatListener");
+		megaChatApi.addChatListener(this);
+		megaChatApi.addChatCallListener(this);
 
 		if (megaChatApi != null){
 			logDebug("retryChatPendingConnections()");
@@ -2359,32 +2356,26 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			selectDrawerItemLollipop(drawerItem);
 
 			showOfflineMode();
-			if(isChatEnabled()){
-				UserCredentials credentials = dbH.getCredentials();
-				if(credentials!=null){
-					String gSession = credentials.getSession();
-					int ret = megaChatApi.getInitState();
-					logDebug("In Offline mode - Init chat is: " + ret);
-					if(ret==0||ret==MegaChatApi.INIT_ERROR){
-						ret = megaChatApi.init(gSession);
-						logDebug("After init: " + ret);
-						if (ret == MegaChatApi.INIT_NO_CACHE) {
-							logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-						}else if (ret == MegaChatApi.INIT_ERROR) {
-							logWarning("condition ret == MegaChatApi.INIT_ERROR");
-						}else{
-							logDebug("Chat correctly initialized");
-						}
+
+			UserCredentials credentials = dbH.getCredentials();
+			if (credentials != null) {
+				String gSession = credentials.getSession();
+				int ret = megaChatApi.getInitState();
+				logDebug("In Offline mode - Init chat is: " + ret);
+				if (ret == 0 || ret == MegaChatApi.INIT_ERROR) {
+					ret = megaChatApi.init(gSession);
+					logDebug("After init: " + ret);
+					if (ret == MegaChatApi.INIT_NO_CACHE) {
+						logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
+					} else if (ret == MegaChatApi.INIT_ERROR) {
+						logWarning("condition ret == MegaChatApi.INIT_ERROR");
+					} else {
+						logDebug("Chat correctly initialized");
 					}
-					else{
-						logDebug("Offline mode: Do not init, chat already initialized");
-					}
+				} else {
+					logDebug("Offline mode: Do not init, chat already initialized");
 				}
 			}
-			else{
-				logDebug("Offline mode: chat disabled");
-			}
-			return;
         }
 
 		transfersOverViewLayout = findViewById(R.id.transfers_overview_item_layout);
@@ -2621,11 +2612,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			megaApi.addGlobalListener(this);
 
-			if(isChatEnabled()){
-				megaApi.shouldShowRichLinkWarning(this);
-				megaApi.isRichPreviewsEnabled(this);
-				megaApi.isGeolocationEnabled(this);
-			}
+			megaApi.shouldShowRichLinkWarning(this);
+			megaApi.isRichPreviewsEnabled(this);
+			megaApi.isGeolocationEnabled(this);
 
 			transferData = megaApi.getTransferData(this);
 			int downloadsInProgress = transferData.getNumDownloads();
@@ -2797,15 +2786,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(ACTION_OPEN_CHAT_LINK)){
+						logDebug("ACTION_OPEN_CHAT_LINK: " + getIntent().getDataString());
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
-
-						if (isChatEnabled()) {
-							logDebug("ACTION_OPEN_CHAT_LINK: " + getIntent().getDataString());
-							megaChatApi.checkChatLink(getIntent().getDataString(), this);
-						}
-
+						megaChatApi.checkChatLink(getIntent().getDataString(), this);
 						getIntent().setAction(null);
 						setIntent(null);
 					}
@@ -2813,13 +2798,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending = false;
-						if (isChatEnabled()) {
-							megaChatApi.checkChatLink(getIntent().getDataString(), this);
-							idJoinToChatLink = getIntent().getLongExtra("idChatToJoin", -1);
-							joiningToChatLink = true;
-							if (idJoinToChatLink == -1) {
-								showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
-							}
+
+						megaChatApi.checkChatLink(getIntent().getDataString(), this);
+						idJoinToChatLink = getIntent().getLongExtra("idChatToJoin", -1);
+						joiningToChatLink = true;
+						if (idJoinToChatLink == -1) {
+							showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
 						}
 
 						getIntent().setAction(null);
@@ -2945,22 +2929,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        }
 
 			logDebug("Check if there any unread chat");
-			if(isChatEnabled()){
-				if(megaChatApi!=null){
-					logDebug("Connect to chat!: " + megaChatApi.getInitState());
-					if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
-						logDebug("Connection goes!!!");
-						megaChatApi.connect(this);
-					}
-					else{
-						logWarning("Not launch connect: " + megaChatApi.getInitState());
-					}
+			if (megaChatApi != null) {
+				logDebug("Connect to chat!: " + megaChatApi.getInitState());
+				if ((megaChatApi.getInitState() != MegaChatApi.INIT_ERROR)) {
+					logDebug("Connection goes!!!");
+					megaChatApi.connect(this);
+				} else {
+					logWarning("Not launch connect: " + megaChatApi.getInitState());
 				}
-				else{
-					logError("megaChatApi is NULL");
-				}
-				setChatBadge();
+			} else {
+				logError("megaChatApi is NULL");
 			}
+			setChatBadge();
 
 			logDebug("Check if there any INCOMING pendingRequest contacts");
 			setContactTitleSection();
@@ -3412,51 +3392,48 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	void setContactStatus() {
-		logDebug("setContactStatus");
-		if(isChatEnabled()) {
-			logDebug("Chat Enabled");
-			if(megaChatApi == null) {
-				megaChatApi = app.getMegaChatApi();
-				megaChatApi.addChatListener(this);
-				megaChatApi.addChatCallListener(this);
-			}
-			int chatStatus = megaChatApi.getOnlineStatus();
-			if (contactStatus != null) {
-				switch (chatStatus) {
-					case MegaChatApi.STATUS_ONLINE: {
-						logDebug("Online");
-						contactStatus.setVisibility(View.VISIBLE);
-						contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
-						break;
-					}
-					case MegaChatApi.STATUS_AWAY: {
-						logDebug("Away");
-						contactStatus.setVisibility(View.VISIBLE);
-						contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
-						break;
-					}
-					case MegaChatApi.STATUS_BUSY: {
-						logDebug("Busy");
-						contactStatus.setVisibility(View.VISIBLE);
-						contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
-						break;
-					}
-					case MegaChatApi.STATUS_OFFLINE: {
-						logDebug("Offline");
-						contactStatus.setVisibility(View.VISIBLE);
-						contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
-						break;
-					}
-					case MegaChatApi.STATUS_INVALID: {
-						logWarning("Invalid");
-						contactStatus.setVisibility(View.GONE);
-						break;
-					}
-					default: {
-						logDebug("Default");
-						contactStatus.setVisibility(View.GONE);
-						break;
-					}
+		if (megaChatApi == null) {
+			megaChatApi = app.getMegaChatApi();
+			megaChatApi.addChatListener(this);
+			megaChatApi.addChatCallListener(this);
+		}
+
+		int chatStatus = megaChatApi.getOnlineStatus();
+		if (contactStatus != null) {
+			switch (chatStatus) {
+				case MegaChatApi.STATUS_ONLINE: {
+					logDebug("Online");
+					contactStatus.setVisibility(View.VISIBLE);
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
+					break;
+				}
+				case MegaChatApi.STATUS_AWAY: {
+					logDebug("Away");
+					contactStatus.setVisibility(View.VISIBLE);
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
+					break;
+				}
+				case MegaChatApi.STATUS_BUSY: {
+					logDebug("Busy");
+					contactStatus.setVisibility(View.VISIBLE);
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
+					break;
+				}
+				case MegaChatApi.STATUS_OFFLINE: {
+					logDebug("Offline");
+					contactStatus.setVisibility(View.VISIBLE);
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
+					break;
+				}
+				case MegaChatApi.STATUS_INVALID: {
+					logWarning("Invalid");
+					contactStatus.setVisibility(View.GONE);
+					break;
+				}
+				default: {
+					logDebug("Default");
+					contactStatus.setVisibility(View.GONE);
+					break;
 				}
 			}
 		}
@@ -3514,19 +3491,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			logDebug ("Notifications Enabled: " + nf.areNotificationsEnabled());
 			if (!nf.areNotificationsEnabled()){
 				logDebug("OFF");
-				if (dbH.getShowNotifOff() == null || dbH.getShowNotifOff().equals("true")){
-					if (isChatEnabled()){
-						if (megaChatApi == null){
-							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-						}
-						if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getChatListItems().size() >= 1)){
-							setTurnOnNotificationsFragment();
-						}
+				if (dbH.getShowNotifOff() == null || dbH.getShowNotifOff().equals("true")) {
+					if (megaChatApi == null) {
+						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 					}
-					else {
-						if ((megaApi.getContacts().size() >= 1)){
-							setTurnOnNotificationsFragment();
-						}
+					if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getChatListItems().size() >= 1)) {
+						setTurnOnNotificationsFragment();
 					}
 				}
 			}
@@ -5113,13 +5083,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			if (getSettingsFragment() != null) {
 				sttFLol.setOnlineOptions(false);
-			}
-			rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-			if (rChatFL != null) {
-				logDebug("OFFLINE: Update screen RecentChats");
-				if (!isChatEnabled()) {
-					rChatFL.showNoConnectionScreen();
-				}
 			}
 
 			logDebug("DrawerItem on start offline: " + drawerItem);
@@ -6713,18 +6676,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					break;
 
 				case CHAT:
-					if (isChatEnabled()) {
-						if (searchExpand) {
-							openSearchView();
-						} else {
-							inviteMenuItem.setVisible(true);
-							if (getChatsFragment() != null && rChatFL.getItemCount() > 0) {
-								selectMenuItem.setVisible(true);
-								searchMenuItem.setVisible(true);
-							}
-							importLinkMenuItem.setVisible(true);
-							importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
+					if (searchExpand) {
+						openSearchView();
+					} else {
+						inviteMenuItem.setVisible(true);
+						if (getChatsFragment() != null && rChatFL.getItemCount() > 0) {
+							selectMenuItem.setVisible(true);
+							searchMenuItem.setVisible(true);
 						}
+						importLinkMenuItem.setVisible(true);
+						importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
 					}
 					break;
 
@@ -9106,6 +9067,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void openLink (String link) {
+		// Password link
+		if (matchRegexs(link, PASSWORD_LINK_REGEXS)) {
+			dismissOpenLinkDialog();
+			Intent openLinkIntent = new Intent(this, OpenPasswordLinkActivity.class);
+			openLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openLinkIntent.setData(Uri.parse(link));
+			startActivity(openLinkIntent);
+			return;
+		}
+
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 			int error = nC.importLink(link);
 			if (openLinkError.getVisibility() == View.VISIBLE) {
@@ -13517,31 +13488,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			logDebug("onRequestFinish: " + MegaRequest.TYPE_LOGOUT);
 
-			if (e.getErrorCode() == MegaError.API_OK){
+			if (e.getErrorCode() == MegaError.API_OK) {
 				logDebug("onRequestFinish:OK:" + MegaRequest.TYPE_LOGOUT);
-				if(isChatEnabled()){
-					logDebug("END logout sdk request - wait chat logout");
-				}
-				else{
-					logDebug("END logout sdk request - chat disabled");
-					if (dbH == null){
-						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-					}
-					if (dbH != null){
-						dbH.clearEphemeral();
-					}
-
-					AccountController aC = new AccountController(this);
-					aC.logoutConfirmed(this);
-
-					Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-					tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-					this.startActivity(tourIntent);
-
-					finish();
-				}
-			}
-			else if (e.getErrorCode() != MegaError.API_ESID){
+				logDebug("END logout sdk request - wait chat logout");
+			} else if (e.getErrorCode() != MegaError.API_ESID) {
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 			}
 		} else if(request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
@@ -14586,10 +14536,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						logDebug("isOwnChange!!!: " + user.getEmail());
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS)){
 							logDebug("Change on CHANGE_TYPE_RICH_PREVIEWS");
-							if(isChatEnabled()){
-								megaApi.shouldShowRichLinkWarning(this);
-								megaApi.isRichPreviewsEnabled(this);
-							}
+							megaApi.shouldShowRichLinkWarning(this);
+							megaApi.isRichPreviewsEnabled(this);
 						}
 					}
 					else{
@@ -15937,43 +15885,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		this.displayedAccountType = displayedAccountType;
 	}
 
-	public void enableChat(){
-
-		((MegaApplication) getApplication()).enableChat();
-
-		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-		intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-		intent.setAction(ACTION_ENABLE_CHAT);
-		startActivity(intent);
-		finish();
-//		UserCredentials credentials = dbH.getCredentials();
-//		String gSession = credentials.getSession();
-//		int ret = megaChatApi.init(gSession);
-//		megaApi.fetchNodes(this);
-	}
-
-	public void disableChat(){
-		logDebug("disableChat");
-
-		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-		if (cFLol != null){
-			cFLol.notifyDataSetChanged();
-		}
-
-		drawerItem = DrawerItem.SETTINGS;
-		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-
-		if (megaChatApi != null){
-			megaChatApi.removeChatListener(this);
-		}
-
-		megaChatApi.logout(this);
-		app.disableMegaChatApi();
-		megaChatApi=null;
-
-		updateNavigationToolbarIcon();
-	}
-
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
 		if (item != null){
@@ -15992,12 +15903,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			rChatFL.listItemUpdate(item);
 		}
 
-		if(isChatEnabled()){
-			if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-				logDebug("Change unread count: " + item.getUnreadCount());
-				setChatBadge();
-				updateNavigationToolbarIcon();
-			}
+		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+			logDebug("Change unread count: " + item.getUnreadCount());
+			setChatBadge();
+			updateNavigationToolbarIcon();
 		}
 	}
 
@@ -16028,31 +15937,28 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			status = -1;
 		}
 
-		if(megaChatApi!=null){
-			if(isChatEnabled()){
-				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-				if(userHandle == megaChatApi.getMyUserHandle()){
-					logDebug("My own status update");
-					setContactStatus();
-					if(drawerItem == DrawerItem.CHAT){
-						if(rChatFL!=null){
-							rChatFL.onlineStatusUpdate(status);
-						}
+		if (megaChatApi != null) {
+			rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+			if (userHandle == megaChatApi.getMyUserHandle()) {
+				logDebug("My own status update");
+				setContactStatus();
+				if (drawerItem == DrawerItem.CHAT) {
+					if (rChatFL != null) {
+						rChatFL.onlineStatusUpdate(status);
 					}
 				}
-				else{
-					logDebug("Status update for the user: " + userHandle);
-					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-					if(rChatFL!=null){
-						logDebug("Update Recent chats view");
-						rChatFL.contactStatusUpdate(userHandle, status);
-					}
+			} else {
+				logDebug("Status update for the user: " + userHandle);
+				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+				if (rChatFL != null) {
+					logDebug("Update Recent chats view");
+					rChatFL.contactStatusUpdate(userHandle, status);
+				}
 
-					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-					if(cFLol!=null){
-						logDebug("Update Contacts view");
-						cFLol.contactPresenceUpdate(userHandle, status);
-					}
+				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
+				if (cFLol != null) {
+					logDebug("Update Contacts view");
+					cFLol.contactPresenceUpdate(userHandle, status);
 				}
 			}
 		}
@@ -16306,7 +16212,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void setChatBadge() {
-		if(isChatEnabled() && megaChatApi != null) {
+		if(megaChatApi != null) {
 			int numberUnread = megaChatApi.getUnreadChats();
 			if (numberUnread == 0) {
 				chatBadge.setVisibility(View.GONE);
@@ -16327,7 +16233,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void setCallBadge(){
-		if (!isOnline(this) || !isChatEnabled() || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall(megaChatApi))) {
+		if (!isOnline(this) || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall(megaChatApi))) {
 			callBadge.setVisibility(View.GONE);
 			return;
 		}
@@ -16951,7 +16857,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	 */
 	private void setCallMenuItem(){
 		if((drawerItem == DrawerItem.CHAT || drawerItem == DrawerItem.CLOUD_DRIVE || drawerItem == DrawerItem.SHARED_ITEMS)
-				&& !isScreenInPortrait(this) && isChatEnabled() && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1){
+				&& !isScreenInPortrait(this) && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1){
 			returnCallMenuItem.setVisible(true);
 
 			MegaChatCall call = megaChatApi.getChatCall(getChatCallInProgress(megaChatApi));
