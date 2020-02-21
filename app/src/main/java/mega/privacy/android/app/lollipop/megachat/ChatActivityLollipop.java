@@ -437,6 +437,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         isForwardingFromNC = true;
         preservedMsgSelected = messagesSelected;
         preservedMsgToImport = messagesToImport;
+        preservedMessagesSelected = null;
     }
 
     private class UserTyping {
