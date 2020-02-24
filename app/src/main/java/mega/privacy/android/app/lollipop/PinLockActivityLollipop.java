@@ -39,7 +39,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -205,7 +204,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		logoutButton.setOnClickListener(this);
 
 		enterButton = (Button) findViewById(R.id.button_enter);
-		enterButton.setText(getString(R.string.cam_sync_ok));
+		enterButton.setText(getString(R.string.general_ok));
 		enterButton.setOnClickListener(this);
 
 		unlockText = (TextView) findViewById(R.id.unlock_text_view);
