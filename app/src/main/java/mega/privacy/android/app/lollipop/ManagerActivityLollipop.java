@@ -208,7 +208,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.billing.BillingManager;
@@ -4939,7 +4938,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		try {
-			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.general_ok, dialogClickListener)
 					.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
 		}
 		catch (Exception e){}
@@ -7722,7 +7721,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							AlertDialog.Builder builder = new AlertDialog.Builder(this);
 							builder.setMessage(getString(R.string.no_permissions_upload));
 //								builder.setTitle(R.string.op_not_allowed);
-							builder.setCancelable(false).setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
+							builder.setCancelable(false).setPositiveButton(R.string.general_ok, new DialogInterface.OnClickListener() {
 								   public void onClick(DialogInterface dialog, int id) {
 										//do things
 									   alertNotPermissionsUpload.dismiss();
@@ -10526,7 +10525,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.settings_rb_scheduler_select_days_title));
-		builder.setPositiveButton(getString(R.string.cam_sync_ok),
+		builder.setPositiveButton(getString(R.string.general_ok),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -11465,7 +11464,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		String message= getResources().getString(R.string.email_verification_text_change_pass);
-		builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+		builder.setMessage(message).setPositiveButton(R.string.general_ok, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 

@@ -95,14 +95,12 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
-import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
@@ -1252,7 +1250,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     builder.setTitle(getString(R.string.chat_error_open_title));
                     builder.setMessage(getString(R.string.chat_error_open_message));
 
-                    builder.setPositiveButton(getString(R.string.cam_sync_ok),
+                    builder.setPositiveButton(getString(R.string.general_ok),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     finish();
@@ -8385,7 +8383,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         try {
-            builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+            builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.general_ok, dialogClickListener)
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
         }
         catch (Exception e){}

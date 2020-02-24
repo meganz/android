@@ -630,9 +630,9 @@
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Sadece Wi-Fi</string>
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi or Mobil Veri</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">Tamam</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">Atla</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">Durdur</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">Tamam</string>
+    <string name="general_skip" context="skip the step of camera upload">Atla</string>
+    <string name="general_stop" context="skip the step of camera upload">Durdur</string>
     <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Kamera yüklemesi devam ediyor</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Kamera Yüklemelerini durdurmak istiyor musunuz?</string>
     <!--

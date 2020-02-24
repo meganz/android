@@ -821,7 +821,7 @@ public class PDFView extends RelativeLayout {
         }
         else {
             builder.setMessage(R.string.corrupt_pdf_dialog_text)
-                    .setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
+                    .setPositiveButton(R.string.general_ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             ((PdfViewerActivityLollipop) getContext()).finish();
                         }
