@@ -150,6 +150,7 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -219,7 +220,6 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -228,6 +228,7 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -264,7 +265,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
-public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
         NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
 
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
@@ -419,7 +420,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private BillingManager mBillingManager;
 	private List<SkuDetails> mSkuDetailsList;
 
-    public enum FragmentTag {
+	private CallListener callListener = new CallListener(this);
+
+	public enum FragmentTag {
 		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
 		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION;
 
@@ -1860,7 +1863,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			megaChatApi = app.getMegaChatApi();
 			logDebug("addChatListener");
 			megaChatApi.addChatListener(this);
-			megaChatApi.addChatCallListener(this);
+			megaChatApi.addChatCallListener(callListener);
 		}
 		else{
 			megaChatApi=null;
@@ -3367,7 +3370,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if(megaChatApi == null) {
 				megaChatApi = app.getMegaChatApi();
 				megaChatApi.addChatListener(this);
-				megaChatApi.addChatCallListener(this);
+				megaChatApi.addChatCallListener(callListener);
 			}
 			int chatStatus = megaChatApi.getOnlineStatus();
 			if (contactStatus != null) {
@@ -4422,7 +4425,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		if (megaChatApi != null){
 			megaChatApi.removeChatListener(this);
-			megaChatApi.removeChatCallListener(this);
+			megaChatApi.removeChatCallListener(callListener);
 
 		}
         if (alertDialogSMSVerification != null) {
@@ -17079,33 +17082,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return parentHandleInbox;
 	}
 
-	@Override
-	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		if (call == null || call.getChatid() == -1 || !call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) return;
-
-		int callStatus = call.getStatus();
-		logDebug("Call status: " + callStatusToString(callStatus));
-		switch (callStatus) {
-			case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-			case MegaChatCall.CALL_STATUS_RING_IN:
-			case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-			case MegaChatCall.CALL_STATUS_RECONNECTING:
-			case MegaChatCall.CALL_STATUS_JOINING:
-			case MegaChatCall.CALL_STATUS_DESTROYED:
-			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
-				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-				if (rChatFL != null && rChatFL.isVisible()) {
-					rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
-				}
-				if(isScreenInPortrait(this)) {
-					setCallWidget();
-				}else{
-					supportInvalidateOptionsMenu();
-				}
-				break;
-			}
-			default:
-				break;
+	public void checkCall(MegaChatCall call){
+		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+		if (rChatFL != null && rChatFL.isVisible()) {
+			rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
+		}
+		if(isScreenInPortrait(this)) {
+			setCallWidget();
+		}else{
+			supportInvalidateOptionsMenu();
 		}
 	}
 

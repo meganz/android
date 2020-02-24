@@ -112,6 +112,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
@@ -128,8 +129,6 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
@@ -165,7 +164,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 
 public class AudioVideoPlayerLollipop extends DownloadableActivity implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
-        MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener, MegaChatCallListenerInterface {
+        MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
     public static final String IS_PLAYLIST = "IS_PLAYLIST";
@@ -332,6 +331,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     private GetMediaFilesTask getMediaFilesTask;
 
     private long [] nodeHandles;
+    private CallListener callListener = new CallListener(this);
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -611,7 +611,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                         return;
                     }
 
-                    megaChatApi.addChatCallListener(this);
+                    megaChatApi.addChatCallListener(callListener);
                 }
 
                 if (isFolderLink) {
@@ -798,12 +798,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
     }
 
-    @Override
-    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        logDebug("onChatCallUpdate ");
-        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)
-                && (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)
-                && player != null && player.getPlayWhenReady()) {
+    public void checkCall(){
+        if(player != null && player.getPlayWhenReady()){
             player.setPlayWhenReady(false);
         }
     }
@@ -3441,7 +3437,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
 
         if (megaChatApi != null) {
-            megaChatApi.removeChatCallListener(this);
+            megaChatApi.removeChatCallListener(callListener);
         }
 
         if (megaApiFolder != null) {
@@ -3718,7 +3714,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
 
             if (megaChatApi != null) {
-                megaChatApi.removeChatCallListener(this);
+                megaChatApi.removeChatCallListener(callListener);
             }
 
             if (player != null){

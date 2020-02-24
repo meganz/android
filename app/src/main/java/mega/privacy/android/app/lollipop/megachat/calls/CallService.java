@@ -17,33 +17,27 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-
 import java.io.File;
-import java.util.Locale;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.CallListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
-public class CallService extends Service implements MegaChatCallListenerInterface {
+public class CallService extends Service{
 
     MegaApplication app;
     MegaApiAndroid megaApi;
@@ -58,6 +52,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
 
     private String notificationChannelId = NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
     private String notificationChannelName = NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
+    private CallListener callListener = new CallListener(this);
 
     public void onCreate() {
         super.onCreate();
@@ -66,7 +61,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-        megaChatApi.addChatCallListener(this);
+        megaChatApi.addChatCallListener(callListener);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
             mBuilder = new Notification.Builder(this);
@@ -96,36 +91,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         return START_NOT_STICKY;
     }
 
-    @Override
-    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        if (call.getChatid() == chatId) {
-            if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
-                int callStatus = call.getStatus();
-                logDebug("STATUS: " + callStatus);
-
-                switch (callStatus) {
-                    case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-                    case MegaChatCall.CALL_STATUS_RING_IN:
-                    case MegaChatCall.CALL_STATUS_JOINING:
-                    case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
-                        updateNotificationContent(call);
-                        break;
-                    }
-                    case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-                    case MegaChatCall.CALL_STATUS_DESTROYED: {
-                        stopForeground(true);
-                        mNotificationManager.cancel(NOTIFICATION_CALL_IN_PROGRESS);
-                        stopSelf();
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-        }
-    }
-
-    private void updateNotificationContent(MegaChatCall call) {
+    public void updateNotificationContent(MegaChatCall call) {
         logDebug("updateNotification");
         Notification notif;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -331,13 +297,18 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         }
         return getDefaultAvatar(this, color, fullName, AVATAR_SIZE, true);
     }
+    public void checkDestroyCall(){
+        stopForeground(true);
+        mNotificationManager.cancel(NOTIFICATION_CALL_IN_PROGRESS);
+        stopSelf();
+    }
 
     @Override
     public void onDestroy() {
         logDebug("onDestroy");
 
         if (megaChatApi != null) {
-            megaChatApi.removeChatCallListener(this);
+            megaChatApi.removeChatCallListener(callListener);
         }
 
         mNotificationManager.cancel(NOTIFICATION_CALL_IN_PROGRESS);

@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,11 +19,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.provider.CallLog;
 import android.support.annotation.Nullable;
 import android.support.multidex.MultiDexApplication;
 import android.support.text.emoji.EmojiCompat;
 import android.support.text.emoji.FontRequestEmojiCompatConfig;
 import android.support.text.emoji.bundled.BundledEmojiCompatConfig;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -69,6 +72,7 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
@@ -158,7 +162,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	private PowerManager.WakeLock wakeLock;
 
-	@Override
+    @Override
 	public void networkAvailable() {
 		logDebug("Net available: Broadcast to ManagerActivity");
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
@@ -177,6 +181,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     public static void smsVerifyShowed(boolean isShowed) {
 	    isVerifySMSShowed = isShowed;
     }
+
 
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -1442,294 +1447,260 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 //		}
 //	}
 
+	private void checkOneCall(long chatId){
+		logDebug("One call : Chat Id = " + chatId + ", openCall Chat Id = " + openCallChatId);
+		if(openCallChatId == chatId){
+			logDebug("The call is already opened");
+			return;
+		}
+		MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
+		if(callToLaunch == null || callToLaunch.getStatus() > MegaChatCall.CALL_STATUS_IN_PROGRESS) return;
+		logDebug("Open the call");
+		if (shouldNotify(this) && !isActivityVisible()) {
+			PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+			if(pm != null) {
+				wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaIncomingCallPowerLock");
+			}
+			if(!wakeLock.isHeld()) {
+				wakeLock.acquire(10 * 1000);
+			}
+			toIncomingCall(this, callToLaunch, megaChatApi);
+		} else {
+			launchCallActivity(callToLaunch);
+		}
+	}
+
+	private void checkSeveralCall(MegaHandleList listAllCalls, int callStatus) {
+		logDebug("Several calls = " + listAllCalls.size() + "- Current call Status: " + callStatusToString(callStatus));
+		if(callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){
+			checkQueuedCalls();
+			return;
+		}
+		if (callStatus == MegaChatCall.CALL_STATUS_RING_IN && participatingInACall(megaChatApi)) {
+			checkQueuedCalls();
+			return;
+		}
+
+		MegaHandleList handleList = megaChatApi.getChatCalls(callStatus);
+		if (handleList == null || handleList.size() == 0) return;
+
+		for (int i = 0; i < handleList.size(); i++) {
+			if (openCallChatId != handleList.get(i)) {
+				MegaChatCall callToLaunch = megaChatApi.getChatCall(handleList.get(i));
+				if (callToLaunch != null) {
+					logDebug("Open call");
+					launchCallActivity(callToLaunch);
+					break;
+				}
+			} else {
+				logDebug("The call is already opened");
+			}
+		}
+	}
+
+
+	@Override
+	public void onChatSessionUpdate(MegaChatApiJava api, long chatid, long callid, MegaChatSession session) {
+
+	}
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 		stopService(new Intent(this, IncomingCallService.class));
-
 		if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
 			int callStatus = call.getStatus();
 			logDebug("Call status changed, current status: "+callStatusToString(call.getStatus()));
-			switch (callStatus) {
-				case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-				case MegaChatCall.CALL_STATUS_RING_IN:
-				case MegaChatCall.CALL_STATUS_JOINING:
-				case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
-					if (megaChatApi != null) {
-						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
-						if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
-							setAudioManagerValues(call);
-						}
-						if(callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){
-							removeChatAudioManager();
-							clearIncomingCallNotification(call.getId());
-						}
-						if (listAllCalls != null) {
-							if (listAllCalls.size() == 1) {
-								long chatId = listAllCalls.get(0);
-								logDebug("One call : Chat Id = " + chatId + ", openCall Chat Id = " + openCallChatId);
-								if ( openCallChatId != chatId) {
-									MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
-									if (callToLaunch != null) {
-										if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-											logDebug("One call: open call");
-                                            if (shouldNotify(this) && !isActivityVisible()) {
-                                                PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                                                if(pm != null) {
-                                                    wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaIncomingCallPowerLock");
-                                                }
-                                                if(!wakeLock.isHeld()) {
-                                                    wakeLock.acquire(10 * 1000);
-                                                }
-                                                toIncomingCall(this, callToLaunch, megaChatApi);
-                                            } else {
-                                                launchCallActivity(callToLaunch);
-                                            }
-										} else {
-											logWarning("Launch not in correct status");
-										}
-									}
-								} else {
-									logDebug("One call: call already opened");
-								}
-
-							} else if (listAllCalls.size() > 1) {
-								logDebug("Several calls = " + listAllCalls.size()+"- Current call Status: "+callStatusToString(callStatus));
-								if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-									MegaHandleList handleListRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
-									if ((handleListRequestSent != null) && (handleListRequestSent.size() > 0)) {
-										for (int i = 0; i < handleListRequestSent.size(); i++) {
-											if (openCallChatId != handleListRequestSent.get(i)) {
-												MegaChatCall callToLaunch = megaChatApi.getChatCall(handleListRequestSent.get(i));
-												if (callToLaunch != null) {
-													logDebug("Several calls - "+callStatusToString(callStatus)+": open call");
-													launchCallActivity(callToLaunch);
-													break;
-												}
-											} else {
-												logDebug("Several calls - "+callStatusToString(callStatus)+": call already opened");
-											}
-										}
-									}
-								} else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-									if ((megaChatApi != null) && (participatingInACall(megaChatApi))) {
-										logDebug("Several calls - "+callStatusToString(callStatus)+": show notification");
-										checkQueuedCalls();
-									} else {
-										logDebug("Several calls - "+callStatusToString(callStatus)+": NOT participating in a call");
-										MegaHandleList handleListRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
-										if ((handleListRingIn != null) && (handleListRingIn.size() > 0)) {
-											for (int i = 0; i < handleListRingIn.size(); i++) {
-												if (openCallChatId != handleListRingIn.get(i)) {
-													MegaChatCall callToLaunch = megaChatApi.getChatCall(handleListRingIn.get(i));
-													if (callToLaunch != null) {
-														logDebug("Several calls - "+callStatusToString(callStatus)+": open call");
-														launchCallActivity(callToLaunch);
-														break;
-													}
-												} else {
-													logDebug("Several calls - "+callStatusToString(callStatus)+": call already opened");
-												}
-											}
-										}
-									}
-								} else if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-									MegaHandleList handleListInProg = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-									if ((handleListInProg != null) && (handleListInProg.size() > 0)) {
-										for (int i = 0; i < handleListInProg.size(); i++) {
-											if (openCallChatId != handleListInProg.get(i)) {
-												MegaChatCall callToLaunch = megaChatApi.getChatCall(handleListInProg.get(i));
-												if (callToLaunch != null) {
-													logDebug("Several calls - "+callStatusToString(callStatus)+": open call");
-													launchCallActivity(callToLaunch);
-													break;
-												}
-											} else {
-												logDebug("Several calls - "+callStatusToString(callStatus)+": call already opened");
-											}
-										}
-									}
-								} else {
-									logDebug("Several calls: show notification");
-									checkQueuedCalls();
-								}
-
-							} else {
-								logWarning("No calls in progress");
-							}
-						}
-					}
-					break;
+			if(callStatus == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION){
+				removeValues(call.getChatid());
+			}
+			if(callStatus == MegaChatCall.CALL_STATUS_DESTROYED){
+				checkCallDestroyed(call);
+			}
+			if((callStatus >= MegaChatCall.CALL_STATUS_REQUEST_SENT && callStatus < MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){
+				MegaHandleList listAllCalls = megaChatApi.getChatCalls();
+				if(listAllCalls == null || listAllCalls.size() == 0) return;
+				if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
+					setAudioManagerValues(call);
 				}
-				case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION: {
-					removeStatusVideoAndSpeaker(call.getChatid());
+				if(callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){
 					removeChatAudioManager();
-					break;
-				}
-				case MegaChatCall.CALL_STATUS_DESTROYED: {
-					removeStatusVideoAndSpeaker(call.getChatid());
-					removeChatAudioManager();
-
-				    if(shouldNotify(this)) {
-                        toSystemSettingNotification(this);
-                    }
-                    cancelIncomingCallNotification(this);
-				    if(wakeLock != null && wakeLock.isHeld()) {
-				        wakeLock.release();
-                    }
-
 					clearIncomingCallNotification(call.getId());
-
-					//Show missed call if time out ringing (for incoming calls)
-					try {
-						if (((call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))) {
-							logDebug("TERM_CODE_ANSWER_TIMEOUT");
-							if (call.isLocalTermCode() == false) {
-								logDebug("localTermCodeNotLocal");
-								try {
-									ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-									notificationBuilder.showMissedCallNotification(call);
-								} catch (Exception e) {
-									logError("EXCEPTION when showing missed call notification", e);
-								}
-							}
-						}
-					} catch (Exception e) {
-						logError("EXCEPTION when showing missed call notification", e);
-					}
-
-					//Register a call from Mega in the phone
-//					MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
-//					if(chatRoom.isGroup()){
-//						//Group call ended
-//					}else{
-//						//Individual call ended
-//						try {
-//							if (call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT) {
-//								//Unanswered call
-//								if (call.isOutgoing()) {
-//									try {
-//										//I'm calling and the contact doesn't answer
-//										ContentValues values = new ContentValues();
-//										values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
-//										values.put(CallLog.Calls.DATE, System.currentTimeMillis());
-//										values.put(CallLog.Calls.DURATION, 0);
-//										values.put(CallLog.Calls.TYPE, CallLog.Calls.OUTGOING_TYPE);
-//										values.put(CallLog.Calls.NEW, 1);
-//
-//										if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
-//											return;
-//										}
-//										this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
-//									} catch (Exception e) {
-//										log("EXCEPTION:TERM_CODE_ANSWER_TIMEOUT:call.isOutgoing " + e.getMessage());
-//									}
-//								}else if(call.isIncoming()){
-//									try {
-//										//I'm receiving a call and I don't answer
-//										ContentValues values = new ContentValues();
-//										values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
-//										values.put(CallLog.Calls.DATE, System.currentTimeMillis());
-//										values.put(CallLog.Calls.DURATION, 0);
-//										values.put(CallLog.Calls.TYPE, CallLog.Calls.MISSED_TYPE);
-//										values.put(CallLog.Calls.NEW, 1);
-//
-//										if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
-//											return;
-//										}
-//										this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
-//									} catch (Exception e) {
-//										log("EXCEPTION:TERM_CODE_ANSWER_TIMEOUT:call.isIncoming " + e.getMessage());
-//									}
-//								}
-//							}else if (call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REJECT) {
-//								//Rejected call
-//								if (call.isOutgoing()) {
-//									try {
-//										//I'm calling and the user rejects the call
-//										ContentValues values = new ContentValues();
-//										values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
-//		                                values.put(CallLog.Calls.DATE, System.currentTimeMillis());
-//										values.put(CallLog.Calls.DURATION, 0);
-//										values.put(CallLog.Calls.TYPE, CallLog.Calls.OUTGOING_TYPE);
-//										values.put(CallLog.Calls.NEW, 1);
-//
-//										if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
-//											return;
-//										}
-//										this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
-//									} catch (Exception e) {
-//										log("EXCEPTION:TERM_CODE_CALL_REJECT:call.isOutgoing " + e.getMessage());
-//									}
-//								}else if(call.isIncoming()){
-//									try {
-//										//I'm receiving a call and I reject it
-//										ContentValues values = new ContentValues();
-//										values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
-//										values.put(CallLog.Calls.DATE, System.currentTimeMillis());
-//										values.put(CallLog.Calls.DURATION, 0);
-//										values.put(CallLog.Calls.TYPE, CallLog.Calls.REJECTED_TYPE);
-//										values.put(CallLog.Calls.NEW, 1);
-//
-//										if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
-//											return;
-//										}
-//										this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
-//									} catch (Exception e) {
-//										log("EXCEPTION:TERM_CODE_CALL_REJECT:call.isIncoming " + e.getMessage());
-//									}
-//								}
-//							}else if (call.getTermCode() == MegaChatCall.TERM_CODE_USER_HANGUP) {
-//								//Call answered and hung
-//								if (call.isOutgoing()) {
-//									try {
-//										//I'm calling and the user answers it
-//										ContentValues values = new ContentValues();
-//										values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
-//										values.put(CallLog.Calls.DATE, System.currentTimeMillis());
-//										values.put(CallLog.Calls.DURATION, call.getDuration());
-//										values.put(CallLog.Calls.TYPE, CallLog.Calls.OUTGOING_TYPE);
-//										values.put(CallLog.Calls.NEW, 1);
-//
-//										if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
-//											return;
-//										}
-//										this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
-//									} catch (Exception e) {
-//										log("EXCEPTION:TERM_CODE_USER_HANGUP:call.isOutgoing " + e.getMessage());
-//									}
-//								}else if(call.isIncoming()){
-//									try {
-//										//I'm receiving a call and I answer it
-//										ContentValues values = new ContentValues();
-//		                                values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
-//										values.put(CallLog.Calls.DATE, System.currentTimeMillis());
-//										values.put(CallLog.Calls.DURATION, call.getDuration());
-//										values.put(CallLog.Calls.TYPE, CallLog.Calls.INCOMING_TYPE);
-//										values.put(CallLog.Calls.NEW, 1);
-//
-//										if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
-//											return;
-//										}
-//										this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
-//									} catch (Exception e) {
-//										log("EXCEPTION:TERM_CODE_USER_HANGUP:call.isIncoming " + e.getMessage());
-//									}
-//								}
-//							}
-//						} catch (Exception e) {
-//							log("EXCEPTION:register call on device " + e.getMessage());
-//						}
-//					}
-
-					break;
 				}
-
-				default:
-					break;
+				if(listAllCalls.size() == 1){
+					checkOneCall(listAllCalls.get(0));
+				}else{
+					checkSeveralCall(listAllCalls, callStatus);
+				}
 			}
 		}
 	}
+
+	private void removeValues(long id){
+		removeStatusVideoAndSpeaker(id);
+		removeChatAudioManager();
+	}
+
+	public void checkCallDestroyed(MegaChatCall call){
+        removeValues(call.getChatid());
+
+        if(shouldNotify(this)) {
+            toSystemSettingNotification(this);
+        }
+        cancelIncomingCallNotification(this);
+        if(wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.release();
+        }
+
+        clearIncomingCallNotification(call.getId());
+
+        //Show missed call if time out ringing (for incoming calls)
+        try {
+            if (((call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))) {
+                logDebug("TERM_CODE_ANSWER_TIMEOUT");
+                if (call.isLocalTermCode() == false) {
+                    logDebug("localTermCodeNotLocal");
+                    try {
+                        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+                        notificationBuilder.showMissedCallNotification(call);
+                    } catch (Exception e) {
+                        logError("EXCEPTION when showing missed call notification", e);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logError("EXCEPTION when showing missed call notification", e);
+        }
+
+        //Commented temporary
+//        registerCallInDevice(call);
+
+    }
+
+    private void registerCallInDevice(MegaChatCall call){
+		//Register a call from Mega in the phone
+		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
+		if (chatRoom.isGroup()) {
+			//Group call ended
+		} else {
+			//Individual call ended
+			try {
+				if (call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT) {
+					//Unanswered call
+					if (call.isOutgoing()) {
+						try {
+							//I'm calling and the contact doesn't answer
+							ContentValues values = new ContentValues();
+							values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+							values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+							values.put(CallLog.Calls.DURATION, 0);
+							values.put(CallLog.Calls.TYPE, CallLog.Calls.OUTGOING_TYPE);
+							values.put(CallLog.Calls.NEW, 1);
+
+							if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+								return;
+							}
+							this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+						} catch (Exception e) {
+							logError("EXCEPTION:TERM_CODE_ANSWER_TIMEOUT:call.isOutgoing " + e.getMessage());
+						}
+					} else if (call.isIncoming()) {
+						try {
+							//I'm receiving a call and I don't answer
+							ContentValues values = new ContentValues();
+							values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+							values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+							values.put(CallLog.Calls.DURATION, 0);
+							values.put(CallLog.Calls.TYPE, CallLog.Calls.MISSED_TYPE);
+							values.put(CallLog.Calls.NEW, 1);
+
+							if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+								return;
+							}
+							this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+						} catch (Exception e) {
+							logError("EXCEPTION:TERM_CODE_ANSWER_TIMEOUT:call.isIncoming " + e.getMessage());
+						}
+					}
+				} else if (call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REJECT) {
+					//Rejected call
+					if (call.isOutgoing()) {
+						try {
+							//I'm calling and the user rejects the call
+							ContentValues values = new ContentValues();
+							values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+							values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+							values.put(CallLog.Calls.DURATION, 0);
+							values.put(CallLog.Calls.TYPE, CallLog.Calls.OUTGOING_TYPE);
+							values.put(CallLog.Calls.NEW, 1);
+
+							if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+								return;
+							}
+							this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+						} catch (Exception e) {
+							logError("EXCEPTION:TERM_CODE_CALL_REJECT:call.isOutgoing " + e.getMessage());
+						}
+					} else if (call.isIncoming()) {
+						try {
+							//I'm receiving a call and I reject it
+							ContentValues values = new ContentValues();
+							values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+							values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+							values.put(CallLog.Calls.DURATION, 0);
+							values.put(CallLog.Calls.TYPE, CallLog.Calls.REJECTED_TYPE);
+							values.put(CallLog.Calls.NEW, 1);
+
+							if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+								return;
+							}
+							this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+						} catch (Exception e) {
+							logError("EXCEPTION:TERM_CODE_CALL_REJECT:call.isIncoming " + e.getMessage());
+						}
+					}
+				} else if (call.getTermCode() == MegaChatCall.TERM_CODE_USER_HANGUP) {
+					//Call answered and hung
+					if (call.isOutgoing()) {
+						try {
+							//I'm calling and the user answers it
+							ContentValues values = new ContentValues();
+							values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+							values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+							values.put(CallLog.Calls.DURATION, call.getDuration());
+							values.put(CallLog.Calls.TYPE, CallLog.Calls.OUTGOING_TYPE);
+							values.put(CallLog.Calls.NEW, 1);
+
+							if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+								return;
+							}
+							this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+						} catch (Exception e) {
+							logError("EXCEPTION:TERM_CODE_USER_HANGUP:call.isOutgoing " + e.getMessage());
+						}
+					} else if (call.isIncoming()) {
+						try {
+							//I'm receiving a call and I answer it
+							ContentValues values = new ContentValues();
+							values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+							values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+							values.put(CallLog.Calls.DURATION, call.getDuration());
+							values.put(CallLog.Calls.TYPE, CallLog.Calls.INCOMING_TYPE);
+							values.put(CallLog.Calls.NEW, 1);
+
+							if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+								return;
+							}
+							this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+						} catch (Exception e) {
+							logError("EXCEPTION:TERM_CODE_USER_HANGUP:call.isIncoming " + e.getMessage());
+						}
+					}
+				}
+			} catch (Exception e) {
+				logError("EXCEPTION:register call on device " + e.getMessage());
+			}
+		}
+    }
 
 	private void removeStatusVideoAndSpeaker(long chatId){
 		hashMapSpeaker.remove(chatId);
