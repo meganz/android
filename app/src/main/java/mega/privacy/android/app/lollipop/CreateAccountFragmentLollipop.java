@@ -710,7 +710,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         switch (editText.getId()){
             case R.id.create_account_email_text:{
-
                 userEmailLayout.setError(error);
                 userEmailLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
                 userEmailError.setVisibility(View.VISIBLE);

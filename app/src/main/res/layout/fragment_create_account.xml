@@ -193,7 +193,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:layout_marginTop="55dp"
+                            android:layout_marginTop="60dp"
                             android:paddingBottom="20dp"
                             android:layout_alignTop="@+id/create_account_password_text_layout"
                             android:visibility="gone">
