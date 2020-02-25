@@ -20,22 +20,29 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static nz.mega.sdk.MegaApiJava.*;
 
 public class GlobalListener implements MegaGlobalListenerInterface {
 
     private MegaApplication megaApplication;
-    private MegaApiAndroid megaApi;
     private DatabaseHandler dbH;
 
     public GlobalListener() {
         megaApplication = MegaApplication.getInstance();
-        megaApi = megaApplication.getMegaApi();
-        dbH = DatabaseHandler.getDbHandler(megaApplication);
+        dbH = megaApplication.getDbH();
     }
 
     @Override
     public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+        if (users == null || users.isEmpty()) return;
+
+        if (users.size() == 1) {
+            MegaUser user = users.get(0);
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER)
+                    && api.getMyUserHandle().equals(Long.toString(user.getHandle()))) {
+                api.getMyChatFilesFolder(new GetAttrUserListener(MegaApplication.getInstance(), true));
+            }
+        }
     }
 
     @Override
@@ -87,7 +94,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
 
                     ContactsAdvancedNotificationBuilder notificationBuilder;
-                    notificationBuilder = ContactsAdvancedNotificationBuilder.newInstance(megaApplication, megaApi);
+                    notificationBuilder = ContactsAdvancedNotificationBuilder.newInstance(megaApplication, megaApplication.getMegaApi());
 
                     notificationBuilder.removeAllIncomingContactNotifications();
                     notificationBuilder.showIncomingContactRequestNotification();
@@ -96,7 +103,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 } else if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
 
                     ContactsAdvancedNotificationBuilder notificationBuilder;
-                    notificationBuilder = ContactsAdvancedNotificationBuilder.newInstance(megaApplication, megaApi);
+                    notificationBuilder = ContactsAdvancedNotificationBuilder.newInstance(megaApplication, megaApplication.getMegaApi());
 
                     notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
 

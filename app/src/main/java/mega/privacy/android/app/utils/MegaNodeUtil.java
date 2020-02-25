@@ -19,12 +19,16 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class MegaNodeUtil {
 
@@ -199,5 +203,48 @@ public class MegaNodeUtil {
 
             return dialog;
         }
+    }
+
+    /**
+     * Checks if a MegaNode is the user attribute "My chat files"
+     *
+     * @param node MegaNode to check
+     * @return True if the node is "My chat files" attribute, false otherwise
+     */
+    public static boolean isMyChatFilesFolder(MegaNode node) {
+        MegaApplication megaApplication = MegaApplication.getInstance();
+
+        return node != null && node.getHandle() != INVALID_HANDLE && !megaApplication.getMegaApi().isInRubbish(node)
+                && existsMyChatFilesFolder() && node.getHandle() == megaApplication.getDbH().getMyChatFilesFolderHandle();
+    }
+
+    /**
+     * Checks if the user attribute "My chat files" is saved in DB and exists
+     *
+     * @return True if the the user attribute "My chat files" is saved in the DB, false otherwise
+     */
+    public static boolean existsMyChatFilesFolder() {
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        MegaApiJava megaApi = MegaApplication.getInstance().getMegaApi();
+
+        if (dbH != null && dbH.getMyChatFilesFolderHandle() != INVALID_HANDLE) {
+            MegaNode myChatFilesFolder = megaApi.getNodeByHandle(dbH.getMyChatFilesFolderHandle());
+
+            return myChatFilesFolder != null && myChatFilesFolder.getHandle() != INVALID_HANDLE && !megaApi.isInRubbish(myChatFilesFolder);
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets the node of the user attribute "My chat files" from the DB.
+     *
+     * Before call this method is neccesary to call existsMyChatFilesFolder() method
+     *
+     * @return "My chat files" folder node
+     * @see MegaNodeUtil#existsMyChatFilesFolder()
+     */
+    public static MegaNode getMyChatFilesFolder() {
+        return MegaApplication.getInstance().getMegaApi().getNodeByHandle(MegaApplication.getInstance().getDbH().getMyChatFilesFolderHandle());
     }
 }

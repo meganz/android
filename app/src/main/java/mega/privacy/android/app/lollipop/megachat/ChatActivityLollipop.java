@@ -95,14 +95,12 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
-import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
@@ -172,6 +170,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -2659,7 +2658,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         isForwardingMessage = true;
         storedUnhandledData(messagesSelected);
-        megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
+        checkIfIsNeededToAskForMyChatFilesFolder();
     }
 
     public void proceedWithAction() {
@@ -8507,7 +8506,21 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         preservedIntents.add(intent);
         if (!isAskingForMyChatFiles) {
             isAskingForMyChatFiles = true;
+            checkIfIsNeededToAskForMyChatFilesFolder();
+        }
+    }
+
+    private void checkIfIsNeededToAskForMyChatFilesFolder() {
+        if (!existsMyChatFilesFolder()) {
             megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
+        }
+
+        setMyChatFilesFolder(getMyChatFilesFolder());
+
+        if (isForwardingFromNC()) {
+            handleStoredData();
+        } else {
+            proceedWithAction();
         }
     }
 

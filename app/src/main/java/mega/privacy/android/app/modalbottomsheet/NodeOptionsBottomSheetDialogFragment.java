@@ -45,6 +45,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -262,6 +263,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
                 } else if (((ManagerActivityLollipop) context).isCameraUploads(node)) {
                     nodeThumb.setImageResource(R.drawable.ic_folder_camera_uploads_list);
+                } else if (isMyChatFilesFolder(node)) {
+                    nodeThumb.setImageResource(R.drawable.ic_folder_chat_list);
                 } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
                     nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
                 } else {

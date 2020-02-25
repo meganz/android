@@ -23,6 +23,8 @@ public class SetAttrUserListener extends BaseListener{
             case USER_ATTR_MY_CHAT_FILES_FOLDER:
                 if (e.getErrorCode() != MegaError.API_OK) {
                     logWarning("Error setting \"My chat files\" folder as user's attribute");
+                } else {
+                    dBH.setMyChatFilesFolderHandle(request.getNodeHandle());
                 }
                 break;
         }

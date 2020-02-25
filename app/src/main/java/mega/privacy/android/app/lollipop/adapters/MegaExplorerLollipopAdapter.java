@@ -319,6 +319,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 }
             } else if (isCameraUploads(node)) {
                 holder.imageView.setImageResource(R.drawable.ic_folder_camera_uploads_list);
+            } else if (isMyChatFilesFolder(node)) {
+                holder.imageView.setImageResource(R.drawable.ic_folder_chat_list);
             } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
                 holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
             } else {
@@ -410,6 +412,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 holder.folderIcon.setImageResource(R.drawable.ic_folder_incoming_list);
             } else if (isCameraUploads(node)) {
                 holder.folderIcon.setImageResource(R.drawable.ic_folder_camera_uploads_list);
+            } else if (isMyChatFilesFolder(node)) {
+                holder.folderIcon.setImageResource(R.drawable.ic_folder_chat_list);
             } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
                 holder.folderIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
             } else {

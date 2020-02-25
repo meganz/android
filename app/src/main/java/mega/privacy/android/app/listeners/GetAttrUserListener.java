@@ -17,8 +17,16 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class GetAttrUserListener extends BaseListener {
 
+    private boolean onlyDBUpdate;
+
     public GetAttrUserListener(Context context) {
         super(context);
+    }
+
+    public GetAttrUserListener(Context context, boolean onlyDBUpdate) {
+        super(context);
+
+        this.onlyDBUpdate = onlyDBUpdate;
     }
 
     @Override
@@ -39,7 +47,7 @@ public class GetAttrUserListener extends BaseListener {
                 } else if (e.getErrorCode() == MegaError.API_ENOENT) {
                     myChatFolderNode = api.getNodeByPath(CHAT_FOLDER, api.getRootNode());
 
-                    if (myChatFolderNode != null) {
+                    if (myChatFolderNode != null && !api.isInRubbish(myChatFolderNode)) {
                         String name = context.getString(R.string.my_chat_files_folder);
 
                         if (!myChatFolderNode.getName().equals(name)) {
@@ -50,9 +58,14 @@ public class GetAttrUserListener extends BaseListener {
                 }
 
                 if (myChatFolderNode != null && !api.isInRubbish(myChatFolderNode)) {
+                    dBH.setMyChatFilesFolderHandle(myChatFolderNode.getHandle());
                     myChatFolderFound = true;
-                } else {
+                } else if (!onlyDBUpdate){
                     api.createFolder(context.getString(R.string.my_chat_files_folder), api.getRootNode(), new CreateFolderListener(context, true));
+                }
+
+                if (onlyDBUpdate) {
+                    return;
                 }
 
                 if (context instanceof FileExplorerActivityLollipop) {

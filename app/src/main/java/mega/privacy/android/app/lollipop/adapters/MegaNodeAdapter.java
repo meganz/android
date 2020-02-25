@@ -706,23 +706,17 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-            } else if (type == FILE_BROWSER_ADAPTER) {
+            } else {
                 if (((ManagerActivityLollipop) context).isCameraUploads(node)) {
                     setFolderGridSelected(holder, position, R.drawable.ic_folder_camera_uploads_list);
+                } else if (isMyChatFilesFolder(node)) {
+                    setFolderGridSelected(holder, position, R.drawable.ic_folder_chat_list);
                 } else if (node.isInShare()) {
                     setFolderGridSelected(holder, position, R.drawable.ic_folder_incoming);
                 } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
                     setFolderGridSelected(holder, position, R.drawable.ic_folder_outgoing);
                 } else {
                     setFolderGridSelected(holder, position, R.drawable.ic_folder);
-                }
-            } else {
-                if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                    setFolderGridSelected(holder,position,R.drawable.ic_folder_outgoing);
-                } else if (node.isInShare()) {
-                    setFolderGridSelected(holder,position,R.drawable.ic_folder_incoming);
-                } else {
-                    setFolderGridSelected(holder,position,R.drawable.ic_folder);
                 }
             }
         } else if (node.isFile()) {
@@ -995,24 +989,16 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-            } else if (type == FILE_BROWSER_ADAPTER) {
+            } else {
                 if (((ManagerActivityLollipop) context).isCameraUploads(node)) {
                     setFolderListSelected(holder, position, R.drawable.ic_folder_camera_uploads_list);
+                } else if (isMyChatFilesFolder(node)) {
+                    setFolderListSelected(holder, position, R.drawable.ic_folder_chat_list);
                 } else if (node.isInShare()) {
                     setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
                 } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
                     setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
                 } else {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_list);
-                }
-            } else {
-                if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
-                }
-                else if (node.isInShare()) {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
-                }
-                else {
                     setFolderListSelected(holder, position, R.drawable.ic_folder_list);
                 }
             }

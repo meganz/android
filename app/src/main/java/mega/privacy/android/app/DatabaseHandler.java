@@ -771,7 +771,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (oldVersion <= 53){
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_INTENTS + " = '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "';");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_MY_CHAT_FILES_FOLDER_HANDLE + " = '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "';");
 		}
 	}
 
@@ -3579,7 +3579,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 */
 	public void setMyChatFilesFolderHandle(long myChatFilesFolderHandle) {
 		logInfo("Setting the storage state in the DB");
-		setLongValue(TABLE_ATTRIBUTES, KEY_STORAGE_STATE, myChatFilesFolderHandle);
+		setLongValue(TABLE_ATTRIBUTES, KEY_MY_CHAT_FILES_FOLDER_HANDLE, myChatFilesFolderHandle);
 	}
 
 	public String getShowNotifOff (){
