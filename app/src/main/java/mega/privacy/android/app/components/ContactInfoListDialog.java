@@ -24,6 +24,8 @@ import java.util.Set;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.InvitationContactInfo;
 
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+
 public class ContactInfoListDialog {
 
     private Context context;
@@ -119,16 +121,12 @@ public class ContactInfoListDialog {
         if (window != null) {
             Display display = window.getWindowManager().getDefaultDisplay();
             display.getMetrics(metrics);
-            if (onLandscapeMode()) {
-                window.setLayout((int) (screenW * WIDTH_L), (int) (screenH * HEIGHT_L));
-            } else {
+            if (isScreenInPortrait(context)) {
                 window.setLayout((int) (screenW * WIDTH_P), (int) (screenH * HEIGHT_P));
+            } else {
+                window.setLayout((int) (screenW * WIDTH_L), (int) (screenH * HEIGHT_L));
             }
         }
-    }
-
-    private boolean onLandscapeMode() {
-        return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     public void recycle() {
@@ -142,7 +140,7 @@ public class ContactInfoListDialog {
         /**
          * @param contactInfos The selected/unselected contact infos.
          */
-        void onSelect(@NonNull Set<InvitationContactInfo> contactInfos,@NonNull Set<InvitationContactInfo> toRemove);
+        void onSelect(@NonNull Set<InvitationContactInfo> contactInfos, @NonNull Set<InvitationContactInfo> toRemove);
 
         void cancel();
     }

@@ -372,6 +372,11 @@ public class Constants {
 
     public static final String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
 
+    /**
+     * A phone number pattern, which length should be in 5-22, and the beginning can have a '+'.
+     */
+    public static final Pattern PHONE_NUMBER_REGEX = Pattern.compile("^[+]?[0-9]{5,22}$");
+
     public static final Pattern EMAIL_ADDRESS
             = Pattern.compile(
             "[a-zA-Z0-9\\+\\.\\_\\%\\-\\&\\+]{1,256}" +

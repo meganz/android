@@ -46,6 +46,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,7 +61,6 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.ContactsFilter;
 import mega.privacy.android.app.utils.contacts.ContactsUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
@@ -75,6 +75,7 @@ import static mega.privacy.android.app.lollipop.InvitationContactInfo.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class InviteContactActivity extends PinActivityLollipop implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
@@ -216,7 +217,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         recyclerViewList.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Util.hideKeyboard(InviteContactActivity.this, 0);
+                hideKeyboard(InviteContactActivity.this, 0);
                 return false;
             }
         });
@@ -544,7 +545,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     }
 
     private boolean isValidPhone(CharSequence target) {
-        boolean result = target != null && target.length() > PHONE_NUMBER_MIN_LENGTH;
+        boolean result = target != null && PHONE_NUMBER_REGEX.matcher(target).matches();
         logDebug("isValidPhone" + result);
         return result;
     }
@@ -573,7 +574,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
                     typeContactEditText.getText().clear();
                 }
                 if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    Util.hideKeyboard(this, 0);
+                    hideKeyboard(this, 0);
                 }
             } else {
                 logDebug("Last character is: " + last);
@@ -599,44 +600,44 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             String s = v.getText().toString();
             String processedStrong = s.trim();
-            logDebug("s: " + s);
-            if (TextUtils.isEmpty(s)) {
-                Util.hideKeyboard(this, 0);
+            if (TextUtils.isEmpty(processedStrong)) {
+                hideKeyboard(this, 0);
             } else {
-                String result = checkInputEmail(s);
-                if (result != null) {
-                    typeContactEditText.getText().clear();
-                    Util.hideKeyboard(this, 0);
-                    showSnackbar(result);
-                    return true;
-                }
-
+                typeContactEditText.getText().clear();
                 boolean isEmailValid = isValidEmail(processedStrong);
                 boolean isPhoneValid = isValidPhone(processedStrong);
                 if (isEmailValid) {
+                    String result = checkInputEmail(processedStrong);
+                    if (result != null) {
+                        hideKeyboard(this, 0);
+                        showSnackbar(result);
+                        return true;
+                    }
                     addContactInfo(processedStrong, TYPE_MANUAL_INPUT_EMAIL);
                 } else if (isPhoneValid) {
                     addContactInfo(processedStrong, TYPE_MANUAL_INPUT_PHONE);
                 }
                 if (isEmailValid || isPhoneValid) {
-                    typeContactEditText.getText().clear();
-                    Util.hideKeyboard(this, 0);
+                    hideKeyboard(this, 0);
+                } else {
+                    Toast.makeText(this, R.string.invalid_input, Toast.LENGTH_SHORT).show();
+                    return true;
                 }
-                if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    Util.hideKeyboard(this, 0);
+                if(!isScreenInPortrait(this)) {
+                    hideKeyboard(this, 0);
                 }
                 if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
                     filterContactsTask.cancel(true);
                 }
                 startFilterTask();
-                Util.hideKeyboard(this, 0);
+                hideKeyboard(this, 0);
             }
             refreshInviteContactButton();
             return true;
         }
         if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_SEND)) {
             if (addedContacts.isEmpty()) {
-                Util.hideKeyboard(this, 0);
+                hideKeyboard(this, 0);
             } else {
                 inviteContacts(addedContacts);
             }
@@ -671,7 +672,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
                 enableFabButton(false);
                 logDebug("invite Contacts");
                 inviteContacts(addedContacts);
-                Util.hideKeyboard(this, 0);
+                hideKeyboard(this, 0);
                 break;
             }
         }
@@ -938,7 +939,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
 
-        params.setMargins(Util.px2dp(ADDED_CONTACT_VIEW_MARGIN_LEFT, outMetrics), 0, 0, 0);
+        params.setMargins(px2dp(ADDED_CONTACT_VIEW_MARGIN_LEFT, outMetrics), 0, 0, 0);
         View rowView = inflater.inflate(R.layout.selected_contact_item, null, false);
         rowView.setLayoutParams(params);
         rowView.setId(id);
@@ -1118,7 +1119,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
                     }
                 }
 
-                Util.hideKeyboard(InviteContactActivity.this, 0);
+                hideKeyboard(InviteContactActivity.this, 0);
                 new Handler().postDelayed(new Runnable() {
 
                     @Override

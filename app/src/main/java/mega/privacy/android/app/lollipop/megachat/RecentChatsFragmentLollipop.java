@@ -120,6 +120,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     private TextView moreContacts;
     private TextView moreContactsTitle;
     private TextView actionBarTitle, actionBarSubtitle;
+    private View bannerDivider;
 
     private AppBarLayout appBarLayout;
 
@@ -262,6 +263,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             moreContactsTitle.setVisibility(View.VISIBLE);
         } else {
             bannerContainer.setVisibility(View.GONE);
+            bannerDivider.setVisibility(View.GONE);
         }
     }
 
@@ -279,6 +281,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if (listView != null) {
             if (context instanceof ManagerActivityLollipop) {
                 if(bannerContainer.getVisibility() == View.GONE) {
+                    bannerDivider.setVisibility(View.GONE);
                     if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                         ((ManagerActivityLollipop) context).changeActionBarElevation(true);
                     } else {
@@ -287,8 +290,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 } else {
                     ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
+                        bannerDivider.setVisibility(View.GONE);
                         appBarLayout.setElevation(px2dp(4, outMetrics));
                     } else {
+                        bannerDivider.setVisibility(View.VISIBLE);
                         appBarLayout.setElevation(0);
                     }
                 }
@@ -412,6 +417,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         moreContacts = v.findViewById(R.id.more_contacts);
         moreContacts.setOnClickListener(this);
         moreContactsTitle = v.findViewById(R.id.more_contacts_title);
+        bannerDivider = v.findViewById(R.id.invitation_banner_divider);
         moreContactsTitle.setOnClickListener(this);
         if(showInviteBanner()) {
             bannerContainer.setVisibility(View.VISIBLE);
