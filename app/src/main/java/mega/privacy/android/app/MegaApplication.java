@@ -229,7 +229,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				logDebug("TYPE_FETCH_NODES");
 				if (e.getErrorCode() == MegaError.API_OK){
 					askForFullAccountInfo();
-                    megaApi.getMyChatFilesFolder(new GetAttrUserListener(getApplicationContext(), true));
+					if (dbH != null && dbH.getMyChatFilesFolderHandle() == INVALID_HANDLE) {
+						megaApi.getMyChatFilesFolder(new GetAttrUserListener(getApplicationContext(), true));
+					}
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
