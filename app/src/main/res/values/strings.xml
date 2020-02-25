@@ -37,6 +37,10 @@
 
     <string name="general_export" context="button">Export</string>
 
+    <string name="general_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="general_skip" context="Skip a step of a configuration process.">Skip</string>
+    <string name="general_stop" context="Label for a button to stop some process. For example stop the Camera Uploads">Stop</string>
+
     <string name="general_retry" context="option shown when a message could not be sent">Retry</string>
     <string name="general_open_browser" context="Button to open the default web browser">Open browser</string>
     <!--
@@ -658,9 +662,6 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or mobile data</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">Skip</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">Camera Uploads in progress</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to stop Camera Uploads?</string>
     <!--
@@ -1924,8 +1925,6 @@
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Test your password</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Password accepted</string>
     <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
-    <string name="recovery_key_exported_dialog_title" context="Title of the dialog ‘Recovery Key exported’">Recovery Key exported</string>
-    <string name="recovery_key_exported_dialog_text" context="Text of the dialog ‘Recovery Key exported’">The Recovery Key has been exported into the Offline section as MEGARecoveryKey.txt.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">You are about to logout, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Copy to clipboard</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Export Recovery Key</string>

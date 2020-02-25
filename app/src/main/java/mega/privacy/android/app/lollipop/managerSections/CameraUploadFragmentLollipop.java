@@ -793,8 +793,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			switchCellularConnection = (SwitchCompat) v.findViewById(R.id.cellular_connection_switch);
 			switchUploadVideos = (SwitchCompat) v.findViewById(R.id.upload_videos_switch);
 
-			bSkip.setText(getString(R.string.cam_sync_skip));
-			bOK.setText(getString(R.string.cam_sync_ok));
+			bSkip.setText(getString(R.string.general_skip));
+			bOK.setText(getString(R.string.general_ok));
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				bSkip.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
 				bOK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));

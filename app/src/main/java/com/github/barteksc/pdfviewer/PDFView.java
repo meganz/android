@@ -783,7 +783,7 @@ public class PDFView extends RelativeLayout {
             }
         } else {
             builder.setMessage(R.string.corrupt_pdf_dialog_text)
-                    .setPositiveButton(R.string.cam_sync_ok, (dialog, which) -> pdfViewer.finish())
+                    .setPositiveButton(R.string.general_ok, (dialog, which) -> pdfViewer.finish())
                     .show();
         }
     }

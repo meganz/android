@@ -1220,7 +1220,7 @@ public class Util {
             builder.setTitle(title);
         }
         builder.setMessage(message);
-        builder.setPositiveButton("OK", null);
+        builder.setPositiveButton(context.getString(R.string.general_ok), null);
         if (listener != null) {
             builder.setOnDismissListener(listener);
         }

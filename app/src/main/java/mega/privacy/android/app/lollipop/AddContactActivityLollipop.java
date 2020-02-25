@@ -3288,7 +3288,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal)
                     .setTitle(getString(R.string.enter_group_name))
                     .setMessage(getString(R.string.alert_enter_group_name))
-                    .setPositiveButton("OK",null)
+                    .setPositiveButton(getString(R.string.general_ok), null)
                     .show();
             return;
         }

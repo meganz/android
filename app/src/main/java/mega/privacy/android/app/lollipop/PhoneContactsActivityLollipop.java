@@ -285,7 +285,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 	void showAlert(String message) {
 		AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		bld.setMessage(message);
-		bld.setPositiveButton("OK",new android.content.DialogInterface.OnClickListener() {
+		bld.setPositiveButton(getString(R.string.general_ok), new android.content.DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				finish();

@@ -67,12 +67,9 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPresenceConfig;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -2689,7 +2686,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         builder.setTitle(getString(R.string.title_dialog_insert_MK));
         builder.setMessage(getString(R.string.text_dialog_insert_MK));
-        builder.setPositiveButton(getString(R.string.cam_sync_ok),
+        builder.setPositiveButton(getString(R.string.general_ok),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
 
