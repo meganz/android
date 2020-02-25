@@ -258,28 +258,24 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 nodeInfo.setText(getInfoFolder(node, context, megaApi));
                 nodeVersionsIcon.setVisibility(View.GONE);
 
-                    if (node.isInShare()) {
-                        nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
-                    } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                        nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
-                    }
-                    else{
-                        if(((ManagerActivityLollipop) context).isCameraUploads(node)){
-                            nodeThumb.setImageResource(R.drawable.ic_folder_image_list);
-                        }else{
-                            nodeThumb.setImageResource(R.drawable.ic_folder_list);
-                        }
-                    }
-                    counterShares--;
-                    optionSendChat.setVisibility(View.GONE);
+                if (node.isInShare()) {
+                    nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
+                } else if (((ManagerActivityLollipop) context).isCameraUploads(node)) {
+                    nodeThumb.setImageResource(R.drawable.ic_folder_camera_uploads_list);
+                } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                    nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
                 } else {
-                    long nodeSize = node.getSize();
-                    nodeInfo.setText(getSizeString(nodeSize));
-
-                if(megaApi.hasVersions(node)){
-                    nodeVersionsIcon.setVisibility(View.VISIBLE);
+                    nodeThumb.setImageResource(R.drawable.ic_folder_list);
                 }
-                else{
+                counterShares--;
+                optionSendChat.setVisibility(View.GONE);
+            } else {
+                long nodeSize = node.getSize();
+                nodeInfo.setText(getSizeString(nodeSize));
+
+                if (megaApi.hasVersions(node)) {
+                    nodeVersionsIcon.setVisibility(View.VISIBLE);
+                } else {
                     nodeVersionsIcon.setVisibility(View.GONE);
                 }
 
