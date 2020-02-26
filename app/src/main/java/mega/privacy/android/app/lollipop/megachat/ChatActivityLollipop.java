@@ -117,7 +117,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
@@ -2792,7 +2792,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                             }
                         }
                     }
-                    CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, idMessages, this, CreateChatToPerformActionListener.SEND_MESSAGES, idChat);
+                    CreateChatListener listener = new CreateChatListener(chats, users, idMessages, this, CreateChatListener.SEND_MESSAGES, idChat);
 
                     if(users != null && !users.isEmpty()) {
                         for (MegaUser user : users) {

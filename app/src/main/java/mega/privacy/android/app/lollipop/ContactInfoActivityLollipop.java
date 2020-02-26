@@ -72,7 +72,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -99,7 +99,6 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -853,12 +852,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			ArrayList<MegaChatRoom> chats = new ArrayList<>();
 			ArrayList<MegaUser> usersNoChat = new ArrayList<>();
 			usersNoChat.add(user);
-			CreateChatToPerformActionListener listener = null;
+			CreateChatListener listener = null;
 
 			if (startVideo) {
-				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_VIDEO_CALL);
+				listener = new CreateChatListener(chats, usersNoChat, -1, this, CreateChatListener.START_VIDEO_CALL);
 			} else {
-				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_AUDIO_CALL);
+				listener = new CreateChatListener(chats, usersNoChat, -1, this, CreateChatListener.START_AUDIO_CALL);
 			}
 
 			MegaChatPeerList peers = MegaChatPeerList.createInstance();
@@ -1301,14 +1300,14 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			MegaChatRoom chatRoomToSend = megaChatApi.getChatRoomByUser(user.getHandle());
 			if(chatRoomToSend!=null){
-				checkIfNodesAreMineBeforeAttach(fileHandles, chatRoomToSend.getChatId());
+				new ChatController(this).checkIfNodesAreMineAndAttachNodes(fileHandles, chatRoomToSend.getChatId());
 			}
 			else{
 				//Create first the chat
 				ArrayList<MegaChatRoom> chats = new ArrayList<>();
 				ArrayList<MegaUser> usersNoChat = new ArrayList<>();
 				usersNoChat.add(user);
-				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandles, this, CreateChatToPerformActionListener.SEND_FILES, -1);
+				CreateChatListener listener = new CreateChatListener(chats, usersNoChat, fileHandles, this, CreateChatListener.SEND_FILES, -1);
 				MegaChatPeerList peers = MegaChatPeerList.createInstance();
 				peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 				megaChatApi.createChat(false, peers, listener);
@@ -1332,30 +1331,14 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
 
             nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
-        }
-		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+        } else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 
-			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
-			logDebug("Send to " + chatHandles.length + " chats");
+            long userHandle[] = {user.getHandle()};
+            intent.putExtra(USER_HANDLES, userHandle);
 
-			int countChat = chatHandles.length;
-			logDebug("Selected: " + countChat + " chats to send");
-
-			for (long chatHandle : chatHandles) {
-				MegaHandleList handleList = MegaHandleList.createInstance();
-				handleList.addMegaHandle(user.getHandle());
-				megaChatApi.attachContacts(chatHandle, handleList);
-			}
-
-			if(countChat==1){
-				openChat(chatHandles[0], null);
-			}
-			else{
-				String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, 1);
-				showSnackbar(SNACKBAR_TYPE, message, -1);
-			}
-		}else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
+            new ChatController(this).checkIntentToShareSomething(intent);
+		} else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
             if (!isOnline(this)) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
@@ -1399,10 +1382,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         }
 
 		super.onActivityResult(requestCode, resultCode, intent);
-	}
-
-	public void checkIfNodesAreMineBeforeAttach(long[] fileHandles, long chatId) {
-		new ChatController(this).checkIfNodesAreMineAndAttachNodes(fileHandles, chatId);
 	}
 
 	public void sendFilesToChat(long[] fileHandles, long chatId) {

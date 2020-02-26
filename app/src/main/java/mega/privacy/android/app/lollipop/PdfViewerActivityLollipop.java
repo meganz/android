@@ -88,7 +88,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -2344,7 +2344,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     }
 
                     if(nodeHandles!=null){
-                        CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, nodeHandles[0], this, CreateChatToPerformActionListener.SEND_FILE);
+                        CreateChatListener listener = new CreateChatListener(chats, users, nodeHandles[0], this, CreateChatListener.SEND_FILE);
                         for (MegaUser user : users) {
                             MegaChatPeerList peers = MegaChatPeerList.createInstance();
                             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);

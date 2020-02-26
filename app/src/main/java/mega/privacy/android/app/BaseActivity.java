@@ -468,30 +468,6 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * Method for send a file into one or more chats
-     *
-     * @param context Context of the Activity where the file has to be sent
-     * @param chats Chats where the file has to be sent
-     * @param fileHandle Handle of the file that has to be sent
-     */
-    public void sendFileToChatsFromContacts(Context context, ArrayList<MegaChatRoom> chats, long fileHandle){
-        logDebug("sendFileToChatsFromContacts");
-
-        MultipleAttachChatListener listener = null;
-
-        if(chats.size()==1){
-            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), chats.size());
-            megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
-        }
-        else{
-            listener = new MultipleAttachChatListener(context, -1, chats.size());
-            for(int i=0;i<chats.size();i++){
-                megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
-            }
-        }
-    }
-
-    /**
      * Method to refresh the account details info if necessary.
      */
     protected void refreshAccountInfo(){
