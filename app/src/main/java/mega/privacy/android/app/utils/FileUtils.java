@@ -593,13 +593,33 @@ public class FileUtils {
         return title;
     }
 
+    /**
+     * Gets the uri of a local file.
+     *
+     * @param context   current Context.
+     * @param file      file to get the uri.
+     * @return The uri of the file.
+     */
     public static Uri getUriForFile(Context context, File file) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                && file.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", file);
         } else {
             return Uri.fromFile(file);
         }
+    }
+
+    /**
+     * Shares a file.
+     *
+     * @param context   current Context.
+     * @param file      file to share.
+     */
+    public static void shareFile(Context context, File file) {
+        Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+        shareIntent.setType(MimeTypeList.typeForName(file.getName()).getType() + "/*");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }
 }
 

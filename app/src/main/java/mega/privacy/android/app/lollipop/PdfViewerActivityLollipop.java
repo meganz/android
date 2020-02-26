@@ -1229,10 +1229,11 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         saveForOfflineMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
         chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove);
 
+        shareMenuItem.setVisible(true);
+
         if (!inside){
             propertiesMenuItem.setVisible(false);
             chatMenuItem.setVisible(false);
-            shareMenuItem.setVisible(true);
             downloadMenuItem.setVisible(false);
             getlinkMenuItem.setVisible(false);
             renameMenuItem.setVisible(false);
@@ -1257,7 +1258,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             if (type == OFFLINE_ADAPTER){
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(true);
                 propertiesMenuItem.setVisible(true);
                 downloadMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
@@ -1273,12 +1273,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             else if(type == SEARCH_ADAPTER && !fromIncoming){
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
-                if (isUrl){
-                    shareMenuItem.setVisible(false);
-                }
-                else {
-                    shareMenuItem.setVisible(true);
-                }
                 if(node.isExported()){
                     removelinkMenuItem.setVisible(true);
                     getlinkMenuItem.setVisible(false);
@@ -1314,7 +1308,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             else if (type == FROM_CHAT){
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
                 moveMenuItem.setVisible(false);
@@ -1364,7 +1357,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 logDebug("FILE_LINK_ADAPTER");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(true);
                 renameMenuItem.setVisible(false);
@@ -1380,7 +1372,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             else if (type == ZIP_ADAPTER) {
                 propertiesMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
-                shareMenuItem.setVisible(true);
                 downloadMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
@@ -1404,13 +1395,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(true);
-
-                if (isUrl){
-                    shareMenuItem.setVisible(false);
-                }
-                else {
-                    shareMenuItem.setVisible(true);
-                }
 
                 MegaNode node = megaApi.getNodeByHandle(handle);
                 int accessLevel = megaApi.getAccess(node);
@@ -1440,12 +1424,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 chatRemoveMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
-                if (!isUrl) {
-                    shareMenuItem.setVisible(true);
-                }
-                else {
-                    shareMenuItem.setVisible(false);
-                }
                 removelinkMenuItem.setVisible(false);
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
@@ -1470,14 +1448,11 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 }
             }
             else {
-                shareMenuItem.setVisible(true);
-                boolean shareVisible = true;
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if (node == null) {
                     getlinkMenuItem.setVisible(false);
                     removelinkMenuItem.setVisible(false);
-                    shareMenuItem.setVisible(false);
                     propertiesMenuItem.setVisible(false);
                     downloadMenuItem.setVisible(false);
                     renameMenuItem.setVisible(false);
@@ -1491,16 +1466,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     chatRemoveMenuItem.setVisible(false);
                 }
                 else {
-                    if(type==CONTACT_FILE_ADAPTER){
-                        shareMenuItem.setVisible(false);
-                        shareVisible = false;
-                    }
-                    else{
-                        if(isFolderLink){
-                            shareMenuItem.setVisible(false);
-                            shareVisible = false;
-                        }
-                    }
                     copyMenuItem.setVisible(true);
 
                     if(node.isExported()){
@@ -1589,16 +1554,16 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     }
 
                     downloadMenuItem.setVisible(true);
-                    if (isUrl){
-                        shareMenuItem.setVisible(false);
-                    }
-                    else if (shareVisible){
-                        shareMenuItem.setVisible(true);
-                    }
-
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
                     chatRemoveMenuItem.setVisible(false);
+                }
+            }
+
+            if (type != OFFLINE_ADAPTER || type != ZIP_ADAPTER) {
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                if (node != null && megaApi.getAccess(node) != MegaShare.ACCESS_OWNER) {
+                    shareMenuItem.setVisible(false);
                 }
             }
         }
@@ -1617,7 +1582,11 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 break;
             }
             case R.id.pdf_viewer_share: {
-                intentToSendFile();
+                if (type == OFFLINE_ADAPTER || type == ZIP_ADAPTER) {
+                    shareFile(this, new File(uri.toString()));
+                } else {
+                    shareNode(this, megaApi.getNodeByHandle(handle));
+                }
                 break;
             }
             case R.id.pdf_viewer_download: {
@@ -2208,30 +2177,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
         linkIntent.putExtra("handle", handle);
         startActivity(linkIntent);
-    }
-
-    public void intentToSendFile(){
-        logDebug("intentToSendFile");
-
-        if(uri!=null){
-            if (!isUrl){
-                Intent share = new Intent(android.content.Intent.ACTION_SEND);
-                share.setType("application/pdf");
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    logDebug("Use provider to share");
-                    share.putExtra(Intent.EXTRA_STREAM, uri);
-                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }
-                else{
-                    share.putExtra(Intent.EXTRA_STREAM, uri);
-                }
-                startActivity(Intent.createChooser(share, getString(R.string.context_share)));
-            }
-            else {
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.not_download), -1);
-            }
-        }
     }
 
     public void updateFile (){

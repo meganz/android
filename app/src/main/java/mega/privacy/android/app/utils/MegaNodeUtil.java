@@ -209,34 +209,50 @@ public class MegaNodeUtil {
         }
     }
 
+    /**
+     *
+     * Shares a node.
+     * If the node is a folder creates and/or shares the folder link.
+     * If the node is a file and exists in local storage, shares the file. If not, creates and/or shares the file link.
+     *
+     * @param context   current Context.
+     * @param node      node to share.
+     */
     public static void shareNode (Context context, MegaNode node) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
             String path = getLocalFile(context, node.getName(), node.getSize());
 
-            Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
-
-            if (!isTextEmpty(path)) {
-                Uri uri = getUriForFile(context, new File(path));
-                shareIntent.setType(MimeTypeList.typeForName(node.getName()).getType() + "/*");
-                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }
-                context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+            if (!isTextEmpty(path) && !node.isFolder()) {
+                shareFile(context, new File(path));
             } else if (node.isExported()) {
-                startShareIntent(context, shareIntent, node.getPublicLink());
+                startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
             } else {
-                MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, shareIntent));
+                MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND)));
             }
         }
     }
 
+    /**
+     * Ends the creation of the share intent and starts it.
+     *
+     * @param context       current Context.
+     * @param shareIntent   intent to start the share.
+     * @param link          link of the node to share.
+     */
     public static void startShareIntent (Context context, Intent shareIntent, String link) {
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, link);
         context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }
 
+    /**
+     * Checks if there is any error before continues any action.
+     *
+     * @param context   current Context.
+     * @param message   action being taken.
+     * @param node      node involved in the action.
+     * @return True if there is not any error, false otherwise.
+     */
     private static boolean shouldContinueWithoutError(Context context, String message, MegaNode node) {
         String error = "Error " + message + ". ";
 
