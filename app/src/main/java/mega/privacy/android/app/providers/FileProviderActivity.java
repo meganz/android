@@ -1137,7 +1137,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (hashes != null&&hashes.length>0){
 			for (long hash : hashes) {
 				MegaNode tempNode = megaApi.getNodeByHandle(hash);
-				String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize(), pathToDownload);
+				String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize());
 				if(localPath != null){
 					try {
 						logDebug("COPY_FILE");

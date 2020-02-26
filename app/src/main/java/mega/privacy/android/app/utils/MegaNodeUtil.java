@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -16,14 +17,21 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaNodeUtil {
@@ -199,5 +207,48 @@ public class MegaNodeUtil {
 
             return dialog;
         }
+    }
+
+    public static void shareNode (Context context, MegaNode node) {
+        if (shouldContinueWithoutError(context, "sharing node", node)) {
+            String path = getLocalFile(context, node.getName(), node.getSize());
+
+            Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+
+            if (!isTextEmpty(path)) {
+                Uri uri = getUriForFile(context, new File(path));
+                shareIntent.setType(MimeTypeList.typeForName(node.getName()).getType() + "/*");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+            } else if (node.isExported()) {
+                startShareIntent(context, shareIntent, node.getPublicLink());
+            } else {
+                MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, shareIntent));
+            }
+        }
+    }
+
+    public static void startShareIntent (Context context, Intent shareIntent, String link) {
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, link);
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+    }
+
+    private static boolean shouldContinueWithoutError(Context context, String message, MegaNode node) {
+        String error = "Error " + message + ". ";
+
+        if (node == null) {
+            logError(error + "Node == NULL");
+            return false;
+        } else if (!isOnline(context)) {
+            logError(error + "No network connection");
+            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+            return false;
+        }
+
+        return true;
     }
 }

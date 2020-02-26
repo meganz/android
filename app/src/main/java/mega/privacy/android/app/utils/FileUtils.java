@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -303,115 +304,47 @@ public class FileUtils {
         return size;
     }
 
-    public static String getLocalFile(Context context, String fileName, long fileSize,
-                                      String destDir)
-    {
-        Cursor cursor = null;
-        try
-        {
-            if(MimeTypeList.typeForName(fileName).isImage())
-            {
-                final String[] projection = { MediaStore.Images.Media.DATA };
-                final String selection = MediaStore.Images.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Images.Media.SIZE + " = ?";
-                final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
+    /**
+     * Checks if a local file exists
+     *
+     * @param context   the current context
+     * @param fileName  name of the file
+     * @param fileSize  size of the file
+     * @return The path of the file if the local file exists, null otherwise
+     */
+    public static String getLocalFile(Context context, String fileName, long fileSize) {
+        String data = MediaStore.Files.FileColumns.DATA;
 
-                cursor = context.getContentResolver().query(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()){
-                        return path;
-                    }
-                }
-                if(cursor != null) cursor.close();
+        final String[] projection = {data};
+        final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND " + MediaStore.Files.FileColumns.SIZE + " = ?";
+        final String[] selectionArgs = {fileName, String.valueOf(fileSize)};
 
-                cursor = context.getContentResolver().query(
-                        MediaStore.Images.Media.INTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()) return path;
-                }
-                if(cursor != null) cursor.close();
+        Cursor cursor = context.getContentResolver().query(
+                MediaStore.Files.getContentUri("external"), projection, selection,
+                selectionArgs, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int dataColumn = cursor.getColumnIndexOrThrow(data);
+            String path = cursor.getString(dataColumn);
+            cursor.close();
+            cursor = null;
+            if (new File(path).exists()) {
+                return path;
             }
-            else if(MimeTypeList.typeForName(fileName).isVideoReproducible())
-            {
-                final String[] projection = { MediaStore.Video.Media.DATA };
-                final String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Video.Media.SIZE + " = ?";
-                final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
-
-                cursor = context.getContentResolver().query(
-                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()) return path;
-                }
-                if(cursor != null) cursor.close();
-
-                cursor = context.getContentResolver().query(
-                        MediaStore.Video.Media.INTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()) return path;
-                }
-                if(cursor != null) cursor.close();
-            }
-            else if (MimeTypeList.typeForName(fileName).isAudio()) {
-                final String[] projection = { MediaStore.Audio.Media.DATA };
-                final String selection = MediaStore.Audio.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Audio.Media.SIZE + " = ?";
-                final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
-
-                cursor = context.getContentResolver().query(
-                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()) return path;
-                }
-                if(cursor != null) cursor.close();
-
-                cursor = context.getContentResolver().query(
-                        MediaStore.Video.Media.INTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()) return path;
-                }
-                if(cursor != null) cursor.close();
-            }
-        } catch (Exception e)
-        {
-            if(cursor != null) cursor.close();
         }
+        if (cursor != null) cursor.close();
 
-        //Not found, searching in the download folder
-        if(destDir != null)
-        {
-            File file = new File(destDir, fileName);
-            if(file.exists() && (file.length() == fileSize))
-                return file.getAbsolutePath();
+        cursor = context.getContentResolver().query(
+                MediaStore.Files.getContentUri("internal"), projection, selection,
+                selectionArgs, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int dataColumn = cursor.getColumnIndexOrThrow(data);
+            String path = cursor.getString(dataColumn);
+            cursor.close();
+            cursor = null;
+            if (new File(path).exists()) return path;
         }
+        if (cursor != null) cursor.close();
+
         return null;
     }
 
@@ -658,6 +591,15 @@ public class FileUtils {
             title += ".pdf";
         }
         return title;
+    }
+
+    public static Uri getUriForFile(Context context, File file) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                && file.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
+            return FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", file);
+        } else {
+            return Uri.fromFile(file);
+        }
     }
 }
 

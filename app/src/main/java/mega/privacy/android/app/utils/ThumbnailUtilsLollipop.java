@@ -1381,7 +1381,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			logDebug("localPath is not null: " + localPath);
@@ -1400,7 +1400,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			ResizerParams params = new ResizerParams();
@@ -1418,7 +1418,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			logDebug("localPath is not null: " + localPath);
@@ -1438,7 +1438,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			logDebug("localPath is not null: " + localPath);
@@ -1495,7 +1495,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			logDebug("localPath is not null: " + localPath);

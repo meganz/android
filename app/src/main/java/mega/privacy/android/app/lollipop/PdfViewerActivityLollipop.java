@@ -2259,22 +2259,11 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     fileNameTextView.setText(pdfFileName);
                     supportInvalidateOptionsMenu();
 
+                    String localPath = getLocalFile(this, file.getName(), file.getSize());
 
-                    downloadLocationDefaultPath = getDownloadLocation(this);
-                    boolean isOnMegaDownloads = false;
-                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
-                    File f = new File(downloadLocationDefaultPath, file.getName());
-                    if(f.exists() && (f.length() == file.getSize())){
-                        isOnMegaDownloads = true;
-                    }
-                    if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+                    if (localPath != null){
                         File mediaFile = new File(localPath);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                            uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
-                        }
-                        else{
-                            uri = Uri.fromFile(mediaFile);
-                        }
+                        uri = getUriForFile(this, mediaFile);
                     }
                     else {
                         if (megaApi == null){

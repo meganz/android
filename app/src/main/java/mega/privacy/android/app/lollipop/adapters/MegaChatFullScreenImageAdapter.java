@@ -310,12 +310,9 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 			}
 
-			boolean isOnMegaDownloads = false;
-			String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
-			logDebug("isOnMegaDownloads: " + isOnMegaDownloads + ", Node Handle: " + node.getHandle());
-			if (localPath != null && megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))){
+			String localPath = getLocalFile(context, node.getName(), node.getSize());
 
-
+			if (localPath != null){
 				if (drawable != null){
 					Glide.with(context)
 							.load(new File(localPath))

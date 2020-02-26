@@ -2345,7 +2345,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 Uri newUri = uri;
                 if (uri.toString().contains(VOICE_CLIP_FOLDER)) {
                     MegaNode file = megaApi.getNodeByHandle(handle);
-                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                    String localPath = getLocalFile(this, file.getName(), file.getSize());
                     if (localPath == null) break;
                     File voiceClipFile = new File(localPath);
                     newUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", voiceClipFile);
@@ -3463,7 +3463,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     setTitle(fileName);
 
                     boolean isOnMegaDownloads = false;
-                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                    String localPath = getLocalFile(this, file.getName(), file.getSize());
                     File f = new File(downloadLocationDefaultPath, file.getName());
                     if(f.exists() && (f.length() == file.getSize())){
                         isOnMegaDownloads = true;
@@ -4262,7 +4262,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                         }
                         mSource = null;
                         boolean isOnMegaDownloads = false;
-                        localPath = getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
+                        localPath = getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize());
                         File f = new File(downloadLocationDefaultPath, n.getName());
                         if (f.exists() && (f.length() == n.getSize())) {
                             isOnMegaDownloads = true;

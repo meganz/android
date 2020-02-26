@@ -262,16 +262,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 	boolean isDownloaded(MegaNode node) {
 		logDebug("Node Handle: " + node.getHandle());
-		boolean isOnMegaDownloads = false;
-		String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
-		File f = new File(downloadLocationDefaultPath, node.getName());
-		if (f.exists() && (f.length() == node.getSize())) {
-			isOnMegaDownloads = true;
-		}
-		if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))) {
-			return true;
-		}
-		return false;
+
+		return getLocalFile(this, node.getName(), node.getSize()) != null;
 	}
 
 	@Override
@@ -785,7 +777,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 					if (MimeTypeList.typeForName(node.getName()).isGIF()){
-						String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+						String localPath = getLocalFile(this, node.getName(), node.getSize());
 						if (localPath != null) {
 							previewFile = new File(localPath);
 						}
