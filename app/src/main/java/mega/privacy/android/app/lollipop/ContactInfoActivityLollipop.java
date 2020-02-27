@@ -120,6 +120,8 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 @SuppressLint("NewApi")
 public class ContactInfoActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
 
+	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
+
 	ContactController cC;
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
     private android.support.v7.app.AlertDialog renameDialog;
@@ -222,6 +224,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
 
     private AskForDisplayOverDialog askForDisplayOverDialog;
+
+    private boolean waitingForCall;
 
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
@@ -594,6 +598,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		} else {
 			logWarning("Extras is NULL");
 		}
+
+		if (savedInstanceState != null) {
+			waitingForCall = savedInstanceState.getBoolean(WAITING_FOR_CALL, false);
+		}
+
         if(askForDisplayOverDialog != null) {
             askForDisplayOverDialog.showDialog();
         }
@@ -835,7 +844,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		}
 	}
 
-	public void startCall(boolean startVideo) {
+	public void startCall() {
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if (chatRoomTo != null) {
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
@@ -843,9 +852,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				i.putExtra(CHAT_ID, chatRoomTo.getChatId());
 				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(i);
-			} else {
-				((MegaApplication) getApplication()).setSpeakerStatus(chatRoomTo.getChatId(), startVideo);
+			} else if (isStatusConnected(this, megaChatApi, chatRoomTo.getChatId())){
+				app.setSpeakerStatus(chatRoomTo.getChatId(), startVideo);
 				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+			} else {
+				waitingForCall = true;
 			}
 		} else {
 			//Create first the chat
@@ -895,7 +906,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				logDebug("REQUEST_CAMERA");
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					if(checkPermissionsCall()){
-						startCall(startVideo);
+						startCall();
 					}
 				}
 				break;
@@ -904,7 +915,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				logDebug("RECORD_AUDIO");
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					if(checkPermissionsCall()){
-						startCall(startVideo);
+						startCall();
 					}
 				}
 				break;
@@ -1136,12 +1147,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	private void startingACall(boolean withVideo) {
-		if (megaChatApi != null && isStatusConnected(this, megaChatApi, megaChatApi.getChatRoomByUser(user.getHandle()).getChatId())) {
-			logDebug("I'm not in a call");
-			startVideo = withVideo;
-			if (checkPermissionsCall()) {
-				startCall(startVideo);
-			}
+		startVideo = withVideo;
+		if (checkPermissionsCall()) {
+			startCall();
 		}
 	}
 
@@ -2265,9 +2273,16 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
     }
-    
-    
-    @Override
+
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putBoolean(WAITING_FOR_CALL, waitingForCall);
+	}
+
+	@Override
     public void onUsersUpdate(MegaApiJava api,ArrayList<MegaUser> users) {
     
     }
@@ -2332,7 +2347,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
+		if (waitingForCall) {
+			MegaChatRoom chatRoom = megaChatApi.getChatRoom(user.getHandle());
+			if (chatRoom != null && chatRoom.getChatId() == chatid) {
+				startCall();
+			}
+		}
 	}
 
 	@Override

@@ -110,9 +110,8 @@ public class CreateChatListener extends ChatBaseListener {
             case START_VIDEO_CALL:
                 if (e.getErrorCode() != MegaError.API_OK) {
                     showSnackbar(context, context.getString(R.string.create_chat_error));
-                    ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
-                } else {
-                    startCall(action, request, api);
+                } else if (context instanceof ContactInfoActivityLollipop){
+                    ((ContactInfoActivityLollipop) context).startCall();
                 }
                 break;
 
@@ -161,18 +160,6 @@ public class CreateChatListener extends ChatBaseListener {
                     }
                 }
                 break;
-        }
-    }
-
-    private void startCall(int action, MegaChatRequest request, MegaChatApiJava api) {
-        MegaChatRoom chat = api.getChatRoom(request.getChatHandle());
-        if (chat != null) {
-            if (action == START_AUDIO_CALL) {
-                MegaApplication.getInstance().setSpeakerStatus(chat.getChatId(), false);
-            } else if (action == START_VIDEO_CALL){
-                MegaApplication.getInstance().setSpeakerStatus(chat.getChatId(), true);
-            }
-            api.startChatCall(chat.getChatId(), false, (ContactInfoActivityLollipop) context);
         }
     }
 }
