@@ -268,6 +268,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
         NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
 
+	public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
 	private static final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
 	private static final String OFFLINE_SEARCH_PATHS = "OFFLINE_SEARCH_PATHS";
@@ -285,24 +286,26 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private static final String INDEX_CLOUD = "INDEX_CLOUD";
     public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
 
-	private final int ERROR_TAB = -1;
-	private final int CLOUD_TAB = 0;
-	private final int RECENTS_TAB = 1;
-	private final int INCOMING_TAB = 0;
-	private final int OUTGOING_TAB = 1;
-	private final int CONTACTS_TAB = 0;
-	private final int SENT_REQUESTS_TAB = 1;
-	private final int RECEIVED_REQUESTS_TAB = 2;
-	private final int GENERAL_TAB = 0;
-	private final int STORAGE_TAB = 1;
+	private static final int ERROR_TAB = -1;
+	private static final int CLOUD_TAB = 0;
+	private static final int RECENTS_TAB = 1;
+	private static final int INCOMING_TAB = 0;
+	private static final int OUTGOING_TAB = 1;
+	private static final int CONTACTS_TAB = 0;
+	private static final int SENT_REQUESTS_TAB = 1;
+	private static final int RECEIVED_REQUESTS_TAB = 2;
+	private static final int GENERAL_TAB = 0;
+	private static final int STORAGE_TAB = 1;
+	public static final int PENDING_TAB = 0;
+	public static final int COMPLETED_TAB = 1;
 
-	private final int CLOUD_DRIVE_BNV = 0;
-	private final int CAMERA_UPLOADS_BNV = 1;
-	private final int CHAT_BNV = 2;
-	private final int SHARED_BNV = 3;
-	private final int OFFLINE_BNV = 4;
-	private final int HIDDEN_BNV = 5;
-	private final int MEDIA_UPLOADS_BNV = 6;
+	private static final int CLOUD_DRIVE_BNV = 0;
+	private static final int CAMERA_UPLOADS_BNV = 1;
+	private static final int CHAT_BNV = 2;
+	private static final int SHARED_BNV = 3;
+	private static final int OFFLINE_BNV = 4;
+	private static final int HIDDEN_BNV = 5;
+	private static final int MEDIA_UPLOADS_BNV = 6;
 
 	private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
@@ -2418,6 +2421,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_SHOW_TRANSFERS);
+						intent.putExtra(TRANSFERS_TAB, getIntent().getIntExtra(TRANSFERS_TAB, ERROR_TAB));
 						startActivity(intent);
 						finish();
 						return;
@@ -3050,6 +3054,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	        		if (intentRec.getAction() != null){
 	        			if (intentRec.getAction().equals(ACTION_SHOW_TRANSFERS)){
 	        				drawerItem = DrawerItem.TRANSFERS;
+	        				indexTransfers = intentRec.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
 							setIntent(null);
 	        			} else if (intentRec.getAction().equals(ACTION_REFRESH_AFTER_BLOCKED)) {
 							drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -3736,6 +3741,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					logDebug("Intent show transfers");
 
     				drawerItem = DrawerItem.TRANSFERS;
+					indexTransfers = intent.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
     				selectDrawerItemLollipop(drawerItem);
     			}
     			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
@@ -5373,61 +5379,24 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 
-		if (mTabsAdapterTransfers == null){
-			logWarning("mTabsAdapterTransfers == null");
-
-			mTabsAdapterTransfers = new TransfersPageAdapter(getSupportFragmentManager(),this);
+		if (mTabsAdapterTransfers == null) {
+			mTabsAdapterTransfers = new TransfersPageAdapter(getSupportFragmentManager(), this);
 			viewPagerTransfers.setAdapter(mTabsAdapterTransfers);
 			tabLayoutTransfers.setupWithViewPager(viewPagerTransfers);
-
-			logDebug("The index of the TAB TRANSFERS is: " + indexTransfers);
-			if(indexTransfers!=-1) {
-				if (viewPagerMyAccount != null) {
-					switch (indexTransfers){
-						case GENERAL_TAB:{
-							viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
-							logDebug("General TAB");
-							break;
-						}
-						case STORAGE_TAB:{
-							viewPagerMyAccount.setCurrentItem(STORAGE_TAB);
-							logDebug("Storage TAB");
-							break;
-						}
-						default:{
-							viewPagerMyAccount.setCurrentItem(GENERAL_TAB);
-							logDebug("Default general TAB");
-							break;
-						}
-					}
-				}
-			}
-			else{
-				//No bundle, no change of orientation
-				logDebug("indexTransfers is NOT -1");
-			}
-		}
-		else{
-			logDebug("mTabsAdapterTransfers NOT null");
+		} else {
 			tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 			completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
+		}
 
-			if(indexTransfers!=-1) {
-				logDebug("The index of the TAB Transfers is: " + indexTransfers);
-				if (viewPagerTransfers != null) {
-					switch (indexTransfers) {
-						case 1: {
-							viewPagerTransfers.setCurrentItem(1);
-							logDebug("Select Storage TAB");
-							break;
-						}
-						default: {
-							viewPagerTransfers.setCurrentItem(0);
-							logDebug("Select General TAB");
-							break;
-						}
-					}
-				}
+		if (viewPagerTransfers != null) {
+			switch (indexTransfers) {
+				case COMPLETED_TAB:
+					viewPagerTransfers.setCurrentItem(COMPLETED_TAB);
+					break;
+
+				default:
+					viewPagerTransfers.setCurrentItem(PENDING_TAB);
+					break;
 			}
 		}
 

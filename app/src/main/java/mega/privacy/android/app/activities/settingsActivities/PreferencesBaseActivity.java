@@ -38,9 +38,11 @@ public class PreferencesBaseActivity extends PinActivityLollipop {
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
+
+        changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
     }
 
     @Override

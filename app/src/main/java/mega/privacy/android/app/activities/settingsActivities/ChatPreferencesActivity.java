@@ -22,7 +22,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
 
         super.onCreate(savedInstanceState);
 
-        aB.setTitle(getString(R.string.section_chat));
+        aB.setTitle(getString(R.string.section_chat).toUpperCase());
 
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);

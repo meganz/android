@@ -93,7 +93,7 @@
         <item name="preferenceTheme">@style/PreferenceStyle</item>
     </style>
 
-    <style name="PreferencesScreen" parent="Theme.Megaactionbar.Secondary">
+    <style name="PreferencesScreen" parent="Theme.Megaactionbar">
         <item name="colorControlNormal">@color/text_secondary</item>
     </style>
 

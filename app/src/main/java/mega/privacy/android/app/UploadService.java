@@ -43,6 +43,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -326,7 +327,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 
     private void notifyNotification(String notificationTitle,String size,int notificationId,String channelId,String channelName) {
-        Intent intent = new Intent(UploadService.this,ManagerActivityLollipop.class);
+        Intent intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
+        intent.setAction(ACTION_SHOW_TRANSFERS);
+        intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelId,channelName,NotificationManager.IMPORTANCE_DEFAULT);
@@ -338,7 +341,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,0))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false);
@@ -347,7 +350,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         } else {
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,0))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false);
@@ -427,6 +430,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             case 0:
             default:
                 intent.setAction(ACTION_SHOW_TRANSFERS);
+                intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
                 break;
             case 1:
                 intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -436,7 +440,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 break;
         }
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -948,7 +952,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 			mBuilderCompatO
 					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);
@@ -958,7 +962,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		else {
 			mBuilderCompat
 					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);
