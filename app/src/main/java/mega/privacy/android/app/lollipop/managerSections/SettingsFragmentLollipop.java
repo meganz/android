@@ -1740,9 +1740,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				logWarning("Set PIN ERROR");
 			}
 		}
-		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_CANCELED && intent != null){
-			logDebug("REQUEST_DOWNLOAD_FOLDER - canceled");
-		}
 		else if (requestCode == REQUEST_CAMERA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Local folder to sync
 			String cameraPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);

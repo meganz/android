@@ -753,7 +753,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	/**
 	 * This dialog is shown when the user is selecting the download location.
-	 * It asks if they want to set the current choosen location as default.
+	 * It asks if they want to set the current chosen location as default.
 	 * It the user enables the checkbox, the dialog should not appear again.
 	 *
 	 */

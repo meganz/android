@@ -13935,12 +13935,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
 		}
 		else {
+			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
 			for (ShareInfo info : infos) {
 				if(info.isContact){
 					requestContactsPermissions(info, parentNode);
 				}
 				else{
-				    showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
                     Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());

@@ -731,7 +731,7 @@ public class FileUtils {
 
         if (!checkVideo) return;
 
-        if (isVideoFile(parentPath + "/" + node.getName()) && node != null && !node.hasThumbnail()) {
+        if (node != null && isVideoFile(parentPath + "/" + node.getName()) && !node.hasThumbnail()) {
             MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
             try {
                 ThumbnailUtilsLollipop.createThumbnailVideo(context, localPath, megaApi, node.getHandle());

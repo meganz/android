@@ -153,12 +153,16 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
                 logDebug("tree uri is null!");
                 onCannotWriteOnSDCard();
             }
-        } else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_OK && intent != null) {
-            String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            dbH.setStorageDownloadLocation(path);
-            downloadLocationPath = path;
-            if (downloadLocation != null) {
-                downloadLocation.setSummary(path);
+        } else if (requestCode == REQUEST_DOWNLOAD_FOLDER && intent != null) {
+            if (resultCode == Activity.RESULT_OK) {
+                String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+                dbH.setStorageDownloadLocation(path);
+                downloadLocationPath = path;
+                if (downloadLocation != null) {
+                    downloadLocation.setSummary(path);
+                }
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                logDebug("REQUEST_DOWNLOAD_FOLDER - canceled");
             }
         }
     }

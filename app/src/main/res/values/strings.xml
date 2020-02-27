@@ -343,22 +343,22 @@
 
     <plurals name="download_began">
         <item context="Message when a download starts. Singular 1 file" quantity="one">Download has started</item>
-        <item context="Message when many downloads start. Plural more than 1 file" quantity="other">%1$d downloads have started</item>
+        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have started</item>
     </plurals>
 
     <plurals name="download_finish">
         <item context="Message when a download finishes. Singular 1 file" quantity="one">Download has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file" quantity="other">%1$d downloads have finished</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have finished</item>
     </plurals>
 
     <plurals name="upload_began">
         <item context="Message when a upload starts. Singular 1 file" quantity="one">Upload has started</item>
-        <item context="Message when many uploads start. Plural more than 1 file" quantity="other">%1$d uploads have started</item>
+        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have started</item>
     </plurals>
 
     <plurals name="upload_finish">
         <item context="Message when a download finishes. Singular 1 file" quantity="one">Upload has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file" quantity="other">%1$d uploads have finished</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have finished</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>

@@ -1864,6 +1864,7 @@ public class ChatController {
                                 showSnackbar(context, context.getString(R.string.general_already_downloaded));
                             }
                         } catch (Exception e) {
+                            logWarning("Exception downloading file", e);
                             showSnackbar(context, context.getString(R.string.general_already_downloaded));
                         }
                     }

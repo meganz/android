@@ -3271,10 +3271,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		setStringValue(TABLE_PREFERENCES, KEY_STORAGE_ASK_ALWAYS, storageAskAlways + "");
 	}
 
+	/**
+	 * Sets the flag to indicate if should ask the user about set the current path as default download location.
+	 *
+	 * @param askSetDownloadLocation true if should ask, false otherwise.
+	 */
 	public void setAskSetDownloadLocation(boolean askSetDownloadLocation) {
 		setStringValue(TABLE_PREFERENCES, KEY_ASK_SET_DOWNLOAD_LOCATION, askSetDownloadLocation + "");
 	}
 
+	/**
+	 * Gets the flag which indicates if should ask the user about set the current path as default download location.
+	 *
+	 * @return true if should ask, false otherwise.
+	 */
 	public boolean getAskSetDownloadLocation() {
 		return getBooleanValue(TABLE_PREFERENCES, KEY_ASK_SET_DOWNLOAD_LOCATION, true);
 	}
