@@ -8082,7 +8082,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
             case MegaChatCall.CALL_STATUS_RING_IN:{
                 if (isGroup()) {
-                    usersWithVideo();
+                    usersWithVideo(call);
 
                     long callerHandle = call.getCaller();
                     String textLayout;
@@ -8119,6 +8119,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 activateChrono(false, subtitleChronoCall, call);
                 callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
                 showCallInProgressLayout(getString(R.string.reconnecting_message), false, call);
+                callInProgressLayout.setOnClickListener(this);
                 return;
             }
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
@@ -8127,6 +8128,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     updateCallInProgressLayout(call);
                     return;
                 }
+                callInProgressLayout.setOnClickListener(null);
                 showCallInProgressLayout(getString(R.string.connected_message), false, call);
                 callInProgressLayout.setAlpha(1);
                 callInProgressLayout.setVisibility(View.VISIBLE);
@@ -8149,27 +8151,29 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         activateChrono(false, subtitleChronoCall, call);
         callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
         showCallInProgressLayout(text, false, call);
+        callInProgressLayout.setOnClickListener(this);
     }
 
     private void updateCallInProgressLayout(MegaChatCall call){
         if (call == null) call = megaChatApi.getChatCall(idChat);
         if (call == null) return;
         showCallInProgressLayout(getString(R.string.call_in_progress_layout), true, call);
+        callInProgressLayout.setOnClickListener(this);
         if (isGroup()) {
             subtitleCall.setVisibility(View.VISIBLE);
             individualSubtitleToobar.setVisibility(View.GONE);
             groupalSubtitleToolbar.setVisibility(View.GONE);
         }
-        usersWithVideo();
+        usersWithVideo(call);
         activateChrono(true, subtitleChronoCall, call);
         invalidateOptionsMenu();
     }
 
-    public void usersWithVideo() {
-        if (megaChatApi == null || !isGroup() || megaChatApi.getChatCall(idChat) == null || subtitleCall.getVisibility() != View.VISIBLE)
+    public void usersWithVideo(MegaChatCall call) {
+        if (megaChatApi == null || !isGroup() || subtitleCall.getVisibility() != View.VISIBLE)
             return;
 
-        int usersWithVideo = megaChatApi.getChatCall(idChat).getNumParticipants(MegaChatCall.VIDEO);
+        int usersWithVideo = call.getNumParticipants(MegaChatCall.VIDEO);
         int totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
         if (usersWithVideo <= 0 || totalVideosAllowed == 0) {
             participantsLayout.setVisibility(View.GONE);
