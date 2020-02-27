@@ -1940,7 +1940,7 @@ public class ChatController {
             return;
         }
 
-        showSnackBarWhenDownloading(context, numberOfNodesToDownload, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
+        showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
     }
 
     public void importNode(long idMessage, long idChat) {

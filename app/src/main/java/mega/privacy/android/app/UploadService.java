@@ -42,6 +42,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -297,6 +298,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             if (totalFolderUploads > 0) {
                 showFolderUploadCompleteNotification();
             }
+
+            sendUploadFinishBroadcast();
         }
 
         if (megaApi.getNumPendingUploads() <= 0) {
@@ -361,6 +364,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             transferredBytes = transferredBytes + currentTransfer.getTransferredBytes();
         }
         return transferredBytes;
+    }
+
+    private void sendUploadFinishBroadcast() {
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED);
+        intent.putExtra(TRANSFER_TYPE, UPLOAD_TRANSFER);
+        intent.putExtra(NUMBER_FILES, totalFileUploads + totalFolderUploads);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     /*

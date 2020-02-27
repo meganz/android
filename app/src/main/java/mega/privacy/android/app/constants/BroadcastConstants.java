@@ -7,7 +7,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED = "INTENT_EVENT_ACCOUNT_BLOCKED";
     public static final String BROADCAST_ACTION_INTENT_MANAGE_SHARE = "BROADCAST_ACTION_INTENT_MANAGE_SHARE";
     public static final String BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES = "INTENT_TAKEN_DOWN_FILES";
-    public static final String BROADCAST_ACTION_INTENT_SHOWSNACKBAR_DOWNLOAD_FINISHED = "BROADCAST_ACTION_INTENT_SHOWSNACKBAR_DOWNLOAD_FINISHED";
+    public static final String BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED = "BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED";
 
 
 
@@ -21,5 +21,7 @@ public class BroadcastConstants {
     public static final String EVENT_NUMBER = "EVENT_NUMBER";
     public static final String TYPE_SHARE = "TYPE_SHARE";
     public static final String NUMBER_FILES = "NUMBER_FILES";
-
+    public static final String TRANSFER_TYPE = "TRANSFER_TYPE";
+    public static final String DOWNLOAD_TRANSFER = "DOWNLOAD_TRANSFER";
+    public static final String UPLOAD_TRANSFER = "UPLOAD_TRANSFER";
 }

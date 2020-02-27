@@ -695,16 +695,15 @@ public class FileUtils {
      *      several files have to be downloaded and some of them are already downloaded
      *
      * @param context activity where the snackbar has to be shown
-     * @param numberOfNodesToDownload total of downloads
      * @param numberOfNodesPending pending downloads
      * @param numberOfNodesAlreadyDownloaded files already downloaded
      */
-    public static void showSnackBarWhenDownloading(Context context, int numberOfNodesToDownload, int numberOfNodesPending, int numberOfNodesAlreadyDownloaded) {
-        logDebug("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
+    public static void showSnackBarWhenDownloading(Context context, int numberOfNodesPending, int numberOfNodesAlreadyDownloaded) {
+        logDebug(" Already downloaded: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
 
-        if (numberOfNodesToDownload == numberOfNodesPending && numberOfNodesToDownload == 1) {
-            showSnackbar(context, context.getString(R.string.download_began));
-        } else if (numberOfNodesAlreadyDownloaded > 0) {
+        if (numberOfNodesAlreadyDownloaded == 0) {
+            showSnackbar(context, context.getResources().getQuantityString(R.plurals.download_began, numberOfNodesPending, numberOfNodesPending));
+        } else {
             String msg;
             msg = context.getResources().getQuantityString(R.plurals.file_already_downloaded, numberOfNodesAlreadyDownloaded, numberOfNodesAlreadyDownloaded);
             if (numberOfNodesPending > 0) {

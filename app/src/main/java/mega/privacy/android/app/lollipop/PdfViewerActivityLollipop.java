@@ -1114,6 +1114,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         else {
 
             MegaNode parentNode = megaApi.getRootNode();
+            showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
             for (ShareInfo info : infos) {
 
                 Intent intent = new Intent(this, UploadService.class);

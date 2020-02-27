@@ -45,7 +45,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -2619,7 +2618,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
 
 						if (getIntent().getBooleanExtra(SHOW_MESSAGE_UPLOAD_STARTED, false)) {
-							showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began), -1);
+							int numberUploads = getIntent().getIntExtra(NUMBER_UPLOADS, 1);
+							showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, numberUploads, numberUploads), -1);
 						}
 
 						if (locationFileInfo){
@@ -3814,7 +3814,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
 
 					if (getIntent().getBooleanExtra(SHOW_MESSAGE_UPLOAD_STARTED, false)) {
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began), -1);
+						int numberUploads = getIntent().getIntExtra(NUMBER_UPLOADS, 1);
+						showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, numberUploads, numberUploads), -1);
 					}
 
 					actionOpenFolder(handleIntent);
@@ -13114,6 +13115,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				parentNode = megaApi.getRootNode();
 			}
 
+			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, paths.size(), paths.size()), -1);
 			for (String path : paths) {
 				try {
 					Thread.sleep(300);
@@ -13964,14 +13966,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
 		}
 		else {
-			Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
 			for (ShareInfo info : infos) {
 				if(info.isContact){
 					requestContactsPermissions(info, parentNode);
 				}
 				else{
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began), -1);
-					Intent intent = new Intent(this, UploadService.class);
+				    showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
+                    Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
@@ -14056,7 +14057,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		File file = createTemporalTextFile(this, name, data);
 		if(file!=null){
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began), -1);
+			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, 1, 1), -1);
 
 			Intent intent = new Intent(this, UploadService.class);
 			intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());

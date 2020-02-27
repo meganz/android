@@ -719,7 +719,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			showSnackbar(getString(R.string.upload_can_not_open));
 		}
 		else {
-			showSnackbar(getString(R.string.upload_began));
+			showSnackbar(getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());

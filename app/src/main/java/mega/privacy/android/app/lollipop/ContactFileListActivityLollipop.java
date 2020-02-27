@@ -1203,6 +1203,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 				parentNode = megaApi.getRootNode();
 			}
 
+			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, paths.size(), paths.size()));
 			for (String path : paths) {
 				Intent uploadServiceIntent = new Intent(this, UploadService.class);
 				File file = new File(path);
@@ -1228,7 +1229,6 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				logDebug("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began));
 				startService(uploadServiceIntent);
 				i++;
 			}
@@ -1263,7 +1263,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			showErrorAlertDialog(getString(R.string.upload_can_not_open),
 					false, this);
 		} else {
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began));
+			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());

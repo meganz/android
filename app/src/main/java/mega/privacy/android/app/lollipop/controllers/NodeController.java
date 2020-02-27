@@ -820,7 +820,6 @@ public class NodeController {
                 }
             }
 
-            int numberOfNodesToDownload = 0;
             int numberOfNodesAlreadyDownloaded = 0;
             int numberOfNodesPending = 0;
 
@@ -852,7 +851,6 @@ public class NodeController {
                     for (MegaNode document : dlFiles.keySet()) {
                         String path = dlFiles.get(document);
                         String targetPath = targets.get(document.getHandle());
-                        numberOfNodesToDownload++;
 
                         File destDir = new File(path);
                         File destFile;
@@ -916,7 +914,7 @@ public class NodeController {
                 }
             }
 
-            showSnackBarWhenDownloading(context, numberOfNodesToDownload, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
+            showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
         }
     }
 
@@ -1611,7 +1609,7 @@ public class NodeController {
                 checkDownload(context, tempNode, localPath, parentPath, false, downloadToSDCard, sdCardOperator);
             } else{
                 logDebug("LocalPath is NULL");
-                showSnackbar(context, context.getString(R.string.download_began));
+                showSnackbar(context, context.getResources().getQuantityString(R.plurals.download_began, 1, 1));
 
                 if(tempNode != null){
                     logDebug("Node!=null: "+tempNode.getName());

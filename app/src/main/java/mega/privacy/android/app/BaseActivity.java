@@ -111,8 +111,8 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(downloadFinishedReceiver,
-                new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_DOWNLOAD_FINISHED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(transferFinishedReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
@@ -160,7 +160,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(downloadFinishedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(transferFinishedReceiver);
 
         super.onDestroy();
     }
@@ -260,12 +260,29 @@ public class BaseActivity extends AppCompatActivity {
     };
 
     /**
-     * Broadcast to show a snackbar when all the downloads finish
+     * Broadcast to show a snackbar when all the transfers finish
      */
-    private BroadcastReceiver downloadFinishedReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver transferFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Util.showSnackbar(baseActivity, getString(R.string.download_finish));
+            if (intent == null) {
+                return;
+            }
+
+            String message = null;
+            int numTransfers = intent.getIntExtra(NUMBER_FILES, 1);
+
+            switch (intent.getStringExtra(TRANSFER_TYPE)) {
+                case DOWNLOAD_TRANSFER:
+                    message = getResources().getQuantityString(R.plurals.download_finish, numTransfers, numTransfers);
+                    break;
+
+                case UPLOAD_TRANSFER:
+                    message = getResources().getQuantityString(R.plurals.upload_finish, numTransfers, numTransfers);
+                    break;
+            }
+
+            Util.showSnackbar(baseActivity, message);
         }
     };
 

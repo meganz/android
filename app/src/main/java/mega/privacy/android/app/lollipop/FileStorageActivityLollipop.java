@@ -770,7 +770,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		text.setText(R.string.confirmation_download_location);
 
 		Button cancelButton = v.findViewById(R.id.negative_button);
-		cancelButton.setText(R.string.general_cancel);
+		cancelButton.setText(R.string.general_negative_button);
 		cancelButton.setOnClickListener(v2 -> setDownloadLocationDialog.dismiss());
 
 		Button confirmationButton = v.findViewById(R.id.positive_button);
@@ -784,18 +784,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		checkBox.setChecked(confirmationChecked);
 
 		LinearLayout checkBoxLayout = v.findViewById(R.id.confirmation_checkbox_layout);
-		checkBoxLayout.setOnClickListener(v1 -> {
-			checkBox.setChecked(!checkBox.isChecked());
-
-			confirmationChecked = checkBox.isChecked();
-			confirmationButton.setEnabled(!confirmationChecked);
-
-			if (confirmationChecked) {
-				confirmationButton.setAlpha(0.5f);
-			} else {
-				confirmationButton.setAlpha(1);
-			}
-		});
+		checkBoxLayout.setOnClickListener(v1 -> checkBox.setChecked(!checkBox.isChecked()));
 
 		builder.setCancelable(false);
 		builder.setOnDismissListener(dialog -> {
