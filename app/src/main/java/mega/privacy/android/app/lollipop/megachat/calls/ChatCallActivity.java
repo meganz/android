@@ -945,7 +945,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     public void hideReconnecting() {
         if (!reconnectingLayout.isShown()) return;
-
         logDebug("Hidding Reconnecting bar and showing You are back bar");
         reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
         reconnectingText.setText(getString(R.string.connected_message));
@@ -966,6 +965,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void showReconnecting() {
         reconnectingLayout.clearAnimation();
         if(reconnectingLayout.isShown() && !reconnectingText.getText().equals(getString(R.string.connected_message))) return;
+        logDebug("Showing Reconnecting bar");
         reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
         reconnectingText.setText(getString(R.string.reconnecting_message));
         reconnectingLayout.setVisibility(View.VISIBLE);
@@ -2286,7 +2286,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private void checkOutgoingCall() {
         if (chat.isGroup()) {
-            peersOnCall.clear();
             checkCurrentParticipants();
             updateSubTitle();
 
@@ -2299,7 +2298,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void checkIncomingCall() {
         updateSubtitleNumberOfVideos();
         if (!chat.isGroup()) return;
-        peersOnCall.clear();
         checkCurrentParticipants();
         updateSubTitle();
 
@@ -2332,7 +2330,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     public void checkTerminatingCall(MegaChatCall call) {
-        if(megaChatApi == null || getCall() == null || call.getId() != callChat.getId() || (statusCallInProgress(call) && call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING)) return;
+        if(megaChatApi == null || callChat == null || call.getId() != callChat.getId() || (statusCallInProgress(call) && call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING)){
+            return;
+        }
 
         clearHandlers();
         stopSpeakerAudioManger();
@@ -2413,18 +2413,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         logDebug("Checking the current participants in the call. Call status: " + callStatusToString(callChat.getStatus()));
         boolean changes = false;
 
-        if (!peersOnCall.isEmpty()) {
-            //Check the participants to be removed
-            for (InfoPeerGroupCall peer : peersOnCall) {
-                for (int j = 0; j < callChat.getPeeridParticipants().size(); j++) {
-                    if (peer.getPeerId() == callChat.getPeeridParticipants().get(j) && peer.getClientId() == callChat.getClientidParticipants().get(j)) {
-                        removeContact(peer);
-                        changes = true;
-                        break;
-                    }
-                }
-            }
-        }
+        if (!peersOnCall.isEmpty()) peersOnCall.clear();
 
         //Check the participants to be added
         for (int i = 0; i < callChat.getPeeridParticipants().size(); i++) {

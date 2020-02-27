@@ -74,17 +74,18 @@ public class CallListener implements MegaChatCallListenerInterface {
             if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                 if (context instanceof CallService)
                     ((CallService) context).updateNotificationContent(call);
-                if (context instanceof ChatCallActivity)
+                if (context instanceof ChatCallActivity){
                     ((ChatCallActivity) context).checkInprogressCall(call.getId());
+                }
             }
             if (callStatus == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                 if (context instanceof ChatCallActivity)
-                    ((ChatCallActivity) context).checkTerminatingCall(call.getId(), call.getChatid());
+                    ((ChatCallActivity) context).checkTerminatingCall(call);
                 if (context instanceof CallService) ((CallService) context).checkDestroyCall();
             }
             if (callStatus == MegaChatCall.CALL_STATUS_DESTROYED) {
                 if (context instanceof ChatCallActivity)
-                    ((ChatCallActivity) context).checkTerminatingCall(call.getId(), call.getChatid());
+                    ((ChatCallActivity) context).checkTerminatingCall(call);
                 if (context instanceof CallService) ((CallService) context).checkDestroyCall();
                 if (context instanceof ChatActivityLollipop)
                     ((ChatActivityLollipop) context).usersWithVideo(call);
@@ -95,8 +96,9 @@ public class CallListener implements MegaChatCallListenerInterface {
                     ((ChatCallActivity) context).checkUserNoPresentInCall(call.getId());
             }
             if (callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
-                if (context instanceof ChatCallActivity)
-                    ((ChatCallActivity) context).checkReconnectingCall(call.getId());
+                if (context instanceof ChatCallActivity) {
+                    ((ChatCallActivity) context).checkReconnectingCall(call);
+                }
             }
 
         }
