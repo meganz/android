@@ -64,7 +64,7 @@
 
     <string name="error_general_nodes" context="Error getting the root node">خطأ، الرجاء المحاولة مرة أخرى.</string>
 
-    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
+    <string name="general_rk" context="File name (without extension) of file exported with the recovery key">ميغا MEGA-مفتاح الإستعادة</string>
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist">مجلد الوسائط الثانوي غير موجود، الرجاء اختيار مجلد جديد</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">لم يتم العثور على وحدة تخزين خارجية</string>
@@ -172,7 +172,7 @@
     <string name="alert_no_app" context="Alert text before download">ليس هناك أي تطبيق لفتح الملف %s. هل تريد متابعة التنزيل؟</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">لا تظهر مرة أخرى</string>
 
-    <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Are you sure that you want to cancel the current login process?</string>
+    <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">هل أنت متأكد من أنك تريد إلغاء عملية تسجيل الدخول الحالية؟</string>
 
     <string name="login_text" context="Login button">تسجيل الدخول</string>
     <string name="email_text" context="email label">البريد الإلكتروني</string>
@@ -526,7 +526,7 @@
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
     <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">اختيار من نظام الملف</string>
-    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Pick from</string>
+    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">اختار من</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -546,7 +546,7 @@
     <string name="upload_prepare" context="Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file">جاري معالجة الملف</string>
     <plurals name="upload_prepare">
         <item context="Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file" quantity="one">جاري معالجة الملف</item>
-        <item context="Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+        <item context="Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files" quantity="other">معالجة الملفات</item>
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">الموارد غير متوفرة مؤقتا، يرجى المحاولة مرة أخرى في وقت لاحق</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">لا يمكن فتح الملف المحدد</string>
@@ -621,7 +621,7 @@
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">المعاينة لم تتحمل بعد، الرجاء الانتظار ياغالي</string>
     <string name="not_load_preview_low_memory" context="due to device is low on memory, cannot load an image preview temporarily">The preview is not able to load due to insufficient memory available. Please try again later.</string>
 
-    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">رجاء، سجل خروجك قبل إنشاء الحساب</string>
+    <string name="log_out_warning" context="alert when clicking a newsignup link being logged">يرجى تسجيل الخروج قبل إنشاء الحساب</string>
 
     <!--
     <string name="import_correct" context="success message after import a file">Imported successfully</string>
@@ -641,9 +641,9 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">شبكة الوايرلس فقط</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">شبكة الوايرلس او بيانات الموبايل</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">حسنا</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">تخطى</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">ايقاف</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">حسنا</string>
+    <string name="general_skip" context="skip the step of camera upload">تخطى</string>
+    <string name="general_stop" context="skip the step of camera upload">ايقاف</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">جاري تنفيذ ترفيعات الكاميرا</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">هل تريد إيقاف عمليات ترفيع صور الكاميرا؟</string>
     <!--
@@ -659,14 +659,14 @@
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">التخزين</string>
     <string name="settings_pin_lock" context="settings of the pin lock">كود التعريف الشخصي</string>
-	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">ضغط الفيديو يستهلك الكثير من الطاقة. سوف تتطلب منك ميغا MEGA أن تشحن جهازك بشكل مستمر إذا كانت مقاطع الفيديو المراد ضغطها أكبر من %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">متقدم</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">مسح التخزين المؤقت</string>
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">حذف ملفات المحملة دون اتصال</string>
 
-    <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Open file when downloaded</string>
+    <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">افتح الملف عند التحميل</string>
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">إلغاء حسابك</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">المستخدمة حاليا %s</string>
@@ -677,7 +677,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">عرض الوسائل المتقدمة (SD خارجي)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
 	<string name="verify_account_title" context="enter verification code page title">تأكيد حسابك</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been locked temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">الدولة</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">رقم هاتفك</string>
     <string name="general_back_button" context="Button label - go to previous page">العودة</string>
@@ -763,7 +763,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">سيتم حذف الملفات المحلية وسيتم تسجيل خروجك بعد 10 محاولات فاشلة</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">رمز غير صحيح</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">رمز PIN خاطئ، يرجى المحاولة مرة أخرى. لديك 1 محاولة باقية</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">رمز PIN خاطئ، يرجى إعادة المحاولة. تبقى لديك  %2d محاولات</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">رمز PIN غير متطابق</string>
@@ -892,8 +892,8 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">مهاجم خارجي لا يمكنه الوصول إلى حسابك فقط مع المفتاح الخاص بك. إعادة تعيين كلمة مرور يتطلب المفتاح والوصول إلى البريد الإلكتروني الخاص بك.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">نسخ مفتاح الاستعادة إلى الحافظة أو حفظه كملف نصي</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">حفظ</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
+    <string name="save_action" context="Action of a button to save something">حفظ</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">تم نسخ مفتاح الاسترداد بنجاح</string>
 
     <string name="change_pass" context="Button to change the password">تغيير</string>
 
@@ -950,7 +950,7 @@
     <string name="title_enter_new_password" context="Title of the screen to write the new password after opening the recovery link">أدخل كلمة مرور جديدة</string>
     <string name="recovery_link_expired" context="Message when the user tries to open a recovery pass link and it has expired">لقد انتهت صلاحية هذا الرابط ، يرجى المحاولة مرة أخرى.</string>
 
-    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">سيتم استخدام مفتاح الاستعادة لإعادة تعيين كلمة المرور. الرجاء إدخال كلمة المرور الجديدة.</string>
+    <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">سيتم استخدام مفتاح الإستعادة الخاص بك لإعادة تعيين كلمة المرور الخاصة بك. الرجاء إدخال كلمة المرور الجديدة.</string>
     <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">ستتلقى رابط الاستعادة يتيح لك إعادة تعيين كلمة المرور.</string>
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">الترقية</string>
@@ -1030,7 +1030,7 @@
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">بريد إلكتروني غير صالح و/أو كلمة مرور غير صالحة. حاول مرة اخرى.</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">تم تعليق حسابك بسبب انتهاكات بنود الخدمة. الرجاء التواصل من خلال هذا البريد الالكتروني support&#64;mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">هناك الكثير من المحاولات الفاشلة لتسجيل الدخول، يرجى الانتظار لمدة ساعة.</string>
-    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">لم يتم التحقق من صحة هذا الحساب بعد. تفقد بريدك الالكتروني من فضلك.</string>
+    <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">لم يتم التحقق من هذا الحساب بعد. من فضلك تفقد بريدك الالكتروني.</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn’t exist">رابط المجلد غير متوفر</string>
     <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">تمت إزالة الرابط المجلد بسبب  شروط الخدمة / انتهاك سياسة الاستخدام المقبول.</string>
@@ -1160,7 +1160,7 @@
     <string name="title_mega_authenticity_empty_screen" context="Message about MEGA when there are no message in the chat screen">الموثوقية</string>
     <string name="title_mega_confidentiality_empty_screen" context="Message about MEGA when there are no message in the chat screen">السرية</string>
 
-    <string name="error_not_logged_with_correct_account" context="Error message shown when opening a cancel link with an account that not corresponds to the link">هذا الرابط غير مرتبط بهذا الحساب. الرجاء تسجيل الدخول باستخدام الحساب الصحيح.</string>
+    <string name="error_not_logged_with_correct_account" context="Error message shown when opening a cancel link with an account that not corresponds to the link">هذا الرابط لا يعود لهذا الحساب. يرجى تسجيل الدخول باستخدام الحساب الصحيح.</string>
     <string name="cancel_link_expired" context="Message when the user tries to open a cancel link and it has expired">صلاحية رابط الإلغاء قد انتهت ، الرجاء إعادة المحاولة.</string>
 
     <string name="no_results_found" context="Text shown after searching and no results found">لا نتائج تم إيجادها</string>
@@ -1284,7 +1284,7 @@
         <item context="Title of the contact list" quantity="other">%1$d جهات اتصال</item>
     </plurals>
 
-    <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">خطأ في مشاركة المجلد، حاول ثانية.</string>
+    <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">خطأ في مشاركة المجلد. حاول مرة اخرى.</string>
 
     <plurals name="confirmation_remove_contact">
         <item context="confirmation message before removing a contact, Singular" quantity="one">سيتم فقدان جميع البيانات المرتبطة بجهة الاتصال المحددة بشكل دائم.</item>
@@ -1384,7 +1384,7 @@
         <item context="Label to show the number of transfers in progress, Plural" quantity="other">%1$d من %2$d ملفات</item>
     </plurals>
 
-	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Process is finishing&#8230;</string>
+	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">العملية تنتهي &#8230;</string>
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">عرض</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">إيقاف جميع عمليات النقل</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">استئناف جميع عمليات النقل</string>
@@ -1419,8 +1419,8 @@
     </plurals>
 
 	<plurals name="folder_upload_service_notification">
-		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder</item>
-		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders</item>
+		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">ترفيع %1$d من %2$d مجلد</item>
+		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">ترفيع %1$d من %2$d مجلدات</item>
 	</plurals>
 
     <plurals name="upload_service_final_notification">
@@ -1429,8 +1429,8 @@
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification">
-		<item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">Uploaded %1$d folder</item>
-		<item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">Uploaded %1$d folders</item>
+		<item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">تم ترفيع %1$d مجلد</item>
+		<item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">تم ترفيع %1$d مجلدات</item>
 	</plurals>
 
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">الحجم الكلي: %1$s</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">حدد جهات الاتصال من قائمة جهات اتصال الهاتف أو أدخل عناوين بريد إلكتروني متعددة.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">ادع أصدقائك إلى MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">شكرا! الدعوة أرسلت عبر البريد الإلكتروني</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">تم إرسال الدعوة</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">تشجيع أصدقائك لتسجيل وتثبيت تطبيق MEGA . طالما أن صديقك يستخدم عنوان البريد الإلكتروني نفسه الذي أدخلته، فستتلقى مكافأة حصة نقل مجانية.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">البريد الإلكتروني غير صحيح</string>
@@ -1657,7 +1657,7 @@
     <string name="settings_help" context="Settings category title for Help">المساعدة</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">أرسل ملاحظات</string>
     <string name="setting_feedback_subject" context="mail subject">تعليقات من الأندرويد</string>
-    <string name="setting_feedback_body" context="mail body">ءجاء ، اكتب ملاحظاتك هنا:</string>
+    <string name="setting_feedback_body" context="mail body">يرجى كتابة ملاحظاتك هنا:</string>
     <string name="settings_feedback_body_device_model" context="mail body">موديل الجهاز</string>
     <string name="settings_feedback_body_android_version" context="mail body">نسخة الأندرويد</string>
 
@@ -1731,13 +1731,13 @@
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">تم نسخ الرابط الى الحافظة</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">تم اعادة تعيين رمز QR بنجاح</string>
     <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">تم حذف رمز QR بنجاح</string>
-    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">فشل عملية اعادة تعيين رمز QR. من فصلك يرجى اعادة المحاولة</string>
-    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">فشل عملية حذف رمز QR. من فضلك يرجى اعادة المحاولة</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">لم يتم إعادة تعيين رمز الاستجابة السريعة  لحدوث خطأ. حاول مرة أخرى.</string>
+    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">لم يتم حذف رمز الإستجابة السريعة بسبب خطأ. يرجى المحاولة مرة أخرى.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">تم ارسال الدعوة</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">تم دعوة المستخدم %s وسوف يظهر بقائمة جهات الاتصال الخاصة بك عند قبوله للدعوة</string>
-    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">حدث خطأ أثناء عملية مشاركة ملف الـ QR. قد يكون الملف غير موجود. من فضلك يرجى إعادة المحاولة.</string>
-    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">حدث خطأ أثناء عملية ترفيع ملف الـ QR. قد يكون الملف غير موجود. من فضلك يرجى إعادة المحاولة.</string>
-    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">حدث خطأ أثناء عملية تنزيل ملف الـ QR. قد يكون الملف غير موجود. من فضلك يرجى إعادة المحاولة.</string>
+    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">حدث خطأ أثناء محاولة مشاركة ملف رمز الاستجابة السريعة. ربما الملف غير موجود. الرجاء المحاولة في وقت لاحق.</string>
+    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">حدث خطأ أثناء محاولة ترفيع ملف رمز الاستجابة السريعة. ربما الملف غير موجود. الرجاء معاودة المحاولة في وقت لاحق.</string>
+    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">حدث خطأ أثناء محاولة تحميل ملف رمز الاستجابة السريعة. ربما الملف غير موجود. الرجاء المحاولة في وقت لاحق.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">تم تنزيل ملف الـ QR بنجاح الى %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">الدعوة لم ترسل</string>
     <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">رمز الاستجابة السريعة QR أو رابط جهة الاتصال غير صالح. يرجى إعادة قراءة رمز صالح او ادخال رابط صالح.</string>
@@ -1756,7 +1756,7 @@
 
     <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">شارك باستخدام</string>
 
-    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">الرجاء تسجيل الدخول قبل تمكين المحادثة</string>
+    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">يرجى تسجيل الدخول قبل تمكين المحادثة</string>
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">تحديد المدة</string>
 
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">جيد</string>
     <string name="pass_strong" context="Password strong">قوي</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">المكالمة قيد التنفيذ</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">المكالمة قيد التنفيذ</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">انقر للعودة إلى المكالمة</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">الرجوع إلى المكالمة</string>
 
@@ -1838,11 +1838,11 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">المحادثة يتم رفعها</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">جودة فيديوهات المحادثة</string>
-	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Video Quality</string>
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">جودة الفيديو</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries">
-        <item context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of origin quality multimedia file to upload.">Original quality</item>
-        <item context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload.">Medium quality</item>
+        <item context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of origin quality multimedia file to upload.">الجودة الاصلية</item>
+        <item context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload.">جودة متوسطة</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">مكالمة فائتة</string>
@@ -1890,7 +1890,7 @@
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">تحقق من كلمة المرور</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">التحقق من كلمة المرور</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">تم قبول كلمة المرور</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">كلمة مرور خاطئة.\n قم بعمل نسخة احتياطية لمفتاح الاسترداد في أسرع وقت ممكن!</string>
     <string name="recovery_key_exported_dialog_title" context="Title of the dialog ‘Recovery Key exported’">تم تصدير مفتاح الاستعادة</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog ‘Recovery Key exported’">تم تصدير مفتاح الاسترجاع الى موقع حفظ البيانات دون اتصال باسم MEGARecoveryKey.txt \nتنويه: الملف سيحذف بشكل تلقائي إذا قمت بتسجيل الخروج. يرجى حفظ الملف بمكان آمن</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">انت بصدد تسجيل الخروج، يرجى التحقق من كلمة المرور خاصتك للتأكد من تذكرك لها\nضياع كلمة المرور سيؤدي الى فقدان الولوج للبيانات الخاصة بك على MEGA</string>
@@ -1932,7 +1932,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">المخدمات مشغولة جدا، يرجى الانتظار</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">هذه العملية تستغرق وقتا أطول من المتوقع. أرجو الإنتظار.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">تجاوز الحد الاعظمي للطلبات. من فضلك انتظر.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">Canceling login process. Please wait&#8230;</string>
+    <string name="login_in_progress" context="message when previous login is being canceled">إلغاء عملية تسجيل الدخول. يرجى الإنتظار&#8230;</string>
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">حدث خطأ، الملف معطوب او غير موجود</string>
 
@@ -2129,11 +2129,11 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">الرمز غير صالح</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">مساحة التخزين شبه ممتلئة. قم بترقية حسابك الى PRO لتحصل على مساحة تخزين حتى 8 تيرابايت وحجم تراسل حتى 16 تيرابايت.</string>
-    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">السواقة السحابية ممتلئة تقريباً. قم بالترقية الآن و إحصل على حتى 8 تيرابايت من مساحة التخزين و  16 تيرابايت من حجم التراسل المتاح.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">السواقة السحابية ممتلئة تقريباً. قم بالترقية إلى PRO واحصل على ما يصل إلى %1$s من مساحة التخزين و %2$s من حجم التراسل المتاح</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">السواقة السحابية ممتلئة تقريباً. قم بالترقية الآن و إحصل على حتى %1$s من مساحة التخزين و %2$s من حجم التراسل المتاح.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">السواقة السحابية ممتلئة تقريباً. إذا كنت بحاجة لمساحة أكبر يرجى التواصل مع فريق ميغا MEGA للدعم لتحصل على إشتراك خاص.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">السواقة السحابية ممتلئة. قم بالترقية إلى برو PRO و إحصل على 8 تيرابايت من مساحة التخزين و 16 تيرابايت حجم التراسل المتاح.</string>
-    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">السواقة السحابية ممتلئة. قم بالترقية الآن و إحصل على  حتى 8 تيرابايت من مساحة التخزين و 16 تيرابايت حجم التراسل المتاح.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">السواقة السحابية ممتلئة تقريباً. قم بالترقيةإلى PRO و إحصل على حتى %1$s من مساحة التخزين و %2$s من حجم التراسل المتاح.</string>
+    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">السواقة السحابية ممتلئة تقريباً. قم بالترقية الآن و إحصل على حتى %1$s من مساحة التخزين و %2$s من حجم التراسل المتاح.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">السواقة السحابية ممتلئة. إذا كنت بحاجة لمساحة تخزين أكبر يرجى التواصل مع فريق ميغا MEGA للدعم لتحصل على إشتراك خاص.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">مشاهدة الباقات</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">اشتراك مخصص</string>
@@ -2177,7 +2177,7 @@
 
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">حدث تشات</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">قد يكون وصلك رسائل جديدة</string>
-    <string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
+    <string name="retrieving_message_title" context="When app is retrieving push message">استرجاع الرسالة</string>
 
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">جدولة افراغ سلة المحذوفات</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">تم افراغ سلة المحذوفات خاصتك تلقائياً</string>
@@ -2188,9 +2188,9 @@
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">أزل الملفات الأكبر من</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d يوم</string>
-	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notify me when size is larger than</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">أرسل لي إشعاراً عندما يكون الحجم أكبر من</string>
 
-	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to compress are larger than</string>
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">إذا كانت مقاطع الفيديو المراد ضغطها أكبر من</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">لتعطيل الافراغ التلقائي لسلة المحذوفات أو لتحديد زمن أطول للاحتفاظ، يجب ان تشترك باشتراك PRO.</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]طلب التواصل من [/B][A]%s [/A][B]قد تم رفضه[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">حسابك الحالي هو [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* تخضع لمشاركتك في برنامج الإنجازات لدينا</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">خاضع لمشاركاتك في برنامج إنجازاتنا.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">اختر طريقة الدفع</string>
 
     <string name="billing_period_title" context="title of billing period">فترة الفاتورة</string>
@@ -2310,14 +2310,14 @@
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">إظهار آخر ظهور&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">السماح لجهات الاتصال خاصتك بمعرفة آخر وقت ظهور كنت فيه متصلاً مع MEGA.</string>
 
-	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Not enough storage space</string>
-	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video compression.</string>
+	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">لا يوجد مساحة تخزين كافية</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">لا يوجد مساحة تخزين كافية للقيام بضغط الفيديو.</string>
 	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
-	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">The total size of the videos to compress exceeds %s, please put your device on charge to continue.</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">يتجاوز الحجم الكلي لمقاطع الفيديو المراد ضغطها %s، يرجى توصيل جهازك إلى الشحن للمتابعة.</string>
 	<string name="message_keep_device_name" context="Message displayed when the user changes the ‘Keep file names as in the device’ setting">This setting will take effect the next time Camera Uploads runs</string>
 	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
 	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
-	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
+	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">تم تحديد مجلد غير صالح</string>
 
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d ملف</item>
@@ -2414,15 +2414,15 @@
 
     <string name="error_meta_message_invalid" context="Content of a invalid meta message">تحتوي الرسالة على بيانات وصفية غير صالحة.</string>
 
-    <string name="title_activity_maps" context="Title of the activity that sends a location">Send Location</string>
-    <string name="current_location_label" context="Label layout on maps activity that permits send current location">Send your current location</string>
-    <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">Send your current location: [A]%1$s[/A]</string>
-    <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">Nearby places</string>
-    <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">This location will be opened using a third party maps provider outside the end-to-end encrypted MEGA platform.</string>
-    <string name="title_marker_maps" context="Title of the location marker set by the user">Send This Location</string>
-    <string name="no_places_found" context="Label shown when after a maps search and no places were found">No places were found</string>
-    <string name="gps_disabled" context="Title of the dialog shown when the location is disabled">The GPS is disabled</string>
-    <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">Would you like to open the location settings?</string>
+    <string name="title_activity_maps" context="Title of the activity that sends a location">إرسال موقع</string>
+    <string name="current_location_label" context="Label layout on maps activity that permits send current location">إرسال موقعك الحالي</string>
+    <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">إرسال موقعك الحالي: [A]%1$s[/A]</string>
+    <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">الاماكن المجاورة</string>
+    <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">سيتم فتح هذا الموقع باستخدام طرف ثالث مزود خرائط من خارج منصة ميغا MEGA المشفرة من طرف إلى طرف.</string>
+    <string name="title_marker_maps" context="Title of the location marker set by the user">إرسال هذا الموقع</string>
+    <string name="no_places_found" context="Label shown when after a maps search and no places were found">لم يتم العثور على أية أماكن</string>
+    <string name="gps_disabled" context="Title of the dialog shown when the location is disabled">تم تعطيل نظام تحديد المواقع GPS.</string>
+    <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">هل ترغب في فتح إعدادات الموقع؟</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
@@ -2431,8 +2431,8 @@
         <item context="Confirmation message after forwarding one or several messages, version items" quantity="other">تمت إعادة توجيه الرسائل بنجاح</item>
     </plurals>
 
-    <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Pinned Location</string>
-    <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">From File System</string>
+    <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">موقع مثبت</string>
+    <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">من نظام الملفات</string>
 
     <plurals name="num_files_not_send">
         <item context="Alert shown when a num of files have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">لم يتم إرسال %d ملف إلى %d المحادثات</item>
@@ -2446,7 +2446,7 @@
 
     <plurals name="num_messages_not_send">
         <item context="Alert shown when a num of messages have not been sent because of any error occurs, Singular of file. 1 file" quantity="one">لم يتم ارسال %d رسالة إلى %d محادثات</item>
-        <item context="Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files" quantity="other">%d messages were not sent to %d chats</item>
+        <item context="Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files" quantity="other">لم يتم إرسال %d رسالة إلى %d محادثة</item>
     </plurals>
 
     <plurals name="quantity_of_local_contact">
@@ -2499,7 +2499,7 @@
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">لقد قمت بإدخال كلمة مرور خاطئة، يرجى المحاولة مرة آخرى.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">كلمة المرور التي أدخلتها غير صالحة.</string>
 
-    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">It is not possible to open the file. It is an unknown file type or it has not been possible to unzip the file successfully.</string>
+    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">لا يمكن فتح الملف. إنه نوع ملف غير معروف أو أنه لم يكن من الممكن فك ضغط الملف بنجاح.</string>
 
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">لا يمكن تشغيل ملفات الوسائط أثناء وجود مكالمة جارية.</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">مكالمة جارية</string>
@@ -2531,48 +2531,48 @@
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">ادخل رابط المحادثة</string>
 
-    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
-    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
-    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please enter a valid file or folder link</string>
-    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please enter a valid chat link</string>
-    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
-    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
-    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">لصق رابط</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">رابط ملف أو مجلد غير صالح</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">الرجاء إدخال رابط  ملف أو مجلد صالح</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">يرجى إدخال رابط محادثة صالح</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">لقد قمت بلصق رابط محادثة.</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">لقد قمت بلصق رابط جهة اتصال.</string>
+    <string name="action_open_contact_link" context="Menu item">فتح رابط جهة الاتصال</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">يمكن للأشخاص الانضمام إلى مجموعتك باستخدام هذا الرابط.</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">رابط محادثة جديد</string>
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">ادخل اسم المجموعة</string>
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">لإنشاء رابط محادثة، يجب عليك تسمية المجموعة.</string>
-    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
+    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">ادع جهات الاتصال وابدأ المحادثة بأمان باستخدام المحادثة المشفرة من ميغا MEGA.</string>
     <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">ابدأ بالمحادثة مع جهات الاتصال خاصتك باستخدام التشفير من طرف الى طرف</string>
 
     <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hi! Have secure conversations on MEGA with me and get up to 50GB free storage. %1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it.">لا يوجد رابط محادثة متاح</string>
-    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chat link deleted successfully.</string>
+    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">تم حذف رابط المحادثة بنجاح.</string>
 
-    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (ACCEPTED)</string>
-    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (DELETED)</string>
-    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (DENIED)</string>
-    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (IGNORED)</string>
-    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REMINDED)</string>
-    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
+    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (تم قبول الطلب)</string>
+    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (تم حذف الطلب)</string>
+    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (تم رفض الطلب)</string>
+    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s ( تم تجاهل الطلب)</string>
+    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (تم التذكير)</string>
+    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (بالانتظار)</string>
 
     <string name="version_restored" context="Message shown when it restored successfully a file version">Version restored successfully.</string>
 
-    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">Slide to cancel</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">This voice message is not available</string>
+    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">انقر مطولاً للتسجيل، ثم حرر للإرسال.</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice messages">إزلق للإلغاء</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice message that it is not available">هذه الرسالة الصوتية غير متوفرة</string>
 
     <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Invite a friend via</string>
     <string name="invite_contact_action_button" context="Action button label">Invite a friend via&#8230;</string>
 	<plurals name="file_already_downloaded">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">تم تنزيل ملف %d بالفعل.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">تم تنزيل ملفات %d بالفعل.&#160;</item>
 	</plurals>
 
 	<plurals name="file_pending_download">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">ملف %d قيد الانتظار</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d ملفات بالانتظار</item>
 	</plurals>
 
@@ -2593,7 +2593,7 @@
 
     <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB">Get %1$s free when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text to explain the benefits of adding phone number to non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
-    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">It is not possible to record voice messages while there is a call in progress.</string>
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice message while on a call in progress">لا يمكن تسجيل الرسائل الصوتية أثناء وجود مكالمة جارية.</string>
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 
     <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">مكالمة واردة</string>

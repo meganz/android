@@ -97,7 +97,6 @@ public class ChatExplorerFragment extends Fragment {
     private RelativeLayout contentLayout;
     private ProgressBar progressBar;
 
-    private boolean chatEnabled = true;
     private float density;
     private DisplayMetrics outMetrics;
     private Display display;
@@ -124,21 +123,13 @@ public class ChatExplorerFragment extends Fragment {
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
-        if(isChatEnabled()){
-            chatEnabled=true;
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-                if (context instanceof ChatExplorerActivity) {
-                    megaChatApi.addChatListener((ChatExplorerActivity) context);
-                }
-                else if (context instanceof FileExplorerActivityLollipop) {
-                    megaChatApi.addChatListener((FileExplorerActivityLollipop) context);
-                }
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            if (context instanceof ChatExplorerActivity) {
+                megaChatApi.addChatListener((ChatExplorerActivity) context);
+            } else if (context instanceof FileExplorerActivityLollipop) {
+                megaChatApi.addChatListener((FileExplorerActivityLollipop) context);
             }
-        }
-        else{
-            logWarning("Chat not enabled!");
-            chatEnabled=false;
         }
 
         chatExplorerFragment = this;

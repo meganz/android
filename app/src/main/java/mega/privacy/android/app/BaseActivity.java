@@ -65,14 +65,14 @@ public class BaseActivity extends AppCompatActivity {
 
     public BaseActivity() {
         app = MegaApplication.getInstance();
-        megaApi = app.getMegaApi();
-        megaApiFolder = app.getMegaApiFolder();
 
-        if(isChatEnabled()) {
+        //Will be checked again and initialized at `onCreate()`
+        if (app != null) {
+            megaApi = app.getMegaApi();
+            megaApiFolder = app.getMegaApiFolder();
             megaChatApi = app.getMegaChatApi();
+            dbH = app.getDbH();
         }
-
-        dbH = app.getDbH();
     }
 
     private AlertDialog expiredBusinessAlert;
@@ -171,15 +171,15 @@ public class BaseActivity extends AppCompatActivity {
             app = MegaApplication.getInstance();
         }
 
-        if (megaApi == null){
-            megaApi = app.getMegaApi();
-        }
+        if (app != null) {
+            if (megaApi == null){
+                megaApi = app.getMegaApi();
+            }
 
-        if (megaApiFolder == null) {
-            megaApiFolder = app.getMegaApiFolder();
-        }
+            if (megaApiFolder == null) {
+                megaApiFolder = app.getMegaApiFolder();
+            }
 
-        if(isChatEnabled()){
             if (megaChatApi == null){
                 megaChatApi = app.getMegaChatApi();
             }
@@ -328,20 +328,17 @@ public class BaseActivity extends AppCompatActivity {
                 megaApi.retryPendingConnections();
             }
 
-            if(isChatEnabled()) {
-                if (megaChatApi != null) {
-                    megaChatApi.retryPendingConnections(false, null);
+            if (megaChatApi != null) {
+                megaChatApi.retryPendingConnections(false, null);
 
-                    if(megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()){
-                        delaySignalPresence = false;
-                        if(!(this instanceof ChatCallActivity) && megaChatApi.isSignalActivityRequired()){
-                            logDebug("Send signal presence");
-                            megaChatApi.signalPresenceActivity();
-                        }
+                if (megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()) {
+                    delaySignalPresence = false;
+                    if (!(this instanceof ChatCallActivity) && megaChatApi.isSignalActivityRequired()) {
+                        logDebug("Send signal presence");
+                        megaChatApi.signalPresenceActivity();
                     }
-                    else {
-                        delaySignalPresence = true;
-                    }
+                } else {
+                    delaySignalPresence = true;
                 }
             }
         }

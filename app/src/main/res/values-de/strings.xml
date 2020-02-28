@@ -641,9 +641,9 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Nur via WLAN</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">WLAN oder Mobildaten</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">Überspringen</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">Anhalten</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="general_skip" context="skip the step of camera upload">Überspringen</string>
+    <string name="general_stop" context="skip the step of camera upload">Anhalten</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">Kameraupload aktiv</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Kamera-Uploads anhalten?</string>
     <!--
@@ -677,7 +677,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Weitere Speichermedien anzeigen (externe SD-Karten)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
 	<string name="verify_account_title" context="enter verification code page title">Account verifizieren</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been locked temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Land</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Ihre Mobilnummer</string>
     <string name="general_back_button" context="Button label - go to previous page">Zurück</string>
@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">Ein Angreifer, der sich eine Kopie Ihres Rettungsschlüssels verschafft hat, kann damit trotzdem noch nicht auf Ihre Daten zugreifen, da ein Passwort-Reset zusätzlich den Zugang zu Ihrer E-Mail voraussetzt.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Kopieren Sie den Rettungsschlüssel in Ihre Zwischenablage oder speichern Sie ihn als Textdatei.</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">Speichern</string>
+    <string name="save_action" context="Action of a button to save something">Speichern</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Ihr Rettungsschlüssel wurde erfolgreich in die Zwischenablage kopiert</string>
 
     <string name="change_pass" context="Button to change the password">Ändern</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">Nutzer aus Ihren Konakten auswählen oder E-Mail-Adresse(n) eingeben.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">Freunde auf MEGA einladen</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">Vielen Dank! Die Einladung wurde per E-Mail versandt</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">Einladung versandt</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Laden Sie Ihre Freunde zur Registrierung und Installation der MEGA-App ein. Nutzen diese zur Anmeldung die gleiche E-Mail-Adresse, erhalten Sie Ihren Bonus.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">Fehlerhafte E-Mail-Adresse</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">Gut</string>
     <string name="pass_strong" context="Password strong">Stark</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Anruf aktiv</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Anruf aktiv</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Zurück zum Anruf</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Zurück zum Anruf</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Kontaktanfrage von [/B][A]%s [/A][B]abgelehnt[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Sie sind unter dem Account [A]%s[/A] eingeloggt</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Bei Teilnahme an unserem kostenlosen Bonusprogramm</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Bei erfolgreicher Teilnahme an unserem Bonusprogramm.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Zahlungsmethode auswählen</string>
 
     <string name="billing_period_title" context="title of billing period">Zahlungsintervall</string>

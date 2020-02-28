@@ -604,7 +604,7 @@
     <string name="upgrade_activity" context="title of the Upgrade screen">PRO Membership</string>
     -->
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">選擇會員方案</string>
-    <string name="select_membership_1" context="the user has to decide the way of payment">按月或按年度訂閱</string>
+    <string name="select_membership_1" context="the user has to decide the way of payment">按月或按年度自動訂閱</string>
 
     <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
 
@@ -641,9 +641,9 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">只在WiFi連線</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或行動網路</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">跳過</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">停止</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="general_skip" context="skip the step of camera upload">跳過</string>
+    <string name="general_stop" context="skip the step of camera upload">停止</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">相機上傳正在進行中</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">您想停用相機上傳功能嗎？</string>
     <!--
@@ -660,7 +660,7 @@
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">儲存空間</string>
     <string name="settings_pin_lock" context="settings of the pin lock">PIN 鎖定</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">影片壓縮很耗電力；如果要壓縮的影片大小超過%s，MEGA將會要求您主動為設備充電。</string>
-	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">如果啟用，您將上傳關於相片在哪裡拍攝的資訊，所以分享時請格外小心。</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">如果啟用，您將上傳關於相片拍攝位置的資訊，所以分享時請格外小心。</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">進階</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">清除快取</string>
@@ -677,7 +677,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">顯示高級設備（外置SD）</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">新增電話號碼</string>
 	<string name="verify_account_title" context="enter verification code page title">驗證您的帳戶</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">因為潛在的濫用，您的帳號已被暫停使用。請驗證您的電話號碼以將您的帳號解鎖。</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">因為潛在的濫用，您的帳號已被暫停封鎖。請驗證您的電話號碼來解鎖您的帳號。</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">國家</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">您的手機號碼</string>
     <string name="general_back_button" context="Button label - go to previous page">返回</string>
@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">外來攻擊者如持有您的金鑰仍將無法獲取您的資料。密碼重置將會需要金鑰以及需可存取您的電子郵件。</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">將還原金鑰複製到剪貼簿或將其以文字文件型態儲存</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">儲存</string>
+    <string name="save_action" context="Action of a button to save something">儲存</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">已成功複製還原金鑰</string>
 
     <string name="change_pass" context="Button to change the password">變更</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">從手機通訊錄中選擇聯絡人，或輸入多個電子郵件地址。</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">邀請朋友加入MEGA</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">謝謝！已以電子郵件發送出邀請函</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">邀請已發送</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">鼓勵你的朋友註冊並安裝MEGA應用程式吧！只要您的朋友註冊時使用的電子郵件地址與您輸入的相同，你就會收到傳輸配額獎勵喔。</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">電子郵件格式錯誤</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">好</string>
     <string name="pass_strong" context="Password strong">強</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">正在通話中</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">正在通話中</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">點擊返回通話</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">返回通話</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">來自[A]%s[/A][B]的聯絡人請求[/B][B]被拒絕[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">您現在的帳戶是[A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">*依您參與我們的獎勵計劃狀況而定</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">取決於您所達成的獎勵挑戰。</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">選擇付款方式</string>
 
     <string name="billing_period_title" context="title of billing period">繳費週期</string>

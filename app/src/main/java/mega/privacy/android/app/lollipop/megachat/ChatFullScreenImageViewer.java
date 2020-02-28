@@ -334,10 +334,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 
 		dbH = DatabaseHandler.getDbHandler(this);
 
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	    }
-
 		MegaApplication app = (MegaApplication)getApplication();
 
 		if(isOnline(this)){
@@ -354,20 +350,18 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 			}
 		}
 
-		if(isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+		}
 
-			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				logDebug("Refresh session - karere");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
-				return;
-			}
+		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+			logDebug("Refresh session - karere");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
 		}
 
 		if(megaApi!=null){
@@ -405,8 +399,6 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 		});
 
 		viewPager.setPageMargin(40);
-
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		tB = findViewById(R.id.call_toolbar);
 		if (tB == null) {

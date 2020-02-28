@@ -37,6 +37,10 @@
 
     <string name="general_export" context="button">Export</string>
 
+    <string name="general_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="general_skip" context="Skip a step of a configuration process.">Skip</string>
+    <string name="general_stop" context="Label for a button to stop some process. For example stop the Camera Uploads">Stop</string>
+
     <string name="general_retry" context="option shown when a message could not be sent">Retry</string>
     <string name="general_open_browser" context="Button to open the default web browser">Open browser</string>
     <!--
@@ -658,9 +662,6 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or mobile data</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">Skip</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">Camera Uploads in progress</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to stop Camera Uploads?</string>
     <!--
@@ -694,7 +695,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
 	<string name="verify_account_title" context="enter verification code page title">Verify your account</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been locked temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Country</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Your phone number</string>
     <string name="general_back_button" context="Button label - go to previous page">Back</string>
@@ -946,6 +947,8 @@
 
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">You must be logged in to perform this action.</string>
+    <string name="change_email_not_logged_in" context="Error message when a user attempts to change their email without an active login session.">You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.</string>
+    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">Congratulations, your new email address for this MEGA account is: %1$s</string>
     <string name="invalid_string" context="Error when the user leaves empty the password field">Incorrect</string>
 
     <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Invalid email address</string>
@@ -1087,15 +1090,12 @@
     <!--
     <string name="archive_chat_empty" context="Message shown when the user has no archived chats">No archived conversations</string>
     -->
-    <string name="recent_chat_enable_chat" context="Message shown when the user has no archived chats">Chat is disabled</string>
-    <string name="recent_chat_enable_chat_button" context="Message shown when the user has no archived chats">Enable chat</string>
 
     <!--
     <string name="get_started_button" context="Button to start using the chat">Get started</string>
     -->
 
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invite your friends to join you on Chat and enjoy our encrypted platform with privacy and security.</string>
-    <!--<string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat[A]and enjoy our encrypted platform with privacy and security.</string>-->
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
@@ -1354,8 +1354,6 @@
 
     <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Remove from Save for Offline?</string>
 
-    <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without a connection.</string>
-
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Not available</string>
@@ -1438,10 +1436,20 @@
         <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Uploading %1$d of %2$d files</item>
     </plurals>
 
+    <plurals name="upload_service_paused_notification">
+        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">Uploading %1$d of %2$d file (paused)</item>
+        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Uploading %1$d of %2$d files (paused)</item>
+    </plurals>
+
 	<plurals name="folder_upload_service_notification">
 		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder</item>
 		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders</item>
 	</plurals>
+
+    <plurals name="folder_upload_service_paused_notification">
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder (paused)</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders (paused)</item>
+    </plurals>
 
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">Uploaded %1$d file</item>
@@ -1488,6 +1496,11 @@
     <plurals name="download_service_notification">
         <item context="Text of the notification shown when the download service is running, Singular" quantity="one">Downloading %1$d of %2$d file</item>
         <item context="Text of the notification shown when the download service is running, Plural" quantity="other">Downloading %1$d of %2$d files</item>
+    </plurals>
+
+    <plurals name="download_service_paused_notification">
+        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">Downloading %1$d of %2$d file (paused)</item>
+        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Downloading %1$d of %2$d files (paused)</item>
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is depleted">Depleted transfer quota</string>
@@ -1783,7 +1796,6 @@
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Set period</string>
 
     <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security.[/B]</string>
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">[C]Enable [/C][B]Chat[/B][A][C] and enjoy our encrypted platform with privacy and security.[/C]</string>
 
     <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]No media on [/B][A]Camera Uploads[/A][B].[/B]</string>
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Empty [/B][A]Rubbish Bin[/A][B].[/B]</string>
@@ -1817,7 +1829,7 @@
     <string name="pass_good" context="Password good">Good</string>
     <string name="pass_strong" context="Password strong">Strong</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Call in progress</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Call in progress</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Click to go back to the call</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Return to the call</string>
 
@@ -1913,8 +1925,6 @@
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Test your password</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Password accepted</string>
     <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
-    <string name="recovery_key_exported_dialog_title" context="Title of the dialog ‘Recovery Key exported’">Recovery Key exported</string>
-    <string name="recovery_key_exported_dialog_text" context="Text of the dialog ‘Recovery Key exported’">The Recovery Key has been exported into the Offline section as MEGARecoveryKey.txt.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">You are about to logout, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Copy to clipboard</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Export Recovery Key</string>
@@ -2322,7 +2332,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Contact request from [/B][A]%s [/A][B]was declined[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Your current account is [A]%s[/A]</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Subject to your participation in our achievement program</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject to your participation in our achievements program.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Select payment method</string>
 
     <string name="billing_period_title" context="title of billing period">Billing period</string>
@@ -2416,6 +2426,7 @@
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
 
     <string name="call_ended_message" context="Message shown when a call ends.">[A]Call ended[/A][C]. Duration: [/C]</string>
+    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]Group call ended[/A][C]. Duration: [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s hour[/B]</item>
         <item context="Message that shows the hours of a call when it ends, more hours" quantity="other">[B]%1$s hours[/B]</item>
@@ -2428,6 +2439,8 @@
         <item context="Message that shows the seconds of a call when it ends, one second" quantity="one">[B]%1$d second[/B]</item>
         <item context="Message that shows the seconds of a call when it ends, more seconds" quantity="other">[B]%1$d seconds[/B]</item>
     </plurals>
+    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]Call ended[/A]</string>
+    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]Group call ended[/A]</string>
 
     <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]Last seen [/A]today %1$s</string>
     <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user">[A]Last seen [/A]a long time ago</string>
@@ -2461,6 +2474,9 @@
     <string name="open_location_settings" context="Text of the dialog shown when the location is disabled for open location settings">Would you like to open the location settings?</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
+
+    <string name="on_permanently_denied" context="After the user ticketed \'Don\'t ask again' on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions on your device\’s settings</string>
+    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won\'t contact them.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
         <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">Message forwarded</item>

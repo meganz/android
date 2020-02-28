@@ -80,6 +80,7 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class ContactsFragmentLollipop extends Fragment implements MegaRequestListenerInterface, View.OnClickListener{
 
@@ -696,23 +697,16 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				if (isChatEnabled()) {
-					menu.findItem(R.id.cab_menu_send_file).setVisible(true);
-					menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				menu.findItem(R.id.cab_menu_send_file).setVisible(true);
+				menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-					menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
-					menu.findItem(R.id.cab_menu_start_conversation).setIcon(mutateIconSecondary(context, R.drawable.ic_chat, R.color.white));
-					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
+				menu.findItem(R.id.cab_menu_start_conversation).setIcon(mutateIconSecondary(context, R.drawable.ic_chat, R.color.white));
+				menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-					menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
-					menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(getContext(), R.drawable.ic_share_contact, R.color.white));
-					menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-				}
-				else {
-					menu.findItem(R.id.cab_menu_send_file).setVisible(false);
-					menu.findItem(R.id.cab_menu_start_conversation).setVisible(false);
-					menu.findItem(R.id.cab_menu_send_to_chat).setVisible(false);
-				}
+				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
+				menu.findItem(R.id.cab_menu_send_to_chat).setIcon(mutateIconSecondary(getContext(), R.drawable.ic_share_contact, R.color.white));
+				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -815,11 +809,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
-		if(isChatEnabled() && megaChatApi == null){
-			megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-		}
-		else{
-			logWarning("Chat not enabled!");
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
@@ -1073,14 +1064,12 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 		sortBy();
 
-		if(isChatEnabled()){
-			if(!visibleContacts.isEmpty()){
-				for (int i=0;i<visibleContacts.size();i++){
-					int userStatus = megaChatApi.getUserOnlineStatus(visibleContacts.get(i).getMegaUser().getHandle());
-					if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-						logDebug("Request last green for user");
-						megaChatApi.requestLastGreen(visibleContacts.get(i).getMegaUser().getHandle(), null);
-					}
+		if (!visibleContacts.isEmpty()) {
+			for (int i = 0; i < visibleContacts.size(); i++) {
+				int userStatus = megaChatApi.getUserOnlineStatus(visibleContacts.get(i).getMegaUser().getHandle());
+				if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
+					logDebug("Request last green for user");
+					megaChatApi.requestLastGreen(visibleContacts.get(i).getMegaUser().getHandle(), null);
 				}
 			}
 		}
@@ -1304,10 +1293,9 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public void sortBy(){
 		logDebug("sortBy");
 
-		if(((ManagerActivityLollipop)context).orderContacts == MegaApiJava.ORDER_DEFAULT_DESC){
-			Collections.sort(visibleContacts,  Collections.reverseOrder(new Comparator<MegaContactAdapter>(){
-
-				public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
+		switch (((ManagerActivityLollipop)context).orderContacts) {
+			case ORDER_DEFAULT_DESC:
+				Collections.sort(visibleContacts,  Collections.reverseOrder((c1, c2) -> {
 					String name1 = c1.getFullName();
 					String name2 = c2.getFullName();
 					int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
@@ -1315,37 +1303,31 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 						res = name1.compareTo(name2);
 					}
 					return res;
-				}
-			}));
-		}
-		else if(((ManagerActivityLollipop)context).orderContacts == MegaApiJava.ORDER_CREATION_ASC){
-			Collections.sort(visibleContacts,  new Comparator<MegaContactAdapter>(){
+				}));
+				break;
 
-				public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
+			case ORDER_CREATION_ASC:
+				Collections.sort(visibleContacts, (c1, c2) -> {
 					long timestamp1 = c1.getMegaUser().getTimestamp();
 					long timestamp2 = c2.getMegaUser().getTimestamp();
 
 					long result = timestamp2 - timestamp1;
 					return (int)result;
-				}
-			});
-		}
-		else if(((ManagerActivityLollipop)context).orderContacts == MegaApiJava.ORDER_CREATION_DESC){
-			Collections.sort(visibleContacts,  Collections.reverseOrder(new Comparator<MegaContactAdapter>(){
+				});
+				break;
 
-				public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
+			case ORDER_CREATION_DESC:
+				Collections.sort(visibleContacts,  Collections.reverseOrder((c1, c2) -> {
 					long timestamp1 = c1.getMegaUser().getTimestamp();
 					long timestamp2 = c2.getMegaUser().getTimestamp();
 
 					long result = timestamp2 - timestamp1;
 					return (int)result;
-				}
-			}));
-		}
-		else{
-			Collections.sort(visibleContacts, new Comparator<MegaContactAdapter>(){
+				}));
+				break;
 
-				public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
+			default:
+				Collections.sort(visibleContacts, (c1, c2) -> {
 					String name1 = c1.getFullName();
 					String name2 = c2.getFullName();
 					int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
@@ -1353,17 +1335,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 						res = name1.compareTo(name2);
 					}
 					return res;
-				}
-			});
+				});
+				break;
 		}
-	}
 
-	public void updateOrder(){
-
-//		for(int i=0; i<visibleContacts.size();i++){
-//			log("contact ordered "+i+ " "+visibleContacts.get(i).getFullName());
-//		}
-		if(isAdded()){
+		if (isAdded() && adapter != null) {
 			adapter.notifyDataSetChanged();
 		}
 	}

@@ -173,6 +173,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private Context mContext;
     private VideoCompressor mVideoCompressor;
 
+    private BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            new Handler().postDelayed(() -> {
+                updateProgressNotification();
+            }, 1000);
+        }
+    };
+
     private BroadcastReceiver chargingStopReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context,Intent intent) {
@@ -203,6 +212,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public void onCreate() {
         registerReceiver(chargingStopReceiver,new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
         registerReceiver(batteryInfoReceiver,new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        registerReceiver(pauseReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
     }
 
     @Override
@@ -218,6 +228,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         if(batteryInfoReceiver != null){
             unregisterReceiver(batteryInfoReceiver);
+        }
+        if (pauseReceiver != null) {
+            unregisterReceiver(pauseReceiver);
         }
     }
     
@@ -964,39 +977,28 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                                     if (!isLoggingIn) {
     
                                         setLoginState(true);
-    
-                                        if (isChatEnabled()) {
-                                            logWarning("shouldRun: Chat is ENABLED");
-                                            if (megaChatApi == null) {
-                                                megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
-                                            }
-                                            
-                                            int ret = megaChatApi.getInitState();
 
-                                            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-                                                ret = megaChatApi.init(gSession);
-                                                logDebug("shouldRun: result of init ---> " + ret);
-                                                chatSettings = dbH.getChatSettings();
-                                                if (ret == MegaChatApi.INIT_NO_CACHE) {
-                                                    logDebug("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
+                                        if (megaChatApi == null) {
+                                            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+                                        }
 
-                                                } else if (ret == MegaChatApi.INIT_ERROR) {
-                                                    logDebug("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
-                                                    if (chatSettings == null) {
-                                                        logWarning("shouldRun: ERROR----> Switch OFF chat");
-                                                        chatSettings = new ChatSettings();
-                                                        chatSettings.setEnabled(false + "");
-                                                        dbH.setChatSettings(chatSettings);
-                                                    } else {
-                                                        logWarning("shouldRun: ERROR----> Switch OFF chat");
-                                                        dbH.setEnabledChat(false + "");
-                                                    }
-                                                    megaChatApi.logout(CameraUploadsService.this);
-                                                } else {
-                                                    logDebug("shouldRun: Chat correctly initialized");
-                                                }
+                                        int ret = megaChatApi.getInitState();
+
+                                        if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+                                            ret = megaChatApi.init(gSession);
+                                            logDebug("shouldRun: result of init ---> " + ret);
+                                            chatSettings = dbH.getChatSettings();
+                                            if (ret == MegaChatApi.INIT_NO_CACHE) {
+                                                logDebug("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
+
+                                            } else if (ret == MegaChatApi.INIT_ERROR) {
+                                                logDebug("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
+                                                megaChatApi.logout(CameraUploadsService.this);
+                                            } else {
+                                                logDebug("shouldRun: Chat correctly initialized");
                                             }
                                         }
+
                                         logDebug("Camera upload start fast login");
                                         megaApi.fastLogin(gSession,CameraUploadsService.this);
                                     } else {
@@ -1390,18 +1392,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("Fetch nodes ok");
-                chatSettings = dbH.getChatSettings();
-                if (chatSettings != null) {
-                    boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-                    if (chatEnabled) {
-                        logDebug("Chat enabled-->connect");
-                        megaChatApi.connectInBackground(this);
-                    } else {
-                        logWarning("Chat NOT enabled - readyToManager");
-                    }
-                } else {
-                    logWarning("chatSettings NULL - readyToManager");
-                }
+                logDebug("Chat --> connect");
+                megaChatApi.connectInBackground(this);
                 setLoginState(false);
     
                 try {
@@ -1864,7 +1856,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             } else {
                 inProgress = totalTransfers - pendingTransfers + 1;
             }
-            message = getResources().getQuantityString(R.plurals.upload_service_notification,totalTransfers,inProgress,totalTransfers);
+
+            if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+                message = getResources().getQuantityString(R.plurals.upload_service_paused_notification,totalTransfers,inProgress,totalTransfers);
+            } else {
+                message = getResources().getQuantityString(R.plurals.upload_service_notification,totalTransfers,inProgress,totalTransfers);
+            }
         }
         
         String info = getProgressSize(this,totalSizeTransferred,totalSizePendingTransfer);

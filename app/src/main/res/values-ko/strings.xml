@@ -641,9 +641,9 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">와이파이 전용</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">와이파이 또는 모바일 데이터</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">넘기기</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">정지</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="general_skip" context="skip the step of camera upload">넘기기</string>
+    <string name="general_stop" context="skip the step of camera upload">정지</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">카메라 업로드 진행중</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">카메라 업로드를 정지하시겠습니까?</string>
     <!--
@@ -677,7 +677,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">고급 장치 표시 (외부 SD)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">전화번호 추가</string>
 	<string name="verify_account_title" context="enter verification code page title">계정을 인증하세요</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">당신의 계정은 잠재적 남용을 방지하기 위해 일시적으로 정지되었습니다. 계정을 해제하려면 전화번호를 인증하세요.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">당신의 계정은 잠재적 남용을 방지하기 위해 일시적으로 잠겼습니다. 계정을 해제하려면 전화번호를 인증하세요.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">국가</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">당신의 전화번호</string>
     <string name="general_back_button" context="Button label - go to previous page">뒤로</string>
@@ -892,7 +892,7 @@
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">외부 공격자가 당신의 키만으로 계정에 접근할 수는 없습니다. 비밀번호 재설정은 당신의 이메일에 대한 접근과 키 모두를 요구합니다.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">복구 키를 클립보드에 복사하거나 텍스트 파일로 저장하세요</string>
 
-    <string name="save_action" context="Action of the button to save the master key as a text file">저장</string>
+    <string name="save_action" context="Action of a button to save something">저장</string>
     <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">복구 키가 성공적으로 복사되었습니다</string>
 
     <string name="change_pass" context="Button to change the password">변경</string>
@@ -1631,7 +1631,7 @@
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">휴대전화 연락처 목록에서 선택하거나 여러 이메일 주소를 입력하세요.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">MEGA에 친구 초대</string>
-    <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">고맙습니다! 초대장이 이메일로 발송되었습니다</string>
+    <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">초대 발송됨</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">당신의 친구들이 가입하고 MEGA 앱을 설치하도록 독려하세요. 친구들이 당신이 입력한 같은 이메일 주소를 사용하면, 당신은 전송 할당량 보상을 받게 됩니다.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">이메일이 변형되었습니다</string>
@@ -1795,7 +1795,7 @@
     <string name="pass_good" context="Password good">좋음</string>
     <string name="pass_strong" context="Password strong">강함</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">진행중인 통화</string>
+    <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">진행중인 통화</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">통화로 돌아가려면 클릭하세요</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">통화로 돌아옴</string>
 
@@ -2290,7 +2290,7 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[A]%s님이 보낸 [/A][B]연락처 요청을 [/B][B]거절하였습니다[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">현재 계정은 [A]%s[/A]입니다</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* 도전 과제 프로그램에 참여한 경우</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">도전 과제 프로그램에 참여할 수 있습니다.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">지불 수단을 선택하세요</string>
 
     <string name="billing_period_title" context="title of billing period">결제 주기</string>

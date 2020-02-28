@@ -394,10 +394,6 @@ public class ChatController {
         }
     }
 
-    public void enableChat(){
-        dbH.setEnabledChat(true+"");
-    }
-
     public String createSingleManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
         logDebug("Message ID: " + androidMessage.getMessage().getMsgId() + ", Chat ID: " + chatRoom.getChatId());
 
@@ -765,7 +761,8 @@ public class ChatController {
                             int minutes = (message.getDuration() % 3600) / 60;
                             int seconds = message.getDuration() % 60;
 
-                            textToShow = context.getString(R.string.call_ended_message);
+                            textToShow = chatRoom.isGroup() ? context.getString(R.string.group_call_ended_message) :
+                                    context.getString(R.string.call_ended_message);
 
                             if(hours != 0){
                                 String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
@@ -954,7 +951,8 @@ public class ChatController {
                             int minutes = (message.getDuration() % 3600) / 60;
                             int seconds = message.getDuration() % 60;
 
-                            textToShow = context.getString(R.string.call_ended_message);
+                            textToShow = chatRoom.isGroup() ? context.getString(R.string.group_call_ended_message) :
+                                    context.getString(R.string.call_ended_message);
 
                             if(hours != 0){
                                 String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
