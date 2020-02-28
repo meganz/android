@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "mega.privacy.android.app"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 292
         versionName "3.7.3 (292)"
         multiDexEnabled true
@@ -63,16 +63,16 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.exifinterface:exifinterface:1.0.0'
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation 'com.google.android.gms:play-services-wallet:16.0.1'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.exifinterface:exifinterface:1.1.0'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.gms:play-services-wallet:18.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.nirhart:parallaxscroll:1.0'
     implementation 'androidx.palette:palette:1.0.0'
-    implementation 'com.google.firebase:firebase-messaging:17.3.4'
-    implementation 'com.google.firebase:firebase-core:16.0.5'
+    implementation 'com.google.firebase:firebase-messaging:20.1.1'
+    implementation 'com.google.firebase:firebase-core:17.2.3'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.vdurmont:emoji-java:4.0.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.8.0'
@@ -83,13 +83,13 @@ dependencies {
     implementation 'com.brandongogetap:stickyheaders:0.5.1'
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
-    implementation 'androidx.multidex:multidex:2.0.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.emoji:emoji:1.0.0'
     implementation 'androidx.emoji:emoji-appcompat:1.0.0'
     implementation 'androidx.emoji:emoji-bundled:1.0.0'
-    implementation 'androidx.preference:preference:1.0.0'
-    implementation 'com.google.android.gms:play-services-location:16.0.0'
-    implementation 'com.google.android.gms:play-services-maps:16.1.0'
+    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'net.opacapp:multiline-collapsingtoolbar:27.1.1'
