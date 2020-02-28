@@ -2278,14 +2278,6 @@ public class ChatController {
         }
     }
 
-    public void sendContactsToChats(ArrayList<MegaChatRoom> chats, long[] userHandles) {
-        long[] chatHandles = new long[chats.size()];
-        for (int i = 0; i < chats.size(); i++) {
-            chatHandles[i] = chats.get(i).getChatId();
-        }
-        sendContactsToChats(chatHandles, userHandles);
-    }
-
     public void sendContactsToChats(long[] chatHandles, long[] userHandles) {
         MegaHandleList handleList = MegaHandleList.createInstance();
 

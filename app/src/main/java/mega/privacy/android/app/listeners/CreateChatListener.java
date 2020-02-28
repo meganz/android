@@ -121,7 +121,7 @@ public class CreateChatListener extends ChatBaseListener {
                     showSnackbar(context, context.getResources().getQuantityString(R.plurals.num_files_not_send, handles.length, totalCounter));
                 } else {
                     //Send files
-                    new ChatController(context).checkIfNodesAreMineAndAttachNodes(handles, chats.get(0).getChatId());
+                    new ChatController(context).checkIfNodesAreMineAndAttachNodes(handles, getChatHandles());
                 }
                 break;
 
@@ -130,7 +130,7 @@ public class CreateChatListener extends ChatBaseListener {
                     //All send contacts fail; Show error
                     showSnackbar(context, context.getResources().getQuantityString(R.plurals.num_contacts_not_send, handles.length, totalCounter));
                 } else {
-                    new ChatController(context).sendContactsToChats(chats, handles);
+                    new ChatController(context).sendContactsToChats(getChatHandles(), handles);
                 }
                 break;
 
@@ -161,5 +161,15 @@ public class CreateChatListener extends ChatBaseListener {
                 }
                 break;
         }
+    }
+
+    private long[] getChatHandles() {
+        long[] chatHandles = new long[chats.size()];
+
+        for (int i = 0; i < chats.size(); i++) {
+            chatHandles [i] = chats.get(i).getChatId();
+        }
+
+        return chatHandles;
     }
 }
