@@ -2349,7 +2349,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 		if (waitingForCall) {
 			MegaChatRoom chatRoom = megaChatApi.getChatRoom(user.getHandle());
-			if (chatRoom != null && chatRoom.getChatId() == chatid) {
+
+			if (chatRoom != null
+					&& chatRoom.getChatId() == chatid
+					&& megaChatApi.getChatConnectionState(chatid) == MegaChatApi.CHAT_CONNECTION_ONLINE) {
+				waitingForCall = false;
 				startCall();
 			}
 		}
