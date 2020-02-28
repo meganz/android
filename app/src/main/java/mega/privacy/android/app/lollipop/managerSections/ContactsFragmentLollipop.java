@@ -1166,7 +1166,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				adapter.notifyItemChanged(positionVisibleContacts);
 			}
 			sortBy();
-			updateOrder();
 		}
 	}
 
