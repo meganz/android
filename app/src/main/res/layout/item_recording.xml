@@ -40,41 +40,41 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@id/recording_micro_image"
                 android:layout_toRightOf="@id/recording_micro_image">
-                <ImageView
+                <RelativeLayout
                     android:id="@+id/first_bar"
                     android:layout_width="8dp"
                     android:layout_height="16dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginRight="6dp"/>
-                <ImageView
+                <RelativeLayout
                     android:id="@+id/second_bar"
                     android:layout_width="8dp"
                     android:layout_height="25dp"
                     android:layout_alignParentBottom="true"
                     android:layout_toRightOf="@id/first_bar"
                     android:layout_marginRight="6dp"/>
-                <ImageView
+                <RelativeLayout
                     android:id="@+id/third_bar"
                     android:layout_width="8dp"
                     android:layout_height="34dp"
                     android:layout_alignParentBottom="true"
                     android:layout_toRightOf="@id/second_bar"
                     android:layout_marginRight="6dp"/>
-                <ImageView
+                <RelativeLayout
                     android:id="@+id/fourth_bar"
                     android:layout_width="8dp"
                     android:layout_height="43dp"
                     android:layout_alignParentBottom="true"
                     android:layout_toRightOf="@id/third_bar"
                     android:layout_marginRight="6dp"/>
-                <ImageView
+                <RelativeLayout
                     android:id="@+id/fifth_bar"
                     android:layout_width="8dp"
                     android:layout_height="50dp"
                     android:layout_alignParentBottom="true"
                     android:layout_toRightOf="@id/fourth_bar"
                     android:layout_marginRight="6dp"/>
-                <ImageView
+                <RelativeLayout
                     android:id="@+id/sixth_bar"
                     android:layout_width="8dp"
                     android:layout_alignParentBottom="true"

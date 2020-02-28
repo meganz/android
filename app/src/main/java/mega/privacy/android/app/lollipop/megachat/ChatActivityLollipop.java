@@ -17,7 +17,6 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.location.Address;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -96,14 +95,12 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
-import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
@@ -200,6 +197,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private final static int TITLE_TOOLBAR_IND_PORT = 100;
     private final static int HINT_LAND = 550;
     private final static int HINT_PORT = 250;
+    private final static boolean IS_LOW = true;
+    private final static boolean IS_HIGH = false;
 
     public static int MEGA_FILE_LINK = 1;
     public static int MEGA_FOLDER_LINK = 2;
@@ -233,7 +232,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private final static int FOURTH_RANGE = 4;
     private final static int FIFTH_RANGE = 5;
     private final static int SIXTH_RANGE = 6;
-    private final static int CORNER_RADIUS = 8;
+    private final static int WIDTH_BAR = 8;
 
     private final static int TYPE_MESSAGE_JUMP_TO_LEAST = 0;
     private final static int TYPE_MESSAGE_NEW_MESSAGE = 1;
@@ -417,12 +416,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private boolean isShareLinkDialogDismissed = false;
     private RelativeLayout recordingLayout;
     private TextView recordingChrono;
-    private ImageView firstBar, secondBar, thirdBar, fourthBar, fifthBar, sixthBar;
-    private GradientDrawable shapeHigh = new GradientDrawable();
-    private GradientDrawable shapeLow = new GradientDrawable();
-
+    private RelativeLayout firstBar, secondBar, thirdBar, fourthBar, fifthBar, sixthBar;
     private int currentAmplitude = -1;
-
     private Handler handlerVisualizer = new Handler();
 
     private ActionMode actionMode;
@@ -734,13 +729,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         fourthBar = findViewById(R.id.fourth_bar);
         fifthBar = findViewById(R.id.fifth_bar);
         sixthBar = findViewById(R.id.sixth_bar);
-        shapeLow.setShape(GradientDrawable.RECTANGLE);
-        shapeLow.setCornerRadius(CORNER_RADIUS);
-        shapeLow.setColor(ContextCompat.getColor(this, R.color.less_transparent_white));
-        shapeHigh.setShape(GradientDrawable.RECTANGLE);
-        shapeHigh.setCornerRadius(CORNER_RADIUS);
-        shapeHigh.setColor(ContextCompat.getColor(this, R.color.white));
-        initializeVisualizer(true);
+
+        initRecordingItems(IS_LOW);
         recordingLayout.setVisibility(View.GONE);
 
         enableButton(rLKeyboardTwemojiButton, keyboardTwemojiButton);
@@ -2190,7 +2180,42 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         setRecordingNow(true);
         recordView.startRecordingTime();
         handlerVisualizer.post(updateVisualizer);
+        initRecordingItems(IS_LOW);
         recordingLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void initRecordingItems(boolean isLow){
+        firstBar.getLayoutParams().height = px2dp(16, outMetrics);
+        firstBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
+        firstBar.requestLayout();
+
+        secondBar.getLayoutParams().height = px2dp(25, outMetrics);
+        secondBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
+        secondBar.requestLayout();
+
+        thirdBar.getLayoutParams().height = px2dp(34, outMetrics);
+        thirdBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
+        thirdBar.requestLayout();
+
+        fourthBar.getLayoutParams().height = px2dp(43, outMetrics);
+        fourthBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
+        fourthBar.requestLayout();
+
+        fifthBar.getLayoutParams().height = px2dp(50, outMetrics);
+        fifthBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
+        fifthBar.requestLayout();
+
+        sixthBar.getLayoutParams().height = px2dp(59, outMetrics);
+        sixthBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
+        sixthBar.requestLayout();
+
+        changeColor(firstBar, isLow);
+        changeColor(secondBar, isLow);
+        changeColor(thirdBar, isLow);
+        changeColor(fourthBar, isLow);
+        changeColor(fifthBar, isLow);
+        changeColor(sixthBar, isLow);
+
     }
 
     public static String getVoiceClipName(long timestamp) {
@@ -8626,21 +8651,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     };
 
-    private void initializeVisualizer(boolean isLow) {
-        GradientDrawable shape;
-        if(isLow){
-            shape = shapeLow;
-        }else{
-            shape = shapeHigh;
-        }
-        changeAmplitude(firstBar, shape);
-        changeAmplitude(secondBar, shape);
-        changeAmplitude(thirdBar, shape);
-        changeAmplitude(fourthBar, shape);
-        changeAmplitude(fifthBar, shape);
-        changeAmplitude(sixthBar, shape);
-    }
-
     private void updateAmplitudeVisualizer(int newAmplitude) {
         if (currentAmplitude != -1 && getRangeAmplitude(currentAmplitude) == getRangeAmplitude(newAmplitude))
             return;
@@ -8658,48 +8668,58 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         return SIXTH_RANGE;
     }
 
-    private void changeAmplitude(ImageView imageView, GradientDrawable shape) {
-        if (imageView.getBackground() == shape) return;
-        imageView.setBackground(shape);
+    private void changeColor(RelativeLayout bar, boolean isLow) {
+        Drawable background;
+        if(isLow){
+            background = ContextCompat.getDrawable(this, R.drawable.recording_low);
+        }else{
+            background = ContextCompat.getDrawable(this, R.drawable.recording_high);
+        }
+        if (bar.getBackground() == background) return;
+        bar.setBackground(background);
     }
     private void needToUpdateVisualizer(int currentAmplitude) {
         int resultRange = getRangeAmplitude(currentAmplitude);
+
         if (resultRange == NOT_SOUND) {
-            initializeVisualizer(true);
+            initRecordingItems(IS_LOW);
             return;
         }
         if (resultRange == SIXTH_RANGE) {
-            initializeVisualizer(false);
+            initRecordingItems(IS_HIGH);
             return;
         }
-        changeAmplitude(firstBar, shapeHigh);
-        changeAmplitude(sixthBar, shapeLow);
+        changeColor(firstBar, IS_HIGH);
+        changeColor(sixthBar, IS_LOW);
+
         if (resultRange > FIRST_RANGE) {
-            changeAmplitude(secondBar, shapeHigh);
+            changeColor(secondBar, IS_HIGH);
             if (resultRange > SECOND_RANGE) {
-                changeAmplitude(thirdBar, shapeHigh);
+                changeColor(thirdBar, IS_HIGH);
                 if (resultRange > THIRD_RANGE) {
-                    changeAmplitude(fourthBar, shapeHigh);
+                    changeColor(fourthBar, IS_HIGH);
                     if (resultRange > FOURTH_RANGE) {
-                        changeAmplitude(fifthBar, shapeHigh);
+                        changeColor(fifthBar, IS_HIGH);
                     } else {
-                        changeAmplitude(fifthBar, shapeLow);
+                        changeColor(fifthBar, IS_LOW);
                     }
                 } else {
-                    changeAmplitude(fifthBar, shapeLow);
-                    changeAmplitude(fourthBar, shapeLow);
+                    changeColor(fourthBar, IS_LOW);
+                    changeColor(fifthBar, IS_LOW);
                 }
             } else {
-                changeAmplitude(fifthBar, shapeLow);
-                changeAmplitude(fourthBar, shapeLow);
-                changeAmplitude(thirdBar, shapeLow);
+                changeColor(thirdBar, IS_LOW);
+                changeColor(fourthBar, IS_LOW);
+                changeColor(fifthBar, IS_LOW);
             }
         } else {
-            changeAmplitude(fifthBar, shapeLow);
-            changeAmplitude(fourthBar, shapeLow);
-            changeAmplitude(thirdBar, shapeLow);
-            changeAmplitude(secondBar, shapeLow);
+            changeColor(secondBar, IS_LOW);
+            changeColor(thirdBar, IS_LOW);
+            changeColor(fourthBar, IS_LOW);
+            changeColor(fifthBar, IS_LOW);
         }
     }
+
+
 
 }
