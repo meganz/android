@@ -852,11 +852,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				i.putExtra(CHAT_ID, chatRoomTo.getChatId());
 				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(i);
-			} else if (isStatusConnected(this, megaChatApi, chatRoomTo.getChatId())){
-				app.setSpeakerStatus(chatRoomTo.getChatId(), startVideo);
-				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
-			} else {
-				waitingForCall = true;
+			} else if (isStatusConnected(this, megaChatApi, chatRoomTo.getChatId())) {
+				startCallWithChatOnline(chatRoomTo);
 			}
 		} else {
 			//Create first the chat
@@ -2347,15 +2344,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-		if (waitingForCall) {
-			MegaChatRoom chatRoom = megaChatApi.getChatRoom(user.getHandle());
+		MegaChatRoom chatRoom = api.getChatRoom(chatid);
 
-			if (chatRoom != null
-					&& chatRoom.getChatId() == chatid
-					&& megaChatApi.getChatConnectionState(chatid) == MegaChatApi.CHAT_CONNECTION_ONLINE) {
-				waitingForCall = false;
-				startCall();
-			}
+		if (waitingForCall && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
+				&& chatRoom != null && chatRoom.getPeerHandle(0) == user.getHandle()) {
+			startCallWithChatOnline(api.getChatRoom(chatid));
 		}
 	}
 
@@ -2375,5 +2368,15 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				logDebug("Date last green: " + formattedDate);
 			}
 		}
+	}
+
+	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
+		app.setSpeakerStatus(chatRoom.getChatId(), startVideo);
+		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
+		waitingForCall = false;
+	}
+
+	public void setWaitingForCall() {
+		waitingForCall = true;
 	}
 }

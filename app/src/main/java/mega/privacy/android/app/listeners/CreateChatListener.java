@@ -111,7 +111,7 @@ public class CreateChatListener extends ChatBaseListener {
                 if (e.getErrorCode() != MegaError.API_OK) {
                     showSnackbar(context, context.getString(R.string.create_chat_error));
                 } else if (context instanceof ContactInfoActivityLollipop){
-                    ((ContactInfoActivityLollipop) context).startCall();
+                    ((ContactInfoActivityLollipop) context).setWaitingForCall();
                 }
                 break;
 
