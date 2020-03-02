@@ -1221,7 +1221,7 @@ public class Util {
             builder.setTitle(title);
         }
         builder.setMessage(message);
-        builder.setPositiveButton("OK", null);
+        builder.setPositiveButton(context.getString(R.string.general_ok), null);
         if (listener != null) {
             builder.setOnDismissListener(listener);
         }
@@ -1276,31 +1276,6 @@ public class Util {
 		cal.setTimeInMillis(timestamp*1000);
 		logDebug("Calendar: " + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.MONTH));
 		return cal;
-	}
-
-	public static boolean isChatEnabled (){
-		logDebug("isChatEnabled");
-		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-		ChatSettings chatSettings = dbH.getChatSettings();
-		boolean chatEnabled;
-
-		if(chatSettings!=null){
-			if(chatSettings.getEnabled()!=null){
-				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-				logDebug("A - chatEnabled: " + chatEnabled);
-				return chatEnabled;
-			}
-			else{
-				chatEnabled=true;
-				logDebug("B - chatEnabled: " + chatEnabled);
-				return chatEnabled;
-			}
-		}
-		else{
-			chatEnabled=true;
-			logDebug("C - chatEnabled: " + chatEnabled);
-			return chatEnabled;
-		}
 	}
 
 	public static boolean canVoluntaryVerifyPhoneNumber() {

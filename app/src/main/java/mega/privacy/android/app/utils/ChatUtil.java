@@ -32,10 +32,12 @@ import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatMessage;
@@ -115,7 +117,7 @@ public class ChatUtil {
     /*Method to show or hide the "Tap to return to call" banner*/
     public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
         if (megaChatApi == null || callInProgressLayout == null) return;
-        if (!isChatEnabled() || !participatingInACall(megaChatApi)) {
+        if (!participatingInACall(megaChatApi)) {
             callInProgressLayout.setVisibility(View.GONE);
             activateChrono(false, callInProgressChrono, null);
             return;
@@ -537,6 +539,20 @@ public class ChatUtil {
             drawable.draw(canvas);
         }
         return result;
+    }
+
+    public static boolean isStatusConnected(Context context, MegaChatApiAndroid megaChatApi, long chatId) {
+        return checkConnection(context) && megaChatApi != null && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED && megaChatApi.getChatConnectionState(chatId) == MegaChatApi.CHAT_CONNECTION_ONLINE;
+    }
+
+    public static boolean checkConnection(Context context) {
+        if (!isOnline(context)) {
+            if (context instanceof ContactInfoActivityLollipop) {
+                ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            }
+            return false;
+        }
+        return true;
     }
 
 }

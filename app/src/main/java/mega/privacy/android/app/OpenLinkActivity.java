@@ -407,36 +407,15 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		logDebug("onRequestFinish");
 		if(request.getType() == MegaRequest.TYPE_LOGOUT){
-			if(isChatEnabled()){
-				logDebug("END logout sdk request - wait chat logout");
+			logDebug("END logout sdk request - wait chat logout");
 
-				if(app.getUrlConfirmationLink()!=null){
-					logDebug("Confirmation link - show confirmation screen");
-					if (dbH != null){
-						dbH.clearEphemeral();
-					}
-
-					AccountController aC = new AccountController(this);
-					aC.logoutConfirmed(this);
-
-					Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-					confirmIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-					confirmIntent.putExtra(EXTRA_CONFIRMATION, urlConfirmationLink);
-					confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					confirmIntent.setAction(ACTION_CONFIRM);
-					startActivity(confirmIntent);
-					app.setUrlConfirmationLink(null);
-					finish();
-				}
-			}
-			else{
-				logDebug("END logout sdk request - chat disabled");
-				if (dbH != null){
+			if (MegaApplication.getUrlConfirmationLink() != null) {
+				logDebug("Confirmation link - show confirmation screen");
+				if (dbH != null) {
 					dbH.clearEphemeral();
 				}
 
-				AccountController aC = new AccountController(this);
-				aC.logoutConfirmed(this);
+				AccountController.logoutConfirmed(this);
 
 				Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
 				confirmIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
@@ -444,7 +423,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				confirmIntent.setAction(ACTION_CONFIRM);
 				startActivity(confirmIntent);
-				app.setUrlConfirmationLink(null);
+				MegaApplication.setUrlConfirmationLink(null);
 				finish();
 			}
 		}
