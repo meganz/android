@@ -2185,30 +2185,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void initRecordingItems(boolean isLow){
-        firstBar.getLayoutParams().height = px2dp(16, outMetrics);
-        firstBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
-        firstBar.requestLayout();
-
-        secondBar.getLayoutParams().height = px2dp(25, outMetrics);
-        secondBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
-        secondBar.requestLayout();
-
-        thirdBar.getLayoutParams().height = px2dp(34, outMetrics);
-        thirdBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
-        thirdBar.requestLayout();
-
-        fourthBar.getLayoutParams().height = px2dp(43, outMetrics);
-        fourthBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
-        fourthBar.requestLayout();
-
-        fifthBar.getLayoutParams().height = px2dp(50, outMetrics);
-        fifthBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
-        fifthBar.requestLayout();
-
-        sixthBar.getLayoutParams().height = px2dp(59, outMetrics);
-        sixthBar.getLayoutParams().width = px2dp(WIDTH_BAR, outMetrics);
-        sixthBar.requestLayout();
-
         changeColor(firstBar, isLow);
         changeColor(secondBar, isLow);
         changeColor(thirdBar, isLow);
