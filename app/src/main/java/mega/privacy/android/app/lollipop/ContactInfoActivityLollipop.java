@@ -1276,6 +1276,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	public void showConfirmationSetNickname(final String alias) {
+		((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1285,6 +1287,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		input.setSingleLine();
 		input.setSelectAllOnFocus(true);
+		input.requestFocus();
 		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 		input.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
@@ -1302,6 +1305,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			input.setText(alias);
 			builder.setTitle(getString(R.string.edit_nickname));
 		}
+		int colorDisableButton = ContextCompat.getColor(this, R.color.accentColorTransparent);
+		int colorEnableButton = ContextCompat.getColor(this, R.color.accentColor);
 
 		input.addTextChangedListener(new TextWatcher() {
 			private void handleText() {
@@ -1309,8 +1314,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					final Button okButton = setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE);
 					if (input.getText().length() == 0) {
 						okButton.setEnabled(false);
+						okButton.setTextColor(colorDisableButton);
 					} else {
 						okButton.setEnabled(true);
+						okButton.setTextColor(colorEnableButton);
 					}
 				}
 			}
@@ -1339,12 +1346,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		setNicknameDialog = builder.create();
 		setNicknameDialog.show();
 		setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-		setNicknameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onClickAlertDialog(input, alias);
-			}
-		});
+		setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(colorDisableButton);
+		setNicknameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> onClickAlertDialog(input, alias));
+
 	}
 
 	private void onClickAlertDialog(EmojiEditText input, String alias) {
