@@ -2,7 +2,6 @@ package mega.privacy.android.app.components;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -64,7 +63,7 @@ public class ContactInfoListDialog {
      * proportion of screen height under portrait mode
      */
     private static final float HEIGHT_L = 0.9f;
-    private static final float CHECKBOX_ALAPHA = 0.3f;
+    private static final float CHECKBOX_ALPHA = 0.3f;
 
     public ContactInfoListDialog(@NonNull Context context, InvitationContactInfo contact, final OnMultipleSelectedListener listener) {
         this.context = context;
@@ -189,7 +188,7 @@ public class ContactInfoListDialog {
                     viewHolder.checkBox.setAlpha(1.0f);
                 } else {
                     viewHolder.checkBox.setChecked(false);
-                    viewHolder.checkBox.setAlpha(CHECKBOX_ALAPHA);
+                    viewHolder.checkBox.setAlpha(CHECKBOX_ALPHA);
                 }
             } else {
                 if (added.contains(content)) {
@@ -198,7 +197,7 @@ public class ContactInfoListDialog {
                     viewHolder.checkBox.setAlpha(1.0f);
                 } else {
                     viewHolder.checkBox.setChecked(false);
-                    viewHolder.checkBox.setAlpha(CHECKBOX_ALAPHA);
+                    viewHolder.checkBox.setAlpha(CHECKBOX_ALPHA);
                 }
             }
 
@@ -228,7 +227,7 @@ public class ContactInfoListDialog {
                     checkedIndex.remove(Integer.valueOf(position));
                     selected.remove(info);
                     unSelected.add(info);
-                    buttonView.setAlpha(CHECKBOX_ALAPHA);
+                    buttonView.setAlpha(CHECKBOX_ALPHA);
                 }
             });
         }
