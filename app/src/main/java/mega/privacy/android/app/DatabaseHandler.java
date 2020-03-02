@@ -1317,8 +1317,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public ArrayList<MegaContactGetter.MegaContact> getMegaContacts() {
         String sql = "SELECT * FROM " + TABLE_MEGA_CONTACTS;
         Cursor cursor = db.rawQuery(sql, null);
+        ArrayList<MegaContactGetter.MegaContact> contacts = new ArrayList<>();
         if (cursor != null) {
-            ArrayList<MegaContactGetter.MegaContact> contacts = new ArrayList<>();
             try {
                 MegaContactGetter.MegaContact contact;
                 while(cursor.moveToNext()) {
@@ -1337,12 +1337,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     contacts.add(contact);
                 }
-                return contacts;
             } finally {
                 cursor.close();
             }
         }
-        return null;
+        return contacts;
     }
 
     public void clearMegaContacts() {
