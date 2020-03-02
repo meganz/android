@@ -11,12 +11,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
@@ -379,12 +379,13 @@ public class ContactController {
         if(user!=null){
             //Check the user is not previously in the DB
             if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
-                MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "", null);
+                MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "");
                 dbH.setContact(megaContactDB);
             }
-            megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(context));
-            megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(context));
-            megaApi.getUserAlias(user.getHandle(), new ContactNameListener(context));
+            GetAttrUserListener listener = new GetAttrUserListener(context);
+            megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, listener);
+            megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, listener);
+            megaApi.getUserAlias(user.getHandle(), listener);
         }
     }
 

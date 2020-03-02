@@ -342,6 +342,16 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         }
     };
 
+    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+                updateAdapter(userHandle);
+            }
+        }
+    };
+
     public void activateActionMode(){
         logDebug("activateActionMode");
         if (!adapter.isMultipleSelect()){
@@ -581,11 +591,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 }
             }
         });
-
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        if (localBroadcastManager != null) {
-            localBroadcastManager.registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
-        }
 
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -900,6 +905,9 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
         LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
 	}
 	
 	private String getTranslatedNameForParentNodes(long parentHandle){
@@ -3214,16 +3222,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             updateActionModeTitle();
         }
     }
-
-    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null) {
-                long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-                updateAdapter(userHandle);
-            }
-        }
-    };
 
     private void updateAdapter(long handleReceived) {
         if (listContacts != null && !listContacts.isEmpty()) {

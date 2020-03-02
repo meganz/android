@@ -151,6 +151,7 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -160,7 +161,6 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
@@ -254,7 +254,6 @@ import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -265,6 +264,8 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
+
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
@@ -943,8 +944,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null) {
 				long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-				if(cFLol != null){
+				if(getContactsFragment() != null){
 					cFLol.updateContact(userHandle);
 				}
 			}
@@ -15397,7 +15397,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							}
 							else{
 								logDebug("The user: "+ user.getHandle() + "changed his first name");
-								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(this));
+								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new GetAttrUserListener(this));
 							}
 						}
 
@@ -15408,13 +15408,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							}
 							else{
 								logDebug("The user: " + user.getHandle() + "changed his last name");
-								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(this));
+								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new GetAttrUserListener(this));
 							}
 						}
 
 						if(user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)){
 							logDebug("I changed the user: " + user.getHandle() + " nickname");
-							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new ContactNameListener(this));
+							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new GetAttrUserListener(this));
 						}
 
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){

@@ -7,6 +7,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED = "INTENT_EVENT_ACCOUNT_BLOCKED";
     public static final String BROADCAST_ACTION_INTENT_MANAGE_SHARE = "BROADCAST_ACTION_INTENT_MANAGE_SHARE";
     public static final String BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES = "INTENT_TAKEN_DOWN_FILES";
+    public static final String BROADCAST_ACTION_INTENT_FILTER_NICKNAME = "INTENT_FILTER_NICKNAME";
 
 
 //    Broadcasts' actions
@@ -19,5 +20,6 @@ public class BroadcastConstants {
     public static final String EVENT_NUMBER = "EVENT_NUMBER";
     public static final String TYPE_SHARE = "TYPE_SHARE";
     public static final String NUMBER_FILES = "NUMBER_FILES";
+    public static final String EXTRA_USER_HANDLE = "USER_HANDLE";
 
 }

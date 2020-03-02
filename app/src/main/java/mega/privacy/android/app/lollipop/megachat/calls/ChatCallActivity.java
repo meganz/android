@@ -85,6 +85,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback {
 
@@ -3074,7 +3075,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             mutateContactCallLayout.setVisibility(View.GONE);
         } else {
             String name = chat.getPeerFirstname(0);
-            if (name == null || name.trim().length() <= 0) {
+            if (isTextEmpty(name)) {
                 if (megaChatApi != null) name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
                 if (name == null) name = getString(R.string.unknown_name_label);
             }

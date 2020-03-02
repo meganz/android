@@ -2,6 +2,8 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -13,12 +15,14 @@ import nz.mega.sdk.MegaRequest;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class GetAttrUserListener extends BaseListener {
-
+    DatabaseHandler dbH;
     public GetAttrUserListener(Context context) {
         super(context);
+        dbH = MegaApplication.getInstance().getDbH();
     }
 
     @Override
@@ -26,7 +30,7 @@ public class GetAttrUserListener extends BaseListener {
         if (request.getType() != MegaRequest.TYPE_GET_ATTR_USER) return;
 
         switch (request.getParamType()) {
-            case USER_ATTR_MY_CHAT_FILES_FOLDER:
+            case USER_ATTR_MY_CHAT_FILES_FOLDER: {
 
                 MegaNode myChatFolderNode = null;
                 boolean myChatFolderFound = false;
@@ -88,6 +92,33 @@ public class GetAttrUserListener extends BaseListener {
                 }
 
                 break;
+            }
+            case USER_ATTR_FIRSTNAME: {
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    updateFirstName(context, dbH, request.getText(), request.getEmail());
+                }
+                break;
+            }
+            case USER_ATTR_LASTNAME: {
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    updateLastName(context, dbH, request.getText(), request.getEmail());
+                }
+                break;
+            }
+            case USER_ATTR_ALIAS:{
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    String nickname = request.getName();
+                    if (nickname == null) {
+                        updateDBNickname(api, dbH, context, request.getMegaStringMap());
+                        break;
+                    }
+                    dbH.setContactNickname(nickname, request.getNodeHandle());
+                    notifyNicknameUpdate(context, request.getNodeHandle());
+                } else {
+                    logDebug("Error recovering the alias" + e.getErrorCode());
+                }
+                break;
+            }
         }
     }
 }

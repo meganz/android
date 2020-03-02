@@ -90,6 +90,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, AdapterView.OnItemClickListener {
 
@@ -162,6 +164,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
 
+
+    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+                updateAdapter(userHandle);
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -222,10 +235,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             dbH = DatabaseHandler.getDbHandler(getApplicationContext());
             chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
-            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-            if (localBroadcastManager != null) {
-                localBroadcastManager.registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
-            }
             setContentView(R.layout.activity_group_chat_properties);
 
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
@@ -394,6 +403,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             if (megaChatApi.isSignalActivityRequired()) {
                 megaChatApi.signalPresenceActivity();
             }
+
+            LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
+                    new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
 
             //Set participants
             participants = new ArrayList<>();
@@ -573,15 +585,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-        if (intent != null) {
-            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-            updateAdapter(userHandle);
-        }
-        }
-    };
 
     private void updateAdapter(long contactHandle){
         int position = -1;
@@ -607,7 +610,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if (nickname != null) return nickname;
 
         String fullName = chat.getPeerFullname(contact);
-        if (fullName == null || fullName.trim().length() <= 0) return chat.getPeerEmail(contact);
+        if (isTextEmpty(fullName)) return chat.getPeerEmail(contact);
 
         return fullName;
     }

@@ -7,6 +7,15 @@ public class MegaContactDB {
 	String nickname;
 	String mail;
 
+	public MegaContactDB(String handle, String mail, String name, String lastName) {
+		super();
+		this.handle = handle;
+		this.name = name;
+		this.lastName = lastName;
+		this.mail = mail;
+		this.nickname = null;
+	}
+
 	public MegaContactDB(String handle, String mail, String name, String lastName, String nickname) {
 		super();
 		this.handle = handle;

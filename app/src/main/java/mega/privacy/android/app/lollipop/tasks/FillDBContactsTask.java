@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
-import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaUser;
@@ -35,12 +35,13 @@ public class FillDBContactsTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... params) {
         ArrayList<MegaUser> contacts = megaApi.getContacts();
+        GetAttrUserListener listener = new GetAttrUserListener(context);
         for (int i = 0; i < contacts.size(); i++) {
-            MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "", null);
+            MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(contacts.get(i).getHandle()), contacts.get(i).getEmail(), "", "");
             dbH.setContact(megaContactDB);
-            megaApi.getUserAttribute(contacts.get(i), MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(context));
-            megaApi.getUserAttribute(contacts.get(i), MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(context));
-            megaApi.getUserAlias(contacts.get(i).getHandle(), new ContactNameListener(context));
+            megaApi.getUserAttribute(contacts.get(i), MegaApiJava.USER_ATTR_FIRSTNAME, listener);
+            megaApi.getUserAttribute(contacts.get(i), MegaApiJava.USER_ATTR_LASTNAME, listener);
+            megaApi.getUserAlias(contacts.get(i).getHandle(), listener);
 
         }
         return null;

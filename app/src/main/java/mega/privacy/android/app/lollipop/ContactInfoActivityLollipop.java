@@ -72,10 +72,10 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
@@ -123,6 +123,8 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
+
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
 @SuppressLint("NewApi")
@@ -250,6 +252,20 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		}
 	};
 
+	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null) return;
+
+			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+				if(user != null && userHandle == user.getHandle()){
+					checkNickname(user.getHandle());
+					updateAvatar();
+				}
+
+		}
+	};
+
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
 		AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
@@ -308,10 +324,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-			if (localBroadcastManager != null) {
-				localBroadcastManager.registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
-			}
+
 			setContentView(R.layout.activity_chat_contact_properties);
             fragmentContainer = findViewById(R.id.fragment_container);
 			toolbar = findViewById(R.id.toolbar);
@@ -587,6 +600,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
+		LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
+				new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
 	}
 
 	private void visibilityStateIcon() {
@@ -1269,12 +1284,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		final EmojiEditText input = new EmojiEditText(this);
 		layout.addView(input, params);
 
-		input.setOnLongClickListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				return false;
-			}
-		});
 		input.setSingleLine();
 		input.setSelectAllOnFocus(true);
 		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
@@ -1321,19 +1330,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			}
 		});
 		builder.setPositiveButton(getString(R.string.button_set),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						onClickAlertDialog(input, alias);
-					}
-				});
+				(dialog, whichButton) -> onClickAlertDialog(input, alias));
 
 
-		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				hideKeyboard(contactInfoActivityLollipop, InputMethodManager.HIDE_NOT_ALWAYS);
-			}
-		});
+		builder.setOnDismissListener(dialog -> hideKeyboard(contactInfoActivityLollipop, InputMethodManager.HIDE_NOT_ALWAYS));
 
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		builder.setView(layout);
@@ -1350,7 +1350,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	private void onClickAlertDialog(EmojiEditText input, String alias) {
 		String name = input.getText().toString();
-		if (name.equals("") || name.isEmpty() || name.trim().isEmpty()) {
+		if (isTextEmpty(name)) {
 			logWarning("Input is empty");
 			input.setError(getString(R.string.invalid_string));
 			input.requestFocus();
@@ -1363,21 +1363,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void addNickname(String oldNickname, String newNickname) {
 		if (oldNickname != null && newNickname != null && oldNickname.equals(newNickname)) return;
 		//Update the new nickname
-		megaApi.setUserAlias(user.getHandle(), newNickname, new ContactNameListener(this));
+		megaApi.setUserAlias(user.getHandle(), newNickname, new SetAttrUserListener(this));
 	}
 
-	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent != null) {
-				long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-				if(user != null && userHandle == user.getHandle()){
-					checkNickname(user.getHandle());
-					updateAvatar();
-				}
-			}
-		}
-	};
+
 
 	private void updateAvatar(){
 		if(isOnline(this)){
@@ -1761,7 +1750,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
 
 		if (drawableArrow != null) {
 			drawableArrow.setColorFilter(null);
@@ -1780,6 +1768,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         }
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
 	}
 
 	@Override

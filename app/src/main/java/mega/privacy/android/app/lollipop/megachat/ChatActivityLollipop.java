@@ -173,7 +173,8 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
 
 public class ChatActivityLollipop extends DownloadableActivity implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
@@ -1659,10 +1660,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             String participant;
 
             String participantName = chatRoom.getPeerFirstname(i);
-            if (participantName == null || participantName.trim().isEmpty()) {
+            if (isTextEmpty(participantName)) {
                 //Get the lastname
                 String participantLastName = chatRoom.getPeerLastname(i);
-                if (participantLastName == null || participantLastName.trim().isEmpty()) {
+                if (isTextEmpty(participantLastName)) {
+
                     //Get the email
                     participant = chatRoom.getPeerEmail(i);
                 } else {

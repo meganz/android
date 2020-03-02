@@ -72,6 +72,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
@@ -1161,7 +1162,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if(fullNameAction == null )
 			fullNameAction = chatRoom.getPeerFullnameByHandle(handle);
 
-		if(fullNameAction == null || fullNameAction.trim().length()<=0)
+		if(isTextEmpty(fullNameAction))
 			fullNameAction = cC.getFullName(handle, chatId);
 
 		return fullNameAction;
@@ -1205,7 +1206,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 					String fullNameAction = getMessageSenderName(chatRoom, chat.getChatId(), chat.getLastMessageSender());
-					if (fullNameAction.isEmpty() || fullNameAction.trim().length() <= 0) {
+					if (isTextEmpty(fullNameAction)) {
 						if(!((ViewHolderNormalChatList)holder).nameRequestedAction){
 							logDebug("Call for nonContactHandle: "+ chat.getLastMessageSender());
 							fullNameAction = context.getString(R.string.unknown_name_label);
