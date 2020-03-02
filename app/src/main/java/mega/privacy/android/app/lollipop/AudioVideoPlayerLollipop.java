@@ -87,7 +87,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -197,7 +197,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
     };
     private boolean isFolderLink = false;
-    private SimpleExoPlayerView simpleExoPlayerView;
+    private PlayerView playerView;
     private SimpleExoPlayer player;
     private Uri uri;
     private TextView exoPlayerName;
@@ -555,7 +555,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         fragmentContainer.setVisibility(View.GONE);
         createPlaylistProgressBar = (ProgressBar) findViewById(R.id.create_playlist_progress_bar);
         createPlaylistProgressBar.setVisibility(View.GONE);
-        simpleExoPlayerView = (SimpleExoPlayerView) findViewById(R.id.player_view);
+        playerView = findViewById(R.id.player_view);
 
         handler = new Handler();
 
@@ -751,14 +751,14 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
 
         if (savedInstanceState == null){
-            ViewTreeObserver observer = simpleExoPlayerView.getViewTreeObserver();
+            ViewTreeObserver observer = playerView.getViewTreeObserver();
             observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
 
-                    simpleExoPlayerView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    playerView.getViewTreeObserver().removeOnPreDrawListener(this);
                     int[] location = new int[2];
-                    simpleExoPlayerView.getLocationOnScreen(location);
+                    playerView.getLocationOnScreen(location);
                     int[] getlocation = new int[2];
                     getLocationOnScreen(getlocation);
                     if (screenPosition != null){
@@ -771,15 +771,15 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                             mTopDelta = getlocation[1] - location[1];
                         }
 
-                        mWidthScale = (float) screenPosition[2] / simpleExoPlayerView.getWidth();
-                        mHeightScale = (float) screenPosition[3] / simpleExoPlayerView.getHeight();
+                        mWidthScale = (float) screenPosition[2] / playerView.getWidth();
+                        mHeightScale = (float) screenPosition[3] / playerView.getHeight();
                     }
                     else {
                         mLeftDelta = (screenWidth/2) - location[0];
                         mTopDelta = (screenHeight/2) - location[1];
 
-                        mWidthScale = (float) (screenWidth/4) / simpleExoPlayerView.getWidth();
-                        mHeightScale = (float) (screenHeight/4) / simpleExoPlayerView.getHeight();
+                        mWidthScale = (float) (screenWidth/4) / playerView.getWidth();
+                        mHeightScale = (float) (screenHeight/4) / playerView.getHeight();
                     }
 
                     runEnterAnimation();
@@ -1019,15 +1019,15 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         player = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
 
         //Set media controller
-        simpleExoPlayerView.setUseController(true);
-        simpleExoPlayerView.requestFocus();
+        playerView.setUseController(true);
+        playerView.requestFocus();
 
         if (player != null) {
             //Bind the player to the view
-            simpleExoPlayerView.setPlayer(player);
-            simpleExoPlayerView.setControllerAutoShow(false);
-            simpleExoPlayerView.setControllerShowTimeoutMs(999999999);
-            simpleExoPlayerView.setOnTouchListener(new View.OnTouchListener() {
+            playerView.setPlayer(player);
+            playerView.setControllerAutoShow(false);
+            playerView.setControllerShowTimeoutMs(999999999);
+            playerView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
 
@@ -1310,7 +1310,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 nextButton.setEnabled(true);
                 nextButton.setAlpha(1F);
             }
-            simpleExoPlayerView.refreshDrawableState();
+            playerView.refreshDrawableState();
         }
     }
 
@@ -1365,19 +1365,19 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     containerControls.animate().translationY(400).setDuration(0).withEndAction(new Runnable() {
                         @Override
                         public void run() {
-                            simpleExoPlayerView.hideController();
+                            playerView.hideController();
                         }
                     }).start();
                 }
             }
             else if (playbackStateSaved != Player.STATE_BUFFERING){
-                simpleExoPlayerView.showController();
+                playerView.showController();
                 containerControls.animate().translationY(0).setDuration(0).start();
                 audioContainer.setVisibility(View.VISIBLE);
             }
         }
         else if (playbackStateSaved != Player.STATE_BUFFERING){
-            simpleExoPlayerView.showController();
+            playerView.showController();
             containerControls.animate().translationY(0).setDuration(0).start();
             audioContainer.setVisibility(View.VISIBLE);
         }
@@ -1621,7 +1621,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     containerControls.animate().translationY(400).setDuration(0).withEndAction(new Runnable() {
                         @Override
                         public void run() {
-                            simpleExoPlayerView.hideController();
+                            playerView.hideController();
                         }
                     }).start();
                 }
@@ -1645,20 +1645,20 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
 
 
-        simpleExoPlayerView.setPivotX(0);
-        simpleExoPlayerView.setPivotY(0);
-        simpleExoPlayerView.setScaleX(mWidthScale);
-        simpleExoPlayerView.setScaleY(mHeightScale);
-        simpleExoPlayerView.setTranslationX(mLeftDelta);
-        simpleExoPlayerView.setTranslationY(mTopDelta);
+        playerView.setPivotX(0);
+        playerView.setPivotY(0);
+        playerView.setScaleX(mWidthScale);
+        playerView.setScaleY(mHeightScale);
+        playerView.setTranslationX(mLeftDelta);
+        playerView.setTranslationY(mTopDelta);
 
         ivShadow.setAlpha(0);
 
-        simpleExoPlayerView.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
+        playerView.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
             @Override
             public void run() {
                 showActionStatusBar();
-                simpleExoPlayerView.showController();
+                playerView.showController();
                 containerControls.animate().translationY(0).setDuration(400L).start();
                 containerAudioVideoPlayer.setBackgroundColor(BLACK);
                 playerLayout.setBackgroundColor(BLACK);
@@ -1751,7 +1751,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 containerControls.animate().translationY(400).setDuration(duration).withEndAction(new Runnable() {
                     @Override
                     public void run() {
-                        simpleExoPlayerView.hideController();
+                        playerView.hideController();
                     }
                 }).start();
             }
@@ -1765,7 +1765,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 tB.animate().translationY(0).setDuration(400L).start();
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             }
-            simpleExoPlayerView.showController();
+            playerView.showController();
             if (creatingPlaylist){
                 enableNextButton();
             }
@@ -3143,6 +3143,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
 
         if (intent == null) {
             return;
@@ -3768,7 +3769,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 else {
                     aB.hide();
                 }
-                simpleExoPlayerView.hideController();
+                playerView.hideController();
             }
             containerAudioVideoPlayer.setBackgroundColor(TRANSPARENT);
 
@@ -3778,7 +3779,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 draggableView.setCurrentView(null);
             }
             else {
-                draggableView.setCurrentView(simpleExoPlayerView.getVideoSurfaceView());
+                draggableView.setCurrentView(playerView.getVideoSurfaceView());
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 containerAudioVideoPlayer.setElevation(0);

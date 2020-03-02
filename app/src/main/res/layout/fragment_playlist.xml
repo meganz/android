@@ -76,7 +76,7 @@
             android:layout_height="82dp"
             android:layout_alignParentBottom="true">
 
-            <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+            <com.google.android.exoplayer2.ui.PlayerView
                 android:id="@+id/player_view_playlist"
                 android:focusable="true"
                 android:layout_width="match_parent"

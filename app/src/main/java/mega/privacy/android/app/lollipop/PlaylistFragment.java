@@ -26,7 +26,7 @@ import android.widget.TextView;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class PlaylistFragment extends Fragment{
     PlayListAdapter adapter;
     public TextView contentText;
     RelativeLayout containerContentText;
-    private SimpleExoPlayerView simpleExoPlayerViewPlaylist;
+    private PlayerView playerViewPlaylist;
     private SimpleExoPlayer player;
     View v;
     RelativeLayout containerPlayer;
@@ -148,14 +148,14 @@ public class PlaylistFragment extends Fragment{
 
         contentText = (TextView) v.findViewById(R.id.content_text);
         containerContentText = (RelativeLayout) v.findViewById(R.id.content_text_layout);
-        simpleExoPlayerViewPlaylist = (SimpleExoPlayerView) v.findViewById(R.id.player_view_playlist);
+        playerViewPlaylist = v.findViewById(R.id.player_view_playlist);
         containerPlayer  =(RelativeLayout) v.findViewById(R.id.player_layout_container);
-        simpleExoPlayerViewPlaylist.setUseController(true);
-        simpleExoPlayerViewPlaylist.setPlayer(player);
-        simpleExoPlayerViewPlaylist.setControllerAutoShow(false);
-        simpleExoPlayerViewPlaylist.setControllerShowTimeoutMs(1999999999);
-        simpleExoPlayerViewPlaylist.setControllerHideOnTouch(false);
-        simpleExoPlayerViewPlaylist.showController();
+        playerViewPlaylist.setUseController(true);
+        playerViewPlaylist.setPlayer(player);
+        playerViewPlaylist.setControllerAutoShow(false);
+        playerViewPlaylist.setControllerShowTimeoutMs(1999999999);
+        playerViewPlaylist.setControllerHideOnTouch(false);
+        playerViewPlaylist.showController();
 
         v.findViewById(R.id.exo_content_frame).setVisibility(View.GONE);
         v.findViewById(R.id.exo_overlay).setVisibility(View.GONE);
