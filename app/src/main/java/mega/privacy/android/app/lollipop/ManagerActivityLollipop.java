@@ -942,12 +942,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent != null) {
-				long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-				if(getContactsFragment() != null){
-					cFLol.updateContact(userHandle);
-				}
+			if (intent == null) return;
+			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+			if (getContactsFragment() != null) {
+				cFLol.updateContact(userHandle);
 			}
+
 		}
 	};
 
@@ -15390,29 +15390,27 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							}
 						}
 
-						if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
-							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
+						if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)) {
+							if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
 								logDebug("I change my first name");
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, this);
-							}
-							else{
-								logDebug("The user: "+ user.getHandle() + "changed his first name");
+							} else {
+								logDebug("The user: " + user.getHandle() + "changed his first name");
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new GetAttrUserListener(this));
 							}
 						}
 
-						if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
-							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
+						if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)) {
+							if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
 								logDebug("I change my last name");
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, this);
-							}
-							else{
+							} else {
 								logDebug("The user: " + user.getHandle() + "changed his last name");
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new GetAttrUserListener(this));
 							}
 						}
 
-						if(user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)){
+						if (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)) {
 							logDebug("I changed the user: " + user.getHandle() + " nickname");
 							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new GetAttrUserListener(this));
 						}

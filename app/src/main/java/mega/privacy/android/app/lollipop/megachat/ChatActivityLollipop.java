@@ -498,7 +498,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     };
 
-
     private BroadcastReceiver chatArchivedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -512,10 +511,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent != null) {
-                long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-                if(userHandle != 0) updateNicknameInChat();
-            }
+            if (intent == null) return;
+            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+            if (userHandle != 0) updateNicknameInChat();
         }
     };
 
@@ -1234,7 +1232,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     public void updateNicknameInChat() {
-        if(idChat == -1 || megaChatApi.getChatRoom(idChat) == null) return;
+        if (idChat == -1 || megaChatApi.getChatRoom(idChat) == null) return;
         chatRoom = megaChatApi.getChatRoom(idChat);
         initializeInputText();
         if (adapter != null) adapter.notifyDataSetChanged();
@@ -1664,7 +1662,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 //Get the lastname
                 String participantLastName = chatRoom.getPeerLastname(i);
                 if (isTextEmpty(participantLastName)) {
-
                     //Get the email
                     participant = chatRoom.getPeerEmail(i);
                 } else {

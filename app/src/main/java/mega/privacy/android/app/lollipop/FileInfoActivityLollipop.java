@@ -345,10 +345,10 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
     private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent != null) {
-                long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-                updateAdapter(userHandle);
-            }
+            if (intent == null) return;
+            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+            updateAdapter(userHandle);
+
         }
     };
 
@@ -1538,13 +1538,13 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 						MegaUser user= megaApi.getContact(mS.getUser());
 						contactMail=user.getEmail();
 						if(user!=null){
-						    String name = getMegaUserNameDB(user);
-						    if(name != null){
-						        ownerLabel.setText(name);
-						        ownerInfo.setText(user.getEmail());
-						        setOwnerState(user.getHandle());
-						        createDefaultAvatar(ownerRoundeImage, user, name);
-                            }else{
+                            String name = getMegaUserNameDB(user);
+                            if (name != null) {
+                                ownerLabel.setText(name);
+                                ownerInfo.setText(user.getEmail());
+                                setOwnerState(user.getHandle());
+                                createDefaultAvatar(ownerRoundeImage, user, name);
+                            } else {
                                 logWarning("The contactDB is null: ");
                                 ownerLabel.setText(user.getEmail());
                                 ownerInfo.setText(user.getEmail());

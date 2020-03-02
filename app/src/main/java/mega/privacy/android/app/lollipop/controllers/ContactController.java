@@ -372,23 +372,19 @@ public class ContactController {
         }
     }
 
-
-    public void addContactDB(String email){
-
+    public void addContactDB(String email) {
         MegaUser user = megaApi.getContact(email);
-        if(user!=null){
-            //Check the user is not previously in the DB
-            if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
-                MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "");
-                dbH.setContact(megaContactDB);
-            }
-            GetAttrUserListener listener = new GetAttrUserListener(context);
-            megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, listener);
-            megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, listener);
-            megaApi.getUserAlias(user.getHandle(), listener);
+        if (user == null) return;
+        //Check the user is not previously in the DB
+        if (dbH.findContactByHandle(String.valueOf(user.getHandle())) == null) {
+            MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "");
+            dbH.setContact(megaContactDB);
         }
+        GetAttrUserListener listener = new GetAttrUserListener(context);
+        megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, listener);
+        megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, listener);
+        megaApi.getUserAlias(user.getHandle(), listener);
     }
-
 
     public void acceptInvitationContact(MegaContactRequest c){
         logDebug("acceptInvitationContact");

@@ -10,6 +10,7 @@ import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 
@@ -18,6 +19,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ContactNicknameBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
+    private final static int MAX_HEIGHT = 48;
     public LinearLayout mainLinearLayout;
     public TextView titleText;
     public LinearLayout optionEditNickname;
@@ -29,7 +31,6 @@ public class ContactNicknameBottomSheetDialogFragment extends BottomSheetDialogF
     private int heightDisplay;
     private String nickname;
     private ContactInfoActivityLollipop contactInfoActivity = (ContactInfoActivityLollipop) context;
-    private final static int MAX_HEIGHT = 48;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

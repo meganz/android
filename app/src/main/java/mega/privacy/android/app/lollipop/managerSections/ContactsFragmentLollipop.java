@@ -1134,7 +1134,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		return recyclerView;
 	}
 
-	public void updateContact(long contactHandle){
+	public void updateContact(long contactHandle) {
 		int positionVisibleContacts = -1;
 		int positionContacts = -1;
 		for (int i = 0; i < visibleContacts.size(); i++) {

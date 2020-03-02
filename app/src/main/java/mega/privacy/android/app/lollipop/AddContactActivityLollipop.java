@@ -2396,10 +2396,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    private MegaContactAdapter createMegaContact(MegaUser contact){
+    private MegaContactAdapter createMegaContact(MegaUser contact) {
         MegaContactDB contactDB = getContactDB(contact.getHandle());
         String fullName = getContactNameDB(contactDB);
-        if(fullName ==  null) fullName = contact.getEmail();
+        if (fullName == null) fullName = contact.getEmail();
         return new MegaContactAdapter(contactDB, contact, fullName);
     }
 

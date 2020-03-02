@@ -192,10 +192,10 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		holder.contactMail = referralBonus.getEmails().get(0);
 		MegaUser contact = megaApi.getContact(holder.contactMail);
 
-		if(contact != null) {
+		if (contact != null) {
 			long handle = contact.getHandle();
 			String fullName = getContactNameDB(handle);
-			if(fullName ==  null) fullName = holder.contactMail;
+			if (fullName == null) fullName = holder.contactMail;
 			logDebug("Contact: " + holder.contactMail + " name: " + fullName);
 
 			holder.textViewContactName.setText(fullName);
@@ -203,33 +203,30 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 
 			Bitmap defaultAvatar = getDefaultAvatar(context, getColorAvatar(context, megaApi, contact), fullName, AVATAR_SIZE, true);
-			((ViewHolderReferralBonusesList)holder).imageView.setImageBitmap(defaultAvatar);
+			((ViewHolderReferralBonusesList) holder).imageView.setImageBitmap(defaultAvatar);
 
-			UserAvatarListenerList listener = new UserAvatarListenerList(context, ((ViewHolderReferralBonusesList)holder), this);
+			UserAvatarListenerList listener = new UserAvatarListenerList(context, ((ViewHolderReferralBonusesList) holder), this);
 
-			File avatar = buildAvatarFile(context,holder.contactMail + ".jpg");
+			File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
 			Bitmap bitmap = null;
-			if (isFileAvailable(avatar)){
-				if (avatar.length() > 0){
+			if (isFileAvailable(avatar)) {
+				if (avatar.length() > 0) {
 					BitmapFactory.Options bOpts = new BitmapFactory.Options();
 					bOpts.inPurgeable = true;
 					bOpts.inInputShareable = true;
 					bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 					if (bitmap == null) {
 						avatar.delete();
-						megaApi.getUserAvatar(holder.contactMail,buildAvatarFile(context,holder.contactMail + ".jpg").getAbsolutePath(),listener);
-					}
-					else{
+						megaApi.getUserAvatar(holder.contactMail, buildAvatarFile(context, holder.contactMail + ".jpg").getAbsolutePath(), listener);
+					} else {
 						logDebug("Do not ask for user avatar - its in cache: " + avatar.getAbsolutePath());
-						((ViewHolderReferralBonusesList)holder).imageView.setImageBitmap(bitmap);
+						((ViewHolderReferralBonusesList) holder).imageView.setImageBitmap(bitmap);
 					}
+				} else {
+					megaApi.getUserAvatar(holder.contactMail, buildAvatarFile(context, holder.contactMail + ".jpg").getAbsolutePath(), listener);
 				}
-				else{
-					megaApi.getUserAvatar(holder.contactMail,buildAvatarFile(context,holder.contactMail + ".jpg").getAbsolutePath(),listener);
-				}
-			}
-			else{
-				megaApi.getUserAvatar(holder.contactMail,buildAvatarFile(context,holder.contactMail + ".jpg").getAbsolutePath(),listener);
+			} else {
+				megaApi.getUserAvatar(holder.contactMail, buildAvatarFile(context, holder.contactMail + ".jpg").getAbsolutePath(), listener);
 			}
 		}
 

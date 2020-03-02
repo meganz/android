@@ -231,28 +231,25 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-				if (e.getErrorCode() == MegaError.API_OK){
+				if (e.getErrorCode() == MegaError.API_OK) {
 					if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME || request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
-						if (megaApi != null && request.getEmail()!=null){
+						if (megaApi != null && request.getEmail() != null) {
 							MegaUser user = megaApi.getContact(request.getEmail());
 							if (user != null) {
 								logDebug("User handle: " + user.getHandle());
 								logDebug("Visibility: " + user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
-								if(user.getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
+								if (user.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
 									logDebug("Non-contact");
-									if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-										dbH.setNonContactEmail(request.getEmail(), user.getHandle()+"");
-										dbH.setNonContactFirstName(request.getText(), user.getHandle()+"");
+									if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
+										dbH.setNonContactEmail(request.getEmail(), user.getHandle() + "");
+										dbH.setNonContactFirstName(request.getText(), user.getHandle() + "");
+									} else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
+										dbH.setNonContactLastName(request.getText(), user.getHandle() + "");
 									}
-									else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-										dbH.setNonContactLastName(request.getText(), user.getHandle()+"");
-									}
-								}
-								else{
+								} else {
 									logDebug("The user is or was CONTACT:");
 								}
-							}
-							else{
+							} else {
 								logWarning("User is NULL");
 							}
 						}

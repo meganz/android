@@ -164,14 +164,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
 
-
     private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent != null) {
-                long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-                updateAdapter(userHandle);
-            }
+            if (intent == null) return;
+            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+            updateAdapter(userHandle);
+
         }
     };
 
@@ -511,9 +510,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     }
 
-    private String checkParticipantName(long handle, int position){
+    private String checkParticipantName(long handle, int position) {
         String fullName = getNicknameContact(handle);
-        if(fullName == null) fullName = getParticipantFullName(position);
+        if (fullName == null) fullName = getParticipantFullName(position);
         return fullName;
     }
 
@@ -586,22 +585,22 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
 
-    private void updateAdapter(long contactHandle){
+    private void updateAdapter(long contactHandle) {
         int position = -1;
-        if(participants != null && participants.size()>0){
-            for (int i=0; i< participants.size(); i++){
+        if (participants != null && participants.size() > 0) {
+            for (int i = 0; i < participants.size(); i++) {
                 long participantHandle = participants.get(i).getHandle();
-                if(participantHandle == contactHandle){
+                if (participantHandle == contactHandle) {
                     position = i;
                     break;
                 }
             }
         }
 
-        if(position != -1){
+        if (position != -1) {
             String fullName = checkParticipantName(contactHandle, position);
             participants.get(position).setFullName(fullName);
-            adapter.updateParticipant(position+1, participants);
+            adapter.updateParticipant(position + 1, participants);
         }
     }
 

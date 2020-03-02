@@ -40,6 +40,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -246,9 +247,9 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
         else{
             String fullName = getNicknameContact(participantHandle);
-            if(fullName == null){
+            if (fullName == null) {
                 fullName = selectedChat.getPeerFullnameByHandle(participantHandle);
-                if (fullName == null || fullName.isEmpty() || fullName.equals("")) {
+                if (isTextEmpty(fullName)) {
                     fullName = selectedChat.getPeerEmailByHandle(participantHandle);
                 }
             }

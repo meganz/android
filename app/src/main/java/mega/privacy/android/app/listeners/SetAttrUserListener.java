@@ -34,7 +34,6 @@ public class SetAttrUserListener extends BaseListener{
                 }
                 break;
             }
-
             case USER_ATTR_FIRSTNAME: {
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateFirstName(context, dbH, request.getText(), request.getEmail());

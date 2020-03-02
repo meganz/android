@@ -991,7 +991,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         });
     }
 
-    private void showOwnerSharedFolder(){
+    private void showOwnerSharedFolder() {
         ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
         for (int j = 0; j < sharesIncoming.size(); j++) {
             MegaShare mS = sharesIncoming.get(j);

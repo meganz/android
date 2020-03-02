@@ -231,10 +231,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     long parentHandle;
 	private String nickname;
 
-    private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
+	private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
 	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
 
-    private AskForDisplayOverDialog askForDisplayOverDialog;
+	private AskForDisplayOverDialog askForDisplayOverDialog;
 
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
@@ -258,10 +258,10 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			if (intent == null) return;
 
 			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-				if(user != null && userHandle == user.getHandle()){
-					checkNickname(user.getHandle());
-					updateAvatar();
-				}
+			if (user != null && userHandle == user.getHandle()) {
+				checkNickname(user.getHandle());
+				updateAvatar();
+			}
 
 		}
 	};
@@ -463,8 +463,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					}
 					withoutNickname(fullName);
 				}
-			}
-			else{
+			} else {
 				logDebug("From contacts!!");
 				fromContacts = true;
 				user = megaApi.getContact(userEmailExtra);
@@ -624,7 +623,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		MegaContactDB contactDB = getContactDB(contactHandle);
 		if (contactDB == null) return;
 		String fullName = buildFullName(contactDB.getName(), contactDB.getLastName(), contactDB.getMail());
-		//Check if the contact has nickname:
 		String nicknameText = contactDB.getNickname();
 		if (nicknameText == null || nicknameText.trim().length() <= 0) {
 			withoutNickname(fullName);
@@ -1262,11 +1260,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				startActivity(nodeHistoryIntent);
 				break;
 			}
-			case R.id.chat_contact_properties_nickname:{
-				if(setNicknameText.getText().toString().equals(getString(R.string.add_nickname))){
+			case R.id.chat_contact_properties_nickname: {
+				if (setNicknameText.getText().toString().equals(getString(R.string.add_nickname))) {
 					showConfirmationSetNickname(null);
-				}else{
-					if (user == null || isBottomSheetDialogShown(contactNicknameBottomSheetDialogFragment)) return;
+				} else {
+					if (user == null || isBottomSheetDialogShown(contactNicknameBottomSheetDialogFragment))
+						return;
 					nickname = firstLineTextToolbar.getText().toString();
 					contactNicknameBottomSheetDialogFragment = new ContactNicknameBottomSheetDialogFragment();
 					contactNicknameBottomSheetDialogFragment.show(getSupportFragmentManager(), contactNicknameBottomSheetDialogFragment.getTag());
@@ -1306,7 +1305,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		input.addTextChangedListener(new TextWatcher() {
 			private void handleText() {
-				if(setNicknameDialog != null) {
+				if (setNicknameDialog != null) {
 					final Button okButton = setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE);
 					if (input.getText().length() == 0) {
 						okButton.setEnabled(false);
@@ -1365,8 +1364,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		//Update the new nickname
 		megaApi.setUserAlias(user.getHandle(), newNickname, new SetAttrUserListener(this));
 	}
-
-
 
 	private void updateAvatar(){
 		if(isOnline(this)){

@@ -105,7 +105,7 @@ public class GetAttrUserListener extends BaseListener {
                 }
                 break;
             }
-            case USER_ATTR_ALIAS:{
+            case USER_ATTR_ALIAS: {
                 if (e.getErrorCode() == MegaError.API_OK) {
                     String nickname = request.getName();
                     if (nickname == null) {

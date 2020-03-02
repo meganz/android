@@ -20,7 +20,7 @@ import nz.mega.sdk.MegaUser;
 import mega.privacy.android.app.MegaApplication;
 
 import static mega.privacy.android.app.utils.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 
 public class ContactUtil {
@@ -41,7 +41,7 @@ public class ContactUtil {
         return user.getEmail();
     }
 
-    public static String getContactNameDB(MegaContactDB contactDB){
+    public static String getContactNameDB(MegaContactDB contactDB) {
         String nicknameText = contactDB.getNickname();
         if (nicknameText != null) {
             return nicknameText;
@@ -69,21 +69,16 @@ public class ContactUtil {
     }
 
     public static String buildFullName(String name, String lastName, String mail) {
-        if (name == null) name = "";
-
-        if (lastName == null) lastName = "";
-
-        String fullName;
-
-        if (name.trim().length() <= 0) {
+        String fullName = "";
+        if (!isTextEmpty(name)) {
+            fullName = name;
+            if (!isTextEmpty(lastName)) {
+                fullName = fullName + " " + lastName;
+            }
+        } else if (!isTextEmpty(lastName)) {
             fullName = lastName;
-        } else {
-            fullName = name + " " + lastName;
-        }
-
-        if (fullName.trim().length() <= 0) {
-            if (mail == null || mail.trim().length() <= 0) mail = "";
-            return mail;
+        } else if (!isTextEmpty(mail)) {
+            fullName = mail;
         }
         return fullName;
     }
@@ -95,29 +90,20 @@ public class ContactUtil {
             if (nicknameText != null) return nicknameText;
 
             String firstNameText = contactDB.getName();
-            if (firstNameText == null) {
-                firstNameText = "";
-            }
-            if (firstNameText.trim().length() > 0) return firstNameText;
+            if (!isTextEmpty(firstNameText)) return firstNameText;
 
             String lastNameText = contactDB.getLastName();
-            if (lastNameText == null) {
-                lastNameText = "";
-            }
-            if (lastNameText.trim().length() > 0) return lastNameText;
+            if (!isTextEmpty(lastNameText)) return lastNameText;
 
             String emailText = contactDB.getMail();
-            if (emailText == null) {
-                emailText = "";
-            }
-            if (emailText.trim().length() > 0) return emailText;
+            if (!isTextEmpty(emailText)) return emailText;
         }
         return "";
     }
 
     public static void updateDBNickname(MegaApiJava api, DatabaseHandler dbH, Context context, MegaStringMap map) {
         ArrayList<MegaContactAdapter> contactsDB = getContactsDBList(api);
-        if(contactsDB == null || contactsDB.isEmpty()) return;
+        if (contactsDB == null || contactsDB.isEmpty()) return;
 
         //No nicknames
         if (map == null || map.size() == 0) {
@@ -195,12 +181,13 @@ public class ContactUtil {
         }
     }
 
-    public static void updateFirstName(Context context, DatabaseHandler dbH, String name, String email){
+    public static void updateFirstName(Context context, DatabaseHandler dbH, String name, String email) {
         dbH.setContactName(name, email);
         updateView(context);
     }
-    public static void updateLastName(Context context, DatabaseHandler dbH, String lastName, String email){
-        dbH.setContactLastName(lastName,email);
+
+    public static void updateLastName(Context context, DatabaseHandler dbH, String lastName, String email) {
+        dbH.setContactLastName(lastName, email);
         updateView(context);
     }
 }

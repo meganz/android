@@ -746,7 +746,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SHOW_INVITE_BANNER + " = '" + encrypt("true") + "';");
         }
 
-
 		if(oldVersion <= 48) {
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT;");
             db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_MODIFICATION_DESC)) + "';");
@@ -2031,11 +2030,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	    return db.update(TABLE_CONTACTS, values, KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'", null);
 	}
 
-	public int setContactNickname (String nickname, long handle){
+	public int setContactNickname(String nickname, long handle) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_CONTACT_NICKNAME, encrypt(nickname));
-		return db.update(TABLE_CONTACTS, values, KEY_CONTACT_HANDLE + " = '" + encrypt(handle+"") + "'", null);
+		return db.update(TABLE_CONTACTS, values, KEY_CONTACT_HANDLE + " = '" + encrypt(handle + "") + "'", null);
 	}
+
 	public int getContactsSize(){
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
 		Cursor cursor = db.rawQuery(selectQuery, null);
