@@ -879,7 +879,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				if (mS.getNodeHandle() == n.getHandle()) {
 					MegaUser user = megaApi.getContact(mS.getUser());
 
-					name = getMegaUserNameDB(megaApi, this, user);
+					name = getMegaUserNameDB(user);
 					if(name == null) name = "";
 				}
 			}

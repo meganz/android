@@ -1675,7 +1675,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
 
             //Check nickname
-            String nickname = getNicknameContact(this, chatRoom.getPeerHandle(i));
+            String nickname = getNicknameContact(chatRoom.getPeerHandle(i));
             if(nickname != null){
                 participant = nickname;
             }

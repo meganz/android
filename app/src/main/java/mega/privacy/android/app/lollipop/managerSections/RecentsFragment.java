@@ -329,8 +329,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         for (int i = 0; i < contacts.size(); i++) {
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 long contactHandle = contacts.get(i).getHandle();
-                MegaContactDB contactDB = getContactDB(context, contactHandle);
-                String fullName = getContactNameDB(megaApi, context, contactDB);
+                MegaContactDB contactDB = getContactDB(contactHandle);
+                String fullName = getContactNameDB(contactDB);
                 if(fullName == null) fullName = contacts.get(i).getEmail();
                 MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
                 visibleContacts.add(megaContactAdapter);

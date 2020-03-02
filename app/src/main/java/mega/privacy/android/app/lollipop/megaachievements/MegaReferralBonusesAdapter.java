@@ -195,7 +195,7 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		if(contact != null)
 		{
 			long handle = contact.getHandle();
-			String fullName = getContactNameDB(megaApi, context, handle);
+			String fullName = getContactNameDB(handle);
 			if(fullName ==  null) fullName = holder.contactMail;
 			logDebug("Contact: " + holder.contactMail + " name: " + fullName);
 

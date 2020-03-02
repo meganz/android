@@ -1072,7 +1072,7 @@ public class ChatController {
             if(contact!=null){
                 if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
                     logDebug("Is contact!");
-                    return getFirstNameDB(context, userHandle);
+                    return getFirstNameDB(userHandle);
                 }
                 else{
                     logDebug("Old contact");
@@ -1113,7 +1113,7 @@ public class ChatController {
             MegaUser contact = megaApi.getContact(handleString);
             if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
                 logDebug("Is contact!");
-                String nameContact = getContactNameDB(megaApi, context, userHandle);
+                String nameContact = getContactNameDB(userHandle);
                 if(nameContact != null) return nameContact;
                 return "";
             }
@@ -1191,7 +1191,7 @@ public class ChatController {
 
     public String getParticipantFirstName(long userHandle, MegaChatRoom chatRoom){
         logDebug("User handle: " + userHandle + ", Chat ID: " + chatRoom.getChatId());
-        String firstName = getFirstNameDB(context, userHandle);
+        String firstName = getFirstNameDB(userHandle);
         if(firstName == null) firstName = chatRoom.getPeerFirstnameByHandle(userHandle);
 
         if (firstName == null || firstName.trim().length() <= 0){
@@ -1226,7 +1226,7 @@ public class ChatController {
     public String getParticipantFullName(long userHandle, MegaChatRoom chatRoom){
         logDebug("User handle: " + userHandle + ", Chat ID: " + chatRoom.getChatId());
 
-        String fullName = getNicknameContact(context, userHandle);
+        String fullName = getNicknameContact(userHandle);
         if(fullName == null) fullName = chatRoom.getPeerFullnameByHandle(userHandle);
         if (fullName == null || fullName.trim().isEmpty() || fullName.equals("")) fullName = chatRoom.getPeerEmailByHandle(userHandle);
 

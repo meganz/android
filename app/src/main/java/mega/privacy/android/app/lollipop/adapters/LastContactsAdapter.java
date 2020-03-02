@@ -148,7 +148,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
 
     private void setDefaultAvatar(MegaUser contact,ViewHolder holder) {
         int color = getColorAvatar(context, megaApi, contact);
-        String fullName = getMegaUserNameDB(megaApi, context, contact);
+        String fullName = getMegaUserNameDB(contact);
         Bitmap bitmap = getDefaultAvatar(context, color, fullName, AVATAR_SIZE, true);
         holder.avatarImage.setImageBitmap(bitmap);
     }

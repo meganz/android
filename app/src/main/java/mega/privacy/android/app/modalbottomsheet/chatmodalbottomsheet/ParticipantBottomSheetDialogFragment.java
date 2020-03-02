@@ -245,7 +245,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             addAvatarParticipantPanel(participantHandle, megaChatApi.getMyEmail(), myFullName);
         }
         else{
-            String fullName = getNicknameContact(context, participantHandle);
+            String fullName = getNicknameContact(participantHandle);
             if(fullName == null){
                 fullName = selectedChat.getPeerFullnameByHandle(participantHandle);
                 if (fullName == null || fullName.isEmpty() || fullName.equals("")) {

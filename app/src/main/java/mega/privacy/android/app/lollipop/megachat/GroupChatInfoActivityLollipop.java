@@ -500,7 +500,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     private String checkParticipantName(long handle, int position){
-        String fullName = getNicknameContact(this, handle);
+        String fullName = getNicknameContact(handle);
         if(fullName == null) fullName = getParticipantFullName(position);
         return fullName;
     }
@@ -603,7 +603,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     private String getParticipantFullName(long contact) {
-        String nickname = getNicknameContact(this, contact);
+        String nickname = getNicknameContact(contact);
         if (nickname != null) return nickname;
 
         String fullName = chat.getPeerFullname(contact);

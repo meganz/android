@@ -581,7 +581,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			if (contact == null) {
 				finish();
 			}
-			fullName =  getMegaUserNameDB(megaApi, this, contact);
+			fullName =  getMegaUserNameDB(contact);
 
 			if (aB != null) {
 				aB.setDisplayHomeAsUpEnabled(true);

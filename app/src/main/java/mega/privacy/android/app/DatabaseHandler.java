@@ -30,7 +30,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-
 public class DatabaseHandler extends SQLiteOpenHelper {
 
 	private static final int DATABASE_VERSION = 54;

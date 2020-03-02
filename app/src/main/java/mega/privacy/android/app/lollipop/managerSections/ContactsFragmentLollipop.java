@@ -1055,8 +1055,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		for (int i=0;i<contacts.size();i++){
 			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 				long contactHandle = contacts.get(i).getHandle();
-				MegaContactDB contactDB = getContactDB(context, contactHandle);
-				String fullName = getContactNameDB(megaApi, context, contactDB);
+				MegaContactDB contactDB = getContactDB(contactHandle);
+				String fullName = getContactNameDB(contactDB);
 				MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
 				visibleContacts.add(megaContactAdapter);
 			}
@@ -1151,8 +1151,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 		}
 		if (positionVisibleContacts != -1 && positionContacts != -1) {
-			MegaContactDB contactDB = getContactDB(context, contactHandle);
-			MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(positionContacts), getContactNameDB(megaApi, context, contactDB));
+			MegaContactDB contactDB = getContactDB(contactHandle);
+			MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(positionContacts), getContactNameDB(contactDB));
 			visibleContacts.set(positionVisibleContacts, megaContactAdapter);
 
 			if (adapter == null) {

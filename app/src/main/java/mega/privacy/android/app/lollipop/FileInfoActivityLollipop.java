@@ -1530,7 +1530,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 						MegaUser user= megaApi.getContact(mS.getUser());
 						contactMail=user.getEmail();
 						if(user!=null){
-						    String name = getMegaUserNameDB(megaApi, this, user);
+						    String name = getMegaUserNameDB(user);
 						    if(name != null){
 						        ownerLabel.setText(name);
 						        ownerInfo.setText(user.getEmail());

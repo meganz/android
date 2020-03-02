@@ -115,8 +115,8 @@ public class ContactNameListener implements MegaRequestListenerInterface {
         for (int i = 0; i < contacts.size(); i++) {
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 long contactHandle = contacts.get(i).getHandle();
-                MegaContactDB contactDB = getContactDB(context, contactHandle);
-                String fullName = getContactNameDB(megaApi, context, contactDB);
+                MegaContactDB contactDB = getContactDB(contactHandle);
+                String fullName = getContactNameDB(contactDB);
                 MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
                 visibleContacts.add(megaContactAdapter);
             }
@@ -133,7 +133,7 @@ public class ContactNameListener implements MegaRequestListenerInterface {
             if (contactsDB != null && !contactsDB.isEmpty()) {
                 for (int i = 0; i < contactsDB.size(); i++) {
                     long contactDBHandle = contactsDB.get(i).getMegaUser().getHandle();
-                    String nickname = getNicknameContact(context, contactDBHandle);
+                    String nickname = getNicknameContact(contactDBHandle);
                     if (nickname != null) {
                         dbH.setContactNickname(null, contactDBHandle);
                         notifyNicknameUpdate(contactDBHandle);

@@ -284,7 +284,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                     if(mS.getNodeHandle()==node.getHandle()){
                         MegaUser user= megaApi.getContact(mS.getUser());
                         if(user!=null){
-                            holder.textViewFileSize.setText(getMegaUserNameDB(megaApi, context, user));
+                            holder.textViewFileSize.setText(getMegaUserNameDB(user));
                         }
                         else{
                             holder.textViewFileSize.setText(mS.getUser());
