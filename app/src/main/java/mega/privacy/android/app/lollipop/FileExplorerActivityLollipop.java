@@ -2817,7 +2817,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			}
 		});
 
-		input.setImeActionLabel(getString(R.string.cam_sync_ok),EditorInfo.IME_ACTION_DONE);
+		input.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -2834,7 +2834,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		else {
 			builder.setTitle(getString(R.string.context_new_file_name));
 		}
-		builder.setPositiveButton(getString(R.string.cam_sync_ok),
+		builder.setPositiveButton(getString(R.string.general_ok),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String value = input.getText().toString().trim();

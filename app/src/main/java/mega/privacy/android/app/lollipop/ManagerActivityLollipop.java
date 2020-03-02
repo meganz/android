@@ -4954,7 +4954,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		try {
-			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.general_ok, dialogClickListener)
 					.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
 		}
 		catch (Exception e){}
@@ -7700,7 +7700,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							AlertDialog.Builder builder = new AlertDialog.Builder(this);
 							builder.setMessage(getString(R.string.no_permissions_upload));
 //								builder.setTitle(R.string.op_not_allowed);
-							builder.setCancelable(false).setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
+							builder.setCancelable(false).setPositiveButton(R.string.general_ok, new DialogInterface.OnClickListener() {
 								   public void onClick(DialogInterface dialog, int id) {
 										//do things
 									   alertNotPermissionsUpload.dismiss();
@@ -10504,7 +10504,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.settings_rb_scheduler_select_days_title));
-		builder.setPositiveButton(getString(R.string.cam_sync_ok),
+		builder.setPositiveButton(getString(R.string.general_ok),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -11443,7 +11443,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		String message= getResources().getString(R.string.email_verification_text_change_pass);
-		builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+		builder.setMessage(message).setPositiveButton(R.string.general_ok, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
@@ -14952,6 +14952,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
 			logDebug("MegaRequest.TYPE_PAUSE_TRANSFERS");
+			//force update the pause notification to prevent missed onTransferUpdate
+			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+
 			if (e.getErrorCode() == MegaError.API_OK) {
 
 				if(drawerItem == DrawerItem.CLOUD_DRIVE){

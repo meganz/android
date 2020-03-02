@@ -641,9 +641,9 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Solo Wi-Fi</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi o plan de datos</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">Aceptar</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">Saltar</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">Detener</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">Aceptar</string>
+    <string name="general_skip" context="skip the step of camera upload">Saltar</string>
+    <string name="general_stop" context="skip the step of camera upload">Detener</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">Subidas de la cámara en curso</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">¿Quieres detener las Subidas de la cámara?</string>
     <!--

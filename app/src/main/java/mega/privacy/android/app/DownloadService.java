@@ -6,14 +6,17 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
@@ -148,6 +151,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private Intent intent;
 
+	/** the receiver and manager for the broadcast to listen to the pause event */
+	private BroadcastReceiver pauseBroadcastReceiver;
+	private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
+
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
@@ -179,6 +186,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		rootNode = megaApi.getRootNode();
+
+		// delay 1 second to refresh the pause notification to prevent update is missed
+		pauseBroadcastReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				new Handler().postDelayed(() -> {
+					updateProgressNotification();
+				}, 1000);
+			}
+		};
+		pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+
 	}
 
 	@Override
@@ -205,6 +224,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         if (fs.length > 1 && fs[1] != null) {
             purgeDirectory(fs[1]);
         }
+        pauseBroadcastManager.unregisterReceiver(pauseBroadcastReceiver);
 		super.onDestroy();
 	}
 
@@ -1186,10 +1206,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		if(update){
-			//refresh UI every 1 seconds to avoid too much workload on main thread
+			/* refresh UI every 1 seconds to avoid too much workload on main thread
+			 * while in paused status, the update should not be avoided*/
 			if(!isOverquota) {
 				long now = System.currentTimeMillis();
-				if (now - lastUpdated > ONTRANSFERUPDATE_REFRESH_MILLIS) {
+				if (now - lastUpdated > ONTRANSFERUPDATE_REFRESH_MILLIS || megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ) {
 					lastUpdated = now;
 				} else {
 					return;
@@ -1204,7 +1225,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			else{
 				int inProgress = totalTransfers - pendingTransfers + 1;
-				message = getResources().getQuantityString(R.plurals.download_service_notification, totalTransfers, inProgress, totalTransfers);
+
+				if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)) {
+					message = getResources().getQuantityString(R.plurals.download_service_paused_notification, totalTransfers, inProgress, totalTransfers);
+				} else {
+					message = getResources().getQuantityString(R.plurals.download_service_notification, totalTransfers, inProgress, totalTransfers);
+				}
 			}
 
 			Intent intent;

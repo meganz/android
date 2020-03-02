@@ -173,6 +173,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private Context mContext;
     private VideoCompressor mVideoCompressor;
 
+    private BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            new Handler().postDelayed(() -> {
+                updateProgressNotification();
+            }, 1000);
+        }
+    };
+
     private BroadcastReceiver chargingStopReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context,Intent intent) {
@@ -203,6 +212,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public void onCreate() {
         registerReceiver(chargingStopReceiver,new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
         registerReceiver(batteryInfoReceiver,new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        registerReceiver(pauseReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
     }
 
     @Override
@@ -218,6 +228,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         if(batteryInfoReceiver != null){
             unregisterReceiver(batteryInfoReceiver);
+        }
+        if (pauseReceiver != null) {
+            unregisterReceiver(pauseReceiver);
         }
     }
     
@@ -1843,7 +1856,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             } else {
                 inProgress = totalTransfers - pendingTransfers + 1;
             }
-            message = getResources().getQuantityString(R.plurals.upload_service_notification,totalTransfers,inProgress,totalTransfers);
+
+            if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+                message = getResources().getQuantityString(R.plurals.upload_service_paused_notification,totalTransfers,inProgress,totalTransfers);
+            } else {
+                message = getResources().getQuantityString(R.plurals.upload_service_notification,totalTransfers,inProgress,totalTransfers);
+            }
         }
         
         String info = getProgressSize(this,totalSizeTransferred,totalSizePendingTransfer);

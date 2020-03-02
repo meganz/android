@@ -33,7 +33,7 @@
         android:background="@android:color/transparent"
         android:elevation="0dp"
         android:textColor="@color/accentColor"
-        android:text="@string/cam_sync_ok"
+        android:text="@string/general_ok"
         android:textSize="14sp"/>
 
 

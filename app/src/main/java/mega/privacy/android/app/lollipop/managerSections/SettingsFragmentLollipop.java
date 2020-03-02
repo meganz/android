@@ -2537,7 +2537,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(getString(R.string.settings_video_compression_queue_size_popup_title));
-        builder.setPositiveButton(getString(R.string.cam_sync_ok),
+        builder.setPositiveButton(getString(R.string.general_ok),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) { }
                 });

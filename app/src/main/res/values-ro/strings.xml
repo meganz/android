@@ -641,9 +641,9 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Numai Wi-Fi</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi sau plan de date</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">Ok</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">Omite</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">Oprește</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">Ok</string>
+    <string name="general_skip" context="skip the step of camera upload">Omite</string>
+    <string name="general_stop" context="skip the step of camera upload">Oprește</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">Încărcări cameră în curs</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Vrei să oprești încărcări cameră?</string>
     <!--

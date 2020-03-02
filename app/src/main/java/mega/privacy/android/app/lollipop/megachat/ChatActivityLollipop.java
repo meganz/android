@@ -95,14 +95,12 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
-import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
@@ -1252,7 +1250,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     builder.setTitle(getString(R.string.chat_error_open_title));
                     builder.setMessage(getString(R.string.chat_error_open_message));
 
-                    builder.setPositiveButton(getString(R.string.cam_sync_ok),
+                    builder.setPositiveButton(getString(R.string.general_ok),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     finish();
@@ -1854,12 +1852,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.white_50_opacity));
             }
 
-
-            if ((chatRoom.isPreview()) || (megaChatApi.getConnectionState() != MegaChatApi.CONNECTED)
-                        || (megaChatApi.getChatConnectionState(idChat) != MegaChatApi.CHAT_CONNECTION_ONLINE)) {
-                logDebug("chatRoom.isPreview || megaChatApi.getConnectionState() " + megaChatApi.getConnectionState() +
-                        " || megaChatApi.getChatConnectionState(idChat) "+(megaChatApi.getChatConnectionState(idChat)));
-
+            if(chatRoom.isPreview() || !isStatusConnected(this, megaChatApi, idChat)) {
                 leaveMenuItem.setVisible(false);
                 clearHistoryMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
@@ -2250,7 +2243,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      */
     private void recordButtonDeactivated(boolean isDeactivated) {
         logDebug("isDeactivated: " + isDeactivated);
-        recordView.showLock(false);
         recordButtonLayout.setBackground(null);
         sendIcon.setVisibility(View.GONE);
         recordButton.setVisibility(View.VISIBLE);
@@ -7006,7 +6998,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                 MegaApplication.setOpenChatId(idChat);
                 showChat(null);
-
                 supportInvalidateOptionsMenu();
                 if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
                     if (megaChatApi.getChatRoom(idChat).isActive()) {
@@ -7085,7 +7076,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.error_unarchive_chat, chatTitle), -1);
                 }
             }
-
             supportInvalidateOptionsMenu();
             setChatSubtitle();
 
@@ -7631,7 +7621,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             MegaApplication.setShowPinScreen(true);
             MegaApplication.setOpenChatId(idChat);
-
             supportInvalidateOptionsMenu();
             createSpeakerAudioManger();
 
@@ -7865,7 +7854,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
         logDebug("Chat ID: "+ chatid + ". New State: " + newState);
-        supportInvalidateOptionsMenu();
 
         if (idChat == chatid) {
             if (newState == MegaChatApi.CHAT_CONNECTION_ONLINE) {
@@ -7882,8 +7870,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             } else {
                 setAsRead = false;
             }
-
             setChatSubtitle();
+            supportInvalidateOptionsMenu();
         }
     }
 
@@ -8105,7 +8093,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private void showCallLayout(MegaChatCall call) {
         if (megaChatApi == null) return;
         if (call == null) call = megaChatApi.getChatCall(idChat);
-        if (call == null) return;
+        if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING && !isStatusConnected(this, megaChatApi, idChat))) return;
+
         logDebug("Call status "+callStatusToString(call.getStatus())+". Group chat: "+isGroup());
         switch (call.getStatus()){
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
@@ -8386,7 +8375,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         try {
-            builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+            builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.general_ok, dialogClickListener)
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
         }
         catch (Exception e){}

@@ -641,9 +641,9 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fiのみ</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fiまたはモバイルデータ</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">省く</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">停止</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="general_skip" context="skip the step of camera upload">省く</string>
+    <string name="general_stop" context="skip the step of camera upload">停止</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">カメラアップロードが進行中</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">カメラアップロードを停止しますか？　</string>
     <!--
