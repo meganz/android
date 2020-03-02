@@ -679,7 +679,6 @@ public class FileUtils {
         if (isFileAvailable(file) && !file.getParent().equals(currenParentPath)) {
             try {
                 new Thread(new CopyFileThread(downloadToSDCard, localPath, currenParentPath, node.getName(), sdCardOperator)).start();
-                copyFile(file, new File(currenParentPath, node.getName()));
             } catch (Exception e) {
                 logWarning("Exception copying file", e);
             }
@@ -725,7 +724,7 @@ public class FileUtils {
     public static void checkDownload (Context context, MegaNode node, String localPath, String parentPath, boolean checkVideo, boolean downloadToSDCard, SDCardOperator sdCardOperator){
         if (isAlreadyDownloadedInCurrentPath(node, localPath, parentPath, downloadToSDCard, sdCardOperator)) {
             showSnackbar(context, context.getString(R.string.general_already_downloaded));
-        } else {
+        } else if (isFileAvailable(new File(localPath))){
             showSnackbar(context, context.getString(R.string.copy_already_downloaded));
         }
 

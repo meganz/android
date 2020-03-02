@@ -778,6 +778,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		confirmationButton.setOnClickListener(v3 -> {
 			setDownloadLocationDialog.dismiss();
 			dbH.setStorageAskAlways(false);
+			dbH.setStorageDownloadLocation(path.getAbsolutePath());
+			prefs.setStorageDownloadLocation(path.getAbsolutePath());
 		});
 
 		CheckBox checkBox = v.findViewById(R.id.confirmation_checkbox);

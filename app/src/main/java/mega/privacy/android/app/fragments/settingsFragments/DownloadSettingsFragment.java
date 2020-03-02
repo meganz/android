@@ -26,6 +26,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class DownloadSettingsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
@@ -48,11 +49,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
         storageAskMeAlways.setOnPreferenceClickListener(this);
 
         File[] fs = context.getExternalFilesDirs(null);
-        if (fs.length == 1 || (fs.length > 1 && fs[1] == null)) {
-            hasSDCard = false;
-        } else {
-            hasSDCard = true;
-        }
+        hasSDCard = fs.length > 1 && fs[1] != null;
 
         if (prefs.getStorageAskAlways() == null) {
             askMe = true;
@@ -63,12 +60,13 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
 
         storageAskMeAlways.setChecked(askMe);
 
-        if (prefs.getStorageAskAlways() == null || prefs.getStorageDownloadLocation() == null || prefs.getStorageDownloadLocation().isEmpty()) {
+        if (isTextEmpty(prefs.getStorageDownloadLocation())) {
             File defaultDownloadLocation = buildDefaultDownloadDir(context);
             defaultDownloadLocation.mkdirs();
 
             downloadLocationPath = defaultDownloadLocation.getAbsolutePath();
-            dbH.setStorageDownloadLocation(downloadLocationPath);
+        } else {
+            downloadLocationPath = prefs.getStorageDownloadLocation();
         }
 
         setDownloadLocation();
@@ -102,8 +100,11 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
     }
 
     private void setDownloadLocation() {
+        dbH.setStorageDownloadLocation(downloadLocationPath);
+        prefs.setStorageDownloadLocation(downloadLocationPath);
+
         if (downloadLocation != null) {
-            downloadLocation.setSummary(prefs.getStorageDownloadLocation());
+            downloadLocation.setSummary(downloadLocationPath);
         }
     }
 
@@ -112,7 +113,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
         if (requestCode == REQUEST_CODE_TREE) {
             if (intent == null) {
                 logDebug("intent NULL");
-                if (requestCode != Activity.RESULT_OK) {
+                if (resultCode != Activity.RESULT_OK) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         showSnackbar(context, getString(R.string.download_requires_permission));
                     }
@@ -138,12 +139,8 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             toSelectFolder(sdCardOperator.getSDCardRoot());
                         } else {
-                            String path = getFullPathFromTreeUri(treeUri, context);
-                            dbH.setStorageDownloadLocation(path);
-                            downloadLocationPath = path;
-                            if (downloadLocation != null) {
-                                downloadLocation.setSummary(path);
-                            }
+                            downloadLocationPath = getFullPathFromTreeUri(treeUri, context);
+                            setDownloadLocation();
                         }
                     } else {
                         onCannotWriteOnSDCard();
@@ -155,12 +152,8 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
             }
         } else if (requestCode == REQUEST_DOWNLOAD_FOLDER && intent != null) {
             if (resultCode == Activity.RESULT_OK) {
-                String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-                dbH.setStorageDownloadLocation(path);
-                downloadLocationPath = path;
-                if (downloadLocation != null) {
-                    downloadLocation.setSummary(path);
-                }
+                downloadLocationPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+                setDownloadLocation();
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 logDebug("REQUEST_DOWNLOAD_FOLDER - canceled");
             }
