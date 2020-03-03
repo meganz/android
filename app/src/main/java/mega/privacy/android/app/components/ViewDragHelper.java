@@ -19,15 +19,14 @@ package mega.privacy.android.app.components;
 
 import android.content.Context;
 import androidx.core.view.MotionEventCompat;
-import androidx.core.view.VelocityTrackerCompat;
 import androidx.core.view.ViewCompat;
-import androidx.core.widget.ScrollerCompat;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
+import android.widget.OverScroller;
 
 import java.util.Arrays;
 
@@ -130,7 +129,7 @@ public class ViewDragHelper {
     private int mEdgeSize;
     private int mTrackingEdges;
 
-    private ScrollerCompat mScroller;
+    private OverScroller mScroller;
 
     private final Callback mCallback;
 
@@ -389,7 +388,7 @@ public class ViewDragHelper {
         mTouchSlop = vc.getScaledTouchSlop();
         mMaxVelocity = vc.getScaledMaximumFlingVelocity();
         mMinVelocity = vc.getScaledMinimumFlingVelocity();
-        mScroller = ScrollerCompat.create(context, sInterpolator);
+        mScroller = new OverScroller(context, sInterpolator);
     }
 
     /**
@@ -561,8 +560,8 @@ public class ViewDragHelper {
         }
 
         return forceSettleCapturedViewAt(finalLeft, finalTop,
-                (int) VelocityTrackerCompat.getXVelocity(mVelocityTracker, mActivePointerId),
-                (int) VelocityTrackerCompat.getYVelocity(mVelocityTracker, mActivePointerId));
+                (int) mVelocityTracker.getXVelocity(mActivePointerId),
+                (int) mVelocityTracker.getYVelocity(mActivePointerId));
     }
 
     /**
@@ -694,8 +693,8 @@ public class ViewDragHelper {
         }
 
         mScroller.fling(mCapturedView.getLeft(), mCapturedView.getTop(),
-                (int) VelocityTrackerCompat.getXVelocity(mVelocityTracker, mActivePointerId),
-                (int) VelocityTrackerCompat.getYVelocity(mVelocityTracker, mActivePointerId),
+                (int) mVelocityTracker.getXVelocity(mActivePointerId),
+                (int) mVelocityTracker.getYVelocity(mActivePointerId),
                 minLeft, maxLeft, minTop, maxTop);
 
         setDragState(STATE_SETTLING);
@@ -1365,10 +1364,10 @@ public class ViewDragHelper {
     private void releaseViewForPointerUp() {
         mVelocityTracker.computeCurrentVelocity(1000, mMaxVelocity);
         final float xvel = clampMag(
-                VelocityTrackerCompat.getXVelocity(mVelocityTracker, mActivePointerId),
+                mVelocityTracker.getXVelocity(mActivePointerId),
                 mMinVelocity, mMaxVelocity);
         final float yvel = clampMag(
-                VelocityTrackerCompat.getYVelocity(mVelocityTracker, mActivePointerId),
+                mVelocityTracker.getYVelocity(mActivePointerId),
                 mMinVelocity, mMaxVelocity);
         dispatchViewReleased(xvel, yvel);
     }

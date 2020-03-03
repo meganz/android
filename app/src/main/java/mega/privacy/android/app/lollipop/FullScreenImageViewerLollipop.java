@@ -1087,7 +1087,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 					adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
 					viewPager.setAdapter(adapterMega);
 					viewPager.setCurrentItem(positionG);
-					viewPager.setOnPageChangeListener(this);
+					viewPager.addOnPageChangeListener(this);
 
 					fileNameTextView = findViewById(R.id.full_image_viewer_file_name);
 					if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -1445,7 +1445,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		viewPager.setTranslationX(mLeftDelta);
 		viewPager.setTranslationY(mTopDelta);
 
-		ivShadow.setAlpha(0);
+		ivShadow.setImageAlpha(0);
 
 		viewPager.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
 			@Override
