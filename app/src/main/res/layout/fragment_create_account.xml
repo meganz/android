@@ -48,7 +48,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <android.support.design.widget.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_name_text_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                            <android.support.v7.widget.AppCompatEditText
+                            <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_name_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
                                 android:hint="@string/first_name_text"
                                 android:theme="@style/ColorControlStyle"/>
 
-                        </android.support.design.widget.TextInputLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
                             android:id="@+id/create_account_name_text_error_icon"
@@ -84,7 +84,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <android.support.design.widget.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_last_name_text_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                            <android.support.v7.widget.AppCompatEditText
+                            <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_last_name_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -102,7 +102,7 @@
                                 android:hint="@string/lastname_text"
                                 android:theme="@style/ColorControlStyle"/>
 
-                        </android.support.design.widget.TextInputLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
                             android:id="@+id/create_account_last_name_text_error_icon"
@@ -120,7 +120,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <android.support.design.widget.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_email_text_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -128,7 +128,7 @@
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                            <android.support.v7.widget.AppCompatEditText
+                            <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_email_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
                                 android:hint="@string/email_text"
                                 android:theme="@style/ColorControlStyle"/>
 
-                        </android.support.design.widget.TextInputLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
                             android:id="@+id/create_account_email_text_error_icon"
@@ -156,7 +156,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <android.support.design.widget.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_password_text_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -164,7 +164,7 @@
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                            <android.support.v7.widget.AppCompatEditText
+                            <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_password_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -174,7 +174,7 @@
                                 android:hint="@string/password_text"
                                 android:theme="@style/ColorControlStyle"/>
 
-                        </android.support.design.widget.TextInputLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
                             android:id="@+id/toggle_button_passwd"
@@ -282,7 +282,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <android.support.design.widget.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_password_text_confirm_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -290,7 +290,7 @@
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                            <android.support.v7.widget.AppCompatEditText
+                            <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_password_text_confirm"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -300,7 +300,7 @@
                                 android:hint="@string/confirm_password_text"
                                 android:theme="@style/ColorControlStyle"/>
 
-                        </android.support.design.widget.TextInputLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
                             android:id="@+id/toggle_button_confirm_passwd"

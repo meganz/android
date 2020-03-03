@@ -13,13 +13,13 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -88,7 +88,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     private MegaApiAndroid megaApi;
     private MegaApiAndroid megaApiFolder;
 
-    private android.support.v7.app.AlertDialog alertDialogTransferOverquota;
+    private androidx.appcompat.app.AlertDialog alertDialogTransferOverquota;
 
     boolean waitingForConfirmAccount = false;
     String emailTemp = null;
@@ -346,7 +346,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
     public void showAlertIncorrectRK() {
         logDebug("showAlertIncorrectRK");
-        final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+        final androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
 
         dialogBuilder.setTitle(getString(R.string.incorrect_MK_title));
         dialogBuilder.setMessage(getString(R.string.incorrect_MK));
@@ -360,7 +360,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
         });
 
-        android.support.v7.app.AlertDialog alert = dialogBuilder.create();
+        androidx.appcompat.app.AlertDialog alert = dialogBuilder.create();
         alert.show();
     }
 
@@ -368,7 +368,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         logDebug("showAlertLoggedOut");
         ((MegaApplication) getApplication()).setEsid(false);
         if(!isFinishing()){
-            final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+            final androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
 
             dialogBuilder.setTitle(getString(R.string.title_alert_logged_out));
             dialogBuilder.setMessage(getString(R.string.error_server_expired_session));
@@ -381,7 +381,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 }
             });
 
-            android.support.v7.app.AlertDialog alert = dialogBuilder.create();
+            androidx.appcompat.app.AlertDialog alert = dialogBuilder.create();
             alert.show();
         }
     }
@@ -399,7 +399,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         }
 
         if(show){
-            android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+            androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
 
             LayoutInflater inflater = this.getLayoutInflater();
             View dialogView = inflater.inflate(R.layout.transfer_overquota_layout_not_logged, null);
@@ -505,7 +505,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
         builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
@@ -639,8 +639,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder;
-        builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder;
+        builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
     }
@@ -682,8 +682,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder;
-        builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder;
+        builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
     }

@@ -2,8 +2,8 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;

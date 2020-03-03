@@ -22,19 +22,19 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.OpenableColumns;
-import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.view.MenuItemCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -269,7 +269,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     private DraggableView draggableView;
     private ImageView ivShadow;
     private NodeController nC;
-    private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
     private boolean fromShared = false;
@@ -2476,12 +2476,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
              }
          };
 
-         android.support.v7.app.AlertDialog.Builder builder;
+         androidx.appcompat.app.AlertDialog.Builder builder;
          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-             builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+             builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
          }
          else{
-             builder = new android.support.v7.app.AlertDialog.Builder(this);
+             builder = new androidx.appcompat.app.AlertDialog.Builder(this);
          }
 
          builder.setMessage(R.string.confirmation_delete_one_attachment);
@@ -2507,7 +2507,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
          final long sizeC = size;
          final ChatController chatC = new ChatController(this);
 
-         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
          LinearLayout confirmationLayout = new LinearLayout(this);
          confirmationLayout.setOrientation(LinearLayout.VERTICAL);
          LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2840,7 +2840,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 return false;
             }
         });
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
@@ -2861,7 +2861,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         builder.setView(layout);
         renameDialog = builder.create();
         renameDialog.show();
-        renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+        renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -2929,8 +2929,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     }
 
     public void showRemoveLink(){
-        android.support.v7.app.AlertDialog removeLinkDialog;
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog removeLinkDialog;
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
@@ -3855,7 +3855,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3904,7 +3904,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);

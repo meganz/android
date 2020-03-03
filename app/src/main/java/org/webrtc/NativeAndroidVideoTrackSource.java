@@ -10,9 +10,7 @@
 
 package org.webrtc;
 
-import android.support.annotation.Nullable;
-import org.webrtc.VideoFrame;
-import org.webrtc.VideoProcessor;
+import androidx.annotation.Nullable;
 
 /**
  * This class is meant to be a simple layer that only handles the JNI wrapping of a C++

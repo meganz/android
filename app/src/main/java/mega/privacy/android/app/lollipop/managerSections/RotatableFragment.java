@@ -1,7 +1,7 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 

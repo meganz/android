@@ -15,12 +15,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.StatFs;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.print.PrintHelper;
-import android.support.v7.app.AlertDialog;
-import android.view.View;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.print.PrintHelper;
+import androidx.appcompat.app.AlertDialog;
 
 import java.io.BufferedWriter;
 import java.io.File;

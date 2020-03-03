@@ -1,13 +1,10 @@
 package mega.privacy.android.app.modalbottomsheet;
 
 import android.app.Dialog;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.print.PrintHelper;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.print.PrintHelper;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -15,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import nz.mega.sdk.MegaApiAndroid;

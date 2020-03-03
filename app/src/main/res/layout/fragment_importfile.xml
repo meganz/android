@@ -1,4 +1,4 @@
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scroll_container_import"
     android:layout_width="match_parent"
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/content_text">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/file_list_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -153,4 +153,4 @@
 
     </RelativeLayout>
 
-</android.support.v4.widget.NestedScrollView>
+</androidx.core.widget.NestedScrollView>

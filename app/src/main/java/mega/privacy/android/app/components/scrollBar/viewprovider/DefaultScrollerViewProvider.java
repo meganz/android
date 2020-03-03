@@ -1,14 +1,12 @@
 package mega.privacy.android.app.components.scrollBar.viewprovider;
 
-import android.graphics.drawable.InsetDrawable;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.scrollBar.Utils;
 
 
 public class DefaultScrollerViewProvider extends ScrollerViewProvider {
