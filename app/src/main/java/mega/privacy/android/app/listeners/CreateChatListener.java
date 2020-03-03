@@ -4,7 +4,6 @@ import android.content.Context;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -18,7 +17,6 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -102,7 +100,7 @@ public class CreateChatListener extends ChatBaseListener {
 
                     showSnackbar(context, message);
                 } else {
-                    new ChatController(context).sendFileToChatsFromContacts(context, chats, fileHandle);
+                    ChatController.sendFileToChatsFromContacts(context, chats, fileHandle);
                 }
                 break;
 

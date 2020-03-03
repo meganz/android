@@ -2225,16 +2225,16 @@ public class ChatController {
                 ArrayList<MegaChatRoom> chats = new ArrayList<>();
                 ArrayList<MegaUser> users = new ArrayList<>();
 
-                for (int i = 0; i < contactHandles.length; i++) {
-                    MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
+                for (long contactHandle : contactHandles) {
+                    MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandle));
                     if (user != null) {
                         users.add(user);
                     }
                 }
 
                 if (chatHandles != null) {
-                    for (int i = 0; i < chatHandles.length; i++) {
-                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
+                    for (long chatHandle : chatHandles) {
+                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandle);
                         if (chatRoom != null) {
                             chats.add(chatRoom);
                         }
