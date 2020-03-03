@@ -374,7 +374,7 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 
 		setContentView(R.layout.activity_chat_full_screen_image_viewer);
 
-		draggableView.setViewAnimator(new ExitViewAnimator());
+		draggableView.setViewAnimator(new ExitViewAnimator<>());
 
 		relativeImageViewerLayout = (RelativeLayout) findViewById(R.id.full_image_viewer_layout);
 		fragmentContainer = (RelativeLayout) findViewById(R.id.chat_full_image_viewer_parent_layout);

@@ -493,7 +493,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
         }
 	    //need re-calculate
 	    folderCount = 0;
-        CopyOnWriteArrayList<MegaOffline> safeList = new CopyOnWriteArrayList(nodes);
+        CopyOnWriteArrayList<MegaOffline> safeList = new CopyOnWriteArrayList<>(nodes);
         for (MegaOffline node : safeList) {
             if (node == null) {
                 safeList.remove(node);

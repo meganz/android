@@ -133,7 +133,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		megaChatApi = app.getMegaChatApi();
-		mapProgressFileTransfers = new HashMap();
+		mapProgressFileTransfers = new HashMap<>();
         mapProgressFolderTransfers = new HashMap<>();
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		isForeground = false;

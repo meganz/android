@@ -103,7 +103,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
 
     private ArrayList<MegaNode> getNodeListToBeDisplayed(ArrayList<MegaNode> fullList) {
         
-        ArrayList newList = new ArrayList<>();
+        ArrayList<MegaNode> newList = new ArrayList<>();
         if (fullList.size() > MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED) {
             for (int i = 0;i < MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED;i++) {
                 newList.add(fullList.get(i));

@@ -929,7 +929,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 		relativeImageViewerLayout = findViewById(R.id.full_image_viewer_layout);
 
-		draggableView.setViewAnimator(new ExitViewAnimator());
+		draggableView.setViewAnimator(new ExitViewAnimator<>());
 
 		handler = new Handler();
 		fullScreenImageViewer = this;

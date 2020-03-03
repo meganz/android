@@ -285,10 +285,11 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		if (savedInstanceState != null) {
-			parentHandleStack = (Stack<Long>)(savedInstanceState.getSerializable(PARENT_HANDLE_STACK));
+			parentHandleStack = (Stack<Long>) savedInstanceState.getSerializable(PARENT_HANDLE_STACK);
 		}
 	}
 	@Override

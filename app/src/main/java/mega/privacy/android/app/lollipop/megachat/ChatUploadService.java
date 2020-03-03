@@ -156,8 +156,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		canceled = false;
 		isOverquota = 0;
 
-		mapVideoDownsampling = new HashMap();
-		mapProgressTransfers = new HashMap();
+		mapVideoDownsampling = new HashMap<>();
+		mapProgressTransfers = new HashMap<>();
 
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -259,6 +259,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		return Bitmap.CompressFormat.JPEG;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void onHandleIntent(final Intent intent) {
 		if (intent == null) return;
 

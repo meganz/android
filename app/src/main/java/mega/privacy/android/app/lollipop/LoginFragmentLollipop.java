@@ -2053,6 +2053,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
         enableLoginButton();
         try{

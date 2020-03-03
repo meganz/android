@@ -329,6 +329,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 		
 		@Override
+        @SuppressWarnings("unchecked")
 		protected List<ShareInfo> doInBackground(Intent... params) {
 			logDebug("OwnFilePrepareTask: doInBackground");
             Intent intent = params[0];
@@ -390,6 +391,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		logDebug("onCreate first");

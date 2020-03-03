@@ -40,7 +40,7 @@ public class MegaNodeUtil {
 
         if (nodes == null) return folderCount;
 
-        CopyOnWriteArrayList<MegaNode> safeList = new CopyOnWriteArrayList(nodes);
+        CopyOnWriteArrayList<MegaNode> safeList = new CopyOnWriteArrayList<>(nodes);
 
         for (MegaNode node : safeList) {
             if (node == null) {

@@ -1187,7 +1187,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	public ArrayList<MegaNode> getNodes(){
 	    //remove the null placeholder.
 		if (nodes != null) {
-			CopyOnWriteArrayList<MegaNode> safeList = new CopyOnWriteArrayList(nodes);
+			CopyOnWriteArrayList<MegaNode> safeList = new CopyOnWriteArrayList<>(nodes);
 			for (MegaNode node : safeList) {
 				if (node == null) {
 					safeList.remove(node);

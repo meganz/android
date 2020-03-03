@@ -365,7 +365,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
         downloadLocationDefaultPath = getDownloadLocation(this);
 
-        draggableView.setViewAnimator(new ExitViewAnimator());
+        draggableView.setViewAnimator(new ExitViewAnimator<>());
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

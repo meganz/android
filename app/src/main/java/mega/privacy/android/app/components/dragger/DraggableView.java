@@ -73,7 +73,7 @@ public class DraggableView extends FrameLayout{
         return viewAnimator;
     }
 
-    public void setViewAnimator(@Nullable ViewAnimator viewAnimator) {
+    public void setViewAnimator(@Nullable ViewAnimator<DraggableView> viewAnimator) {
         this.viewAnimator = viewAnimator;
     }
 
