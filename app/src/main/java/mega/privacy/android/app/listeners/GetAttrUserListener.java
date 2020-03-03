@@ -114,6 +114,10 @@ public class GetAttrUserListener extends BaseListener {
                     }
                     dbH.setContactNickname(nickname, request.getNodeHandle());
                     notifyNicknameUpdate(context, request.getNodeHandle());
+
+                } else if (e.getErrorCode() == MegaError.API_ENOENT) {
+                    dbH.setContactNickname(null, request.getNodeHandle());
+                    notifyNicknameUpdate(context, request.getNodeHandle());
                 } else {
                     logDebug("Error recovering the alias" + e.getErrorCode());
                 }

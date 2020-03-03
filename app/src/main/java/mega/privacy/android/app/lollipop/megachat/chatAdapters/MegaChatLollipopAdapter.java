@@ -95,7 +95,7 @@ import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
-
+import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
 
@@ -8249,32 +8249,26 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    String getContactMessageName(int pos, ViewHolderMessageChat holder, long handle) {
+    private String getContactMessageName(int pos, ViewHolderMessageChat holder, long handle) {
         if (isHolderNull(pos, holder)) {
             return null;
         }
+
         String name = cC.getFullName(handle, chatRoom);
+        if (!isTextEmpty(name)) return name;
 
-        if (name == null) {
-            name = "";
+        logWarning("NOT found in DB");
+        name = context.getString(R.string.unknown_name_label);
+        if (!holder.nameRequestedAction) {
+            logDebug("Call for nonContactName: " + handle);
+            holder.nameRequestedAction = true;
+            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, handle, chatRoom.isPreview(), pos);
+            megaChatApi.getUserFirstname(handle, chatRoom.getAuthorizationToken(), listener);
+            megaChatApi.getUserLastname(handle, chatRoom.getAuthorizationToken(), listener);
+            megaChatApi.getUserEmail(handle, listener);
+        } else {
+            logWarning("Name already asked and no name received: " + handle);
         }
-
-        if (name.trim().length() <= 0) {
-            logWarning("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-            name = context.getString(R.string.unknown_name_label);
-            if (!holder.nameRequestedAction) {
-                logDebug("Call for nonContactName: " + handle);
-                holder.nameRequestedAction = true;
-                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, handle, chatRoom.isPreview(), pos);
-                megaChatApi.getUserFirstname(handle, chatRoom.getAuthorizationToken(), listener);
-                megaChatApi.getUserLastname(handle, chatRoom.getAuthorizationToken(), listener);
-                megaChatApi.getUserEmail(handle, listener);
-            }
-            else {
-                logWarning("4-Name already asked and no name received: " + handle);
-            }
-        }
-
         return name;
     }
 

@@ -21,7 +21,7 @@ import mega.privacy.android.app.MegaApplication;
 
 import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ContactUtil {
 
@@ -104,7 +104,6 @@ public class ContactUtil {
     public static void updateDBNickname(MegaApiJava api, DatabaseHandler dbH, Context context, MegaStringMap map) {
         ArrayList<MegaContactAdapter> contactsDB = getContactsDBList(api);
         if (contactsDB == null || contactsDB.isEmpty()) return;
-
         //No nicknames
         if (map == null || map.size() == 0) {
             for (int i = 0; i < contactsDB.size(); i++) {

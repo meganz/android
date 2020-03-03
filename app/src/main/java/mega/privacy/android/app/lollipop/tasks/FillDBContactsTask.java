@@ -42,7 +42,6 @@ public class FillDBContactsTask extends AsyncTask<String, Void, String> {
             megaApi.getUserAttribute(contacts.get(i), MegaApiJava.USER_ATTR_FIRSTNAME, listener);
             megaApi.getUserAttribute(contacts.get(i), MegaApiJava.USER_ATTR_LASTNAME, listener);
             megaApi.getUserAlias(contacts.get(i).getHandle(), listener);
-
         }
         return null;
     }

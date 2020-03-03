@@ -1232,12 +1232,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     public void updateNicknameInChat() {
-        if (idChat == -1 || megaChatApi.getChatRoom(idChat) == null) return;
-        chatRoom = megaChatApi.getChatRoom(idChat);
+        if (chatRoom.isGroup()) {
+            setChatSubtitle();
+        }
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    private void updateTitle() {
         initializeInputText();
-        if (adapter != null) adapter.notifyDataSetChanged();
         titleToolbar.setText(chatRoom.getTitle());
-        setChatSubtitle();
     }
 
     private void showChat(String textSnackbar){
@@ -4684,7 +4689,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             supportInvalidateOptionsMenu();
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_TITLE)){
-            logDebug("CHANGE_TYPE_TITLE for the chat: " + chat.getChatId());
+            updateTitle();
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_USER_STOP_TYPING)){
             logDebug("CHANGE_TYPE_USER_STOP_TYPING for the chat: " + chat.getChatId());

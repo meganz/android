@@ -256,7 +256,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null) return;
-
 			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
 			if (user != null && userHandle == user.getHandle()) {
 				checkNickname(user.getHandle());
@@ -1282,7 +1281,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(16, outMetrics), scaleWidthPx(17, outMetrics), 0);
 		final EmojiEditText input = new EmojiEditText(this);
 		layout.addView(input, params);
-		showKeyboard();
 		input.setSingleLine();
 		input.setSelectAllOnFocus(true);
 		input.requestFocus();
@@ -1291,6 +1289,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		input.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		showKeyboard();
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
 		input.setImeActionLabel(getString(R.string.add_nickname), EditorInfo.IME_ACTION_DONE);

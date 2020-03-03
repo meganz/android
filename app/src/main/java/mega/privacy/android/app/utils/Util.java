@@ -34,7 +34,6 @@ import android.os.Handler;
 
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.support.v7.app.ActionBar;
@@ -101,7 +100,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -1647,7 +1645,6 @@ public class Util {
 	}
 
 	public static void hideKeyboard(Activity activity, int flag){
-
 		View v = activity.getCurrentFocus();
 		if (v != null){
 			InputMethodManager imm = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
@@ -1747,6 +1744,16 @@ public class Util {
      */
 	public static String getHexValue(int color){
 		return String.format("#%06X", 0xFFFFFF & color);
+	}
+
+	public static void showKeyboard() {
+		InputMethodManager inputMethodManager = (InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+	}
+
+	public static void hideKeyboard() {
+		InputMethodManager inputMethodManager = (InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 	}
 
     public static void showKeyboardDelayed(final View view) {
