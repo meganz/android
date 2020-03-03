@@ -30,27 +30,30 @@ public class ContactNicknameBottomSheetDialogFragment extends BottomSheetDialogF
     private LinearLayout items_layout;
     private int heightDisplay;
     private String nickname;
-    private ContactInfoActivityLollipop contactInfoActivity = (ContactInfoActivityLollipop) context;
+    private ContactInfoActivityLollipop contactInfoActivityLollipop = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (savedInstanceState != null) {
             nickname = savedInstanceState.getString(EXTRA_USER_NICKNAME, null);
         } else if (context instanceof ContactInfoActivityLollipop) {
-            nickname = contactInfoActivity.getNickname();
+            contactInfoActivityLollipop = ((ContactInfoActivityLollipop) context);
+            nickname = contactInfoActivityLollipop.getNickname();
         }
     }
 
     @Override
     public void onClick(View v) {
+        if(contactInfoActivityLollipop == null) return;
         switch (v.getId()) {
             case R.id.edit_nickname_layout: {
-                contactInfoActivity.showConfirmationSetNickname(nickname);
+                contactInfoActivityLollipop.showConfirmationSetNickname(nickname);
                 break;
             }
             case R.id.remove_nickname_layout: {
-                contactInfoActivity.addNickname(null, null);
+                contactInfoActivityLollipop.addNickname(null, null);
                 break;
             }
         }
