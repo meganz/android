@@ -33,7 +33,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 53;
+	private static final int DATABASE_VERSION = 54;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -101,6 +101,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SEC_SYNC_TIMESTAMP = "secondarySyncTimeStamp";
     private static final String KEY_SEC_VIDEO_SYNC_TIMESTAMP = "secondaryVideoSyncTimeStamp";
     private static final String KEY_STORAGE_ADVANCED_DEVICES = "storageadvanceddevices";
+	private static final String KEY_ASK_SET_DOWNLOAD_LOCATION = "askSetDefaultDownloadLocation";
     private static final String KEY_PREFERRED_VIEW_LIST = "preferredviewlist";
     private static final String KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera";
     private static final String KEY_URI_EXTERNAL_SD_CARD = "uriexternalsdcard";
@@ -150,6 +151,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_TRANSFER_STATE = "transferstate";
 	private static final String KEY_TRANSFER_SIZE = "transfersize";
 	private static final String KEY_TRANSFER_HANDLE = "transferhandle";
+	private static final String KEY_TRANSFER_PATH = "transferpath";
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
 	private static final String KEY_SMALL_GRID_CAMERA = "smallgridcamera";
@@ -304,7 +306,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_SHOW_INVITE_BANNER + " TEXT,"                 //39
                 + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       //40
 				+ KEY_SD_CARD_URI + " TEXT,"                        //41
-                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT" + ")";        //42
+                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT,"				//42
+				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN" + ")"; //43
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -354,7 +357,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_TRANSFER_FILENAME + " TEXT, " + KEY_TRANSFER_TYPE + " TEXT, " +
-				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT"+")";
+				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT, " + KEY_TRANSFER_PATH + " TEXT" + ")";
 		db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
 
 		String CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS " + TABLE_EPHEMERAL + "("
@@ -766,6 +769,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
 			onCreate(db);
 			setChatSettings(db, chatSettings);
+		}
+
+		if (oldVersion <= 53) {
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_ASK_SET_DOWNLOAD_LOCATION + " = '" + encrypt("true") + "';");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_ASK_ALWAYS + " = '" + encrypt("true") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_PATH + " TEXT;");
 		}
 	}
 
@@ -1729,6 +1739,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_TRANSFER_STATE, encrypt(transfer.getState()+""));
 		values.put(KEY_TRANSFER_SIZE, encrypt(transfer.getSize()));
 		values.put(KEY_TRANSFER_HANDLE, encrypt(transfer.getNodeHandle()));
+		values.put(KEY_TRANSFER_PATH, encrypt(transfer.getPath()));
 
 		db.insert(TABLE_COMPLETED_TRANSFERS, null, values);
 	}
@@ -1754,8 +1765,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					int stateInt = Integer.parseInt(state);
 					String size = decrypt(cursor.getString(4));
 					String nodeHandle = decrypt(cursor.getString(5));
+					String path = decrypt(cursor.getString(6));
 
-					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(filename, typeInt, stateInt, size, nodeHandle);
+					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(filename, typeInt, stateInt, size, nodeHandle, path);
 					cTs.add(cT);
 				} while (cursor.moveToPrevious());
 			}
@@ -3201,6 +3213,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return value;
 	}
 
+	/**
+	 * Get a boolean value from the database.
+	 *
+	 * @param tableName    Name of the database's table.
+	 * @param columnName   Name of the table's column.
+	 * @param defaultValue Default value to return if no result found.
+	 * @return Boolean value selected from the database.
+	 */
+	private boolean getBooleanValue(String tableName, String columnName, boolean defaultValue) {
+		try {
+			String value = getStringValue(tableName, columnName, Boolean.toString(defaultValue));
+			if (value != null && !value.isEmpty()) {
+				return Boolean.valueOf(value);
+			}
+		} catch (Exception e) {
+			logWarning("EXCEPTION - Return default value: " + defaultValue, e);
+		}
+
+		return defaultValue;
+	}
+
 	public void setPinLockEnabled (boolean pinLockEnabled){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
@@ -3233,36 +3266,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
-	public void setStorageAskAlways (boolean storageAskAlways){
-		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-        ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_ASK_ALWAYS + "= '" + encrypt(storageAskAlways + "") + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-	        values.put(KEY_STORAGE_ASK_ALWAYS, encrypt(storageAskAlways + ""));
-	        db.insert(TABLE_PREFERENCES, null, values);
-		}
-		cursor.close();
+	public void setStorageAskAlways(boolean storageAskAlways) {
+		setStringValue(TABLE_PREFERENCES, KEY_STORAGE_ASK_ALWAYS, storageAskAlways + "");
 	}
 
-	public void setStorageAdvancedDevices (boolean storageAdvancedDevices){
-		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-        ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_ADVANCED_DEVICES + "= '" + encrypt(storageAdvancedDevices + "") + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-	        values.put(KEY_STORAGE_ADVANCED_DEVICES, encrypt(storageAdvancedDevices + ""));
-	        db.insert(TABLE_PREFERENCES, null, values);
-		}
-		cursor.close();
+	/**
+	 * Sets the flag to indicate if should ask the user about set the current path as default download location.
+	 *
+	 * @param askSetDownloadLocation true if should ask, false otherwise.
+	 */
+	public void setAskSetDownloadLocation(boolean askSetDownloadLocation) {
+		setStringValue(TABLE_PREFERENCES, KEY_ASK_SET_DOWNLOAD_LOCATION, askSetDownloadLocation + "");
+	}
+
+	/**
+	 * Gets the flag which indicates if should ask the user about set the current path as default download location.
+	 *
+	 * @return true if should ask, false otherwise.
+	 */
+	public boolean getAskSetDownloadLocation() {
+		return getBooleanValue(TABLE_PREFERENCES, KEY_ASK_SET_DOWNLOAD_LOCATION, true);
 	}
 
 	public void setStorageDownloadLocation (String storageDownloadLocation){

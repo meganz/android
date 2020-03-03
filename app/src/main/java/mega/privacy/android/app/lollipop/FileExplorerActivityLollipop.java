@@ -1708,7 +1708,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				if(parentNode == null){
 					parentNode = megaApi.getRootNode();
 				}
-				showSnackbar(getString(R.string.upload_began));
+
+				backToCloud(parentNode.getHandle(), infos.size());
 				for (ShareInfo info : infos) {
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -1856,8 +1857,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			else{
 				onIntentProcessed();
 			}
-			logDebug("After UPLOAD click - back to Cloud");
-			this.backToCloud(handle);
 		}
 		else if (mode == IMPORT){
 			long parentHandle = handle;
@@ -1924,10 +1923,12 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
-	private void backToCloud(long handle){
+	private void backToCloud(long handle, int numberUploads){
 		logDebug("handle: " + handle);
 
-		Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
+		Intent startIntent = new Intent(this, ManagerActivityLollipop.class)
+				.putExtra(SHOW_MESSAGE_UPLOAD_STARTED, true)
+				.putExtra(NUMBER_UPLOADS, numberUploads);
 		if(handle!=-1){
 			startIntent.setAction(ACTION_OPEN_FOLDER);
 			startIntent.putExtra("PARENT_HANDLE", handle);
@@ -1948,7 +1949,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			file = createTemporalTextFile(this, name, data);
 		}
 		if(file!=null){
-			showSnackbar(getString(R.string.upload_began));
 			Intent intent = new Intent(this, UploadService.class);
 			intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
 			intent.putExtra(UploadService.EXTRA_NAME, file.getName());
@@ -1957,7 +1957,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			startService(intent);
 
 			logDebug("After UPLOAD click - back to Cloud");
-			this.backToCloud(parentNode.getHandle());
+			this.backToCloud(parentNode.getHandle(), 1);
 			finishActivity();
 		}
 		else{

@@ -39,7 +39,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
-import static mega.privacy.android.app.utils.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -111,6 +111,9 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(transferFinishedReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
+
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
             if (isExpiredBusinessAlertShown) {
@@ -157,6 +160,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(transferFinishedReceiver);
 
         super.onDestroy();
     }
@@ -252,6 +256,33 @@ public class BaseActivity extends AppCompatActivity {
             logDebug("BROADCAST INFORM THERE ARE TAKEN DOWN FILES IMPLIED IN ACTION");
             int numberFiles = intent.getIntExtra(NUMBER_FILES, 1);
             Util.showSnackbar(baseActivity, getResources().getQuantityString(R.plurals.alert_taken_down_files, numberFiles, numberFiles));
+        }
+    };
+
+    /**
+     * Broadcast to show a snackbar when all the transfers finish
+     */
+    private BroadcastReceiver transferFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) {
+                return;
+            }
+
+            String message = null;
+            int numTransfers = intent.getIntExtra(NUMBER_FILES, 1);
+
+            switch (intent.getStringExtra(TRANSFER_TYPE)) {
+                case DOWNLOAD_TRANSFER:
+                    message = getResources().getQuantityString(R.plurals.download_finish, numTransfers, numTransfers);
+                    break;
+
+                case UPLOAD_TRANSFER:
+                    message = getResources().getQuantityString(R.plurals.upload_finish, numTransfers, numTransfers);
+                    break;
+            }
+
+            Util.showSnackbar(baseActivity, message);
         }
     };
 
