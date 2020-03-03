@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.listeners;
 
-import android.app.Activity;
 import android.content.Context;
 
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -172,7 +170,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     } else {
                         MegaChatRoom chat = api.getChatRoom(request.getChatHandle());
                         if (chat != null) {
-                            application.setSpeakerStatus(chat.getChatId(), false);
+                            MegaApplication.setSpeakerStatus(chat.getChatId(), false);
                             api.startChatCall(chat.getChatId(), false, (ContactInfoActivityLollipop) context);
                         } else {
                             logWarning("Chatroom not recovered");
@@ -187,7 +185,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     } else {
                         MegaChatRoom chat = api.getChatRoom(request.getChatHandle());
                         if (chat != null) {
-                            application.setSpeakerStatus(chat.getChatId(), true);
+                            MegaApplication.setSpeakerStatus(chat.getChatId(), true);
                             application.manuallyActivatedLocalCamera();
                             api.startChatCall(chat.getChatId(), true, (ContactInfoActivityLollipop) context);
                         } else {

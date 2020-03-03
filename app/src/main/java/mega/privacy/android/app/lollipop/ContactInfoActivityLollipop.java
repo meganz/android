@@ -890,7 +890,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(i);
 			} else {
-				app.setSpeakerStatus(chatRoomTo.getChatId(), startVideo);
+				MegaApplication.setSpeakerStatus(chatRoomTo.getChatId(), startVideo);
 				if(startVideo) app.manuallyActivatedLocalCamera();
 				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
 			}

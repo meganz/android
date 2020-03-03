@@ -160,7 +160,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private PowerManager.WakeLock wakeLock;
 	private Handler cameraHandler = null;
 	private CameraManager cameraManager = null;
-	private Object cameraCallback = null;
+	private CameraManager.AvailabilityCallback cameraCallback = null;
 	private boolean localCameraEnabled = false;
 
 	@Override
