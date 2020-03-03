@@ -28,6 +28,6 @@
         <Button
             android:id="@+id/btn_ok"
             style="@style/alert_diaolog_btn"
-            android:text="@string/cam_sync_ok" />
+            android:text="@string/general_ok" />
     </LinearLayout>
 </RelativeLayout>
