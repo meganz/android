@@ -9,8 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -28,6 +26,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaCompletedTransfersAdapter;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -35,38 +34,28 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CompletedTransfersFragmentLollipop extends Fragment {
 
-	Context context;
-	RecyclerView listView;
-	MegaCompletedTransfersAdapter adapter;
-	
-	MegaApiAndroid megaApi;
-	TextView contentText;
-	ImageView emptyImage;
-	TextView emptyText;
+	private Context context;
+	private RecyclerView listView;
+	private MegaCompletedTransfersAdapter adapter;
 
-	float density;
-	DisplayMetrics outMetrics;
-	Display display;
-	
-	LinearLayoutManager mLayoutManager;
+	private MegaApiAndroid megaApi;
+	private ImageView emptyImage;
+	private TextView emptyText;
 
-	DatabaseHandler dbH;
-	
-	CompletedTransfersFragmentLollipop transfersFragment = this;
-	
-//	SparseArray<TransfersHolder> transfersListArray = null;
+	private DisplayMetrics outMetrics;
 
-	public ArrayList<AndroidCompletedTransfer> tL = null;
+	private LinearLayoutManager mLayoutManager;
 
-	private Handler handler;
-	
+	private DatabaseHandler dbH;
+
+	public ArrayList<AndroidCompletedTransfer> tL = new ArrayList<>();
+
 	@Override
-	public void onCreate (Bundle savedInstanceState){
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+	public void onCreate(Bundle savedInstanceState) {
+		if (megaApi == null) {
+			megaApi = MegaApplication.getInstance().getMegaApi();
 		}
 
-		tL = new ArrayList<AndroidCompletedTransfer>();
 		dbH = DatabaseHandler.getDbHandler(context);
 
 		super.onCreate(savedInstanceState);
@@ -74,29 +63,26 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 	}
 
 	public static CompletedTransfersFragmentLollipop newInstance() {
-		logDebug("newInstance");
-		CompletedTransfersFragmentLollipop fragment = new CompletedTransfersFragmentLollipop();
-		return fragment;
+		return new CompletedTransfersFragmentLollipop();
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {  
-		
+							 Bundle savedInstanceState) {
+
 		super.onCreateView(inflater, container, savedInstanceState);
-		
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+
+		if (megaApi == null) {
+			megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
 		}
-		
-		display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
-	    
+
+		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
+
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 
-		listView = (RecyclerView) v.findViewById(R.id.transfers_list_view);
+		listView = v.findViewById(R.id.transfers_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setHasFixedSize(true);
@@ -109,43 +95,32 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 				if (listView != null) {
 					if (listView.canScrollVertically(-1)) {
 						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
+					} else {
 						((ManagerActivityLollipop) context).changeActionBarElevation(false);
 					}
 				}
 			}
 		});
 
-		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
-		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);
+		emptyImage = v.findViewById(R.id.transfers_empty_image);
+		emptyText = v.findViewById(R.id.transfers_empty_text);
 
-//		emptyImage.setImageResource(R.drawable.ic_no_active_transfers);
-//		emptyText.setText(getString(R.string.completed_transfers_empty));
-
-
-		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			emptyImage.setImageResource(R.drawable.ic_zero_landscape_saved_for_offline);
-		}else{
+		} else {
 			emptyImage.setImageResource(R.drawable.ic_zero_portrait_transfers);
 		}
 
 		String textToShow = String.format(context.getString(R.string.completed_transfers_empty_new));
-		try{
+		try {
 			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
+		} catch (Exception e) {
+			logWarning("Exception formatting string", e);
 		}
-		catch (Exception e){}
-		Spanned result = null;
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-		} else {
-			result = Html.fromHtml(textToShow);
-		}
-		emptyText.setText(result);
-
+		emptyText.setText(Util.getSpannedHtmlText(textToShow));
 
 		setCompletedTransfers();
 
@@ -156,31 +131,26 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		return v;
 	}
 
-	public void setCompletedTransfers(){
+	public void setCompletedTransfers() {
 		logDebug("setCompletedTransfers");
 		tL.clear();
 		tL.addAll(dbH.getCompletedTransfers());
+		setEmptyView();
+	}
 
-		if(tL!=null){
-			if (tL.size() == 0){
-				emptyImage.setVisibility(View.VISIBLE);
-				emptyText.setVisibility(View.VISIBLE);
-				listView.setVisibility(View.GONE);
-			}
-			else{
-				emptyImage.setVisibility(View.GONE);
-				emptyText.setVisibility(View.GONE);
-				listView.setVisibility(View.VISIBLE);
-			}
-		}
-		else{
+	private void setEmptyView() {
+		if (tL != null && tL.size() > 0) {
+			emptyImage.setVisibility(View.GONE);
+			emptyText.setVisibility(View.GONE);
+			listView.setVisibility(View.VISIBLE);
+		} else {
 			emptyImage.setVisibility(View.VISIBLE);
 			emptyText.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
 		}
 	}
 
-	public void updateCompletedTransfers(){
+	public void updateCompletedTransfers() {
 		logDebug("updateCompletedTransfers");
 
 		setCompletedTransfers();
@@ -188,65 +158,44 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 	}
 
 	@Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
-    }
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		context = activity;
+	}
 
-	public int onBackPressed(){
-		
-		if (adapter == null){
+	public int onBackPressed() {
+
+		if (adapter == null) {
 			return 0;
 		}
-		
-		if (adapter.getPositionClicked() != -1){
+
+		if (adapter.getPositionClicked() != -1) {
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();
 			return 1;
-		}
-		else{
+		} else {
 			return 0;
 		}
 	}
 
-    public void transferFinish(AndroidCompletedTransfer transfer){
+	public void transferFinish(AndroidCompletedTransfer transfer) {
 		logDebug("transferFinish");
-		if(tL!=null){
-			tL.add(0,transfer);
-		}
-		else{
-			tL = new ArrayList<AndroidCompletedTransfer>();
+		if (tL != null) {
+			tL.add(0, transfer);
+		} else {
+			tL = new ArrayList<>();
 			tL.add(transfer);
 		}
 
-		if(tL.size()==1){
-			((ManagerActivityLollipop)context).invalidateOptionsMenu();
+		if (tL.size() == 1) {
+			((ManagerActivityLollipop) context).invalidateOptionsMenu();
 		}
 
-		if (tL.size() == 0){
-			emptyImage.setVisibility(View.VISIBLE);
-			emptyText.setVisibility(View.VISIBLE);
-			listView.setVisibility(View.GONE);
-		}
-		else{
-			emptyImage.setVisibility(View.GONE);
-			emptyText.setVisibility(View.GONE);
-			listView.setVisibility(View.VISIBLE);
-		}
+		setEmptyView();
 		adapter.notifyDataSetChanged();
 	}
 
-	public boolean isAnyTransferCompleted (){
-		if(tL!=null){
-			if(tL.isEmpty()){
-				return false;
-			}
-			else{
-				return true;
-			}
-		}
-		else{
-			return false;
-		}
+	public boolean isAnyTransferCompleted() {
+		return tL != null && !tL.isEmpty();
 	}
 }
