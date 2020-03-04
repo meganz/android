@@ -160,7 +160,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
@@ -233,7 +233,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -12355,76 +12354,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
 			logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 
-			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
-			long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
-			long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
-			long[] userHandles = intent.getLongArrayExtra(USER_HANDLES);
-
-			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
-				if (contactHandles != null && contactHandles.length > 0) {
-					ArrayList<MegaChatRoom> chats = new ArrayList<>();
-					ArrayList<MegaUser> users = new ArrayList<>();
-
-					for (int i=0; i<contactHandles.length; i++) {
-						MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
-						if (user != null) {
-							users.add(user);
-						}
-					}
-
-					if (chatHandles != null) {
-						for (int i = 0; i < chatHandles.length; i++) {
-							MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
-							if (chatRoom != null) {
-								chats.add(chatRoom);
-							}
-						}
-					}
-
-					CreateChatToPerformActionListener listener = null;
-					boolean createChats = false;
-
-					if(nodeHandles!=null){
-						listener = new CreateChatToPerformActionListener(chats, users, nodeHandles, this, CreateChatToPerformActionListener.SEND_FILES, -1);
-						createChats = true;
-					}
-					else if(userHandles!=null){
-						listener = new CreateChatToPerformActionListener(chats, users, userHandles, this, CreateChatToPerformActionListener.SEND_CONTACTS, -1);
-						createChats = true;
-					}
-					else{
-						logWarning("Error on sending to chat");
-					}
-
-					if (createChats) {
-						for (MegaUser user : users) {
-							MegaChatPeerList peers = MegaChatPeerList.createInstance();
-							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-							megaChatApi.createChat(false, peers, listener);
-						}
-					}
-				}
-				else {
-					int countChat = chatHandles.length;
-					logDebug("Selected: " + countChat + " chats to send");
-
-					if(nodeHandles!=null){
-						logDebug("Send " + nodeHandles.length + " nodes");
-						checkIfNodesAreMineBeforeAttach(null, chatHandles, nodeHandles);
-					}
-					else if(userHandles!=null){
-						logDebug("Send " + userHandles.length + " contacts");
-
-						sendContactsToChats(null, chatHandles, userHandles);
-					}
-					else{
-						logWarning("Error on sending to chat");
-					}
-				}
-			}
-			else {
-				logWarning("Error on sending to chat");
-			}
+			new ChatController(this).checkIntentToShareSomething(intent);
 		}
 		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
@@ -12501,11 +12431,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			if(usersNoChat==null || usersNoChat.isEmpty()){
-				checkIfNodesAreMineBeforeAttach(chats, null, fileHandles);
+				new ChatController(this).checkIfNodesAreMineAndAttachNodes(fileHandles, getChatHandles(chats, null));
 			}
 			else{
 				//Create first the chats
-				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandles, this, CreateChatToPerformActionListener.SEND_FILES, -1);
+				CreateChatListener listener = new CreateChatListener(chats, usersNoChat, fileHandles, this, CreateChatListener.SEND_FILES, -1);
 
 				for(int i=0; i<usersNoChat.size(); i++){
 					MegaChatPeerList peers = MegaChatPeerList.createInstance();
@@ -12977,12 +12907,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return chatHandles;
 	}
 
-	public void checkIfNodesAreMineBeforeAttach(ArrayList<MegaChatRoom> chats, long[] chatHandles, long[] nodeHandles) {
-
-
-		new ChatController(this).checkIfNodesAreMineAndAttachNodes(nodeHandles, getChatHandles(chats, chatHandles));
-	}
-
 	public void sendFilesToChats(ArrayList<MegaChatRoom> chats, long[] _chatHandles, long[] nodeHandles) {
 		long[] chatHandles = getChatHandles(chats, _chatHandles);
 
@@ -13000,31 +12924,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			for (int j = 0; j < nodeHandles.length; j++) {
 				megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
 			}
-		}
-	}
-
-	public void sendContactsToChats (ArrayList<MegaChatRoom> chats, long[] chatHandles, long[] userHandles) {
-		if (chatHandles == null && chats != null) {
-			chatHandles = new long[chats.size()];
-			for (int i=0; i<chats.size(); i++) {
-				chatHandles[i] = chats.get(i).getChatId();
-			}
-		}
-
-		MegaHandleList handleList = MegaHandleList.createInstance();
-		for (long userHandle : userHandles) {
-			handleList.addMegaHandle(userHandle);
-		}
-
-		for (long chatHandle : chatHandles) {
-			megaChatApi.attachContacts(chatHandle, handleList);
-		}
-
-		if (chatHandles.length == 1) {
-			showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatHandles[0]);
-		} else{
-			String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, userHandles.length);
-			showSnackbar(MESSAGE_SNACKBAR_TYPE, message, -1);
 		}
 	}
 
