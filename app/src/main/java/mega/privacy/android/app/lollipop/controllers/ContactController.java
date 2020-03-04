@@ -35,7 +35,7 @@ import static mega.privacy.android.app.listeners.ShareListener.CHANGE_PERMISSION
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 
 public class ContactController {
 

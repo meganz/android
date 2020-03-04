@@ -251,7 +251,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -1418,7 +1418,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									REQUEST_WRITE_STORAGE);
 		        		}
 		        		else{
-		        			takePicture(this);
+							checkTakePicture(this, megaChatApi);
 							typesCameraPermission = -1;
 		        		}
 		        	}
@@ -1466,7 +1466,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
 							}
 							else{
-								takePicture(this);
+								checkTakePicture(this, megaChatApi);
 								typesCameraPermission = -1;
 							}
 						}
@@ -1493,7 +1493,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									REQUEST_CAMERA);
 						}
 						else{
-							takePicture(this);
+							checkTakePicture(this, megaChatApi);
 							typesCameraPermission = -1;
 						}
 					}
@@ -3746,7 +3746,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     			}
     			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
 					logDebug("Intent take selfie");
-    				takePicture(this);
+					checkTakePicture(this, megaChatApi);
     			}
 				else if (intent.getAction().equals(SHOW_REPEATED_UPLOAD)){
 					logDebug("Intent SHOW_REPEATED_UPLOAD");
@@ -7610,11 +7610,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 
 					if (hasStoragePermission && hasCameraPermission){
-						takePicture(this);
+						checkTakePicture(this, megaChatApi);
 					}
 				}
 		    	else{
-		    		takePicture(this);
+					checkTakePicture(this, megaChatApi);
 		    	}
 
 		    	return true;
@@ -8086,16 +8086,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.action_scan_qr: {
 				logDebug("Action menu scan QR code pressed");
                 //Check if there is a in progress call:
-				if(megaChatApi!=null) {
-
-					if (!participatingInACall(megaChatApi)) {
-						ScanCodeFragment fragment = new ScanCodeFragment();
-						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
-						Intent intent = new Intent(this, QRCodeActivity.class);
-						intent.putExtra("contacts", true);
-						startActivity(intent);
-					}
+				if(isNecessaryDisableLocalCamera(megaChatApi) != -1){
+					showConfirmationOpenCamera(this, megaChatApi, ACTION_OPEN_QR);
+					return true;
 				}
+				openQA();
 				return true;
 			}
 			case R.id.action_return_call:{
@@ -8109,6 +8104,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	            return super.onOptionsItemSelected(item);
             }
 		}
+	}
+
+	public void openQA(){
+		ScanCodeFragment fragment = new ScanCodeFragment();
+		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
+		Intent intent = new Intent(this, QRCodeActivity.class);
+		intent.putExtra("contacts", true);
+		startActivity(intent);
 	}
 
 	private void updateView (boolean isList) {
@@ -10199,7 +10202,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			return;
 		}
-		takePicture(this);
+		checkTakePicture(this, megaChatApi);
 	}
 
 	@Override

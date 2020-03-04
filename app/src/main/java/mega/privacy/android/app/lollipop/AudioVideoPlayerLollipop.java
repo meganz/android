@@ -154,7 +154,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EX
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;

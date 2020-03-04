@@ -73,7 +73,7 @@ import nz.mega.sdk.MegaChatRoom;
 
 import static android.app.Activity.RESULT_OK;
 import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_RECENT;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;

@@ -34,7 +34,6 @@ import android.os.Handler;
 
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.support.v7.app.ActionBar;
@@ -101,13 +100,14 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1765,6 +1765,14 @@ public class Util {
 		}
 
 		return Html.fromHtml(string);
+	}
+
+	public static void checkTakePicture(Activity activity, MegaChatApiAndroid megaChatApi) {
+		if (isNecessaryDisableLocalCamera(megaChatApi) != -1) {
+			showConfirmationOpenCamera(activity, megaChatApi, ACTION_TAKE_PICTURE);
+			return;
+		}
+		takePicture(activity);
 	}
 
 	/**
