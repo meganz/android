@@ -6,14 +6,17 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
@@ -43,7 +46,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -62,8 +64,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.constants.SettingsConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
-import static mega.privacy.android.app.utils.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -147,6 +151,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private Intent intent;
 
+	/** the receiver and manager for the broadcast to listen to the pause event */
+	private BroadcastReceiver pauseBroadcastReceiver;
+	private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
+
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
@@ -178,6 +186,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		rootNode = megaApi.getRootNode();
+
+		// delay 1 second to refresh the pause notification to prevent update is missed
+		pauseBroadcastReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				new Handler().postDelayed(() -> {
+					updateProgressNotification();
+				}, 1000);
+			}
+		};
+		pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+
 	}
 
 	@Override
@@ -204,6 +224,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         if (fs.length > 1 && fs[1] != null) {
             purgeDirectory(fs[1]);
         }
+        pauseBroadcastManager.unregisterReceiver(pauseBroadcastReceiver);
 		super.onDestroy();
 	}
 
@@ -440,6 +461,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		logDebug("onQueueComplete: total of files before reset " + total);
 		if(total <= 0){
 			logDebug("onQueueComplete: reset total downloads");
+			Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED);
+			intent.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER);
+			intent.putExtra(NUMBER_FILES, megaApi.getTotalDownloads());
+			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 			megaApi.resetTotalDownloads();
 			errorEBloqued = 0;
 			errorCount = 0;
@@ -527,11 +552,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			size = getString(R.string.general_total_size, totalBytes);
 		}
 
-		Intent intent = null;
-		if(totalDownloads != 1)
-		{
-			intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
+		Intent intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
+		intent.setAction(ACTION_SHOW_TRANSFERS);
+		intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
 
+		PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		if (totalDownloads != 1) {
 			logDebug("Show notification");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
@@ -543,7 +570,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				mBuilderCompatO
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+						.setContentIntent(pendingIntent)
 						.setAutoCancel(true).setTicker(notificationTitle)
 						.setContentTitle(notificationTitle).setContentText(size)
 						.setOngoing(false);
@@ -555,7 +582,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			else {
 				mBuilderCompat
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+						.setContentIntent(pendingIntent)
 						.setAutoCancel(true).setTicker(notificationTitle)
 						.setContentTitle(notificationTitle).setContentText(size)
 						.setOngoing(false);
@@ -650,7 +677,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 								mBuilderCompatO
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -660,7 +687,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							else {
 								mBuilderCompat
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -740,7 +767,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 								mBuilderCompatO
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -750,7 +777,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							else {
 								mBuilderCompat
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -831,7 +858,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 								mBuilderCompatO
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -843,7 +870,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							else {
 								mBuilderCompat
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -910,7 +937,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 											mBuilderCompatO
 													.setSmallIcon(R.drawable.ic_stat_notify)
-													.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+													.setContentIntent(pendingIntent)
 													.setAutoCancel(true).setTicker(notificationTitle)
 													.setContentTitle(notificationTitle).setContentText(size)
 													.setOngoing(false);
@@ -922,7 +949,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 										else {
 											mBuilderCompat
 													.setSmallIcon(R.drawable.ic_stat_notify)
-													.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+													.setContentIntent(pendingIntent)
 													.setAutoCancel(true).setTicker(notificationTitle)
 													.setContentTitle(notificationTitle).setContentText(size)
 													.setOngoing(false);
@@ -964,7 +991,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 									mBuilderCompatO
 											.setSmallIcon(R.drawable.ic_stat_notify)
-											.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+											.setContentIntent(pendingIntent)
 											.setAutoCancel(true).setTicker(notificationTitle)
 											.setContentTitle(notificationTitle).setContentText(size)
 											.setOngoing(false);
@@ -976,7 +1003,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								else {
 									mBuilderCompat
 											.setSmallIcon(R.drawable.ic_stat_notify)
-											.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+											.setContentIntent(pendingIntent)
 											.setAutoCancel(true).setTicker(notificationTitle)
 											.setContentTitle(notificationTitle).setContentText(size)
 											.setOngoing(false);
@@ -1042,7 +1069,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 							mBuilderCompatO
 									.setSmallIcon(R.drawable.ic_stat_notify)
-									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+									.setContentIntent(pendingIntent)
 									.setAutoCancel(true).setTicker(notificationTitle)
 									.setContentTitle(notificationTitle).setContentText(size)
 									.setOngoing(false);
@@ -1054,7 +1081,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else {
 							mBuilderCompat
 									.setSmallIcon(R.drawable.ic_stat_notify)
-									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+									.setContentIntent(pendingIntent)
 									.setAutoCancel(true).setTicker(notificationTitle)
 									.setContentTitle(notificationTitle).setContentText(size)
 									.setOngoing(false);
@@ -1069,8 +1096,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				} else {
 					openFile = true; //Set the openFile to the default
 
-					intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
-
 					logDebug("Show notification");
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 						NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
@@ -1082,7 +1107,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						mBuilderCompatO
 								.setSmallIcon(R.drawable.ic_stat_notify)
-								.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+								.setContentIntent(pendingIntent)
 								.setAutoCancel(true).setTicker(notificationTitle)
 								.setContentTitle(notificationTitle).setContentText(size)
 								.setOngoing(false);
@@ -1094,7 +1119,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					else {
 						mBuilderCompat
 								.setSmallIcon(R.drawable.ic_stat_notify)
-								.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+								.setContentIntent(pendingIntent)
 								.setAutoCancel(true).setTicker(notificationTitle)
 								.setContentTitle(notificationTitle).setContentText(size)
 								.setOngoing(false);
@@ -1110,7 +1135,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			catch (Exception e){
 				openFile = true; //Set the openFile to the default
 				logError("Exception", e);
-				intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
 				logDebug("Show notification");
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1123,7 +1147,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 					mBuilderCompatO
 							.setSmallIcon(R.drawable.ic_stat_notify)
-							.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+							.setContentIntent(pendingIntent)
 							.setAutoCancel(true).setTicker(notificationTitle)
 							.setContentTitle(notificationTitle).setContentText(size)
 							.setOngoing(false);
@@ -1135,7 +1159,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				else {
 					mBuilderCompat
 							.setSmallIcon(R.drawable.ic_stat_notify)
-							.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+							.setContentIntent(pendingIntent)
 							.setAutoCancel(true).setTicker(notificationTitle)
 							.setContentTitle(notificationTitle).setContentText(size)
 							.setOngoing(false);
@@ -1182,10 +1206,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		if(update){
-			//refresh UI every 1 seconds to avoid too much workload on main thread
+			/* refresh UI every 1 seconds to avoid too much workload on main thread
+			 * while in paused status, the update should not be avoided*/
 			if(!isOverquota) {
 				long now = System.currentTimeMillis();
-				if (now - lastUpdated > ONTRANSFERUPDATE_REFRESH_MILLIS) {
+				if (now - lastUpdated > ONTRANSFERUPDATE_REFRESH_MILLIS || megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ) {
 					lastUpdated = now;
 				} else {
 					return;
@@ -1200,7 +1225,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			else{
 				int inProgress = totalTransfers - pendingTransfers + 1;
-				message = getResources().getQuantityString(R.plurals.download_service_notification, totalTransfers, inProgress, totalTransfers);
+
+				if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)) {
+					message = getResources().getQuantityString(R.plurals.download_service_paused_notification, totalTransfers, inProgress, totalTransfers);
+				} else {
+					message = getResources().getQuantityString(R.plurals.download_service_notification, totalTransfers, inProgress, totalTransfers);
+				}
 			}
 
 			Intent intent;
@@ -1216,13 +1246,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				contentText = getString(R.string.download_touch_to_cancel);
 				intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
 				intent.setAction(ACTION_CANCEL_DOWNLOAD);
-				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 			}
 			else{
 				contentText = getString(R.string.download_touch_to_show);
 				intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
 				intent.setAction(ACTION_SHOW_TRANSFERS);
-				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+				intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 			}
 
 			int currentapiVersion = android.os.Build.VERSION.SDK_INT;
@@ -1322,12 +1353,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			dbH.clearEphemeral();
 			intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
 			intent.setAction(ACTION_OVERQUOTA_TRANSFER);
-			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		}
 		else{
 			intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
 			intent.setAction(ACTION_OVERQUOTA_TRANSFER);
-			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		}
 
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
@@ -1450,7 +1481,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(!transfer.isFolderTransfer()){
 				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
 					String size = getSizeString(transfer.getTotalBytes());
-					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
+					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"", transfer.getParentPath());
 					dbH.setCompletedTransfer(completedTransfer);
 				}
 
@@ -1856,7 +1887,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private void refreshSettingsFragment() {
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
-		intent.setAction(SettingsFragmentLollipop.ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
+		intent.setAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 }

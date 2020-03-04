@@ -469,8 +469,8 @@
     
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Тільки Wi-Fi</string>
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi або тарифний план</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">ОК</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">Пропустити</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">ОК</string>
+    <string name="general_skip" context="skip the step of camera upload">Пропустити</string>
     <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Процес відвантаження з камери</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Ви бажаєте відмінити завантаження з камери?</string>
     <!--<string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Тека призначення недоступна</string>-->

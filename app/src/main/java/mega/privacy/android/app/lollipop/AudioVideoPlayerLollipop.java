@@ -115,7 +115,7 @@ import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
@@ -160,7 +160,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -1346,7 +1345,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             builder = new AlertDialog.Builder(this);
         }
         builder.setCancelable(false);
-        String accept = getResources().getString(R.string.cam_sync_ok).toUpperCase();
+        String accept = getResources().getString(R.string.general_ok).toUpperCase();
         try {
             builder.setMessage(R.string.corrupt_video_dialog_text)
                     .setPositiveButton(accept, new DialogInterface.OnClickListener() {
@@ -3196,7 +3195,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
 
                     if(nodeHandles!=null){
-                        CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, nodeHandles[0], this, CreateChatToPerformActionListener.SEND_FILE);
+                        CreateChatListener listener = new CreateChatListener(chats, users, nodeHandles[0], this, CreateChatListener.SEND_FILE);
                         for (MegaUser user : users) {
                             MegaChatPeerList peers = MegaChatPeerList.createInstance();
                             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);

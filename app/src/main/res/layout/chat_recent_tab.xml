@@ -145,6 +145,14 @@
                     </RelativeLayout>
                 </FrameLayout>
             </LinearLayout>
+            <View
+                android:id="@+id/invitation_banner_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider_upgrade_account"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_alignParentBottom="true"/>
         </android.support.design.widget.AppBarLayout>
 
         <ScrollView

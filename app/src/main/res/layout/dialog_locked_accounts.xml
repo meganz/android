@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_gravity="right"
-            android:text="@string/cam_sync_ok"
+            android:text="@string/general_ok"
             android:textColor="@color/accentColor"
             style="?android:attr/borderlessButtonStyle" />
 

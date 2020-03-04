@@ -324,7 +324,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 				return false;
 			}
 		});
-		input.setImeActionLabel(getString(R.string.cam_sync_ok),EditorInfo.IME_ACTION_DONE);
+		input.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {

@@ -81,7 +81,7 @@ import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.adapters.MegaFileInfoSharedContactLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -106,7 +106,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
-import static mega.privacy.android.app.utils.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -2559,7 +2559,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                     }
 
                     if(nodeHandles!=null){
-                        CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, nodeHandles[0], this, CreateChatToPerformActionListener.SEND_FILE);
+                        CreateChatListener listener = new CreateChatListener(chats, users, nodeHandles[0], this, CreateChatListener.SEND_FILE);
                         for (MegaUser user : users) {
                             MegaChatPeerList peers = MegaChatPeerList.createInstance();
                             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);

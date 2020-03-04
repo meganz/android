@@ -641,9 +641,9 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">只在WiFi連線</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或行動網路</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">跳過</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">停止</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="general_skip" context="skip the step of camera upload">跳過</string>
+    <string name="general_stop" context="skip the step of camera upload">停止</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">相機上傳正在進行中</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">您想停用相機上傳功能嗎？</string>
     <!--
@@ -1886,7 +1886,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">您還記得你的密碼嗎？</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">您即將登出，請測試您的密碼以確保您已牢記密碼。\n如果您遺失了密碼，您將無法存取您的MEGA資料。</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">您即將登出，請測試您的密碼以確保您有記住它。如果您遺失密碼，您將無法存取MEGA資料。</string>
-    <string name="remember_pwd_dialog_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">不再顯示</string>
+    <string name="general_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">不再顯示</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">測試密碼</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">測試您的密碼</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">密碼正確</string>

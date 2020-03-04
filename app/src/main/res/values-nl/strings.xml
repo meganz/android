@@ -641,9 +641,9 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Alleen Wi-Fi</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele data</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">Overslaan</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="general_skip" context="skip the step of camera upload">Overslaan</string>
+    <string name="general_stop" context="skip the step of camera upload">Stop</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">Camera uploads in behandeling</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Wilt u Camera Uploads stoppen?</string>
     <!--
@@ -1886,7 +1886,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">Herinnert u zich uw wachtwoord?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">U staat op het punt uit te loggen, test uw wachtwoord om er zeker van te zijn dat u deze onthoud. \nAls u uw wachtwoord verliest, verliest u toegang tot uw MEGA gegevens.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Test uw wachtwoord om er zeker van te zijn dat u deze onthoud. Als u uw wachtwoord verliest, verliest u toegang tot uw MEGA gegevens.</string>
-    <string name="remember_pwd_dialog_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">Laat me niet meer zien</string>
+    <string name="general_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">Laat me niet meer zien</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Wachtwoord testen</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Test uw wachtwoord</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Wachtwoord geaccepteerd</string>
