@@ -158,7 +158,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 						handleList.add(nodes.get(0).getHandle());
 						NodeController nC = new NodeController(versionsFileActivity);
 						nC.prepareForDownload(handleList, false);
-						showSnackbar(getString(R.string.download_began));
 						clearSelections();
 						actionMode.invalidate();
 					}

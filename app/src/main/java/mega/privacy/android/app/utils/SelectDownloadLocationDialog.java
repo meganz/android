@@ -10,11 +10,11 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.fragments.settingsFragments.DownloadSettingsFragment;
 import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.utils.download.ChatDownloadInfo;
 import mega.privacy.android.app.utils.download.DownloadInfo;
 import mega.privacy.android.app.utils.download.DownloadLinkInfo;
@@ -58,7 +58,7 @@ public class SelectDownloadLocationDialog {
 
     protected NodeController nodeController;
 
-    protected SettingsFragmentLollipop settingsFragment;
+    protected DownloadSettingsFragment settingsFragment;
 
     protected ChatController chatController;
 
@@ -118,7 +118,7 @@ public class SelectDownloadLocationDialog {
         this.chatController = chatController;
     }
 
-    public void setSettingsFragment(SettingsFragmentLollipop settingsFragment) {
+    public void setSettingsFragment(DownloadSettingsFragment settingsFragment) {
         this.settingsFragment = settingsFragment;
     }
 
