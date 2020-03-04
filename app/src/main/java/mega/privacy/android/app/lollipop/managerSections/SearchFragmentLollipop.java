@@ -364,17 +364,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					}
 				}
 
-				if(allFiles){
-					if (isChatEnabled()) {
-						showSendToChat = true;
-					}
-					else {
-						showSendToChat = false;
-					}
-				}else{
-					showSendToChat = false;
-				}
-
+				showSendToChat = allFiles;
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);

@@ -175,31 +175,19 @@ public class DBUtil {
         }
     }
 
-    public static boolean isSendOriginalAttachments (){
-        logDebug("isSendOriginalAttachments");
+    public static boolean isSendOriginalAttachments() {
         dbH = MegaApplication.getInstance().getDbH();
 
-        if(dbH!=null){
+        if (dbH != null) {
             ChatSettings chatSettings = dbH.getChatSettings();
-            boolean sendOriginalAttachments;
 
-            if(chatSettings!=null){
-                if(chatSettings.getEnabled()!=null){
-                    sendOriginalAttachments = Boolean.parseBoolean(chatSettings.getSendOriginalAttachments());
-                    return sendOriginalAttachments;
-                }
-                else{
-                    sendOriginalAttachments=false;
-                    return sendOriginalAttachments;
-                }
-            }
-            else{
-                sendOriginalAttachments=false;
-                return sendOriginalAttachments;
+            if (chatSettings != null) {
+                return Boolean.parseBoolean(chatSettings.getSendOriginalAttachments());
+            } else {
+                return false;
             }
         }
-        else{
-            return false;
-        }
+
+        return false;
     }
 }

@@ -26,10 +26,11 @@
         android:layout_toRightOf="@id/transfers_list_thumbnail"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
+		android:layout_marginRight="13dp"
         android:textColor="@color/file_list_first_row"
-        android:ellipsize="end"
+        android:ellipsize="middle"
         android:textSize="16sp"
-        android:maxLines="1"/>
+		android:singleLine="true"/>
     
     <ImageView
         android:id="@+id/transfers_list_completed_image"
@@ -47,7 +48,10 @@
         android:layout_toRightOf="@id/transfers_list_completed_image"
         android:layout_below="@+id/transfers_list_filename"
         android:textColor="@color/file_list_second_row"
-        android:layout_marginLeft="5dp"/>
+        android:layout_marginLeft="5dp"
+		android:layout_marginRight="13dp"
+		android:singleLine="true"
+		android:ellipsize="middle"/>
 
 	<ImageButton
 		android:id="@+id/transfers_list_option_remove"

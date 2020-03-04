@@ -340,7 +340,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.itemLayout.setOnClickListener(this);
 				holder.itemLayout.setOnLongClickListener(this);
 			}
-			if (isChatEnabled() && chat.isCallInProgress() && megaChatApi != null && megaChatApi.getNumCalls() != 0) {
+			if (chat.isCallInProgress() && megaChatApi != null && megaChatApi.getNumCalls() != 0) {
 				MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
 				if (call != null) {
 					if(call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT || call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED){

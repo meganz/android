@@ -33,6 +33,7 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
@@ -74,7 +75,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
@@ -1200,16 +1200,33 @@ public class Util {
 		return null;
 	}
 
-	public static void showAlert(Context context, String message, String title) {
-		logDebug("showAlert");
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		if(title!=null){
-			builder.setTitle(title);
-		}
-		builder.setMessage(message);
-		builder.setPositiveButton("OK",null);
-		builder.show();
-	}
+    public static AlertDialog showAlert(Context context, String message, String title) {
+        logDebug("showAlert");
+        return showAlert(context, message, title, null);
+    }
+
+    /**
+     * Show a simple alert dialog with a 'OK' button to dismiss itself.
+     *
+     * @param context Context
+     * @param message the text content.
+     * @param title the title of the dialog, optional.
+     * @param listener callback when press 'OK' button, optional.
+     * @return the created alert dialog, the caller should cancel the dialog when the context destoried, otherwise window will leak.
+     */
+    public static AlertDialog showAlert(Context context, String message, @Nullable String title, @Nullable DialogInterface.OnDismissListener listener) {
+        logDebug("showAlert");
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        if (title != null) {
+            builder.setTitle(title);
+        }
+        builder.setMessage(message);
+        builder.setPositiveButton(context.getString(R.string.general_ok), null);
+        if (listener != null) {
+            builder.setOnDismissListener(listener);
+        }
+        return builder.show();
+    }
 
 	public static long calculateTimestampMinDifference(String timeStamp) {
 		logDebug("calculateTimestampDifference");
@@ -1259,31 +1276,6 @@ public class Util {
 		cal.setTimeInMillis(timestamp*1000);
 		logDebug("Calendar: " + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.MONTH));
 		return cal;
-	}
-
-	public static boolean isChatEnabled (){
-		logDebug("isChatEnabled");
-		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-		ChatSettings chatSettings = dbH.getChatSettings();
-		boolean chatEnabled;
-
-		if(chatSettings!=null){
-			if(chatSettings.getEnabled()!=null){
-				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-				logDebug("A - chatEnabled: " + chatEnabled);
-				return chatEnabled;
-			}
-			else{
-				chatEnabled=true;
-				logDebug("B - chatEnabled: " + chatEnabled);
-				return chatEnabled;
-			}
-		}
-		else{
-			chatEnabled=true;
-			logDebug("C - chatEnabled: " + chatEnabled);
-			return chatEnabled;
-		}
 	}
 
 	public static boolean canVoluntaryVerifyPhoneNumber() {
@@ -1451,27 +1443,23 @@ public class Util {
 			}
 		}
 	}
-
-	public static void changeStatusBarColor(Context context, Window window, int color) {
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.setStatusBarColor(ContextCompat.getColor(context, color));
-	}
-
-    public static Bitmap createAvatarBackground(String colorString) {
+    public static Bitmap createAvatarBackground(int color) {
         Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(circle);
         Paint paintCircle = new Paint();
         paintCircle.setAntiAlias(true);
-        int color = (colorString == null) ?
-                ContextCompat.getColor(MegaApplication.getInstance().getApplicationContext(), R.color.lollipop_primary_color) :
-                Color.parseColor(colorString);
         paintCircle.setColor(color);
         int radius = circle.getWidth() / 2;
         c.drawCircle(radius, radius, radius, paintCircle);
         return circle;
     }
-    
+
+    public static void changeStatusBarColor(Context context, Window window, int color) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(ContextCompat.getColor(context, color));
+    }
+
 	public static MegaPreferences getPreferences (Context context) {
 		return DatabaseHandler.getDbHandler(context).getPreferences();
 	}
@@ -1672,10 +1660,6 @@ public class Util {
 
 	}
 
-	public static boolean isPermissionGranted(Context context, String permission){
-        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
-    }
-
 	public static boolean isScreenInPortrait(Context context) {
 		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			return true;
@@ -1749,28 +1733,6 @@ public class Util {
 
 		logDebug("URL decoded: " + url);
 		return url;
-	}
-
-    public static boolean hasPermissions(Context context, String... permissions) {
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-			return true;
-		}
-
-		if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-	public static void requestPermission(Activity activity, int requestCode, String... permission) {
-		ActivityCompat.requestPermissions(activity,
-				permission,
-				requestCode);
 	}
 
     /**

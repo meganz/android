@@ -39,7 +39,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
-import static mega.privacy.android.app.utils.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -70,13 +70,9 @@ public class BaseActivity extends AppCompatActivity {
         if (app != null) {
             megaApi = app.getMegaApi();
             megaApiFolder = app.getMegaApiFolder();
-
-            if(isChatEnabled()) {
-                megaChatApi = app.getMegaChatApi();
-            }
+            megaChatApi = app.getMegaChatApi();
+            dbH = app.getDbH();
         }
-
-        dbH = app.getDbH();
     }
 
     private AlertDialog expiredBusinessAlert;
@@ -114,6 +110,9 @@ public class BaseActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(takenDownFilesReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(transferFinishedReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED));
 
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
@@ -161,6 +160,7 @@ public class BaseActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(accountBlockedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(businessExpiredReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(takenDownFilesReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(transferFinishedReceiver);
 
         super.onDestroy();
     }
@@ -184,10 +184,8 @@ public class BaseActivity extends AppCompatActivity {
                 megaApiFolder = app.getMegaApiFolder();
             }
 
-            if(isChatEnabled()){
-                if (megaChatApi == null){
-                    megaChatApi = app.getMegaChatApi();
-                }
+            if (megaChatApi == null){
+                megaChatApi = app.getMegaChatApi();
             }
         }
 
@@ -258,6 +256,33 @@ public class BaseActivity extends AppCompatActivity {
             logDebug("BROADCAST INFORM THERE ARE TAKEN DOWN FILES IMPLIED IN ACTION");
             int numberFiles = intent.getIntExtra(NUMBER_FILES, 1);
             Util.showSnackbar(baseActivity, getResources().getQuantityString(R.plurals.alert_taken_down_files, numberFiles, numberFiles));
+        }
+    };
+
+    /**
+     * Broadcast to show a snackbar when all the transfers finish
+     */
+    private BroadcastReceiver transferFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) {
+                return;
+            }
+
+            String message = null;
+            int numTransfers = intent.getIntExtra(NUMBER_FILES, 1);
+
+            switch (intent.getStringExtra(TRANSFER_TYPE)) {
+                case DOWNLOAD_TRANSFER:
+                    message = getResources().getQuantityString(R.plurals.download_finish, numTransfers, numTransfers);
+                    break;
+
+                case UPLOAD_TRANSFER:
+                    message = getResources().getQuantityString(R.plurals.upload_finish, numTransfers, numTransfers);
+                    break;
+            }
+
+            Util.showSnackbar(baseActivity, message);
         }
     };
 
@@ -334,20 +359,17 @@ public class BaseActivity extends AppCompatActivity {
                 megaApi.retryPendingConnections();
             }
 
-            if(isChatEnabled()) {
-                if (megaChatApi != null) {
-                    megaChatApi.retryPendingConnections(false, null);
+            if (megaChatApi != null) {
+                megaChatApi.retryPendingConnections(false, null);
 
-                    if(megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()){
-                        delaySignalPresence = false;
-                        if(!(this instanceof ChatCallActivity) && megaChatApi.isSignalActivityRequired()){
-                            logDebug("Send signal presence");
-                            megaChatApi.signalPresenceActivity();
-                        }
+                if (megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()) {
+                    delaySignalPresence = false;
+                    if (!(this instanceof ChatCallActivity) && megaChatApi.isSignalActivityRequired()) {
+                        logDebug("Send signal presence");
+                        megaChatApi.signalPresenceActivity();
                     }
-                    else {
-                        delaySignalPresence = true;
-                    }
+                } else {
+                    delaySignalPresence = true;
                 }
             }
         }
@@ -474,30 +496,6 @@ public class BaseActivity extends AppCompatActivity {
         TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
         snackbar.show();
-    }
-
-    /**
-     * Method for send a file into one or more chats
-     *
-     * @param context Context of the Activity where the file has to be sent
-     * @param chats Chats where the file has to be sent
-     * @param fileHandle Handle of the file that has to be sent
-     */
-    public void sendFileToChatsFromContacts(Context context, ArrayList<MegaChatRoom> chats, long fileHandle){
-        logDebug("sendFileToChatsFromContacts");
-
-        MultipleAttachChatListener listener = null;
-
-        if(chats.size()==1){
-            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), chats.size());
-            megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
-        }
-        else{
-            listener = new MultipleAttachChatListener(context, -1, chats.size());
-            for(int i=0;i<chats.size();i++){
-                megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
-            }
-        }
     }
 
     /**

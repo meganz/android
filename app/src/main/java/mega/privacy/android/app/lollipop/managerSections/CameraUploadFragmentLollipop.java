@@ -85,14 +85,15 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_CU;
 import static mega.privacy.android.app.MegaPreferences.*;
-import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
@@ -792,8 +793,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			switchCellularConnection = (SwitchCompat) v.findViewById(R.id.cellular_connection_switch);
 			switchUploadVideos = (SwitchCompat) v.findViewById(R.id.upload_videos_switch);
 
-			bSkip.setText(getString(R.string.cam_sync_skip));
-			bOK.setText(getString(R.string.cam_sync_ok));
+			bSkip.setText(getString(R.string.general_skip));
+			bOK.setText(getString(R.string.general_ok));
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				bSkip.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
 				bOK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
@@ -1376,7 +1377,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.setFirstTime(false);
 //		dbH.setCamSyncEnabled(false);
-		dbH.setStorageAskAlways(false);
+		dbH.setStorageAskAlways(true);
 		File defaultDownloadLocation = buildDefaultDownloadDir(context);
 		defaultDownloadLocation.mkdirs();
 		

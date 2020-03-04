@@ -445,9 +445,16 @@
 	              android:theme="@style/SMSVerificationReceiveTxtActivityTheme"/>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity"
+            android:name="mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity"
             android:label="@string/contact_properties_activity"
-            android:theme="@style/Theme.Megaactionbar.Secondary"
+            android:theme="@style/PreferencesScreen"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity"
+            android:label="@string/download_location"
+            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 

@@ -211,5 +211,7 @@
     <color name="status_bar_red_alert">#CF4949</color>
 
     <color name="reconnecting_bar">#FFF5A623</color>
+    <color name="voice_clip_bubble">#323232</color>
+    <color name="background_recording">#78252525</color>
 
 </resources>
