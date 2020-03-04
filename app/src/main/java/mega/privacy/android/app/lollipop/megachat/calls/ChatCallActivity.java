@@ -2290,7 +2290,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             megaChatApi.signalPresenceActivity();
         }
         application.setSpeakerStatus(callChat.getChatid(), isVideoCall);
-        if(isVideoCall) application.manuallyActivatedLocalCamera();
+        if (isVideoCall) application.manuallyActivatedLocalCamera();
         megaChatApi.answerChatCall(chatId, isVideoCall, this);
     }
 

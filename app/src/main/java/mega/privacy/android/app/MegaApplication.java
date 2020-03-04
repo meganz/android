@@ -179,40 +179,41 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
-	private void checkDeviceCamera() {
-		if(cameraManager != null) return;
-		cameraManager = (CameraManager) getApplicationContext().getSystemService(Context.CAMERA_SERVICE);
-		if(cameraHandler == null) cameraHandler = new Handler();
+	private void disableLocalCamera() {
+		if (localCameraEnabled) {
+			localCameraEnabled = false;
+			return;
+		}
+		if (megaChatApi == null) return;
+		long chatIdCallInProgress = getChatCallInProgress(megaChatApi);
+		MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
+		if (callInProgress != null && callInProgress.hasLocalVideo()) {
+			logDebug("Disabling local video ... the camera is using by other app");
+			megaChatApi.disableVideo(chatIdCallInProgress, null);
+		}
+	}
 
-		if(cameraCallback == null) {
+	private void checkDeviceCamera() {
+		if (cameraManager != null) return;
+		cameraManager = (CameraManager) getApplicationContext().getSystemService(Context.CAMERA_SERVICE);
+		if (cameraHandler == null) cameraHandler = new Handler();
+
+		if (cameraCallback == null) {
 			cameraCallback = new CameraManager.AvailabilityCallback() {
 				@Override
 				public void onCameraAvailable(String cameraId) {
 					super.onCameraAvailable(cameraId);
+					disableLocalCamera();
 				}
 
 				@Override
 				public void onCameraUnavailable(String cameraId) {
 					super.onCameraUnavailable(cameraId);
-					/*Find the call in progress that has video enabled and disable the video*/
-					if(localCameraEnabled){
-						localCameraEnabled = false;
-						return;
-					}
-					if (megaChatApi != null) {
-						long chatIdCallInProgress = getChatCallInProgress(megaChatApi);
-						MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
-						if (callInProgress != null && callInProgress.hasLocalVideo()) {
-							logDebug("Disabling local video ... the camera is using by other app");
-							megaChatApi.disableVideo(chatIdCallInProgress, null);
-						}
-					}
+					disableLocalCamera();
 				}
 			};
 		}
-
-		cameraManager.registerAvailabilityCallback((CameraManager.AvailabilityCallback) cameraCallback, cameraHandler);
-
+		cameraManager.registerAvailabilityCallback(cameraCallback, cameraHandler);
 	}
 
 	public void manuallyActivatedLocalCamera(){
@@ -1324,7 +1325,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 				case MegaChatCall.CALL_STATUS_RING_IN:
 				case MegaChatCall.CALL_STATUS_JOINING:
-				case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
+				case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+				case MegaChatCall.CALL_STATUS_RECONNECTING: {
 					checkDeviceCamera();
 					if (megaChatApi != null) {
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();

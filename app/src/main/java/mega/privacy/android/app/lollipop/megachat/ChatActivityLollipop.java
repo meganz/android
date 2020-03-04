@@ -2533,8 +2533,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
 
     }
-    private void checkCamera(){
-        if(startVideo) app.manuallyActivatedLocalCamera();
+
+    private void checkCamera() {
+        if (startVideo) app.manuallyActivatedLocalCamera();
     }
 
     private boolean checkPermissions(String permission, int requestCode) {
