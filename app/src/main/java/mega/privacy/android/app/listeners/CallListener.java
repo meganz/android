@@ -2,7 +2,6 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -19,8 +18,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 public class CallListener implements MegaChatCallListenerInterface {
 
     Context context;
-    private MegaApplication application = MegaApplication.getInstance();
-
     public CallListener(Context context) {
         this.context = context;
     }
@@ -53,7 +50,6 @@ public class CallListener implements MegaChatCallListenerInterface {
             if (callStatus == MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM) {
                 if (context instanceof ChatCallActivity)
                     ((ChatCallActivity) context).updateLocalAV();
-
             }
             if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
                 if (context instanceof CallService)
@@ -74,7 +70,7 @@ public class CallListener implements MegaChatCallListenerInterface {
             if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                 if (context instanceof CallService)
                     ((CallService) context).updateNotificationContent(call);
-                if (context instanceof ChatCallActivity){
+                if (context instanceof ChatCallActivity) {
                     ((ChatCallActivity) context).checkInprogressCall(call.getId());
                 }
             }
@@ -106,8 +102,8 @@ public class CallListener implements MegaChatCallListenerInterface {
             logDebug("Changes in local av flags ");
             if (context instanceof ChatActivityLollipop)
                 ((ChatActivityLollipop) context).usersWithVideo(call);
-            if (context instanceof ChatCallActivity) ((ChatCallActivity) context).updateLocalAV();
-
+            if (context instanceof ChatCallActivity)
+                ((ChatCallActivity) context).updateLocalAV();
         }
 
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION)) {
