@@ -15943,12 +15943,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	public void addCompletedTransfer(MegaTransfer transfer){
 		logDebug("Node Handle: " + transfer.getNodeHandle());
 
-		String size = getSizeString(transfer.getTotalBytes());
-		AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"", transfer.getParentPath());
-
 		completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
-		if(completedTFLol!=null){
-			completedTFLol.transferFinish(completedTransfer);
+		if (completedTFLol != null) {
+			completedTFLol.transferFinish(new AndroidCompletedTransfer(transfer));
 		}
 	}
 
@@ -15993,18 +15990,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		//workaround - can not get folder transfer children detail except using global listener
-        if(transfer.getType()==MegaTransfer.TYPE_UPLOAD && transfer.getFolderTransferTag() > 0) {
-            Intent intent = new Intent(this,UploadService.class);
-            if (e.getErrorCode() == MegaError.API_OK) {
-                intent.setAction(ACTION_CHILD_UPLOADED_OK);
-                startService(intent);
-            }else{
-                intent.setAction(ACTION_CHILD_UPLOADED_FAILED);
-                startService(intent);
-            }
-        }
-
-        //workaround - can not get folder transfer children detail except using global listener
         if(transfer.getType()==MegaTransfer.TYPE_UPLOAD && transfer.getFolderTransferTag() > 0) {
             Intent intent = new Intent(this,UploadService.class);
             if (e.getErrorCode() == MegaError.API_OK) {
@@ -17007,12 +16992,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			result = Html.fromHtml(textToShow);
 		}
 		notificationsSectionText.setText(result);
-	}
-
-	@Override
-	public void onActionModeStarted(ActionMode mode) {
-		super.onActionModeStarted(mode);
-		getTheme().applyStyle(R.style.ActionOverflowButtonStyle, true);
 	}
 
 	public void setChatBadge() {

@@ -19,8 +19,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
@@ -199,5 +201,27 @@ public class MegaNodeUtil {
 
             return dialog;
         }
+    }
+
+    public static String getParentFolderPath(MegaNode node) {
+        if (node != null) {
+            MegaApplication app = MegaApplication.getInstance();
+            MegaApiAndroid megaApi = app.getMegaApi();
+            String path = megaApi.getNodePath(node);
+
+            while (megaApi.getParentNode(node) != null) {
+                node = megaApi.getParentNode(node);
+            }
+
+            if (node.getHandle() == megaApi.getRootNode().getHandle()) {
+                return app.getString(R.string.section_cloud_drive) + path;
+            } else if (node.getHandle() == megaApi.getRubbishNode().getHandle()) {
+                return app.getString(R.string.section_rubbish_bin) + path.replace("bin" + SEPARATOR, "");
+            } else if (node.isInShare()) {
+                return app.getString(R.string.title_incoming_shares_explorer) + SEPARATOR + path.substring(path.indexOf(":") + 1);
+            }
+        }
+
+        return "";
     }
 }

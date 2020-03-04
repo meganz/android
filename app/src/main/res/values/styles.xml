@@ -149,13 +149,6 @@
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="ActionOverflowButtonStyle" parent="@style/Widget.AppCompat.ActionButton.Overflow">
-        <item name="srcCompat">@drawable/ic_dots_vertical_white</item>
-        <item name="android:src">@drawable/ic_dots_vertical_white</item>
-        <item name="background">@drawable/ic_dots_vertical_white</item>
-        <item name="android:background">@drawable/ic_dots_vertical_white</item>
-    </style>
-
     <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">@color/dark_primary_color</item>
         <item name="tabIndicatorHeight">2dp</item>

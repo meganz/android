@@ -275,7 +275,7 @@ public class OfflineUtils {
 
         switch (from) {
             case FROM_INCOMING_SHARES: {
-                path = path + OFFLINE_DIR + File.separator + OfflineUtils.findIncomingParentHandle(node, megaApi);
+                path = path + OFFLINE_DIR + File.separator + findIncomingParentHandle(node, megaApi);
                 break;
             }
             case FROM_INBOX: {
@@ -639,5 +639,24 @@ public class OfflineUtils {
         }
 
         return false;
+    }
+
+    public static String removeInitialOfflinePath(String path, long handle) {
+        MegaApplication app = MegaApplication.getInstance();
+        MegaApiAndroid megaApi = app.getMegaApi();
+
+        File inboxOfflineFolder = getOfflineFolder(app, OFFLINE_INBOX_DIR);
+        MegaNode transferNode = megaApi.getNodeByHandle(handle);
+        File incomingFolder = getOfflineFolder(app, OFFLINE_DIR + SEPARATOR + findIncomingParentHandle(transferNode, megaApi));
+
+        if (inboxOfflineFolder != null && path.startsWith(inboxOfflineFolder.getAbsolutePath())) {
+            path = path.replace(inboxOfflineFolder.getPath(), "");
+        } else if (incomingFolder != null && path.startsWith(incomingFolder.getAbsolutePath())) {
+            path = path.replace(incomingFolder.getPath(), "");
+        } else {
+            path = path.replace(getOfflineFolder(app, OFFLINE_DIR).getPath(), "");
+        }
+
+        return app.getString(R.string.section_saved_for_offline_new) + path;
     }
 }

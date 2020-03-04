@@ -311,14 +311,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-		newFolderMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
-		
-		if (mode == Mode.PICK_FOLDER) {
+
+        if (mode == Mode.PICK_FOLDER) {
             newFolderMenuItem.setVisible(true);
-		}
-		else{
-			newFolderMenuItem.setVisible(false);
-		}
+        } else {
+            newFolderMenuItem.setVisible(false);
+        }
 	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -350,12 +348,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 						REQUEST_WRITE_STORAGE);
 			}
 		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
-		}
+		changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
@@ -380,6 +373,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		aB = getSupportActionBar();
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
 		
 		Intent intent = getIntent();
 		prompt = intent.getStringExtra(EXTRA_PROMPT);
@@ -398,10 +392,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			serializedNodes = intent.getStringArrayListExtra(EXTRA_SERIALIZED_NODES);
 			url = intent.getExtras().getString(EXTRA_URL);
 			size = intent.getExtras().getLong(EXTRA_SIZE);
-			aB.setTitle(getString(R.string.general_select_to_download));
+			aB.setTitle(getString(R.string.general_select_to_download).toUpperCase());
 		}
 		else{
-			aB.setTitle(getString(R.string.general_select_to_upload));
+			aB.setTitle(getString(R.string.general_select_to_upload).toUpperCase());
 		}
 		
 		if (savedInstanceState != null) {
@@ -574,8 +568,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		
 		setFiles(newPath);
 		path = newPath;
-		contentText.setText(makeBold(path.getAbsolutePath(), path.getName()));
-//		windowTitle.setText(makeBold(path.getAbsolutePath(), path.getName()));
+		contentText.setText(path.getAbsolutePath());
 		invalidateOptionsMenu();
         if (mode == Mode.PICK_FILE) {
 			clearSelections();

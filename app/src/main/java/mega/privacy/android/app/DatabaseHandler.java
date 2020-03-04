@@ -33,7 +33,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 54;
+	private static final int DATABASE_VERSION = 55;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -152,6 +152,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_TRANSFER_SIZE = "transfersize";
 	private static final String KEY_TRANSFER_HANDLE = "transferhandle";
 	private static final String KEY_TRANSFER_PATH = "transferpath";
+	private static final String KEY_TRANSFER_OFFLINE = "transferoffline";
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
 	private static final String KEY_SMALL_GRID_CAMERA = "smallgridcamera";
@@ -357,7 +358,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_TRANSFER_FILENAME + " TEXT, " + KEY_TRANSFER_TYPE + " TEXT, " +
-				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT, " + KEY_TRANSFER_PATH + " TEXT" + ")";
+				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT, " + KEY_TRANSFER_PATH + " TEXT, " +
+				KEY_TRANSFER_OFFLINE + " BOOLEAN" + ")";
 		db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
 
 		String CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS " + TABLE_EPHEMERAL + "("
@@ -776,6 +778,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_ASK_SET_DOWNLOAD_LOCATION + " = '" + encrypt("true") + "';");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_ASK_ALWAYS + " = '" + encrypt("true") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_PATH + " TEXT;");
+		}
+
+		if (oldVersion <= 54) {
+			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_OFFLINE + " BOOLEAN;");
 		}
 	}
 
@@ -1740,6 +1746,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_TRANSFER_SIZE, encrypt(transfer.getSize()));
 		values.put(KEY_TRANSFER_HANDLE, encrypt(transfer.getNodeHandle()));
 		values.put(KEY_TRANSFER_PATH, encrypt(transfer.getPath()));
+		values.put(KEY_TRANSFER_OFFLINE, encrypt(transfer.getIsOfflineFile() + ""));
 
 		db.insert(TABLE_COMPLETED_TRANSFERS, null, values);
 	}
@@ -1766,8 +1773,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String size = decrypt(cursor.getString(4));
 					String nodeHandle = decrypt(cursor.getString(5));
 					String path = decrypt(cursor.getString(6));
+					boolean offline = Boolean.parseBoolean(decrypt(cursor.getString(7)));
 
-					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(filename, typeInt, stateInt, size, nodeHandle, path);
+					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(filename, typeInt, stateInt, size, nodeHandle, path, offline);
 					cTs.add(cT);
 				} while (cursor.moveToPrevious());
 			}

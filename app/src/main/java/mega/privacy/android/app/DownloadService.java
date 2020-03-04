@@ -1480,9 +1480,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(!transfer.isFolderTransfer()){
 				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
-					String size = getSizeString(transfer.getTotalBytes());
-					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"", transfer.getParentPath());
-					dbH.setCompletedTransfer(completedTransfer);
+					dbH.setCompletedTransfer(new AndroidCompletedTransfer(transfer));
 				}
 
 				if (!isVoiceClip) {
