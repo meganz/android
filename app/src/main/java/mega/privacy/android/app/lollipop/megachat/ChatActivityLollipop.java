@@ -8580,16 +8580,16 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void checkIfIsNeededToAskForMyChatFilesFolder() {
-        if (!existsMyChatFilesFolder()) {
-            megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
-        }
+        if (existsMyChatFilesFolder()) {
+            setMyChatFilesFolder(getMyChatFilesFolder());
 
-        setMyChatFilesFolder(getMyChatFilesFolder());
-
-        if (isForwardingFromNC()) {
-            handleStoredData();
+            if (isForwardingFromNC()) {
+                handleStoredData();
+            } else {
+                proceedWithAction();
+            }
         } else {
-            proceedWithAction();
+            megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
         }
     }
 

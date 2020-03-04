@@ -17,12 +17,23 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class GetAttrUserListener extends BaseListener {
 
+    /**
+     * Indicates if the request is only to update the DB.
+     * If so, the rest of the actions in onRequestFinish() can be ignored.
+     */
     private boolean onlyDBUpdate;
 
     public GetAttrUserListener(Context context) {
         super(context);
     }
 
+    /**
+     * Constructor to init a request for check the USER_ATTR_MY_CHAT_FILES_FOLDER user's attribute
+     * and update the DB with the result.
+     *
+     * @param context       current application context
+     * @param onlyDBUpdate  true if the purpose of the request is only update the DB, false otherwise
+     */
     public GetAttrUserListener(Context context, boolean onlyDBUpdate) {
         super(context);
 
@@ -55,6 +66,8 @@ public class GetAttrUserListener extends BaseListener {
                         }
                         api.setMyChatFilesFolder(myChatFolderNode.getHandle(), new SetAttrUserListener(context));
                     }
+                } else {
+                    logError("Error getting \"My chat files\" folder: " + e.getErrorString());
                 }
 
                 if (myChatFolderNode != null && !api.isInRubbish(myChatFolderNode)) {
@@ -94,10 +107,6 @@ public class GetAttrUserListener extends BaseListener {
                         nodeAttachmentHistoryActivity.setMyChatFilesFolder(myChatFolderNode);
                         nodeAttachmentHistoryActivity.handleStoredData();
                     }
-                }
-
-                if (e.getErrorCode() != MegaError.API_OK || e.getErrorCode() != MegaError.API_ENOENT) {
-                    logError("Error getting \"My chat files\" folder: " + e.getErrorString());
                 }
 
                 break;

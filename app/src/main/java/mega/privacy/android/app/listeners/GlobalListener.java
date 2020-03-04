@@ -35,8 +35,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
     public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
         if (users == null || users.isEmpty()) return;
 
-        if (users.size() == 1) {
-            MegaUser user = users.get(0);
+        for (MegaUser user : users) {
+            if (user == null) {
+                continue;
+            }
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER)
                     && api.getMyUserHandle().equals(Long.toString(user.getHandle()))) {

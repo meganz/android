@@ -145,6 +145,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
             }
             if (myChatFilesFolderExists) {
                 proceedWithHandleStoredData(request.getNodeHandle());
+                MegaApplication.getInstance().getDbH().setMyChatFilesFolderHandle(request.getNodeHandle());
             }
         }
     }
