@@ -585,6 +585,12 @@ public class RecordView extends RelativeLayout {
         animationHelper.animateSmallMicAlpha();
         counterTime.setBase(SystemClock.elapsedRealtime());
         counterTime.start();
+        counterTime.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chrono) {
+                recordListener.changeTimer(chrono.getText());
+            }
+        });
     }
 
     public void setOnRecordListener(OnRecordListener recordListener) {

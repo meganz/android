@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white">
+
+    <mega.privacy.android.app.components.TwoLineCheckPreference
+        android:key="settings_storage_ask_me_always"
+        android:title="@string/settings_storage_ask_me_always"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
+    <android.support.v7.preference.Preference
+        android:key="settings_storage_download_location"
+        android:title="@string/settings_storage_download_location"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
+</android.support.v7.preference.PreferenceScreen>
