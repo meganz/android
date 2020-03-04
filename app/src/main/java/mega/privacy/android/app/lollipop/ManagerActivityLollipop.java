@@ -736,6 +736,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	RelativeLayout inboxSection;
 	RelativeLayout contactsSection;
 	RelativeLayout notificationsSection;
+	private RelativeLayout transfersSection;
 	RelativeLayout settingsSection;
 	Button upgradeAccount;
 	TextView contactsSectionText;
@@ -2096,7 +2097,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		notificationsSection = (RelativeLayout) findViewById(R.id.notifications_section);
 		notificationsSection.setOnClickListener(this);
 		notificationsSectionText = (TextView) findViewById(R.id.notification_section_text);
-        contactsSectionText = (TextView) findViewById(R.id.contacts_section_text);
+		contactsSectionText = (TextView) findViewById(R.id.contacts_section_text);
+		transfersSection = findViewById(R.id.transfers_section);
+		transfersSection.setOnClickListener(this);
         settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
         upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
@@ -11940,6 +11943,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		logDebug("onClick");
 
 		DrawerItem oldDrawerItem = drawerItem;
+		boolean sectionClicked = false;
 
 		switch(v.getId()){
 			case R.id.navigation_drawer_add_phone_number_button:{
@@ -11976,53 +11980,46 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 			case R.id.navigation_drawer_account_section:
 			case R.id.my_account_section: {
-				isFirstTimeCam();
 				if (isOnline(this) && megaApi.getRootNode()!=null) {
+					sectionClicked = true;
 					drawerItem = DrawerItem.ACCOUNT;
 					accountFragment = MY_ACCOUNT_FRAGMENT;
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
-					selectDrawerItemLollipop(drawerItem);
 				}
 				break;
 			}
 			case R.id.inbox_section: {
-				isFirstTimeCam();
+				sectionClicked = true;
 				drawerItem = DrawerItem.INBOX;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.contacts_section: {
-				isFirstTimeCam();
+				sectionClicked = true;
 				drawerItem = DrawerItem.CONTACTS;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.notifications_section: {
-				isFirstTimeCam();
+				sectionClicked = true;
 				drawerItem = DrawerItem.NOTIFICATIONS;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
+			case R.id.transfers_section:
+				sectionClicked = true;
+				drawerItem = DrawerItem.TRANSFERS;
+				break;
+
 			case R.id.settings_section: {
-				isFirstTimeCam();
+				sectionClicked = true;
 				drawerItem = DrawerItem.SETTINGS;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.upgrade_navigation_view: {
-				isFirstTimeCam();
+				sectionClicked = true;
 				drawerLayout.closeDrawer(Gravity.LEFT);
 				drawerItemPreUpgradeAccount = drawerItem;
 				drawerItem = DrawerItem.ACCOUNT;
 				accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
 				displayedAccountType = -1;
-				checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.lost_authentication_device: {
@@ -12063,6 +12060,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}
 				break;
 			}
+		}
+
+		if (sectionClicked) {
+			isFirstTimeCam();
+			checkIfShouldCloseSearchView(oldDrawerItem, drawerItem);
+			selectDrawerItemLollipop(drawerItem);
 		}
 	}
 
