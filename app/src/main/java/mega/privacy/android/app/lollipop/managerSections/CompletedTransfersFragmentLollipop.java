@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,10 +25,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaCompletedTransfersAdapter;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
 public class CompletedTransfersFragmentLollipop extends Fragment {
@@ -120,7 +119,7 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		} catch (Exception e) {
 			logWarning("Exception formatting string", e);
 		}
-		emptyText.setText(Util.getSpannedHtmlText(textToShow));
+		emptyText.setText(getSpannedHtmlText(textToShow));
 
 		setCompletedTransfers();
 
@@ -131,7 +130,7 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		return v;
 	}
 
-	public void setCompletedTransfers() {
+	private void setCompletedTransfers() {
 		logDebug("setCompletedTransfers");
 		tL.clear();
 		tL.addAll(dbH.getCompletedTransfers());
@@ -158,24 +157,9 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 	}
 
 	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		context = activity;
-	}
-
-	public int onBackPressed() {
-
-		if (adapter == null) {
-			return 0;
-		}
-
-		if (adapter.getPositionClicked() != -1) {
-			adapter.setPositionClicked(-1);
-			adapter.notifyDataSetChanged();
-			return 1;
-		} else {
-			return 0;
-		}
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		this.context = context;
 	}
 
 	public void transferFinish(AndroidCompletedTransfer transfer) {
