@@ -19,7 +19,7 @@ import nz.mega.sdk.MegaStringMap;
 import nz.mega.sdk.MegaUser;
 import mega.privacy.android.app.MegaApplication;
 
-import static mega.privacy.android.app.utils.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 

@@ -1441,27 +1441,23 @@ public class Util {
 			}
 		}
 	}
-
-	public static void changeStatusBarColor(Context context, Window window, int color) {
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.setStatusBarColor(ContextCompat.getColor(context, color));
-	}
-
-    public static Bitmap createAvatarBackground(String colorString) {
+    public static Bitmap createAvatarBackground(int color) {
         Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(circle);
         Paint paintCircle = new Paint();
         paintCircle.setAntiAlias(true);
-        int color = (colorString == null) ?
-                ContextCompat.getColor(MegaApplication.getInstance().getApplicationContext(), R.color.lollipop_primary_color) :
-                Color.parseColor(colorString);
         paintCircle.setColor(color);
         int radius = circle.getWidth() / 2;
         c.drawCircle(radius, radius, radius, paintCircle);
         return circle;
     }
-    
+
+    public static void changeStatusBarColor(Context context, Window window, int color) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(ContextCompat.getColor(context, color));
+    }
+
 	public static MegaPreferences getPreferences (Context context) {
 		return DatabaseHandler.getDbHandler(context).getPreferences();
 	}

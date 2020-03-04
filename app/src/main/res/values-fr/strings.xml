@@ -1886,7 +1886,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">Vous souvenez-vous de votre mot de passe ?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">Vous êtes sur le point de vous déconnecter, veuillez tester votre mot de passe pour vous assurer que vous en souvenez. \nSi vous perdez votre mot de passe, vous perdrez l\'accès à vos données MEGA.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Veuillez tester votre mot de passe pour vous assurer que vous en souvenez. Si vous perdez votre mot de passe, vous perdrez l\'accès à vos données MEGA.</string>
-    <string name="remember_pwd_dialog_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">Ne plus afficher</string>
+    <string name="general_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">Ne plus afficher</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Tester le mot de passe</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Testez votre mot de passe</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Le mot de passe a été accepté</string>

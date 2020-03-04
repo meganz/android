@@ -1,36 +1,22 @@
-package mega.privacy.android.app.lollipop.megachat;
+package mega.privacy.android.app.fragments.settingsFragments;
 
-
-import android.app.Activity;
-import android.content.Context;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.SwitchPreferenceCompat;
 
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApiAndroid;
+import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 
+import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class SettingsChatFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
-    Context context;
-    private MegaApiAndroid megaApi;
-    private MegaChatApiAndroid megaChatApi;
-    DatabaseHandler dbH;
-    MegaPreferences prefs;
-    ChatSettings chatSettings;
+public class SettingsChatFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
-    public static String KEY_CHAT_NOTIFICATIONS = "settings_chat_notifications";
-    public static String KEY_CHAT_SOUND = "settings_chat_sound";
-    public static String KEY_CHAT_VIBRATE = "settings_chat_vibrate";
+    ChatSettings chatSettings;
 
     SwitchPreferenceCompat chatNotificationsSwitch;
     Preference chatSoundPreference;
@@ -39,22 +25,10 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
     boolean chatNotifications;
     boolean chatVibration;
 
-    @Override
-    public void onCreate(final Bundle savedInstanceState)
-    {
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) getActivity().getApplication()).getMegaApi();
-        }
+    public SettingsChatFragment () {
+        super();
 
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) getActivity().getApplication()).getMegaChatApi();
-        }
-
-        dbH = DatabaseHandler.getDbHandler(getActivity());
-        prefs = dbH.getPreferences();
         chatSettings = dbH.getChatSettings();
-
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -248,17 +222,5 @@ public class SettingsChatFragment extends PreferenceFragmentCompat implements Pr
             dbH.setNotificationSoundChat(chosenSound);
         }
 
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.context = activity;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
     }
 }
