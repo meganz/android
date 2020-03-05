@@ -66,7 +66,7 @@ import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 
 
-public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MyChatFilesExisitListener<Intent> {
+public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
 	static final float DOWNSCALE_IMAGES_PX = 2000000f;
 
@@ -80,6 +80,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public static String EXTRA_ATTACH_CHAT_IDS = "ATTACH_CHAT_IDS";
 	public static String EXTRA_UPLOAD_FILES_FINGERPRINTS = "UPLOAD_FILES_FINGERPRINTS";
 	public static String EXTRA_PEND_MSG_IDS = "PEND_MSG_IDS";
+	public static final String EXTRA_PARENT_NODE = "EXTRA_PARENT_NODE";
 
 	private boolean isForeground = false;
 	private boolean canceled;
@@ -127,9 +128,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private int notificationId = NOTIFICATION_CHAT_UPLOAD;
 	private String notificationChannelId = NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID;
 	private String notificationChannelName = NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME;
-
-	//Intent being stored when My Chat Files folder does not exist
-	private Intent preservedIntent;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -242,18 +240,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	}
 
 	protected void onHandleIntent(final Intent intent) {
-		if (existsMyChatFiles(intent, megaApi, this, this)) {
-			logDebug(CHAT_FOLDER + " already exists");
-			parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-			handleIntentIfFolderExist(intent);
-		} else {
-			logDebug(CHAT_FOLDER + " does not exist, create the folder then upload files");
-		}
-	}
-
-	private void handleIntentIfFolderExist(Intent intent) {
 		if (intent == null) return;
+
 		ArrayList<PendingMessageSingle> pendingMessageSingles = new ArrayList<>();
+		parentNode = MegaNode.unserialize(intent.getStringExtra(EXTRA_PARENT_NODE));
+
 		if (intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
 			HashMap<String, String> fileFingerprints = (HashMap<String, String>) intent.getSerializableExtra(EXTRA_UPLOAD_FILES_FINGERPRINTS);
 			long[] idPendMsgs = intent.getLongArrayExtra(EXTRA_PEND_MSG_IDS);
@@ -314,7 +305,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 
 			if (pendingMsg != null) {
-				sendOriginalAttachments = isSendOriginalAttachments(this);
+				sendOriginalAttachments = isSendOriginalAttachments();
 				logDebug("sendOriginalAttachments is " + sendOriginalAttachments);
 
 				if (chatId != -1) {
@@ -1402,21 +1393,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER && CHAT_FOLDER.equals(request.getName())) {
-			if (e.getErrorCode() == MegaError.API_OK) {
-				logDebug("Create folder successfully, continue on pending chat upload");
-				handleStoredData();
-			} else {
-				//cannot create chat folder
-				logWarning("Chat folder NOT exists and cannot be created --> STOP service");
-			    isForeground = false;
-			    stopForeground(true);
-			    mNotificationManager.cancel(notificationId);
-			    stopSelf();
-				logDebug("After stopSelf");
-			}
-		}
-
 		if (e.getErrorCode()==MegaError.API_OK) {
 			logDebug("onRequestFinish OK");
 		}
@@ -1587,20 +1563,5 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 		}
-	}
-
-	@Override
-	public void storedUnhandledData(Intent preservedData) {
-		preservedIntent = preservedData;
-	}
-
-	@Override
-	public void handleStoredData() {
-		logDebug("Create folder successfully, continue on pending chat upload");
-		if (parentNode == null) {
-			parentNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
-		}
-		handleIntentIfFolderExist(preservedIntent);
-		preservedIntent = null;
 	}
 }

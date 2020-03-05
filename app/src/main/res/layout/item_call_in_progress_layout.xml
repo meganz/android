@@ -25,9 +25,8 @@
             android:textColor="@color/white"
             android:gravity="center"
             android:textAlignment="gravity"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:singleLine="false"
+            android:singleLine="true"
+            android:ellipsize="middle"
             android:textSize="14sp"
             android:text="@string/call_in_progress_layout"/>
 

@@ -39,7 +39,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
@@ -106,22 +105,21 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static android.graphics.Color.BLACK;
-import static android.graphics.Color.TRANSPARENT;
-import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
-import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
-import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
-import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
+import static android.graphics.Color.*;
+import static mega.privacy.android.app.SearchNodesTask.*;
+import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
+import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.*;
+import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
+public class FullScreenImageViewerLollipop extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
 
 	int[] screenPosition;
 	int mLeftDelta;
@@ -196,7 +194,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
-	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 
 
 	MegaNode node;
@@ -1002,7 +999,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if (megaApi == null || megaApi.getRootNode() == null) {
 				logDebug("Refresh session - sdk");
 				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-				intentLogin.putExtra("visibleFragment", LOGIN_FRAGMENT);
+				intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intentLogin);
 				finish();
@@ -1016,7 +1013,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
 				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-				intentLogin.putExtra("visibleFragment",  LOGIN_FRAGMENT);
+				intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
 				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intentLogin);
 				finish();
@@ -2269,27 +2266,27 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			logDebug("Local folder selected");
-			if(adapterType == FILE_LINK_ADAPTER){
-				String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            if(adapterType == FILE_LINK_ADAPTER){
 				if (nC == null) {
 					nC = new NodeController(this);
 				}
 				nC.downloadTo(currentDocument, parentPath, url);
 			}
 			else{
-				String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 				String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 				long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 				long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 				boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
-				logDebug("URL: " + url + ", SIZE: " + size);
 
 				if(nC==null){
 					nC = new NodeController(this, isFolderLink);
 				}
-				nC.checkSizeBeforeDownload(parentPath, url, size, hashes, highPriority);
+				nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
 			}
-		}
+        } else if (requestCode == REQUEST_CODE_TREE) {
+            onRequestSDCardWritePermission(intent, resultCode, false, nC);
+        }
 		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -2443,7 +2440,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
-		logDebug("askSizeConfirmationBeforeDownload");
+        logDebug("askSizeConfirmationBeforeDownload");
 
 		final String parentPathC = parentPath;
 		final String urlC = url;
@@ -2492,7 +2489,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
-		logDebug("askConfirmationNoAppInstaledBeforeDownload");
+        logDebug("askConfirmationNoAppInstaledBeforeDownload");
 
 		final String parentPathC = parentPath;
 		final String urlC = url;
@@ -2524,7 +2521,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						if(nC==null){
 							nC = new NodeController(fullScreenImageViewer, isFolderLink);
 						}
-						nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
+						nC.download(parentPathC,urlC, sizeC, hashesC, highPriority);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {

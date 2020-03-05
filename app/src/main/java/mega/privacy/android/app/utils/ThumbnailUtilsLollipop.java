@@ -1690,21 +1690,23 @@ public class ThumbnailUtilsLollipop {
 				if (holder != null){
 					File thumbDir = getThumbFolder(context);
 					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
-					if (thumb.exists()) {
-						if (thumb.length() > 0) {
-							final Bitmap bitmap = getBitmapForCache(thumb, context);
-							if (bitmap != null) {
-								thumbnailCache.put(handle, bitmap);
+					if (thumb.exists() && thumb.length() > 0) {
+						final Bitmap bitmap = getBitmapForCache(thumb, context);
+						if (bitmap != null) {
+							thumbnailCache.put(handle, bitmap);
 
-								if ((holder.getDocument() == handle)){
-									holder.postSetImageView();
-									holder.setBitmap(bitmap);
+							if ((holder.getDocument() == handle)){
+								holder.postSetImageView();
+								holder.setBitmap(bitmap);
+								try {
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.getImageView().startAnimation(fadeInAnimation);
-									holder.postSetImageView();
-									adapter.notifyItemChanged(holder.getPositionOnAdapter());
-									logDebug("Thumbnail update");
+								} catch (NumberFormatException n) {
+									logError("Error loading animation", n);
 								}
+								holder.postSetImageView();
+								adapter.notifyItemChanged(holder.getPositionOnAdapter());
+								logDebug("Thumbnail update");
 							}
 						}
 					}

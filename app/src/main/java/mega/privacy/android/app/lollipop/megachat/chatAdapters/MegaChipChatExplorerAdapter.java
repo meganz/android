@@ -4,11 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -21,8 +16,6 @@ import android.widget.RelativeLayout;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -30,21 +23,21 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
-import mega.privacy.android.app.utils.ChatUtil;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+
 
 public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipChatExplorerAdapter.ViewHolderChips> implements View.OnClickListener{
 
-    ArrayList<ChatExplorerListItem> items;
+    private ArrayList<ChatExplorerListItem> items;
     private MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     private Context context;
@@ -102,14 +95,11 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         holder = new ViewHolderChips(v);
         holder.itemLayout = v.findViewById(R.id.item_layout_chip);
         holder.textViewName = v.findViewById(R.id.name_chip);
-        holder.textViewName.setEmojiSize(Util.px2dp(Constants.EMOJI_SIZE_EXTRA_SMALL, outMetrics));
-        holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
+        holder.textViewName.setMaxWidthEmojis(px2dp(MAX_WIDTH_ADD_CONTACTS, outMetrics));
         holder.avatar = v.findViewById(R.id.rounded_avatar);
         holder.deleteIcon = v.findViewById(R.id.delete_icon_chip);
         holder.deleteIcon.setOnClickListener(this);
-
         holder.deleteIcon.setTag(holder);
-
         v.setTag(holder);
 
         return holder;
@@ -157,6 +147,8 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
     @Override
     public int getItemCount() {
+        if (items == null) return 0;
+
         return  items.size();
     }
 
@@ -210,10 +202,15 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         logDebug("setUserAvatar");
 
         if (item.getChat() != null && item.getChat().isGroup()) {
-            createGroupChatAvatar(holder, item);
+            int color = ContextCompat.getColor(context, R.color.divider_upgrade_account);
+            holder.avatar.setImageBitmap(getDefaultAvatar(context, color, item.getTitle(), AVATAR_SIZE, true));
         }
         else {
-            createDefaultAvatar(holder, item);
+            MegaUser user = null;
+            if (item.getContact() != null && item.getContact().getMegaUser() != null) {
+                user = item.getContact().getMegaUser();
+            }
+            holder.avatar.setImageBitmap(getDefaultAvatar(context, getColorAvatar(context, megaApi, user), item.getTitle(), AVATAR_SIZE, true));
 
             ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
             File avatar = null;
@@ -277,97 +274,4 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         }
     }
 
-    void createGroupChatAvatar(ViewHolderChips holder, ChatExplorerListItem item){
-        logDebug("createGroupChatAvatar()");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint paintText = new Paint();
-        Paint paintCircle = new Paint();
-        paintCircle.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
-        paintCircle.setAntiAlias(true);
-
-        paintText.setColor(Color.WHITE);
-        paintText.setTextSize(150);
-        paintText.setAntiAlias(true);
-        paintText.setTextAlign(Paint.Align.CENTER);
-        Typeface face = Typeface.SANS_SERIF;
-        paintText.setTypeface(face);
-        paintText.setAntiAlias(true);
-        paintText.setSubpixelText(true);
-        paintText.setStyle(Paint.Style.FILL);
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-
-        String firstLetter = ChatUtil.getFirstLetter(item.getTitle());
-
-        logDebug("Draw letter: " + firstLetter);
-        Rect bounds = new Rect();
-
-        paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-        int xPos = (c.getWidth()/2);
-        int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-        c.drawText(firstLetter, xPos, yPos, paintText);
-
-        holder.avatar.setImageBitmap(defaultAvatar);;
-    }
-
-    public void createDefaultAvatar(ViewHolderChips holder, ChatExplorerListItem item){
-        logDebug("createDefaultAvatar()");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint paintText = new Paint();
-        Paint paintCircle = new Paint();
-
-        paintText.setColor(Color.WHITE);
-        paintText.setTextSize(150);
-        paintText.setAntiAlias(true);
-        paintText.setTextAlign(Paint.Align.CENTER);
-        Typeface face = Typeface.SANS_SERIF;
-        paintText.setTypeface(face);
-        paintText.setAntiAlias(true);
-        paintText.setSubpixelText(true);
-        paintText.setStyle(Paint.Style.FILL);
-
-        String color = null;
-        if (item.getContact() != null && item.getContact().getMegaUser() != null) {
-            color = megaApi.getUserAvatarColor(item.getContact().getMegaUser());
-        }
-        if(color!=null){
-            logDebug("The color to set the avatar is " + color);
-            paintCircle.setColor(Color.parseColor(color));
-        }
-        else{
-            logDebug("Default color to the avatar");
-            paintCircle.setColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
-        }
-        paintCircle.setAntiAlias(true);
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-        String firstLetter = ChatUtil.getFirstLetter(item.getTitle());
-        if(firstLetter == null || firstLetter.trim().isEmpty() || firstLetter.equals("(")){
-            firstLetter = " ";
-        }
-        Rect bounds = new Rect();
-
-        paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-        int xPos = (c.getWidth()/2);
-        int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-        c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-
-        holder.avatar.setImageBitmap(defaultAvatar);
-    }
 }

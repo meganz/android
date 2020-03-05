@@ -1,116 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/chat_background">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:background="@color/grey_my_account_background"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
-            android:layout_gravity="center_horizontal">
-            <ImageView
-                android:id="@+id/icon_info_achievements"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_invite_friends_big"/>
-
-            <ImageView
-                android:id="@+id/icon_achievement_completed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_check_achievements"/>
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/title_info_achievements"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="24dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginLeft="24dp"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_horizontal"
-            android:textSize="14dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:background="@color/white"
-            android:lineSpacingMultiplier="1.2"
-            android:textColor="@color/mail_my_account"/>
-
         <LinearLayout
-            android:id="@+id/separator_info_achievements"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="43dp"
-            android:orientation="horizontal"
-            android:background="@color/separator_grey"/>
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="48dp">
+
+                <ImageView
+                    android:id="@+id/icon_info_achievements"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_invite_friends_big" />
+
+                <ImageView
+                    android:id="@+id/icon_achievement_completed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_check_achievements" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/title_info_achievements"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:layout_marginRight="24dp"
+                android:background="@color/white"
+                android:gravity="center_horizontal"
+                android:lineSpacingMultiplier="1.2"
+                android:paddingLeft="12dp"
+                android:paddingTop="8dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="8dp"
+                android:textColor="@color/mail_my_account"
+                android:textSize="14sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/white">
+            android:layout_marginTop="6dp"
+            android:background="@color/white"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/how_works_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_achievement_invite_friends"
-                android:layout_marginBottom="16dp"
-                android:layout_marginTop="24dp"
-                android:textSize="16dp"
-                android:lineSpacingMultiplier="1.2"
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/blue_unlocked_rewards"/>
+                style="@style/how_it_works" />
 
             <TextView
                 android:id="@+id/info_achievements_how_works_first_p"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/first_paragraph_achievement_invite_friends"
-                android:layout_marginLeft="24dp"
-                android:layout_marginBottom="16dp"
-                android:layout_marginRight="24dp"
-                android:textSize="14dp"
-                android:lineSpacingMultiplier="1.5"
-                android:textColor="@color/grey_achievements_invite_friends"/>
+                style="@style/how_works_first_p" />
 
             <TextView
                 android:id="@+id/info_achievements_how_works_second_p"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/second_paragraph_achievement_invite_friends"
-                android:layout_marginRight="24dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginLeft="24dp"
-                android:layout_marginBottom="24dp"
-                android:textStyle="italic"
-                android:textSize="14dp"
-                android:lineSpacingMultiplier="1.5"
-                android:textColor="@color/grey_achievements_invite_friends_sub"/>
+                style="@style/how_works_second_p" />
 
         </LinearLayout>
 
     </LinearLayout>
-
-</RelativeLayout>
-
 
 </ScrollView>

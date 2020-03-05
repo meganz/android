@@ -92,7 +92,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         if(context instanceof ManagerActivityLollipop) {
                             ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
                             managerActivity.refreshAfterMovingToRubbish();
-                            resetAccountDetailsTimeStamp(context);
+                            resetAccountDetailsTimeStamp();
                         }
                         else {
                             ((ContactFileListActivityLollipop) context).refreshAfterMovingToRubbish();
@@ -109,7 +109,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
                         ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
                         managerActivity.refreshAfterMovingToRubbish();
-                        resetAccountDetailsTimeStamp(context);
+                        resetAccountDetailsTimeStamp();
                     }
                     else{
                         logDebug("Move nodes request finished");
@@ -145,7 +145,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
                         ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
                         managerActivity.refreshAfterRemoving();
-                        resetAccountDetailsTimeStamp(context);
+                        resetAccountDetailsTimeStamp();
                     }
 
                     break;
@@ -199,7 +199,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                             message = context.getString(R.string.number_correctly_copied, max_items);
                         }
 
-                        resetAccountDetailsTimeStamp(context);
+                        resetAccountDetailsTimeStamp();
                     }
                     break;
                 }
@@ -300,9 +300,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
             }
             else if(context instanceof ContactAttachmentActivityLollipop){
                 ((ContactAttachmentActivityLollipop) context).showSnackbar(message);
-            }
-            else if(context instanceof AchievementsActivity){
-                ((AchievementsActivity) context).showInviteConfirmationDialog();
             }
             else if(context instanceof AddContactActivityLollipop){
                 ((AddContactActivityLollipop) context).showSnackbar(message);

@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,49 +21,41 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import java.util.ArrayList;
 
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SMSVerificationActivity;
-import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaEvent;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaUser;
-import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
-import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.*;
 
 
-public class LoginActivityLollipop extends BaseActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
+public class LoginActivityLollipop extends BaseActivity implements MegaRequestListenerInterface {
 
     float scaleH, scaleW;
     float density;
@@ -131,14 +124,28 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
     };
 
+    private BroadcastReceiver onAccountUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null) return;
+
+            if (intent.getAction().equals(ACTION_ON_ACCOUNT_UPDATE) && waitingForConfirmAccount) {
+                waitingForConfirmAccount = false;
+                visibleFragment = LOGIN_FRAGMENT;
+                showFragment(visibleFragment);
+            }
+        }
+    };
+
     @Override
     protected void onDestroy() {
         logDebug("onDestroy");
+
+        app.setIsLoggingRunning(false);
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
-        if (megaApi != null) {
-            megaApi.removeGlobalListener(this);
-            megaApi.removeRequestListener(this);
-        }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onAccountUpdateReceiver);
+
         super.onDestroy();
     }
 
@@ -147,8 +154,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
         super.onCreate(savedInstanceState);
-        
+
         loginActivity = this;
+
+        app.setIsLoggingRunning(true);
 
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -170,20 +179,17 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
             megaApiFolder = ((MegaApplication) getApplication()).getMegaApiFolder();
         }
 
-        megaApi.addGlobalListener(this);
-        megaApi.addRequestListener(this);
-
         setContentView(R.layout.activity_login);
         relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_login);
 
         intentReceived = getIntent();
         if(savedInstanceState!=null) {
             logDebug("Bundle is NOT NULL");
-            visibleFragment = savedInstanceState.getInt("visibleFragment", LOGIN_FRAGMENT);
+            visibleFragment = savedInstanceState.getInt(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
         }
         else{
             if (intentReceived != null) {
-                visibleFragment = intentReceived.getIntExtra("visibleFragment", LOGIN_FRAGMENT);
+                visibleFragment = intentReceived.getIntExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                 logDebug("There is an intent! VisibleFragment: " + visibleFragment);
             } else {
                 visibleFragment = LOGIN_FRAGMENT;
@@ -205,6 +211,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
+
+        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
+        filter.addAction(ACTION_ON_ACCOUNT_UPDATE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(onAccountUpdateReceiver, filter);
+
         isBackFromLoginPage = false;
         showFragment(visibleFragment);
     }
@@ -263,12 +274,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-                getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
-
-//				getFragmentManager()
-//						.beginTransaction()
-//						.attach(loginFragment)
-//						.commit();
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
             }
             case CHOOSE_ACCOUNT_FRAGMENT: {
@@ -281,12 +287,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, chooseAccountFragment);
                 ft.commitNowAllowingStateLoss();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-                }
+
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
             }
             case CREATE_ACCOUNT_FRAGMENT: {
@@ -299,12 +301,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, createAccountFragment);
                 ft.commitNowAllowingStateLoss();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
-                }
+
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
 
             }
@@ -321,26 +319,14 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 break;
             }
             case CONFIRM_EMAIL_FRAGMENT: {
-
                 if (confirmEmailFragment == null) {
                     confirmEmailFragment = new ConfirmEmailFragmentLollipop();
-                    if ((passwdTemp != null) && (emailTemp != null)) {
-                        confirmEmailFragment.setEmailTemp(emailTemp);
-                        confirmEmailFragment.setPasswdTemp(passwdTemp);
-                        confirmEmailFragment.setFirstNameTemp(firstNameTemp);
-//						emailTemp = null;
-//						passwdTemp = null;
-//						nameTemp = null;
-                    }
-                } else {
-                    if ((passwdTemp != null) && (emailTemp != null)) {
-                        confirmEmailFragment.setEmailTemp(emailTemp);
-                        confirmEmailFragment.setPasswdTemp(passwdTemp);
-                        confirmEmailFragment.setFirstNameTemp(firstNameTemp);
-//						emailTemp = null;
-//						passwdTemp = null;
-//						nameTemp = null;
-                    }
+                }
+
+                if (passwdTemp != null && emailTemp != null) {
+                    confirmEmailFragment.setEmailTemp(emailTemp);
+                    confirmEmailFragment.setPasswdTemp(passwdTemp);
+                    confirmEmailFragment.setFirstNameTemp(firstNameTemp);
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -348,13 +334,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 ft.commitNowAllowingStateLoss();
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
-                }
 
+                changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
                 break;
             }
         }
@@ -362,6 +343,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         if( ((MegaApplication) getApplication()).isEsid()){
             showAlertLoggedOut();
         }
+    }
+
+    public Intent getIntentReceived() {
+        return intentReceived;
     }
 
     public void showAlertIncorrectRK() {
@@ -660,12 +645,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         };
 
         android.support.v7.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        } else {
-            builder = new android.support.v7.app.AlertDialog.Builder(this);
-        }
-
+        builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
     }
@@ -708,12 +688,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         };
 
         android.support.v7.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        } else {
-            builder = new android.support.v7.app.AlertDialog.Builder(this);
-        }
-
+        builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
     }
@@ -804,70 +779,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         return this.emailTemp;
     }
 
-
-//	public void onNewIntent(Intent intent){
-//		if (intent != null && ACTION_CONFIRM.equals(intent.getAction())) {
-//			loginFragment.handleConfirmationIntent(intent);
-//		}
-//	}
-
-    @Override
-    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-
-    }
-
-    @Override
-    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-        logDebug("onUserAlertsUpdate");
-    }
-
-    @Override
-    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
-
-    }
-
-    @Override
-    public void onReloadNeeded(MegaApiJava api) {
-    }
-
-    @Override
-    public void onAccountUpdate(MegaApiJava api) {
-        logDebug("onAccountUpdate");
-
-        if (waitingForConfirmAccount) {
-            waitingForConfirmAccount = false;
-            visibleFragment = LOGIN_FRAGMENT;
-            showFragment(visibleFragment);
-        }
-    }
-
-    @Override
-    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
-    }
-
-
-    @Override
-    public void onEvent(MegaApiJava api, MegaEvent event) {
-        logDebug("onEvent");
-        if(event.getType()==MegaEvent.EVENT_ACCOUNT_BLOCKED){
-            logDebug("Event received: " + event.getText() + "_" + event.getNumber());
-            int whyAmIBlocked = (int) event.getNumber();
-            if(whyAmIBlocked == 200){
-                accountBlocked = getString(R.string.account_suspended_multiple_breaches_ToS);
-                megaChatApi.logout(loginFragment);
-            } else if(whyAmIBlocked == 300){
-                accountBlocked = getString(R.string.account_suspended_breache_ToS);
-                megaChatApi.logout(loginFragment);
-            } else if(whyAmIBlocked == 500) {
-                //CODE REFACTOR PENDING TO UNIFY CODE
-                //Processed in the `onEvent` callback of `MegaApplication`
-            } else {
-                //Default account blocked error
-                accountBlocked = getString(R.string.error_account_suspended);
-            }
-        }
-    }
-
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
         logDebug("onRequestStart - " + request.getRequestString());
@@ -932,7 +843,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
 
         super.onSaveInstanceState(outState);
 
-        outState.putInt("visibleFragment", visibleFragment);
+        outState.putInt(VISIBLE_FRAGMENT, visibleFragment);
     }
 
     @Override
@@ -948,25 +859,41 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            if (visibleFragment == LOGIN_FRAGMENT) {
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
-            }
+        if (visibleFragment == LOGIN_FRAGMENT) {
+            changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color_secondary);
         }
+    }
+
+    public void setKeyboardVisibilityListener(final OnKeyboardVisibilityListener onKeyboardVisibilityListener) {
+        final View parentView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+        parentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            private boolean alreadyOpen;
+            private final int defaultKeyboardHeightDP = 100;
+            private final int EstimatedKeyboardDP = defaultKeyboardHeightDP + (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 48 : 0);
+            private final Rect rect = new Rect();
+
+            @Override
+            public void onGlobalLayout() {
+                int estimatedKeyboardHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, EstimatedKeyboardDP, parentView.getResources().getDisplayMetrics());
+                parentView.getWindowVisibleDisplayFrame(rect);
+                int heightDiff = parentView.getRootView().getHeight() - (rect.bottom - rect.top);
+                boolean isShown = heightDiff >= estimatedKeyboardHeight;
+
+                if (isShown == alreadyOpen) {
+                    return;
+                }
+                alreadyOpen = isShown;
+                onKeyboardVisibilityListener.onVisibilityChanged(isShown);
+            }
+        });
     }
 
     public void hideAB(){
         if (aB != null){
             aB.hide();
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
-        }
+
+        changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
     }
 }

@@ -6,6 +6,8 @@
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     -->
 
+    <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF Viewer</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">von</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Ja</string>
     <string name="general_no" context="Answer for confirmation dialog.">Nein</string>
@@ -62,7 +64,7 @@
     -->
     <string name="general_show_info" context="Hint how to cancel the download">Infos anzeigen</string>
 
-    <string name="error_general_nodes" context="Error getting the root node">Fehler! Bitte versuchen Sie es später erneut.</string>
+    <string name="error_general_nodes" context="Error getting the root node">Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.</string>
 
     <string name="general_rk" context="File name (without extension) of file exported with the recovery key">MEGA-RECOVERYKEY</string>
 
@@ -213,12 +215,16 @@
 
     <string name="create_account_text" context="button that allows the user to create an account">Account erstellen</string>
     <string name="name_text" context="category in sort by action">Name</string>
+    <string name="first_name_text" context="First Name of the user">Vorname(n)</string>
     <string name="lastname_text" context="Last name of the user">Familienname</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Ich stimme den [A]Nutzungbedingungen[/A] von MEGA zu</string>
+    <string name="top" context="Text placed on the checkbox to make sure user agree that understand the danger of losing password">Mir ist bekannt, dass ich [B]ohne mein Passwort alle meine Daten verliere[/B] Weitere Informationen über unsere [A]Ende-zu-Ende-Verschlüsselung[/A]</string>
     <string name="already_account" context="Does the user already have a MEGA account">Haben Sie bereits einen Account?</string>
 
     <string name="create_account_no_terms" context="warning dialog">Sie müssen die AGBs akzeptieren.</string>
-    <string name="error_enter_username" context="Warning dialog">Bitte geben Sie Ihren Namen ein</string>
+
+    <string name="create_account_no_top" context="warning dialog, for user do not tick checkbox of understanding the danger of losing password">Bitte bestätigen Sie, dass Ihnen die Konsequenzen eines Passwortverlusts bewusst sind.</string>
+    <string name="error_enter_username" context="Warning message when the first name is a required field to submit a form. For example during the create account process.">Bitte geben Sie Ihren Namen ein</string>
     <string name="error_enter_userlastname" context="Warning dialog">Bitte geben Sie Ihren Nachnamen ein.</string>
     <string name="error_short_password" context="when creating the account">Das Passwort ist zu kurz</string>
     <string name="error_passwords_dont_match" context="when creating the account">Passwörter stimmen nicht überein</string>
@@ -639,6 +645,10 @@
 
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Foto machen</string>
 
+    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Allow notifications for incoming MEGA calls</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
+
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Nur via WLAN</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">WLAN oder Mobildaten</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
@@ -675,7 +685,7 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Standard Download Ordner</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Downloadziel immer abfragen</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Weitere Speichermedien anzeigen (externe SD-Karten)</string>
-	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
+	<string name="add_phone_number_label" context="Label of button on account page that ask user to add their phone number">Add phone number</string>
 	<string name="verify_account_title" context="enter verification code page title">Account verifizieren</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been locked temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Land</string>
@@ -686,7 +696,7 @@
 	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Please select a country code</string>
     <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Country codes could not be fetched.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Bitte geben Sie eine gültige Telefonnummer an.</string>
-	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Please type the verification code sent to</string>
+	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">Please enter the verification code sent to</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Account verifizieren</string>
 	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">You didn’t receive a code?</string>
@@ -804,7 +814,7 @@
     <string name="my_account_title" context="title of the My Account screen">Accountart</string>
     <string name="renews_on" context="title of the Expiration Date">Erneuert sich am&#160;</string>
     <string name="expires_on" context="title of the Expiration Date">Gültig bis&#160;</string>
-    <string name="free_account">GRATIS</string>
+    <string name="free_account">Kostenlos</string>
 
     <!--
     <string name="free_storage" context="Not translate">50 GB</string>
@@ -836,6 +846,10 @@
     <string name="sortby_size" context="category in sort by action">Größe</string>
     <string name="sortby_size_largest_first" context="sort files by size largest first">Größte</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">Kleinste</string>
+
+    <string name="sortby_type" context="Title of sort by media type options">Media type</string>
+    <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Fotos</string>
+    <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Videos</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">Pro Monat</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">Pro Jahr</string>
@@ -1601,8 +1615,6 @@
     <string name="achievements_title" context="title of the section for achievements">Errungenschaften</string>
     <string name="achievements_subtitle" context="subtitle of the section for achievements">Profitieren Sie von der Werbung neuer Benutzer</string>
 
-    <string name="button_invite_friends" context="button to invite friends for getting achievements">Freunde einladen</string>
-
     <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">Wir belohnen jede Vermittlung mit %1$s Speicherplatz und %2$s Transfervolumen</string>
 
     <string name="figures_achievements_text" context="sentence to detail the figures of storage and transfer quota related to each achievement">Verdienen Sie sich %1$s Extra-Speicherplatz und %2$s Transfervolumen</string>
@@ -1613,7 +1625,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">Boni für Kundenwerbung</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">Mobil-App installieren</string>
-    <string name="title_add_phone" context="title of the section for add phone number in achivements section (maximum 24 chars)">Add mobile phone</string>
+    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">Add mobile phone</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Anmeldebonus</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">MEGA-Desktop-App installieren</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Grundspeicherplatz</string>
@@ -1714,6 +1726,9 @@
     <string name="send_feedback_panel" context="Label to show send feedback">Nein, Feedback senden</string>
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Erweiterte Optionen</string>
+    <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">MEGA needs your permission to download files</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Choose download location</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">Kontakterlaubnis verweigert</string>
 
@@ -1735,6 +1750,7 @@
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">Fehler beim Löschen des QR-Codes.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Einladung versandt.</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">%s wurde eingeladen und erscheint nach Annahme der Einladung in Ihrer Kontaktliste</string>
+    <string name="invite_sent_text_multi" context="Text of dialog shown when multiple contacts request has been sent">Die Benutzer wurden eingeladen und werden in Ihrer Kontaktliste auftauchen, sobald sie die Einladung annehmen.</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">Bei der Freigabe der QR-Datei ist ein Fehler aufgetreten.</string>
     <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">Es ist ein Fehler beim Uploaden der QR-Datei aufgetreten. Die Datei existiert möglicherweise nicht.</string>
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">Es ist ein Fehler beim Herunterladen der QR-Datei aufgetreten. Die Datei existiert möglicherweise nicht.</string>
@@ -1904,8 +1920,9 @@
     <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">Zur neuesten</string>
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">Neue Nachrichten</string>
 
-
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">Eingehender Anruf</string>
+    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">MEGA background pop-ups are disabled.\nTap to change the settings.</string>
 
     <plurals name="number_unread_messages">
         <item context="Subtitle to show the number of unread messages on a chat, unread message" quantity="one">%1$s ungelesene Nachricht</item>
@@ -2379,7 +2396,7 @@
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Anhang schon versandt</string>
 
-    <string name="call_ended_message" context="Message shown when a call ends.">[A]Anruf beendet[/A][C]. Anrufdauer: [/C]</string>
+    <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]Anruf beendet[/A][C]. Anrufdauer: [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s Stunde[/B]</item>
         <item context="Message that shows the hours of a call when it ends, more hours" quantity="other">[B]%1$s Stunden[/B]</item>
@@ -2453,7 +2470,7 @@
         <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d contact found on MEGA</item>
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacts found on MEGA</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">Invite contact now?</string>
+    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user&#039;s phone contacts have a MEGA account. In other case here would appear all the user&#039;s phone contacts that have a MEGA account.">Invite contact now?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
 
@@ -2546,7 +2563,7 @@
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation">Laden Sie Kontakte ein und kommunizieren Sie sicher mit MEGAs Ende-zu-Ende-Verschlüsselung.</string>
     <string name="recent_chat_empty_text" context="Text of the empty screen when there are not chat conversations">Sicherer Chat mit Ihren Kontakten - Ende-zu-Ende-verschlüsselt</string>
 
-    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hi! Have secure conversations on MEGA with me and get up to 50GB free storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hi! Have secure conversations on MEGA with me and get up to 50 GB free storage. %1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it.">Kein Chatlink verfügbar.</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chatlink erfolgreich gelöscht</string>
@@ -2576,6 +2593,9 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d Dateien in der Warteschlange</item>
 	</plurals>
 
+    <string name="login_to_mega" context="Title of the login screen">In MEGA einloggen</string>
+    <string name="create_account_title" context="Title of the create account screen">MEGA-Account erstellen</string>
+
     <string name="recents_label" context="Label to reference a recents section">Neue/Geänderte Dateien</string>
     <string name="chats_label" context="Label to reference a chats section">Chats</string>
 
@@ -2601,13 +2621,29 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Lade</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Bitte warten&#8230;</string>
 
-    <string name="logout_warning_offline" context="Warning shown to alert user when logout and has offline files">Sobald Sie sich ausloggen, werden alle lokal gespeicherten Offline-Dateien gelöscht.</string>
-    <string name="logout_warning_transfers" context="Warning shown to alert user when logout and has transfers in progress">Durch den Logout werden alle laufenden Transfers abgebrochen.</string>
-    <string name="logout_warning_offline_and_transfers" context="Warning shown to alert user when logout and has offline files and transfers in progress">Sobald Sie sich ausloggen, werden Ihre Offline-Dateien gelöscht und alle laufenden Transfers abgebrochen.</string>
+    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Sobald Sie sich ausloggen, werden alle lokal gespeicherten Offline-Dateien gelöscht.</string>
+    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Durch den Logout werden alle laufenden Transfers abgebrochen.</string>
+    <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">Sobald Sie sich ausloggen, werden Ihre Offline-Dateien gelöscht und alle laufenden Transfers abgebrochen.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Unknown name</string>
 
+    <string name="title_long" context="Error when renaming a chat title and it is too long">Title too long</string>
     <string name="error_creating_group_and_attaching_file" context="Alert shown to the user when they is trying to create an empty group for attach a file">Bitte wählen Sie einen oder mehrere Kontakte aus</string>
 
     <string name="contacts_sent" context="Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts">%s Kontakte versandt.</string>
+
+    <string name="my_chat_files_folder" context="Name by default of the folder where the files sent to the chat are stored in the cloud">Chatdateien</string>
+    <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Error. The folder %1$s was not created</string>
+
+    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">E-Mail-Adresse bestätigen</string>
+    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Your account has been temporarily locked for your safety.</string>
+    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]Please verify your email address[/A] and follow the steps in MEGA’s email to unlock your account.</string>
+    <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Details</string>
+    <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
+    <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Account gesperrt</string>
+    <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Wir vermuten, dass Sie das Passwort für Ihren MEGA-Account auch anderswo verwenden, und dass einer dieser Dienste kompromittiert wurde.</string>
+    <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Ihr Passwort ist so in Umlauf geraten, und dubiose Personen loggen sich in sämtliche Ihrer Accounts ein, bei denen Sie das Passwort verwenden.</string>
+
+    <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Verbindung wiederhergestellt.</string>
 </resources>
