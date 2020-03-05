@@ -25,7 +25,7 @@ public class SetAttrUserListener extends BaseListener{
         switch (request.getParamType()) {
             case USER_ATTR_MY_CHAT_FILES_FOLDER:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateMychatFilesFolderHandle(request.getMegaStringMap());
+                    updateMyChatFilesFolderHandle(request.getMegaStringMap());
                 } else {
                     logWarning("Error setting \"My chat files\" folder as user's attribute");
                 }
@@ -40,9 +40,9 @@ public class SetAttrUserListener extends BaseListener{
      * Before update the DB, it has to obtain the handle contained in a MegaStringMap,
      * where one of the entries will contain a key "h" and its value, the handle in base64.
      *
-     * @param map MegaStringMap which contains the handle of the node setted as USER_ATTR_MY_CHAT_FILES_FOLDER.
+     * @param map MegaStringMap which contains the handle of the node set as USER_ATTR_MY_CHAT_FILES_FOLDER.
      */
-    private void updateMychatFilesFolderHandle(MegaStringMap map) {
+    private void updateMyChatFilesFolderHandle(MegaStringMap map) {
         if (map != null && map.size() > 0 && !isTextEmpty(map.get("h"))) {
             long handle = base64ToHandle(map.get("h"));
             if (handle != INVALID_HANDLE) {
