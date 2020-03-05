@@ -13443,31 +13443,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
         }
 
-        dialogView.findViewById(R.id.sv_btn_horizontal_not_now).setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                alertDialogSMSVerification.dismiss();
-            }
-        });
-        dialogView.findViewById(R.id.sv_btn_horizontal_add).setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),SMSVerificationActivity.class));
-                alertDialogSMSVerification.dismiss();
-            }
+        dialogView.findViewById(R.id.sv_btn_horizontal_not_now).setOnClickListener(v -> alertDialogSMSVerification.dismiss());
+        dialogView.findViewById(R.id.sv_btn_horizontal_add).setOnClickListener(v -> {
+            startActivity(new Intent(getApplicationContext(),SMSVerificationActivity.class));
+            alertDialogSMSVerification.dismiss();
         });
         if(alertDialogSMSVerification == null) {
             alertDialogSMSVerification = dialogBuilder.create();
             alertDialogSMSVerification.setCancelable(false);
-            alertDialogSMSVerification.setOnDismissListener(new DialogInterface.OnDismissListener() {
-
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    isSMSDialogShowing = false;
-                }
-            });
+            alertDialogSMSVerification.setOnDismissListener(dialog -> isSMSDialogShowing = false);
             alertDialogSMSVerification.setCanceledOnTouchOutside(false);
         }
         alertDialogSMSVerification.show();
