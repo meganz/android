@@ -259,25 +259,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 nodeInfo.setText(getInfoFolder(node, context, megaApi));
                 nodeVersionsIcon.setVisibility(View.GONE);
 
-                if (node.isInShare()) {
-                    nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
-                } else if (((ManagerActivityLollipop) context).isCameraUploads(node)) {
-                    if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS && isOutShare()) {
-                        nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
-                    } else {
-                        nodeThumb.setImageResource(R.drawable.ic_folder_camera_uploads_list);
-                    }
-                } else if (isMyChatFilesFolder(node)) {
-                    if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS && isOutShare()) {
-                        nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
-                    } else {
-                        nodeThumb.setImageResource(R.drawable.ic_folder_chat_list);
-                    }
-                } else if (isOutShare()) {
-                    nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
-                } else {
-                    nodeThumb.setImageResource(R.drawable.ic_folder_list);
-                }
+                nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
                 counterShares--;
                 optionSendChat.setVisibility(View.GONE);
             } else {
@@ -390,7 +372,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
                     optionShare.setVisibility(View.VISIBLE);
-                    if (isOutShare()) {
+                    if (isOutShare(node)) {
                         optionShareText.setText(R.string.context_sharing_folder);
                     } else {
                         optionShareText.setText(R.string.context_share_folder);
@@ -1090,6 +1072,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             logDebug("First LEVEL is false: " + dBT);
                             i.putExtra("firstLevel", false);
                         }
+                    } else if (((ManagerActivityLollipop) context).getTabItemShares() == 1) {
+                        i.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
                     }
                 }
                 else if(drawerItem== ManagerActivityLollipop.DrawerItem.INBOX){
@@ -1109,21 +1093,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             i.putExtra("firstLevel", false);
                         }
                     }
-                }
-
-                if (node.isFolder()) {
-                    if (node.isInShare()){
-                        i.putExtra("imageId", R.drawable.ic_folder_incoming);
-                    }
-                    else if (isOutShare()){
-                        i.putExtra("imageId", R.drawable.ic_folder_outgoing);
-                    }
-                    else{
-                        i.putExtra("imageId", R.drawable.ic_folder);
-                    }
-                }
-                else {
-                    i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
                 }
                 i.putExtra("name", node.getName());
 
@@ -1155,7 +1124,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     logWarning("The selected node is NULL");
                     return;
                 }
-                if(isOutShare()){
+                if(isOutShare(node)){
                     Intent i = new Intent(context, FileContactListActivityLollipop.class);
                     i.putExtra("name", node.getHandle());
                     context.startActivity(i);
@@ -1381,9 +1350,5 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     public interface CustomHeight{
         int getHeightToPanel(BottomSheetDialogFragment dialog);
-    }
-
-    private boolean isOutShare() {
-        return node.isOutShare() || megaApi.isPendingShare(node);
     }
 }

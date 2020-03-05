@@ -657,9 +657,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.fileLayout.setVisibility(View.GONE);
             holder.textViewFileSize.setVisibility(View.VISIBLE);
 
+            setFolderGridSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
+
             if (type == FOLDER_LINK_ADAPTER) {
                 holder.textViewFileSize.setText(getInfoFolder(node,context,megaApi));
-                setFolderGridSelected(holder,position,R.drawable.ic_folder_list);
             } else {
                 holder.textViewFileSize.setText(getInfoFolder(node,context));
             }
@@ -668,12 +669,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 
             if (type == INCOMING_SHARES_ADAPTER) {
-                if (node.isInShare()) {
-                    setFolderGridSelected(holder,position,R.drawable.ic_folder_incoming);
-                }
-                else {
-                    setFolderGridSelected(holder,position,R.drawable.ic_folder);
-                }
                 //Show the owner of the shared folder
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
                 for (int j = 0;j < sharesIncoming.size();j++) {
@@ -698,26 +693,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
                 }
             } else if (type == OUTGOING_SHARES_ADAPTER) {
-                if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                    setFolderGridSelected(holder,position,R.drawable.ic_folder_outgoing);
-                }
-                else {
-                    setFolderGridSelected(holder,position,R.drawable.ic_folder);
-                }
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-            } else {
-                if (((ManagerActivityLollipop) context).isCameraUploads(node)) {
-                    setFolderGridSelected(holder, position, R.drawable.ic_folder_camera_uploads_list);
-                } else if (isMyChatFilesFolder(node)) {
-                    setFolderGridSelected(holder, position, R.drawable.ic_folder_chat_list);
-                } else if (node.isInShare()) {
-                    setFolderGridSelected(holder, position, R.drawable.ic_folder_incoming);
-                } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                    setFolderGridSelected(holder, position, R.drawable.ic_folder_outgoing);
-                } else {
-                    setFolderGridSelected(holder, position, R.drawable.ic_folder);
-                }
             }
         } else if (node.isFile()) {
             //TODO file
@@ -895,12 +872,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             holder.versionsIcon.setVisibility(View.GONE);
 
+            setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
+
             if (type == FOLDER_LINK_ADAPTER) {
                 holder.textViewFileSize.setText(getInfoFolder(node,context,megaApi));
-                setFolderListSelected(holder, position, R.drawable.ic_folder_list);
             } else if (type == CONTACT_FILE_ADAPTER|| type == CONTACT_SHARED_FOLDER_ADAPTER){
-                setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
-
                 boolean firstLevel;
                 if(type == CONTACT_FILE_ADAPTER){
                     firstLevel = ((ContactFileListFragmentLollipop) fragment).isEmptyParentHandleStack();
@@ -931,12 +907,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 } else {
                     holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.black));
                     holder.takenDownImage.setVisibility(View.GONE);
-                }
-                if (node.isInShare()) {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
-                }
-                else {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_list);
                 }
 
                 //Show the owner of the shared folder
@@ -981,26 +951,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
             } else if (type == OUTGOING_SHARES_ADAPTER) {
-                if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
-                }
-                else {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_list);
-                }
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-            } else {
-                if (((ManagerActivityLollipop) context).isCameraUploads(node)) {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_camera_uploads_list);
-                } else if (isMyChatFilesFolder(node)) {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_chat_list);
-                } else if (node.isInShare()) {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
-                } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
-                } else {
-                    setFolderListSelected(holder, position, R.drawable.ic_folder_list);
-                }
             }
         } else {
             logDebug("Node is file");
