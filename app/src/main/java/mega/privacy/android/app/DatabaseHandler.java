@@ -3187,7 +3187,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		try {
 			String value = getStringValue(tableName, columnName, Long.toString(defaultValue));
 			if (value != null && !value.isEmpty()) {
-				return Long.valueOf(value);
+				return Long.parseLong(value);
 			}
 		} catch (Exception e) {
 			logWarning("EXCEPTION - Return default value: " + defaultValue, e);
