@@ -34,6 +34,7 @@ import android.os.Handler;
 
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.support.v7.app.ActionBar;
@@ -1812,4 +1813,9 @@ public class Util {
 	public static boolean isAndroid10() {
 		return Build.VERSION.SDK_INT >= ANDROID_10_Q;
 	}
+
+	public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus){
+		textInputLayout.setPasswordVisibilityToggleEnabled(focus);
+	}
+
 }
