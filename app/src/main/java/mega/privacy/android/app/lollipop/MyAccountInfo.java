@@ -134,9 +134,14 @@ public class MyAccountInfo {
         lastSessionFormattedDate = "";
         createSessionTimeStamp = -1;
 
-        productAccounts.clear();
+        if (productAccounts != null) {
+            productAccounts.clear();
+        }
 
-        availableSkus.clear();
+        if (availableSkus != null) {
+            availableSkus.clear();
+        }
+
         activeGooglePlaySubscription = null;
 
         pricing = null;
