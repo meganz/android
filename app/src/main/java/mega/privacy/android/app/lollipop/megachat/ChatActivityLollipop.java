@@ -2505,7 +2505,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                 logDebug("The call in this chat is Ring in");
-                ((MegaApplication) getApplication()).setSpeakerStatus(chatRoom.getChatId(), false);
+                MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
                 MegaApplication.setShowPinScreen(false);
                 Intent intent = new Intent(this, ChatCallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -2516,7 +2516,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                 logDebug("The call in this chat is In progress, but I do not participate");
-                ((MegaApplication) getApplication()).setSpeakerStatus(chatRoom.getChatId(), startVideo);
+                MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
+                checkCamera();
                 megaChatApi.startChatCall(idChat, startVideo, this);
             }
             return;
@@ -2526,10 +2527,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (!participatingInACall(megaChatApi)) {
             logDebug("There is not a call in this chat and I am not in another call");
             MegaApplication.setCallLayoutStatus(idChat, false);
-            ((MegaApplication) getApplication()).setSpeakerStatus(chatRoom.getChatId(), startVideo);
+            MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
+            checkCamera();
             megaChatApi.startChatCall(idChat, startVideo, this);
         }
 
+    }
+
+    private void checkCamera() {
+        if (startVideo) app.manuallyActivatedLocalCamera();
     }
 
     private boolean checkPermissions(String permission, int requestCode) {
@@ -3367,7 +3373,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             case R.id.rl_media_icon_chat: {
                 logDebug("media_icon_chat");
                 if (recordView.isRecordingNow()) break;
-
                 hideKeyboard();
                 if (participatingInACall(megaChatApi)) {
                     showConfirmationOpenCamera(chatRoom);
@@ -6956,7 +6961,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 MegaChatCall call = megaChatApi.getChatCall(idChat);
                 if (call == null) return;
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-                    ((MegaApplication) getApplication()).setSpeakerStatus(chatRoom.getChatId(), false);
+                    MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
                     megaChatApi.answerChatCall(idChat, false, this);
 
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
@@ -8190,7 +8195,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     return;
                 }
 
-                if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && MegaApplication.getCallLayoutStatus(idChat)) {
+                if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && app.getCallLayoutStatus(idChat)) {
                     tapToReturnLayout(call, getString(R.string.call_in_progress_layout));
                     return;
                 }
@@ -8340,8 +8345,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             e.printStackTrace();
         }
 
-        MegaApiAndroid megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY,
-                MegaApplication.USER_AGENT, path);
+        MegaApiAndroid megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, MegaApplication.USER_AGENT, path);
 
         megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
         megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
