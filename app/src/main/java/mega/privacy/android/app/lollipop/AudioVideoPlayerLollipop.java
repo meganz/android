@@ -1102,7 +1102,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                     logDebug("playbackState: " + playbackState);
 
-                    if (playWhenReady && participatingInACall(megaChatApi)) {
+                    if (playWhenReady && participatingInACall()) {
                         //Not allow to play content when a call is in progress
                         player.setPlayWhenReady(false);
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);

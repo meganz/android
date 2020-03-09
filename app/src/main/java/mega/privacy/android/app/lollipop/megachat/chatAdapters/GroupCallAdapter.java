@@ -239,7 +239,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.rlGeneral.setLayoutParams(lp);
         }
 
-        if(isEstablishedCall(megaChatApi, chatId)){
+        if(isEstablishedCall(chatId)){
             holder.rlGeneral.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -496,7 +496,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             if(peer.isAudioOn()){
                 holder.microSurface.setVisibility(View.GONE);
             }else{
-                if(isEstablishedCall(megaChatApi, chatId)) {
+                if(isEstablishedCall(chatId)) {
                     holder.microSurface.setVisibility(View.VISIBLE);
                 }else{
                     holder.microSurface.setVisibility(View.GONE);
@@ -506,7 +506,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             if(peer.isGoodQuality()){
                 holder.qualityLayout.setVisibility(View.GONE);
             }else{
-                if(isEstablishedCall(megaChatApi, chatId)) {
+                if(isEstablishedCall(chatId)) {
                     holder.qualityLayout.setVisibility(View.VISIBLE);
                 }else{
                     holder.qualityLayout.setVisibility(View.GONE);
@@ -602,7 +602,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 holder.microAvatar.setVisibility(View.GONE);
             }else{
 
-                if(isEstablishedCall(megaChatApi, chatId)) {
+                if(isEstablishedCall(chatId)) {
                     holder.microAvatar.setVisibility(View.VISIBLE);
                 }else{
                     holder.microAvatar.setVisibility(View.GONE);

@@ -1327,7 +1327,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 										}
 									}
 								} else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-									if ((megaChatApi != null) && (participatingInACall(megaChatApi))) {
+									if ((megaChatApi != null) && (participatingInACall())) {
 										logDebug("Several calls - "+callStatusToString(callStatus)+": show notification");
 										checkQueuedCalls();
 									} else {

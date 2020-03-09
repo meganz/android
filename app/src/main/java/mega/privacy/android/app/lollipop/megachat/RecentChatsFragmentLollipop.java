@@ -737,7 +737,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             case R.id.call_in_progress_layout: {
                 logDebug("call_in_progress_layout");
                 if (checkPermissionsCall()) {
-                    returnCall(context, megaChatApi);
+                    returnCall(context);
                 }
                 break;
             }
@@ -1667,7 +1667,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("REQUEST_CAMERA -> returnTheCall");
-                        returnCall(context, megaChatApi);
+                        returnCall(context);
                     }
                 }
                 break;
@@ -1676,7 +1676,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("RECORD_AUDIO -> returnTheCall");
-                        returnCall(context, megaChatApi);
+                        returnCall(context);
                     }
                 }
                 break;

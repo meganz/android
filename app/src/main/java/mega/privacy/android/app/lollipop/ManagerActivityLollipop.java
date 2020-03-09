@@ -1418,7 +1418,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									REQUEST_WRITE_STORAGE);
 		        		}
 		        		else{
-							checkTakePicture(this, megaChatApi);
+							checkTakePicture(this);
 							typesCameraPermission = -1;
 		        		}
 		        	}
@@ -1438,7 +1438,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}else if(typesCameraPermission == START_CALL_PERMISSIONS){
 					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 						if(checkPermissionsCall()){
-							returnCall(this, megaChatApi);
+							returnCall(this);
 						}
 						typesCameraPermission = -1;
 					}
@@ -1466,7 +1466,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
 							}
 							else{
-								checkTakePicture(this, megaChatApi);
+								checkTakePicture(this);
 								typesCameraPermission = -1;
 							}
 						}
@@ -1493,7 +1493,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									REQUEST_CAMERA);
 						}
 						else{
-							checkTakePicture(this, megaChatApi);
+							checkTakePicture(this);
 							typesCameraPermission = -1;
 						}
 					}
@@ -1569,7 +1569,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case RECORD_AUDIO: {
 				if(typesCameraPermission == START_CALL_PERMISSIONS && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 					if(checkPermissionsCall()){
-						returnCall(this, megaChatApi);
+						returnCall(this);
 					}
 					typesCameraPermission = -1;
 				}
@@ -3746,7 +3746,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     			}
     			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
 					logDebug("Intent take selfie");
-					checkTakePicture(this, megaChatApi);
+					checkTakePicture(this);
     			}
 				else if (intent.getAction().equals(SHOW_REPEATED_UPLOAD)){
 					logDebug("Intent SHOW_REPEATED_UPLOAD");
@@ -7610,11 +7610,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 
 					if (hasStoragePermission && hasCameraPermission){
-						checkTakePicture(this, megaChatApi);
+						checkTakePicture(this);
 					}
 				}
 		    	else{
-					checkTakePicture(this, megaChatApi);
+					checkTakePicture(this);
 		    	}
 
 		    	return true;
@@ -8086,8 +8086,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.action_scan_qr: {
 				logDebug("Action menu scan QR code pressed");
                 //Check if there is a in progress call:
-				if(isNecessaryDisableLocalCamera(megaChatApi) != -1){
-					showConfirmationOpenCamera(this, megaChatApi, ACTION_OPEN_QR);
+				if(isNecessaryDisableLocalCamera() != -1){
+					showConfirmationOpenCamera(this, ACTION_OPEN_QR);
 					return true;
 				}
 				openQA();
@@ -8096,7 +8096,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.action_return_call:{
 				logDebug("Action menu return to call in progress pressed");
 				if(checkPermissionsCall()){
-					returnCall(this, megaChatApi);
+					returnCall(this);
 				}
 				return true;
 			}
@@ -10202,7 +10202,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			return;
 		}
-		checkTakePicture(this, megaChatApi);
+		checkTakePicture(this);
 	}
 
 	@Override
@@ -12062,7 +12062,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			case R.id.call_in_progress_layout:{
 				if(checkPermissionsCall()){
-					returnCall(this, megaChatApi);
+					returnCall(this);
 				}
 				break;
 			}
@@ -17037,7 +17037,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void setCallBadge(){
-		if (!isOnline(this) || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall(megaChatApi))) {
+		if (!isOnline(this) || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall())) {
 			callBadge.setVisibility(View.GONE);
 			return;
 		}
@@ -17646,7 +17646,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			hideCallWidget();
 			return;
 		}
-		showCallLayout(this, megaChatApi, callInProgressLayout, callInProgressChrono, callInProgressText);
+		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
 	}
 
 	private void hideCallWidget() {
@@ -17664,10 +17664,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	 */
 	private void setCallMenuItem(){
 		if((drawerItem == DrawerItem.CHAT || drawerItem == DrawerItem.CLOUD_DRIVE || drawerItem == DrawerItem.SHARED_ITEMS)
-				&& !isScreenInPortrait(this) && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1){
+				&& !isScreenInPortrait(this) && participatingInACall() && getChatCallInProgress() != -1){
 			returnCallMenuItem.setVisible(true);
 
-			MegaChatCall call = megaChatApi.getChatCall(getChatCallInProgress(megaChatApi));
+			MegaChatCall call = megaChatApi.getChatCall(getChatCallInProgress());
 			int callStatus = call.getStatus();
 
 			if(callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){

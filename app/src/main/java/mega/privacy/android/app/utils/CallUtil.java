@@ -29,8 +29,11 @@ import static mega.privacy.android.app.utils.Util.*;
 public class CallUtil {
 
     /*Method to know if i'm participating in any A/V call*/
-    public static boolean participatingInACall(MegaChatApiAndroid megaChatApi) {
-        if (megaChatApi == null) return false;
+    public static boolean participatingInACall() {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        if(megaChatApi == null)
+            return false;
+
         MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
         MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
         MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
@@ -56,31 +59,33 @@ public class CallUtil {
     }
 
     /*Method to know the chat id which A / V call I am participating in*/
-    public static long getChatCallInProgress(MegaChatApiAndroid megaChatApi) {
+    public static long getChatCallInProgress() {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         if (megaChatApi != null) {
             MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
             if (listCallsRequestSent != null && listCallsRequestSent.size() > 0) {
                 return listCallsRequestSent.get(0);
             }
-
             MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
             if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
                 return listCallsInProgress.get(0);
             }
-
             MegaHandleList listCallsInReconnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RECONNECTING);
             if (listCallsInReconnecting != null && listCallsInReconnecting.size() > 0) {
                 return listCallsInReconnecting.get(0);
             }
         }
+
         return -1;
     }
 
     /*Method to return to the call which I am participating*/
-    public static void returnCall(Context context, MegaChatApiAndroid megaChatApi) {
-        if ((megaChatApi == null) || (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)) == null))
+    public static void returnCall(Context context) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        if (megaChatApi == null || megaChatApi.getChatCall(getChatCallInProgress()) == null)
             return;
-        long chatId = getChatCallInProgress(megaChatApi);
+
+        long chatId = getChatCallInProgress();
         MegaChatCall call = megaChatApi.getChatCall(chatId);
         MegaApplication.setShowPinScreen(false);
         Intent intent = new Intent(context, ChatCallActivity.class);
@@ -88,19 +93,20 @@ public class CallUtil {
         intent.putExtra(CHAT_ID, chatId);
         intent.putExtra(CALL_ID, call.getId());
         context.startActivity(intent);
-
     }
 
     /*Method to show or hide the "Tap to return to call" banner*/
-    public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
+    public static void showCallLayout(Context context, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         if (megaChatApi == null || callInProgressLayout == null) return;
-        if (!participatingInACall(megaChatApi)) {
+
+        if (!participatingInACall()) {
             callInProgressLayout.setVisibility(View.GONE);
             activateChrono(false, callInProgressChrono, null);
             return;
         }
 
-        long chatId = getChatCallInProgress(megaChatApi);
+        long chatId = getChatCallInProgress();
         if (chatId == -1) return;
 
         MegaChatCall call = megaChatApi.getChatCall(chatId);
@@ -109,7 +115,6 @@ public class CallUtil {
             activateChrono(false, callInProgressChrono, null);
             callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.reconnecting_bar));
             callInProgressText.setText(context.getString(R.string.reconnecting_message));
-
         } else {
             logDebug("Displayed the layout to return to the call");
             callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
@@ -130,9 +135,10 @@ public class CallUtil {
     }
 
     /*Method to know if a call is established*/
-    public static boolean isEstablishedCall(MegaChatApiAndroid megaChatApi, long chatId) {
+    public static boolean isEstablishedCall(long chatId) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        if (megaChatApi == null || megaChatApi.getChatCall(chatId) == null) return false;
 
-        if ((megaChatApi == null) || (megaChatApi.getChatCall(chatId) == null)) return false;
         MegaChatCall call = megaChatApi.getChatCall(chatId);
         return (call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS);
     }
@@ -170,7 +176,6 @@ public class CallUtil {
         } else {
             secondsString = "" + seconds;
         }
-
         if (hours > 0) {
             if (hours < 10) {
                 finalTime = "0" + hours + ":";
@@ -178,9 +183,7 @@ public class CallUtil {
                 finalTime = "" + hours + ":";
             }
         }
-
-        finalTime = finalTime + minutesString + ":" + secondsString;
-        return finalTime;
+        return finalTime + minutesString + ":" + secondsString;
     }
 
     public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity) {
@@ -192,24 +195,17 @@ public class CallUtil {
             android.app.AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
             dialogBuilder.setPositiveButton(
                     activity.getString(android.R.string.ok),
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            if (finish) {
-                                activity.finishAndRemoveTask();
-                            }
+                    (dialog, which) -> {
+                        dialog.dismiss();
+                        if (finish) {
+                            activity.finishAndRemoveTask();
                         }
                     });
-            dialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    if (finish) {
-                        activity.finishAndRemoveTask();
-                    }
+            dialogBuilder.setOnCancelListener(dialog -> {
+                if (finish) {
+                    activity.finishAndRemoveTask();
                 }
             });
-
 
             android.app.AlertDialog dialog = dialogBuilder.create();
             dialog.show();
@@ -221,43 +217,35 @@ public class CallUtil {
 
     public static String callStatusToString(int status) {
         switch (status) {
-            case MegaChatCall.CALL_STATUS_INITIAL: {
+            case MegaChatCall.CALL_STATUS_INITIAL:
                 return "CALL_STATUS_INITIAL";
-            }
-            case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM: {
+            case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM:
                 return "CALL_STATUS_HAS_LOCAL_STREAM";
-            }
-            case MegaChatCall.CALL_STATUS_REQUEST_SENT: {
+            case MegaChatCall.CALL_STATUS_REQUEST_SENT:
                 return "CALL_STATUS_REQUEST_SENT";
-            }
-            case MegaChatCall.CALL_STATUS_RING_IN: {
+            case MegaChatCall.CALL_STATUS_RING_IN:
                 return "CALL_STATUS_RING_IN";
-            }
-            case MegaChatCall.CALL_STATUS_JOINING: {
+            case MegaChatCall.CALL_STATUS_JOINING:
                 return "CALL_STATUS_JOINING";
-            }
-            case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
+            case MegaChatCall.CALL_STATUS_IN_PROGRESS:
                 return "CALL_STATUS_IN_PROGRESS";
-            }
-            case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION: {
+            case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
                 return "CALL_STATUS_TERMINATING_USER_PARTICIPATION";
-            }
-            case MegaChatCall.CALL_STATUS_DESTROYED: {
+            case MegaChatCall.CALL_STATUS_DESTROYED:
                 return "CALL_STATUS_DESTROYED";
-            }
-            case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+            case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
                 return "CALL_STATUS_USER_NO_PRESENT";
-            }
-            case MegaChatCall.CALL_STATUS_RECONNECTING: {
+            case MegaChatCall.CALL_STATUS_RECONNECTING:
                 return "CALL_STATUS_RECONNECTING";
-            }
             default:
                 return String.valueOf(status);
         }
     }
 
-    public static boolean isStatusConnected(Context context, MegaChatApiAndroid megaChatApi, long chatId) {
-        return checkConnection(context) && megaChatApi != null && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED && megaChatApi.getChatConnectionState(chatId) == MegaChatApi.CHAT_CONNECTION_ONLINE;
+    public static boolean isStatusConnected(Context context, long chatId) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        if (megaChatApi == null) return false;
+        return checkConnection(context) && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED && megaChatApi.getChatConnectionState(chatId) == MegaChatApi.CHAT_CONNECTION_ONLINE;
     }
 
     public static boolean checkConnection(Context context) {
@@ -270,38 +258,49 @@ public class CallUtil {
         return true;
     }
 
-    private static void disableLocalCamera(MegaChatApiAndroid megaChatApi) {
-        if (megaChatApi == null) return;
-        long idCall = isNecessaryDisableLocalCamera(megaChatApi);
-        if (idCall != -1)
-            megaChatApi.disableVideo(idCall, null);
+    private static void disableLocalCamera() {
+        long idCall = isNecessaryDisableLocalCamera();
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        if (megaChatApi == null || idCall == -1) return;
+
+        megaChatApi.disableVideo(idCall, null);
     }
 
-    public static long isNecessaryDisableLocalCamera(MegaChatApiAndroid megaChatApi) {
+    public static long isNecessaryDisableLocalCamera() {
         long noVideo = -1;
-        if (megaChatApi == null) return noVideo;
-        long chatIdCallInProgress = getChatCallInProgress(megaChatApi);
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        if (megaChatApi == null) {
+            return noVideo;
+        }
+
+        long chatIdCallInProgress = getChatCallInProgress();
         MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
-        if (callInProgress == null || !callInProgress.hasLocalVideo()) return noVideo;
+        if (callInProgress == null || !callInProgress.hasLocalVideo()) {
+            return noVideo;
+        }
+
         return chatIdCallInProgress;
     }
 
-    public static void showConfirmationOpenCamera(Activity activity, MegaChatApiAndroid megaChatApi, String action) {
+    public static void showConfirmationOpenCamera(Activity activity, String action) {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
             switch (which) {
-                case DialogInterface.BUTTON_POSITIVE: {
+                case DialogInterface.BUTTON_POSITIVE:
                     logDebug("Open camera and lost the camera in the call");
-                    disableLocalCamera(megaChatApi);
-                    if (activity instanceof ChatActivityLollipop && action.equals(ACTION_TAKE_PICTURE))
+                    disableLocalCamera();
+                    if (activity instanceof ChatActivityLollipop && action.equals(ACTION_TAKE_PICTURE)) {
                         ((ChatActivityLollipop) activity).controlCamera();
+                    }
                     if (activity instanceof ManagerActivityLollipop) {
-                        if (action.equals(ACTION_OPEN_QR))
+                        if (action.equals(ACTION_OPEN_QR)) {
                             ((ManagerActivityLollipop) activity).openQA();
-                        if (action.equals(ACTION_TAKE_PICTURE)) takePicture(activity);
-
+                        }
+                        if (action.equals(ACTION_TAKE_PICTURE)) {
+                            takePicture(activity);
+                        }
                     }
                     break;
-                }
+
                 case DialogInterface.BUTTON_NEGATIVE:
                     break;
             }

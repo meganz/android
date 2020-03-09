@@ -1137,7 +1137,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	private void startingACall(boolean withVideo) {
-		if (megaChatApi != null && isStatusConnected(this, megaChatApi, megaChatApi.getChatRoomByUser(user.getHandle()).getChatId())) {
+		if (megaChatApi != null && isStatusConnected(this, megaChatApi.getChatRoomByUser(user.getHandle()).getChatId())) {
 			logDebug("I'm not in a call");
 			startVideo = withVideo;
 			if (checkPermissionsCall()) {

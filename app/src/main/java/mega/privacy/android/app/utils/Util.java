@@ -1767,9 +1767,9 @@ public class Util {
 		return Html.fromHtml(string);
 	}
 
-	public static void checkTakePicture(Activity activity, MegaChatApiAndroid megaChatApi) {
-		if (isNecessaryDisableLocalCamera(megaChatApi) != -1) {
-			showConfirmationOpenCamera(activity, megaChatApi, ACTION_TAKE_PICTURE);
+	public static void checkTakePicture(Activity activity) {
+		if (isNecessaryDisableLocalCamera() != -1) {
+			showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE);
 			return;
 		}
 		takePicture(activity);

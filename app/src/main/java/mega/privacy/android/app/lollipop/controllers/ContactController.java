@@ -113,7 +113,7 @@ public class ContactController {
             }
         }
 
-        if (megaChatApi != null && participatingInACall(megaChatApi)) {
+        if (megaChatApi != null && participatingInACall()) {
             MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(c.getHandle());
             if (chatRoomTo != null) {
                 long chatId = chatRoomTo.getChatId();
