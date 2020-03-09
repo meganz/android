@@ -108,7 +108,9 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
             if(email!=null){
                 MegaUser megaUser = megaApi.getContact(email);
                 String fullName = getMegaUserNameDB(megaUser);
-                if (fullName == null) fullName = megaUser.getEmail();
+                if (fullName == null) {
+                    fullName = megaUser.getEmail();
+                }
                 contact = new MegaContactAdapter(getContactDB(megaUser.getHandle()), megaUser, fullName);
             }
         }

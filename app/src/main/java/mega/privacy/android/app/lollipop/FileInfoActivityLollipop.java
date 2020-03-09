@@ -348,7 +348,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             if (intent == null) return;
             long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
             updateAdapter(userHandle);
-
         }
     };
 

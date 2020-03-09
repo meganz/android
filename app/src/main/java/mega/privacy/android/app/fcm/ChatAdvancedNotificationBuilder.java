@@ -775,7 +775,10 @@ public final class ChatAdvancedNotificationBuilder {
 
     private String getFullName(MegaChatRoom chat) {
         String fullName = getNicknameContact(chat.getPeerHandle(0));
-        if (fullName == null) fullName = chat.getPeerFullname(0);
+        if (fullName == null) {
+            fullName = chat.getPeerFullname(0);
+        }
+
         return fullName;
     }
 

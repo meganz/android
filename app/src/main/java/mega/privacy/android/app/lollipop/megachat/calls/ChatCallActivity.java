@@ -3076,13 +3076,19 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         } else {
             String name = chat.getPeerFirstname(0);
             if (isTextEmpty(name)) {
-                if (megaChatApi != null) name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
-                if (name == null) name = getString(R.string.unknown_name_label);
+                if (megaChatApi != null) {
+                    name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
+                }
+                if (name == null) {
+                    name = getString(R.string.unknown_name_label);
+                }
             }
 
             String nickname = getNicknameContact(chat.getPeerHandle(0));
-            if(nickname != null) name = nickname;
-            
+            if (nickname != null) {
+                name = nickname;
+            }
+
             mutateCallText.setText(getString(R.string.muted_contact_micro, name));
             mutateContactCallLayout.setVisibility(View.VISIBLE);
         }

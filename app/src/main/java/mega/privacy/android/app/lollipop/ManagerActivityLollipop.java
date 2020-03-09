@@ -948,10 +948,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (getContactsFragment() != null) {
 				cFLol.updateContact(userHandle);
 			}
-
 		}
 	};
-
 
 	private BroadcastReceiver receiverUpdatePosition = new BroadcastReceiver() {
 		@Override

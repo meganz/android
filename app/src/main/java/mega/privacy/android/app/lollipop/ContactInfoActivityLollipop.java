@@ -458,7 +458,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 					checkNickname(user.getHandle());
 				} else {
 					String fullName = "";
-					if (chat.getTitle() != null && !chat.getTitle().trim().isEmpty()) {
+					if (!isTextEmpty(chat.getTitle())) {
 						fullName = chat.getTitle();
 					} else if (userEmailExtra != null) {
 						fullName = userEmailExtra;
@@ -629,9 +629,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	private void checkNickname(long contactHandle) {
 		MegaContactDB contactDB = getContactDB(contactHandle);
 		if (contactDB == null) return;
+
 		String fullName = buildFullName(contactDB.getName(), contactDB.getLastName(), contactDB.getMail());
 		String nicknameText = contactDB.getNickname();
-		if (nicknameText == null || nicknameText.trim().length() <= 0) {
+
+		if (!isTextEmpty(nicknameText)) {
 			withoutNickname(fullName);
 		} else {
 			withNickname(fullName, nicknameText);
@@ -1266,9 +1268,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			case R.id.chat_contact_properties_nickname: {
 				if (setNicknameText.getText().toString().equals(getString(R.string.add_nickname))) {
 					showConfirmationSetNickname(null);
-				} else {
-					if (user == null || isBottomSheetDialogShown(contactNicknameBottomSheetDialogFragment))
-						return;
+				} else if (user != null && !isBottomSheetDialogShown(contactNicknameBottomSheetDialogFragment)) {
 					nickname = firstLineTextToolbar.getText().toString();
 					contactNicknameBottomSheetDialogFragment = new ContactNicknameBottomSheetDialogFragment();
 					contactNicknameBottomSheetDialogFragment.show(getSupportFragmentManager(), contactNicknameBottomSheetDialogFragment.getTag());
@@ -1301,7 +1301,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		if (alias == null) {
 			input.setHint(getString(R.string.add_nickname));
 			builder.setTitle(getString(R.string.add_nickname));
-
 		} else {
 			input.setHint(alias);
 			input.setText(alias);

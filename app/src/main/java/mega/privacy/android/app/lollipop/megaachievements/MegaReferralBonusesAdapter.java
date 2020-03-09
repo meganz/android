@@ -196,8 +196,6 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 			long handle = contact.getHandle();
 			String fullName = getContactNameDB(handle);
 			if (fullName == null) fullName = holder.contactMail;
-			logDebug("Contact: " + holder.contactMail + " name: " + fullName);
-
 			holder.textViewContactName.setText(fullName);
 
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -219,7 +217,6 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 						avatar.delete();
 						megaApi.getUserAvatar(holder.contactMail, buildAvatarFile(context, holder.contactMail + ".jpg").getAbsolutePath(), listener);
 					} else {
-						logDebug("Do not ask for user avatar - its in cache: " + avatar.getAbsolutePath());
 						((ViewHolderReferralBonusesList) holder).imageView.setImageBitmap(bitmap);
 					}
 				} else {

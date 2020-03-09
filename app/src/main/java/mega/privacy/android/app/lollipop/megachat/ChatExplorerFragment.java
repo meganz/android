@@ -327,8 +327,9 @@ public class ChatExplorerFragment extends Fragment {
         }
         MegaContactDB contactDB = getContactDB(handle);
         String fullName = getContactNameDB(contactDB);
-        if(fullName ==  null) fullName = user.getEmail();
-
+        if (fullName == null) {
+            fullName = user.getEmail();
+        }
         if (handle != -1) {
             int userStatus = megaChatApi.getUserOnlineStatus(handle);
             if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
@@ -385,7 +386,9 @@ public class ChatExplorerFragment extends Fragment {
                 long contactHandle = contactsMEGA.get(i).getHandle();
                 MegaContactDB contactDB = getContactDB(contactHandle);
                 String fullName = getContactNameDB(contactDB);
-                if(fullName ==  null) fullName = contactsMEGA.get(i).getEmail();
+                if (fullName == null) {
+                    fullName = contactsMEGA.get(i).getEmail();
+                }
                 MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
                 contacts.add(megaContactAdapter);
             }

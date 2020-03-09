@@ -1,5 +1,7 @@
 package mega.privacy.android.app;
 
+import static mega.privacy.android.app.utils.TextUtil.*;
+
 public class MegaContactDB {
     String handle;
     String name;
@@ -66,7 +68,7 @@ public class MegaContactDB {
     }
 
     public void setNickname(String nickname) {
-        if (nickname != null && nickname.trim().length() <= 0) {
+        if (isTextEmpty(nickname)) {
             this.nickname = null;
         } else {
             this.nickname = nickname;

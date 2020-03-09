@@ -534,7 +534,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         public void onReceive(Context context, Intent intent) {
             if (intent == null) return;
             long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
-            if (userHandle != 0) updateNicknameInChat();
+            if (userHandle != 0) {
+                updateNicknameInChat();
+            }
         }
     };
 

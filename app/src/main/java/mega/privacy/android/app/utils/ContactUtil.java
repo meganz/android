@@ -26,18 +26,16 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 public class ContactUtil {
 
     public static MegaContactDB getContactDB(long contactHandle) {
-        MegaApplication app = MegaApplication.getInstance();
-        if (app != null) {
-            DatabaseHandler dbH = app.getDbH();
-            return dbH.findContactByHandle(String.valueOf(contactHandle));
-        }
-        return null;
+        return MegaApplication.getInstance().getDbH().findContactByHandle(String.valueOf(contactHandle));
     }
 
     public static String getMegaUserNameDB(MegaUser user) {
         if (user == null) return null;
         String nameContact = getContactNameDB(user.getHandle());
-        if (nameContact != null) return nameContact;
+        if (nameContact != null) {
+            return nameContact;
+        }
+
         return user.getEmail();
     }
 
@@ -57,7 +55,10 @@ public class ContactUtil {
 
     public static String getContactNameDB(long contactHandle) {
         MegaContactDB contactDB = getContactDB(contactHandle);
-        if (contactDB != null) return getContactNameDB(contactDB);
+        if (contactDB != null) {
+            return getContactNameDB(contactDB);
+        }
+
         return null;
     }
 
@@ -87,16 +88,24 @@ public class ContactUtil {
         MegaContactDB contactDB = getContactDB(contactHandle);
         if (contactDB != null) {
             String nicknameText = contactDB.getNickname();
-            if (nicknameText != null) return nicknameText;
+            if (nicknameText != null) {
+                return nicknameText;
+            }
 
             String firstNameText = contactDB.getName();
-            if (!isTextEmpty(firstNameText)) return firstNameText;
+            if (!isTextEmpty(firstNameText)) {
+                return firstNameText;
+            }
 
             String lastNameText = contactDB.getLastName();
-            if (!isTextEmpty(lastNameText)) return lastNameText;
+            if (!isTextEmpty(lastNameText)) {
+                return lastNameText;
+            }
 
             String emailText = contactDB.getMail();
-            if (!isTextEmpty(emailText)) return emailText;
+            if (!isTextEmpty(emailText)) {
+                return emailText;
+            }
         }
         return "";
     }

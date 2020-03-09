@@ -1749,7 +1749,7 @@ public class Util {
 	}
 
 	public static void hideKeyboard() {
-		InputMethodManager inputMethodManager = (InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		InputMethodManager inputMethodManager = (InputMethodManager) MegaApplication.getInstance().getSystemService(Context.INPUT_METHOD_SERVICE);
 		inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 	}
 

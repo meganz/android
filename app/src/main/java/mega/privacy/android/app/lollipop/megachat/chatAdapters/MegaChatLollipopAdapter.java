@@ -8255,7 +8255,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         String name = cC.getFullName(handle, chatRoom);
-        if (!isTextEmpty(name)) return name;
+        if (!isTextEmpty(name)) {
+            return name;
+        }
 
         logWarning("NOT found in DB");
         name = context.getString(R.string.unknown_name_label);

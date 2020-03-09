@@ -1118,7 +1118,10 @@ public class ChatController {
             if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
                 logDebug("Is contact!");
                 String nameContact = getContactNameDB(userHandle);
-                if(nameContact != null) return nameContact;
+                if (nameContact != null) {
+                    return nameContact;
+                }
+
                 return "";
             }
             else{
@@ -1222,8 +1225,12 @@ public class ChatController {
         logDebug("User handle: " + userHandle + ", Chat ID: " + chatRoom.getChatId());
 
         String fullName = getNicknameContact(userHandle);
-        if (fullName == null) fullName = chatRoom.getPeerFullnameByHandle(userHandle);
-        if (isTextEmpty(fullName)) fullName = chatRoom.getPeerEmailByHandle(userHandle);
+        if (fullName == null) {
+            fullName = chatRoom.getPeerFullnameByHandle(userHandle);
+        }
+        if (isTextEmpty(fullName)) {
+            fullName = chatRoom.getPeerEmailByHandle(userHandle);
+        }
 
         return fullName;
     }

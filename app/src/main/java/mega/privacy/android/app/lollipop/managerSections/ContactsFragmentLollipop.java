@@ -1141,7 +1141,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			if (visibleContacts.get(i).getMegaUser().getHandle() == contactHandle) {
 				positionVisibleContacts = i;
 				break;
-
 			}
 		}
 		for (int i = 0; i < contacts.size(); i++) {
