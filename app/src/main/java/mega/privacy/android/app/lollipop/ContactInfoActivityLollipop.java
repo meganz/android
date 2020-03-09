@@ -2372,7 +2372,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
-		app.setSpeakerStatus(chatRoom.getChatId(), startVideo);
+		MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
+		if (startVideo) app.manuallyActivatedLocalCamera();
 		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
 		waitingForCall = false;
 	}

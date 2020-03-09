@@ -35,42 +35,21 @@
 
         <Button
             android:id="@+id/dialog_first_button"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_gravity="right"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="6dp"
-            android:background="@android:color/transparent"
-            android:elevation="0dp"
-            android:gravity="right|center_vertical"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp" />
+            android:layout_gravity="end"
+            android:textSize="14sp"
+            style="@style/TransparentBackgroundButtonWithoutBorder" />
 
         <Button
             android:id="@+id/dialog_second_button"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_gravity="right"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="6dp"
-            android:background="@android:color/transparent"
-            android:elevation="0dp"
-            android:gravity="right|center_vertical"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp" />
+            android:layout_gravity="end"
+            android:textSize="14sp"
+            style="@style/TransparentBackgroundButtonWithoutBorder" />
 
         <Button
             android:id="@+id/dialog_third_button"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_gravity="right"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="6dp"
-            android:background="@android:color/transparent"
-            android:elevation="0dp"
-            android:gravity="right|center_vertical"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp" />
+            android:layout_gravity="end"
+            android:textSize="14sp"
+            style="@style/TransparentBackgroundButtonWithoutBorder" />
 
     </LinearLayout>
 
