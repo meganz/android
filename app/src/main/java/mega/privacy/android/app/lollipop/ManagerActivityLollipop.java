@@ -8085,11 +8085,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.action_scan_qr: {
 				logDebug("Action menu scan QR code pressed");
                 //Check if there is a in progress call:
-				if(isNecessaryDisableLocalCamera() != -1){
-					showConfirmationOpenCamera(this, ACTION_OPEN_QR);
-					return true;
-				}
-				openQA();
+				checkBeforeOpeningQR();
 				return true;
 			}
 			case R.id.action_return_call:{
@@ -8105,7 +8101,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void openQA(){
+	public void checkBeforeOpeningQR(){
+		if (isNecessaryDisableLocalCamera() != -1) {
+			showConfirmationOpenCamera(this, ACTION_OPEN_QR);
+			return;
+		}
+		openQR();
+	}
+
+	public void openQR(){
 		ScanCodeFragment fragment = new ScanCodeFragment();
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
 		Intent intent = new Intent(this, QRCodeActivity.class);

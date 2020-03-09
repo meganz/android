@@ -13,7 +13,9 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -293,11 +295,17 @@ public class CallUtil {
                     }
                     if (activity instanceof ManagerActivityLollipop) {
                         if (action.equals(ACTION_OPEN_QR)) {
-                            ((ManagerActivityLollipop) activity).openQA();
+                            ((ManagerActivityLollipop) activity).openQR();
                         }
                         if (action.equals(ACTION_TAKE_PICTURE)) {
                             takePicture(activity);
                         }
+                    }
+                    if (activity instanceof AddContactActivityLollipop && action.equals(ACTION_OPEN_QR)) {
+                        ((AddContactActivityLollipop) activity).initScanQR();
+                    }
+                    if (activity instanceof InviteContactActivity && action.equals(ACTION_OPEN_QR)) {
+                        ((InviteContactActivity) activity).initScanQR();
                     }
                     break;
 

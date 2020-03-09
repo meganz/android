@@ -852,7 +852,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				i.putExtra(CHAT_ID, chatRoomTo.getChatId());
 				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(i);
-			} else if (isStatusConnected(this, megaChatApi, chatRoomTo.getChatId())) {
+			} else if (isStatusConnected(this, chatRoomTo.getChatId())) {
 				startCallWithChatOnline(chatRoomTo);
 			}
 		} else {
