@@ -2566,7 +2566,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         if (result == null) {
             result = uri.getLastPathSegment();
         }
-        return addPdfFileExtension(result);
+        return result != null ? addPdfFileExtension(result) : null;
     }
 
     @Override
