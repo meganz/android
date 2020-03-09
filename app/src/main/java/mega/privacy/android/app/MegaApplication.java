@@ -189,6 +189,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			return;
 		}
 		if (megaChatApi == null) return;
+
 		long chatIdCallInProgress = getChatCallInProgress(megaChatApi);
 		MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
 		if (callInProgress != null && callInProgress.hasLocalVideo()) {
@@ -1378,7 +1379,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	}
 
-
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 		stopService(new Intent(this, IncomingCallService.class));
@@ -1387,6 +1387,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			logDebug("Call status changed, current status: " + callStatusToString(call.getStatus()));
 			if (callStatus == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
 				removeValues(call.getChatid());
+				clearCameraHandle();
 			}
 			if (callStatus == MegaChatCall.CALL_STATUS_DESTROYED) {
 				checkCallDestroyed(call);
@@ -1394,13 +1395,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			if ((callStatus >= MegaChatCall.CALL_STATUS_REQUEST_SENT && callStatus < MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
 				MegaHandleList listAllCalls = megaChatApi.getChatCalls();
 				if (listAllCalls == null || listAllCalls.size() == 0) return;
+				checkDeviceCamera();
 				if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
 					setAudioManagerValues(call);
 				}
 				if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
 					removeChatAudioManager();
 					clearIncomingCallNotification(call.getId());
-					clearCameraHandle();
 				}
 				if (listAllCalls.size() == 1) {
 					checkOneCall(listAllCalls.get(0));
@@ -1426,9 +1427,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		if (wakeLock != null && wakeLock.isHeld()) {
 			wakeLock.release();
 		}
-
 		clearIncomingCallNotification(call.getId());
-
 		//Show missed call if time out ringing (for incoming calls)
 		try {
 			if (((call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))) {

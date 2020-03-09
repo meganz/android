@@ -421,7 +421,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 	private BillingManager mBillingManager;
 	private List<SkuDetails> mSkuDetailsList;
-
 	private CallListener callListener = new CallListener(this);
 
 	public enum FragmentTag {

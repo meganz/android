@@ -21,7 +21,6 @@ public class InfoPeerGroupCall {
         this.greenLayer = false;
         this.goodQuality = true;
         this.listener = null;
-
     }
 
     public InfoPeerGroupCall(long peerId, long clientId, String name, boolean videoOn, boolean audioOn, boolean greenLayer, boolean goodQuality, GroupCallListener listener) {

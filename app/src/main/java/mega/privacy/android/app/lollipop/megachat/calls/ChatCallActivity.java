@@ -82,9 +82,9 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback {
 
@@ -165,7 +165,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private EmojiTextView avatarBigCameraGroupCallInitialLetter;
     private AppRTCAudioManager rtcAudioManager = null;
     private Animation shake;
-
     private LinearLayout linearFAB;
     private RelativeLayout relativeCall;
     private LinearLayout linearArrowCall;
@@ -192,7 +191,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private MegaApplication application =  MegaApplication.getInstance();
     private boolean inTemporaryState = false;
     private CallListener callListener = new CallListener(this);
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -259,6 +257,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         logDebug("Initializing call UI");
         //Contact's avatar
         if (chatId == -1 || megaChatApi == null) return;
+
         megaChatApi.addChatCallListener(callListener);
         chat = megaChatApi.getChatRoom(chatId);
         callChat = megaChatApi.getChatCall(chatId);
@@ -301,10 +300,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     /* Check the initial state of the call, it will run onCreate and onNewIntent */
     private void checkInitialCallStatus() {
         if (chatId == -1 || megaChatApi == null || getCall() == null) return;
+
         chat = megaChatApi.getChatRoom(chatId);
         int callStatus = callChat.getStatus();
         logDebug("Checking the call status, it is " + callStatusToString(callStatus));
-
         if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
             displayLinearFAB(true);
             checkIncomingCall();
@@ -319,7 +318,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             updateSubTitle();
             updateSubtitleNumberOfVideos();
         }
-
         if ((callStatus >= MegaChatCall.CALL_STATUS_REQUEST_SENT && callStatus <= MegaChatCall.CALL_STATUS_IN_PROGRESS) || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
             setAvatarLayout();
             if (callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
@@ -335,6 +333,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         Bundle extras = intent.getExtras();
         logDebug("Action: " + getIntent().getAction());
         if (extras == null) return;
+
         long newChatId = extras.getLong(CHAT_ID, -1);
         if (megaChatApi == null) return;
 
@@ -344,6 +343,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             checkInitialCallStatus();
         } else {
             if (newChatId == -1) return;
+
             logDebug("Different call");
             chatId = newChatId;
             initialUI(chatId);
@@ -979,6 +979,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         reconnectingLayout.clearAnimation();
         if (reconnectingLayout.isShown() && !reconnectingText.getText().equals(getString(R.string.connected_message)))
             return;
+
         logDebug("Showing Reconnecting bar");
         reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
         reconnectingText.setText(getString(R.string.reconnecting_message));
@@ -1361,7 +1362,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         logDebug("Call Status " + callStatusToString(callChat.getStatus()));
         boolean isVideoOn = callChat.hasLocalVideo();
         if (!inTemporaryState) {
-            MegaApplication.setVideoStatus(callChat.getChatid(), isVideoOn);
+            application.setVideoStatus(callChat.getChatid(), isVideoOn);
         }
         if (isVideoOn) {
             logDebug("Video local enabled");
@@ -1408,7 +1409,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (getCall() == null) return;
         logDebug("Call Status " + callStatusToString(callChat.getStatus()));
         boolean isAudioOn = callChat.hasLocalAudio();
-
         if (isAudioOn) {
             logDebug("Audio local enabled");
             updateMicroFABstatus(true);
@@ -1416,7 +1416,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             logDebug("Audio local disabled");
             updateMicroFABstatus(false);
         }
-
         if (!chat.isGroup()) {
             //Individual call
             refreshOwnMicro();
@@ -1426,6 +1425,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             int position = peersOnCall.size() - 1;
             if ((isAudioOn && peersOnCall.get(position).isAudioOn()) || (!isAudioOn && !peersOnCall.get(position).isAudioOn()))
                 return;
+
             if (isAudioOn) peersOnCall.get(position).setAudioOn(true);
             if (!isAudioOn) peersOnCall.get(position).setAudioOn(false);
             updateChangesAudio(position);
@@ -1452,6 +1452,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private void updateMicroFABstatus(boolean needToBeEnable) {
         if (!microFAB.isShown()) return;
+
         microFAB.hide();
         if (needToBeEnable) {
             //Enable video FAB
@@ -1571,7 +1572,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             mutateContactCallLayout.setVisibility(View.GONE);
         } else {
             String name = chat.getPeerFirstname(0);
-            if ((name == null) || (name == " ")) {
+            if (isTextEmpty(name)) {
                 if (megaChatApi != null) {
                     name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
                 }
@@ -1590,7 +1591,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             updateRemoteVideoGroupCall(session);
         } else {
             logDebug("Updating video status in a one to one call");
-
             updateRemoteVideoIndividualCall(session);
         }
         checkTypeCall();
@@ -1598,10 +1598,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private void updateRemoteVideoIndividualCall(MegaChatSession session) {
         logDebug("Status of remote video is " + isRemoteVideo + ". User has video " + session.hasVideo());
-
         if ((isRemoteVideo == REMOTE_VIDEO_NOT_INIT || isRemoteVideo == REMOTE_VIDEO_DISABLED) && session.hasVideo()) {
             optionsRemoteCameraFragmentFS(true);
-
         } else if ((isRemoteVideo == REMOTE_VIDEO_NOT_INIT || isRemoteVideo == REMOTE_VIDEO_ENABLED) && !session.hasVideo()) {
             optionsRemoteCameraFragmentFS(false);
         }
@@ -1732,9 +1730,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         remoteCameraFragmentFS = null;
     }
 
-
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         logDebug("onRequestPermissionsResult");
@@ -1796,7 +1791,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     public void itemClicked(InfoPeerGroupCall peer) {
-
         logDebug("userSelected: -> (peerId = " + peer.getPeerId() + ", clientId = " + peer.getClientId() + ")");
         if (peerSelected.getPeerId() == peer.getPeerId() && peerSelected.getClientId() == peer.getClientId()) {
             //I touched the same user that is now in big fragment:

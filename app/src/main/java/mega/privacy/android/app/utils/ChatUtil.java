@@ -459,18 +459,14 @@ public class ChatUtil {
 
     public static String sessionStatusToString(int status) {
         switch (status) {
-            case MegaChatSession.SESSION_STATUS_INVALID: {
+            case MegaChatSession.SESSION_STATUS_INVALID:
                 return "SESSION_STATUS_INVALID";
-            }
-            case MegaChatSession.SESSION_STATUS_INITIAL: {
+            case MegaChatSession.SESSION_STATUS_INITIAL:
                 return "SESSION_STATUS_INITIAL";
-            }
-            case MegaChatSession.SESSION_STATUS_IN_PROGRESS: {
+            case MegaChatSession.SESSION_STATUS_IN_PROGRESS:
                 return "SESSION_STATUS_IN_PROGRESS";
-            }
-            case MegaChatSession.SESSION_STATUS_DESTROYED: {
+            case MegaChatSession.SESSION_STATUS_DESTROYED:
                 return "SESSION_STATUS_DESTROYED";
-            }
             default:
                 return String.valueOf(status);
         }
@@ -478,36 +474,26 @@ public class ChatUtil {
 
     public static String callStatusToString(int status) {
         switch (status) {
-            case MegaChatCall.CALL_STATUS_INITIAL: {
+            case MegaChatCall.CALL_STATUS_INITIAL:
                 return "CALL_STATUS_INITIAL";
-            }
-            case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM: {
+            case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM:
                 return "CALL_STATUS_HAS_LOCAL_STREAM";
-            }
-            case MegaChatCall.CALL_STATUS_REQUEST_SENT: {
+            case MegaChatCall.CALL_STATUS_REQUEST_SENT:
                 return "CALL_STATUS_REQUEST_SENT";
-            }
-            case MegaChatCall.CALL_STATUS_RING_IN: {
+            case MegaChatCall.CALL_STATUS_RING_IN:
                 return "CALL_STATUS_RING_IN";
-            }
-            case MegaChatCall.CALL_STATUS_JOINING: {
+            case MegaChatCall.CALL_STATUS_JOINING:
                 return "CALL_STATUS_JOINING";
-            }
-            case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
+            case MegaChatCall.CALL_STATUS_IN_PROGRESS:
                 return "CALL_STATUS_IN_PROGRESS";
-            }
-            case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION: {
+            case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
                 return "CALL_STATUS_TERMINATING_USER_PARTICIPATION";
-            }
-            case MegaChatCall.CALL_STATUS_DESTROYED: {
+            case MegaChatCall.CALL_STATUS_DESTROYED:
                 return "CALL_STATUS_DESTROYED";
-            }
-            case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+            case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
                 return "CALL_STATUS_USER_NO_PRESENT";
-            }
-            case MegaChatCall.CALL_STATUS_RECONNECTING: {
+            case MegaChatCall.CALL_STATUS_RECONNECTING:
                 return "CALL_STATUS_RECONNECTING";
-            }
             default:
                 return String.valueOf(status);
         }
