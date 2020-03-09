@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +28,7 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 
+import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -101,7 +101,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
                         logDebug("Sent invite to: " + email);
                         // for UI smoothness, ignore the callback
                         megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
-                        showSnackBar(context, SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
+                        showSnackbar(context, context.getString(R.string.context_contact_request_sent, email));
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         dialog.dismiss();
@@ -148,8 +148,18 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     public void setDefaultAvatar(MegaContactGetter.MegaContact contact, ContactViewHolder holder) {
         int color = getColorAvatar(context, megaApi, contact.getId());
-        Bitmap background = getDefaultAvatar(context, color, contact.getLocalName(), AVATAR_SIZE, true);
+        Bitmap background = createAvatarBackground(color);
         holder.avatar.setImageBitmap(background);
+
+        String firstLetter = getFirstLetter(contact.getLocalName());
+        if (firstLetter.trim().isEmpty() || firstLetter.equals("(")) {
+            holder.textViewInitialLetter.setVisibility(View.INVISIBLE);
+        } else {
+            holder.textViewInitialLetter.setText(firstLetter);
+            holder.textViewInitialLetter.setTextColor(WHITE);
+            holder.textViewInitialLetter.setVisibility(View.VISIBLE);
+            holder.textViewInitialLetter.setTextSize(24);
+        }
     }
 
     @Override

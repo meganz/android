@@ -651,9 +651,9 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Solo Wi-Fi</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi o plan de datos</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">Aceptar</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">Saltar</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">Detener</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">Aceptar</string>
+    <string name="general_skip" context="skip the step of camera upload">Saltar</string>
+    <string name="general_stop" context="skip the step of camera upload">Detener</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">Subidas de la cámara en curso</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">¿Quieres detener las Subidas de la cámara?</string>
     <!--
@@ -1902,7 +1902,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">¿Recuerdas tu contraseña?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">Estás a punto de cerrar sesión. Prueba tu contraseña para asegurarte de que la recuerdas.\nSi pierdes tu contraseña, perderás el acceso a tus datos en MEGA.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Por favor, prueba tu contraseña para asegurarte de que la recuerdas. Si pierdes tu contraseña, perderás el acceso a tus datos en MEGA.</string>
-    <string name="remember_pwd_dialog_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">No volver a mostrar</string>
+    <string name="general_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">No volver a mostrar</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Prueba tu contraseña</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Prueba tu contraseña</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Contraseña correcta</string>

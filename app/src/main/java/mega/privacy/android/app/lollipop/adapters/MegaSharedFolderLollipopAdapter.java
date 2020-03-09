@@ -7,9 +7,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -29,7 +27,6 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -287,42 +284,32 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 					holder.textViewContactName.setText(holder.contactMail);
 				}
 
-				if(isChatEnabled()){
-					holder.stateIcon.setVisibility(View.VISIBLE);
-					if (megaChatApi != null){
-						int userStatus = megaChatApi.getUserOnlineStatus(contact.getHandle());
-						if(userStatus == MegaChatApi.STATUS_ONLINE){
-							logDebug("This user is connected");
-							holder.stateIcon.setVisibility(View.VISIBLE);
-							holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
-						}
-						else if(userStatus == MegaChatApi.STATUS_AWAY){
-							logDebug("This user is away");
-							holder.stateIcon.setVisibility(View.VISIBLE);
-							holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
-						}
-						else if(userStatus == MegaChatApi.STATUS_BUSY){
-							logDebug("This user is busy");
-							holder.stateIcon.setVisibility(View.VISIBLE);
-							holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
-						}
-						else if(userStatus == MegaChatApi.STATUS_OFFLINE){
-							logDebug("This user is offline");
-							holder.stateIcon.setVisibility(View.VISIBLE);
-							holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
-						}
-						else if(userStatus == MegaChatApi.STATUS_INVALID){
-							logWarning("INVALID status: " + userStatus);
-							holder.stateIcon.setVisibility(View.GONE);
-						}
-						else{
-							logDebug("This user status is: " + userStatus);
-							holder.stateIcon.setVisibility(View.GONE);
-						}
+				holder.stateIcon.setVisibility(View.VISIBLE);
+				if (megaChatApi != null) {
+					int userStatus = megaChatApi.getUserOnlineStatus(contact.getHandle());
+					if (userStatus == MegaChatApi.STATUS_ONLINE) {
+						logDebug("This user is connected");
+						holder.stateIcon.setVisibility(View.VISIBLE);
+						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
+					} else if (userStatus == MegaChatApi.STATUS_AWAY) {
+						logDebug("This user is away");
+						holder.stateIcon.setVisibility(View.VISIBLE);
+						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
+					} else if (userStatus == MegaChatApi.STATUS_BUSY) {
+						logDebug("This user is busy");
+						holder.stateIcon.setVisibility(View.VISIBLE);
+						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
+					} else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
+						logDebug("This user is offline");
+						holder.stateIcon.setVisibility(View.VISIBLE);
+						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
+					} else if (userStatus == MegaChatApi.STATUS_INVALID) {
+						logWarning("INVALID status: " + userStatus);
+						holder.stateIcon.setVisibility(View.GONE);
+					} else {
+						logDebug("This user status is: " + userStatus);
+						holder.stateIcon.setVisibility(View.GONE);
 					}
-				}
-				else{
-					holder.stateIcon.setVisibility(View.GONE);
 				}
 			}
 			else{
@@ -611,7 +598,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	/*
 	 * Get list of all selected shares
 	 */
-	public List<MegaShare> getSelectedShares() {
+	public ArrayList<MegaShare> getSelectedShares() {
 		ArrayList<MegaShare> shares = new ArrayList<MegaShare>();
 		
 		for (int i = 0; i < selectedItems.size(); i++) {

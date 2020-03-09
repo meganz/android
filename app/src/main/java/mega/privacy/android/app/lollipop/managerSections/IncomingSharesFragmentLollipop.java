@@ -418,12 +418,7 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 					}
 				}
 
-				if(areFiles && isChatEnabled()) {
-					showSendToChat = true;
-				}
-				else {
-					showSendToChat = false;
-				}
+				showSendToChat = areFiles;
 
 				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
 				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -1202,6 +1197,10 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 	@Override
 	public void multipleItemClick(int position) {
 		adapter.toggleSelection(position);
+	}
+
+	@Override
+	public void reselectUnHandledSingleItem(int position) {
 	}
 
 	public void findNodes(){

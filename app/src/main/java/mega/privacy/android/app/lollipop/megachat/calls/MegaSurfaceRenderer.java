@@ -29,6 +29,7 @@ import org.webrtc.Logging;
 import java.nio.ByteBuffer;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
 public class MegaSurfaceRenderer implements Callback {
 
@@ -157,10 +158,7 @@ public class MegaSurfaceRenderer implements Callback {
         byteBuffer = null;
     }
 
-    public Bitmap CreateBitmap(int width, int height) {
-        logDebug("width = " + width + ", height = " + height);
-
-        Logging.d(TAG, "CreateByteBitmap " + width + ":" + height);
+    public Bitmap createBitmap(int width, int height) {
         if (bitmap == null) {
             try {
                 android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
@@ -172,32 +170,33 @@ public class MegaSurfaceRenderer implements Callback {
         srcRect.top = 0;
         srcRect.bottom = height;
         srcRect.right = width;
-
-        logDebug("sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
         adjustAspectRatio();
-
         return bitmap;
     }
 
-    public void DrawBitmap(boolean flag, boolean isLocal) {
-        if (bitmap == null || surfaceHolder == null)
-            return;
 
+    /**
+     * Draw video frames.
+     * @param inProgressCall Indicates if the call is in progress.
+     * @param isLocal Indicates if the frames are from the local camera.
+     */
+    public void drawBitmap(boolean inProgressCall, boolean isLocal) {
+        if (bitmap == null || surfaceHolder == null) return;
         Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas == null) return;
-        if (isLocal) {
+        if (isLocal && isFrontCameraInUse()) {
             canvas.scale(-1, 1);
             canvas.translate(-canvas.getWidth(), 0);
         }
-        if (flag) {
+        if (inProgressCall) {
             paint.reset();
             paint.setXfermode(modesrcover);
             canvas.drawRoundRect(dstRectf, 20, 20, paint);
             paint.setXfermode(modesrcin);
-            canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
         } else {
-            canvas.drawBitmap(bitmap, srcRect, dstRect, null);
+            paint = null;
         }
+        canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
         surfaceHolder.unlockCanvasAndPost(canvas);
     }
 }

@@ -22,7 +22,7 @@ import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 
 public class PermissionsFragment extends Fragment implements View.OnClickListener {
 

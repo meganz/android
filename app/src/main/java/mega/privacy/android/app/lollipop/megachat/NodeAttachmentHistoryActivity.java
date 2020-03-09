@@ -57,7 +57,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
@@ -1108,9 +1108,9 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 
 			showProgressForwarding();
 
-			long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
-			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+			long[] idMessages = intent.getLongArrayExtra(ID_MESSAGES);
+			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+			long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
 
 			if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
 				if (contactHandles != null && contactHandles.length > 0) {
@@ -1131,7 +1131,7 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 						}
 					}
 
-					CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, idMessages, this, CreateChatToPerformActionListener.SEND_MESSAGES, chatId);
+					CreateChatListener listener = new CreateChatListener(chats, users, idMessages, this, CreateChatListener.SEND_MESSAGES, chatId);
 
 					for (MegaUser user : users) {
 						MegaChatPeerList peers = MegaChatPeerList.createInstance();
@@ -1562,10 +1562,6 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 	public void showSnackbar(int type, String s){
 		showSnackbar(type, container, s);
 	}
-    
-    public void showSnackbar(int type, String s,int chatId){
-        showSnackbar(type, container, s, chatId);
-    }
 
 	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
 		logDebug("Size: " + size);

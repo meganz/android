@@ -17,7 +17,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.utils.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -134,6 +134,11 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 intent.putExtra(EVENT_NUMBER, event.getNumber());
                 intent.putExtra(EVENT_TEXT, event.getText());
                 LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+                break;
+
+            case MegaEvent.EVENT_BUSINESS_STATUS:
+                megaApplication.updateBusinessStatus();
+
                 break;
         }
     }

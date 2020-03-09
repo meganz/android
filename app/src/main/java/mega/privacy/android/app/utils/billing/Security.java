@@ -1,4 +1,5 @@
-/* Copyright (c) 2012 Google Inc.
+/*
+ * Copyright (c) 2012 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +17,9 @@
 package mega.privacy.android.app.utils.billing;
 
 import android.text.TextUtils;
-import android.util.Log;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-
+import android.util.Base64;
+import com.android.billingclient.util.BillingHelper;
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -31,14 +29,11 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+
 /**
- * Security-related methods. For a secure implementation, all of this code
- * should be implemented on a server that communicates with the
- * application on the device. For the sake of simplicity and clarity of this
- * example, this code is included here and is executed on the device. If you
- * must verify the purchases on the phone, you should obfuscate this code to
- * make it harder for an attacker to replace the code with stubs that treat all
- * purchases as verified.
+ * Security-related methods. For a secure implementation, all of this code should be implemented on
+ * a server that communicates with the application on the device.
  */
 public class Security {
     private static final String TAG = "IABUtil/Security";
@@ -47,51 +42,58 @@ public class Security {
     private static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
 
     /**
-     * Verifies that the data was signed with the given signature, and returns
-     * the verified purchase. The data is in JSON format and signed
-     * with a private key. The data also contains the {@link PurchaseState}
-     * and product ID of the purchase.
+     * Verifies that the data was signed with the given signature, and returns the verified
+     * purchase.
      * @param base64PublicKey the base64-encoded public key to use for verifying.
      * @param signedData the signed JSON string (signed, not encrypted)
      * @param signature the signature for the data, signed with the private key
+     * @throws IOException if encoding algorithm is not supported or key specification
+     * is invalid
      */
-    public static boolean verifyPurchase(String base64PublicKey, String signedData, String signature) {
-        if (TextUtils.isEmpty(signedData) || TextUtils.isEmpty(base64PublicKey) ||
-                TextUtils.isEmpty(signature)) {
-            Log.e(TAG, "Purchase verification failed: missing data.");
+    public static boolean verifyPurchase(String base64PublicKey, String signedData,
+            String signature) throws IOException {
+        if (TextUtils.isEmpty(signedData) || TextUtils.isEmpty(base64PublicKey)
+                || TextUtils.isEmpty(signature)) {
+            BillingHelper.logWarn(TAG, "Purchase verification failed: missing data.");
+            logWarning("Purchase verification failed: missing data.");
             return false;
         }
 
-        PublicKey key = Security.generatePublicKey(base64PublicKey);
-        return Security.verify(key, signedData, signature);
+        PublicKey key = generatePublicKey(base64PublicKey);
+        return verify(key, signedData, signature);
     }
 
     /**
-     * Generates a PublicKey instance from a string containing the
-     * Base64-encoded public key.
+     * Generates a PublicKey instance from a string containing the Base64-encoded public key.
      *
      * @param encodedPublicKey Base64-encoded public key
-     * @throws IllegalArgumentException if encodedPublicKey is invalid
+     * @throws IOException if encoding algorithm is not supported or key specification
+     * is invalid
      */
-    public static PublicKey generatePublicKey(String encodedPublicKey) {
+    public static PublicKey generatePublicKey(String encodedPublicKey) throws IOException {
         try {
-            byte[] decodedKey = Base64.decode(encodedPublicKey);
+            byte[] decodedKey = Base64.decode(encodedPublicKey, Base64.DEFAULT);
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
             return keyFactory.generatePublic(new X509EncodedKeySpec(decodedKey));
         } catch (NoSuchAlgorithmException e) {
+            // "RSA" is guaranteed to be available.
+            logError("RSA is unavailable.", e);
             throw new RuntimeException(e);
         } catch (InvalidKeySpecException e) {
-            Log.e(TAG, "Invalid key specification.");
-            throw new IllegalArgumentException(e);
-        } catch (Base64DecoderException e) {
-            Log.e(TAG, "Base64 decoding failed.");
-            throw new IllegalArgumentException(e);
+            String msg = "Invalid key specification: " + e;
+            BillingHelper.logWarn(TAG, msg);
+            logWarning(msg, e);
+            throw new IOException(msg);
+        } catch (IllegalArgumentException e) {
+            BillingHelper.logWarn(TAG, e.getMessage());
+            logWarning(e.getMessage(), e);
+            throw new IOException(e.getMessage());
         }
     }
 
     /**
-     * Verifies that the signature from the server matches the computed
-     * signature on the data.  Returns true if the data is correctly signed.
+     * Verifies that the signature from the server matches the computed signature on the data.
+     * Returns true if the data is correctly signed.
      *
      * @param publicKey public key associated with the developer account
      * @param signedData signed data from server
@@ -99,24 +101,34 @@ public class Security {
      * @return true if the data and signature match
      */
     public static boolean verify(PublicKey publicKey, String signedData, String signature) {
-        Signature sig;
+        byte[] signatureBytes;
         try {
-            sig = Signature.getInstance(SIGNATURE_ALGORITHM);
-            sig.initVerify(publicKey);
-            sig.update(signedData.getBytes());
-            if (!sig.verify(Base64.decode(signature))) {
-                Log.e(TAG, "Signature verification failed.");
+            signatureBytes = Base64.decode(signature, Base64.DEFAULT);
+        } catch (IllegalArgumentException e) {
+            BillingHelper.logWarn(TAG, "Base64 decoding failed.");
+            logWarning("Base64 decoding failed.", e);
+            return false;
+        }
+        try {
+            Signature signatureAlgorithm = Signature.getInstance(SIGNATURE_ALGORITHM);
+            signatureAlgorithm.initVerify(publicKey);
+            signatureAlgorithm.update(signedData.getBytes());
+            if (!signatureAlgorithm.verify(signatureBytes)) {
+                BillingHelper.logWarn(TAG, "Signature verification failed.");
+                logWarning("Signature verification failed.");
                 return false;
             }
             return true;
         } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, "NoSuchAlgorithmException.");
+            // "RSA" is guaranteed to be available.
+            logError("RSA is unavailable.", e);
+            throw new RuntimeException(e);
         } catch (InvalidKeyException e) {
-            Log.e(TAG, "Invalid key specification.");
+            BillingHelper.logWarn(TAG, "Invalid key specification.");
+            logWarning("Invalid key specification.", e);
         } catch (SignatureException e) {
-            Log.e(TAG, "Signature exception.");
-        } catch (Base64DecoderException e) {
-            Log.e(TAG, "Base64 decoding failed.");
+            BillingHelper.logWarn(TAG, "Signature exception.");
+            logWarning("Signature exception.", e);
         }
         return false;
     }
