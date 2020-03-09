@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.camera2.CameraManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -148,10 +149,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	private static boolean registeredChatListeners = false;
 
-    private static boolean isVerifySMSShowed = false;
+	private static boolean isVerifySMSShowed = false;
 
-    private static boolean isBlockedDueToWeakAccount = false;
-    private static boolean isWebOpenDueToEmailVerification = false;
+	private static boolean isBlockedDueToWeakAccount = false;
+	private static boolean isWebOpenDueToEmailVerification = false;
 
 	MegaChatApiAndroid megaChatApi = null;
 
@@ -161,6 +162,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private static MegaApplication singleApplicationInstance;
 
 	private PowerManager.WakeLock wakeLock;
+	private Handler cameraHandler = null;
+	private CameraManager cameraManager = null;
+	private CameraManager.AvailabilityCallback cameraCallback = null;
+	private boolean localCameraEnabled = false;
 
     @Override
 	public void networkAvailable() {
@@ -178,29 +183,63 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
-    public static void smsVerifyShowed(boolean isShowed) {
+	private void disableLocalCamera() {
+		if (localCameraEnabled) {
+			localCameraEnabled = false;
+			return;
+		}
+		if (megaChatApi == null) return;
+		long chatIdCallInProgress = getChatCallInProgress(megaChatApi);
+		MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
+		if (callInProgress != null && callInProgress.hasLocalVideo()) {
+			logDebug("Disabling local video ... the camera is using by other app");
+			megaChatApi.disableVideo(chatIdCallInProgress, null);
+		}
+	}
+
+	private void checkDeviceCamera() {
+		if (cameraManager != null) return;
+		cameraManager = (CameraManager) getApplicationContext().getSystemService(Context.CAMERA_SERVICE);
+		if (cameraHandler == null) cameraHandler = new Handler();
+
+		if (cameraCallback == null) {
+			cameraCallback = new CameraManager.AvailabilityCallback() {
+				@Override
+				public void onCameraAvailable(String cameraId) {
+					super.onCameraAvailable(cameraId);
+					disableLocalCamera();
+				}
+
+				@Override
+				public void onCameraUnavailable(String cameraId) {
+					super.onCameraUnavailable(cameraId);
+					disableLocalCamera();
+				}
+			};
+		}
+		cameraManager.registerAvailabilityCallback(cameraCallback, cameraHandler);
+	}
+
+	public void manuallyActivatedLocalCamera(){
+		localCameraEnabled = true;
+	}
+
+	private void clearCameraHandle(){
+		if (cameraHandler != null) {
+			cameraHandler.removeCallbacksAndMessages(null);
+			cameraHandler = null;
+		}
+		if(cameraManager != null && cameraCallback != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+			cameraManager.unregisterAvailabilityCallback((CameraManager.AvailabilityCallback) cameraCallback);
+			cameraManager = null;
+			cameraCallback = null;
+		}
+	}
+
+	public static void smsVerifyShowed(boolean isShowed) {
 	    isVerifySMSShowed = isShowed;
     }
 
-
-//	static final String GA_PROPERTY_ID = "UA-59254318-1";
-//	
-//	/**
-//	 * Enum used to identify the tracker that needs to be used for tracking.
-//	 *
-//	 * A single tracker is usually enough for most purposes. In case you do need multiple trackers,
-//	 * storing them all in Application object helps ensure that they are created only once per
-//	 * application instance.
-//	 */
-//	public enum TrackerName {
-//	  APP_TRACKER/*, // Tracker used only in this app.
-//	  GLOBAL_TRACKER, // Tracker used by all the apps from a company. eg: roll-up tracking.
-//	  ECOMMERCE_TRACKER, // Tracker used by all ecommerce transactions from a company.
-//	  */
-//	}
-//
-//	HashMap<TrackerName, Tracker> mTrackers = new HashMap<TrackerName, Tracker>();
-	
 	class BackgroundRequestListener implements MegaRequestListenerInterface
 	{
 
@@ -228,17 +267,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			if (request.getType() == MegaRequest.TYPE_LOGOUT){
 				logDebug("Logout finished: " + e.getErrorString() + "(" + e.getErrorCode() +")");
 				if (e.getErrorCode() == MegaError.API_OK) {
-					if (isChatEnabled()) {
-						logDebug("END logout sdk request - wait chat logout");
-					} else {
-						logDebug("END logout sdk request - chat disabled");
-						DatabaseHandler.getDbHandler(getApplicationContext()).clearEphemeral();
-						AccountController.logoutConfirmed(getApplicationContext());
-
-						Intent tourIntent = new Intent(getApplicationContext(), LoginActivityLollipop.class);
-						tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-						startActivity(tourIntent);
-					}
+					logDebug("END logout sdk request - wait chat logout");
 				} else if (e.getErrorCode() == MegaError.API_EINCOMPLETE) {
 					if (request.getParamType() == MegaError.API_ESSL) {
 						logWarning("SSL verification failed");
@@ -250,13 +279,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					myAccountInfo = new MyAccountInfo();
 
 					esid = true;
-
-					if(!isChatEnabled()){
-						logWarning("Chat is not enable - proceed to show login");
-						if(activityVisible){
-							launchExternalLogout();
-						}
-					}
 
 					AccountController.localLogoutApp(getApplicationContext());
 				} else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
@@ -403,13 +425,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
-	public void launchExternalLogout(){
-		logDebug("launchExternalLogout");
-		Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
-		loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-		startActivity(loginIntent);
-	}
-
 	private final int interval = 3000;
 	private Handler keepAliveHandler = new Handler();
 	int backgroundStatus = -1;
@@ -480,7 +495,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
         scheduleCameraUploadJob(getApplicationContext());
-
         storageState = dbH.getStorageState();
 
 		boolean fileLoggerSDK = false;
@@ -582,6 +596,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
+
 		logoutReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context,Intent intent) {
@@ -628,10 +643,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         clearPublicCache(this);
 
 		ContextUtils.initialize(getApplicationContext());
-
-//		initializeGA();
-		
-//		new MegaTest(getMegaApi()).start();
 	}
 
 
@@ -764,13 +775,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		catch (Exception e){}
 	}
 
-	public void enableChat(){
-		logDebug("enableChat");
-		if(isChatEnabled()){
-			megaChatApi = getMegaChatApi();
-		}
-	}
-
 	public MegaApiAndroid getMegaApi()
 	{
 		if(megaApi == null)
@@ -805,17 +809,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 			megaApi.addGlobalListener(new GlobalListener());
 
-//			DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-//			if (dbH.getCredentials() != null){
-//				megaChatApi = new MegaChatApiAndroid(megaApi, true);
-//			}
-//			else{
-//				megaChatApi = new MegaChatApiAndroid(megaApi, false);
-//			}
-
-			if(isChatEnabled()){
-				megaChatApi = getMegaChatApi();
-			}
+			megaChatApi = getMegaChatApi();
 
 			String language = Locale.getDefault().toString();
 			boolean languageString = megaApi.setLanguage(language);
@@ -924,27 +918,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		return chatNotificationReceived;
 	}
 
-	public static void setChatNotificationReceived(boolean chatNotificationReceived) {
-		MegaApplication.chatNotificationReceived = chatNotificationReceived;
-	}
-
-	//	synchronized Tracker getTracker(TrackerName trackerId) {
-//		if (!mTrackers.containsKey(trackerId)) {
-//
-//			GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-//			Tracker t = null;
-//			if (trackerId == TrackerName.APP_TRACKER){
-//				t = analytics.newTracker(GA_PROPERTY_ID);
-//			}
-////			Tracker t = (trackerId == TrackerName.APP_TRACKER) ? analytics.newTracker(PROPERTY_ID)
-////					: (trackerId == TrackerName.GLOBAL_TRACKER) ? analytics.newTracker(R.xml.global_tracker)
-////							: analytics.newTracker(R.xml.ecommerce_tracker);
-//					mTrackers.put(trackerId, t);
-//					
-//		}
-//	
-//		return mTrackers.get(trackerId);
-//	}
+    public static void setChatNotificationReceived(boolean chatNotificationReceived) {
+        MegaApplication.chatNotificationReceived = chatNotificationReceived;
+    }
 
 	public static long getOpenChatId() {
 		return openChatId;
@@ -1009,7 +985,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					PendingIntent.FLAG_ONE_SHOT);
 
 			Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
+            String notificationTitle;
+            if(n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE) && !n.hasChanged(MegaNode.CHANGE_TYPE_NEW)){
+                notificationTitle = getString(R.string.context_permissions_changed);
+            }else{
+                notificationTitle = getString(R.string.title_incoming_folder_notification);
+            }
 			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_HIGH);
 				channel.setShowBadge(true);
@@ -1019,7 +1000,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(this, notificationChannelId);
 				notificationBuilderO
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setContentTitle(getString(R.string.title_incoming_folder_notification))
+						.setContentTitle(notificationTitle)
 						.setContentText(notificationContent)
 						.setStyle(new NotificationCompat.BigTextStyle()
 								.bigText(notificationContent))
@@ -1036,7 +1017,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			else {
 				NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setContentTitle(getString(R.string.title_incoming_folder_notification))
+						.setContentTitle(notificationTitle)
 						.setContentText(notificationContent)
 						.setStyle(new NotificationCompat.BigTextStyle()
 								.bigText(notificationContent))
@@ -1074,63 +1055,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		} catch (Exception e) {
 			logError("Exception", e);
 		}
-
-//        try{
-//            String source = "Tap to get more info";
-//            Spanned notificationContent;
-//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-//                notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
-//            } else {
-//                notificationContent = Html.fromHtml(source);
-//            }
-//
-//            int notificationId = NOTIFICATION_PUSH_CLOUD_DRIVE;
-//
-//            Intent intent = new Intent(this, ManagerActivityLollipop.class);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            intent.setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-//                    PendingIntent.FLAG_ONE_SHOT);
-//
-//            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-//                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-//                    .setContentTitle(getString(R.string.title_incoming_folder_notification))
-//                    .setContentText(notificationContent)
-//                    .setStyle(new NotificationCompat.BigTextStyle()
-//                            .bigText(notificationContent))
-//                    .setAutoCancel(true)
-//                    .setSound(defaultSoundUri)
-//                    .setColor(ContextCompat.getColor(this,R.color.mega))
-//                    .setContentIntent(pendingIntent);
-//
-//            Drawable d;
-//
-//            if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
-//                d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-//            } else {
-//                d = getResources().getDrawable(R.drawable.ic_folder_incoming);
-//            }
-//
-//            notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
-//
-//            NotificationManager notificationManager =
-//                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//            notificationManager.notify(notificationId, notificationBuilder.build());
-//        }
-//        catch(Exception e){
-//            log("Exception when showing shared folder notification: "+e.getMessage());
-//        }
 	}
 
 	public void sendSignalPresenceActivity(){
 		logDebug("sendSignalPresenceActivity");
-		if(isChatEnabled()){
-			if (megaChatApi != null){
-				if(megaChatApi.isSignalActivityRequired()){
-					megaChatApi.signalPresenceActivity();
-				}
+		if (megaChatApi != null) {
+			if (megaChatApi.isSignalActivityRequired()) {
+				megaChatApi.signalPresenceActivity();
 			}
 		}
 	}
@@ -1309,7 +1240,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 
 		int chatUnread = 0;
-		if(isChatEnabled() && megaChatApi != null) {
+		if (megaChatApi != null) {
 			chatUnread = megaChatApi.getUnreadChats();
 		}
 
@@ -1356,30 +1287,25 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						if(msg.getType()==MegaChatMessage.TYPE_NORMAL||msg.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT||msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT){
 							if(msg.isDeleted()){
 								logDebug("Message deleted");
-//								updateChatNotification(chatid, msg);
 
 								megaChatApi.pushReceived(false);
 							}
 							else if(msg.isEdited()){
 								logDebug("Message edited");
-//								updateChatNotification(chatid, msg);
 								megaChatApi.pushReceived(false);
 							}
 							else{
 								logDebug("New normal message");
-//								showChatNotification(chatid, msg);
 								megaChatApi.pushReceived(true);
 							}
 						}
 						else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
 							logDebug("New TRUNCATE message");
-//							showChatNotification(chatid, msg);
 							megaChatApi.pushReceived(false);
 						}
 					}
 					else{
 						logDebug("Message SEEN");
-//						removeChatSeenNotification(chatid, msg);
 						megaChatApi.pushReceived(false);
 					}
 				}
@@ -1393,59 +1319,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 	}
 
-//	public void updateChatNotification(long chatid, MegaChatMessage msg){
-//		ChatAdvancedNotificationBuilder notificationBuilder;
-//		notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-//
-//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//			notificationBuilder.updateNotification(chatid, msg);
-//		}
-//		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//
-//			NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//			StatusBarNotification[] notifs = mNotificationManager.getActiveNotifications();
-//			boolean shown=false;
-//			for(int i = 0; i< notifs.length; i++){
-//				if(notifs[i].getId()==NOTIFICATION_PRE_N_CHAT){
-//					shown = true;
-//					break;
-//				}
-//			}
-//			if(shown){
-//				notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
-//			}
-//		}
-//		else{
-//			notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
-//		}
-//	}
-//
-//	public void removeChatSeenNotification(long chatid, MegaChatMessage msg){
-//		ChatAdvancedNotificationBuilder notificationBuilder;
-//		notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-//
-//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//			notificationBuilder.removeSeenNotification(chatid, msg);
-//		}
-//		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//
-//			NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//			StatusBarNotification[] notifs = mNotificationManager.getActiveNotifications();
-//			boolean shown=false;
-//			for(int i = 0; i< notifs.length; i++){
-//				if(notifs[i].getId()==NOTIFICATION_PRE_N_CHAT){
-//					shown = true;
-//					break;
-//				}
-//			}
-//			if(shown){
-//				notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
-//			}
-//		}
-//		else{
-//			notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
-//		}
-//	}
 
 	private void checkOneCall(long chatId) {
 		logDebug("One call : Chat Id = " + chatId + ", openCall Chat Id = " + openCallChatId);
@@ -1505,6 +1378,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	}
 
+
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 		stopService(new Intent(this, IncomingCallService.class));
@@ -1526,6 +1400,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
 					removeChatAudioManager();
 					clearIncomingCallNotification(call.getId());
+					clearCameraHandle();
 				}
 				if (listAllCalls.size() == 1) {
 					checkOneCall(listAllCalls.get(0));
@@ -1571,11 +1446,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		} catch (Exception e) {
 			logError("EXCEPTION when showing missed call notification", e);
 		}
-
 		//Commented temporary
-//        registerCallInDevice(call);
-
+        //registerCallInDevice(call);
 	}
+
 
 	private void registerCallInDevice(MegaChatCall call) {
 		//Register a call from Mega in the phone

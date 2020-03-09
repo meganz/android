@@ -406,22 +406,21 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 				finish();
 				return;
 			}
-			if (isChatEnabled()) {
-				if (megaChatApi == null) {
-					megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-				}
 
-				if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-					logDebug("Refresh session - karere");
-					Intent intent = new Intent(this, LoginActivityLollipop.class);
-					intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-					intent.setData(Uri.parse(url));
-					intent.setAction(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL);
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					startActivity(intent);
-					finish();
-					return;
-				}
+			if (megaChatApi == null) {
+				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+			}
+
+			if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+				logDebug("Refresh session - karere");
+				Intent intent = new Intent(this, LoginActivityLollipop.class);
+				intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+				intent.setData(Uri.parse(url));
+				intent.setAction(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+				return;
 			}
 		}
 		
@@ -676,7 +675,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 				return false;
 			}
 		});
-		input.setImeActionLabel(getString(R.string.cam_sync_ok),EditorInfo.IME_ACTION_DONE);
+		input.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -970,17 +969,8 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 			else {
 				logWarning("node not found");
 			}
-			logDebug("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
-			if (numberOfNodesAlreadyDownloaded > 0){
-				String msg = getString(R.string.already_downloaded_multiple, numberOfNodesAlreadyDownloaded);
-				if (numberOfNodesPending > 0){
-					msg = msg + getString(R.string.pending_multiple, numberOfNodesPending);
-				}
-				showSnackbar(SNACKBAR_TYPE, msg);
-			}
-			else {
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.download_began));
-			}
+
+			showSnackBarWhenDownloading(this, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
 		}
 	}
 	

@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -66,7 +67,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         this.updater = updater;
     }
 
-    public static class MegaContact implements ContactWithEmail {
+    public static class MegaContact {
 
         private String id;
 
@@ -178,7 +179,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                 MegaStringMap map = request.getMegaStringMap();
                 MegaStringTable table = request.getMegaStringTable();
 
-                if(table.size() == 0) {
+                if (table.size() == 0) {
                     // when there's no matched user, should be considered as successful
                     updateLastSyncTimestamp();
                 }
@@ -210,7 +211,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
             } else {
                 logWarning("Get registered contacts faild with error code: " + e.getErrorCode());
                 //current account has requested mega contacts too many times and reached the limitation, no need to re-try.
-                if(e.getErrorCode() == MegaError.API_ETOOMANY) {
+                if (e.getErrorCode() == MegaError.API_ETOOMANY) {
                     updateLastSyncTimestamp();
                 }
                 if (updater != null) {
@@ -263,9 +264,21 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     }
 
     private ArrayList<MegaContact> filterOut(MegaApiJava api, ArrayList<MegaContact> list) {
-        ContactsFilter.filterOutContacts(api, list);
-        ContactsFilter.filterOutPendingContacts(api, list);
-        ContactsFilter.filterOutMyself(api, list);
+        List<String> emails = new ArrayList<>();
+        for (MegaContact megaContact : list) {
+            emails.add(megaContact.getEmail());
+        }
+
+        ContactsFilter.filterOutContacts(api, emails);
+        ContactsFilter.filterOutPendingContacts(api, emails);
+        ContactsFilter.filterOutMyself(api, emails);
+        Iterator<MegaContact> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            if (!emails.contains(iterator.next().email)) {
+                iterator.remove();
+            }
+        }
+
         Collections.sort(list, new Comparator<MegaContact>() {
 
             @Override
@@ -288,7 +301,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     }
 
     public void getMegaContacts(MegaApiAndroid api, long period) {
-        if(api.getRootNode() == null) {
+        if (api.getRootNode() == null) {
             logDebug("haven't logged in, return");
             return;
         }
@@ -297,7 +310,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
             logDebug("getMegaContacts request from server");
             api.getRegisteredContacts(getRequestParameter(getLocalContacts()), this);
         } else {
-            if(!requestInProgress) {
+            if (!requestInProgress) {
                 logDebug("getMegaContacts load from database");
                 if (updater != null) {
                     ArrayList<MegaContact> list = dbH.getMegaContacts();

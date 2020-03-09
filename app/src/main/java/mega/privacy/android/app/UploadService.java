@@ -7,14 +7,17 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
@@ -42,9 +45,12 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -114,6 +120,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	//2 - pre-overquota
     private int isOverquota = 0;
 
+    /** the receiver and manager for the broadcast to listen to the pause event */
+    private BroadcastReceiver pauseBroadcastReceiver;
+    private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
+
     @SuppressLint("NewApi")
 	@Override
 	public void onCreate() {
@@ -140,6 +150,22 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mBuilder = new Notification.Builder(UploadService.this);
 		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, null);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // delay 1 second to refresh the pause notification to prevent update is missed
+        pauseBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                new Handler().postDelayed(() -> {
+                    if (totalFileUploads > 0) {
+                        updateProgressNotification(false);
+                    }
+                    if (totalFolderUploads > 0) {
+                        updateProgressNotification(true);
+                    }
+                }, 1000);
+            }
+        };
+        pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 	}
 
 	@Override
@@ -155,6 +181,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             megaChatApi.saveCurrentState();
         }
 
+        pauseBroadcastManager.unregisterReceiver(pauseBroadcastReceiver);
 		super.onDestroy();
 	}
 
@@ -296,6 +323,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             if (totalFolderUploads > 0) {
                 showFolderUploadCompleteNotification();
             }
+
+            sendUploadFinishBroadcast();
         }
 
         if (megaApi.getNumPendingUploads() <= 0) {
@@ -315,14 +344,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         stopSelf();
 		logDebug("After stopSelf");
 
-        if (isPermissionGranted(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 			deleteCacheFolderIfEmpty(getApplicationContext(), TEMPORAL_FOLDER);
         }
 
 	}
 
     private void notifyNotification(String notificationTitle,String size,int notificationId,String channelId,String channelName) {
-        Intent intent = new Intent(UploadService.this,ManagerActivityLollipop.class);
+        Intent intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
+        intent.setAction(ACTION_SHOW_TRANSFERS);
+        intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelId,channelName,NotificationManager.IMPORTANCE_DEFAULT);
@@ -334,7 +365,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,0))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false);
@@ -343,7 +374,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         } else {
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,0))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false);
@@ -360,6 +391,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             transferredBytes = transferredBytes + currentTransfer.getTransferredBytes();
         }
         return transferredBytes;
+    }
+
+    private void sendUploadFinishBroadcast() {
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED);
+        intent.putExtra(TRANSFER_TYPE, UPLOAD_TRANSFER);
+        intent.putExtra(NUMBER_FILES, totalFileUploads + totalFolderUploads);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     /*
@@ -416,6 +454,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             case 0:
             default:
                 intent.setAction(ACTION_SHOW_TRANSFERS);
+                intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
                 break;
             case 1:
                 intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -425,7 +464,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 break;
         }
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -527,12 +566,20 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             message = getString(R.string.download_preparing_files);
         } else {
             int filesProgress;
-            if(isFolderUpload){
+            if (isFolderUpload) {
                 filesProgress = totalFolderUploadsCompleted + 1 > totalFolderUploads ? totalFolderUploads : totalFolderUploadsCompleted + 1;
-                message = getResources().getQuantityString(R.plurals.folder_upload_service_notification,totalFolderUploads,filesProgress,totalFolderUploads);
-            }else{
+                if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+                    message = getResources().getQuantityString(R.plurals.folder_upload_service_paused_notification, totalFolderUploads, filesProgress, totalFolderUploads);
+                } else {
+                    message = getResources().getQuantityString(R.plurals.folder_upload_service_notification, totalFolderUploads, filesProgress, totalFolderUploads);
+                }
+            } else {
                 filesProgress = totalFileUploadsCompleted + 1 > totalFileUploads ? totalFileUploads : totalFileUploadsCompleted + 1;
-                message = getResources().getQuantityString(R.plurals.upload_service_notification,totalFileUploads,filesProgress,totalFileUploads);
+                if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+                    message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalFileUploads, filesProgress, totalFileUploads);
+                } else {
+                    message = getResources().getQuantityString(R.plurals.upload_service_notification, totalFileUploads, filesProgress, totalFileUploads);
+                }
             }
         }
 
@@ -618,7 +665,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 mapProgressFileTransfers.put(transfer.getTag(), transfer);
                 if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
                     String size = getSizeString(transfer.getTotalBytes());
-                    AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
+                    AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "", transfer.getParentPath());
                     dbH.setCompletedTransfer(completedTransfer);
                 }
             }
@@ -937,7 +984,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 			mBuilderCompatO
 					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);
@@ -947,7 +994,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		else {
 			mBuilderCompat
 					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);

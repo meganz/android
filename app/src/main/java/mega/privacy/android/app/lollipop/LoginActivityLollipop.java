@@ -48,7 +48,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 
-import static mega.privacy.android.app.utils.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -352,7 +352,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         dialogBuilder.setMessage(getString(R.string.incorrect_MK));
         dialogBuilder.setCancelable(false);
 
-        dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new android.content.DialogInterface.OnClickListener() {
+        dialogBuilder.setPositiveButton(getString(R.string.general_ok), new android.content.DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -373,7 +373,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             dialogBuilder.setTitle(getString(R.string.title_alert_logged_out));
             dialogBuilder.setMessage(getString(R.string.error_server_expired_session));
 
-            dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new android.content.DialogInterface.OnClickListener() {
+            dialogBuilder.setPositiveButton(getString(R.string.general_ok), new android.content.DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

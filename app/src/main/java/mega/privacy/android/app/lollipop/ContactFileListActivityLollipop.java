@@ -80,9 +80,10 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
-import static mega.privacy.android.app.utils.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
@@ -523,20 +524,18 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			return;
 		}
 
-		if (isChatEnabled()) {
-			if (megaChatApi == null) {
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+		}
 
-			if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-				logDebug("Refresh session - karere");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
-				return;
-			}
+		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+			logDebug("Refresh session - karere");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
 		}
 
 		megaApi.addGlobalListener(this);
@@ -1204,6 +1203,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 				parentNode = megaApi.getRootNode();
 			}
 
+			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, paths.size(), paths.size()));
 			for (String path : paths) {
 				Intent uploadServiceIntent = new Intent(this, UploadService.class);
 				File file = new File(path);
@@ -1229,7 +1229,6 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				logDebug("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began));
 				startService(uploadServiceIntent);
 				i++;
 			}
@@ -1264,7 +1263,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			showErrorAlertDialog(getString(R.string.upload_can_not_open),
 					false, this);
 		} else {
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_began));
+			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());

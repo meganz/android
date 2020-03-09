@@ -51,7 +51,7 @@ public class ContactController {
         if (megaApi == null){
             megaApi = MegaApplication.getInstance().getMegaApi();
         }
-        if(isChatEnabled() && megaChatApi == null){
+        if (megaChatApi == null) {
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 

@@ -10,10 +10,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 
-import static mega.privacy.android.app.utils.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class ShareListener extends BaseListener {
     public static final String SHARE_LISTENER = "SHARE_LISTENER";

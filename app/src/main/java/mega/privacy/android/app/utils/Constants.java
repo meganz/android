@@ -51,7 +51,6 @@ public class Constants {
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
     public static final String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
-    public static final String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
     public static final String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
@@ -250,6 +249,8 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP = "INTENT_CHAT_ARCHIVED_GROUP";
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
 
+    public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
+
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
     public static final int RUBBISH_BIN_ADAPTER = 2002;
@@ -374,6 +375,11 @@ public class Constants {
 
     public static final String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
 
+    /**
+     * A phone number pattern, which length should be in 5-22, and the beginning can have a '+'.
+     */
+    public static final Pattern PHONE_NUMBER_REGEX = Pattern.compile("^[+]?[0-9]{5,22}$");
+
     public static final Pattern EMAIL_ADDRESS
             = Pattern.compile(
             "[a-zA-Z0-9\\+\\.\\_\\%\\-\\&\\+]{1,256}" +
@@ -424,6 +430,9 @@ public class Constants {
     public static final String SELECTED_USERS = "SELECTED_USERS";
     public static final String ID_MESSAGES = "ID_MESSAGES";
     public static final String USER_HANDLES = "USER_HANDLES";
+
+    public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
+    public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
 
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
     public static final int MAX_WIDTH_CONTACT_NAME_PORT = 200;

@@ -115,7 +115,7 @@ import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
@@ -158,7 +158,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -596,23 +595,20 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
                 }
 
-                if(isChatEnabled()){
-                    if (megaChatApi == null){
-                        megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-                    }
-
-                    if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-                        logDebug("Refresh session - karere");
-                        Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                        intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-                        intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intentLogin);
-                        finish();
-                        return;
-                    }
-
-                    megaChatApi.addChatCallListener(callListener);
+                if (megaChatApi == null) {
+                    megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
                 }
+                if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+                    logDebug("Refresh session - karere");
+                    Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+                    intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+                    intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intentLogin);
+                    finish();
+                    return;
+                }
+
+                megaChatApi.addChatCallListener(callListener);
 
                 if (isFolderLink) {
                     megaApiFolder = app.getMegaApiFolder();
@@ -1101,7 +1097,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                     logDebug("playbackState: " + playbackState);
 
-                    if (playWhenReady && isChatEnabled() && megaChatApi != null && participatingInACall(megaChatApi)) {
+                    if (playWhenReady && participatingInACall(megaChatApi)) {
                         //Not allow to play content when a call is in progress
                         player.setPlayWhenReady(false);
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);
@@ -1341,7 +1337,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             builder = new AlertDialog.Builder(this);
         }
         builder.setCancelable(false);
-        String accept = getResources().getString(R.string.cam_sync_ok).toUpperCase();
+        String accept = getResources().getString(R.string.general_ok).toUpperCase();
         try {
             builder.setMessage(R.string.corrupt_video_dialog_text)
                     .setPositiveButton(accept, new DialogInterface.OnClickListener() {
@@ -1970,13 +1966,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 renameMenuItem.setVisible(true);
                 moveMenuItem.setVisible(true);
                 copyMenuItem.setVisible(true);
-
-                if(isChatEnabled()){
-                    chatMenuItem.setVisible(true);
-                }
-                else{
-                    chatMenuItem.setVisible(false);
-                }
+                chatMenuItem.setVisible(true);
 
                 MegaNode parent = megaApi.getNodeByHandle(handle);
                 while (megaApi.getParentNode(parent) != null){
@@ -2081,12 +2071,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
             else if (adapterType == INCOMING_SHARES_ADAPTER || fromIncoming) {
                 propertiesMenuItem.setVisible(true);
-                if(isChatEnabled()){
-                    chatMenuItem.setVisible(true);
-                }
-                else{
-                    chatMenuItem.setVisible(false);
-                }
+                chatMenuItem.setVisible(true);
                 copyMenuItem.setVisible(true);
                 removeMenuItem.setVisible(false);
                 importMenuItem.setVisible(false);
@@ -2240,12 +2225,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                                     renameMenuItem.setVisible(true);
                                     moveMenuItem.setVisible(true);
                                     moveToTrashMenuItem.setVisible(true);
-                                    if(isChatEnabled()){
-                                        chatMenuItem.setVisible(true);
-                                    }
-                                    else{
-                                        chatMenuItem.setVisible(false);
-                                    }
+                                    chatMenuItem.setVisible(true);
                                     break;
                                 }
                                 case MegaShare.ACCESS_READWRITE:
@@ -2259,12 +2239,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                             }
                         }
                         else{
-                            if(isChatEnabled()){
-                                chatMenuItem.setVisible(true);
-                            }
-                            else{
-                                chatMenuItem.setVisible(false);
-                            }
+                            chatMenuItem.setVisible(true);
                             renameMenuItem.setVisible(true);
                             moveMenuItem.setVisible(true);
 
@@ -3195,7 +3170,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
 
                     if(nodeHandles!=null){
-                        CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, nodeHandles[0], this, CreateChatToPerformActionListener.SEND_FILE);
+                        CreateChatListener listener = new CreateChatListener(chats, users, nodeHandles[0], this, CreateChatListener.SEND_FILE);
                         for (MegaUser user : users) {
                             MegaChatPeerList peers = MegaChatPeerList.createInstance();
                             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);

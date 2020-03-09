@@ -27,6 +27,7 @@ import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -54,6 +55,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.listeners.CallListener;
+import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
@@ -81,6 +83,8 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback {
 
@@ -184,6 +188,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private LocalCameraCallFullScreenFragment localCameraFragmentFS = null;
     private RemoteCameraCallFullScreenFragment remoteCameraFragmentFS = null;
     private BigCameraGroupCallFragment bigCameraGroupCallFragment = null;
+    private MenuItem cameraSwapMenuItem;
     private MegaApplication application =  MegaApplication.getInstance();
     private boolean inTemporaryState = false;
     private CallListener callListener = new CallListener(this);
@@ -192,13 +197,35 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         logDebug("onCreateOptionsMenu");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.call_action, menu);
+        cameraSwapMenuItem = menu.findItem(R.id.cab_menu_camera_swap);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        logDebug("onPrepareOptionsMenu");
+        if(isNecessaryToShowSwapCameraOption()){
+            cameraSwapMenuItem.setVisible(true);
+            if(callChat.hasLocalVideo()){
+                cameraSwapMenuItem.setEnabled(true);
+                cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.background_chat));
+            }else{
+                cameraSwapMenuItem.setEnabled(false);
+                cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.white_50_opacity));
+            }
+        }else{
+            cameraSwapMenuItem.setVisible(false);
+        }
+
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private boolean isNecessaryToShowSwapCameraOption(){
+        if(callChat == null) return false;
+        int callStatus = callChat.getStatus();
+        if(callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || callStatus < MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM || (callStatus > MegaChatCall.CALL_STATUS_IN_PROGRESS && callStatus != MegaChatCall.CALL_STATUS_RECONNECTING)) return false;
+        return true;
     }
 
     @Override
@@ -209,6 +236,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         switch (id) {
             case android.R.id.home: {
                 onBackPressed();
+                break;
+            }
+            case R.id.cab_menu_camera_swap:{
+                swapCamera(new ChatChangeVideoStreamListener(getApplicationContext()));
                 break;
             }
         }
@@ -587,7 +618,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         logDebug("Type: " + request.getType());
-
         if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER && e.getErrorCode() != MegaError.API_OK) {
             logDebug("TYPE_GET_ATTR_USER: OK");
 
@@ -1030,6 +1060,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 logDebug("Video FAB");
                 if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     displayLinearFAB(false);
+                    application.manuallyActivatedLocalCamera();
                     megaChatApi.answerChatCall(chatId, true, this);
                     clearHandlers();
                     answerCallFAB.clearAnimation();
@@ -1040,6 +1071,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     megaChatApi.disableVideo(chatId, this);
                 } else {
                     logDebug("Enable Video");
+                    application.manuallyActivatedLocalCamera();
                     megaChatApi.enableVideo(chatId, this);
                 }
                 sendSignalPresence();
@@ -1812,6 +1844,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             megaChatApi.signalPresenceActivity();
         }
         application.setSpeakerStatus(callChat.getChatid(), isVideoCall);
+        if (isVideoCall) application.manuallyActivatedLocalCamera();
         megaChatApi.answerChatCall(chatId, isVideoCall, this);
     }
 
