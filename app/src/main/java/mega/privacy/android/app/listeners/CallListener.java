@@ -18,6 +18,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 public class CallListener implements MegaChatCallListenerInterface {
 
     Context context;
+
     public CallListener(Context context) {
         this.context = context;
     }

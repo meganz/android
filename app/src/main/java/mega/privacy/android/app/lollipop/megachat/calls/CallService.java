@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -31,11 +30,11 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class CallService extends Service{
 
@@ -297,7 +296,8 @@ public class CallService extends Service{
         }
         return getDefaultAvatar(this, color, fullName, AVATAR_SIZE, true);
     }
-    public void checkDestroyCall(){
+
+    public void checkDestroyCall() {
         stopForeground(true);
         mNotificationManager.cancel(NOTIFICATION_CALL_IN_PROGRESS);
         stopSelf();

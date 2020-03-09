@@ -12,7 +12,7 @@ public class InfoPeerGroupCall {
     private GroupCallListener listener;
     private boolean goodQuality;
 
-    public InfoPeerGroupCall(long peerId, long clientId, String name){
+    public InfoPeerGroupCall(long peerId, long clientId, String name) {
         this.peerId = peerId;
         this.clientId = clientId;
         this.name = name;

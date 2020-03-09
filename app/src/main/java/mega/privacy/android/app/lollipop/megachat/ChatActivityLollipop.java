@@ -95,16 +95,14 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
-import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
-import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
+import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -152,7 +150,6 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
-import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
@@ -424,7 +421,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private MegaNode myChatFilesFolder;
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
 
-    private CallListener callListener = null;
+    private CallListener callListener = new CallListener(this);
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -450,8 +447,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         preservedMsgSelected = messagesSelected;
         preservedMsgToImport = messagesToImport;
     }
-
-
 
     private class UserTyping {
         MegaChatParticipant participantTyping;
@@ -598,7 +593,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
 
         megaChatApi.addChatListener(this);
-        if(callListener == null) callListener = new CallListener(this);
         megaChatApi.addChatCallListener(callListener);
 
         dbH = DatabaseHandler.getDbHandler(this);
@@ -8058,16 +8052,16 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void updateLayout(MegaChatCall call){
-        if(call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED){
+    public void updateLayout(MegaChatCall call) {
+        if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
             setSubtitleVisibility();
             hideCallInProgressLayout(call);
             return;
         }
-        if(call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && isAfterReconnecting(this, callInProgressLayout, callInProgressText)) {
+        if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && isAfterReconnecting(this, callInProgressLayout, callInProgressText)) {
             return;
         }
-        if(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING){
+        if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
             MegaApplication.setCallLayoutStatus(idChat, false);
         }
         showCallLayout(call);
@@ -8517,7 +8511,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         this.isWaitingForMoreFiles = isWaitingForMoreFiles;
     }
 
-    public long getCurrentChatid(){
+    public long getCurrentChatid() {
         return idChat;
     }
 }

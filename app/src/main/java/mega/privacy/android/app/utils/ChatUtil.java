@@ -4,14 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
-import android.content.pm.ActivityInfo;
-import android.content.res.Resources;
 import android.os.SystemClock;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.TypedValue;
@@ -23,7 +23,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -470,13 +469,12 @@ public class ChatUtil {
             case MegaChatSession.SESSION_STATUS_DESTROYED: {
                 return "SESSION_STATUS_DESTROYED";
             }
-
             default:
                 return String.valueOf(status);
         }
     }
 
-    public static String callStatusToString(int status){
+    public static String callStatusToString(int status) {
         switch (status) {
             case MegaChatCall.CALL_STATUS_INITIAL: {
                 return "CALL_STATUS_INITIAL";
@@ -509,7 +507,7 @@ public class ChatUtil {
                 return "CALL_STATUS_RECONNECTING";
             }
             default:
-                return  String.valueOf(status);
+                return String.valueOf(status);
         }
     }
 
