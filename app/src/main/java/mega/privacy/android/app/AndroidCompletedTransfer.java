@@ -38,7 +38,7 @@ public class AndroidCompletedTransfer {
         this.state = transfer.getState();
         this.size = getSizeString(transfer.getTotalBytes());
         this.nodeHandle = transfer.getNodeHandle() + "";
-        this.path = removeLastFileSeparator(transfer);
+        this.path = getTransferPath(transfer);
     }
 
     public String getFileName() {
@@ -105,7 +105,7 @@ public class AndroidCompletedTransfer {
         return path;
     }
 
-    private String removeLastFileSeparator(MegaTransfer transfer) {
+    private String getTransferPath(MegaTransfer transfer) {
         MegaApplication app = MegaApplication.getInstance();
         MegaApiAndroid megaApi = app.getMegaApi();
 

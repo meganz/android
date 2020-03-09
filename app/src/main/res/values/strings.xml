@@ -2731,4 +2731,5 @@
 
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back.</string>
 
+    <string name="view_in_folder_label" context="Action to show any file in its location">View in folder</string>
 </resources>

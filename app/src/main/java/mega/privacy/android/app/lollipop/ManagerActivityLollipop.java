@@ -199,6 +199,7 @@ import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
@@ -345,6 +346,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	long[] searchDate = null;
 
+	private AndroidCompletedTransfer selectedTransfer;
 	MegaNode selectedNode;
 	MegaOffline selectedOfflineNode;
 	MegaContactAdapter selectedUser;
@@ -11508,6 +11510,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 	}
 
+	public void showManageTransferOptionsPanel(AndroidCompletedTransfer transfer) {
+		if (transfer == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+		selectedTransfer = transfer;
+		bottomSheetDialogFragment =  new ManageTransferBottomSheetDialogFragment();
+		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+	}
+
 	public void showNodeOptionsPanel(MegaNode node){
 		logDebug("showNodeOptionsPanel");
 
@@ -16556,6 +16566,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
 			toast.show();
 		}
+	}
+
+	public AndroidCompletedTransfer getSelectedTransfer() {
+		return selectedTransfer;
 	}
 
 	public MegaNode getSelectedNode() {

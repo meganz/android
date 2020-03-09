@@ -123,7 +123,7 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 
 		setCompletedTransfers();
 
-		adapter = new MegaCompletedTransfersAdapter(context, this, tL, listView);
+		adapter = new MegaCompletedTransfersAdapter(context, tL);
 
 		listView.setAdapter(adapter);
 
