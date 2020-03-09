@@ -185,7 +185,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			return;
 		}
 		if (megaChatApi == null) return;
-		long chatIdCallInProgress = getChatCallInProgress(megaChatApi);
+		long chatIdCallInProgress = getChatCallInProgress();
 		MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
 		if (callInProgress != null && callInProgress.hasLocalVideo()) {
 			logDebug("Disabling local video ... the camera is using by other app");
