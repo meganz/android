@@ -191,23 +191,19 @@ public class ChatUtil {
             return length + count;
 
         }
-        return -1;
+        return length;
     }
 
     public static int getMaxAllowed(@Nullable CharSequence text) {
-
         int realLength = getRealLength(text);
-        if (realLength > MAX_ALLOWED_CHARACTERS_AND_EMOJIS){
+        if (realLength > MAX_ALLOWED_CHARACTERS_AND_EMOJIS) {
             return text.length();
         }
         return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
     }
 
     public static boolean isAllowedTitle(String text) {
-        if (getMaxAllowed(text) == text.length() && text.length() != MAX_ALLOWED_CHARACTERS_AND_EMOJIS) {
-            return false;
-        }
-        return true;
+        return getMaxAllowed(text) != text.length() || getRealLength(text) == MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
     }
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {

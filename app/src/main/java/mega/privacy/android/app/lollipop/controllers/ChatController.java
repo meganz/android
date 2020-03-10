@@ -37,6 +37,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatImportToForwardListener;
 import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
@@ -57,7 +58,9 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
@@ -71,6 +74,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class ChatController {
 
@@ -296,7 +300,7 @@ public class ChatController {
         }
 
         logDebug("Delete normal message with status = "+message.getStatus());
-        if(message.getStatus() == MegaChatMessage.STATUS_SENDING && message.getMsgId() == megaApi.INVALID_HANDLE){
+        if(message.getStatus() == MegaChatMessage.STATUS_SENDING && message.getMsgId() == INVALID_HANDLE){
 
             messageToDelete = megaChatApi.deleteMessage(chatId, message.getTempId());
         }else{
@@ -2041,10 +2045,11 @@ public class ChatController {
         else{
             if (context instanceof ChatActivityLollipop) {
                 ((ChatActivityLollipop) context).storedUnhandledData(messagesSelected, messagesToImport);
+                ((ChatActivityLollipop) context).handleStoredData();
             } else if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
+                megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
             }
-            megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
         }
     }
 
@@ -2179,6 +2184,113 @@ public class ChatController {
         } else if (context instanceof ManagerActivityLollipop) {
             CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChats);
             copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
+        }
+    }
+
+    public void checkIntentToShareSomething(Intent intent) {
+        long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+        long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
+        long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
+        long[] userHandles = intent.getLongArrayExtra(USER_HANDLES);
+
+        if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
+            if (contactHandles != null && contactHandles.length > 0) {
+                ArrayList<MegaChatRoom> chats = new ArrayList<>();
+                ArrayList<MegaUser> users = new ArrayList<>();
+
+                for (long contactHandle : contactHandles) {
+                    MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandle));
+                    if (user != null) {
+                        users.add(user);
+                    }
+                }
+
+                if (chatHandles != null) {
+                    for (long chatHandle : chatHandles) {
+                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandle);
+                        if (chatRoom != null) {
+                            chats.add(chatRoom);
+                        }
+                    }
+                }
+
+                CreateChatListener listener = null;
+                boolean createChats = false;
+
+                if (nodeHandles != null) {
+                    listener = new CreateChatListener(chats, users, nodeHandles, context, CreateChatListener.SEND_FILES, -1);
+                    createChats = true;
+                } else if (userHandles != null) {
+                    listener = new CreateChatListener(chats, users, userHandles, context, CreateChatListener.SEND_CONTACTS, -1);
+                    createChats = true;
+                } else {
+                    logWarning("Error on sending to chat");
+                }
+
+                if (createChats) {
+                    for (MegaUser user : users) {
+                        MegaChatPeerList peers = MegaChatPeerList.createInstance();
+                        peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+                        megaChatApi.createChat(false, peers, listener);
+                    }
+                }
+            } else {
+                int countChat = chatHandles.length;
+                logDebug("Selected: " + countChat + " chats to send");
+
+                if (nodeHandles != null) {
+                    logDebug("Send " + nodeHandles.length + " nodes");
+                    checkIfNodesAreMineAndAttachNodes(nodeHandles, chatHandles);
+                } else if (userHandles != null) {
+                    logDebug("Send " + userHandles.length + " contacts");
+                    sendContactsToChats(chatHandles, userHandles);
+                } else {
+                    logWarning("Error on sending to chat");
+                }
+            }
+        }
+    }
+
+    public void sendContactsToChats(long[] chatHandles, long[] userHandles) {
+        MegaHandleList handleList = MegaHandleList.createInstance();
+
+        for (long userHandle : userHandles) {
+            handleList.addMegaHandle(userHandle);
+        }
+
+        for (long chatHandle : chatHandles) {
+            megaChatApi.attachContacts(chatHandle, handleList);
+        }
+
+        if (chatHandles.length == 1) {
+            showSnackbar(context, MESSAGE_SNACKBAR_TYPE, null, chatHandles[0]);
+        } else {
+            showSnackbar(context, MESSAGE_SNACKBAR_TYPE, null, INVALID_HANDLE);
+        }
+    }
+
+    /**
+     * Method for send a file into one or more chats
+     *
+     * @param context Context of the Activity where the file has to be sent
+     * @param chats Chats where the file has to be sent
+     * @param fileHandle Handle of the file that has to be sent
+     */
+    public static void sendFileToChatsFromContacts(Context context, ArrayList<MegaChatRoom> chats, long fileHandle){
+        logDebug("sendFileToChatsFromContacts");
+
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MultipleAttachChatListener listener;
+
+        if(chats.size()==1){
+            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), chats.size());
+            megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
+        }
+        else{
+            listener = new MultipleAttachChatListener(context, -1, chats.size());
+            for(int i=0;i<chats.size();i++){
+                megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
+            }
         }
     }
 }

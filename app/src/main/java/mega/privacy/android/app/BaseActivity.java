@@ -132,8 +132,8 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         logDebug("onPause");
-        app.activityPaused();
         checkMegaObjects();
+        MegaApplication.activityPaused();
         isPaused = true;
         super.onPause();
     }
@@ -141,11 +141,11 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         logDebug("onResume");
-        app.activityResumed();
         super.onResume();
         setAppFontSize(this);
 
         checkMegaObjects();
+        MegaApplication.activityResumed();
         isPaused = false;
 
         retryConnectionsAndSignalPresence();
@@ -425,7 +425,8 @@ public class BaseActivity extends AppCompatActivity {
      *            - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
      * @param view Layout where the snackbar is going to show.
      * @param s Text to shown in the snackbar
-     * @param idChat Chat ID. If this param has a valid value, different to -1, the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat
+     * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
+     *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
      */
     public void showSnackbar (int type, View view, String s, long idChat) {
         logDebug(("showSnackbar: " + s));
@@ -434,7 +435,7 @@ public class BaseActivity extends AppCompatActivity {
         display.getMetrics(outMetrics);
 
         Snackbar snackbar = null;
-        if (type == MESSAGE_SNACKBAR_TYPE && (s==null || s.isEmpty())) {
+        if (type == MESSAGE_SNACKBAR_TYPE) {
             snackbar = Snackbar.make(view, R.string.sent_as_message, Snackbar.LENGTH_LONG);
         }
         else if (type == NOT_SPACE_SNACKBAR_TYPE) {
@@ -496,30 +497,6 @@ public class BaseActivity extends AppCompatActivity {
         TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
         snackbar.show();
-    }
-
-    /**
-     * Method for send a file into one or more chats
-     *
-     * @param context Context of the Activity where the file has to be sent
-     * @param chats Chats where the file has to be sent
-     * @param fileHandle Handle of the file that has to be sent
-     */
-    public void sendFileToChatsFromContacts(Context context, ArrayList<MegaChatRoom> chats, long fileHandle){
-        logDebug("sendFileToChatsFromContacts");
-
-        MultipleAttachChatListener listener = null;
-
-        if(chats.size()==1){
-            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), chats.size());
-            megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
-        }
-        else{
-            listener = new MultipleAttachChatListener(context, -1, chats.size());
-            for(int i=0;i<chats.size();i++){
-                megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
-            }
-        }
     }
 
     /**

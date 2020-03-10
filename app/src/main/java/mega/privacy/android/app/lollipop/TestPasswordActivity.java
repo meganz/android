@@ -4,37 +4,31 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
 
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -48,43 +42,34 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class TestPasswordActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
 
-    LinearLayout passwordReminderLayout;
-    ImageView passwordReminderCloseButton;
-    CheckBox blockCheckBox;
-    TextView dialogTest;
-    Button testPasswordButton;
-    Button passwordReminderBackupRecoveryKeyButton;
-    Button passwordReminderDismissButton;
+    private LinearLayout passwordReminderLayout;
+    private ImageView passwordReminderCloseButton;
+    private CheckBox blockCheckBox;
+    private TextView dialogTest;
+    private Button testPasswordButton;
+    private Button passwordReminderBackupRecoveryKeyButton;
+    private Button passwordReminderDismissButton;
 
-    LinearLayout testPasswordLayout;
-    Toolbar tB;
-    ActionBar aB;
-    private EditText passwordEditText;
-    private ImageView passwordToggle;
-    private TextView passwordErrorText;
+    private LinearLayout testPasswordLayout;
+    private Toolbar tB;
+    private ActionBar aB;
+    private TextInputLayout passwordLayout;
+    private AppCompatEditText passwordText;
     private ImageView passwordErrorImage;
     private Button confirmPasswordButton;
     private Button testPasswordbackupRecoveryKeyButton;
     private Button testPasswordDismissButton;
-    private RelativeLayout containerPasswordError;
-    private TextView enterPwdHint;
     private Button proceedToLogout;
 
     private ProgressBar progressBar;
 
-    private Drawable password_background;
+    private boolean passwordCorrect;
+    private boolean logout;
 
-    private boolean passwdVisibility = false;
-    private boolean passwordCorrect = false;
-    private boolean logout = false;
-
-    MegaApiAndroid megaApi;
-    DatabaseHandler dbH;
-
-    int counter = 0;
-    boolean testingPassword = false;
-    boolean dismissPasswordReminder = false;
-    int numRequests = 0;
+    private int counter;
+    private boolean testingPassword;
+    private boolean dismissPasswordReminder;
+    private int numRequests;
 
     private RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment;
 
@@ -111,40 +96,34 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
-        megaApi = ((MegaApplication)getApplication()).getMegaApi();
-
-        passwordReminderLayout = (LinearLayout) findViewById(R.id.password_reminder_layout);
-        passwordReminderCloseButton = (ImageView) findViewById(R.id.password_reminder_close_image_button);
+        passwordReminderLayout = findViewById(R.id.password_reminder_layout);
+        passwordReminderCloseButton = findViewById(R.id.password_reminder_close_image_button);
         passwordReminderCloseButton.setOnClickListener(this);
-        dialogTest = (TextView) findViewById(R.id.password_reminder_text);
-        blockCheckBox = (CheckBox) findViewById(R.id.password_reminder_checkbox);
+        dialogTest = findViewById(R.id.password_reminder_text);
+        blockCheckBox = findViewById(R.id.password_reminder_checkbox);
         blockCheckBox.setOnClickListener(this);
-        testPasswordButton = (Button) findViewById(R.id.password_reminder_test_button);
+        testPasswordButton = findViewById(R.id.password_reminder_test_button);
         testPasswordButton.setOnClickListener(this);
-        passwordReminderBackupRecoveryKeyButton = (Button) findViewById(R.id.password_reminder_recoverykey_button);
+        passwordReminderBackupRecoveryKeyButton = findViewById(R.id.password_reminder_recoverykey_button);
         passwordReminderBackupRecoveryKeyButton.setOnClickListener(this);
-        passwordReminderDismissButton = (Button) findViewById(R.id.password_reminder_dismiss_button);
+        passwordReminderDismissButton = findViewById(R.id.password_reminder_dismiss_button);
         passwordReminderDismissButton.setOnClickListener(this);
 
-        testPasswordLayout = (LinearLayout) findViewById(R.id.test_password_layout);
-        tB = (Toolbar) findViewById(R.id.toolbar);
-        enterPwdHint = (TextView) findViewById(R.id.test_password_enter_pwd_hint);
-        passwordEditText = (EditText) findViewById(R.id.test_password_edittext);
-        passwordToggle = (ImageView) findViewById(R.id.toggle_button);
-        passwordToggle.setOnClickListener(this);
-        passwordErrorText = (TextView) findViewById(R.id.test_password_text_error_text);
-        passwordErrorImage = (ImageView) findViewById(R.id.test_password_text_error_icon);
-        confirmPasswordButton = (Button) findViewById(R.id.test_password_confirm_button);
+        testPasswordLayout = findViewById(R.id.test_password_layout);
+        tB = findViewById(R.id.toolbar);
+        passwordLayout = findViewById(R.id.test_password_text_layout);
+        passwordText = findViewById(R.id.test_password_edittext);
+        passwordErrorImage = findViewById(R.id.test_password_text_error_icon);
+        confirmPasswordButton = findViewById(R.id.test_password_confirm_button);
         confirmPasswordButton.setOnClickListener(this);
-        testPasswordbackupRecoveryKeyButton = (Button) findViewById(R.id.test_password_backup_button);
+        testPasswordbackupRecoveryKeyButton = findViewById(R.id.test_password_backup_button);
         testPasswordbackupRecoveryKeyButton.setOnClickListener(this);
-        testPasswordDismissButton = (Button) findViewById(R.id.test_password_dismiss_button);
+        testPasswordDismissButton = findViewById(R.id.test_password_dismiss_button);
         testPasswordDismissButton.setOnClickListener(this);
-        containerPasswordError = (RelativeLayout) findViewById(R.id.test_password_text_error);
-        proceedToLogout = (Button) findViewById(R.id.proceed_to_logout_button);
+        proceedToLogout = findViewById(R.id.proceed_to_logout_button);
         proceedToLogout.setOnClickListener(this);
 
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        progressBar = findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.GONE);
 
         if (isLogout()) {
@@ -164,23 +143,19 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             proceedToLogout.setVisibility(View.GONE);
         }
 
-        passwordEditText.getBackground().clearColorFilter();
+        passwordText.getBackground().clearColorFilter();
 
-        passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    String password = passwordEditText.getText().toString();
-                    passwordCorrect = megaApi.checkPassword(password);
-                    showError(passwordCorrect);
-                    return true;
-                }
-                return false;
+        passwordText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                String password = passwordText.getText().toString();
+                passwordCorrect = megaApi.checkPassword(password);
+                showError(passwordCorrect);
+                return true;
             }
+            return false;
         });
 
-        passwordEditText.addTextChangedListener(new TextWatcher() {
+        passwordText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -199,24 +174,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             }
         });
 
-        enterPwdHint.setVisibility(View.INVISIBLE);
-        passwordEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    enterPwdHint.setVisibility(View.VISIBLE);
-                    passwordEditText.setHint(null);
-                    passwordToggle.setVisibility(View.VISIBLE);
-                    passwordToggle.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_b_shared_read));
-                }
-                else {
-                    passwordToggle.setVisibility(View.GONE);
-                    passwdVisibility = false;
-                    showHidePassword();
-                }
-            }
-        });
-        password_background = passwordEditText.getBackground().mutate().getConstantState().newDrawable();
+        passwordText.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(passwordLayout, hasFocus));
 
         if (testingPassword) {
             setTestPasswordLayout();
@@ -266,68 +224,50 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     }
 
     void quitError(){
-        if(containerPasswordError.getVisibility() != View.INVISIBLE){
-            enterPwdHint.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
-            containerPasswordError.setVisibility(View.INVISIBLE);
-            passwordEditText.setBackground(password_background);
-            testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
-            confirmPasswordButton.setEnabled(true);
-            confirmPasswordButton.setAlpha(1F);
-        }
+        passwordLayout.setError(null);
+        passwordLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
+        passwordErrorImage.setVisibility(View.GONE);
+        testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+        confirmPasswordButton.setEnabled(true);
+        confirmPasswordButton.setAlpha(1F);
     }
 
     void showError (boolean correct) {
         hideKeyboard(this, 0);
-        if(containerPasswordError.getVisibility() == View.INVISIBLE){
-            containerPasswordError.setVisibility(View.VISIBLE);
-            Drawable background = password_background.mutate().getConstantState().newDrawable();
-            PorterDuffColorFilter porterDuffColorFilter;
-            if (correct){
-                porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.green_unlocked_rewards), PorterDuff.Mode.SRC_ATOP);
-                passwordErrorText.setText(getString(R.string.test_pwd_accepted));
-                passwordErrorText.setTextColor(ContextCompat.getColor(this, R.color.green_unlocked_rewards));
-                passwordErrorImage.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_accept_test));
-                testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
-                passwordEditText.setEnabled(false);
-                passwordReminderSucceeded();
-            }
-            else {
-                counter++;
-                porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-                passwordErrorText.setText(getString(R.string.test_pwd_wrong));
-                enterPwdHint.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-                passwordErrorText.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-                Drawable errorIcon = ContextCompat.getDrawable(this, R.drawable.ic_input_warning);
-                errorIcon.setColorFilter(porterDuffColorFilter);
-                passwordErrorImage.setImageDrawable(errorIcon);
-                testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-                if (counter == 3) {
-                    Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
-                    intent.putExtra("logout", isLogout());
-                    startActivity(intent);
-                    onBackPressed();
-                }
-            }
-            confirmPasswordButton.setEnabled(false);
-            confirmPasswordButton.setAlpha(0.3F);
-            background.setColorFilter(porterDuffColorFilter);
-            if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                passwordEditText.setBackgroundDrawable(background);
-            } else{
-                passwordEditText.setBackground(background);
-            }
-        }
-    }
 
-    void showHidePassword (){
-        if(!passwdVisibility){
-            passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            passwordEditText.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-            passwordEditText.setSelection(passwordEditText.getText().length());
-        }else{
-            passwordEditText.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            passwordEditText.setSelection(passwordEditText.getText().length());
+        Drawable icon;
+
+        if (correct){
+            passwordLayout.setError(getString(R.string.test_pwd_accepted));
+            passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceMedium);
+            passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceMedium);
+            icon = ContextCompat.getDrawable(this, R.drawable.ic_accept_test);
+            icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.green_unlocked_rewards), PorterDuff.Mode.SRC_ATOP));
+            passwordErrorImage.setImageDrawable(icon);
+            testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+            passwordText.setEnabled(false);
+            passwordReminderSucceeded();
         }
+        else {
+            counter++;
+            passwordLayout.setError(getString(R.string.test_pwd_wrong));
+            passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+            passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceError);
+            icon = ContextCompat.getDrawable(this, R.drawable.ic_input_warning);
+            icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP));
+            passwordErrorImage.setImageDrawable(icon);
+            testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+            if (counter == 3) {
+                Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
+                intent.putExtra("logout", isLogout());
+                startActivity(intent);
+                onBackPressed();
+            }
+        }
+
+        passwordErrorImage.setVisibility(View.VISIBLE);
+        confirmPasswordButton.setEnabled(false);
+        confirmPasswordButton.setAlpha(0.3F);
     }
 
     @Override
@@ -365,21 +305,8 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
                 setTestPasswordLayout();
                 break;
             }
-            case R.id.toggle_button:{
-                if (passwdVisibility) {
-                    passwordToggle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_shared_read));
-                    passwdVisibility = false;
-                    showHidePassword();
-                }
-                else {
-                    passwordToggle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_see));
-                    passwdVisibility = true;
-                    showHidePassword();
-                }
-                break;
-            }
             case R.id.test_password_confirm_button:{
-                String password = passwordEditText.getText().toString();
+                String password = passwordText.getText().toString();
                 passwordCorrect = megaApi.checkPassword(password);
                 showError(passwordCorrect);
                 break;

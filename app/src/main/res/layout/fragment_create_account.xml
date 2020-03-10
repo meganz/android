@@ -162,7 +162,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             app:errorEnabled="true"
-                            app:errorTextAppearance="@style/InputTextAppearanceError">
+                            app:errorTextAppearance="@style/InputTextAppearanceError"
+                            app:passwordToggleDrawable="@drawable/password_toggle"
+                            app:passwordToggleTint="@color/password_color_toggle">
 
                             <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_password_text"
@@ -175,17 +177,6 @@
                                 android:theme="@style/ColorControlStyle"/>
 
                         </com.google.android.material.textfield.TextInputLayout>
-
-                        <ImageView
-                            android:id="@+id/toggle_button_passwd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignTop="@+id/create_account_password_text_layout"
-                            android:layout_marginTop="15dp"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_b_shared_read"
-                            android:visibility="gone"/>
 
                         <ImageView
                             android:layout_width="wrap_content"
@@ -202,7 +193,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:layout_marginTop="55dp"
+                            android:layout_marginTop="60dp"
                             android:paddingBottom="20dp"
                             android:layout_alignTop="@+id/create_account_password_text_layout"
                             android:visibility="gone">
@@ -288,7 +279,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             app:errorEnabled="true"
-                            app:errorTextAppearance="@style/InputTextAppearanceError">
+                            app:errorTextAppearance="@style/InputTextAppearanceError"
+                            app:passwordToggleDrawable="@drawable/password_toggle"
+                            app:passwordToggleTint="@color/password_color_toggle">
 
                             <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_password_text_confirm"
@@ -301,17 +294,6 @@
                                 android:theme="@style/ColorControlStyle"/>
 
                         </com.google.android.material.textfield.TextInputLayout>
-
-                        <ImageView
-                            android:id="@+id/toggle_button_confirm_passwd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignTop="@+id/create_account_password_text_confirm_layout"
-                            android:layout_marginTop="15dp"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_b_shared_read"
-                            android:visibility="gone"/>
 
                         <ImageView
                             android:layout_width="wrap_content"

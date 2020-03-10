@@ -34,13 +34,15 @@ import android.os.Handler;
 
 import android.provider.MediaStore;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import android.text.Html;
+import com.google.android.material.textfield.TextInputLayout;
+
 import androidx.appcompat.app.ActionBar;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+
+import android.text.Html;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
-import androidx.core.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -1804,4 +1806,9 @@ public class Util {
 	public static boolean isAndroid10() {
 		return Build.VERSION.SDK_INT >= ANDROID_10_Q;
 	}
+
+	public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus){
+		textInputLayout.setPasswordVisibilityToggleEnabled(focus);
+	}
+
 }

@@ -17,7 +17,6 @@ package com.github.barteksc.pdfviewer;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -28,25 +27,21 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.HandlerThread;
+import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.AppCompatEditText;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.github.barteksc.pdfviewer.exception.PageRenderingException;
 import com.github.barteksc.pdfviewer.link.DefaultLinkHandler;
@@ -86,6 +81,8 @@ import java.util.List;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 
+import static mega.privacy.android.app.utils.Util.*;
+
 /**
  * It supports animations, zoom, cache, and swipe.
  * <p>
@@ -115,6 +112,8 @@ public class PDFView extends RelativeLayout {
     private float minZoom = DEFAULT_MIN_SCALE;
     private float midZoom = DEFAULT_MID_SCALE;
     private float maxZoom = DEFAULT_MAX_SCALE;
+
+    private PdfViewerActivityLollipop pdfViewer;
 
     /**
      * START - scrolling in first page direction
@@ -239,6 +238,8 @@ public class PDFView extends RelativeLayout {
     /** Construct the initial view */
     public PDFView(Context context, AttributeSet set) {
         super(context, set);
+
+        pdfViewer = (PdfViewerActivityLollipop) getContext();
 
         renderingHandlerThread = new HandlerThread("PDF renderer");
 
@@ -707,30 +708,8 @@ public class PDFView extends RelativeLayout {
 
         jumpTo(defaultPage, false);
 
-        ((PdfViewerActivityLollipop) getContext()).loading = false;
-        ((PdfViewerActivityLollipop) getContext()).progressBar.setVisibility(GONE);
-//        ((PdfViewerActivityLollipop) getContext()).progressDialog.hide();
-    }
-
-    public void showHidePassword (EditText passwordText, ImageView toggleButton) {
-        boolean passwdVisible;
-        if (passwordText.getInputType() == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
-            passwdVisible = true;
-        }
-        else {
-            passwdVisible = false;
-        }
-        if(passwdVisible){
-            toggleButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_b_shared_read));
-            passwordText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            passwordText.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-            passwordText.setSelection(passwordText.getText().length());
-        }
-        else{
-            toggleButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_b_see));
-            passwordText.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            passwordText.setSelection(passwordText.getText().length());
-        }
+        pdfViewer.loading = false;
+        pdfViewer.progressBar.setVisibility(GONE);
     }
 
     void showErrorDialog(final Throwable t) {
@@ -739,38 +718,35 @@ public class PDFView extends RelativeLayout {
 
         builder.setCancelable(false);
         if (t.getLocalizedMessage().equals("Password required or incorrect password.") || t.getMessage().equals("Password required or incorrect password.")) {
-            if (((PdfViewerActivityLollipop) getContext()).getMaxIntents() > 0) {
-                LayoutInflater inflater = ((PdfViewerActivityLollipop) getContext()).getLayoutInflater();
-                View layout = inflater.inflate(R.layout.dialog_pdf_password, null);
-                final EditText passwordText = layout.findViewById(R.id.password_text);
-                final ImageView toggleButton = (ImageView) layout.findViewById(R.id.toggle_button);
-                toggleButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        showHidePassword(passwordText, toggleButton);
-                    }
-                });
-                final RelativeLayout errorLayout = layout.findViewById(R.id.password_text_error);
-                if (((PdfViewerActivityLollipop) getContext()).getPassword() != null) {
-                    errorLayout.setVisibility(VISIBLE);
-                    String text = ((PdfViewerActivityLollipop) getContext()).getPassword();
+            if (pdfViewer.getMaxIntents() > 0) {
+                View layout = pdfViewer.getLayoutInflater().inflate(R.layout.dialog_pdf_password, null);
+                final TextInputLayout passwordLayout = layout.findViewById(R.id.password_layout);
+                final AppCompatEditText passwordText = layout.findViewById(R.id.password_text);
+                final ImageView passwordError = layout.findViewById(R.id.password_text_error_icon);
+
+                if (pdfViewer.getPassword() != null) {
+                    passwordError.setVisibility(VISIBLE);
+                    String text = pdfViewer.getPassword();
                     passwordText.setText(text);
                     passwordText.setSelection(text.length());
+                    passwordLayout.setError(pdfViewer.getString(R.string.error_enter_password));
+                    passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
+                    passwordError.setVisibility(View.VISIBLE);
                     passwordText.getBackground().mutate().setColorFilter(ContextCompat.getColor(getContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 } else {
-                    errorLayout.setVisibility(GONE);
+                    passwordError.setVisibility(GONE);
                 }
-                passwordText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                    @Override
-                    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                        if (actionId == EditorInfo.IME_ACTION_DONE) {
-                            showHidePassword(passwordText, toggleButton);
-                            ((PdfViewerActivityLollipop) getContext()).reloadPDFwithPassword(textView.getText().toString());
-                            return true;
-                        }
-                        return false;
+
+                passwordText.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(passwordLayout, hasFocus));
+
+                passwordText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        pdfViewer.reloadPDFwithPassword(textView.getText().toString());
+                        return true;
                     }
+                    return false;
                 });
+
                 passwordText.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -784,48 +760,29 @@ public class PDFView extends RelativeLayout {
 
                     @Override
                     public void afterTextChanged(Editable editable) {
-                        if (errorLayout.getVisibility() == VISIBLE) {
-                            errorLayout.setVisibility(GONE);
-                            passwordText.getBackground().mutate().setColorFilter(ContextCompat.getColor(getContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                        if (passwordLayout.getError() != null && !passwordLayout.getError().toString().isEmpty()) {
+                            passwordLayout.setError(null);
+                            passwordLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
+                            passwordError.setVisibility(View.GONE);
                         }
                     }
                 });
+
                 builder.setView(layout);
                 builder.setTitle(getContext().getString(R.string.title_pdf_password))
-                        .setMessage(getContext().getString(R.string.text_pdf_password, ((PdfViewerActivityLollipop) getContext()).getPdfFileName()))
-                        .setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                showHidePassword(passwordText, toggleButton);
-                                ((PdfViewerActivityLollipop) getContext()).finish();
-                            }
-                        })
-                        .setPositiveButton(R.string.contact_accept, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                showHidePassword(passwordText, toggleButton);
-                                ((PdfViewerActivityLollipop) getContext()).reloadPDFwithPassword(passwordText.getText().toString());
-                            }
-                        }).show();
-            }
-            else {
+                        .setMessage(getContext().getString(R.string.text_pdf_password, pdfViewer.getPdfFileName()))
+                        .setNegativeButton(R.string.general_cancel, (dialogInterface, i) -> pdfViewer.finish())
+                        .setPositiveButton(R.string.contact_accept, (dialogInterface, i) -> pdfViewer.reloadPDFwithPassword(passwordText.getText().toString()))
+                        .show();
+            } else {
                 builder.setTitle(getResources().getString(R.string.general_error_word))
                         .setMessage(getResources().getString(R.string.error_max_pdf_password))
-                        .setPositiveButton(R.string.contact_accept, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                ((PdfViewerActivityLollipop) getContext()).finish();
-                            }
-                        }).show();
+                        .setPositiveButton(R.string.contact_accept, (dialogInterface, i) -> pdfViewer.finish())
+                        .show();
             }
-        }
-        else {
+        } else {
             builder.setMessage(R.string.corrupt_pdf_dialog_text)
-                    .setPositiveButton(R.string.general_ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            ((PdfViewerActivityLollipop) getContext()).finish();
-                        }
-                    })
+                    .setPositiveButton(R.string.general_ok, (dialog, which) -> pdfViewer.finish())
                     .show();
         }
     }

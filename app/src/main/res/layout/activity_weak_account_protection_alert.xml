@@ -83,22 +83,44 @@
 
             </RelativeLayout>
 
-            <Button
-                android:id="@+id/resend_email_button"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:background="@drawable/background_accent_button"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:layout_marginTop="78dp"
-                android:layout_marginRight="18dp"
-                android:text="@string/resend_email_label"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                style="@style/ButtonStyle"/>
+                android:layout_marginTop="94dp"
+                android:paddingBottom="30dp">
+
+                <Button
+                    android:id="@+id/logout_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_toLeftOf="@+id/resend_email_button"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_marginRight="18dp"
+                    android:text="@string/action_logout"
+                    android:textColor="@color/accentColor"
+                    android:textSize="14sp"
+                    style="@style/ButtonStyleWithoutBorder"/>
+
+                <Button
+                    android:id="@+id/resend_email_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/background_accent_button"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_marginRight="18dp"
+                    android:text="@string/resend_email_label"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    style="@style/ButtonStyle"/>
+            </RelativeLayout>
 
         </LinearLayout>
 

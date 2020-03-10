@@ -175,10 +175,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String emailTemp = null;
     private String passwdTemp = null;
 
-
-    private ImageView toggleButton;
-    private boolean passwdVisibility;
-
     Toolbar tB;
     LinearLayout loginVerificationLayout;
     InputMethodManager imm;
@@ -291,10 +287,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         });
 
-        toggleButton = (ImageView) v.findViewById(R.id.toggle_button);
-        toggleButton.setOnClickListener(this);
-        passwdVisibility = false;
-
         et_passwordLayout = v.findViewById(R.id.login_password_text_layout);
         et_password = v.findViewById(R.id.login_password_text);
         et_passwordError = v.findViewById(R.id.login_password_text_error_icon);
@@ -330,20 +322,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         });
 
-        et_password.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    toggleButton.setVisibility(View.VISIBLE);
-                    toggleButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-                }
-                else {
-                    toggleButton.setVisibility(View.GONE);
-                    passwdVisibility = false;
-                    showHidePassword();
-                }
-            }
-        });
+        et_password.setOnFocusChangeListener((v1, hasFocus) -> setPasswordToggle(et_passwordLayout, hasFocus));
 
         bLogin = (Button) v.findViewById(R.id.button_login_login);
         bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
@@ -1169,17 +1148,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
-    public void showHidePassword () {
-        if(!passwdVisibility){
-            et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            et_password.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-            et_password.setSelection(et_password.getText().length());
-        }else{
-            et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            et_password.setSelection(et_password.getText().length());
-        }
-    }
-
     public void startLoginInProcess(){
         logDebug("startLoginInProcess");
 
@@ -1553,22 +1521,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         return null;
     }
 
-    void hidePasswordIfVisible () {
-        if (passwdVisibility) {
-            toggleButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-            passwdVisibility = false;
-            showHidePassword();
-        }
-    }
-
-
     @Override
     public void onClick(View v) {
 
         switch(v.getId()) {
             case R.id.button_login_login: {
                 logDebug("Click on button_login_login");
-                hidePasswordIfVisible();
                 loginClicked = true;
                 backWhileLogin = false;
                 onLoginClick(v);
@@ -1576,7 +1534,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             case R.id.button_create_account_login:{
                 logDebug("Click on button_create_account_login");
-                hidePasswordIfVisible();
                 onRegisterClick(v);
                 break;
             }
@@ -1587,7 +1544,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             case R.id.button_forgot_pass:{
                 logDebug("Click on button_forgot_pass");
-                hidePasswordIfVisible();
                 try {
                     String url = "https://mega.nz/recovery";
                     Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
@@ -1600,7 +1556,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
                     startActivity(viewIntent);
                 }
-//                showForgotPassLayout();
                 break;
             }
             case R.id.yes_MK_button:{
@@ -1614,7 +1569,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.login_text_view:{
-                hidePasswordIfVisible();
                 numberOfClicksKarere++;
                 if (numberOfClicksKarere == 5){
                     MegaAttributes attrs = dbH.getAttributes();
@@ -1648,7 +1602,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.text_newToMega:{
-                hidePasswordIfVisible();
                 numberOfClicksSDK++;
                 if (numberOfClicksSDK == 5){
                     MegaAttributes attrs = dbH.getAttributes();
@@ -1678,19 +1631,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         logWarning("attrs is NULL");
                         ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
                     }
-                }
-                break;
-            }
-            case R.id.toggle_button: {
-                if (passwdVisibility) {
-                    toggleButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-                    passwdVisibility = false;
-                    showHidePassword();
-                }
-                else {
-                    toggleButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_see));
-                    passwdVisibility = true;
-                    showHidePassword();
                 }
                 break;
             }
