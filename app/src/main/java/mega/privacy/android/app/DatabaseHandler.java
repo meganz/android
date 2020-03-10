@@ -27,6 +27,7 @@ import nz.mega.sdk.MegaApiJava;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
@@ -3186,7 +3187,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private long getLongValue(String tableName, String columnName, long defaultValue) {
 		try {
 			String value = getStringValue(tableName, columnName, Long.toString(defaultValue));
-			if (value != null && !value.isEmpty()) {
+			if (!isTextEmpty(value)) {
 				return Long.parseLong(value);
 			}
 		} catch (Exception e) {
