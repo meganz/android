@@ -131,7 +131,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
                     Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
                     intent.setAction(ACTION_STORAGE_STATE_CHANGED);
-                    intent.putExtra("state", state);
+                    intent.putExtra(EXTRA_STORAGE_STATE, state);
                     LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
                 }
                 break;

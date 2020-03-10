@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.camera2.CameraManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -96,7 +97,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.3_292";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.4_294";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -145,10 +146,11 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	private static boolean registeredChatListeners = false;
 
-    private static boolean isVerifySMSShowed = false;
+	private static boolean isVerifySMSShowed = false;
 
     private static boolean isBlockedDueToWeakAccount = false;
-    private static boolean isWebOpenDueToEmailVerification = false;
+	private static boolean isWebOpenDueToEmailVerification = false;
+	private static boolean isLoggingRunning = false;
 
 	MegaChatApiAndroid megaChatApi = null;
 
@@ -158,6 +160,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private static MegaApplication singleApplicationInstance;
 
 	private PowerManager.WakeLock wakeLock;
+	private Handler cameraHandler = null;
+	private CameraManager cameraManager = null;
+	private CameraManager.AvailabilityCallback cameraCallback = null;
+	private boolean localCameraEnabled = false;
 
 	@Override
 	public void networkAvailable() {
@@ -175,7 +181,60 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
-    public static void smsVerifyShowed(boolean isShowed) {
+	private void disableLocalCamera() {
+		if (localCameraEnabled) {
+			localCameraEnabled = false;
+			return;
+		}
+		if (megaChatApi == null) return;
+		long chatIdCallInProgress = getChatCallInProgress(megaChatApi);
+		MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
+		if (callInProgress != null && callInProgress.hasLocalVideo()) {
+			logDebug("Disabling local video ... the camera is using by other app");
+			megaChatApi.disableVideo(chatIdCallInProgress, null);
+		}
+	}
+
+	private void checkDeviceCamera() {
+		if (cameraManager != null) return;
+		cameraManager = (CameraManager) getApplicationContext().getSystemService(Context.CAMERA_SERVICE);
+		if (cameraHandler == null) cameraHandler = new Handler();
+
+		if (cameraCallback == null) {
+			cameraCallback = new CameraManager.AvailabilityCallback() {
+				@Override
+				public void onCameraAvailable(String cameraId) {
+					super.onCameraAvailable(cameraId);
+					disableLocalCamera();
+				}
+
+				@Override
+				public void onCameraUnavailable(String cameraId) {
+					super.onCameraUnavailable(cameraId);
+					disableLocalCamera();
+				}
+			};
+		}
+		cameraManager.registerAvailabilityCallback(cameraCallback, cameraHandler);
+	}
+
+	public void manuallyActivatedLocalCamera(){
+		localCameraEnabled = true;
+	}
+
+	private void clearCameraHandle(){
+		if (cameraHandler != null) {
+			cameraHandler.removeCallbacksAndMessages(null);
+			cameraHandler = null;
+		}
+		if(cameraManager != null && cameraCallback != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+			cameraManager.unregisterAvailabilityCallback((CameraManager.AvailabilityCallback) cameraCallback);
+			cameraManager = null;
+			cameraCallback = null;
+		}
+	}
+
+	public static void smsVerifyShowed(boolean isShowed) {
 	    isVerifySMSShowed = isShowed;
     }
 
@@ -437,7 +496,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
         scheduleCameraUploadJob(getApplicationContext());
-
         storageState = dbH.getStorageState();
 
 		boolean fileLoggerSDK = false;
@@ -1054,37 +1112,30 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					AccountController aC = new AccountController(this);
 					aC.logoutConfirmed(this);
 
-					if(activityVisible){
-						if(getUrlConfirmationLink()!=null){
-							logDebug("Launch intent to confirmation account screen");
-							Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-							confirmIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-							confirmIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
-							confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							confirmIntent.setAction(ACTION_CONFIRM);
-							setUrlConfirmationLink(null);
-							startActivity(confirmIntent);
-						}
-						else{
-							logDebug("Launch intent to login activity");
-							Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-							tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-							this.startActivity(tourIntent);
-						}
+					if (isIsLoggingRunning()) {
+						logDebug("Already in Login Activity, not necessary to launch it again");
+						return;
 					}
-					else{
-						logDebug("No activity visible on logging out chat");
-						if(getUrlConfirmationLink()!=null){
-							logDebug("Show confirmation account screen");
-							Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-							confirmIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-							confirmIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
-							confirmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-							confirmIntent.setAction(ACTION_CONFIRM);
-							setUrlConfirmationLink(null);
-							startActivity(confirmIntent);
+
+					Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+
+					if (getUrlConfirmationLink() != null) {
+						loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
+						loginIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
+						if (isActivityVisible()) {
+							loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						} else {
+							loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 						}
+						loginIntent.setAction(ACTION_CONFIRM);
+						setUrlConfirmationLink(null);
+					} else if (isActivityVisible()) {
+						loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					} else {
+						loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					}
+
+					startActivity(loginIntent);
 				}
 				else{
 					logDebug("Disable chat finish logout");
@@ -1265,7 +1316,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 		stopService(new Intent(this, IncomingCallService.class));
-
 		if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
 			int callStatus = call.getStatus();
 			logDebug("Call status changed, current status: "+callStatusToString(call.getStatus()));
@@ -1273,7 +1323,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 				case MegaChatCall.CALL_STATUS_RING_IN:
 				case MegaChatCall.CALL_STATUS_JOINING:
-				case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
+				case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+				case MegaChatCall.CALL_STATUS_RECONNECTING: {
+					checkDeviceCamera();
 					if (megaChatApi != null) {
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
 						if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
@@ -1383,6 +1435,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION: {
 					removeStatusVideoAndSpeaker(call.getChatid());
 					removeChatAudioManager();
+					clearCameraHandle();
 					break;
 				}
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
@@ -1627,5 +1680,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public static boolean isWebOpenDueToEmailVerification() {
 		return isWebOpenDueToEmailVerification;
+	}
+
+	public void setIsLoggingRunning (boolean isLoggingRunning) {
+		MegaApplication.isLoggingRunning = isLoggingRunning;
+	}
+
+	public boolean isIsLoggingRunning() {
+		return isLoggingRunning;
 	}
 }

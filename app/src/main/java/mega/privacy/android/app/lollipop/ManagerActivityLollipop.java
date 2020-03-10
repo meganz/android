@@ -13633,8 +13633,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		alertDialogStorageStatus.show();
 	}
 
-    private Product getPRO3OneMonth() {
-        List<Product> products = MegaApplication.getInstance().getMyAccountInfo().productAccounts;
+	private Product getPRO3OneMonth() {
+		List<Product> products = MegaApplication.getInstance().getMyAccountInfo().productAccounts;
 		if (products != null) {
 			for (Product product : products) {
 				if (product != null && product.getLevel() == PRO_III && product.getMonths() == 1) {
@@ -13645,8 +13645,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			// Edge case: when this method is called, TYPE_GET_PRICING hasn't finished yet.
 			logWarning("Products haven't been initialized!");
 		}
-        return null;
-    }
+		return null;
+	}
 
 	public void askForCustomizedPlan(){
 		logDebug("askForCustomizedPlan");
