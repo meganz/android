@@ -52,7 +52,7 @@
             android:layout_alignLeft="@id/manage_transfer_filename" />
 
         <TextView
-            android:id="@+id/manage_transfer_completed_text"
+            android:id="@+id/manage_transfer_location"
             android:layout_width="wrap_content"
             android:layout_height="25dp"
             android:layout_toRightOf="@id/manage_transfer_completed_image"

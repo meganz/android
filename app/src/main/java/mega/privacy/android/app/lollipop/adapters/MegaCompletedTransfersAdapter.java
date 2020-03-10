@@ -116,19 +116,19 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 			if (thumb == null) {
 				MegaNode node = megaApi.getNodeByHandle(handle);
 				thumb = getThumbnailFromFolder(node, context);
-				if (thumb != null) {
-					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(54, 0, 18, 0);
-					holder.imageView.setLayoutParams(params1);
+			}
 
-					RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
-					params2.setMargins(0, -12, -12, 0);
-					holder.iconDownloadUploadView.setLayoutParams(params2);
+			if (thumb != null) {
+				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.setMargins(54, 0, 18, 0);
+				holder.imageView.setLayoutParams(params1);
 
-					holder.imageView.setImageBitmap(thumb);
-				}
+				RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
+				params2.setMargins(0, -12, -12, 0);
+				holder.iconDownloadUploadView.setLayoutParams(params2);
+				holder.imageView.setImageBitmap(thumb);
 			}
 		}
 
@@ -178,7 +178,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 		switch (v.getId()) {
 			case R.id.transfers_list_item_layout:
-				if (holder.currentPosition < 0 && holder.currentPosition < getItemCount()) {
+				if (holder.currentPosition >= 0 && holder.currentPosition < getItemCount()) {
 					((ManagerActivityLollipop) context).showManageTransferOptionsPanel(getItem(holder.currentPosition));
 				}
 				break;

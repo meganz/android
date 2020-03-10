@@ -14,6 +14,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class AndroidCompletedTransfer {
 
+    private int id;
     private String fileName;
     private int type;
     private int state;
@@ -21,8 +22,10 @@ public class AndroidCompletedTransfer {
     private String nodeHandle;
     private String path;
     private boolean isOfflineFile;
+    private long timeStamp;
 
-    public AndroidCompletedTransfer(String fileName, int type, int state, String size, String nodeHandle, String path, boolean isOfflineFile) {
+    public AndroidCompletedTransfer(int id, String fileName, int type, int state, String size, String nodeHandle, String path, boolean isOfflineFile, long timeStamp) {
+        this.id = id;
         this.fileName = fileName;
         this.type = type;
         this.state = state;
@@ -30,6 +33,7 @@ public class AndroidCompletedTransfer {
         this.nodeHandle = nodeHandle;
         this.path = removeLastFileSeparator(path);
         this.isOfflineFile = isOfflineFile;
+        this.timeStamp = timeStamp;
     }
 
     public AndroidCompletedTransfer (MegaTransfer transfer) {
@@ -39,6 +43,7 @@ public class AndroidCompletedTransfer {
         this.size = getSizeString(transfer.getTotalBytes());
         this.nodeHandle = transfer.getNodeHandle() + "";
         this.path = getTransferPath(transfer);
+        this.timeStamp = System.currentTimeMillis();
     }
 
     public String getFileName() {
@@ -95,6 +100,22 @@ public class AndroidCompletedTransfer {
 
     public void setIsOfflineFile(boolean isOfflineFile) {
         this.isOfflineFile = isOfflineFile;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     private String removeLastFileSeparator(String path) {

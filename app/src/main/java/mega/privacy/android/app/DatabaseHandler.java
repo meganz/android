@@ -3,6 +3,7 @@ package mega.privacy.android.app;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -153,6 +154,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_TRANSFER_HANDLE = "transferhandle";
 	private static final String KEY_TRANSFER_PATH = "transferpath";
 	private static final String KEY_TRANSFER_OFFLINE = "transferoffline";
+	private static final String KEY_TRANSFER_TIMESTAMP = "transfertimestamp";
+	public static final int MAX_TRANSFERS = 100;
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
 	private static final String KEY_SMALL_GRID_CAMERA = "smallgridcamera";
@@ -359,7 +362,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_TRANSFER_FILENAME + " TEXT, " + KEY_TRANSFER_TYPE + " TEXT, " +
 				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT, " + KEY_TRANSFER_PATH + " TEXT, " +
-				KEY_TRANSFER_OFFLINE + " BOOLEAN" + ")";
+				KEY_TRANSFER_OFFLINE + " BOOLEAN, " + KEY_TRANSFER_TIMESTAMP + " TEXT" + ")";
 		db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
 
 		String CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS " + TABLE_EPHEMERAL + "("
@@ -782,6 +785,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (oldVersion <= 54) {
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_OFFLINE + " BOOLEAN;");
+			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_TIMESTAMP + " TEXT;");
 		}
 	}
 
@@ -1738,6 +1742,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return result;
 	}
 
+	private void deleteOldestTransfer() {
+		ArrayList<AndroidCompletedTransfer> completedTransfers = getCompletedTransfers();
+		deleteTransfer(completedTransfers.get(0).getId());
+	}
+
+	public void deleteTransfer(int id) {
+		db.delete(TABLE_COMPLETED_TRANSFERS, KEY_ID + "=" + id, null);
+	}
+
 	public void setCompletedTransfer(AndroidCompletedTransfer transfer){
 		ContentValues values = new ContentValues();
 		values.put(KEY_TRANSFER_FILENAME, encrypt(transfer.getFileName()));
@@ -1747,8 +1760,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_TRANSFER_HANDLE, encrypt(transfer.getNodeHandle()));
 		values.put(KEY_TRANSFER_PATH, encrypt(transfer.getPath()));
 		values.put(KEY_TRANSFER_OFFLINE, encrypt(transfer.getIsOfflineFile() + ""));
+		values.put(KEY_TRANSFER_TIMESTAMP, encrypt(transfer.getTimeStamp() + ""));
 
 		db.insert(TABLE_COMPLETED_TRANSFERS, null, values);
+
+		if (DatabaseUtils.queryNumEntries(db, TABLE_COMPLETED_TRANSFERS) > MAX_TRANSFERS) {
+			deleteOldestTransfer();
+		}
 	}
 
 	public void emptyCompletedTransfers(){
@@ -1758,7 +1776,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public ArrayList<AndroidCompletedTransfer> getCompletedTransfers(){
 		ArrayList<AndroidCompletedTransfer> cTs = new ArrayList<AndroidCompletedTransfer> ();
 
-		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS;
+		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS + " ORDER BY " + KEY_TRANSFER_TIMESTAMP + " DESC";
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		try {
 			if (cursor.moveToLast()){
@@ -1774,8 +1792,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String nodeHandle = decrypt(cursor.getString(5));
 					String path = decrypt(cursor.getString(6));
 					boolean offline = Boolean.parseBoolean(decrypt(cursor.getString(7)));
+					long timeStamp = Long.parseLong(decrypt(cursor.getString(8)));
 
-					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(filename, typeInt, stateInt, size, nodeHandle, path, offline);
+					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp);
 					cTs.add(cT);
 				} while (cursor.moveToPrevious());
 			}

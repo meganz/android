@@ -17763,4 +17763,27 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private SearchFragmentLollipop getSearchFragment() {
 		return sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
 	}
+
+	public void removeTransfer(AndroidCompletedTransfer transfer) {
+		dbH.deleteTransfer(transfer.getId());
+		completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
+		if (completedTFLol != null) {
+			completedTFLol.updateCompletedTransfers();
+		}
+	}
+
+    public void openTransferLocation(AndroidCompletedTransfer transfer) {
+        if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
+            if (transfer.getIsOfflineFile()) {
+                drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+
+            } else {
+
+            }
+
+            selectDrawerItemLollipop(drawerItem);
+        } else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+
+        }
+    }
 }

@@ -27,6 +27,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaCompletedTransfersAdapter;
 import nz.mega.sdk.MegaApiAndroid;
 
+import static mega.privacy.android.app.DatabaseHandler.MAX_TRANSFERS;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -166,6 +167,10 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		logDebug("transferFinish");
 		if (tL != null) {
 			tL.add(0, transfer);
+
+			if (tL.size() >= MAX_TRANSFERS) {
+				tL.remove(tL.size() - 1);
+			}
 		} else {
 			tL = new ArrayList<>();
 			tL.add(transfer);
