@@ -170,6 +170,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -2741,7 +2742,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         isForwardingMessage = true;
         storedUnhandledData(messagesSelected);
-        megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
+        checkIfIsNeededToAskForMyChatFilesFolder();
     }
 
     public void proceedWithAction() {
@@ -8578,6 +8579,20 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         preservedIntents.add(intent);
         if (!isAskingForMyChatFiles) {
             isAskingForMyChatFiles = true;
+            checkIfIsNeededToAskForMyChatFilesFolder();
+        }
+    }
+
+    private void checkIfIsNeededToAskForMyChatFilesFolder() {
+        if (existsMyChatFilesFolder()) {
+            setMyChatFilesFolder(getMyChatFilesFolder());
+
+            if (isForwardingFromNC()) {
+                handleStoredData();
+            } else {
+                proceedWithAction();
+            }
+        } else {
             megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
         }
     }

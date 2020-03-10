@@ -72,6 +72,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -2049,7 +2050,12 @@ public class ChatController {
                 ((ChatActivityLollipop) context).handleStoredData();
             } else if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
-                megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
+                if (existsMyChatFilesFolder()) {
+                    ((NodeAttachmentHistoryActivity) context).setMyChatFilesFolder(getMyChatFilesFolder());
+                    ((NodeAttachmentHistoryActivity) context).handleStoredData();
+                } else {
+                    megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
+                }
             }
         }
     }
