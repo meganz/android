@@ -485,6 +485,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         isVerifySMSShowed = false;
 		singleApplicationInstance = this;
 
+		checkAppUpgrade();
+
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());

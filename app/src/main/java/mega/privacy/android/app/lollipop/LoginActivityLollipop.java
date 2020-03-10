@@ -716,23 +716,19 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     }
 
     public void enableLogsSDK() {
-        logDebug("enableLogsSDK");
-
         dbH.setFileLoggerSDK(true);
         setFileLoggerSDK(true);
         MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
         showSnackbar(getString(R.string.settings_enable_logs));
-        logDebug("App Version: " + getVersion(this));
+        logInfo("App Version: " + getVersion(this));
     }
 
     public void enableLogsKarere() {
-        logDebug("enableLogsKarere");
-
         dbH.setFileLoggerKarere(true);
         setFileLoggerKarere(true);
         MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
         showSnackbar(getString(R.string.settings_enable_logs));
-        logDebug("App Version: " + getVersion(this));
+        logInfo("App Version: " + getVersion(this));
     }
 
     public void setWaitingForConfirmAccount(boolean waitingForConfirmAccount) {

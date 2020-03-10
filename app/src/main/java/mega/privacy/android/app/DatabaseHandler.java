@@ -388,7 +388,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        logDebug("onUpgrade");
+        logInfo("Database upgraded from " + oldVersion + " to " + newVersion);
 
 //		UserCredentials userCredentials = null;
 //
