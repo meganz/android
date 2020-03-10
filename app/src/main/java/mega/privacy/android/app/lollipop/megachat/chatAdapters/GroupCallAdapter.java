@@ -4,9 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -20,8 +17,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
@@ -48,6 +43,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
+    private static final int MARGIN = 15;
+    private static final int SIZE_MUTE_ICON = 24;
 
     Context context;
     MegaApiAndroid megaApi;
@@ -465,13 +462,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
             //Audio icon:
             if(peers.size() < 7){
-                RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
-                paramsMicroSurface.height = scaleWidthPx(24, outMetrics);
-                paramsMicroSurface.width = scaleWidthPx(24, outMetrics);
-                paramsMicroSurface.setMargins(0, scaleWidthPx(15, outMetrics),  scaleWidthPx(15, outMetrics), 0);
-                paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
-                paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
-                holder.microSurface.setLayoutParams(paramsMicroSurface);
+                displayMuteIcon(holder.microSurface, peer);
 
                 RelativeLayout.LayoutParams paramsQuality = new RelativeLayout.LayoutParams(holder.qualityIcon.getLayoutParams());
                 paramsQuality.height = scaleWidthPx(24, outMetrics);
@@ -787,11 +778,44 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
     }
 
+    private ViewHolderGroupCall getHolder(int position) {
+        ViewHolderGroupCall holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+        return holder;
+    }
+
+    private void displayMuteIcon(final ImageView microSurface, InfoPeerGroupCall peer) {
+        RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(microSurface.getLayoutParams());
+        paramsMicroSurface.height = scaleWidthPx(SIZE_MUTE_ICON, outMetrics);
+        paramsMicroSurface.width = scaleWidthPx(SIZE_MUTE_ICON, outMetrics);
+        int marginTop;
+        if (((ChatCallActivity) context).isActionBarShowing() && peer.getPeerId() != megaChatApi.getMyUserHandle() && peer.getClientId() != megaChatApi.getMyClientidHandle(chatId)) {
+            marginTop = (getActionBarHeight() + scaleWidthPx(MARGIN, outMetrics));
+        } else {
+            marginTop = scaleWidthPx(MARGIN, outMetrics);
+        }
+        paramsMicroSurface.setMargins(0, marginTop, scaleWidthPx(MARGIN, outMetrics), 0);
+        paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
+        paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
+        microSurface.setLayoutParams(paramsMicroSurface);
+    }
+
+    public void updateMuteIcon() {
+        if (peers.size() != 2)
+            return;
+
+        for (InfoPeerGroupCall peer : peers) {
+            ViewHolderGroupCall holder = getHolder(peers.indexOf(peer));
+            if (!peer.isAudioOn() && peer.isVideoOn()) {
+                displayMuteIcon(holder.microSurface, peer);
+            }
+        }
+    }
+
     public void changesInAudio(int position, ViewHolderGroupCall holder){
         logDebug("changesInAudio");
 
         if(holder == null){
-            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+            holder = getHolder(position);
         }
         if(holder!=null){
             InfoPeerGroupCall peer = getNodeAt(position);
@@ -806,7 +830,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             }else{
                 if(!peer.isVideoOn()){
                     holder.microSurface.setVisibility(View.GONE);
-
                     holder.microAvatar.setVisibility(View.VISIBLE);
                     //Micro icon:
                     if(peers.size() < 7){
@@ -848,13 +871,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
                     //Audio icon:
                     if(peers.size() < 7){
-                        RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
-                        paramsMicroSurface.height = scaleWidthPx(24, outMetrics);
-                        paramsMicroSurface.width = scaleWidthPx(24, outMetrics);
-                        paramsMicroSurface.setMargins(0, scaleWidthPx(15, outMetrics),  scaleWidthPx(15, outMetrics), 0);
-                        paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
-                        paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
-                        holder.microSurface.setLayoutParams(paramsMicroSurface);
+                        displayMuteIcon(holder.microSurface, peer);
                     }else{
                         RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
                         paramsMicroSurface.height = scaleWidthPx(15, outMetrics);
@@ -869,6 +886,19 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }else{
             notifyItemChanged(position);
         }
+    }
+
+    private int getActionBarHeight() {
+        int actionBarHeight = ((ChatCallActivity) context).getSupportActionBar().getHeight();
+        if (actionBarHeight != 0) {
+            return actionBarHeight;
+        }
+
+        final TypedValue tv = new TypedValue();
+        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            return TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
+        }
+        return actionBarHeight;
     }
 
     public void updateMode(boolean flag){

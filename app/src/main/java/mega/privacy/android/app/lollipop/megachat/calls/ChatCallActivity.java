@@ -99,6 +99,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     final private static int MOVE_ANIMATION = 500;
     final private static int ALPHA_ANIMATION = 600;
     final private static int ALPHA_ARROW_ANIMATION = 1000;
+    final private static int DURATION_TOOLBAR_ANIMATION = 500;
     final private static int NECESSARY_CHANGE_OF_SIZES = 4;
     private final static int TITLE_TOOLBAR = 250;
     private float widthScreenPX, heightScreenPX;
@@ -852,25 +853,37 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         avatarBigCameraGroupCallImage.setImageBitmap(bitmap);
     }
 
+    public boolean isActionBarShowing() {
+        return aB.isShowing();
+    }
+
     private void hideActionBar() {
-        if (aB == null || !aB.isShowing()) return;
+        if (aB == null || !isActionBarShowing()) return;
         if (tB == null) {
             aB.hide();
             return;
         }
-        tB.animate().translationY(-220).setDuration(800L).withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                aB.hide();
+        tB.animate().translationY(-220).setDuration(DURATION_TOOLBAR_ANIMATION).withEndAction(() -> {
+            aB.hide();
+            if (chat.isGroup() && adapterGrid != null) {
+                adapterGrid.updateMuteIcon();
             }
         }).start();
     }
 
     private void showActionBar() {
-        if (aB == null || aB.isShowing()) return;
-        aB.show();
-        if (tB == null) return;
-        tB.animate().translationY(0).setDuration(800L).start();
+        if (aB == null || isActionBarShowing()) return;
+        if (tB == null) {
+            aB.show();
+            return;
+        }
+
+        tB.animate().translationY(0).setDuration(DURATION_TOOLBAR_ANIMATION).withEndAction(() -> {
+            aB.show();
+            if (chat.isGroup() && adapterGrid != null) {
+                adapterGrid.updateMuteIcon();
+            }
+        }).start();
     }
 
     private void hideFABs() {
