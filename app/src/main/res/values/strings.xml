@@ -112,7 +112,7 @@
     <string name="action_pause" context="Search button">Pause</string>
     <string name="action_refresh" context="Menu item">Refresh</string>
     <string name="action_sort_by" context="Menu item">Sort by</string>
-    <string name="action_help" context="Settings category title for Help">Help</string>
+    <string name="action_help" context="Menu item">Help</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Upgrade account</string>
     <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Upgrading account</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Select all</string>
@@ -451,7 +451,7 @@
     <!--
     <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Phone Contacts</string>
     -->
-    <string name="context_delete" context="Button in My Account section to confirm the account deletion">Delete</string>
+    <string name="context_delete" context="menu item">Delete</string>
     <!--
     <string name="context_more" context="menu item">More</string>
     -->
@@ -797,7 +797,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Incorrect code</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN, please try again. You have 1 attempt left</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Wrong PIN code, please try again. You have %2d attempts left</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN Codes don’t match</string>
@@ -1520,7 +1520,7 @@
         <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Downloading %1$d of %2$d files (paused)</item>
     </plurals>
 
-    <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is depleted">Depleted transfer quota</string>
+    <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Insufficient transfer quota</string>
     <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Your queued transfer exceeds the current transfer quota available for your IP address and may therefore be interrupted.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">See our plans</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continue without account</string>
@@ -1753,7 +1753,7 @@
 
     <string name="not_permited_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">Only MEGA contacts can be added</string>
 
-    <string name="invalid_connection_state" context="Info label about the connectivity state of an individual chat">Chat disconnected</string>
+    <string name="invalid_connection_state" context="Info label about the connectivity state of the chat">Reconnecting to chat</string>
 
     <string name="call_error" context="Message show when a call cannot be established">Error. The call cannot be established</string>
 
@@ -1820,7 +1820,7 @@
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]No files in your [/B][A]Inbox[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]No files in your [/B][A]Cloud Drive[/A][B].[/B]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]Offline[/A][B].[/B]</string>
-    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]No [/B][A]Contacts[/A]</string>
+    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]No [/B][A]Contacts[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]No[/A] [B]Conversations[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Loading[/A] [B]Conversations&#8230;[/B]</string>
@@ -2355,8 +2355,8 @@
     <string name="billing_period_title" context="title of billing period">Billing period</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
     <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]One-off (year)[/A] %s</string>
-    <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]Monthly[/A] %s /month</string>
-    <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Yearly[/A] %s /year</string>
+    <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]Monthly[/A] %s/month</string>
+    <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Yearly[/A] %s/year</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">Cancel</string>
     <string name="button_continue" context="dialog option continue in alert dialog">Continue</string>
 
@@ -2437,7 +2437,7 @@
     <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Enable access to contacts</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA needs access to your contacts to help you connect with other people on MEGA.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Allow access to your microphone to make encrypted calls.</string>
-    <string name="general_enable_access" context="General enable access">Enable access</string>
+    <string name="general_enable_access" context="General enable access">Allow Access</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
@@ -2492,8 +2492,8 @@
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
-    <string name="on_permanently_denied" context="After the user ticketed \'Don\'t ask again' on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions on your device\’s settings</string>
-    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won\'t contact them.</string>
+    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions on your device’s settings</string>
+    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
         <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">Message forwarded</item>
@@ -2522,7 +2522,7 @@
         <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d contact found on MEGA</item>
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacts found on MEGA</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user&#039;s phone contacts have a MEGA account. In other case here would appear all the user&#039;s phone contacts that have a MEGA account.">Invite contact now?</string>
+    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Invite contact now?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
 
@@ -2686,7 +2686,7 @@
     <string name="overall_usage_label" context="Title of overall usage section in Storage">Overall usage</string>
     <string name="transfer_label" context="Title of transfer section in Storage">Transfer</string>
 
-    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
+    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA in a desktop browser for more information.</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Your business account is expired</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired. Details for the administrator of the Business account">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>

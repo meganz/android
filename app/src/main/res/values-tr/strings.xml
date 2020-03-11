@@ -324,7 +324,6 @@
 	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transferring</string>
 	-->
     <string name="download_preparing_files" context="message before the download or upload start ">Dosyalar hazırlanıyor</string>
-    <string name="download_began" context="message when the download starts">İndirme başladı</string>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -540,7 +539,6 @@
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">Kaynak geçici olarak mevcut değil, lütfen daha sonra tekrar deneyin</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Seçili dosya açılamıyor</string>
-    <string name="upload_began" context="when an upload starts, a message is shown to the user">Yükleme başladı</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Sıkıştırılmış dosya açılıyor</string>
 
     <string name="error_io_problem" context="error message while browsing the local filesystem">Dosya sistemi problemi</string>
@@ -1028,8 +1026,6 @@
     <!--
     <string name="archive_chat_empty" context="Message shown when the user has no archived chats">No archived conversations</string>
     -->
-    <string name="recent_chat_enable_chat" context="Message shown when the user has no archived chats">Sohbet devredışı</string>
-    <string name="recent_chat_enable_chat_button" context="Message shown when the user has no archived chats">Sohbet\'i etkinleştir</string>
 
     <!--
     <string name="get_started_button" context="Button to start using the chat">Get started</string>
@@ -1184,7 +1180,6 @@
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Mesaj gönderilemedi. Ayarlar için dokunun</string>
 
-    <string name="chat_status_title" context="settings of the chat to choose the status">Durum</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1294,8 +1289,6 @@
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]%2$s üzerinden[/A]</string>
 
     <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Çevrimdışı kaydedilenlerden sil?</string>
-
-    <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Sohbet devre dışı bırakıldı ve bağlantı olmadan etkinleştirilemez.</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Durum</string>
 
@@ -1576,7 +1569,6 @@
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Hesap Baz Kotası</string>
     <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">Kamera Yüklemelerinde hiçbir dosya yok</string>
     <string name="general_num_days_left" context="indicates the number of days left related to a achievement">%1$d d kaldı</string>
-    <string name="expired_achievement" context="state to indicate the achievement has expired">Süresi doldu</string>
 
     <string name="setting_title_use_https_only" context="title of the advanced setting to choose the use of https">HTTP kullanma</string>
     <string name="setting_subtitle_use_https_only" context="subtitle of the advanced setting to choose the use of https">Bu seçeneği sadece aktarmalarınız başlamazsa etkinleştirin. Normal koşullarda, tüm aktarmalar zaten şifreli olduğu için HTTP tatmin edicidir.</string>
@@ -1716,7 +1708,6 @@
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Periyodu ayarla</string>
 
     <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Arkadaşlarınızı [/B][A]Sohbet[/A][B]\'e davet edin ve şifreli platformumuzun gizlilik ve güvenlikle keyfini çıkarın.[/B]</string>
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">[B]Sohbet\'i [/B][C]etkinleştirin[/C] [A][C]ve gizlilik ve güvenlikle şifrelenmiş platformumuzun keyfini çıkarın.[/C]</string>
 
     <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[A]Kamera Yüklemeleri [/A][B]içinde medya yok[/B][B].[/B]</string>
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Çöp Kutusunu [/A][B]Boşalt[/B][B].[/B]</string>
@@ -1846,8 +1837,6 @@
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Parolanızı test edin</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Parola kabul edildi</string>
     <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Yanlış şifre. \nKurtarma Anahtarınızı en kısa sürede yedekleyin!</string>
-    <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">Kurtarma Anahtarı dışarı aktarıldı</string>
-    <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">Kurtarma Anahtarı Çevrimdışı bölümüne MEGARecoveryKey.txt olarak dışa aktarıldı.\nNot: Oturumu kapatırsanız, lütfen güvenli bir yerde saklayın.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Çıkış yapmak üzeresiniz, lütfen hatırladığınızdan emin olmak için parolanızı test edin.\nParolanızı kaybederseniz, MEGA verilerinize erişimi kaybedersiniz.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Panoya kopyala</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Kurtarma Anahtarını Dışa Aktar</string>
