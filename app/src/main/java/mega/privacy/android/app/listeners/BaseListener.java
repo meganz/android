@@ -11,11 +11,12 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class BaseListener implements MegaRequestListenerInterface {
 
-    Context context;
-    protected DatabaseHandler dbH;
+    protected Context context;
+    protected DatabaseHandler dBH;
+
     public BaseListener(Context context) {
         this.context = context;
-        dbH = MegaApplication.getInstance().getDbH();
+        dBH = MegaApplication.getInstance().getDbH();
     }
 
     @Override

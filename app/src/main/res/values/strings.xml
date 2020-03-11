@@ -218,7 +218,7 @@
     <string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
 
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
-    <string name="name_text" context="Name of the user">Name</string>
+    <string name="name_text" context="category in sort by action">Name</string>
     <string name="first_name_text" context="First Name of the user">First Name</string>
     <string name="lastname_text" context="Last name of the user">Last Name</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA’s [A]Terms of Service[/A]</string>
@@ -2696,6 +2696,7 @@
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contact your business account administrator to resolve the issue and activate your account.</string>
     <string name="business_account_clarification" context="">** For genuine business purposes.</string>
     <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep the placeholder is to indicate if the space is refered to storage or transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]%1$s[/A] **</string>
+
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">When you logout, files from your Offline section will be deleted from your device.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">When you logout, ongoing transfers will be cancelled.</string>
     <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">When you logout, files from your Offline section will be deleted from your device and ongoing transfers will be cancelled.</string>
@@ -2715,6 +2716,7 @@
     <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]Please verify your email address[/A] and follow the steps in MEGA’s email to unlock your account.</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Why am I seeing this?</string>
     <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
+    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">Email already sent. Please wait a few minutes before trying again.</string>
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Locked Accounts</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">It is possible that you are using the same password for your MEGA account as for other services, and that at least one of these other services has suffered a data breach.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Your password leaked and is now being used by bad actors to log into your accounts, including, but not limited to, your MEGA account.</string>
@@ -2727,6 +2729,8 @@
     <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
+    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back.</string>
+
     <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">Recording&#8230;</string>
     <string name="create_new_file_action" context="Text shown for the action create new file">Create new file</string>
     <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Permissions error</string>
@@ -2735,7 +2739,4 @@
 
     <string name="download_location" context="Download location label">Download location</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
-
-    <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back.</string>
-
 </resources>

@@ -2,8 +2,6 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -19,8 +17,26 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class GetAttrUserListener extends BaseListener {
+    /**
+     * Indicates if the request is only to update the DB.
+     * If so, the rest of the actions in onRequestFinish() can be ignored.
+     */
+    private boolean onlyDBUpdate;
     public GetAttrUserListener(Context context) {
         super(context);
+    }
+
+    /**
+     * Constructor to init a request for check the USER_ATTR_MY_CHAT_FILES_FOLDER user's attribute
+     * and update the DB with the result.
+     *
+     * @param context       current application context
+     * @param onlyDBUpdate  true if the purpose of the request is only update the DB, false otherwise
+     */
+    public GetAttrUserListener(Context context, boolean onlyDBUpdate) {
+        super(context);
+
+        this.onlyDBUpdate = onlyDBUpdate;
     }
 
     @Override
@@ -40,7 +56,7 @@ public class GetAttrUserListener extends BaseListener {
                 } else if (e.getErrorCode() == MegaError.API_ENOENT) {
                     myChatFolderNode = api.getNodeByPath(CHAT_FOLDER, api.getRootNode());
 
-                    if (myChatFolderNode != null) {
+                    if (myChatFolderNode != null && !api.isInRubbish(myChatFolderNode)) {
                         String name = context.getString(R.string.my_chat_files_folder);
 
                         if (!myChatFolderNode.getName().equals(name)) {
@@ -48,12 +64,20 @@ public class GetAttrUserListener extends BaseListener {
                         }
                         api.setMyChatFilesFolder(myChatFolderNode.getHandle(), new SetAttrUserListener(context));
                     }
+                } else {
+                    logError("Error getting \"My chat files\" folder: " + e.getErrorString());
                 }
                 if (myChatFolderNode != null && !api.isInRubbish(myChatFolderNode)) {
+                    dBH.setMyChatFilesFolderHandle(myChatFolderNode.getHandle());
                     myChatFolderFound = true;
-                } else {
+                } else if (!onlyDBUpdate){
                     api.createFolder(context.getString(R.string.my_chat_files_folder), api.getRootNode(), new CreateFolderListener(context, true));
                 }
+
+                if (onlyDBUpdate) {
+                    return;
+                }
+
                 if (context instanceof FileExplorerActivityLollipop) {
                     FileExplorerActivityLollipop fileExplorerActivityLollipop = (FileExplorerActivityLollipop) context;
                     if (myChatFolderFound) {
@@ -77,9 +101,6 @@ public class GetAttrUserListener extends BaseListener {
                         nodeAttachmentHistoryActivity.setMyChatFilesFolder(myChatFolderNode);
                         nodeAttachmentHistoryActivity.handleStoredData();
                     }
-                }
-                if (e.getErrorCode() != MegaError.API_OK || e.getErrorCode() != MegaError.API_ENOENT) {
-                    logError("Error getting \"My chat files\" folder: " + e.getErrorString());
                 }
                 break;
             case USER_ATTR_FIRSTNAME:
