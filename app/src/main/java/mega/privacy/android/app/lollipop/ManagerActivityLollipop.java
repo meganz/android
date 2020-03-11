@@ -5745,8 +5745,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	@SuppressLint("NewApi")
-	public void selectDrawerItemLollipop(DrawerItem item){
-		logDebug("selectDrawerItemLollipop: "+item);
+	public void selectDrawerItemLollipop(DrawerItem item) {
+    	if (item == null) {
+    		logWarning("The selected DrawerItem is null.");
+    		return;
+		}
+
+    	logDebug("Selected DrawerItem: " + item.name());
 
     	drawerItem = item;
 		((MegaApplication)getApplication()).setRecentChatVisible(false);

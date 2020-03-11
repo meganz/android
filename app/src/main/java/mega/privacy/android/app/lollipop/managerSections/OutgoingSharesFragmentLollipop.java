@@ -537,11 +537,13 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	}
 
 	public void checkScroll () {
-		if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())){
-			((ManagerActivityLollipop) context).changeActionBarElevation(true);
-		}
-		else {
-			((ManagerActivityLollipop) context).changeActionBarElevation(false);
+		if (recyclerView != null) {
+			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())){
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
 		}
 	}
 	

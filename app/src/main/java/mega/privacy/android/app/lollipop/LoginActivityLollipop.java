@@ -866,6 +866,11 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
     public void setKeyboardVisibilityListener(final OnKeyboardVisibilityListener onKeyboardVisibilityListener) {
         final View parentView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+        if (parentView == null) {
+            logWarning("Cannot set the keyboard visibility listener. Parent view is NULL.");
+            return;
+        }
+
         parentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
             private boolean alreadyOpen;
