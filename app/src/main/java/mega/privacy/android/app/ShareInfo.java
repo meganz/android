@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
@@ -406,12 +407,16 @@ public class ShareInfo implements Serializable {
 		}
 
 		if (cursor == null || cursor.getCount() == 0) {
-			logWarning("Error with cursor: null or count is 0");
+			logWarning("Error with cursor");
 			if (cursor != null) {
 				cursor.close();
 			}
 			if (client != null) {
-				client.close();
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					client.close();
+				} else {
+					client.release();
+				}
 			}
 			return;
 		}
@@ -477,7 +482,11 @@ public class ShareInfo implements Serializable {
 		}
 
 		cursor.close();
-		client.close();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			client.close();
+		} else {
+			client.release();
+		}
 
 		logDebug("---- END process content----");
 	}

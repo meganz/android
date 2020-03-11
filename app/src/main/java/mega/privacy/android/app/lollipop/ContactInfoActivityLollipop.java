@@ -72,7 +72,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -99,7 +99,6 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -120,6 +119,8 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
 @SuppressLint("NewApi")
 public class ContactInfoActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
+
+	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
 
 	ContactController cC;
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
@@ -223,6 +224,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
 
     private AskForDisplayOverDialog askForDisplayOverDialog;
+
+    private boolean waitingForCall;
 
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
@@ -595,6 +598,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		} else {
 			logWarning("Extras is NULL");
 		}
+
+		if (savedInstanceState != null) {
+			waitingForCall = savedInstanceState.getBoolean(WAITING_FOR_CALL, false);
+		}
+
         if(askForDisplayOverDialog != null) {
             askForDisplayOverDialog.showDialog();
         }
@@ -836,7 +844,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		}
 	}
 
-	public void startCall(boolean startVideo) {
+	public void startCall() {
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if (chatRoomTo != null) {
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
@@ -844,21 +852,21 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				i.putExtra(CHAT_ID, chatRoomTo.getChatId());
 				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(i);
-			} else {
-				((MegaApplication) getApplication()).setSpeakerStatus(chatRoomTo.getChatId(), startVideo);
-				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+
+			} else if (isStatusConnected(this, megaChatApi, chatRoomTo.getChatId())) {
+				startCallWithChatOnline(chatRoomTo);
 			}
 		} else {
 			//Create first the chat
 			ArrayList<MegaChatRoom> chats = new ArrayList<>();
 			ArrayList<MegaUser> usersNoChat = new ArrayList<>();
 			usersNoChat.add(user);
-			CreateChatToPerformActionListener listener = null;
+			CreateChatListener listener = null;
 
 			if (startVideo) {
-				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_VIDEO_CALL);
+				listener = new CreateChatListener(chats, usersNoChat, -1, this, CreateChatListener.START_VIDEO_CALL);
 			} else {
-				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_AUDIO_CALL);
+				listener = new CreateChatListener(chats, usersNoChat, -1, this, CreateChatListener.START_AUDIO_CALL);
 			}
 
 			MegaChatPeerList peers = MegaChatPeerList.createInstance();
@@ -896,7 +904,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				logDebug("REQUEST_CAMERA");
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					if(checkPermissionsCall()){
-						startCall(startVideo);
+						startCall();
 					}
 				}
 				break;
@@ -905,7 +913,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				logDebug("RECORD_AUDIO");
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					if(checkPermissionsCall()){
-						startCall(startVideo);
+						startCall();
 					}
 				}
 				break;
@@ -1137,12 +1145,9 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	private void startingACall(boolean withVideo) {
-		if (megaChatApi != null && isStatusConnected(this, megaChatApi, megaChatApi.getChatRoomByUser(user.getHandle()).getChatId())) {
-			logDebug("I'm not in a call");
-			startVideo = withVideo;
-			if (checkPermissionsCall()) {
-				startCall(startVideo);
-			}
+		startVideo = withVideo;
+		if (checkPermissionsCall()) {
+			startCall();
 		}
 	}
 
@@ -1301,14 +1306,14 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 			MegaChatRoom chatRoomToSend = megaChatApi.getChatRoomByUser(user.getHandle());
 			if(chatRoomToSend!=null){
-				checkIfNodesAreMineBeforeAttach(fileHandles, chatRoomToSend.getChatId());
+				new ChatController(this).checkIfNodesAreMineAndAttachNodes(fileHandles, chatRoomToSend.getChatId());
 			}
 			else{
 				//Create first the chat
 				ArrayList<MegaChatRoom> chats = new ArrayList<>();
 				ArrayList<MegaUser> usersNoChat = new ArrayList<>();
 				usersNoChat.add(user);
-				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandles, this, CreateChatToPerformActionListener.SEND_FILES, -1);
+				CreateChatListener listener = new CreateChatListener(chats, usersNoChat, fileHandles, this, CreateChatListener.SEND_FILES, -1);
 				MegaChatPeerList peers = MegaChatPeerList.createInstance();
 				peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 				megaChatApi.createChat(false, peers, listener);
@@ -1332,30 +1337,14 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
 
             nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
-        }
-		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+        } else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
 
-			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
-			logDebug("Send to " + chatHandles.length + " chats");
+            long userHandle[] = {user.getHandle()};
+            intent.putExtra(USER_HANDLES, userHandle);
 
-			int countChat = chatHandles.length;
-			logDebug("Selected: " + countChat + " chats to send");
-
-			for (long chatHandle : chatHandles) {
-				MegaHandleList handleList = MegaHandleList.createInstance();
-				handleList.addMegaHandle(user.getHandle());
-				megaChatApi.attachContacts(chatHandle, handleList);
-			}
-
-			if(countChat==1){
-				openChat(chatHandles[0], null);
-			}
-			else{
-				String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, 1);
-				showSnackbar(SNACKBAR_TYPE, message, -1);
-			}
-		}else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
+            new ChatController(this).checkIntentToShareSomething(intent);
+		} else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
             if (!isOnline(this)) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
@@ -1399,10 +1388,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         }
 
 		super.onActivityResult(requestCode, resultCode, intent);
-	}
-
-	public void checkIfNodesAreMineBeforeAttach(long[] fileHandles, long chatId) {
-		new ChatController(this).checkIfNodesAreMineAndAttachNodes(fileHandles, chatId);
 	}
 
 	public void sendFilesToChat(long[] fileHandles, long chatId) {
@@ -2286,9 +2271,16 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
     }
-    
-    
-    @Override
+
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putBoolean(WAITING_FOR_CALL, waitingForCall);
+	}
+
+	@Override
     public void onUsersUpdate(MegaApiJava api,ArrayList<MegaUser> users) {
     
     }
@@ -2353,7 +2345,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+		MegaChatRoom chatRoom = api.getChatRoom(chatid);
 
+		if (waitingForCall && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
+				&& chatRoom != null && chatRoom.getPeerHandle(0) == user.getHandle()) {
+			startCallWithChatOnline(api.getChatRoom(chatid));
+		}
 	}
 
 	@Override
@@ -2372,5 +2369,16 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				logDebug("Date last green: " + formattedDate);
 			}
 		}
+	}
+
+	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
+		MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
+		if (startVideo) app.manuallyActivatedLocalCamera();
+		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
+		waitingForCall = false;
+	}
+
+	public void setWaitingForCall() {
+		waitingForCall = true;
 	}
 }

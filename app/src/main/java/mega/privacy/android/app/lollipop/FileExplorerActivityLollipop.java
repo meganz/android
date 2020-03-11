@@ -69,7 +69,7 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -104,9 +104,11 @@ import static android.webkit.URLUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
@@ -1669,9 +1671,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 
 		if (infos == null) {
-		    showSnackbar(getString(R.string.upload_can_not_open));
-		}
-		else {
+			showSnackbar(getString(R.string.upload_can_not_open));
+		} else if (existsMyChatFilesFolder()) {
+			setMyChatFilesFolder(getMyChatFilesFolder());
+			checkIfFilesExistsInMEGA();
+		} else {
 			megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
 		}
 	}
@@ -2577,7 +2581,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 
 		if (!users.isEmpty()) {
-			CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, -1, this, CreateChatToPerformActionListener.SEND_FILE_EXPLORER_CONTENT);
+			CreateChatListener listener = new CreateChatListener(chats, users, -1, this, CreateChatListener.SEND_FILE_EXPLORER_CONTENT);
 
 			for (MegaUser user : users) {
 				MegaChatPeerList peers = MegaChatPeerList.createInstance();

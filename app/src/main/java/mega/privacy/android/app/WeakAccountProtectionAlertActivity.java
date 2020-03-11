@@ -16,6 +16,7 @@ import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.*;
@@ -30,6 +31,7 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
     private TextView verifyEmailText;
     private RelativeLayout whyAmISeeingThisLayout;
     private Button resendEmailButton;
+    private Button logoutButton;
 
     private AlertDialog infoDialog;
     private boolean isInfoDialogShown;
@@ -68,6 +70,9 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
 
         resendEmailButton = findViewById(R.id.resend_email_button);
         resendEmailButton.setOnClickListener(this);
+
+        logoutButton = findViewById(R.id.logout_button);
+        logoutButton.setOnClickListener(this);
 
         if (savedInstanceState != null) {
             isInfoDialogShown = savedInstanceState.getBoolean(IS_INFO_DIALOG_SHOWN, false);
@@ -112,9 +117,11 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
             case R.id.why_am_i_seeing_this_layout:
                 showInfoDialog();
                 break;
+
             case R.id.resend_email_button:
                 megaApi.resendVerificationEmail(new ResendVerificationEmailListener(this));
                 break;
+
             case R.id.ok_button:
                 isInfoDialogShown = false;
                 try {
@@ -122,6 +129,10 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
                 } catch (Exception e) {
                     logWarning("Exception dismissing infoDialog");
                 }
+                break;
+
+            case R.id.logout_button:
+                AccountController.logout(this, megaApi);
                 break;
         }
     }

@@ -88,7 +88,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -2108,7 +2108,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         Intent i = new Intent(this, FileInfoActivityLollipop.class);
         if (isOffLine){
             i.putExtra("name", pdfFileName);
-            i.putExtra("imageId", MimeTypeThumbnail.typeForName(pdfFileName).getIconResourceId());
             i.putExtra("adapterType", OFFLINE_ADAPTER);
             i.putExtra("path", path);
             if (pathNavigation != null){
@@ -2125,7 +2124,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         else {
             MegaNode node = megaApi.getNodeByHandle(handle);
             i.putExtra("handle", node.getHandle());
-            i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             i.putExtra("name", node.getName());
             if (nC == null) {
                 nC = new NodeController(this);
@@ -2345,7 +2343,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     }
 
                     if(nodeHandles!=null){
-                        CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, nodeHandles[0], this, CreateChatToPerformActionListener.SEND_FILE);
+                        CreateChatListener listener = new CreateChatListener(chats, users, nodeHandles[0], this, CreateChatListener.SEND_FILE);
                         for (MegaUser user : users) {
                             MegaChatPeerList peers = MegaChatPeerList.createInstance();
                             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
@@ -2566,7 +2564,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         if (result == null) {
             result = uri.getLastPathSegment();
         }
-        return addPdfFileExtension(result);
+        return result != null ? addPdfFileExtension(result) : null;
     }
 
     @Override
