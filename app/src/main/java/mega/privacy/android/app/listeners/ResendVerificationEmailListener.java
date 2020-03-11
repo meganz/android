@@ -24,8 +24,9 @@ public class ResendVerificationEmailListener extends BaseListener {
         if (context instanceof WeakAccountProtectionAlertActivity) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 ((WeakAccountProtectionAlertActivity) context).showSnackbar(R.string.confirm_email_misspelled_email_sent);
+            } else if (e.getErrorCode() == MegaError.API_ETEMPUNAVAIL) {
+                ((WeakAccountProtectionAlertActivity) context).showSnackbar(R.string.resend_email_error);
             } else {
-                logError("Error: " + e.getErrorString());
                 ((WeakAccountProtectionAlertActivity) context).showSnackbar(R.string.general_error);
             }
         }
