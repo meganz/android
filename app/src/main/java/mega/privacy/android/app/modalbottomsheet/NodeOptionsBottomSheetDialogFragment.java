@@ -30,7 +30,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -257,28 +256,16 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 nodeInfo.setText(getInfoFolder(node, context, megaApi));
                 nodeVersionsIcon.setVisibility(View.GONE);
 
-                    if (node.isInShare()) {
-                        nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
-                    } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                        nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
-                    }
-                    else{
-                        if(((ManagerActivityLollipop) context).isCameraUploads(node)){
-                            nodeThumb.setImageResource(R.drawable.ic_folder_image_list);
-                        }else{
-                            nodeThumb.setImageResource(R.drawable.ic_folder_list);
-                        }
-                    }
-                    counterShares--;
-                    optionSendChat.setVisibility(View.GONE);
-                } else {
-                    long nodeSize = node.getSize();
-                    nodeInfo.setText(getSizeString(nodeSize));
+                nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
+                counterShares--;
+                optionSendChat.setVisibility(View.GONE);
+            } else {
+                long nodeSize = node.getSize();
+                nodeInfo.setText(getSizeString(nodeSize));
 
-                if(megaApi.hasVersions(node)){
+                if (megaApi.hasVersions(node)) {
                     nodeVersionsIcon.setVisibility(View.VISIBLE);
-                }
-                else{
+                } else {
                     nodeVersionsIcon.setVisibility(View.GONE);
                 }
 
@@ -1087,6 +1074,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             logDebug("First LEVEL is false: " + dBT);
                             i.putExtra("firstLevel", false);
                         }
+                    } else if (((ManagerActivityLollipop) context).getTabItemShares() == 1) {
+                        i.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
                     }
                 }
                 else if(drawerItem== ManagerActivityLollipop.DrawerItem.INBOX){
@@ -1106,21 +1095,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             i.putExtra("firstLevel", false);
                         }
                     }
-                }
-
-                if (node.isFolder()) {
-                    if (node.isInShare()){
-                        i.putExtra("imageId", R.drawable.ic_folder_incoming);
-                    }
-                    else if (node.isOutShare() || megaApi.isPendingShare(node)){
-                        i.putExtra("imageId", R.drawable.ic_folder_outgoing);
-                    }
-                    else{
-                        i.putExtra("imageId", R.drawable.ic_folder);
-                    }
-                }
-                else {
-                    i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
                 }
                 i.putExtra("name", node.getName());
 
@@ -1152,7 +1126,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     logWarning("The selected node is NULL");
                     return;
                 }
-                if(node.isOutShare() || megaApi.isPendingShare(node)){
+                if(isOutShare(node)){
                     Intent i = new Intent(context, FileContactListActivityLollipop.class);
                     i.putExtra("name", node.getHandle());
                     context.startActivity(i);

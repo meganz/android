@@ -2841,20 +2841,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 								Intent i = new Intent(this, FileInfoActivityLollipop.class);
 								i.putExtra("handle", nodeLink.getHandle());
-								if (nodeLink.isFolder()) {
-									if (nodeLink.isInShare()){
-										i.putExtra("imageId", R.drawable.ic_folder_incoming);
-									}
-									else if (nodeLink.isOutShare()||megaApi.isPendingShare(nodeLink)){
-										i.putExtra("imageId", R.drawable.ic_folder_outgoing);
-									}
-									else{
-										i.putExtra("imageId", R.drawable.ic_folder);
-									}
-								}
-								else {
-									i.putExtra("imageId", MimeTypeThumbnail.typeForName(nodeLink.getName()).getIconResourceId());
-								}
 								i.putExtra("name", nodeLink.getName());
 								startActivity(i);
 							}
@@ -13647,8 +13633,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		alertDialogStorageStatus.show();
 	}
 
-    private Product getPRO3OneMonth() {
-        List<Product> products = MegaApplication.getInstance().getMyAccountInfo().productAccounts;
+	private Product getPRO3OneMonth() {
+		List<Product> products = MegaApplication.getInstance().getMyAccountInfo().productAccounts;
 		if (products != null) {
 			for (Product product : products) {
 				if (product != null && product.getLevel() == PRO_III && product.getMonths() == 1) {
@@ -13659,8 +13645,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			// Edge case: when this method is called, TYPE_GET_PRICING hasn't finished yet.
 			logWarning("Products haven't been initialized!");
 		}
-        return null;
-    }
+		return null;
+	}
 
 	public void askForCustomizedPlan(){
 		logDebug("askForCustomizedPlan");
@@ -17083,81 +17069,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void setNewMail (String newMail) {
 		this.newMail = newMail;
-	}
-
-	public boolean isCameraUploads(MegaNode n){
-		logDebug("isCameraUploads()");
-		String cameraSyncHandle = null;
-
-		//Check if the item is the Camera Uploads folder
-		if(dbH.getPreferences()!=null){
-			prefs = dbH.getPreferences();
-			if(prefs.getCamSyncHandle()!=null){
-				cameraSyncHandle = prefs.getCamSyncHandle();
-			}else{
-				cameraSyncHandle = null;
-			}
-		}else{
-			prefs=null;
-		}
-
-		if(cameraSyncHandle!=null){
-			if(!(cameraSyncHandle.equals(""))){
-				if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
-					return true;
-				}
-
-			}else{
-				if(n.getName().equals("Camera Uploads")){
-					if (prefs != null){
-						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
-					}
-					dbH.setCamSyncHandle(n.getHandle());
-					logDebug("FOUND Camera Uploads!!----> " + n.getHandle());
-					return true;
-				}
-			}
-
-		}else{
-			if(n.getName().equals("Camera Uploads")){
-				if (prefs != null){
-					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
-				}
-				dbH.setCamSyncHandle(n.getHandle());
-				logDebug("FOUND Camera Uploads!!: " + n.getHandle());
-				return true;
-			}
-		}
-
-		//Check if the item is the Media Uploads folder
-		String secondaryMediaHandle = null;
-
-		if(prefs!=null){
-			if(prefs.getMegaHandleSecondaryFolder()!=null){
-				secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
-			}else{
-				secondaryMediaHandle = null;
-			}
-		}
-
-		if(secondaryMediaHandle!=null){
-			if(!(secondaryMediaHandle.equals(""))){
-				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
-					logDebug("Click on Media Uploads");
-					return true;
-				}
-			}
-		}else{
-			if(n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)){
-				if (prefs != null){
-					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
-				}
-				dbH.setSecondaryFolderHandle(n.getHandle());
-				logDebug("FOUND Media Uploads!!: " + n.getHandle());
-				return true;
-			}
-		}
-		return false;
 	}
 
 	//need to check image existence before use due to android content provider issue.

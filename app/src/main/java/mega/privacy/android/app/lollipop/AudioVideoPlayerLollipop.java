@@ -2961,7 +2961,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         Intent i = new Intent(this, FileInfoActivityLollipop.class);
         if (isOffline){
             i.putExtra("name", fileName);
-            i.putExtra("imageId", MimeTypeThumbnail.typeForName(fileName).getIconResourceId());
             i.putExtra("adapterType", OFFLINE_ADAPTER);
             i.putExtra("path", path);
             if (pathNavigation != null){
@@ -2978,7 +2977,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         else {
             MegaNode node = megaApi.getNodeByHandle(handle);
             i.putExtra("handle", node.getHandle());
-            i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             if (nC == null) {
                 nC = new NodeController(this);
             }
