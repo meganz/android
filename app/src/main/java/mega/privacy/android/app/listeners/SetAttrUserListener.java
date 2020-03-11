@@ -17,11 +17,9 @@ import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class SetAttrUserListener extends BaseListener {
-    DatabaseHandler dbH;
 
     public SetAttrUserListener(Context context) {
         super(context);
-        dbH = MegaApplication.getInstance().getDbH();
     }
 
     @Override
@@ -38,18 +36,18 @@ public class SetAttrUserListener extends BaseListener {
                 break;
             case USER_ATTR_FIRSTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateFirstName(context, dbH, request.getText(), request.getEmail());
+                    updateFirstName(context, dBH, request.getText(), request.getEmail());
                 }
                 break;
             case USER_ATTR_LASTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateLastName(context, dbH, request.getText(), request.getEmail());
+                    updateLastName(context, dBH, request.getText(), request.getEmail());
                 }
                 break;
             case USER_ATTR_ALIAS:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     String nickname = request.getText();
-                    dbH.setContactNickname(nickname, request.getNodeHandle());
+                    dBH.setContactNickname(nickname, request.getNodeHandle());
                     String message;
                     if (request.getText() == null) {
                         message = context.getString(R.string.snackbar_nickname_removed);
@@ -59,7 +57,7 @@ public class SetAttrUserListener extends BaseListener {
                     showSnackbar(context, message);
                     notifyNicknameUpdate(context, request.getNodeHandle());
                 } else if (e.getErrorCode() == MegaError.API_ENOENT) {
-                    dbH.setContactNickname(null, request.getNodeHandle());
+                    dBH.setContactNickname(null, request.getNodeHandle());
                     notifyNicknameUpdate(context, request.getNodeHandle());
                 } else {
                     logError("Error adding, updating or removing the alias" + e.getErrorCode());
