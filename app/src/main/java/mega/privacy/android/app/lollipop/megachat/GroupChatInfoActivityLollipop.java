@@ -585,23 +585,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-
     private void updateAdapter(long contactHandle) {
-        int position = -1;
-        if (participants != null && participants.size() > 0) {
-            for (int i = 0; i < participants.size(); i++) {
-                long participantHandle = participants.get(i).getHandle();
-                if (participantHandle == contactHandle) {
-                    position = i;
-                    break;
-                }
+        for (MegaChatParticipant participant : participants) {
+            if (participant.getHandle() == contactHandle) {
+                int pos = participants.indexOf(participant);
+                String fullName = checkParticipantName(contactHandle, pos);
+                participants.get(pos).setFullName(fullName);
+                adapter.updateParticipant(pos, participants);
+                break;
             }
-        }
-
-        if (position != -1) {
-            String fullName = checkParticipantName(contactHandle, position);
-            participants.get(position).setFullName(fullName);
-            adapter.updateParticipant(position + 1, participants);
         }
     }
 
