@@ -105,19 +105,19 @@ public class GetAttrUserListener extends BaseListener {
                 break;
             case USER_ATTR_FIRSTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateFirstName(context, dBH, request.getText(), request.getEmail());
+                    updateFirstName(context, request.getText(), request.getEmail());
                 }
                 break;
             case USER_ATTR_LASTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateLastName(context, dBH, request.getText(), request.getEmail());
+                    updateLastName(context, request.getText(), request.getEmail());
                 }
                 break;
             case USER_ATTR_ALIAS:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     String nickname = request.getName();
                     if (nickname == null) {
-                        updateDBNickname(api, dBH, context, request.getMegaStringMap());
+                        updateDBNickname(api, context, request.getMegaStringMap());
                         break;
                     }
                     dBH.setContactNickname(nickname, request.getNodeHandle());

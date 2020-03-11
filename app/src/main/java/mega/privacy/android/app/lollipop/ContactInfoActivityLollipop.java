@@ -633,7 +633,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		String fullName = buildFullName(contactDB.getName(), contactDB.getLastName(), contactDB.getMail());
 		String nicknameText = contactDB.getNickname();
 
-		if (!isTextEmpty(nicknameText)) {
+		if (isTextEmpty(nicknameText)) {
 			withoutNickname(fullName);
 		} else {
 			withNickname(fullName, nicknameText);

@@ -110,7 +110,7 @@ public class ContactUtil {
         return "";
     }
 
-    public static void updateDBNickname(MegaApiJava api, DatabaseHandler dbH, Context context, MegaStringMap map) {
+    public static void updateDBNickname(MegaApiJava api, Context context, MegaStringMap map) {
         ArrayList<MegaContactAdapter> contactsDB = getContactsDBList(api);
         if (contactsDB == null || contactsDB.isEmpty()) return;
         //No nicknames
@@ -119,7 +119,7 @@ public class ContactUtil {
                 long contactDBHandle = contactsDB.get(i).getMegaUser().getHandle();
                 String nickname = getNicknameContact(contactDBHandle);
                 if (nickname != null) {
-                    dbH.setContactNickname(null, contactDBHandle);
+                    MegaApplication.getInstance().getDbH().setContactNickname(null, contactDBHandle);
                     notifyNicknameUpdate(context, contactDBHandle);
                 }
             }
@@ -142,7 +142,7 @@ public class ContactUtil {
             if ((newNickname == null && oldNickname == null) || (newNickname != null && oldNickname != null && newNickname.equals(oldNickname))) {
                 continue;
             } else {
-                dbH.setContactNickname(newNickname, contactDBHandle);
+                MegaApplication.getInstance().getDbH().setContactNickname(newNickname, contactDBHandle);
                 notifyNicknameUpdate(context, contactDBHandle);
             }
         }
@@ -189,13 +189,13 @@ public class ContactUtil {
         }
     }
 
-    public static void updateFirstName(Context context, DatabaseHandler dbH, String name, String email) {
-        dbH.setContactName(name, email);
+    public static void updateFirstName(Context context, String name, String email) {
+        MegaApplication.getInstance().getDbH().setContactName(name, email);
         updateView(context);
     }
 
-    public static void updateLastName(Context context, DatabaseHandler dbH, String lastName, String email) {
-        dbH.setContactLastName(lastName, email);
+    public static void updateLastName(Context context, String lastName, String email) {
+        MegaApplication.getInstance().getDbH().setContactLastName(lastName, email);
         updateView(context);
     }
 }

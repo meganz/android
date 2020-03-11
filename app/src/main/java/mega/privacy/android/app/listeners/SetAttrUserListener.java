@@ -36,12 +36,12 @@ public class SetAttrUserListener extends BaseListener {
                 break;
             case USER_ATTR_FIRSTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateFirstName(context, dBH, request.getText(), request.getEmail());
+                    updateFirstName(context, request.getText(), request.getEmail());
                 }
                 break;
             case USER_ATTR_LASTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateLastName(context, dBH, request.getText(), request.getEmail());
+                    updateLastName(context, request.getText(), request.getEmail());
                 }
                 break;
             case USER_ATTR_ALIAS:
