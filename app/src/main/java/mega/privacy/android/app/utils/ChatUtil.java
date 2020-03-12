@@ -558,14 +558,20 @@ public class ChatUtil {
         return true;
     }
 
+    /**
+     * Gets the image compress format depending on the file extension.
+     * @param name Name of the image file including the extension.
+     * @return Image compress format.
+     */
     private static Bitmap.CompressFormat getCompressFormat(String name) {
         String[] s = name.split("\\.");
 
-        if (s != null && s.length > 1) {
+        if (s.length > 1) {
             String ext = s[s.length - 1];
             switch (ext) {
                 case "jpeg":
                 case "jpg":
+                default:
                     return Bitmap.CompressFormat.JPEG;
 
                 case "png":
@@ -573,14 +579,16 @@ public class ChatUtil {
 
                 case "webp":
                     return Bitmap.CompressFormat.WEBP;
-
-                default:
-                    return Bitmap.CompressFormat.JPEG;
             }
         }
         return Bitmap.CompressFormat.JPEG;
     }
 
+    /**
+     * Checks an image before upload to a chat and downscales it if needed.
+     * @param file Original image file.
+     * @return Image file to be uploaded.
+     */
     public static File checkImageBeforeUpload(File file) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         int orientation = AndroidGfxProcessor.getExifOrientation(file.getAbsolutePath());
@@ -626,14 +634,10 @@ public class ChatUtil {
                 logError("Exception compressing image file for upload it to chat.", e);
             }
 
-            if (scaleBitmap != null) {
-                scaleBitmap.recycle();
-            }
+            scaleBitmap.recycle();
         }
 
-        if (fileBitmap != null) {
-            fileBitmap.recycle();
-        }
+        fileBitmap.recycle();
 
         return outFile;
     }
