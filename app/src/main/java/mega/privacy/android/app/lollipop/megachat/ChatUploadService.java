@@ -238,22 +238,17 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	Bitmap.CompressFormat getCompressFormat(String name) {
 		String[] s = name.split("\\.");
 		String ext;
-		if (s != null && s.length > 1) {
-			ext = s[s.length-1];
+		if (s.length > 1) {
+			ext = s[s.length - 1];
 			switch (ext) {
-				case "jpeg" :
-				case "jpg":{
-					return Bitmap.CompressFormat.JPEG;
-				}
-				case "png": {
+				case "png":
 					return Bitmap.CompressFormat.PNG;
-				}
-				case "webp":{
+				case "webp":
 					return Bitmap.CompressFormat.WEBP;
-				}
-				default: {
+				case "jpeg":
+				case "jpg":
+				default:
 					return Bitmap.CompressFormat.JPEG;
-				}
 			}
 		}
 		return Bitmap.CompressFormat.JPEG;
@@ -378,7 +373,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					height *= factor;
 					logDebug("DATA connection factor<1 totalPixels: " + totalPixels + " width: " + width + " height: " + height +
 							" DOWNSCALE_IMAGES_PX/totalPixels: " + division + " Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): " + Math.sqrt(division));
-					Bitmap scaleBitmap = Bitmap.createScaledBitmap(fileBitmap, (int)width, (int)height, false);
+					Bitmap scaleBitmap = Bitmap.createScaledBitmap(fileBitmap, (int)width, (int)height, true);
 					if (scaleBitmap != null) {
 						logDebug("DATA connection scaled Bitmap != null");
 						File outFile = buildChatTempFile(getApplicationContext(), file.getName());
