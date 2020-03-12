@@ -34,7 +34,7 @@ import android.os.Handler;
 
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.support.v7.app.ActionBar;
@@ -101,7 +101,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -1805,4 +1804,9 @@ public class Util {
 	public static boolean isAndroid10() {
 		return Build.VERSION.SDK_INT >= ANDROID_10_Q;
 	}
+
+	public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus){
+		textInputLayout.setPasswordVisibilityToggleEnabled(focus);
+	}
+
 }

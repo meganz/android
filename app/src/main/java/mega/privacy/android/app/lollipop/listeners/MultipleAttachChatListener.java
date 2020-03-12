@@ -70,7 +70,7 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
             if(context instanceof ManagerActivityLollipop){
                 if(success>0){
                     if(chatId==-1){
-                        ((ManagerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, success, success), -1);
+                        ((ManagerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, -1);
                     }
                     else{
                         ((ManagerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
@@ -91,7 +91,7 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
             else if (context instanceof FullScreenImageViewerLollipop) {
                 if(success>0){
                     if(chatId==-1){
-                        ((FullScreenImageViewerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1, 1), -1);
+                        ((FullScreenImageViewerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, -1);
                     }
                     else{
                         ((FullScreenImageViewerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
@@ -104,7 +104,7 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
             else if (context instanceof AudioVideoPlayerLollipop) {
                 if(success>0){
                     if(chatId==-1){
-                        ((AudioVideoPlayerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1, 1), -1);
+                        ((AudioVideoPlayerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, -1);
                     }
                     else{
                         ((AudioVideoPlayerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
@@ -117,7 +117,7 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
             else if (context instanceof PdfViewerActivityLollipop) {
                 if(success>0){
                     if(chatId==-1){
-                        ((PdfViewerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1, 1), -1);
+                        ((PdfViewerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, -1);
                     }
                     else{
                         ((PdfViewerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
@@ -130,7 +130,7 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
             else if (context instanceof FileInfoActivityLollipop) {
                 if(success>0){
                     if(chatId==-1){
-                        ((FileInfoActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1, 1), -1);
+                        ((FileInfoActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, -1);
                     }
                     else{
                         ((FileInfoActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);

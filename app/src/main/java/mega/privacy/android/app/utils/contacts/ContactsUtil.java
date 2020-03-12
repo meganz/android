@@ -17,6 +17,12 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ContactsUtil {
 
+    /**
+     * A valid normalized phone number must start with '+'.
+     * Invalid phone numbers are not allowed to be sent to server.
+     */
+    private static final String PLUS = "+";
+
     public static class LocalContact {
 
         private long id;
@@ -117,14 +123,14 @@ public class ContactsUtil {
                 for (LocalContact temp : localContacts) {
                     if (temp.getId() == id) {
                         temp.addPhoneNumber(phone);
-                        if (normalizedPhone == null) {
+                        if (normalizedPhone == null || !normalizedPhone.startsWith(PLUS)) {
                             //If roaming, don't normalize the phone number.
                             if (!Util.isRoaming(context)) {
                                 // use current country code to normalize the phone number.
                                 normalizedPhone = Util.normalizePhoneNumberByNetwork(context,phone);
                             }
                         }
-                        if (normalizedPhone != null) {
+                        if (normalizedPhone != null && normalizedPhone.startsWith(PLUS)) {
                             temp.addNormalizedPhoneNumber(normalizedPhone);
                         }
                     }

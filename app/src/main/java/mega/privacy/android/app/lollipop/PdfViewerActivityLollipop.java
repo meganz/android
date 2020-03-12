@@ -2111,7 +2111,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         Intent i = new Intent(this, FileInfoActivityLollipop.class);
         if (isOffLine){
             i.putExtra("name", pdfFileName);
-            i.putExtra("imageId", MimeTypeThumbnail.typeForName(pdfFileName).getIconResourceId());
             i.putExtra("adapterType", OFFLINE_ADAPTER);
             i.putExtra("path", path);
             if (pathNavigation != null){
@@ -2128,7 +2127,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         else {
             MegaNode node = megaApi.getNodeByHandle(handle);
             i.putExtra("handle", node.getHandle());
-            i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             i.putExtra("name", node.getName());
             if (nC == null) {
                 nC = new NodeController(this);
@@ -2569,7 +2567,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         if (result == null) {
             result = uri.getLastPathSegment();
         }
-        return addPdfFileExtension(result);
+        return result != null ? addPdfFileExtension(result) : null;
     }
 
     @Override
