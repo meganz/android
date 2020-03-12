@@ -18,7 +18,6 @@ import android.os.Handler;
 import android.os.PersistableBundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -26,23 +25,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.Html;
-import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -78,7 +71,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
+public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener {
 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
@@ -101,7 +94,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		// Select single folder
 		PICK_FOLDER("ACTION_PICK_FOLDER"),
 		// Pick one or multiple files or folders
-		PICK_FILE("ACTION_PICK_FILE");
+		PICK_FILE("ACTION_PICK_FILE"),
+		//Browse files
+		BROWSE_FILES("ACTION_BROWSE_FILES");
 
 		private String action;
 
@@ -116,14 +111,16 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public static Mode getFromIntent(Intent intent) {
 			if (intent.getAction().equals(PICK_FILE.getAction())) {
 				return PICK_FILE;
+			} else if (intent.getAction().equals(BROWSE_FILES.getAction())) {
+				return BROWSE_FILES;
 			} else {
 				return PICK_FOLDER;
 			}
 		}
 	}
-	MegaPreferences prefs;
-	DatabaseHandler dbH;
-	Mode mode;
+
+	private MegaPreferences prefs;
+	private Mode mode;
 	
 	private MenuItem newFolderMenuItem;
 	
@@ -134,11 +131,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private Button button;
 	private TextView contentText;
 	private RecyclerView listView;
-	LinearLayoutManager mLayoutManager;
+	private LinearLayoutManager mLayoutManager;
 	private Button cancelButton;
-	GestureDetectorCompat detector;
-	ImageView emptyImageView;
-	TextView emptyTextView;
+	private ImageView emptyImageView;
+	private TextView emptyTextView;
+	private LinearLayout buttonsContainer;
 	
 	private Boolean fromSettings, fromSaveRecoveryKey;
 	private Boolean cameraFolderSettings;
@@ -146,21 +143,18 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private boolean hasSDCard;
     private String prompt;
 
-	Stack<Integer> lastPositionStack;
+	private Stack<Integer> lastPositionStack;
 	
 	private String url;
 	private long size;
 	private long[] documentHashes;
 	private ArrayList<String> serializedNodes;
 
-	FileStorageLollipopAdapter adapter;
-	Toolbar tB;
-	ActionBar aB;
-	
-	float scaleH, scaleW;
-	float density;
-	DisplayMetrics outMetrics;
-	Display display;
+	private FileStorageLollipopAdapter adapter;
+	private Toolbar tB;
+	private ActionBar aB;
+
+	private DisplayMetrics outMetrics;
 	
 	private ActionMode actionMode;
 	
@@ -169,28 +163,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private boolean isSetDownloadLocationShown;
 	private boolean confirmationChecked;
 
-	String regex = "[*|\\?:\"<>\\\\\\\\/]";
+	private String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
-	Handler handler;
+	private Handler handler;
 
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
-
-	    public void onLongPress(MotionEvent e) {
-			logDebug("onLongPress");
-	    	
-			if (mode == Mode.PICK_FILE) {
-				logDebug("Mode.PICK_FILE");
-				// handle long press
-				if (!adapter.isMultipleSelect()){
-					adapter.setMultipleSelect(true);
-
-					actionMode = startSupportActionMode(new ActionBarCallBack());
-				}
-				super.onLongPress(e);
-			}
-	    }
-	}
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -327,12 +303,15 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		if (mode == Mode.PICK_FOLDER) {
 			menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-            newFolderMenuItem.setVisible(true);
-		}else{
+			newFolderMenuItem.setVisible(true);
+		} else if (mode == Mode.BROWSE_FILES) {
+			newFolderMenuItem.setVisible(false);
+			menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+		} else {
 			newFolderMenuItem.setVisible(false);
 			menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-
 		}
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -353,22 +332,16 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		
-		display = getWindowManager().getDefaultDisplay();
+		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
-		
-	    scaleW = getScaleW(outMetrics, density);
-	    scaleH = getScaleH(outMetrics, density);
 
 	    handler = new Handler();
 
 		setContentView(R.layout.activity_filestorage);
 		
-		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
-		
 		//Set toolbar
-		tB = (Toolbar) findViewById(R.id.toolbar_filestorage);
+		tB = findViewById(R.id.toolbar_filestorage);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
 		aB.setDisplayHomeAsUpEnabled(true);
@@ -393,8 +366,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			url = intent.getExtras().getString(EXTRA_URL);
 			size = intent.getExtras().getLong(EXTRA_SIZE);
 			aB.setTitle(getString(R.string.general_select_to_download).toUpperCase());
-		}
-		else{
+		} else if (mode == Mode.BROWSE_FILES) {
+			aB.setTitle(getString(R.string.browse_files_label).toUpperCase());
+		} else{
 			aB.setTitle(getString(R.string.general_select_to_upload).toUpperCase());
 		}
 		
@@ -409,76 +383,77 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			confirmationChecked = savedInstanceState.getBoolean(IS_CONFIRMATION_CHECKED, false);
 		}
 		
-        viewContainer = (RelativeLayout) findViewById(R.id.file_storage_container);
-		contentText = (TextView) findViewById(R.id.file_storage_content_text);
-		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
+        viewContainer = findViewById(R.id.file_storage_container);
+		contentText = findViewById(R.id.file_storage_content_text);
+		listView = findViewById(R.id.file_storage_list_view);
 
-		cancelButton = (Button) findViewById(R.id.file_storage_cancel_button);
+		buttonsContainer = findViewById(R.id.options_file_storage_layout);
+		cancelButton = findViewById(R.id.file_storage_cancel_button);
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 
-		button = (Button) findViewById(R.id.file_storage_button);
+		button = findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
+
+		boolean actionButtonAccentStyle = true;
 
 		if (fromSaveRecoveryKey) {
 			button.setText(getString(R.string.save_action).toUpperCase(Locale.getDefault()));
 		} else if (fromSettings) {
 			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-		} else {
-			if (mode == Mode.PICK_FOLDER) {
-				button.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
-			} else {
-				button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-			}
+		} else if (mode == Mode.PICK_FOLDER) {
+			button.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
+		} else if (mode == Mode.PICK_FILE){
+			actionButtonAccentStyle = false;
+			button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+		} else if (mode == Mode.BROWSE_FILES) {
+			buttonsContainer.setVisibility(View.GONE);
 		}
-		emptyImageView = (ImageView) findViewById(R.id.file_storage_empty_image);
-		emptyTextView = (TextView) findViewById(R.id.file_storage_empty_text);
-		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-		}else{
+
+		if (actionButtonAccentStyle) {
+			button.setTextColor(ContextCompat.getColor(this, R.color.white));
+			button.setBackground(ContextCompat.getDrawable(this, R.drawable.background_accent_button));
+		} else {
+			button.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+			button.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
+		}
+
+		emptyImageView = findViewById(R.id.file_storage_empty_image);
+		emptyTextView = findViewById(R.id.file_storage_empty_text);
+		if (isScreenInPortrait(this)) {
 			emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+		} else {
+			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 		}
 		String textToShow = String.format(getString(R.string.file_browser_empty_folder_new));
-		try{
+		try {
 			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
+		} catch (Exception e) {
+			logWarning("Exception formatting text, ", e);
 		}
-		catch (Exception e){}
-		Spanned result = null;
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-		} else {
-			result = Html.fromHtml(textToShow);
-		}
-		emptyTextView.setText(result);
+		emptyTextView.setText(getSpannedHtmlText(textToShow));
 
-		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
+		listView = findViewById(R.id.file_storage_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new LinearLayoutManager(this);
-		listView.addOnItemTouchListener(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
 		
 		if (adapter == null){
-			
 			adapter = new FileStorageLollipopAdapter(this, listView, mode);
 			listView.setAdapter(adapter);
-			
 		}
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			root = buildExternalStorageFile("");
-			if (root == null){
-				root = new File(File.separator);
-			}
-		}
-		else{
+		root = buildExternalStorageFile("");
+		if (root == null){
 			root = new File(File.separator);
 		}
+
 		//pick file from SD card
 		if(hasSDCard) {
 		    root = new File(sdRoot);
@@ -487,38 +462,33 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		lastPositionStack = new Stack<>();
 
 		prefs = dbH.getPreferences();
-		if(!hasSDCard) {
-            if (prefs == null){
-                path = buildExternalStorageFile(DOWNLOAD_DIR);
-            }
-            else{
-                String lastFolder = prefs.getLastFolderUpload();
-                if(lastFolder!=null){
-                    path = new File(prefs.getLastFolderUpload());
-                    if(!path.exists())
-                    {
-                        path = null;
-                    }
-                }
-                else{
-                    path = buildExternalStorageFile(DOWNLOAD_DIR);
-                }
-                if (cameraFolderSettings){
-                    camSyncLocalPath = prefs.getCamSyncLocalPath();
-                }
-            }
-            if (path == null) {
-                path = buildExternalStorageFile(DOWNLOAD_DIR);
-            }
-        } else {
-		    //always pick from SD card root
-		    path = new File(sdRoot);
-        }
-
-		if (cameraFolderSettings) {
-			if (Environment.getExternalStorageDirectory() != null) {
-				path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+		if (!hasSDCard) {
+			if (prefs == null) {
+				path = buildExternalStorageFile(DOWNLOAD_DIR);
+			} else {
+				String lastFolder = prefs.getLastFolderUpload();
+				if (lastFolder != null) {
+					path = new File(prefs.getLastFolderUpload());
+					if (!path.exists()) {
+						path = null;
+					}
+				} else {
+					path = buildExternalStorageFile(DOWNLOAD_DIR);
+				}
+				if (cameraFolderSettings) {
+					camSyncLocalPath = prefs.getCamSyncLocalPath();
+				}
 			}
+			if (path == null) {
+				path = buildExternalStorageFile(DOWNLOAD_DIR);
+			}
+		} else {
+			//always pick from SD card root
+			path = new File(sdRoot);
+		}
+
+		if (cameraFolderSettings && Environment.getExternalStorageDirectory() != null) {
+			path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 		}
 		
 		if (path == null){
@@ -1129,47 +1099,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		return m.find();
 	}
 
-	@Override
-	public boolean onDown(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
+	public void checkActionMode() {
+		if (mode == Mode.PICK_FILE) {
+			logDebug("Mode.PICK_FILE");
+			// handle long press
+			if (adapter != null && !adapter.isMultipleSelect()){
+				adapter.setMultipleSelect(true);
+				actionMode = startSupportActionMode(new ActionBarCallBack());
+			}
+		}
 	}
 }

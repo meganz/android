@@ -1,110 +1,101 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/file_storage_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:background="@color/white"
-    android:id="@+id/file_storage_container"
-    tools:context=".FileStorageActivityLollipop" >
+    android:fitsSystemWindows="true"
+    tools:context=".FileStorageActivityLollipop">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_filestorage"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-		app:popupTheme="@style/Theme.Megaactionbar"
-		app:titleTextAppearance="@style/ToolbarTitle"
-		app:subtitleTextAppearance="@style/ToolbarSubtitle"
-		app:theme="@style/Theme.Megaactionbar"
+        app:popupTheme="@style/Theme.Megaactionbar"
+        app:subtitleTextAppearance="@style/ToolbarSubtitle"
+        app:theme="@style/Theme.Megaactionbar"
+        app:titleTextAppearance="@style/ToolbarTitle"
         tools:context=".FolderLinkActivityLollipop" />
 
     <TextView
-	    android:id="@+id/file_storage_content_text"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:ellipsize="start"
-	    android:paddingLeft="8dp"
-	    android:paddingTop="3dp"
-	    android:paddingBottom="3dp"
-	    android:layout_below="@id/toolbar_filestorage"
-	    android:textColor="@color/black"
-		android:fontFamily="sans-serif-light"
-		android:textStyle="bold"
-	    android:textSize="14sp"/>
+        android:id="@+id/file_storage_content_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_filestorage"
+        android:ellipsize="start"
+        android:fontFamily="sans-serif-light"
+        android:paddingLeft="8dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:textStyle="bold" />
 
-	<RelativeLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_centerInParent="true"
-		android:gravity="center_horizontal">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal">
 
-		<ImageView
-			android:id="@+id/file_storage_empty_image"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_centerHorizontal="true" />
+        <ImageView
+            android:id="@+id/file_storage_empty_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true" />
 
-		<LinearLayout
-			android:id="@+id/offline_empty_text"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_below="@id/file_storage_empty_image"
-			android:layout_centerHorizontal="true"
-			android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/offline_empty_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/file_storage_empty_image"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal">
 
-			<TextView
-				android:id="@+id/file_storage_empty_text"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textColor="@color/text_secondary"
-				android:textSize="16sp" />
-		</LinearLayout>
-	</RelativeLayout>
+            <TextView
+                android:id="@+id/file_storage_empty_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/file_storage_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/file_storage_content_text"
+        android:choiceMode="multipleChoice"
+		android:layout_above="@+id/options_file_storage_layout"/>
 
     <LinearLayout
         android:id="@+id/options_file_storage_layout"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-		android:background="@color/participants_layout"
-		android:gravity="right|center_vertical"
-		android:layout_alignParentBottom="true"
-        android:orientation="horizontal" >
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+		android:layout_alignParentEnd="true"
+        android:layout_marginBottom="16dp"
+		android:padding="5dp"
+        android:gravity="right|center_vertical"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/file_storage_cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-			android:textColor="@color/accentColor"
-			android:gravity="center_vertical|center_horizontal"
-			android:stateListAnimator="@null"
-		 	android:background="@color/participants_layout"/>
+            android:layout_marginEnd="16dp"
+            android:textColor="@color/accentColor"
+            style="@style/ButtonStyleWithoutBorder" />
 
-		<Button
-			android:id="@+id/file_storage_button"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textColor="@color/accentColor"
-			android:gravity="center_vertical|center_horizontal"
-			android:stateListAnimator="@null"
-			android:layout_marginRight="4dp"
-			android:background="@color/participants_layout"/>
+        <Button
+            android:id="@+id/file_storage_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="19dp"
+            style="@style/ButtonStyleWithoutBorder" />
 
     </LinearLayout>
-
-	<View
-		android:id="@+id/separator_3"
-		android:layout_width="match_parent"
-		android:layout_height="1dip"
-		android:layout_above="@id/options_file_storage_layout"
-		android:background="@color/tour_bar_grey" />
-
-   <android.support.v7.widget.RecyclerView
-        android:id="@+id/file_storage_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/file_storage_content_text"
-        android:layout_above="@id/separator_3"
-        android:choiceMode="multipleChoice" />
 
 </RelativeLayout>

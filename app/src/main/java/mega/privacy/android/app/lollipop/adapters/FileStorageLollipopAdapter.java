@@ -442,12 +442,9 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 
 	@Override
 	public void onClick(View v) {
-		logDebug("click!");
 		ViewHolderFileStorage holder = (ViewHolderFileStorage) v.getTag();
 
 		int currentPosition = holder.getAdapterPosition();
-		final FileDocument doc = (FileDocument) getItem(currentPosition);
-		logDebug("In position: " + currentPosition + " document: " + doc.getName());
 
 		switch (v.getId()) {
 			case R.id.file_explorer_filename:
@@ -457,13 +454,18 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			}
 		}
 	}
+
 	@Override
 	public boolean onLongClick(View view) {
-		logDebug("OnLongClick");
 
 		ViewHolderFileStorage holder = (ViewHolderFileStorage) view.getTag();
-		int currentPosition = holder.getAdapterPosition();
-		((FileStorageActivityLollipop) context).itemClick(currentPosition);
+
+		switch (view.getId()) {
+			case R.id.file_explorer_item_layout:
+				((FileStorageActivityLollipop) context).checkActionMode();
+				((FileStorageActivityLollipop) context).itemClick(holder.getAdapterPosition());
+				break;
+		}
 
 		return true;
 	}

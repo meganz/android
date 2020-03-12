@@ -2734,5 +2734,5 @@
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
 
     <string name="view_in_folder_label" context="Action to show any file in its location">View in folder</string>
-
+    <string name="browse_files_label" context="Title of a screen to browse files">Browse files</string>
 </resources>

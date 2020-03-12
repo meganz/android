@@ -659,4 +659,8 @@ public class OfflineUtils {
 
         return app.getString(R.string.section_saved_for_offline_new) + path;
     }
+
+    public static String removeInitialOfflinePath(String path) {
+        return path.replace(MegaApplication.getInstance().getString(R.string.section_saved_for_offline_new), "");
+    }
 }

@@ -132,7 +132,6 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
@@ -149,7 +148,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -245,6 +243,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -17585,15 +17584,24 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     public void openTransferLocation(AndroidCompletedTransfer transfer) {
         if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
             if (transfer.getIsOfflineFile()) {
-                drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
-
-            } else {
-
+				pathNavigationOffline = removeInitialOfflinePath(transfer.getPath()) + SEPARATOR;
+				refreshFragment(FragmentTag.OFFLINE.getTag());
+				selectDrawerItemLollipop(drawerItem = DrawerItem.SAVED_FOR_OFFLINE);
+			} else {
+				Intent intent = new Intent(this, FileStorageActivityLollipop.class);
+				intent.setAction(FileStorageActivityLollipop.Mode.BROWSE_FILES.getAction());
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_PATH, transfer.getPath());
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+				startActivity(intent);
             }
-
-            selectDrawerItemLollipop(drawerItem);
         } else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+			MegaNode node = megaApi.getNodeByHandle(Long.parseLong(transfer.getNodeHandle()));
+			if (node != null) {
+				MegaNode parentNode = megaApi.getParentNode(node);
+				if (parentNode != null) {
 
+				}
+			}
         }
     }
 }
