@@ -360,4 +360,20 @@ public class MegaNodeUtil {
             return R.drawable.ic_folder_list;
         }
     }
+
+    /**
+     * Gets the parent MegaNode of the highest level in tree of the node passed by param.
+     *
+     * @param node  MegaNode to check
+     * @return The root parent MegaNode
+     */
+    public static MegaNode getRootParentNode(MegaNode node) {
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+
+        while (megaApi.getParentNode(node) != null) {
+            node = megaApi.getParentNode(node);
+        }
+
+        return node;
+    }
 }

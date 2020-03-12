@@ -737,6 +737,9 @@
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">External storage</item>
     </string-array>
 
+    <string name="internal_storage_label" context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Internal storage</string>
+    <string name="external_storage_label" context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">External storage</string>
+
     <string-array name="add_contact_array">
         <item context="title of the dialog shown when sending or sharing a folder">Write the user’s email</item>
         <item context="choose the way the new user’s email is inserted, import from phone option">Import from device</item>

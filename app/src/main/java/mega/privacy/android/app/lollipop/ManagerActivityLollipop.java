@@ -17581,9 +17581,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-    public void openTransferLocation(AndroidCompletedTransfer transfer) {
-        if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
-            if (transfer.getIsOfflineFile()) {
+	public void openTransferLocation(AndroidCompletedTransfer transfer) {
+		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
+			if (transfer.getIsOfflineFile()) {
 				pathNavigationOffline = removeInitialOfflinePath(transfer.getPath()) + SEPARATOR;
 				refreshFragment(FragmentTag.OFFLINE.getTag());
 				selectDrawerItemLollipop(drawerItem = DrawerItem.SAVED_FOR_OFFLINE);
@@ -17593,15 +17593,40 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_PATH, transfer.getPath());
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
 				startActivity(intent);
-            }
-        } else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+			}
+		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
 			MegaNode node = megaApi.getNodeByHandle(Long.parseLong(transfer.getNodeHandle()));
 			if (node != null) {
-				MegaNode parentNode = megaApi.getParentNode(node);
-				if (parentNode != null) {
-
+				MegaNode parentNode = getRootParentNode(node);
+				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()) {
+					parentHandleBrowser = node.getParentHandle();
+					refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+					indexCloud = CLOUD_TAB;
+					if (viewPagerCloud != null) {
+						viewPagerCloud.setCurrentItem(indexCloud);
+						if (cloudPageAdapter != null) {
+							cloudPageAdapter.notifyDataSetChanged();
+						}
+					}
+					selectDrawerItemLollipop(drawerItem = DrawerItem.CLOUD_DRIVE);
+				} else if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()) {
+					parentHandleRubbish = node.getParentHandle();
+					refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
+					selectDrawerItemLollipop(drawerItem = DrawerItem.RUBBISH_BIN);
+				} else if (parentNode.isInShare()) {
+					parentHandleIncoming = node.getParentHandle();
+					deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node), this);
+					refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+					indexShares = INCOMING_TAB;
+					if (viewPagerShares != null) {
+						viewPagerShares.setCurrentItem(indexShares);
+						if (sharesPageAdapter != null) {
+							sharesPageAdapter.notifyDataSetChanged();
+						}
+					}
+					selectDrawerItemLollipop(drawerItem = DrawerItem.SHARED_ITEMS);
 				}
 			}
-        }
-    }
+		}
+	}
 }
