@@ -51,6 +51,19 @@
             android:textSize="16sp"
             android:textColor="@color/mail_my_account"
             android:gravity="center"/>
+        <TextView
+            android:id="@+id/subtitle_explanation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:fontFamily="sans-serif"
+            android:layout_below="@+id/subtitle_permissions"
+            android:text="@string/allow_access_contact_explanation"
+            android:textSize="14sp"
+            android:visibility="gone"
+            android:textColor="@color/mail_my_account"
+            android:gravity="center"/>
 
     </RelativeLayout>
 
