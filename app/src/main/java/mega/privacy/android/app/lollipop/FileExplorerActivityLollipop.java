@@ -345,6 +345,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		protected void onPostExecute(List<ShareInfo> info) {
 			if (info == null || info.isEmpty()) {
 				logWarning("Selected items list is null or empty.");
+				finishFileExplorer();
 				return;
 			}
 

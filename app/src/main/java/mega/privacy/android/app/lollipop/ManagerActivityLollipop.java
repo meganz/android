@@ -5517,8 +5517,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item) {
     	if (item == null) {
-    		logWarning("The selected DrawerItem is null.");
-    		return;
+    		logWarning("The selected DrawerItem is NULL. Using latest or default value.");
+    		item = drawerItem != null ? drawerItem : DrawerItem.CLOUD_DRIVE;
 		}
 
     	logDebug("Selected DrawerItem: " + item.name());
