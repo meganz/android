@@ -91,7 +91,7 @@
                             android:layout_marginLeft="72dp"
                             android:layout_marginRight="16dp"
                             android:layout_marginBottom="16dp"
-                            android:text="@string/allow_acces_contact_subtitle"
+                            android:text="@string/grant_mega_access_contacts"
                             android:textSize="14sp"/>
 
                         <Button
