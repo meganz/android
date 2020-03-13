@@ -67,9 +67,9 @@ public class BaseActivity extends AppCompatActivity {
             if(isChatEnabled()) {
                 megaChatApi = app.getMegaChatApi();
             }
-        }
 
-        dbH = app.getDbH();
+            dbH = app.getDbH();
+        }
     }
 
     @Override
@@ -145,10 +145,10 @@ public class BaseActivity extends AppCompatActivity {
                     megaChatApi = app.getMegaChatApi();
                 }
             }
-        }
 
-        if (dbH == null) {
-            dbH = app.getDbH();
+            if (dbH == null) {
+                dbH = app.getDbH();
+            }
         }
     }
 
