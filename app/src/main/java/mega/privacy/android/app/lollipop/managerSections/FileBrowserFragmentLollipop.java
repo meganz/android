@@ -396,16 +396,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					}
 				}
 
-				if(allFiles){
-					if (isChatEnabled()) {
-						showSendToChat = true;
-					}
-					else {
-						showSendToChat = false;
-					}
-				}else{
-					showSendToChat = false;
-				}
+				showSendToChat = allFiles;
 
 				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 				if(selected.size()==adapter.getItemCount()){
@@ -517,15 +508,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		downloadLocationDefaultPath = getDownloadLocation(context);
 		lastPositionStack = new Stack<>();
 
-		if(isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-			}
-		}else{
-			logDebug("Chat not enabled!");
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
 		}
-
-
 
 		super.onCreate(savedInstanceState);
 		logDebug("After onCreate called super");
@@ -703,6 +688,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
         this.context = context;
         aB = ((AppCompatActivity)context).getSupportActionBar();
     }
+
+    @Override
+	public void onDestroy() {
+		adapter.clearTakenDownDialog();
+		super.onDestroy();
+	}
 
 	public void openFile(MegaNode node, int position, int[] screenPosition, ImageView imageView) {
 		if (MimeTypeList.typeForName(node.getName()).isImage()) {
@@ -1036,6 +1027,11 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	@Override
 	public void multipleItemClick(int position) {
 		adapter.toggleSelection(position);
+	}
+
+	@Override
+	public void reselectUnHandledSingleItem(int position) {
+		adapter.filClicked(position);
 	}
 
 	public void setFolderInfoNavigation(MegaNode n){

@@ -127,6 +127,10 @@ public class InboxFragmentLollipop extends RotatableFragment{
 		adapter.toggleSelection(position);
 	}
 
+	@Override
+	public void reselectUnHandledSingleItem(int position) {
+	}
+
 	public void updateScrollPosition(int position) {
 		logDebug("Position: " + position);
 		if (adapter != null) {
@@ -383,16 +387,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 					}
 				}
 
-				if(allFiles){
-					if (isChatEnabled()) {
-						showSendToChat = true;
-					}
-					else {
-						showSendToChat = false;
-					}
-				}else{
-					showSendToChat = false;
-				}
+				showSendToChat = allFiles;
 			}
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);

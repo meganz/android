@@ -28,7 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -420,16 +419,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 					}
 				}
 
-				if(allFiles){
-					if (isChatEnabled()) {
-						showSendToChat = true;
-					}
-					else {
-						showSendToChat = false;
-					}
-				}else{
-					showSendToChat = false;
-				}
+				showSendToChat = allFiles;
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -518,6 +508,12 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 		logDebug("newInstance");
 		OutgoingSharesFragmentLollipop fragment = new OutgoingSharesFragmentLollipop();
 		return fragment;
+	}
+
+	@Override
+	public void onDestroy() {
+		adapter.clearTakenDownDialog();
+		super.onDestroy();
 	}
 			
 	@Override
@@ -1038,7 +1034,6 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	public void findNodes(){
 		logDebug("findNodes");
 		ArrayList<MegaShare> outNodeList = megaApi.getOutShares();
-		ArrayList<MegaShare> pendingNodeList = megaApi.getPendingOutShares();
 
 		nodes.clear();
 		long lastFolder=-1;		
@@ -1055,7 +1050,7 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 				}	
 			}
 		}
-		
+
 		orderNodes();
 	}
 
@@ -1449,6 +1444,11 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 	@Override
 	public void multipleItemClick(int position) {
 		adapter.toggleSelection(position);
+	}
+
+	@Override
+	public void reselectUnHandledSingleItem(int position) {
+		adapter.filClicked(position);
 	}
 
 	public void selectAll(){

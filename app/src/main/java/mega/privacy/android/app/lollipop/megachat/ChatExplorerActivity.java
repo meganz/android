@@ -94,20 +94,19 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             finish();
             return;
         }
-        if(isChatEnabled()){
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-            }
 
-            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-                logDebug("Refresh session - karere");
-                Intent intent = new Intent(this, LoginActivityLollipop.class);
-                intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
-                return;
-            }
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+        }
+
+        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+            logDebug("Refresh session - karere");
+            Intent intent = new Intent(this, LoginActivityLollipop.class);
+            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
         }
 
         chatExplorerActivity = this;
@@ -145,7 +144,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             logDebug("Intent received");
             if(intent.getAction()!=null){
                 if(intent.getAction()== ACTION_FORWARD_MESSAGES){
-                    messagesIds = intent.getLongArrayExtra("ID_MESSAGES");
+                    messagesIds = intent.getLongArrayExtra(ID_MESSAGES);
                     logDebug("Number of messages to forward: " + messagesIds.length);
                     chatIdFrom = intent.getLongExtra("ID_CHAT_FROM", -1);
                 }
@@ -155,7 +154,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 if(nodeHandles!=null){
                     logDebug("Node handle is: " + nodeHandles[0]);
                 }
-                userHandles = intent.getLongArrayExtra("USER_HANDLES");
+                userHandles = intent.getLongArrayExtra(USER_HANDLES);
                 if(userHandles!=null){
                     logDebug("User handles size: " + userHandles.length);
                 }
@@ -391,11 +390,11 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         }
 
         if(userHandles!=null){
-            intent.putExtra("USER_HANDLES", userHandles);
+            intent.putExtra(USER_HANDLES, userHandles);
         }
 
         if(messagesIds!=null){
-            intent.putExtra("ID_MESSAGES", messagesIds);
+            intent.putExtra(ID_MESSAGES, messagesIds);
         }
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
         ArrayList<MegaUser> users = new ArrayList<>();
@@ -415,7 +414,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 chatHandles[i] = chats.get(i).getChatId();
             }
 
-            intent.putExtra("SELECTED_CHATS", chatHandles);
+            intent.putExtra(SELECTED_CHATS, chatHandles);
         }
 
         if (users != null && !users.isEmpty()) {
@@ -424,7 +423,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 userHandles[i] = users.get(i).getHandle();
             }
 
-            intent.putExtra("SELECTED_USERS", userHandles);
+            intent.putExtra(SELECTED_USERS, userHandles);
         }
 
         setResult(RESULT_OK, intent);

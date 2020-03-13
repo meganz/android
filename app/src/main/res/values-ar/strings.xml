@@ -651,9 +651,9 @@
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">شبكة الوايرلس فقط</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">شبكة الوايرلس او بيانات الموبايل</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">حسنا</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">تخطى</string>
-    <string name="cam_sync_stop" context="skip the step of camera upload">ايقاف</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">حسنا</string>
+    <string name="general_skip" context="skip the step of camera upload">تخطى</string>
+    <string name="general_stop" context="skip the step of camera upload">ايقاف</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">جاري تنفيذ ترفيعات الكاميرا</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">هل تريد إيقاف عمليات ترفيع صور الكاميرا؟</string>
     <!--
@@ -1902,7 +1902,7 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">هل تتذكر كلمة مرورك؟</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">انت بصدد تسجيل الخروج، يرجى التحقق من كلمة المرور خاصتك للتأكد من تذكرك لها\nضياع كلمة المرور سيؤدي الى فقدان الولوج للبيانات الخاصة بك على MEGA</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">تحقق من كلمة المرور خاصتك للتأكد من تذكرك لها. ضياع كلمة المرور سيؤدي الى فقدان الولوج للبيانات الخاصة بك على MEGA</string>
-    <string name="remember_pwd_dialog_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">عدم الإظهار مرة اخرى</string>
+    <string name="general_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">عدم الإظهار مرة اخرى</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">تحقق من كلمة المرور</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">التحقق من كلمة المرور</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">تم قبول كلمة المرور</string>

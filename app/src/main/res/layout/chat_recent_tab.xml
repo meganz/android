@@ -91,7 +91,7 @@
                             android:layout_marginLeft="72dp"
                             android:layout_marginRight="16dp"
                             android:layout_marginBottom="16dp"
-                            android:text="@string/allow_acces_contact_subtitle"
+                            android:text="@string/grant_mega_access_contacts"
                             android:textSize="14sp"/>
 
                         <Button
@@ -145,6 +145,14 @@
                     </RelativeLayout>
                 </FrameLayout>
             </LinearLayout>
+            <View
+                android:id="@+id/invitation_banner_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider_upgrade_account"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_alignParentBottom="true"/>
         </android.support.design.widget.AppBarLayout>
 
         <ScrollView

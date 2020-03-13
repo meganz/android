@@ -88,7 +88,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -124,7 +124,9 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class PdfViewerActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
@@ -348,23 +350,21 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 megaApiFolder = app.getMegaApiFolder();
             }
 
-            if (isChatEnabled()) {
-                megaChatApi = app.getMegaChatApi();
-                if (megaChatApi != null) {
-                    if (msgId != -1 && chatId != -1) {
-                        msgChat = megaChatApi.getMessage(chatId, msgId);
-                        if(msgChat==null){
-                            msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
-                        }
-                        if (msgChat != null) {
-                            nodeChat = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
-                            if (isDeleteDialogShow) {
-                                showConfirmationDeleteNode(chatId, msgChat);
-                            }
-                        }
-                    } else {
-                        logWarning("msgId or chatId null");
+            megaChatApi = app.getMegaChatApi();
+            if (megaChatApi != null) {
+                if (msgId != -1 && chatId != -1) {
+                    msgChat = megaChatApi.getMessage(chatId, msgId);
+                    if (msgChat == null) {
+                        msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                     }
+                    if (msgChat != null) {
+                        nodeChat = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
+                        if (isDeleteDialogShow) {
+                            showConfirmationDeleteNode(chatId, msgChat);
+                        }
+                    }
+                } else {
+                    logWarning("msgId or chatId null");
                 }
             }
 
@@ -738,21 +738,18 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 app = (MegaApplication)getApplication();
                 megaApi = app.getMegaApi();
 
-                if(isChatEnabled()){
-                    megaChatApi = app.getMegaChatApi();
-                    if (megaChatApi != null){
-                        if (msgId != -1 && chatId != -1){
-                            msgChat = megaChatApi.getMessage(chatId, msgId);
-                            if(msgChat==null){
-                                msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
-                            }
-                            if (msgChat != null){
-                                nodeChat = msgChat.getMegaNodeList().get(0);
-                            }
+                megaChatApi = app.getMegaChatApi();
+                if (megaChatApi != null) {
+                    if (msgId != -1 && chatId != -1) {
+                        msgChat = megaChatApi.getMessage(chatId, msgId);
+                        if (msgChat == null) {
+                            msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId);
                         }
-                        else {
-                            logWarning("msgId or chatId null");
+                        if (msgChat != null) {
+                            nodeChat = msgChat.getMegaNodeList().get(0);
                         }
+                    } else {
+                        logWarning("msgId or chatId null");
                     }
                 }
 
@@ -1117,6 +1114,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         else {
 
             MegaNode parentNode = megaApi.getRootNode();
+            showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
             for (ShareInfo info : infos) {
 
                 Intent intent = new Intent(this, UploadService.class);
@@ -1295,13 +1293,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 renameMenuItem.setVisible(true);
                 moveMenuItem.setVisible(true);
                 copyMenuItem.setVisible(true);
-
-                if(isChatEnabled()){
-                    chatMenuItem.setVisible(true);
-                }
-                else{
-                    chatMenuItem.setVisible(false);
-                }
+                chatMenuItem.setVisible(true);
 
                 MegaNode parent = megaApi.getNodeByHandle(handle);
                 while (megaApi.getParentNode(parent) != null){
@@ -1404,12 +1396,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             }
             else if (type == INCOMING_SHARES_ADAPTER ||  fromIncoming) {
                 propertiesMenuItem.setVisible(true);
-                if(isChatEnabled()){
-                    chatMenuItem.setVisible(true);
-                }
-                else{
-                    chatMenuItem.setVisible(false);
-                }
+                chatMenuItem.setVisible(true);
                 copyMenuItem.setVisible(true);
                 removeMenuItem.setVisible(false);
                 importMenuItem.setVisible(false);
@@ -1561,12 +1548,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                                     renameMenuItem.setVisible(true);
                                     moveMenuItem.setVisible(true);
                                     moveToTrashMenuItem.setVisible(true);
-                                    if(isChatEnabled()){
-                                        chatMenuItem.setVisible(true);
-                                    }
-                                    else{
-                                        chatMenuItem.setVisible(false);
-                                    }
+                                    chatMenuItem.setVisible(true);
                                     break;
                                 }
                                 case MegaShare.ACCESS_READWRITE:
@@ -1580,12 +1562,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                             }
                         }
                         else{
-                            if(isChatEnabled()){
-                                chatMenuItem.setVisible(true);
-                            }
-                            else{
-                                chatMenuItem.setVisible(false);
-                            }
+                            chatMenuItem.setVisible(true);
                             renameMenuItem.setVisible(true);
                             moveMenuItem.setVisible(true);
 
@@ -1649,14 +1626,12 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 break;
             }
             case R.id.pdf_viewer_chat: {
-                long[] longArray = new long[1];
-                longArray[0] = handle;
 
                 if(nC ==null){
                     nC = new NodeController(this, isFolderLink);
                 }
 
-                MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
+                MegaNode attachNode = megaApi.getNodeByHandle(handle);
                 if (attachNode != null) {
                     nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
                 }
@@ -1667,10 +1642,18 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 break;
             }
             case R.id.pdf_viewer_get_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)) {
+                    break;
+                }
+
                 showGetLinkActivity();
                 break;
             }
             case R.id.pdf_viewer_remove_link: {
+                if (showTakenDownNodeActionNotAvailableDialog(megaApi.getNodeByHandle(handle), this)) {
+                    break;
+                }
+
                 showRemoveLink();
                 break;
             }
@@ -2125,7 +2108,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         Intent i = new Intent(this, FileInfoActivityLollipop.class);
         if (isOffLine){
             i.putExtra("name", pdfFileName);
-            i.putExtra("imageId", MimeTypeThumbnail.typeForName(pdfFileName).getIconResourceId());
             i.putExtra("adapterType", OFFLINE_ADAPTER);
             i.putExtra("path", path);
             if (pathNavigation != null){
@@ -2142,7 +2124,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         else {
             MegaNode node = megaApi.getNodeByHandle(handle);
             i.putExtra("handle", node.getHandle());
-            i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             i.putExtra("name", node.getName());
             if (nC == null) {
                 nC = new NodeController(this);
@@ -2336,8 +2317,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         }
 
         if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-            long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-            long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+            long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+            long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
             long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 
             if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
@@ -2362,7 +2343,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     }
 
                     if(nodeHandles!=null){
-                        CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, nodeHandles[0], this, CreateChatToPerformActionListener.SEND_FILE);
+                        CreateChatListener listener = new CreateChatListener(chats, users, nodeHandles[0], this, CreateChatListener.SEND_FILE);
                         for (MegaUser user : users) {
                             MegaChatPeerList peers = MegaChatPeerList.createInstance();
                             peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
@@ -2605,27 +2586,14 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         if (request.getType() == MegaRequest.TYPE_LOGIN){
 
             if (e.getErrorCode() != MegaError.API_OK) {
-
+                logWarning("Login failed with error code: " + e.getErrorCode());
                 MegaApplication.setLoggingIn(false);
-
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                dbH.clearCredentials();
-                if (dbH.getPreferences() != null){
-                    dbH.clearPreferences();
-                    dbH.setFirstTime(false);
-                }
-            }
-            else{
+            } else {
                 //LOGIN OK
-
                 gSession = megaApi.dumpSession();
                 credentials = new UserCredentials(lastEmail, gSession, "", "", "");
-
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                dbH.clearCredentials();
-
+                dbH.saveCredentials(credentials);
                 logDebug("Logged in with session");
-
                 megaApi.fetchNodes(this);
             }
         }
@@ -2654,35 +2622,15 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
 
                 dbH.saveCredentials(credentials);
 
-                chatSettings = dbH.getChatSettings();
-                if(chatSettings!=null) {
-
-                    boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-                    if(chatEnabled){
-
-                        logDebug("Chat enabled-->connect");
-                        if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
-                            logDebug("Connection goes!!!");
-                            megaChatApi.connect(this);
-                        }
-                        else{
-                            logDebug("Not launch connect: " + megaChatApi.getInitState());
-                        }
-                        MegaApplication.setLoggingIn(false);
-                        download();
-                    }
-                    else{
-
-                        logWarning("Chat NOT enabled - readyToManager");
-                        MegaApplication.setLoggingIn(false);
-                        download();
-                    }
+                logDebug("Chat enabled-->connect");
+                if ((megaChatApi.getInitState() != MegaChatApi.INIT_ERROR)) {
+                    logDebug("Connection goes!!!");
+                    megaChatApi.connect(this);
+                } else {
+                    logDebug("Not launch connect: " + megaChatApi.getInitState());
                 }
-                else{
-                    logWarning("chatSettings NULL - readyToManager");
-                    MegaApplication.setLoggingIn(false);
-                    download();
-                }
+                MegaApplication.setLoggingIn(false);
+                download();
             }
         }
         else if (request.getType() == MegaRequest.TYPE_RENAME){
@@ -2988,6 +2936,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     }
                 }
             }
+        } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
+            showTakenDownAlert(this);
         }
     }
 

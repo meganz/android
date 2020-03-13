@@ -60,6 +60,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -70,66 +71,83 @@ import nz.mega.sdk.MegaUser;
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
-
 
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener {
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
-	final int WIDTH = 500;
 
-	ScrollView scrollView;
-	Context context;
-	MyAccountInfo myAccountInfo;
+	private final int WIDTH = 500;
 
-	RelativeLayout avatarLayout;
-	RoundedImageView myAccountImage;
+	private ScrollView scrollView;
+	private Context context;
+	private MyAccountInfo myAccountInfo;
+
+	private RelativeLayout avatarLayout;
+	private RoundedImageView myAccountImage;
 
 	private EmojiTextView nameView;
 
-	TextView typeAccount;
-	TextView infoEmail;
-	TextView usedSpace;
-	TextView lastSession;
-	TextView connections;
-	TextView addPhoneNumber;
+	private TextView typeAccount;
+	private TextView infoEmail;
+	private TextView expiryRenewText;
+	private TextView expiryRenewDate;
+	private TextView lastSession;
+	private TextView connections;
+	private TextView addPhoneNumber;
 
-	ImageView editImageView;
+	private ImageView editImageView;
 
-	Button upgradeButton;
-	Button logoutButton;
-	Button mkButton;
-	Button changePassButton;
+	private Button upgradeButton;
+	private Button logoutButton;
+	private Button mkButton;
+	private Button changePassButton;
 
-	LinearLayout typeLayout;
-	LinearLayout lastSessionLayout;
-    RelativeLayout connectionsLayout;
+	private LinearLayout accountTypeLayout;
+	private LinearLayout accountTypeSeparator;
+	private LinearLayout expiryRenewLayout;
+	private LinearLayout expiryRenewSeparator;
+	private LinearLayout typeLayout;
+	private LinearLayout lastSessionLayout;
+    private RelativeLayout connectionsLayout;
     private CustomizedGridRecyclerView lastContactsGridView;
 
-	LinearLayout achievementsLayout;
-	LinearLayout achievementsSeparator;
+	private LinearLayout achievementsLayout;
+	private LinearLayout achievementsSeparator;
 
-	LinearLayout parentLinearLayout;
+	private LinearLayout parentLinearLayout;
 
-	ArrayList<MegaUser> lastContacted;
+	private LinearLayout businessAccountManagementAlert;
+	private LinearLayout businessAccountContainer;
+	private TextView businessAccountTypeText;
+	private LinearLayout businessAccountStatusContainer;
+	private LinearLayout businessAccountStatusSeparator;
+	private TextView businessAccountStatusText;
+	private TextView businessAccountRenewsText;
+	private TextView businessAccountRenewsDateText;
+
+
+	private ArrayList<MegaUser> lastContacted;
 	
-	DisplayMetrics outMetrics;
-	float density;
+	private DisplayMetrics outMetrics;
 
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
+	private MegaApiAndroid megaApi;
+	private MegaChatApiAndroid megaChatApi;
 
 	private Bitmap qrAvatarSave;
 
-	int numOfClicksLastSession = 0;
-	boolean staging = false;
+	private int numOfClicksLastSession = 0;
+	private boolean staging = false;
 
-	DatabaseHandler dbH;
+	private DatabaseHandler dbH;
 
 	private TextView logoutWarning;
 
@@ -170,21 +188,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
-		density = ((Activity) context).getResources().getDisplayMetrics().density;
 
-		View v = null;
-		v = inflater.inflate(R.layout.fragment_my_account, container, false);
+		View v = inflater.inflate(R.layout.fragment_my_account, container, false);
 
-		scrollView = (ScrollView) v.findViewById(R.id.my_account_complete_relative_layout);
+		scrollView = v.findViewById(R.id.my_account_complete_relative_layout);
 		new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-				if (scrollView.canScrollVertically(-1)){
-					((ManagerActivityLollipop) context).changeActionBarElevation(true);
-				}
-				else {
-					((ManagerActivityLollipop) context).changeActionBarElevation(false);
-				}
+				checkScroll();
 			}
 		});
 		
@@ -194,10 +205,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		logDebug("My user handle string: " + megaApi.getMyUserHandle());
 
-		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
+		avatarLayout = v.findViewById(R.id.my_account_relative_layout_avatar);
 		avatarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.avatar_qr_background));
 		avatarLayout.setOnClickListener(this);
 
+		boolean createLink = true;
 		if (savedInstanceState != null) {
 			byte[] avatarByteArray = savedInstanceState.getByteArray("qrAvatar");
 			if (avatarByteArray != null) {
@@ -206,16 +218,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				if (qrAvatarSave != null) {
 					logDebug("savedInstanceState qrAvatarSave != null");
 					avatarLayout.setBackground(new BitmapDrawable(qrAvatarSave));
+					createLink = false;
 				}
-				else {
-					megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
-				}
-			}
-			else {
-				megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
 			}
 		}
-		else {
+
+		if (createLink) {
 			megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
 		}
 
@@ -223,49 +231,34 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		nameView.setOnClickListener(this);
 
 		editImageView = (ImageView) v.findViewById(R.id.my_account_edit_icon);
-		editImageView.setOnClickListener(this);
 
-		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
+		infoEmail = v.findViewById(R.id.my_account_email);
 		infoEmail.setText(megaApi.getMyEmail());
-		infoEmail.setOnClickListener(this);
+
+		myAccountImage = v.findViewById(R.id.my_account_thumbnail);
 
         String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
 		addPhoneNumber = v.findViewById(R.id.add_phone_number);
 		if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
             addPhoneNumber.setText(registeredPhoneNumber);
-        } else {
-		    if(canVoluntaryVerifyPhoneNumber()) {
-                addPhoneNumber.setText(R.string.add_phone_number_label);
-                addPhoneNumber.setOnClickListener(this);
-            } else {
-		        addPhoneNumber.setVisibility(View.GONE);
-            }
-        }
-
-		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
-
-		mkButton = (Button) v.findViewById(R.id.MK_button);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+        } else if(canVoluntaryVerifyPhoneNumber()) {
+			addPhoneNumber.setText(R.string.add_phone_number_label);
+			addPhoneNumber.setOnClickListener(this);
+		} else {
+			addPhoneNumber.setVisibility(View.GONE);
 		}
 
+		mkButton = v.findViewById(R.id.MK_button);
+		mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
 		mkButton.setOnClickListener(this);
-		mkButton.setVisibility(View.VISIBLE);
 
 		setMkButtonText();
 
-		changePassButton = (Button) v.findViewById(R.id.change_pass_button);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			changePassButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
-		}
-		else{
-			changePassButton.setBackgroundResource(R.drawable.black_button_border);
-//			mkButton.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-		}
+		changePassButton = v.findViewById(R.id.change_pass_button);
+		changePassButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
 		changePassButton.setOnClickListener(this);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			logDebug("Landscape configuration");
 			nameView.setMaxWidthEmojis(scaleWidthPx(250, outMetrics));
 			infoEmail.setMaxWidth(scaleWidthPx(250, outMetrics));
 		}
@@ -274,46 +267,46 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			infoEmail.setMaxWidth(scaleWidthPx(200, outMetrics));
 		}
 
-		achievementsLayout = (LinearLayout) v.findViewById(R.id.my_account_achievements_layout);
-		achievementsSeparator = (LinearLayout)v.findViewById(R.id.my_account_achievements_separator);
+		accountTypeLayout = v.findViewById(R.id.my_account_account_type_layout_container);
+		accountTypeSeparator = v.findViewById(R.id.my_account_type_separator);
 
-		if(megaApi.isAchievementsEnabled()){
-			logDebug("Achievements enabled!!");
-			achievementsLayout.setVisibility(View.VISIBLE);
-			achievementsSeparator.setVisibility(View.VISIBLE);
-			achievementsLayout.setOnClickListener(this);
-		}
-		else{
-			logDebug("NO Achievements enabled!!");
-			achievementsLayout.setVisibility(View.GONE);
-			achievementsSeparator.setVisibility(View.GONE);
-		}
+		expiryRenewLayout = v.findViewById(R.id.expiry_renew_layout);
+		expiryRenewSeparator = v.findViewById(R.id.expiry_renew_separator);
+		expiryRenewText = v.findViewById(R.id.expiry_renew_text);
+		expiryRenewDate = v.findViewById(R.id.expiry_renew_date);
 
-		typeLayout = (LinearLayout) v.findViewById(R.id.my_account_account_type_layout);
+		typeLayout = v.findViewById(R.id.my_account_account_type_layout);
+		typeAccount = v.findViewById(R.id.my_account_account_type_text);
 
-		typeAccount = (TextView) v.findViewById(R.id.my_account_account_type_text);
-
-		usedSpace = (TextView) v.findViewById(R.id.my_account_used_space);
-
-		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
+		upgradeButton = v.findViewById(R.id.my_account_account_type_button);
 
 		upgradeButton.setText(getString(R.string.my_account_upgrade_pro));
 		upgradeButton.setOnClickListener(this);
-		upgradeButton.setVisibility(View.VISIBLE);
 
-		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
+		businessAccountManagementAlert = v.findViewById(R.id.business_account_management_container);
+		businessAccountContainer = v.findViewById(R.id.business_account_container);
+		businessAccountTypeText = v.findViewById(R.id.business_account_type_text);
+		businessAccountStatusContainer = v.findViewById(R.id.business_account_status_container);
+		businessAccountStatusSeparator = v.findViewById(R.id.business_account_status_separator);
+		businessAccountStatusText = v.findViewById(R.id.business_account_status_text);
+		businessAccountRenewsText = v.findViewById(R.id.business_account_renews_on_label);
+		businessAccountRenewsDateText = v.findViewById(R.id.business_account_renews_date_text);
+
+		achievementsLayout = v.findViewById(R.id.my_account_achievements_layout);
+		achievementsLayout.setOnClickListener(this);
+		achievementsSeparator = v.findViewById(R.id.my_account_achievements_separator);
+
+		lastSessionLayout = v.findViewById(R.id.my_account_last_session_layout);
 		lastSessionLayout.setOnClickListener(this);
-		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
+		lastSession = v.findViewById(R.id.my_account_last_session);
 
-		connectionsLayout = (RelativeLayout) v.findViewById(R.id.my_account_connections_layout);
-		connections = (TextView) v.findViewById(R.id.my_account_connections);
+		connectionsLayout = v.findViewById(R.id.my_account_connections_layout);
+		connections = v.findViewById(R.id.my_account_connections);
 
-		logoutButton = (Button) v.findViewById(R.id.logout_button);
-
+		logoutButton = v.findViewById(R.id.logout_button);
 		logoutButton.setOnClickListener(this);
-		logoutButton.setVisibility(View.VISIBLE);
 
-		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
+		parentLinearLayout = v.findViewById(R.id.parent_linear_layout);
 
 		if(myAccountInfo==null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
@@ -330,7 +323,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		lastContacted = getLastContactedUsers(context);
 		//Draw contact's connection component if lastContacted.size > 0
-        lastContactsGridView = (CustomizedGridRecyclerView)v.findViewById(R.id.last_contacts_gridview);
+        lastContactsGridView = v.findViewById(R.id.last_contacts_gridview);
         
         lastContactsGridView.setColumnCount(LastContactsAdapter.MAX_COLUMN);
         lastContactsGridView.setClipToPadding(false);
@@ -345,10 +338,22 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		return v;
 	}
+
+	private void scrollToTop() {
+		if (scrollView != null) {
+			scrollView.post(new Runnable() {
+				@Override
+				public void run() {
+					scrollView.fullScroll(View.FOCUS_UP);
+				}
+			});
+		}
+	}
     
     @Override
     public void onResume() {
         super.onResume();
+
         //Refresh
 		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
 		updateView();
@@ -420,86 +425,162 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		return fragment;
 	}
 
-	public void setAccountDetails(){
-		logDebug("setAccountDetails");
+	private void permitEditNameAndEmail() {
+		nameView.setOnClickListener(this);
+		infoEmail.setOnClickListener(this);
+		editImageView.setVisibility(View.VISIBLE);
+		editImageView.setOnClickListener(this);
+	}
 
-		if((getActivity() == null) || (!isAdded())){
+	public void setAccountDetails() {
+
+		if (getActivity() == null || !isAdded()) {
 			logWarning("Fragment MyAccount NOT Attached!");
 			return;
 		}
-		//Set account details
-		if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
-			typeAccount.setText(getString(R.string.recovering_info));
-		}
-		else{
-			switch(myAccountInfo.getAccountType()){
 
-				case 0:{
-					typeAccount.setText(R.string.my_account_free);
-					break;
-				}
-
-				case 1:{
-					typeAccount.setText(getString(R.string.my_account_pro1));
-					break;
-				}
-
-				case 2:{
-					typeAccount.setText(getString(R.string.my_account_pro2));
-					break;
-				}
-
-				case 3:{
-					typeAccount.setText(getString(R.string.my_account_pro3));
-					break;
-				}
-
-				case 4:{
-					typeAccount.setText(getString(R.string.my_account_prolite));
-					break;
-				}
-
-			}
-		}
-
-//		if (getPaymentMethodsBoolean == true){
-//			if (upgradeButton != null){
-//				if ((myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
-//					Time now = new Time();
-//					now.setToNow();
-//					if (myAccountInfo.getAccountType() != 0){
-//						if (now.toMillis(false) >= (myAccountInfo.getAccountInfo().getProExpiration()*1000)){
-//							if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-//								upgradeButton.setVisibility(View.VISIBLE);
-//							}
-//						}
-//					}
-//					else{
-//						if (checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-//							upgradeButton.setVisibility(View.VISIBLE);
-//						}
-//					}
-//				}
-//			}
-//		}
-		if(myAccountInfo.getUsedFormatted().trim().length()<=0){
-			usedSpace.setText(getString(R.string.recovering_info));
-		}
-		else{
-			String usedSpaceString = myAccountInfo.getUsedFormatted() + " " + getString(R.string.general_x_of_x) + " " + myAccountInfo.getTotalFormatted();
-			usedSpace.setText(usedSpaceString);
-		}
-
-		if(myAccountInfo.getLastSessionFormattedDate()!=null) {
-			if (myAccountInfo.getLastSessionFormattedDate().trim().length() <= 0) {
-				lastSession.setText(getString(R.string.recovering_info));
-			} else {
-				lastSession.setText(myAccountInfo.getLastSessionFormattedDate());
-			}
-		}
-		else{
+		if (myAccountInfo.getLastSessionFormattedDate() == null
+				|| myAccountInfo.getLastSessionFormattedDate().trim().length() <= 0) {
 			lastSession.setText(getString(R.string.recovering_info));
+		} else {
+			lastSession.setText(myAccountInfo.getLastSessionFormattedDate());
 		}
+
+		//Set account details
+		if (!myAccountInfo.isBusinessStatusReceived()) {
+			businessAccountManagementAlert.setVisibility(View.GONE);
+			typeAccount.setText(getString(R.string.recovering_info));
+			typeAccount.setAllCaps(false);
+			upgradeButton.setVisibility(View.GONE);
+			achievementsLayout.setVisibility(View.GONE);
+			achievementsSeparator.setVisibility(View.GONE);
+			businessAccountContainer.setVisibility(View.GONE);
+			expiryRenewLayout.setVisibility(View.GONE);
+			expiryRenewSeparator.setVisibility(View.GONE);
+			return;
+		}
+
+		if (megaApi.isBusinessAccount()) {
+			accountTypeLayout.setVisibility(View.GONE);
+			accountTypeSeparator.setVisibility(View.GONE);
+			achievementsLayout.setVisibility(View.GONE);
+			achievementsSeparator.setVisibility(View.GONE);
+			businessAccountContainer.setVisibility(View.VISIBLE);
+			expiryRenewLayout.setVisibility(View.GONE);
+			expiryRenewSeparator.setVisibility(View.GONE);
+
+			if (megaApi.isMasterBusinessAccount()) {
+				businessAccountManagementAlert.setVisibility(View.VISIBLE);
+				permitEditNameAndEmail();
+				businessAccountStatusContainer.setVisibility(View.VISIBLE);
+				businessAccountStatusSeparator.setVisibility(View.VISIBLE);
+				businessAccountTypeText.setText(R.string.admin_label);
+
+				int status = megaApi.getBusinessStatus();
+
+				switch (status) {
+					case BUSINESS_STATUS_EXPIRED:
+						status = R.string.expired_label;
+						businessAccountStatusText.setTextColor(getResources().getColor(R.color.expired_red));
+						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.mail_my_account));
+						break;
+					case BUSINESS_STATUS_ACTIVE:
+						status = R.string.active_label;
+						businessAccountStatusText.setTextColor(getResources().getColor(R.color.name_my_account));
+						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.name_my_account));
+						break;
+					case BUSINESS_STATUS_GRACE_PERIOD:
+						status = R.string.grace_label;
+						businessAccountStatusText.setTextColor(getResources().getColor(R.color.grace_yellow));
+						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.grace_yellow));
+						break;
+				}
+				businessAccountStatusText.setText(status);
+
+				if (myAccountInfo.getSubscriptionRenewTime() > 0) {
+					businessAccountRenewsText.setVisibility(View.VISIBLE);
+					businessAccountRenewsDateText.setVisibility(View.VISIBLE);
+					businessAccountRenewsDateText.setText(formatDate(context, myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
+				} else {
+					businessAccountRenewsText.setVisibility(View.GONE);
+					businessAccountRenewsDateText.setVisibility(View.GONE);
+				}
+			} else {
+				businessAccountManagementAlert.setVisibility(View.GONE);
+				nameView.setOnClickListener(null);
+				infoEmail.setOnClickListener(null);
+				editImageView.setVisibility(View.GONE);
+
+				businessAccountStatusContainer.setVisibility(View.GONE);
+				businessAccountStatusSeparator.setVisibility(View.GONE);
+				businessAccountTypeText.setText(R.string.user_label);
+			}
+
+			scrollToTop();
+			return;
+		}
+
+		businessAccountManagementAlert.setVisibility(View.GONE);
+		accountTypeLayout.setVisibility(View.VISIBLE);
+		accountTypeSeparator.setVisibility(View.VISIBLE);
+		upgradeButton.setVisibility(View.VISIBLE);
+		businessAccountContainer.setVisibility(View.GONE);
+
+		permitEditNameAndEmail();
+
+		if (megaApi.isAchievementsEnabled()) {
+			achievementsLayout.setVisibility(View.VISIBLE);
+			achievementsSeparator.setVisibility(View.VISIBLE);
+		} else {
+			achievementsLayout.setVisibility(View.GONE);
+			achievementsSeparator.setVisibility(View.GONE);
+		}
+
+		if (myAccountInfo.getAccountType() < 0 || myAccountInfo.getAccountType() > 4) {
+			typeAccount.setText(getString(R.string.recovering_info));
+			typeAccount.setAllCaps(false);
+		} else {
+			switch (myAccountInfo.getAccountType()) {
+				case 0:
+					typeAccount.setText(R.string.free_account);
+					break;
+
+				case 1:
+					typeAccount.setText(getString(R.string.pro1_account));
+					break;
+
+				case 2:
+					typeAccount.setText(getString(R.string.pro2_account));
+					break;
+
+				case 3:
+					typeAccount.setText(getString(R.string.pro3_account));
+					break;
+
+				case 4:
+					typeAccount.setText(getString(R.string.prolite_account));
+					break;
+			}
+			typeAccount.setAllCaps(true);
+		}
+
+		if (myAccountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
+				&& myAccountInfo.getSubscriptionRenewTime() > 0) {
+			expiryRenewLayout.setVisibility(View.VISIBLE);
+			expiryRenewSeparator.setVisibility(View.VISIBLE);
+			expiryRenewText.setText(getString(R.string.renews_on));
+			expiryRenewDate.setText(formatDate(context, myAccountInfo.getSubscriptionRenewTime(), DATE_MM_DD_YYYY_FORMAT));
+		} else if (myAccountInfo.getProExpirationTime() > 0) {
+			expiryRenewLayout.setVisibility(View.VISIBLE);
+			expiryRenewSeparator.setVisibility(View.VISIBLE);
+			expiryRenewText.setText(getString(R.string.expires_on));
+			expiryRenewDate.setText(formatDate(context, myAccountInfo.getProExpirationTime(), DATE_MM_DD_YYYY_FORMAT));
+		} else {
+			expiryRenewLayout.setVisibility(View.GONE);
+			expiryRenewSeparator.setVisibility(View.GONE);
+		}
+
+		scrollToTop();
 	}
 
 	@Override

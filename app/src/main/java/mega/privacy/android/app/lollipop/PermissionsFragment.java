@@ -22,7 +22,7 @@ import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 
 public class PermissionsFragment extends Fragment implements View.OnClickListener {
 
@@ -42,6 +42,8 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     private TextView itemsText;
     private TextView titleDisplay;
     private TextView subtitleDisplay;
+    // only for access contacts permission.
+    private TextView explanationDisplay;
     private LinearLayout itemsLayout;
 
     private boolean isAllowingAccessShown;
@@ -86,6 +88,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         imgDisplay = v.findViewById(R.id.image_permissions);
         titleDisplay = v.findViewById(R.id.title_permissions);
         subtitleDisplay = v.findViewById(R.id.subtitle_permissions);
+        explanationDisplay = v.findViewById(R.id.subtitle_explanation);
         itemsLayout = v.findViewById(R.id.items_layout);
 
         mImages = new int[]{
@@ -223,6 +226,12 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         imgDisplay.setImageDrawable(ContextCompat.getDrawable(context, mImages[permission]));
         titleDisplay.setText(mTitles[permission]);
         subtitleDisplay.setText(mSubtitles[permission]);
+        // access contacts
+        if(permission == 3) {
+            explanationDisplay.setVisibility(View.VISIBLE);
+        } else {
+            explanationDisplay.setVisibility(View.GONE);
+        }
     }
 
     void askForPermission() {

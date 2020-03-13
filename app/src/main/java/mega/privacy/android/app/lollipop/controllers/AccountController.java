@@ -21,7 +21,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.print.PrintHelper;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.widget.Button;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -58,7 +57,7 @@ import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class AccountController implements View.OnClickListener{
+public class AccountController {
 
     Context context;
     MegaApiAndroid megaApi;
@@ -67,9 +66,6 @@ public class AccountController implements View.OnClickListener{
     MegaPreferences prefs = null;
 
     static int count = 0;
-
-    AlertDialog recoveryKeyExportedDialog;
-    Button recoveryKeyExportedButton;
 
     public AccountController(Context context){
         logDebug("AccountController created");
@@ -446,7 +442,6 @@ public class AccountController implements View.OnClickListener{
         dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 
         dbH.clearChatSettings();
-        dbH.setEnabledChat(true + "");
 
         //clear mega contacts and reset last sync time.
         dbH.clearMegaContacts();
@@ -454,6 +449,9 @@ public class AccountController implements View.OnClickListener{
         preferences.edit().putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0).apply();
 
         new LastShowSMSDialogTimeChecker(context).reset();
+
+        //Clear MyAccountInfo
+        MegaApplication.getInstance().getMyAccountInfo().clear();
     }
 
     public static void removeFolder(Context context, File folder) {
@@ -497,9 +495,6 @@ public class AccountController implements View.OnClickListener{
         logDebug("logoutConfirmed");
 
         localLogoutApp(context);
-
-        //Clear num verions after logout
-        MegaApplication.getInstance().getMyAccountInfo().setNumVersions(-1);
 
         PackageManager m = context.getPackageManager();
         String s = context.getPackageName();
@@ -556,18 +551,5 @@ public class AccountController implements View.OnClickListener{
 
     static public void setCount(int countUa) {
         count = countUa;
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.dialog_recovery_key_button:{
-                recoveryKeyExportedDialog.dismiss();
-                if (context instanceof TestPasswordActivity) {
-                    ((TestPasswordActivity) context).passwordReminderSucceeded();
-                }
-                break;
-            }
-        }
     }
 }

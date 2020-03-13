@@ -9,19 +9,74 @@ import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
+import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class VideoCaptureUtils {
+public class VideoCaptureUtils{
+
+    static private VideoCapturer videoCapturer = null;
+
+    /**
+     * Indicates if show video is allowed. The default value is TRUE, but this value will change to
+     * FALSE meanwhile swapping between front and back cameras. The value will be TRUE again once
+     * the camera swapping is completed.
+     */
+    private static boolean isVideoAllowed = true;
+
+    /**
+     * Check if show video is allowed.
+     *
+     * @see VideoCaptureUtils#isVideoAllowed
+     * @return TRUE if show video is allowed or FALSE in other case.
+     */
+    public static boolean isVideoAllowed() {
+        return isVideoAllowed;
+    }
+
+    /**
+     * Set if show video is allowed.
+     *
+     * @see VideoCaptureUtils#isVideoAllowed
+     * @param isVideoAllowed Value to indicate if show video is allowed.
+     */
+    public static void setIsVideoAllowed(boolean isVideoAllowed) {
+        VideoCaptureUtils.isVideoAllowed = isVideoAllowed;
+    }
+
     static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator, String deviceName) {
         logDebug("createCameraCapturer: " + deviceName);
         return enumerator.createCapturer(deviceName, null);
     }
 
+    /**
+     * Get the video capture devices list.
+     * @return The video capture devices list.
+     */
     static private String[] deviceList() {
         logDebug("DeviceList");
         CameraEnumerator enumerator = new Camera1Enumerator(true);
         return enumerator.getDeviceNames();
+    }
+
+    /**
+     * Swap the current camera device to the opposite camera device.
+     * @param listener Camera swap listener.
+     */
+    public static void swapCamera(ChatChangeVideoStreamListener listener) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        String currentCamera = megaChatApi.getVideoDeviceSelected();
+        String newCamera;
+        if(isFrontCamera(currentCamera)){
+            newCamera = getBackCamera();
+        }else {
+            newCamera = getFrontCamera();
+        }
+        if (newCamera != null) {
+            isVideoAllowed = false;
+            megaChatApi.setChatVideoInDevice(newCamera, listener);
+        }
     }
 
     /**
@@ -43,7 +98,7 @@ public class VideoCaptureUtils {
     /**
      * Get a camera device (front or back).
      * @param front Value to indicate the camera device to get (true: front / false: back).
-     * @return The camera device (front or back) requested.
+     * @return The camera device (front or back) requested. NULL if the requested device does not exist.
      */
     static private String getCameraDevice(boolean front) {
         CameraEnumerator enumerator = new Camera1Enumerator(true);
@@ -76,7 +131,23 @@ public class VideoCaptureUtils {
         return enumerator.isBackFacing(device);
     }
 
-    static private VideoCapturer videoCapturer = null;
+    /**
+     * Check if the front camera is the current video device in use.
+     * @return True if the front camera is in use or false in other case.
+     */
+    static public boolean isFrontCameraInUse() {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        return isFrontCamera(megaChatApi.getVideoDeviceSelected());
+    }
+
+    /**
+     * Check if the back camera is the current video device in use.
+     * @return True if the back camera is in use or false in other case.
+     */
+    static public boolean isBackCameraInUse() {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        return isBackCamera(megaChatApi.getVideoDeviceSelected());
+    }
 
     static public void stopVideoCapture() {
         logDebug("stopVideoCapture");
