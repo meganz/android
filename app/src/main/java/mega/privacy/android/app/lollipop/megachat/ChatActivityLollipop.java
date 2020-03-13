@@ -7706,7 +7706,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             MegaApplication.setShowPinScreen(true);
             MegaApplication.setOpenChatId(idChat);
             supportInvalidateOptionsMenu();
-            createSpeakerAudioManger();
 
             int chatConnection = megaChatApi.getChatConnectionState(idChat);
             logDebug("Chat connection (" + idChat+ ") is: " + chatConnection);
