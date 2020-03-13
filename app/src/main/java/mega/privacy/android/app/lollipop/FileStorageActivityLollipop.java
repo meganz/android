@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.os.Handler;
 import android.os.PersistableBundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -57,9 +59,9 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
@@ -68,6 +70,7 @@ import mega.privacy.android.app.utils.SDCardOperator;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.Util.*;
 
 
@@ -125,7 +128,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private MenuItem newFolderMenuItem;
 	
 	private File path;
-	private String camSyncLocalPath;
 	private File root;
 	private RelativeLayout viewContainer;
 	private Button button;
@@ -136,6 +138,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private ImageView emptyImageView;
 	private TextView emptyTextView;
 	private LinearLayout buttonsContainer;
+
+	private LinearLayout rootLevelLayout;
+	private RelativeLayout internalStorageLayout;
+	private RelativeLayout externalStorageLayout;
 	
 	private Boolean fromSettings, fromSaveRecoveryKey;
 	private Boolean cameraFolderSettings;
@@ -172,46 +178,45 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		logDebug("onOptionsItemSelected");
 
 		// Handle presses on the action bar items
-	    switch (item.getItemId()) {
-		    case android.R.id.home:{
-		    	onBackPressed();
-		    	return true;
-		    }
-		    case R.id.cab_menu_create_folder:{
-		    	showNewFolderDialog();
-		    	return true;
-		    }
-		    case R.id.cab_menu_select_all:{
-		    	selectAll();
-		    	return true;
-		    }
-		    case R.id.cab_menu_unselect_all:{
-		    	clearSelections();
-		    	return true;
-		    }
-		    default:{
-	            return super.onOptionsItemSelected(item);
-	        }
-	    }
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
+            case R.id.cab_menu_create_folder:
+                showNewFolderDialog();
+                return true;
+
+            case R.id.cab_menu_select_all:
+                selectAll();
+                return true;
+
+            case R.id.cab_menu_unselect_all:
+                clearSelections();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 		
 		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			
-			switch(item.getItemId()){
-				case R.id.cab_menu_select_all:{
-					selectAll();
-					break;
-				}
-				case R.id.cab_menu_unselect_all:{
-					clearSelections();
-					break;
-				}
-			}
-			return false;
-		}
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+            switch (item.getItemId()) {
+                case R.id.cab_menu_select_all:
+                    selectAll();
+                    break;
+
+                case R.id.cab_menu_unselect_all:
+                    clearSelections();
+                    break;
+            }
+
+            return false;
+        }
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -418,6 +423,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			button.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
 		}
 
+		rootLevelLayout = findViewById(R.id.root_level_layout);
+		rootLevelLayout.setVisibility(View.GONE);
+		internalStorageLayout = findViewById(R.id.internal_storage_layout);
+		internalStorageLayout.setOnClickListener(this);
+		externalStorageLayout = findViewById(R.id.external_storage_layout);
+		externalStorageLayout.setOnClickListener(this);
+
 		emptyImageView = findViewById(R.id.file_storage_empty_image);
 		emptyTextView = findViewById(R.id.file_storage_empty_text);
 		if (isScreenInPortrait(this)) {
@@ -447,49 +459,48 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			listView.setAdapter(adapter);
 		}
 
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
-		root = buildExternalStorageFile("");
-		if (root == null){
-			root = new File(File.separator);
-		}
-
-		//pick file from SD card
-		if(hasSDCard) {
-		    root = new File(sdRoot);
-        }
-
-		lastPositionStack = new Stack<>();
+        lastPositionStack = new Stack<>();
 
 		prefs = dbH.getPreferences();
-		if (!hasSDCard) {
-			if (prefs == null) {
-				path = buildExternalStorageFile(DOWNLOAD_DIR);
-			} else {
-				String lastFolder = prefs.getLastFolderUpload();
-				if (lastFolder != null) {
-					path = new File(prefs.getLastFolderUpload());
-					if (!path.exists()) {
-						path = null;
-					}
-				} else {
-					path = buildExternalStorageFile(DOWNLOAD_DIR);
-				}
-				if (cameraFolderSettings) {
-					camSyncLocalPath = prefs.getCamSyncLocalPath();
-				}
-			}
-			if (path == null) {
-				path = buildExternalStorageFile(DOWNLOAD_DIR);
-			}
-		} else {
-			//always pick from SD card root
-			path = new File(sdRoot);
-		}
 
-		if (cameraFolderSettings && Environment.getExternalStorageDirectory() != null) {
-			path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-		}
+
+		if (mode ==Mode.BROWSE_FILES) {
+		    root = path = new File(intent.getExtras().getString(EXTRA_PATH));
+        } else {
+            root = buildExternalStorageFile("");
+            if (root == null) {
+                root = new File(File.separator);
+            }
+
+            //pick file from SD card
+            if (hasSDCard) {
+                root = new File(sdRoot);
+            }
+
+            if (cameraFolderSettings && Environment.getExternalStorageDirectory() != null) {
+                path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+            } else if (!hasSDCard) {
+                if (prefs == null) {
+                    path = buildExternalStorageFile(DOWNLOAD_DIR);
+                } else {
+                    String lastFolder = prefs.getLastFolderUpload();
+                    if (lastFolder != null) {
+                        path = new File(prefs.getLastFolderUpload());
+                        if (!path.exists()) {
+                            path = null;
+                        }
+                    } else {
+                        path = buildExternalStorageFile(DOWNLOAD_DIR);
+                    }
+                }
+                if (path == null) {
+                    path = buildExternalStorageFile(DOWNLOAD_DIR);
+                }
+            } else {
+                //always pick from SD card root
+                path = new File(sdRoot);
+            }
+        }
 		
 		if (path == null){
 			finish();
@@ -657,7 +668,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		logDebug("onClick");
 
 		switch (v.getId()) {
-			case R.id.file_storage_button:{
+			case R.id.file_storage_button:
                 //don't record last upload folder for SD card upload
                 if(!hasSDCard) {
                     dbH.setLastUploadFolder(path.getAbsolutePath());
@@ -705,11 +716,16 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 					}.execute();			
 				}
 				break;
-			}
-			case R.id.file_storage_cancel_button:{
+
+			case R.id.file_storage_cancel_button:
 				finish();
 				break;
-			}
+
+			case R.id.internal_storage_layout:
+				break;
+
+			case R.id.external_storage_layout:
+				break;
 		}
 		
 	}
@@ -794,39 +810,44 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		logDebug("Position: " + position);
 
 		FileDocument document = adapter.getDocumentAt(position);
-		if(document == null) {
+		if (document == null) {
 			return;
 		}
-		
-		if (adapter.isMultipleSelect()){
-			logDebug("MULTISELECT ON");
+
+		if (adapter.isMultipleSelect()) {
 			adapter.toggleSelection(position);
 			List<FileDocument> selected = adapter.getSelectedDocuments();
-			if (selected.size() > 0){
+			if (selected.size() > 0) {
 				updateActionModeTitle();
+			}
+		} else if (document.isFolder()) {
+			lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
+			changeFolder(document.getFile());
+		} else if (mode == Mode.PICK_FILE) {
+			//Multiselect on to select several files if desired
+			checkActionMode();
+			adapter.toggleSelection(position);
+			updateActionModeTitle();
+			adapter.notifyDataSetChanged();
+		} else if (mode == Mode.BROWSE_FILES) {
+			File f = adapter.getItem(position).getFile();
+
+			if (isFileAvailable(f)) {
+				String type = MimeTypeList.typeForName(f.getName()).getType();
+
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f), type);
+				} else {
+					intent.setDataAndType(Uri.fromFile(f), type);
+				}
+				intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+				if (isIntentAvailable(this, intent)) {
+					startActivity(intent);
+				}
 			}
 		}
-		else{
-			if (document.isFolder()) {
-
-				int lastFirstVisiblePosition = 0;
-
-				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-
-				logDebug("Push to stack " + lastFirstVisiblePosition + " position");
-				lastPositionStack.push(lastFirstVisiblePosition);
-
-				changeFolder(document.getFile());
-			}
-			else if (mode == Mode.PICK_FILE) {
-				//Multiselect on to select several files if desired
-				adapter.setMultipleSelect(true);				
-				actionMode = startSupportActionMode(new ActionBarCallBack());
-				adapter.toggleSelection(position);
-				updateActionModeTitle();
-				adapter.notifyDataSetChanged();
-			}
-		}		
 	}
 	
 	/*

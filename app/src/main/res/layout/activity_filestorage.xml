@@ -76,10 +76,11 @@
 
             <ImageView
                 android:id="@+id/internal_extorage_image"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="21dp"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_internal_storage"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -109,10 +110,11 @@
 
             <ImageView
                 android:id="@+id/external_extorage_image"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="21dp"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_external_storage"/>
 
             <TextView
                 android:layout_width="wrap_content"
