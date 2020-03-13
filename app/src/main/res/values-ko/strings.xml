@@ -347,22 +347,22 @@
 
     <plurals name="download_began">
         <item context="Message when a download starts. Singular 1 file" quantity="one">다운로드가 시작되었습니다</item>
-        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have started</item>
+        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d개의 다운로드 시작됨</item>
     </plurals>
 
     <plurals name="download_finish">
-        <item context="Message when a download finishes. Singular 1 file" quantity="one">Download has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have finished</item>
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">다운로드 완료</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d개의 다운로드 완료됨</item>
     </plurals>
 
     <plurals name="upload_began">
         <item context="Message when a upload starts. Singular 1 file" quantity="one">업로드가 시작되었습니다</item>
-        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have started</item>
+        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d개의 업로드 시작됨</item>
     </plurals>
 
     <plurals name="upload_finish">
-        <item context="Message when a download finishes. Singular 1 file" quantity="one">Upload has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have finished</item>
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">업로드 완료</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d개의 업로드 완료됨</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -532,7 +532,7 @@
     -->
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">피드백을 보내주셔서 고맙습니다! 메가 구독을 취소하시겠습니까?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">당신의 구독권이 취소되지 않았습니다. 취소 사유를 입력해주세요.</string>
-    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Thank you for subscribing to %1$s %2$s!</string>
+    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">%1$s에 %2$s 구독해주셔서 고맙습니다!</string>
     <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
     <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
     <string name="subscription_type_monthly" context="">월간</string>
@@ -673,8 +673,8 @@
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">사진 찍기</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">수신중인 MEGA 통화의 알림 허용</string>
-    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
-    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA는 백그라운드에서 통화 인터페이스를 띄우기 위해 당신의 허가가 필요합니다.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">걱정 마세요, 기기 설정에서 수동으로 권한을 허용할 수 있습니다.</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">와이파이 전용</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">와이파이 또는 모바일 데이터</string>
@@ -964,10 +964,10 @@
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">이 행동을 하려면 로그인 해야합니다.</string>
     <string name="change_email_not_logged_in" context="Error message when a user attempts to change their email without an active login session.">이메일 변경을 완료하려면 로그인하여야 합니다. 현재 이메일 주소로 다시 로그인한 후, 확인 링크를 다시 클릭하세요.</string>
-    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">Congratulations, your new email address for this MEGA account is: %1$s</string>
+    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">축하합니다, 이 MEGA 계정에 대한 새 이메일 주소는 다음과 같습니다: %1$s</string>
     <string name="invalid_string" context="Error when the user leaves empty the password field">불일치</string>
 
-    <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">Invalid input</string>
+    <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">잘못된 입력</string>
     <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">잘못된 이메일 주소</string>
     <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">이메일 주소를 확인하고 다시 시도하세요.</string>
     <!--
@@ -1454,8 +1454,8 @@
     </plurals>
 
     <plurals name="upload_service_paused_notification">
-        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">Uploading %1$d of %2$d file (paused)</item>
-        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Uploading %1$d of %2$d files (paused)</item>
+        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">파일 %2$d개 중 %1$d번째 업로드중 (일시정지됨)</item>
+        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">파일 %2$d개 중 %1$d번째 업로드중 (일시정지됨)</item>
     </plurals>
 
 	<plurals name="folder_upload_service_notification">
@@ -1464,8 +1464,8 @@
 	</plurals>
 
     <plurals name="folder_upload_service_paused_notification">
-        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder (paused)</item>
-        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders (paused)</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">폴더 %2$d개 중 %1$d번째 업로드중 (일시정지됨)</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">폴더 %2$d개 중 %1$d번째 업로드중 (일시정지됨)</item>
     </plurals>
 
     <plurals name="upload_service_final_notification">
@@ -1516,8 +1516,8 @@
     </plurals>
 
     <plurals name="download_service_paused_notification">
-        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">Downloading %1$d of %2$d file (paused)</item>
-        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Downloading %1$d of %2$d files (paused)</item>
+        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">파일 %2$d개 중 %1$d번째 다운로드중 (일시정지됨)</item>
+        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">파일 %2$d개 중 %1$d번째 다운로드중 (일시정지됨)</item>
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">전송 할당량 부족</string>
@@ -1661,7 +1661,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">초대 보너스</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">모바일 앱 설치</string>
-    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">휴대전화번호 추가</string>
+    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">휴대전화 번호 추가</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">가입 보너스</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">MEGA 데스크톱 앱 설치</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">계정 기본 할당량</string>
@@ -1763,7 +1763,7 @@
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">고급 설정</string>
     <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">MEGA가 파일을 다운로드하려면 당신의 허락이 필요합니다.</string>
-    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">이전 SD 카드를 이용할 수 없습니다. 새 다운로드 위치를 설정하세요.</string>
     <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">다운로드 위치 선택</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">연락처 권한이 승인되지 않았습니다</string>
@@ -1954,7 +1954,7 @@
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">새 메시지</string>
 
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">전화 수신중</string>
-    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">통화 화면 열기</string>
     <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">MEGA 백그라운드 팝업이 해제되어 있습니다.\n설정을 변경하려면 탭하세요.</string>
 
     <plurals name="number_unread_messages">
@@ -2327,8 +2327,8 @@
     <string name="dispute_takendown_file" context="option to dispute taken down file or folder">게시중단 이의제기</string>
     <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">이용 약관 위반으로 인하여 접근 불가</string>
     <plurals name="alert_taken_down_files">
-        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">%d file was not downloaded due to ToS/AUP violation.</item>
-        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">%d files were not downloaded due to ToS/AUP violation.</item>
+        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">%d개의 파일이 이용 약관 위반으로 인해 다운로드되지 않았습니다.</item>
+        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">%d개의 파일이 이용 약관 위반으로 인해 다운로드되지 않았습니다.</item>
     </plurals>
 
     <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]공개적으로 공유한 파일 [/A][B]%s[/B][C] 이/가 복구되었습니다.[/C]</string>
@@ -2366,7 +2366,7 @@
     <string name="payment_method_centili" context="one of the payment methods">[A]통신사 결제[/A] (1회)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">신규</string>
-    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">To upgrade from you current subscription, please contact support for a [A]custom plan[/A].</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">현재 구독을 업그레이드하려면, 고객지원에 [A]개별 요금제[/A]에 대해 문의하세요.</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">파일명</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">최근 접속 시간 보기&#8230;</string>
@@ -2435,14 +2435,15 @@
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">문서 스캔, 사진 촬영 그리고 영상 통화를 하려면 당신의 카메라에 대한 접근을 허용하세요.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">통화 활성화</string>
     <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">연락처 접근 활성화</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA에 있는 다른 사람들과 당신을 연결하기 위해서는 당신의 연락처에 대한 접근이 필요합니다.</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">암호화된 통화를 하려면 당신의 마이크에 접근을 허용하세요.</string>
     <string name="general_enable_access" context="General enable access">접근 허용</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">공유된 파일</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">첨부물이 이미 발송됨</string>
 
-    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]Group call ended[/A][C]. Duration: [/C]</string>
+    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]단체 통화 종료[/A][C]. 통화 시간: [/C]</string>
     <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]통화 종료[/A][C]. 시간: [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s 시간[/B]</item>
@@ -2456,8 +2457,8 @@
         <item context="Message that shows the seconds of a call when it ends, one second" quantity="one">[B]%1$d 초[/B]</item>
         <item context="Message that shows the seconds of a call when it ends, more seconds" quantity="other">[B]%1$d 초[/B]</item>
     </plurals>
-    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]Call ended[/A]</string>
-    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]Group call ended[/A]</string>
+    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]통화 종료[/A]</string>
+    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]단체 통화 종료[/A]</string>
 
     <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]최근 접속 시간 [/A]오늘 %1$s</string>
     <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user">[A]최근 접속 시간 [/A]오래 전</string>
@@ -2492,7 +2493,7 @@
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
-    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions on your device’s settings</string>
+    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">기기 설정에서 MEGA 권한을 허용할 수 있습니다</string>
     <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
@@ -2524,6 +2525,7 @@
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">지금 연락처를 초대할까요?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">누가 MEGA를 사용중인지 보기</string>
+    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">MEGA에서 연락처 불러오는 중&#8230;</string>
 
 
@@ -2675,11 +2677,11 @@
 
     <string name="account_label" context="Head label to show the business account type">Account type</string>
     <string name="business_label" context="Label in My Account section to show user account type">기업용</string>
-    <string name="admin_label" context="Business user role">Admin</string>
-    <string name="user_label" context="Business user role">User</string>
+    <string name="admin_label" context="Business user role">관리자</string>
+    <string name="user_label" context="Business user role">이용자</string>
     <string name="status_label" context="General label to show the status of something or someone">상태</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">활성</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">Grace</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">남은 기간</string>
     <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">사용량</string>
     <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
@@ -2687,11 +2689,11 @@
     <string name="transfer_label" context="Title of transfer section in Storage">전송</string>
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
-    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA in a desktop browser for more information.</string>
+    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">최근 결제에 문제가 있었습니다. 자세한 정보를 보려면 데스크톱 브라우저로 MEGA에 접속하세요.</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">당신의 비즈니스 계정이 만료되었습니다</string>
-    <string name="expired_admin_business_text" context="Details shown when a Business account is expired. Details for the administrator of the Business account">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
+    <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">결제를 처리하는 과정에 문제가 있었습니다. 이 문제가 데스크톱 브라우저에서 해결될 때까지 MEGA가 보기 전용으로 제한됩니다.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">당신의 계정은 현재 [B]정지[/B]되었습니다. 당신의 데이터를 탐색만할 수 있습니다.</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view your Camera Uploads in your user account</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGA는 당신의 데이터에 접근할 수 없지만, 당신의 조직 관리자는 당신의 이용자 계정의 카메라 업로드를 보거나 제어할 수 있는 권한이 있습니다.</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">뭔가 잘못 됐습니다</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">문제를 해결하고 계정을 활성화하려면 비즈니스 계정 관리자에게 연락하세요.</string>
     <string name="business_account_clarification" context="">** For genuine business purposes.</string>
@@ -2716,7 +2718,7 @@
     <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">계정을 잠금 해제하려면 [A]이메일을 인증[/A]하고 절차를 수행하세요.</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">이게 왜 보여지나요?</string>
     <string name="resend_email_label" cotext="Label of a button which action is resend an email">이메일 재발송</string>
-    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">Email already sent. Please wait a few minutes before trying again.</string>
+    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">이메일이 이미 발송되었습니다. 몇 분 기다린 후 다시 시도하세요.</string>
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">잠긴 계정들</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">MEGA와 다른 서비스들에서 같은 비밀번호를 이용하고 있고, 다른 서비스들 중 한 곳에서 데이터 유출이 발생했을 가능성이 있습니다.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">당신의 비밀번호가 유출되어서 MEGA 계정뿐만 아니라 당신의 계정에 접속하려는 나쁜 사람들에게 이용되고 있습니다.</string>
@@ -2731,5 +2733,5 @@
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
 
     <string name="download_location" context="Download location label">다운로드 위치</string>
-    <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
+    <string name="confirmation_download_location" context="Text asking confirmation for download location">항상 이 위치에 저장할까요?</string>
 </resources>

@@ -347,22 +347,22 @@
 
     <plurals name="download_began">
         <item context="Message when a download starts. Singular 1 file" quantity="one">ダウンロード開始</item>
-        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have started</item>
+        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d個のダウンロードが開始されました</item>
     </plurals>
 
     <plurals name="download_finish">
-        <item context="Message when a download finishes. Singular 1 file" quantity="one">Download has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have finished</item>
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">ダウンロードが完了しました</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d個のダウンロードが完了しました</item>
     </plurals>
 
     <plurals name="upload_began">
         <item context="Message when a upload starts. Singular 1 file" quantity="one">アップロード開始</item>
-        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have started</item>
+        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d個のアップロードが開始されました</item>
     </plurals>
 
     <plurals name="upload_finish">
-        <item context="Message when a download finishes. Singular 1 file" quantity="one">Upload has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have finished</item>
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">アップロードが完了しました</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d個のアップロードが完了しました</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -532,7 +532,7 @@
     -->
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">フィードバック、ありがとうございます。本当に、MEGA 定期契約をキャンセルしてしまうのですか？</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">あなたのサブスクリプションはキャンセルされていません。キャンセルの理由をご入力ください</string>
-    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Thank you for subscribing to %1$s %2$s!</string>
+    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">%1$s %2$sをご契約いただきありがとうございます！</string>
     <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
     <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
     <string name="subscription_type_monthly" context="">月ごと</string>
@@ -673,8 +673,8 @@
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">写真を撮る</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">着信MEGA通話の通知を許可する</string>
-    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
-    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGAは、通話インターフェイスをバックグラウンドからポップアップできるようにするためにあなたの許可が必要です。</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">ご心配する必要はございません。あなたの端末の設定から権限を手動で付与できます。</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fiのみ</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fiまたはモバイルデータ</string>
@@ -964,10 +964,10 @@
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">そうなるように、ログインする必要があります。</string>
     <string name="change_email_not_logged_in" context="Error message when a user attempts to change their email without an active login session.">メールの変更を完了するには、ログインする必要があります。現在のメールアドレスで再度ログインしてから、確認リンクをもう一度クリックしてください。</string>
-    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">Congratulations, your new email address for this MEGA account is: %1$s</string>
+    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">おめでとうございます。このMEGAアカウント用のあなたの新しいメールアドレスは次のとおりです：%1$s</string>
     <string name="invalid_string" context="Error when the user leaves empty the password field">エラー</string>
 
-    <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">Invalid input</string>
+    <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">入力が無効です</string>
     <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">メールアドレスが無効です。</string>
     <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">メールアドレスを確認し、やり直して下さい。</string>
     <!--
@@ -1454,8 +1454,8 @@
     </plurals>
 
     <plurals name="upload_service_paused_notification">
-        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">Uploading %1$d of %2$d file (paused)</item>
-        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Uploading %1$d of %2$d files (paused)</item>
+        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">%1$d/%2$dファイルをアップロード中（一時停止）</item>
+        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">%1$d/%2$dファイルをアップロード中（一時停止）</item>
     </plurals>
 
 	<plurals name="folder_upload_service_notification">
@@ -1464,8 +1464,8 @@
 	</plurals>
 
     <plurals name="folder_upload_service_paused_notification">
-        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder (paused)</item>
-        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders (paused)</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">%1$d/%2$dフォルダをアップロード中（一時停止）</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">%1$d/%2$dフォルダをアップロード中（一時停止）</item>
     </plurals>
 
     <plurals name="upload_service_final_notification">
@@ -1516,8 +1516,8 @@
     </plurals>
 
     <plurals name="download_service_paused_notification">
-        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">Downloading %1$d of %2$d file (paused)</item>
-        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Downloading %1$d of %2$d files (paused)</item>
+        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">%1$d/%2$dファイルをダウンロード中（一時停止）</item>
+        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">%1$d/%2$dファイルをダウンロード中（一時停止）</item>
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">転送容量が不十分です</string>
@@ -1763,7 +1763,7 @@
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">詳細設定オプション</string>
     <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">MEGAはファイルをダウンロードするためのあなたの許可が必要です</string>
-    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">古いSDカードは使用できません。新しいダウンロード場所を設定してください。</string>
     <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">ダウンロード場所を選択</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">連絡先権限が付与されていません</string>
@@ -1954,7 +1954,7 @@
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">新しいメッセージ</string>
 
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">着信</string>
-    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">通話に行く</string>
     <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">MEGAのバックグラウンドポップアップが無効です。\nタップして設定を変更してください。</string>
 
     <plurals name="number_unread_messages">
@@ -2327,8 +2327,8 @@
     <string name="dispute_takendown_file" context="option to dispute taken down file or folder">異議申立による削除</string>
     <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">ToS/AUP違反のためアクセスできません</string>
     <plurals name="alert_taken_down_files">
-        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">%d file was not downloaded due to ToS/AUP violation.</item>
-        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">%d files were not downloaded due to ToS/AUP violation.</item>
+        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">ToS/AUP違反により、%d個のファイルはダウンロードされませんでした。</item>
+        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">ToS/AUP違反により、%d個のファイルはダウンロードされませんでした。</item>
     </plurals>
 
     <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]あなたの公開共有されたファイル[/A][B]%s[/B][C]は復活しました。[/C]</string>
@@ -2366,7 +2366,7 @@
     <string name="payment_method_centili" context="one of the payment methods">[A]モバイルキャリア[/A]（一回限り）</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">新</string>
-    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">To upgrade from you current subscription, please contact support for a [A]custom plan[/A].</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">あなたの現在のサブスクリプションからアップグレードするには、[A]カスタムプラン[/A]用にサポートにお問い合わせください。</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">ファイル名</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">最終ログインを表示&#8230;</string>
@@ -2435,14 +2435,15 @@
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">あなたのカメラへのアクセスを許可して、ドキュメントのスキャン、写真の撮影、ビデオ通話を行います。</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">通話を有効にする</string>
     <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">連絡先へのアクセスを有効にする</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGAは、あなたがMEGAで他の人々とつながるのをご支援するために、あなたの連絡先にアクセスする必要があります。</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">あなたのマイクへのアクセスを許可して、暗号化通話を行います。</string>
     <string name="general_enable_access" context="General enable access">アクセスを許可</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">共有ファイル</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">添付ファイルは既に送信されています</string>
 
-    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]Group call ended[/A][C]. Duration: [/C]</string>
+    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]グループ通話が終了しました[/A][C]。通話時間：[/C]</string>
     <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]通話が終了しました[/A][C]。通話時間：[/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s 時間[/B]</item>
@@ -2456,8 +2457,8 @@
         <item context="Message that shows the seconds of a call when it ends, one second" quantity="one">[B]%1$d 秒[/B]</item>
         <item context="Message that shows the seconds of a call when it ends, more seconds" quantity="other">[B]%1$d 秒[/B]</item>
     </plurals>
-    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]Call ended[/A]</string>
-    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]Group call ended[/A]</string>
+    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]通話が終了しました[/A]</string>
+    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]グループ通話が終了しました[/A]</string>
 
     <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]最終ログイン[/A]今日 %1$s</string>
     <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user">[A]最終ログイン[/A]はだいぶ前</string>
@@ -2492,7 +2493,7 @@
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
-    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions on your device’s settings</string>
+    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">端末の設定でいつでもMEGAに権限を付与できます</string>
     <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
@@ -2524,6 +2525,7 @@
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">連絡先を今すぐ招待しますか？</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">すでにMEGAにいる人を確認</string>
+    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">MEGAにいる連絡先を読み込んでいます&#8230;</string>
 
 
@@ -2675,11 +2677,11 @@
 
     <string name="account_label" context="Head label to show the business account type">Account type</string>
     <string name="business_label" context="Label in My Account section to show user account type">ビジネス</string>
-    <string name="admin_label" context="Business user role">Admin</string>
-    <string name="user_label" context="Business user role">User</string>
+    <string name="admin_label" context="Business user role">管理者</string>
+    <string name="user_label" context="Business user role">ユーザー</string>
     <string name="status_label" context="General label to show the status of something or someone">ステータス</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">ログイン有効</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">Grace</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">猶予期間</string>
     <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">ご利用内容</string>
     <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
@@ -2687,11 +2689,11 @@
     <string name="transfer_label" context="Title of transfer section in Storage">転送</string>
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
-    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA in a desktop browser for more information.</string>
+    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">最後のお支払いに問題がございました。詳細については、デスクトップブラウザを使用してMEGAにアクセスしてください。</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">あなたのビジネスアカウントは期限切れです</string>
-    <string name="expired_admin_business_text" context="Details shown when a Business account is expired. Details for the administrator of the Business account">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
+    <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">お支払いの処理中に問題が発生しました。MEGAは、この問題がデスクトップウェブブラウザで修正されるまで、表示のみに制限されています。</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">あなたのアカウントは現在[B]凍結[/B]されています。あなたのデータの閲覧のみ可能です。</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view your Camera Uploads in your user account</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGAはあなたのデータにアクセスしませんが、貴組織の管理者様は、あなたのユーザーアカウントのカメラアップロードを管理し、表示することができます。</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">ちょと、うまく行かなかったようです。</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">あなたのビジネスアカウント管理者に連絡して問題を解決し、あなたのアカウントを有効にしてください。</string>
     <string name="business_account_clarification" context="">** For genuine business purposes.</string>
@@ -2716,7 +2718,7 @@
     <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]メールアドレスを検証して[/A]、MEGAのメールの手順に従ってアカウントのロックを解除してください。</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">これが表示されている理由は？</string>
     <string name="resend_email_label" cotext="Label of a button which action is resend an email">メールを再送</string>
-    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">Email already sent. Please wait a few minutes before trying again.</string>
+    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">メールは既に送信されています。数分待ってから再試行してください。</string>
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">アカウントがロックされました</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">おそらく、MEGAアカウントで他のサービスと同じパスワードを使用しており、それらのサービスの少なくとも1つがデータ侵害を受けていると思われます。</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">あなたのパスワードが漏えいし、悪意のあるアクターがあなたのアカウント（あなたのMEGAアカウントを含むがこれに限定されない）にログインするために使用されています。</string>
@@ -2731,5 +2733,5 @@
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
 
     <string name="download_location" context="Download location label">ダウンロード先</string>
-    <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
+    <string name="confirmation_download_location" context="Text asking confirmation for download location">常にこの場所に保存しますか？</string>
 </resources>

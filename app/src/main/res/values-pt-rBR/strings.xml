@@ -674,7 +674,7 @@
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Permitir notificações de chamadas entrantes no MEGA</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
-    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually grant permissions from your device’s settings.</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Somente Wi-Fi</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi ou dados móveis</string>
@@ -2435,7 +2435,8 @@
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permita o acesso à sua câmera para escanear documentos, tirar fotos e fazer videochamadas.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Ativar chamadas</string>
     <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Permitir acesso aos seus contatos</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">O MEGA precisa ter acesso aos seus contatos para ajudá-lo a entrar em contato com eles no MEGA.</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permitir acesso ao seu microfone para fazer chamadas criptografadas.</string>
     <string name="general_enable_access" context="General enable access">Permitir acesso</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Arquivos compartilhados</string>
@@ -2492,7 +2493,7 @@
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
-    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions on your device’s settings</string>
+    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions in your device’s settings</string>
     <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
@@ -2524,6 +2525,7 @@
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Convidar um contato?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Veja quem já está no MEGA</string>
+    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Carregando contatos no MEGA&#8230;</string>
 
 
@@ -2687,11 +2689,11 @@
     <string name="transfer_label" context="Title of transfer section in Storage">Transferência</string>
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
-    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA in a desktop browser for more information.</string>
+    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA using a desktop browser for more information.</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">A sua conta business expirou</string>
-    <string name="expired_admin_business_text" context="Details shown when a Business account is expired. Details for the administrator of the Business account">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
+    <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">A sua conta [B]expirou[/B]. Somente é possível visualizar os seus dados.</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view your Camera Uploads in your user account</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view the Camera Uploads in your user account</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Algo deu errado</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Entre em contato com o administrador de sua conta comercial para solucionar o problema e ativar a sua conta.</string>
     <string name="business_account_clarification" context="">** For genuine business purposes.</string>

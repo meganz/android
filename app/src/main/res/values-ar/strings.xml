@@ -673,8 +673,8 @@
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">التقاط صورة</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">السماح بالإشعارات لمكالمات ميغا MEGA الواردة</string>
-    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
-    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">تحتاج ميغا MEGA إلى إذن منك للسماح بظهور واجهة المكالمة من الخلفية.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">لا تقلق، لا يزال بإمكانك منح الأذونات يدوياً من إعدادات جهازك.</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">شبكة الوايرلس فقط</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">شبكة الوايرلس او بيانات الموبايل</string>
@@ -1763,7 +1763,7 @@
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">الخيارات المتقدمة</string>
     <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">تحتاج ميغا MEGA إلى إذن منك لتنزيل الملفات</string>
-    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">بطاقة الذاكرة SD القديمة غير متوفرة، يرجى تعيين موقع تنزيل جديد.</string>
     <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">اختيار موقع التحميل</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">لا توجد لديك صلاحيات ممنوحة لجهات الاتصال</string>
@@ -1954,7 +1954,7 @@
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">رسائل جديدة</string>
 
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">مكالمة واردة</string>
-    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">اذهب إلى المكالمة</string>
     <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">تم تعطيل النوافذ المنبثقة من ميغا MEGA.\nانقر لتغيير الإعدادات.</string>
 
     <plurals name="number_unread_messages">
@@ -2435,7 +2435,8 @@
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">السماح بالوصول إلى الكاميرا لمسح مستندات والتقاط صور وإجراء مكالمات فيديو.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">تمكين المكالمات</string>
     <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">تمكين الوصول إلى جهات الاتصال</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">تحتاج ميغا MEGA إلى الوصول إلى جهات الاتصال الخاصة بك لمساعدتك على التواصل مع أشخاص آخرين على ميغا MEGA.</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">السماح بالوصول إلى ميكروفونك لإجراء مكالمات مشفرة.</string>
     <string name="general_enable_access" context="General enable access">السماح بالوصول</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">الملفات المشاركة</string>
@@ -2492,7 +2493,7 @@
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
-    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions on your device’s settings</string>
+    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions in your device’s settings</string>
     <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
@@ -2524,6 +2525,7 @@
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">دعوة جهة الاتصال الآن؟</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">معرفة من هو بالفعل على ميغا MEGA</string>
+    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">جارٍ ترفيع جهات الاتصال على ميغا MEGA &#8230;</string>
 
 
@@ -2687,11 +2689,11 @@
     <string name="transfer_label" context="Title of transfer section in Storage">التحميل</string>
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
-    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA in a desktop browser for more information.</string>
+    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA using a desktop browser for more information.</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">انتهت صلاحية حساب الأعمال خاصتك</string>
-    <string name="expired_admin_business_text" context="Details shown when a Business account is expired. Details for the administrator of the Business account">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
+    <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">حسابك [B]معلق[/B] حالياً. يمكنك فقط تصفح بياناتك.</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view your Camera Uploads in your user account</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view the Camera Uploads in your user account</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">حدث خطأ ما</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">تواصل مع مشرف حساب الأعمال الخاص بك لحل هذه المشكلة وتفعيل حسابك.</string>
     <string name="business_account_clarification" context="">** For genuine business purposes.</string>

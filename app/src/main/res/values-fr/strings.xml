@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l\'utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n\'importe quand, de n\'importe quel appareil, n\'importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l\'accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l\'utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50 Go à tous les utilisateurs inscrits, avec des primes d\'objectif, et propose des abonnements payants avec des limites beaucoup plus élevées : \n\n\nAbonnement PRO LÉGER : 4,99 € (4,99 USD) par mois ou 49,99 € (49,99 USD) par an vous donne 400 Go d\'espace de stockage et 1 To de quota de transfert par mois.\nAbonnement PRO I : 9,99 € (9,99 USD) par mois ou 99,99 € (99,99 USD) par an vous donne 2 To d\'espace de stockage et 2 To de quota de transfert par mois.\nAbonnement PRO II : 19,99 € (19,99 USD) par mois ou 199,99 € (199,99 USD) par an vous donne 8 To d\'espace de stockage et 8 To de quota de transfert par mois.\nAbonnement PRO III : 29,99 € (29,99 USD) par mois ou 299,99 € (299,99 USD) par an vous donne 16 To d\'espace de stockage et 16 To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d\'abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l\'icône de la logithèque Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n\'est pas déjà fait) et cliquez sur l\'appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l\'appli : \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -> Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -> Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -> Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -> MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur : https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web : \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l\'utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n\'importe quand, de n\'importe quel appareil, n\'importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l\'accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l\'utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50 Go à tous les utilisateurs inscrits, avec des primes d\'objectif, et propose des abonnements payants avec des limites beaucoup plus élevées : \n\n\nAbonnement PRO LÉGER : 4,99 € (4,99 USD) par mois ou 49,99 € (49,99 USD) par an vous donne 400 Go d\'espace de stockage et 1 To de quota de transfert par mois.\nAbonnement PRO I : 9,99 € (9,99 USD) par mois ou 99,99 € (99,99 USD) par an vous donne 2 To d\'espace de stockage et 2 To de quota de transfert par mois.\nAbonnement PRO II : 19,99 € (19,99 USD) par mois ou 199,99 € (199,99 USD) par an vous donne 8 To d\'espace de stockage et 8 To de quota de transfert par mois.\nAbonnement PRO III : 29,99 € (29,99 USD) par mois ou 299,99 € (299,99 USD) par an vous donne 16 To d\'espace de stockage et 16 To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d\'abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l\'icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n\'est pas déjà fait) et cliquez sur l\'appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l\'appli : \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -> Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -> Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -> Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -> MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur : https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web : \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
 
     <!--
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -221,11 +221,11 @@
     <string name="name_text" context="category in sort by action">Nom</string>
     <string name="first_name_text" context="First Name of the user">Prénom</string>
     <string name="lastname_text" context="Last name of the user">Nom de famille</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">J\'accepte les [A]conditions générales d\'utilisation[/A] de MEGA</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">J\'accepte les [A]Conditions générales d\'utilisation[/A] de MEGA</string>
     <string name="top" context="Text placed on the checkbox to make sure user agree that understand the danger of losing password">Je comprends que [B]si je perds mon mot de passe, je pourrais perdre mes données[/B]. En apprendre davantage sur le [A]chiffrement de bout en bout de MEGA[/A].</string>
     <string name="already_account" context="Does the user already have a MEGA account">Avez-vous un compte ?</string>
 
-    <string name="create_account_no_terms" context="warning dialog">Vous devez accepter nos conditions générales d\'utilisation</string>
+    <string name="create_account_no_terms" context="warning dialog">Vous devez accepter nos Conditions générales d\'utilisation</string>
 
     <string name="create_account_no_top" context="warning dialog, for user do not tick checkbox of understanding the danger of losing password">Vous devez attester que vous comprenez le danger que représente la perte de votre mot de passe</string>
     <string name="error_enter_username" context="Warning message when the first name is a required field to submit a form. For example during the create account process.">Veuillez saisir votre prénom</string>
@@ -346,23 +346,23 @@
     <string name="download_preparing_files" context="Alert shown when some content is sharing with chats and they are processing">Préparation des fichiers</string>
 
     <plurals name="download_began">
-        <item context="Message when a download starts. Singular 1 file" quantity="one">Le téléchargement est lancé</item>
-        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have started</item>
+        <item context="Message when a download starts. Singular 1 file" quantity="one">Le téléchargement a démarré</item>
+        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d téléchargements ont démarré</item>
     </plurals>
 
     <plurals name="download_finish">
-        <item context="Message when a download finishes. Singular 1 file" quantity="one">Download has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have finished</item>
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">Le téléchargement est terminé</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d téléchargements sont terminés</item>
     </plurals>
 
     <plurals name="upload_began">
         <item context="Message when a upload starts. Singular 1 file" quantity="one">Le téléversement a démarré</item>
-        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have started</item>
+        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d téléversements ont démarré</item>
     </plurals>
 
     <plurals name="upload_finish">
-        <item context="Message when a download finishes. Singular 1 file" quantity="one">Upload has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have finished</item>
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">Le téléversement est terminé</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d téléversements sont terminés</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -532,7 +532,7 @@
     -->
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Nous vous remercions de votre rétroaction ! Voulez-vous vraiment annuler votre abonnement MEGA ?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Votre abonnement n\'a pas été annulé. Veuillez fournir le motif de votre annulation.</string>
-    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Thank you for subscribing to %1$s %2$s!</string>
+    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Nous vous remercions pour votre abonnement %1$s %2$s.</string>
     <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
     <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
     <string name="subscription_type_monthly" context="">Mensuel</string>
@@ -673,8 +673,8 @@
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Prendre une photo</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Permettre les notifications pour les appels MEGA entrants</string>
-    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
-    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA a besoin de votre autorisation pour autoriser  l\'apparition de l\'interface d\'appel.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Ne vous inquiétez pas, vous pouvez quand même accorder les autorisations à partir des paramètres de votre appareil.</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fi seulement</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi ou données mobiles</string>
@@ -964,10 +964,10 @@
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">Vous devez être connecté pour effectuer cette action.</string>
     <string name="change_email_not_logged_in" context="Error message when a user attempts to change their email without an active login session.">Vous devez être connecté pour effectuer votre changement d\'adresse courriel. Veuillez vous connecter de nouveau avec votre adresse courriel actuelle et recliquer ensuite sur le lien de confirmation.</string>
-    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">Congratulations, your new email address for this MEGA account is: %1$s</string>
+    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">Félicitations, votre nouvelle adresse courriel pour ce compte MEGA est : %1$s</string>
     <string name="invalid_string" context="Error when the user leaves empty the password field">Erroné</string>
 
-    <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">Invalid input</string>
+    <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">L\'entrée est invalide</string>
     <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Adresse courriel invalide</string>
     <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Veuillez vérifier l\'adresse courriel et ressayer.</string>
     <!--
@@ -1069,7 +1069,7 @@
     </plurals>
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">L\'adresse courriel ou le mot de passe sont erronés. Veuillez ressayer.</string>
-    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Votre compte a été désactivé en raison du non-respect de nos conditions générales d\'utilisation. Veuillez contacter support&#64;mega.nz</string>
+    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Votre compte a été désactivé en raison du non-respect de nos Conditions générales d\'utilisation. Veuillez contacter support&#64;mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Trop de tentatives infructueuses de connexion, veuillez patienter pendant une heure.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Ce compte n\'a pas encore été validé. Veuillez vérifier vos courriels.</string>
 
@@ -1089,7 +1089,7 @@
         <item context="Plural of items which contains a folder. 2 items" quantity="other">éléments</item>
     </plurals>
 
-    <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">Le compte utilisateur associé a été annulé en raison du non-respect répété de nos conditions générales d\'utilisation.</string>
+    <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">Le compte utilisateur associé a été annulé en raison du non-respect répété de nos Conditions générales d\'utilisation.</string>
 
     <string name="general_error_invalid_decryption_key" context="Error message shown after login into a folder link with an invalid decryption key">La clé de déchiffrement fournie pour le lien de dossier est invalide.</string>
 
@@ -1454,8 +1454,8 @@
     </plurals>
 
     <plurals name="upload_service_paused_notification">
-        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">Uploading %1$d of %2$d file (paused)</item>
-        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Uploading %1$d of %2$d files (paused)</item>
+        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">Téléversement de %1$d fichier sur %2$d (en pause)</item>
+        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Téléversement de %1$d fichiers sur %2$d (en pause)</item>
     </plurals>
 
 	<plurals name="folder_upload_service_notification">
@@ -1464,8 +1464,8 @@
 	</plurals>
 
     <plurals name="folder_upload_service_paused_notification">
-        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder (paused)</item>
-        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders (paused)</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Téléversement de %1$d dossier sur %2$d (en pause)</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Téléversement de %1$d dossiers sur %2$d (en pause)</item>
     </plurals>
 
     <plurals name="upload_service_final_notification">
@@ -1516,8 +1516,8 @@
     </plurals>
 
     <plurals name="download_service_paused_notification">
-        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">Downloading %1$d of %2$d file (paused)</item>
-        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Downloading %1$d of %2$d files (paused)</item>
+        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">Téléchargement de %1$d fichier sur %2$d (en pause)</item>
+        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Téléchargement de %1$d fichiers sur %2$d (en pause)</item>
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Le quota de transfert est insuffisant</string>
@@ -1763,7 +1763,7 @@
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Options avancées</string>
     <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">MEGA a besoin de votre autorisation pour télécharger des fichiers</string>
-    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">L\'ancienne carte SD n\'est pas accessible. Veuillez définir un nouvel emplacement de téléchargement.</string>
     <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Choisir l\'emplacement de téléchargement</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">Aucune permission de contact n\'a été accordée</string>
@@ -1853,8 +1853,8 @@
     <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list’s header">Sur MEGA</string>
     <string name="contacts_phone" context="When it lists contacts of phone, the title of list’s header">Contacts du téléphone</string>
 
-    <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Votre compte a été désactivé en raison de non-respects répétés des conditions générales d\'utilisation de MEGA. Veuillez vérifier votre boîte de réception de courriels.</string>
-    <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Votre compte a été résilié à la suite d\'un non-respect des conditions générales d\'utilisation de MEGA, tel qu\'une violation des droits d\'autrui ; un partage ou une importation de données illégales ; ou un abus du système.</string>
+    <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Votre compte a été désactivé en raison de non-respects répétés des Conditions générales d\'utilisation de MEGA. Veuillez vérifier votre boîte de réception de courriels.</string>
+    <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Votre compte a été résilié à la suite d\'un non-respect des Conditions générales d\'utilisation de MEGA, tel qu\'une violation des droits d\'autrui ; un partage ou une importation de données illégales ; ou un abus du système.</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">Aucun fichier</string>
     <string name="label_file_size_byte" context="size in byte">o</string>
@@ -1954,7 +1954,7 @@
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">Nouveaux messages</string>
 
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">Appel entrant</string>
-    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Accéder à l\'appel</string>
     <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">Les fenêtres de MEGA sont désactivées quand l\'appli est en arrière-plan.\nToucher pour changer les paramètres.</string>
 
     <plurals name="number_unread_messages">
@@ -2061,8 +2061,8 @@
 
     <string name="backup_rk_2fa_end" context="Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process">Exportez votre clé de récupération pour terminer</string>
     <string name="no_authentication_apps_title" context="Title of dialog shown when it tries to open an authentication app and there is no installed">Appli d\'authentification</string>
-    <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">Voulez-vous ouvrir la logithèque Play Store de Google  pour installer une appli d\'authentification ?</string>
-    <string name="play_store_label" context="Label Play Store">Logithèque Play Store</string>
+    <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">Voulez-vous ouvrir le magasin Play Store de Google  pour installer une appli d\'authentification ?</string>
+    <string name="play_store_label" context="Label Play Store">Magasin Play Store</string>
     <string name="text_2fa_help" context="Text shown in an alert explaining how to continue to enable Two-Factor Authentication">Il vous faut une appli d\'authentification pour activer l\'A2F avec MEGA. Vous pouvez télécharger et installer l\'appli Google Authenticator, Duo Mobile, Authy ou Microsoft Authenticator pour votre téléphone ou votre tablette.</string>
 
 
@@ -2327,8 +2327,8 @@
     <string name="dispute_takendown_file" context="option to dispute taken down file or folder">Contester le retrait</string>
     <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">N\'est pas accessible en raison du non-respect des CGU/PUA.</string>
     <plurals name="alert_taken_down_files">
-        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">%d file was not downloaded due to ToS/AUP violation.</item>
-        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">%d files were not downloaded due to ToS/AUP violation.</item>
+        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">%d fichier n\'a pas été téléchargé en raison du non-respect des CGU/PUA.</item>
+        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">%d fichiers n\'ont pas été téléchargés en raison du non-respect des CGU/PUA.</item>
     </plurals>
 
     <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Votre fichier [B]%s[/B] partagé publiquement[/A][C] a été rétabli.[/C]</string>
@@ -2366,7 +2366,7 @@
     <string name="payment_method_centili" context="one of the payment methods">[A]Opérateur de réseau mobile[/A] (une fois)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NOUVELLE</string>
-    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">To upgrade from you current subscription, please contact support for a [A]custom plan[/A].</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Pour surclasser votre abonnement actuel, veuillez contacter notre équipe d\'assistance afin d\'obtenir un [A]abonnement personnalisé[/A].</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">nom du fichier</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Afficher Vu pour la dernière fois&#8230;</string>
@@ -2435,14 +2435,15 @@
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Autorisez l\'accès à votre appareil photo pour numériser des documents, prendre des photos et faire des appels vidéo.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Autoriser les appels</string>
     <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Permettre l\'accès aux contacts</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA a besoin d\'accéder à vos contacts pour vous aider à vous connecter à d\'autres personnes sur MEGA.</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Autorisez l\'accès à votre microphone pour faire des appels chiffrés.</string>
     <string name="general_enable_access" context="General enable access">Autoriser l\'accès</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Fichiers partagés</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Le fichier joint a déjà été envoyé</string>
 
-    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]Group call ended[/A][C]. Duration: [/C]</string>
+    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]L\'appel de groupe est terminé[/A][C]. Durée : [/C]</string>
     <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]L\'appel est terminé[/A][C]. Durée : [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s heure[/B]</item>
@@ -2456,8 +2457,8 @@
         <item context="Message that shows the seconds of a call when it ends, one second" quantity="one">[B]%1$d seconde[/B]</item>
         <item context="Message that shows the seconds of a call when it ends, more seconds" quantity="other">[B]%1$d secondes[/B]</item>
     </plurals>
-    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]Call ended[/A]</string>
-    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]Group call ended[/A]</string>
+    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]L\'appel est terminé[/A]</string>
+    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]L\'appel de groupe est terminé[/A]</string>
 
     <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]Vu pour la dernière fois [/A]aujourd\'hui à %1$s</string>
     <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user">[A]Vu pour la dernière fois [/A]il y a longtemps</string>
@@ -2492,7 +2493,7 @@
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
-    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions on your device’s settings</string>
+    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">Vous pouvez toujours accorder des autorisations à MEGA dans les paramètres de votre appareil</string>
     <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
@@ -2524,6 +2525,7 @@
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Inviter un contact maintenant ?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Voyez qui se trouve déjà sur MEGA</string>
+    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Chargement des contacts sur MEGA&#8230;</string>
 
 
@@ -2675,11 +2677,11 @@
 
     <string name="account_label" context="Head label to show the business account type">Account type</string>
     <string name="business_label" context="Label in My Account section to show user account type">Pour entreprise</string>
-    <string name="admin_label" context="Business user role">Admin</string>
-    <string name="user_label" context="Business user role">User</string>
+    <string name="admin_label" context="Business user role">Administrateur</string>
+    <string name="user_label" context="Business user role">Utilisateur</string>
     <string name="status_label" context="General label to show the status of something or someone">État </string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">Active</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">Grace</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">Délai de tolérance</string>
     <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Utilisation</string>
     <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
@@ -2687,11 +2689,11 @@
     <string name="transfer_label" context="Title of transfer section in Storage">Transfert</string>
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
-    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA in a desktop browser for more information.</string>
+    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">Un problème est survenu lors de votre dernier paiement. Pour plus de précisions, veuillez accéder à MEGA en utilisant un navigateur pour ordinateur.</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Votre compte d\'entreprise est expiré</string>
-    <string name="expired_admin_business_text" context="Details shown when a Business account is expired. Details for the administrator of the Business account">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
+    <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">Un problème est survenu lors du traitement de votre paiement. MEGA sera en lecture seulement tant que ce problème n\'aura pas été corrigé dans un navigateur pour ordinateur.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Votre compte est actuellement [B]désactivé[/B]. Vous ne pouvez que parcourir vos données.</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view your Camera Uploads in your user account</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Bien que MEGA n\'ait pas accès à vos données, l\'administrateur de votre compte MEGA à la possibilité de contrôler et de visualiser les téléversements de l\'appareil photo dans votre compte utilisateur</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Un problème est survenu</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contactez l\'administrateur de votre compte d\'entreprise pour résoudre la situation et activer votre compte.</string>
     <string name="business_account_clarification" context="">** For genuine business purposes.</string>
@@ -2716,7 +2718,7 @@
     <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]Veuillez confirmer votre adresse courriel[/A] et suivre les étapes du courriel de MEGA afin de déverrouiller votre compte.</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Pourquoi est-ce que je vois ceci ?</string>
     <string name="resend_email_label" cotext="Label of a button which action is resend an email">Renvoyer le courriel</string>
-    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">Email already sent. Please wait a few minutes before trying again.</string>
+    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">Le courriel a déjà été envoyé. Veuillez patienter quelques minutes avant de ressayer.</string>
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Comptes verrouillés</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Il est possible que vous utilisiez le même mot de passe pour votre compte MEGA que pour d\'autres services et qu\'au moins l\'un de ses services ait souffert d\'une atteinte à la protection des données.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Votre mot de passe a été divulgué et est maintenant utilisé par des personnes malveillantes pour se connecter à vos comptes dont, mais sans s\'y limiter, à votre compte MEGA.</string>
@@ -2731,5 +2733,5 @@
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
 
     <string name="download_location" context="Download location label">Emplacement de téléchargement</string>
-    <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
+    <string name="confirmation_download_location" context="Text asking confirmation for download location">Toujours enregistrer dans cet emplacement ?</string>
 </resources>
