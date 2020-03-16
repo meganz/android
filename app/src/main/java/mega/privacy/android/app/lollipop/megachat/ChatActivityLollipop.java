@@ -8571,7 +8571,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private void checkIfServiceCanStart(Intent intent) {
         preservedIntents.add(intent);
         if (!isAskingForMyChatFiles) {
-            isAskingForMyChatFiles = true;
             checkIfIsNeededToAskForMyChatFilesFolder();
         }
     }
@@ -8586,6 +8585,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 proceedWithAction();
             }
         } else {
+            isAskingForMyChatFiles = true;
             megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
         }
     }
@@ -8597,11 +8597,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 startService(intent);
             }
             preservedIntents.clear();
-            isAskingForMyChatFiles = false;
         }
     }
 
     public void setMyChatFilesFolder(MegaNode myChatFilesFolder) {
+        isAskingForMyChatFiles = false;
         this.myChatFilesFolder = myChatFilesFolder;
     }
 
