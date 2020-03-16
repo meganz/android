@@ -71,7 +71,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.nirhart:parallaxscroll:1.0'
     implementation 'androidx.palette:palette:1.0.0'
-    implementation 'com.google.firebase:firebase-messaging:20.1.1'
+    implementation 'com.google.firebase:firebase-messaging:20.1.2'
     implementation 'com.google.firebase:firebase-core:17.2.3'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.vdurmont:emoji-java:4.0.0'
