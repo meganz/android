@@ -2519,7 +2519,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                 logDebug("The call in this chat is In progress, but I do not participate");
                 MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
-                checkCamera();
                 megaChatApi.startChatCall(idChat, startVideo, this);
             }
             return;
@@ -2530,14 +2529,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logDebug("There is not a call in this chat and I am not in another call");
             MegaApplication.setCallLayoutStatus(idChat, false);
             MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
-            checkCamera();
             megaChatApi.startChatCall(idChat, startVideo, this);
         }
 
-    }
-
-    private void checkCamera() {
-        if (startVideo) app.manuallyActivatedLocalCamera();
     }
 
     private boolean checkPermissions(String permission, int requestCode) {
