@@ -44,6 +44,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -96,7 +97,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.4_294";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.4_297";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -287,6 +288,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				logDebug("TYPE_FETCH_NODES");
 				if (e.getErrorCode() == MegaError.API_OK){
 					askForFullAccountInfo();
+					if (dbH != null && dbH.getMyChatFilesFolderHandle() == INVALID_HANDLE) {
+						megaApi.getMyChatFilesFolder(new GetAttrUserListener(getApplicationContext(), true));
+					}
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){

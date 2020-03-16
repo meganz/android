@@ -187,10 +187,10 @@ public class BaseActivity extends AppCompatActivity {
             if (megaChatApi == null){
                 megaChatApi = app.getMegaChatApi();
             }
-        }
 
-        if (dbH == null) {
-            dbH = app.getDbH();
+            if (dbH == null) {
+                dbH = app.getDbH();
+            }
         }
     }
 

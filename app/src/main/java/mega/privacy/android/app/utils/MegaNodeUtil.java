@@ -19,12 +19,19 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.jobservices.CameraUploadsService.SECONDARY_UPLOADS;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class MegaNodeUtil {
 
@@ -198,6 +205,135 @@ public class MegaNodeUtil {
             dialog.show();
 
             return dialog;
+        }
+    }
+
+    /**
+     * Checks if a MegaNode is the user attribute "My chat files"
+     *
+     * @param node MegaNode to check
+     * @return True if the node is "My chat files" attribute, false otherwise
+     */
+    public static boolean isMyChatFilesFolder(MegaNode node) {
+        MegaApplication megaApplication = MegaApplication.getInstance();
+
+        return node != null && node.getHandle() != INVALID_HANDLE && !megaApplication.getMegaApi().isInRubbish(node)
+                && existsMyChatFilesFolder() && node.getHandle() == megaApplication.getDbH().getMyChatFilesFolderHandle();
+    }
+
+    /**
+     * Checks if the user attribute "My chat files" is saved in DB and exists
+     *
+     * @return True if the the user attribute "My chat files" is saved in the DB, false otherwise
+     */
+    public static boolean existsMyChatFilesFolder() {
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        MegaApiJava megaApi = MegaApplication.getInstance().getMegaApi();
+
+        if (dbH != null && dbH.getMyChatFilesFolderHandle() != INVALID_HANDLE) {
+            MegaNode myChatFilesFolder = megaApi.getNodeByHandle(dbH.getMyChatFilesFolderHandle());
+
+            return myChatFilesFolder != null && myChatFilesFolder.getHandle() != INVALID_HANDLE && !megaApi.isInRubbish(myChatFilesFolder);
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets the node of the user attribute "My chat files" from the DB.
+     *
+     * Before call this method is neccesary to call existsMyChatFilesFolder() method
+     *
+     * @return "My chat files" folder node
+     * @see MegaNodeUtil#existsMyChatFilesFolder()
+     */
+    public static MegaNode getMyChatFilesFolder() {
+        return MegaApplication.getInstance().getMegaApi().getNodeByHandle(MegaApplication.getInstance().getDbH().getMyChatFilesFolderHandle());
+    }
+
+    /**
+     * Checks if a node is "Camera Uploads" or "Media Uploads" folder.
+     *
+     * Note: The content of this method is temporary and will have to be modified when the PR of the CU user attribute be merged.
+     *
+     * @param n MegaNode to check
+     * @return True if the node is "Camera Uploads" or "Media Uploads" folder, false otherwise
+     */
+    public static boolean isCameraUploads(MegaNode n) {
+        String cameraSyncHandle = null;
+        String secondaryMediaHandle = null;
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        MegaPreferences prefs = dbH.getPreferences();
+
+        //Check if the item is the Camera Uploads folder
+        if (prefs != null && prefs.getCamSyncHandle() != null) {
+            cameraSyncHandle = prefs.getCamSyncHandle();
+        }
+
+        if (cameraSyncHandle != null && !cameraSyncHandle.isEmpty() && n.getHandle() == Long.parseLong(cameraSyncHandle)) {
+            return true;
+        } else if (n.getName().equals("Camera Uploads")) {
+            if (prefs != null) {
+                prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+            }
+            dbH.setCamSyncHandle(n.getHandle());
+            return true;
+        }
+
+        //Check if the item is the Media Uploads folder
+        if (prefs != null && prefs.getMegaHandleSecondaryFolder() != null) {
+            secondaryMediaHandle = prefs.getMegaHandleSecondaryFolder();
+        }
+
+        if (secondaryMediaHandle != null && !secondaryMediaHandle.isEmpty() && n.getHandle() == Long.parseLong(secondaryMediaHandle)) {
+            return true;
+        } else if (n.getName().equals(SECONDARY_UPLOADS)) {
+            if (prefs != null) {
+                prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
+            }
+            dbH.setSecondaryFolderHandle(n.getHandle());
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if a node is  outgoing or a pending outgoing share.
+     *
+     * @param node MegaNode to check
+     * @return True if the node is a outgoing or a pending outgoing share, false otherwise
+     */
+    public static boolean isOutShare(MegaNode node) {
+        return node.isOutShare() || MegaApplication.getInstance().getMegaApi().isPendingShare(node);
+    }
+
+    /**
+     * Gets the the icon that has to be displayed for a folder.
+     *
+     * @param node          MegaNode referencing the folder to check
+     * @param drawerItem    indicates if the icon has to be shown in Outgoing shares section or any other
+     * @return The icon of the folder to be displayed.
+     */
+    public static int getFolderIcon(MegaNode node, ManagerActivityLollipop.DrawerItem drawerItem) {
+        if (node.isInShare()) {
+            return R.drawable.ic_folder_incoming;
+        } else if (isCameraUploads(node)) {
+            if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS && isOutShare(node)) {
+                return R.drawable.ic_folder_outgoing;
+            } else {
+                return R.drawable.ic_folder_camera_uploads_list;
+            }
+        } else if (isMyChatFilesFolder(node)) {
+            if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS && isOutShare(node)) {
+                return R.drawable.ic_folder_outgoing;
+            } else {
+                return R.drawable.ic_folder_chat_list;
+            }
+        } else if (isOutShare(node)) {
+            return R.drawable.ic_folder_outgoing;
+        } else {
+            return R.drawable.ic_folder_list;
         }
     }
 }

@@ -521,7 +521,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                                 View.MeasureSpec.makeMeasureSpec(mapWidth, View.MeasureSpec.EXACTLY));
                         mapView.layout(0, 0, mapWidth, mapWidth);
                         mapView.buildDrawingCache(true);
-                        Bitmap bitmap = Bitmap.createScaledBitmap(mapView.getDrawingCache(), SNAPSHOT_SIZE, SNAPSHOT_SIZE, false);
+                        Bitmap bitmap = Bitmap.createScaledBitmap(mapView.getDrawingCache(), SNAPSHOT_SIZE, SNAPSHOT_SIZE, true);
                         mapView.setDrawingCacheEnabled(false);
 
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();

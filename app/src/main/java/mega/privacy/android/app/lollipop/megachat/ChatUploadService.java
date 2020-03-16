@@ -235,31 +235,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		return START_NOT_STICKY;
 	}
 
-	Bitmap.CompressFormat getCompressFormat(String name) {
-		String[] s = name.split("\\.");
-		String ext;
-		if (s != null && s.length > 1) {
-			ext = s[s.length-1];
-			switch (ext) {
-				case "jpeg" :
-				case "jpg":{
-					return Bitmap.CompressFormat.JPEG;
-				}
-				case "png": {
-					return Bitmap.CompressFormat.PNG;
-				}
-				case "webp":{
-					return Bitmap.CompressFormat.WEBP;
-				}
-				default: {
-					return Bitmap.CompressFormat.JPEG;
-				}
-			}
-		}
-		return Bitmap.CompressFormat.JPEG;
-	}
-
-	@SuppressWarnings("unchecked")
 	protected void onHandleIntent(final Intent intent) {
 		if (intent == null) return;
 
@@ -358,101 +333,32 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		PendingMessageSingle pendingMsg = pendingMsgs.get(0);
 		File file = new File(pendingMsg.getFilePath());
-
-		ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-		boolean isWIFI = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-		boolean isData = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();
+		boolean isData = ((ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();
 
 		if(MimeTypeList.typeForName(file.getName()).isImage() && !MimeTypeList.typeForName(file.getName()).isGIF() && isData){
-			logDebug("DATA connection is Image");
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			Bitmap fileBitmap = BitmapFactory.decodeFile(file.getPath(), options);
-			if (fileBitmap != null) {
-				logDebug("DATA connection file decoded");
-				float width = options.outWidth;
-				float height = options.outHeight;
-				float totalPixels = width * height;
-				float division = DOWNSCALE_IMAGES_PX/totalPixels;
-				float factor = (float) Math.min(Math.sqrt(division), 1);
-				if (factor < 1) {
-					width *= factor;
-					height *= factor;
-					logDebug("DATA connection factor<1 totalPixels: " + totalPixels + " width: " + width + " height: " + height +
-							" DOWNSCALE_IMAGES_PX/totalPixels: " + division + " Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): " + Math.sqrt(division));
-					Bitmap scaleBitmap = Bitmap.createScaledBitmap(fileBitmap, (int)width, (int)height, false);
-					if (scaleBitmap != null) {
-						logDebug("DATA connection scaled Bitmap != null");
-						File outFile = buildChatTempFile(getApplicationContext(), file.getName());
-						if (outFile != null) {
-							logDebug("DATA connection new file != null");
-							FileOutputStream fOut;
-							try {
-								fOut = new FileOutputStream(outFile);
-								scaleBitmap.compress(getCompressFormat(file.getName()), 100, fOut);
-								fOut.flush();
-								fOut.close();
-								logDebug("DATA connection file compressed");
-								String fingerprint = megaApi.getFingerprint(outFile.getAbsolutePath());
-								for (PendingMessageSingle pendMsg : pendingMsgs) {
-									if (fingerprint != null) {
-										pendMsg.setFingerprint(fingerprint);
-									}
-									pendingMessages.add(pendMsg);
-								}
-								megaApi.startUploadWithTopPriority(outFile.getAbsolutePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-								logDebug("DATA connection file uploading");
-							} catch (Exception e){
-								for (PendingMessageSingle pendMsg : pendingMsgs) {
-									pendingMessages.add(pendMsg);
-								}
-								megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-								logError("DATA connection Exception compressing", e);
-							}
-							fileBitmap.recycle();
-							scaleBitmap.recycle();
-						}
-						else {
-							fileBitmap.recycle();
-							scaleBitmap.recycle();
-							for (PendingMessageSingle pendMsg : pendingMsgs) {
-								pendingMessages.add(pendMsg);
-							}
+			String uploadPath;
+			File compressedFile = checkImageBeforeUpload(file);
 
-							megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-							logWarning("DATA connection new file NULL");
-						}
+			if (isFileAvailable(compressedFile)) {
+				String fingerprint = megaApi.getFingerprint(compressedFile.getAbsolutePath());
+				for (PendingMessageSingle pendMsg : pendingMsgs) {
+					if (fingerprint != null) {
+						pendMsg.setFingerprint(fingerprint);
 					}
-					else {
-						fileBitmap.recycle();
-						for (PendingMessageSingle pendMsg : pendingMsgs) {
-							pendingMessages.add(pendMsg);
-						}
-
-						megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-						logWarning("DATA connection scaled Bitmap NULL");
-					}
+					pendingMessages.add(pendMsg);
 				}
-				else {
-					fileBitmap.recycle();
-					for (PendingMessageSingle pendMsg : pendingMsgs) {
-						pendingMessages.add(pendMsg);
-					}
 
-					megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-					logDebug("DATA connection factor >= 1 totalPixels: " + totalPixels + " width: " + width + " height: " + height +
-							" DOWNSCALE_IMAGES_PX/totalPixels: " + DOWNSCALE_IMAGES_PX/totalPixels+" Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): " + Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels));
-				}
-			}
-			else {
+				uploadPath = compressedFile.getAbsolutePath();
+			} else {
 				for (PendingMessageSingle pendMsg : pendingMsgs) {
 					pendingMessages.add(pendMsg);
 				}
 
-				megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-				logWarning("DATA connection file NULL");
+				uploadPath = pendingMsg.getFilePath();
 			}
-		}
-		else if(MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)){
+
+			megaApi.startUploadWithTopPriority(uploadPath, parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
+		} else if(MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)){
 			logDebug("DATA connection is Mp4Video");
 
 			try {

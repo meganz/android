@@ -107,13 +107,18 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			logDebug("PreviewAsyncTask()-doInBackground");
 			handle = params[0];
 			MegaNode node = megaApi.getNodeByHandle(handle);
+			if (node == null) {
+				logWarning("Cannot get the preview because the node is NULL.");
+				return 3;
+			}
+
 			preview = getPreviewFromFolderFullImage(node, activity);
 			
 			if (preview != null){
 				return 0;
 			}
 			else{
-				if (pendingPreviews.contains(node.getHandle())){
+				if (pendingPreviews != null && pendingPreviews.contains(node.getHandle())) {
 					logDebug("The preview is already downloaded or added to the list");
 					return 1;
 				}
