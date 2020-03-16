@@ -66,6 +66,7 @@ public class SettingsConstants {
     public static final String KEY_MEGA_SECONDARY_MEDIA_FOLDER = "settings_mega_secondary_media_folder";
 
     public static final String KEY_CACHE = "settings_advanced_features_cache";
+    public static final String KEY_CANCEL_ACCOUNT = "settings_advanced_features_cancel_account";
     public static final String KEY_OFFLINE = "settings_file_management_offline";
     public static final String KEY_RUBBISH = "settings_file_management_rubbish";
     public static final String KEY_FILE_VERSIONS = "settings_file_management_file_version";
