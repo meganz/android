@@ -1026,6 +1026,7 @@ public class NodeController {
             megaApi.exportNode(document, ((ManagerActivityLollipop) context));
         }
         else if(context instanceof GetLinkActivityLollipop){
+            ((GetLinkActivityLollipop) context).setFinishActivityAtError(true);
             megaApi.exportNode(document, ((GetLinkActivityLollipop) context));
         }
         else  if(context instanceof FullScreenImageViewerLollipop){

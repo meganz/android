@@ -82,6 +82,9 @@ public class BaseActivity extends AppCompatActivity {
 
     private DisplayMetrics outMetrics;
 
+    //Indicates when the activity should finish due to some error
+    private static boolean finishActivityAtError;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
@@ -544,6 +547,10 @@ public class BaseActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 isExpiredBusinessAlertShown = false;
+                if (finishActivityAtError) {
+                    finishActivityAtError = false;
+                    finish();
+                }
                 dialog.dismiss();
             }
         });
@@ -615,5 +622,9 @@ public class BaseActivity extends AppCompatActivity {
 
     public DisplayMetrics getOutMetrics() {
         return outMetrics;
+    }
+
+    public static void setFinishActivityAtError(boolean finishActivityAtError) {
+        BaseActivity.finishActivityAtError = finishActivityAtError;
     }
 }

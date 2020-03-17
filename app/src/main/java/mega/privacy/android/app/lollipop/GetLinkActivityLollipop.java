@@ -340,7 +340,8 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (e.getErrorCode() == MegaError.API_OK) {
 			logDebug("link: " + request.getLink());
-			
+
+			setFinishActivityAtError(false);
 			//for megaApi.encryptLinkWithPassword() case, request.getNodeHandle() returns -1 and cause selectedNode set to null
 			long handle = request.getNodeHandle();
 			if(handle == -1){
@@ -355,6 +356,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		} else {
+			setFinishActivityAtError(false);
 			logWarning("Error: " + e.getErrorString());
 			showSnackbar(getString(R.string.context_no_link));
 		}
