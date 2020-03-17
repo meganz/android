@@ -1417,7 +1417,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									REQUEST_WRITE_STORAGE);
 		        		}
 		        		else{
-							checkTakePicture(this);
+							checkTakePicture(this, TAKE_PHOTO_CODE);
 							typesCameraPermission = -1;
 		        		}
 		        	}
@@ -1465,7 +1465,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
 							}
 							else{
-								checkTakePicture(this);
+								checkTakePicture(this, TAKE_PHOTO_CODE);
 								typesCameraPermission = -1;
 							}
 						}
@@ -1492,7 +1492,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									REQUEST_CAMERA);
 						}
 						else{
-							checkTakePicture(this);
+							checkTakePicture(this, TAKE_PHOTO_CODE);
 							typesCameraPermission = -1;
 						}
 					}
@@ -3731,7 +3731,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     			}
     			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
 					logDebug("Intent take selfie");
-					checkTakePicture(this);
+					checkTakePicture(this, TAKE_PHOTO_CODE);
     			}
 				else if (intent.getAction().equals(SHOW_REPEATED_UPLOAD)){
 					logDebug("Intent SHOW_REPEATED_UPLOAD");
@@ -7600,11 +7600,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 
 					if (hasStoragePermission && hasCameraPermission){
-						checkTakePicture(this);
+						checkTakePicture(this, TAKE_PHOTO_CODE);
 					}
 				}
 		    	else{
-					checkTakePicture(this);
+					checkTakePicture(this, TAKE_PHOTO_CODE);
 		    	}
 
 		    	return true;
@@ -10027,24 +10027,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void takeProfilePicture(){
-		File newFile = buildTempFile(this, "picture.jpg");
-		try {
-			newFile.createNewFile();
-		} catch (IOException e) {}
-
-		Uri outputFileUri;
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
-		}
-		else{
-			outputFileUri = Uri.fromFile(newFile);
-		}
-
-		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-		cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		startActivityForResult(cameraIntent, TAKE_PICTURE_PROFILE_CODE);
+		checkTakePicture(this, TAKE_PICTURE_PROFILE_CODE);
 	}
 
 	public void showCancelMessage(){
@@ -10196,7 +10179,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			return;
 		}
-		checkTakePicture(this);
+		checkTakePicture(this, TAKE_PHOTO_CODE);
 	}
 
 	@Override

@@ -296,9 +296,10 @@ public class CallUtil {
                     if (activity instanceof ManagerActivityLollipop) {
                         if (action.equals(ACTION_OPEN_QR)) {
                             ((ManagerActivityLollipop) activity).openQR();
-                        }
-                        if (action.equals(ACTION_TAKE_PICTURE)) {
-                            takePicture(activity);
+                        } else if (action.equals(ACTION_TAKE_PICTURE)) {
+                            takePicture(activity, TAKE_PHOTO_CODE);
+                        } else if (action.equals(ACTION_TAKE_PROFILE_PICTURE)) {
+                            takePicture(activity, TAKE_PICTURE_PROFILE_CODE);
                         }
                     }
                     if (activity instanceof AddContactActivityLollipop && action.equals(ACTION_OPEN_QR)) {

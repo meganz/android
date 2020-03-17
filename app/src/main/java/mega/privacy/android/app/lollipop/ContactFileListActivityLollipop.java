@@ -225,7 +225,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			return;
 		}
-		checkTakePicture(this);
+		checkTakePicture(this, TAKE_PHOTO_CODE);
 	}
 
 	@Override
