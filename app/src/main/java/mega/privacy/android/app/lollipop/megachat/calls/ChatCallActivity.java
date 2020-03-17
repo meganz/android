@@ -196,21 +196,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.call_action, menu);
         cameraSwapMenuItem = menu.findItem(R.id.cab_menu_camera_swap);
+        cameraSwapMenuItem.setEnabled(true);
+        cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.background_chat));
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if(isNecessaryToShowSwapCameraOption()){
+        if (isNecessaryToShowSwapCameraOption() && callChat.hasLocalVideo()) {
             cameraSwapMenuItem.setVisible(true);
-            if(callChat.hasLocalVideo()){
-                cameraSwapMenuItem.setEnabled(true);
-                cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.background_chat));
-            }else{
-                cameraSwapMenuItem.setEnabled(false);
-                cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.white_50_opacity));
-            }
-        }else{
+        } else {
             cameraSwapMenuItem.setVisible(false);
         }
 
