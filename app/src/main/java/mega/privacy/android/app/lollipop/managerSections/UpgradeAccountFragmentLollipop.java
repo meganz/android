@@ -30,9 +30,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
@@ -1004,11 +1004,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.upgrade_business_layout:{
-				String url = "https://mega.nz/registerb";
-				Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
-				openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				openTermsIntent.setData(Uri.parse(url));
-				startActivity(openTermsIntent);
+				megaApi.getSessionTransferURL("registerb", new SessionTransferURLListener(context));
 				break;
 			}
 		}
