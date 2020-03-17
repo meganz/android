@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
@@ -17,8 +19,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
@@ -28,15 +32,20 @@ import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import nz.mega.sdk.AndroidGfxProcessor;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ChatUtil {
+
+    private static final float DOWNSCALE_IMAGES_PX = 2000000f;
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -68,23 +77,19 @@ public class ChatUtil {
             return length + count;
 
         }
-        return -1;
+        return length;
     }
 
     public static int getMaxAllowed(@Nullable CharSequence text) {
-
         int realLength = getRealLength(text);
-        if (realLength > MAX_ALLOWED_CHARACTERS_AND_EMOJIS){
+        if (realLength > MAX_ALLOWED_CHARACTERS_AND_EMOJIS) {
             return text.length();
         }
         return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
     }
 
     public static boolean isAllowedTitle(String text) {
-        if (getMaxAllowed(text) == text.length() && text.length() != MAX_ALLOWED_CHARACTERS_AND_EMOJIS) {
-            return false;
-        }
-        return true;
+        return getMaxAllowed(text) != text.length() || getRealLength(text) == MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
     }
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
@@ -298,4 +303,87 @@ public class ChatUtil {
         return result;
     }
 
+    /**
+     * Gets the image compress format depending on the file extension.
+     * @param name Name of the image file including the extension.
+     * @return Image compress format.
+     */
+    private static Bitmap.CompressFormat getCompressFormat(String name) {
+        String[] s = name.split("\\.");
+
+        if (s.length > 1) {
+            String ext = s[s.length - 1];
+            switch (ext) {
+                case "jpeg":
+                case "jpg":
+                default:
+                    return Bitmap.CompressFormat.JPEG;
+
+                case "png":
+                    return Bitmap.CompressFormat.PNG;
+
+                case "webp":
+                    return Bitmap.CompressFormat.WEBP;
+            }
+        }
+        return Bitmap.CompressFormat.JPEG;
+    }
+
+    /**
+     * Checks an image before upload to a chat and downscales it if needed.
+     * @param file Original image file.
+     * @return Image file to be uploaded.
+     */
+    public static File checkImageBeforeUpload(File file) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        int orientation = AndroidGfxProcessor.getExifOrientation(file.getAbsolutePath());
+        Rect fileRect = AndroidGfxProcessor.getImageDimensions(file.getAbsolutePath(), orientation);
+        Bitmap fileBitmap = AndroidGfxProcessor.getBitmap(file.getAbsolutePath(), fileRect, orientation, fileRect.right, fileRect.bottom);
+        if (fileBitmap == null) {
+            logError("Bitmap NULL when decoding image file for upload it to chat.");
+            return null;
+        }
+
+        File outFile = null;
+        float width = options.outWidth;
+        float height = options.outHeight;
+        float totalPixels = width * height;
+        float division = DOWNSCALE_IMAGES_PX / totalPixels;
+        float factor = (float) Math.min(Math.sqrt(division), 1);
+
+        if (factor < 1) {
+            width *= factor;
+            height *= factor;
+            logDebug("DATA connection factor<1 totalPixels: " + totalPixels + " width: " + width + " height: " + height +
+                    " DOWNSCALE_IMAGES_PX/totalPixels: " + division + " Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): " + Math.sqrt(division));
+
+            Bitmap scaleBitmap = Bitmap.createScaledBitmap(fileBitmap, (int) width, (int) height, true);
+            if (scaleBitmap == null) {
+                logError("Bitmap NULL when scaling image file for upload it to chat.");
+                return null;
+            }
+
+            outFile = buildChatTempFile(MegaApplication.getInstance().getApplicationContext(), file.getName());
+            if (outFile == null) {
+                logError("File NULL when building it for upload a scaled image to chat.");
+                return null;
+            }
+
+            FileOutputStream fOut;
+            try {
+                fOut = new FileOutputStream(outFile);
+                scaleBitmap.compress(getCompressFormat(file.getName()), 100, fOut);
+                fOut.flush();
+                fOut.close();
+            } catch (Exception e) {
+                logError("Exception compressing image file for upload it to chat.", e);
+            }
+
+            scaleBitmap.recycle();
+        }
+
+        fileBitmap.recycle();
+
+        return outFile;
+    }
 }

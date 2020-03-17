@@ -1561,8 +1561,6 @@
     <string name="achievements_title" context="title of the section for achievements">Başarılar</string>
     <string name="achievements_subtitle" context="subtitle of the section for achievements">Arkadaşlarını davet et ve ödüller kazan</string>
 
-    <string name="button_invite_friends" context="button to invite friends for getting achievements">Arkadaşlarınızı davet edin</string>
-
     <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">Her tavsiye için %1$s depolama alanı ve %2$s aktarım kazanın</string>
 
     <string name="figures_achievements_text" context="sentence to detail the figures of storage and transfer quota related to each achievement">%1$s depolama alanına ve %2$s aktarıma sahip olun</string>

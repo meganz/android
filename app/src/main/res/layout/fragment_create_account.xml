@@ -53,6 +53,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="7dp"
+                            android:hint="@string/first_name_text"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
@@ -63,7 +64,6 @@
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="text|textCapWords"
-                                android:hint="@string/first_name_text"
                                 android:theme="@style/ColorControlStyle"/>
 
                         </android.support.design.widget.TextInputLayout>
@@ -89,6 +89,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
+                            android:hint="@string/lastname_text"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
@@ -99,7 +100,6 @@
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="text|textCapWords"
-                                android:hint="@string/lastname_text"
                                 android:theme="@style/ColorControlStyle"/>
 
                         </android.support.design.widget.TextInputLayout>
@@ -125,6 +125,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
+                            android:hint="@string/email_text"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
@@ -135,7 +136,6 @@
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="textEmailAddress"
-                                android:hint="@string/email_text"
                                 android:theme="@style/ColorControlStyle"/>
 
                         </android.support.design.widget.TextInputLayout>
@@ -161,6 +161,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
+                            android:hint="@string/password_text"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError"
                             app:passwordToggleDrawable="@drawable/password_toggle"
@@ -173,7 +174,6 @@
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="textPassword"
-                                android:hint="@string/password_text"
                                 android:theme="@style/ColorControlStyle"/>
 
                         </android.support.design.widget.TextInputLayout>
@@ -278,6 +278,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
+                            android:hint="@string/confirm_password_text"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError"
                             app:passwordToggleDrawable="@drawable/password_toggle"
@@ -290,7 +291,6 @@
                                 android:textSize="16sp"
                                 android:imeOptions="actionDone"
                                 android:inputType="textPassword"
-                                android:hint="@string/confirm_password_text"
                                 android:theme="@style/ColorControlStyle"/>
 
                         </android.support.design.widget.TextInputLayout>

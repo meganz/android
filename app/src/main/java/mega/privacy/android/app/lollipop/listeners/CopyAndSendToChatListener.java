@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.listeners;
 
-import android.app.Activity;
 import android.content.Context;
 
 import java.util.ArrayList;
@@ -22,6 +21,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER;
 
 public class CopyAndSendToChatListener implements MegaRequestListenerInterface, MyChatFilesExisitListener<ArrayList<MegaNode>> {
@@ -70,8 +70,14 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
     public void copyNodes(ArrayList<MegaNode> nodes, ArrayList<MegaNode> ownerNodes) {
         nodesCopied.addAll(ownerNodes);
         counter = nodes.size();
+
         storedUnhandledData(nodes);
-        megaApi.getMyChatFilesFolder(this);
+        if (existsMyChatFilesFolder()) {
+            parentNode = getMyChatFilesFolder();
+            handleStoredData();
+        } else {
+            megaApi.getMyChatFilesFolder(this);
+        }
     }
 
     private long[] getNodeHandles() {
@@ -139,6 +145,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
             }
             if (myChatFilesFolderExists) {
                 proceedWithHandleStoredData(request.getNodeHandle());
+                MegaApplication.getInstance().getDbH().setMyChatFilesFolderHandle(request.getNodeHandle());
             }
         }
     }

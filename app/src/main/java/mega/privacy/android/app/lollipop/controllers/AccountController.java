@@ -36,6 +36,7 @@ import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.jobservices.SyncRecord;
+import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
@@ -482,7 +483,7 @@ public class AccountController {
             megaApi.logout(((TestPasswordActivity)context));
         }
         else{
-            megaApi.logout();
+            megaApi.logout(new LogoutListener(context));
         }
 
         Intent intent = new Intent();

@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,6 +37,7 @@ import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -266,6 +266,10 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 holder.itemView.setOnClickListener(this);
             }
 
+            holder.permissionsIcon.setVisibility(View.GONE);
+            holder.textViewFileSize.setText(getInfoFolder(node, context));
+            holder.imageView.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
+
             if(node.isInShare()){
                 if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                     holder.textViewFileName.setMaxWidth(scaleWidthPx(260, outMetrics));
@@ -276,7 +280,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                     holder.textViewFileName.setMaxWidth(scaleWidthPx(200, outMetrics));
                     holder.textViewFileSize.setMaxWidth(scaleWidthPx(200, outMetrics));
                 }
-                holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
                 for(int j=0; j<sharesIncoming.size();j++){
                     MegaShare mS = sharesIncoming.get(j);
@@ -315,21 +318,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 else{
                     holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
                 }
-            }
-            else if(node.isOutShare()||megaApi.isPendingShare(node)) {
-                holder.permissionsIcon.setVisibility(View.GONE);
-                holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
-                holder.textViewFileSize.setText(getInfoFolder(node, context));
-
-            }else{
-                holder.permissionsIcon.setVisibility(View.GONE);
-                boolean isCU = isCameraUploads(node);
-                if(isCU){
-                    holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
-                }else{
-                    holder.imageView.setImageResource(R.drawable.ic_folder_list);
-                }
-                holder.textViewFileSize.setText(getInfoFolder(node, context));
             }
         }
         else{
@@ -413,18 +401,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.itemLayout.setBackgroundColor(Color.WHITE);
             holder.itemView.setOnLongClickListener(null);
 
-            if(node.isInShare()){
-                holder.folderIcon.setImageResource(R.drawable.ic_folder_incoming_list);
-            }
-            else if(node.isOutShare()||megaApi.isPendingShare(node)) {
-                holder.folderIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
-            }
-            else if(isCameraUploads(node)){
-                holder.folderIcon.setImageResource(R.drawable.ic_folder_image_list);
-            }
-            else{
-                holder.folderIcon.setImageResource(R.drawable.ic_folder_list);
-            }
+            holder.folderIcon.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
 
             if (disabledNodes != null && disabledNodes.contains(node.getHandle())) {
                 holder.folderIcon.setAlpha(.4f);
