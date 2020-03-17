@@ -15,25 +15,38 @@ import android.widget.TextView;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaHandleList;
+
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 public class textMsgBottomSheet extends BottomSheetDialogFragment implements View.OnClickListener {
 
-    private Context context;
+    Context context;
+    MegaHandleList handleList;
+    AndroidMegaChatMessage message = null;
+    long chatId;
+    long messageId;
+    String email=null;
+
+    int position;
 
     private BottomSheetBehavior mBehavior;
     private LinearLayout items_layout;
 
-    private LinearLayout mainLinearLayout;
+    public LinearLayout mainLinearLayout;
     private RelativeLayout titleLayout;
     private LinearLayout optionForward;
     private LinearLayout optionCopy;
     private DisplayMetrics outMetrics;
 
+    static ManagerActivityLollipop.DrawerItem drawerItem = null;
+    private int heightDisplay;
     private MegaApiAndroid megaApi;
     private DatabaseHandler dbH;
-    private int heightDisplay;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

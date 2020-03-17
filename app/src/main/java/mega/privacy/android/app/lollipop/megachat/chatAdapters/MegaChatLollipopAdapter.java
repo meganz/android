@@ -845,6 +845,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageLayout = v.findViewById(R.id.content_own_message_layout);
             holder.contentOwnMessageText = v.findViewById(R.id.content_own_message_text);
+            holder.contentOwnMessageText.setTag(holder);
+            holder.contentOwnMessageText.setOnClickListener(this);
             holder.contentOwnMessageText.setNeccessaryShortCode(false);
 
             //Own rich links message

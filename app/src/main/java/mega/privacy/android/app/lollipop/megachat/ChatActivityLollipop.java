@@ -130,6 +130,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.textMsgBottomSheet;
 import mega.privacy.android.app.utils.TimeUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -4646,30 +4647,35 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 startActivity(browserIntent);
 
                             } else if(m.getMessage().getType() == MegaChatMessage.TYPE_NORMAL && m.getRichLinkMessage()!=null){
-                                logDebug("TYPE_NORMAL");
-                                AndroidMegaRichLinkMessage richLinkMessage = m.getRichLinkMessage();
-                                String url = richLinkMessage.getUrl();
+                                if(m.getRichLinkMessage() != null){
+                                    logDebug("TYPE_NORMAL");
+                                    AndroidMegaRichLinkMessage richLinkMessage = m.getRichLinkMessage();
+                                    String url = richLinkMessage.getUrl();
 
-                                if(richLinkMessage.isChat()){
-                                    loadChatLink(url);
-                                }
-                                else{
-                                    if(richLinkMessage.getNode()!=null){
-                                        if(richLinkMessage.getNode().isFile()){
-                                            openMegaLink(url, true);
-                                        }
-                                        else{
-                                            openMegaLink(url, false);
-                                        }
+                                    if(richLinkMessage.isChat()){
+                                        loadChatLink(url);
                                     }
                                     else{
-                                        if(richLinkMessage.isFile()){
-                                            openMegaLink(url, true);
+                                        if(richLinkMessage.getNode()!=null){
+                                            if(richLinkMessage.getNode().isFile()){
+                                                openMegaLink(url, true);
+                                            }
+                                            else{
+                                                openMegaLink(url, false);
+                                            }
                                         }
                                         else{
-                                            openMegaLink(url, false);
+                                            if(richLinkMessage.isFile()){
+                                                openMegaLink(url, true);
+                                            }
+                                            else{
+                                                openMegaLink(url, false);
+                                            }
                                         }
                                     }
+                                }else{
+                                    logDebug("Clicked text message");
+                                    showNormalMessageBottomSheet(m, positionInMessages);
                                 }
                             }
                         }
@@ -6817,6 +6823,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         selectedMessageId = message.getMessage().getMsgId();
         bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+    }
+
+    public void showNormalMessageBottomSheet(AndroidMegaChatMessage message, int position){
+        logDebug("showNormalMessageBottomSheet: "+position);
+        selectedPosition = position;
+
+        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+
+        selectedMessageId = message.getMessage().getMsgId();
+        bottomSheetDialogFragment = new textMsgBottomSheet();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
