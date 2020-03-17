@@ -64,11 +64,9 @@ public class ContactNicknameBottomSheetDialogFragment extends BottomSheetDialogF
 
     @Override
     public void setupDialog(final Dialog dialog, int style) {
-
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-
         heightDisplay = outMetrics.heightPixels;
 
         super.setupDialog(dialog, style);
@@ -95,7 +93,6 @@ public class ContactNicknameBottomSheetDialogFragment extends BottomSheetDialogF
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putString(EXTRA_USER_NICKNAME, nickname);
     }

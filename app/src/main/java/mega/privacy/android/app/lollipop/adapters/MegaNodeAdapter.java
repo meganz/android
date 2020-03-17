@@ -1395,7 +1395,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 subtitle = sl.get(0).getUser();
                 MegaContactDB contactDB = dbH.findContactByEmail(subtitle);
                 if (contactDB != null) {
-                    String fullName = new ContactController(context).getFullName(contactDB.getName(), contactDB.getLastName(), contactDB.getMail());
+                    String fullName = getContactNameDB(contactDB);
                     if (fullName != null) {
                         subtitle = fullName;
                     }

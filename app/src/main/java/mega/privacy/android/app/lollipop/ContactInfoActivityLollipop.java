@@ -2409,8 +2409,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-
 		outState.putBoolean(WAITING_FOR_CALL, waitingForCall);
+		hideKeyboard();
 	}
 
 	@Override
