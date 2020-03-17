@@ -1367,7 +1367,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	public void addNickname(String oldNickname, String newNickname) {
-		if (oldNickname != null && newNickname != null && oldNickname.equals(newNickname)) return;
+		if (oldNickname != null && oldNickname.equals(newNickname)) return;
 		//Update the new nickname
 		megaApi.setUserAlias(user.getHandle(), newNickname, new SetAttrUserListener(this));
 	}

@@ -1715,27 +1715,26 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 customSubtitle.append(", ");
             }
             String participant;
-
-            String participantName = chatRoom.getPeerFirstname(i);
-            if (isTextEmpty(participantName)) {
-                //Get the lastname
-                String participantLastName = chatRoom.getPeerLastname(i);
-                if (isTextEmpty(participantLastName)) {
-                    //Get the email
-                    participant = chatRoom.getPeerEmail(i);
-                } else {
-                    //Append last name to the title
-                    participant = participantLastName;
-                }
-            } else {
-                //Append first name to the title
-                participant = participantName;
-            }
-
             //Check nickname
             String nickname = getNicknameContact(chatRoom.getPeerHandle(i));
-            if(nickname != null){
+            if (nickname != null) {
                 participant = nickname;
+            } else {
+                String participantName = chatRoom.getPeerFirstname(i);
+                if (isTextEmpty(participantName)) {
+                    //Get the lastname
+                    String participantLastName = chatRoom.getPeerLastname(i);
+                    if (isTextEmpty(participantLastName)) {
+                        //Get the email
+                        participant = chatRoom.getPeerEmail(i);
+                    } else {
+                        //Append last name to the title
+                        participant = participantLastName;
+                    }
+                } else {
+                    //Append first name to the title
+                    participant = participantName;
+                }
             }
             customSubtitle.append(participant);
         }

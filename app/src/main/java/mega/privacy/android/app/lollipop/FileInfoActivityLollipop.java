@@ -1532,18 +1532,13 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 						contactMail=user.getEmail();
 						if(user!=null){
                             String name = getMegaUserNameDB(user);
-                            if (name != null) {
-                                ownerLabel.setText(name);
-                                ownerInfo.setText(user.getEmail());
-                                setOwnerState(user.getHandle());
-                                createDefaultAvatar(ownerRoundeImage, user, name);
-                            } else {
-                                logWarning("The contactDB is null: ");
-                                ownerLabel.setText(user.getEmail());
-                                ownerInfo.setText(user.getEmail());
-                                setOwnerState(user.getHandle());
-                                createDefaultAvatar(ownerRoundeImage, user, user.getEmail());
+                            if (name == null) {
+                                name = user.getEmail();
                             }
+                            ownerLabel.setText(name);
+                            ownerInfo.setText(user.getEmail());
+                            setOwnerState(user.getHandle());
+                            createDefaultAvatar(ownerRoundeImage, user, name);
 						}
 						else{
 							ownerLabel.setText(mS.getUser());
