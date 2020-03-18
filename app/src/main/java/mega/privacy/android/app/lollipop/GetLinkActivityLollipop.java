@@ -355,7 +355,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 					getLinkFragment.requestFinish(request, e);
 				}
 			}
-		} else {
+		} else if (e.getErrorCode() != MegaError.API_EBUSINESSPASTDUE){
 			setFinishActivityAtError(false);
 			logWarning("Error: " + e.getErrorString());
 			showSnackbar(getString(R.string.context_no_link));
