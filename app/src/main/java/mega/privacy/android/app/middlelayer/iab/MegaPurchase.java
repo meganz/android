@@ -1,6 +1,7 @@
 package mega.privacy.android.app.middlelayer.iab;
 
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 
 import com.android.billingclient.api.Purchase;
 
