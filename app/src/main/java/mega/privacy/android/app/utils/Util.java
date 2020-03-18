@@ -1801,8 +1801,6 @@ public class Util {
 		activity.startActivityForResult(cameraIntent, option);
 	}
 
-//	startActivityForResult(cameraIntent, TAKE_PICTURE_PROFILE_CODE);
-
 	public static void resetActionBar(ActionBar aB) {
 		if (aB != null) {
 			View customView = aB.getCustomView();
