@@ -1,6 +1,5 @@
 package mega.privacy.android.app.components.scrollBar.viewprovider;
 
-import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

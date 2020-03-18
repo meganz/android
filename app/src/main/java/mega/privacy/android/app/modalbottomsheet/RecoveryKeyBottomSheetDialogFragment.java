@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import androidx.print.PrintHelper;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
