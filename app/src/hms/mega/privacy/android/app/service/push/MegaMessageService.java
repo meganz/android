@@ -1,14 +1,13 @@
-package mega.privacy.android.app.hms.push;
+package mega.privacy.android.app.service.push;
 
 import com.huawei.hms.push.HmsMessageService;
 import com.huawei.hms.push.RemoteMessage;
 
-import middlelayer.PushMessageHanlder;
+import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
-
-public class HmsPushService extends HmsMessageService {
+public class MegaMessageService extends HmsMessageService {
 
     private PushMessageHanlder messageHanlder;
 

@@ -496,23 +496,12 @@
         </service>
 
         <service
-            android:name=".fcm.MegaFirebaseMessagingService">
+            android:name=".service.push.MegaMessageService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
-        </service>
-        <service
-            android:name=".hms.push.HmsPushService"
-            android:exported="false">
             <intent-filter>
                 <action android:name="com.huawei.push.action.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
-
-        <service
-            android:name=".fcm.MegaFirebaseInstanceIDService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
 

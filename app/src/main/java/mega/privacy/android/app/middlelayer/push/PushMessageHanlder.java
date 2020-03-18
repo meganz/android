@@ -1,4 +1,4 @@
-package middlelayer;
+package mega.privacy.android.app.middlelayer.push;
 
 import android.content.Context;
 import android.content.Intent;
@@ -31,11 +31,11 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 public class PushMessageHanlder implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
     private static final int AWAKE_CPU_FOR = 60 * 1000;
-    public static final String TYPE_SHARE_FOLDER = "1";
-    public static final String TYPE_CONTACT_REQUEST = "3";
-    public static final String TYPE_ACCEPTANCE = "5";
-    public static final String TYPE_CALL = "4";
-    public static final String TYPE_CHAT = "2";
+    private static final String TYPE_SHARE_FOLDER = "1";
+    private static final String TYPE_CONTACT_REQUEST = "3";
+    private static final String TYPE_ACCEPTANCE = "5";
+    private static final String TYPE_CALL = "4";
+    private static final String TYPE_CHAT = "2";
 
     private MegaApplication app;
 
@@ -165,7 +165,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
         if (megaApi == null) {
             megaApi = app.getMegaApi();
         }
-        logDebug("TOKEN: " + token);
+        logDebug("Push service's token: " + token);
         megaApi.registerPushNotifications(DEVICE_ANDROID, token);
     }
 
