@@ -20,7 +20,7 @@ package mega.privacy.android.app.components.flowlayoutmanager;
 
 
 import android.graphics.Point;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 public class LayoutHelper {

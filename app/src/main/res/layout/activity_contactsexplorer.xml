@@ -9,7 +9,7 @@
     android:orientation="vertical"
     tools:context=".ContactsExplorerActivityLollipop" >
     
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_contacts_explorer"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -40,7 +40,7 @@
         android:textColor="@color/text_secondary"
         android:textSize="16sp" />
   
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/contacts_explorer_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

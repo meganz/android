@@ -9,7 +9,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_contact_attachment_chat"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -60,7 +60,7 @@
         android:background="@color/tour_bar_grey" />
 
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/contact_attachment_chat_view_browser"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
