@@ -20,29 +20,18 @@ import android.app.Activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-
+import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.middlelayer.iab.QuerySkuListCallback;
-import mega.privacy.android.app.utils.TextUtil;
-import mega.privacy.android.app.utils.billing.PaymentUtils;
-import mega.privacy.android.app.utils.billing.Security;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 
 /**
  * Handles all the interactions with Play Store (via Billing library), maintains connection to
  * it through BillingClient and caches temporary states/data if needed
  */
-public class BillingManager  {
+public class BillingManagerImpl implements BillingManager {
 
     /**
      * Handles all the interactions with Play Store (via Billing library), maintains connection to
@@ -52,8 +41,36 @@ public class BillingManager  {
      * @param updatesListener The callback, when billing status update. {@link BillingUpdatesListener}
      * @param pl              Payload, using MegaUser's hanlde as payload. {@link MegaUser#getHandle()}
      */
-    public BillingManager(Activity activity, BillingUpdatesListener updatesListener, String pl) {}
+    public BillingManagerImpl(Activity activity, BillingUpdatesListener updatesListener, String pl) {}
 
+    @Override
+    public boolean isPurchased(MegaPurchase purchase) {
+        return false;
+    }
 
+    @Override
+    public void initiatePurchaseFlow(@Nullable String oldSku, @Nullable String purchaseToken, @NonNull MegaSku skuDetails) {
+
+    }
+
+    @Override
+    public void destroy() {
+
+    }
+
+    @Override
+    public void getInventory(QuerySkuListCallback callback) {
+
+    }
+
+    @Override
+    public boolean isPayloadValid(String pl) {
+        return false;
+    }
+
+    @Override
+    public String getPayload() {
+        return null;
+    }
 }
 

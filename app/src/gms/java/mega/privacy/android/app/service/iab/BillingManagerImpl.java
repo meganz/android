@@ -40,8 +40,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.transform.Result;
-
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -70,6 +68,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     private final Activity mActivity;
     private final List<Purchase> mPurchases = new ArrayList<>();
     private List<SkuDetails> mSkus;
+
 
     /**
      * Handles all the interactions with Play Store (via Billing library), maintains connection to
@@ -184,14 +183,11 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     private void querySkuDetailsAsync(@SkuType String itemType, List<String> skuList, SkuDetailsResponseListener listener) {
         logDebug("querySkuDetailsAsync type is " + itemType);
         // Creating a runnable from the request to use it inside our connection retry policy below
-        Runnable queryRequest = new Runnable() {
-            @Override
-            public void run() {
-                // Query the purchase async
-                SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
-                params.setSkusList(skuList).setType(itemType);
-                mBillingClient.querySkuDetailsAsync(params.build(), listener);
-            }
+        Runnable queryRequest = () -> {
+            // Query the purchase async
+            SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+            params.setSkusList(skuList).setType(itemType);
+            mBillingClient.querySkuDetailsAsync(params.build(), listener);
         };
 
         executeServiceRequest(queryRequest);
@@ -208,19 +204,8 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
                 callback.onSuccess(Converter.convertSkus(skuList));
             }
         };
-
-        List<String> inAppSkus = new ArrayList<>();
-        inAppSkus.add(SKU_PRO_I_MONTH);
-        inAppSkus.add(SKU_PRO_I_YEAR);
-        inAppSkus.add(SKU_PRO_II_MONTH);
-        inAppSkus.add(SKU_PRO_II_YEAR);
-        inAppSkus.add(SKU_PRO_III_MONTH);
-        inAppSkus.add(SKU_PRO_III_YEAR);
-        inAppSkus.add(SKU_PRO_LITE_MONTH);
-        inAppSkus.add(SKU_PRO_LITE_YEAR);
-
         //we only support subscription for google pay
-        querySkuDetailsAsync(BillingClient.SkuType.SUBS, inAppSkus, listener);
+        querySkuDetailsAsync(BillingClient.SkuType.SUBS, IN_APP_SKUS, listener);
     }
 
     private void handlePurchaseList(List<Purchase> purchases) {

@@ -11,7 +11,6 @@ public interface BillingUpdatesListener {
 
     void onBillingClientSetupFinished();
 
-
     void onPurchasesUpdated(boolean isFailed, int resultCode, List<MegaPurchase> purchases);
 
     void onQueryPurchasesFinished(boolean isFailed, int resultCode, List<MegaPurchase> purchases);
