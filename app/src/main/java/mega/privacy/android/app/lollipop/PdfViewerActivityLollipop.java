@@ -1561,12 +1561,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 }
             }
 
-            if (type != OFFLINE_ADAPTER || type != ZIP_ADAPTER) {
-                MegaNode node = megaApi.getNodeByHandle(handle);
-                if (node != null && megaApi.getAccess(node) != MegaShare.ACCESS_OWNER) {
-                    shareMenuItem.setVisible(false);
-                }
-            }
+            shareMenuItem.setVisible(showShareOption(type, handle));
         }
 
         return super.onCreateOptionsMenu(menu);

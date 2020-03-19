@@ -1679,7 +1679,6 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 					imageDrag = imageView;
 
 					String localPath = getLocalFile(this, file.getName(), file.getSize());
-
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
@@ -1769,7 +1768,6 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 					pdfIntent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
 
 					String localPath = getLocalFile(this, file.getName(), file.getSize());
-
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {

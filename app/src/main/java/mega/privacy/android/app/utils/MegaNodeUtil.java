@@ -27,8 +27,10 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.jobservices.CameraUploadsService.SECONDARY_UPLOADS;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -222,7 +224,7 @@ public class MegaNodeUtil {
      * @param context   current Context.
      * @param node      node to share.
      */
-    public static void shareNode (Context context, MegaNode node) {
+    public static void shareNode(Context context, MegaNode node) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
             String path = getLocalFile(context, node.getName(), node.getSize());
 
@@ -244,7 +246,7 @@ public class MegaNodeUtil {
      * @param link          link of the node to share.
      */
     public static void startShareIntent (Context context, Intent shareIntent, String link) {
-        shareIntent.setType("text/plain");
+        shareIntent.setType(TYPE_TEXT_PLAIN);
         shareIntent.putExtra(Intent.EXTRA_TEXT, link);
         context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }
@@ -399,5 +401,23 @@ public class MegaNodeUtil {
         } else {
             return R.drawable.ic_folder_list;
         }
+    }
+
+    /**
+     * Checks if the Toolbar option "share" should be visible or not depending on the permissions of the MegaNode
+     *
+     * @param adapterType   view in which is required the check
+     * @param handle        identifier of the MegaNode to check
+     * @return True if the option "share" should be visible, false otherwise
+     */
+    public static boolean showShareOption(int adapterType, long handle) {
+        if (adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER) {
+            MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+            MegaNode node = megaApi.getNodeByHandle(handle);
+
+            return node != null && megaApi.getAccess(node) == MegaShare.ACCESS_OWNER;
+        }
+
+        return true;
     }
 }

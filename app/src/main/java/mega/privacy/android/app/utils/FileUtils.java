@@ -54,6 +54,9 @@ public class FileUtils {
 
     public static final String OLD_RK_FILE = MAIN_DIR + File.separator + "MEGARecoveryKey.txt";
 
+    private static final String VOLUME_EXTERNAL = "external";
+    private static final String VOLUME_INTERNAL = "internal";
+
     public static String getRecoveryKeyFileName() {
         return MegaApplication.getInstance().getApplicationContext().getString(R.string.general_rk) + ".txt";
     }
@@ -316,14 +319,32 @@ public class FileUtils {
      */
     public static String getLocalFile(Context context, String fileName, long fileSize) {
         String data = MediaStore.Files.FileColumns.DATA;
-
         final String[] projection = {data};
         final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND " + MediaStore.Files.FileColumns.SIZE + " = ?";
         final String[] selectionArgs = {fileName, String.valueOf(fileSize)};
-
         Cursor cursor = context.getContentResolver().query(
-                MediaStore.Files.getContentUri("external"), projection, selection,
+                MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection,
                 selectionArgs, null);
+
+        String path = checkFileInStorage(cursor, data);
+        if (path == null) {
+            cursor = context.getContentResolver().query(
+                    MediaStore.Files.getContentUri(VOLUME_INTERNAL), projection, selection,
+                    selectionArgs, null);
+            path = checkFileInStorage(cursor, data);
+        }
+
+        return path;
+    }
+
+    /**
+     * Searches in the correspondent storage established if the file exists
+     *
+     * @param cursor    Cursor which contains all the requirements to find the file
+     * @param data      Column name in which search
+     * @return The path of the file if exists
+     */
+    private static String checkFileInStorage(Cursor cursor, String data) {
         if (cursor != null && cursor.moveToFirst()) {
             int dataColumn = cursor.getColumnIndexOrThrow(data);
             String path = cursor.getString(dataColumn);
@@ -333,19 +354,10 @@ public class FileUtils {
                 return path;
             }
         }
-        if (cursor != null) cursor.close();
 
-        cursor = context.getContentResolver().query(
-                MediaStore.Files.getContentUri("internal"), projection, selection,
-                selectionArgs, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int dataColumn = cursor.getColumnIndexOrThrow(data);
-            String path = cursor.getString(dataColumn);
+        if (cursor != null) {
             cursor.close();
-            cursor = null;
-            if (new File(path).exists()) return path;
         }
-        if (cursor != null) cursor.close();
 
         return null;
     }
@@ -607,9 +619,9 @@ public class FileUtils {
     public static Uri getUriForFile(Context context, File file) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", file);
-        } else {
-            return Uri.fromFile(file);
         }
+
+        return Uri.fromFile(file);
     }
 
     /**

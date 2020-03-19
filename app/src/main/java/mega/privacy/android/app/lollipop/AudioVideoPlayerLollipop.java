@@ -2105,7 +2105,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 chatRemoveMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
-
                 removelinkMenuItem.setVisible(false);
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
@@ -2246,12 +2245,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 }
             }
 
-            if (adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER) {
-                MegaNode node = megaApi.getNodeByHandle(handle);
-                if (node != null && megaApi.getAccess(node) != MegaShare.ACCESS_OWNER) {
-                    shareMenuItem.setVisible(false);
-                }
-            }
+            shareMenuItem.setVisible(showShareOption(adapterType, handle));
         }
         else {
             logDebug("On Playlist mode");

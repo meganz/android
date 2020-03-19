@@ -610,7 +610,6 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					imageDrag = imageView;
 
 					String localPath = getLocalFile(context, file.getName(), file.getSize());
-
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
@@ -673,7 +672,6 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					pdfIntent.putExtra("adapterType", CONTACT_FILE_ADAPTER);
 
 					String localPath = getLocalFile(context, file.getName(), file.getSize());
-
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N	&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -726,7 +724,6 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					MegaNode file = contactNodes.get(position);
 
 					String localPath = getLocalFile(context, file.getName(), file.getSize());
-
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						InputStream instream = null;

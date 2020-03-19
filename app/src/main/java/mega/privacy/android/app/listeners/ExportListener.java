@@ -12,12 +12,18 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 
 public class ExportListener extends BaseListener {
 
-    protected Intent shareIntent;
+    private Intent shareIntent;
 
     public ExportListener(Context context) {
         super(context);
     }
 
+    /**
+     * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
+     *
+     * @param context       current Context
+     * @param shareIntent   Intent to share the content
+     */
     public ExportListener(Context context, Intent shareIntent) {
         super(context);
 
