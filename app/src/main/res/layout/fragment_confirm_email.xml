@@ -60,7 +60,7 @@
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp">
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/confirm_email_new_email_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
                 app:errorEnabled="true"
                 app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/confirm_email_new_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                     android:inputType="textEmailAddress"
                     android:theme="@style/ColorControlStyle"/>
 
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <ImageView
                 android:layout_width="wrap_content"

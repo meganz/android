@@ -35,31 +35,31 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.design.internal.BottomNavigationItemView;
-import android.support.design.internal.BottomNavigationMenuView;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomnavigation.BottomNavigationItemView;
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
+import com.google.android.material.tabs.TabLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.view.MenuItemCompat;
+import androidx.viewpager.widget.ViewPager;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
@@ -6218,11 +6218,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		searchView = (SearchView) searchMenuItem.getActionView();
 
-		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+		SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
 		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
 		searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
 		searchAutoComplete.setHint(getString(R.string.hint_action_search));
-		View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+		View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
 		v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 
 		if (searchView != null) {
@@ -9521,7 +9521,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
-		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				String value = input.getText().toString().trim();
@@ -10627,7 +10627,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 		};
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
 		String message= getResources().getString(R.string.confirmation_clear_group_chat);
 		builder.setTitle(R.string.title_confirmation_clear_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
@@ -12625,31 +12625,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
         }
 
-        dialogView.findViewById(R.id.sv_btn_horizontal_not_now).setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                alertDialogSMSVerification.dismiss();
-            }
-        });
-        dialogView.findViewById(R.id.sv_btn_horizontal_add).setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),SMSVerificationActivity.class));
-                alertDialogSMSVerification.dismiss();
-            }
+        dialogView.findViewById(R.id.sv_btn_horizontal_not_now).setOnClickListener(v -> alertDialogSMSVerification.dismiss());
+        dialogView.findViewById(R.id.sv_btn_horizontal_add).setOnClickListener(v -> {
+            startActivity(new Intent(getApplicationContext(),SMSVerificationActivity.class));
+            alertDialogSMSVerification.dismiss();
         });
         if(alertDialogSMSVerification == null) {
             alertDialogSMSVerification = dialogBuilder.create();
             alertDialogSMSVerification.setCancelable(false);
-            alertDialogSMSVerification.setOnDismissListener(new DialogInterface.OnDismissListener() {
-
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    isSMSDialogShowing = false;
-                }
-            });
+            alertDialogSMSVerification.setOnDismissListener(dialog -> isSMSDialogShowing = false);
             alertDialogSMSVerification.setCanceledOnTouchOutside(false);
         }
         alertDialogSMSVerification.show();

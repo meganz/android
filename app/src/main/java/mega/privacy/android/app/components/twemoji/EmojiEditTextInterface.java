@@ -1,7 +1,7 @@
 package mega.privacy.android.app.components.twemoji;
 
-import android.support.annotation.DimenRes;
-import android.support.annotation.Px;
+import androidx.annotation.DimenRes;
+import androidx.annotation.Px;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 

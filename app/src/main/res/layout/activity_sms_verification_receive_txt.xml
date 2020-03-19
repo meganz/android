@@ -5,12 +5,12 @@
               android:layout_height="match_parent"
               android:background="@color/white"
               android:orientation="vertical">
-	<android.support.design.widget.AppBarLayout
+	<com.google.android.material.appbar.AppBarLayout
 		android:id="@+id/account_verification_app_bar_layout"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:theme="@style/Theme.Megaactionbar">
-		<android.support.v7.widget.Toolbar
+		<androidx.appcompat.widget.Toolbar
 			android:id="@+id/account_verification_toolbar"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
 			app:popupTheme="@style/Theme.Megaactionbar"
 			app:theme="@style/Theme.Megaactionbar"
 			app:titleTextAppearance="@style/ToolbarTitle"/>
-	</android.support.design.widget.AppBarLayout>
+	</com.google.android.material.appbar.AppBarLayout>
 	<TextView android:layout_width="match_parent"
 	          android:layout_height="wrap_content"
 	          android:layout_marginTop="24dp"

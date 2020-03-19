@@ -94,7 +94,7 @@ public class UploadUtil {
         if (fs.length > 1) {
             Dialog localCameraDialog;
             String[] sdCardOptions = activity.getResources().getStringArray(R.array.settings_storage_download_location_array);
-            android.support.v7.app.AlertDialog.Builder b = new android.support.v7.app.AlertDialog.Builder(activity);
+            androidx.appcompat.app.AlertDialog.Builder b = new androidx.appcompat.app.AlertDialog.Builder(activity);
 
             b.setTitle(activity.getResources().getString(R.string.upload_to_filesystem_from));
             b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {

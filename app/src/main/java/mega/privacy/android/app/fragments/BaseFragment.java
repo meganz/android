@@ -1,7 +1,7 @@
 package mega.privacy.android.app.fragments;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.Display;
 
@@ -9,8 +9,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-
-import static mega.privacy.android.app.utils.Util.*;
 
 public class BaseFragment extends Fragment {
 
