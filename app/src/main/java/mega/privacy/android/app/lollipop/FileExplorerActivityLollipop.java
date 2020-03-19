@@ -10,17 +10,17 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -104,9 +104,11 @@ import static android.webkit.URLUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
@@ -235,7 +237,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private boolean importFileF;
 	private int importFragmentSelected = -1;
 	private String action;
-    private android.support.v7.app.AlertDialog renameDialog;
+    private androidx.appcompat.app.AlertDialog renameDialog;
 	private HashMap<String, String> nameFiles = new HashMap<>();
 
 	private MegaNode myChatFilesNode;
@@ -329,6 +331,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 		
 		@Override
+        @SuppressWarnings("unchecked")
 		protected List<ShareInfo> doInBackground(Intent... params) {
 			logDebug("OwnFilePrepareTask: doInBackground");
             Intent intent = params[0];
@@ -341,6 +344,12 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 		@Override
 		protected void onPostExecute(List<ShareInfo> info) {
+			if (info == null || info.isEmpty()) {
+				logWarning("Selected items list is null or empty.");
+				finishFileExplorer();
+				return;
+			}
+
 			filePreparedInfos = info;
 			if(needLogin) {
                 Intent loginIntent = new Intent(FileExplorerActivityLollipop.this, LoginActivityLollipop.class);
@@ -390,6 +399,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		logDebug("onCreate first");
@@ -903,11 +913,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 		searchView = (SearchView) searchMenuItem.getActionView();
 
-		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+		SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
 		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
 		searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
 		searchAutoComplete.setHint(getString(R.string.hint_action_search));
-		View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+		View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
 		v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 
 		if (searchView != null){
@@ -1669,9 +1679,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 
 		if (infos == null) {
-		    showSnackbar(getString(R.string.upload_can_not_open));
-		}
-		else {
+			showSnackbar(getString(R.string.upload_can_not_open));
+		} else if (existsMyChatFilesFolder()) {
+			setMyChatFilesFolder(getMyChatFilesFolder());
+			checkIfFilesExistsInMEGA();
+		} else {
 			megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
 		}
 	}
@@ -2531,7 +2543,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
-		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
@@ -2855,7 +2867,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
 
-		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
+		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
 			@Override
 			public void onClick(View v)
 			{
@@ -3060,7 +3072,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
             }
         });
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
@@ -3077,7 +3089,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
         builder.setView(layout);
         renameDialog = builder.create();
         renameDialog.show();
-        renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
+        renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String value = input.getText().toString().trim();

@@ -3,7 +3,7 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
 

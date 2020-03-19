@@ -10,7 +10,7 @@
     android:keepScreenOn="true"
     tools:context=".lollipop.megachat.calls.ChatCallActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -134,7 +134,7 @@
                     android:background="@android:color/transparent"
                     android:visibility="gone">
 
-                    <android.support.v7.widget.RecyclerView
+                    <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/big_recycler_view_cameras"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -209,7 +209,7 @@
             </RelativeLayout>
 
             <!-- Toolbar -->
-            <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/call_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -282,7 +282,7 @@
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
-            </android.support.v7.widget.Toolbar>
+            </androidx.appcompat.widget.Toolbar>
 
             <RelativeLayout
                 android:id="@+id/mutate_own_call"
@@ -469,7 +469,7 @@
                 android:background="@null"
                 android:gravity="center_horizontal">
 
-                <android.support.design.widget.FloatingActionButton
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/hang_fab"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
@@ -503,7 +503,7 @@
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginRight="36dp">
 
-                    <android.support.design.widget.FloatingActionButton
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/speaker_fab"
                         android:layout_width="54dp"
                         android:layout_height="54dp"
@@ -525,7 +525,7 @@
                         android:background="@android:color/transparent"
                         android:gravity="bottom|center_horizontal">
 
-                        <android.support.design.widget.FloatingActionButton
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
                             android:id="@+id/answer_call_fab"
                             android:layout_width="54dp"
                             android:layout_height="54dp"
@@ -597,7 +597,7 @@
                     android:background="@android:color/transparent"
                     android:gravity="bottom|center_horizontal">
 
-                    <android.support.design.widget.FloatingActionButton
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/video_fab"
                         android:layout_width="54dp"
                         android:layout_height="54dp"
@@ -668,7 +668,7 @@
                     android:layout_marginBottom="24dp"
                     android:gravity="bottom">
 
-                    <android.support.design.widget.FloatingActionButton
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/micro_fab"
                         android:layout_width="54dp"
                         android:layout_height="54dp"
@@ -682,7 +682,7 @@
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
-                    <android.support.design.widget.FloatingActionButton
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/reject_fab"
                         android:layout_width="54dp"
                         android:layout_height="54dp"
@@ -701,6 +701,6 @@
 
 
         </RelativeLayout>
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
 </RelativeLayout>

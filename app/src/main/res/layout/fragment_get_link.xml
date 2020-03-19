@@ -241,7 +241,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true">
 
-                    <android.support.v7.widget.SwitchCompat
+                    <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/switch_set_expiry_date"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
@@ -322,7 +322,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true">
 
-                    <android.support.v7.widget.SwitchCompat
+                    <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/switch_set_password_protection"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"

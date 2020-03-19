@@ -71,7 +71,7 @@
 			android:layout_below="@id/call_in_progress_layout"
 			android:layout_above="@id/relative_layout_file_list_browser_camera_upload_on_off">
 
-			<android.support.v7.widget.RecyclerView
+			<androidx.recyclerview.widget.RecyclerView
 				android:id="@+id/file_list_view_browser"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
