@@ -1273,6 +1273,8 @@ public class Util {
 				logInfo("App upgraded from " + oldVersionCode + " to " + newVersionCode);
 			}
 			preferences.edit().putInt(APP_VERSION_CODE_KEY, newVersionCode).apply();
+		} else {
+			logInfo("App Version: " + newVersionCode);
 		}
 	}
 
