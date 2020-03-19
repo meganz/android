@@ -17,15 +17,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -172,7 +172,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 	private MenuItem removelinkIcon;
 	private MenuItem chatIcon;
 
-	private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+	private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
 
 	MegaOffline currentNode;
 
@@ -207,7 +207,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
 
-	private android.support.v7.app.AlertDialog renameDialog;
+	private androidx.appcompat.app.AlertDialog renameDialog;
 
 	int orderGetChildren = ORDER_DEFAULT_ASC;
 
@@ -644,8 +644,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
 					return false;
 				}
-				android.support.v7.app.AlertDialog removeLinkDialog;
-				android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+				androidx.appcompat.app.AlertDialog removeLinkDialog;
+				androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
 				LayoutInflater inflater = getLayoutInflater();
 				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
@@ -819,7 +819,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 		relativeImageViewerLayout = findViewById(R.id.full_image_viewer_layout);
 
-		draggableView.setViewAnimator(new ExitViewAnimator());
+		draggableView.setViewAnimator(new ExitViewAnimator<>());
 
 		handler = new Handler();
 		fullScreenImageViewer = this;
@@ -977,7 +977,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 					adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
 					viewPager.setAdapter(adapterMega);
 					viewPager.setCurrentItem(positionG);
-					viewPager.setOnPageChangeListener(this);
+					viewPager.addOnPageChangeListener(this);
 
 					fileNameTextView = findViewById(R.id.full_image_viewer_file_name);
 					if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -1332,7 +1332,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		viewPager.setTranslationX(mLeftDelta);
 		viewPager.setTranslationY(mTopDelta);
 
-		ivShadow.setAlpha(0);
+		ivShadow.setImageAlpha(0);
 
 		viewPager.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
 			@Override
@@ -1712,7 +1712,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		});
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
@@ -1733,7 +1733,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		builder.setView(layout);
 		renameDialog = builder.create();
 		renameDialog.show();
-		renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
@@ -2319,7 +2319,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2368,7 +2368,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);

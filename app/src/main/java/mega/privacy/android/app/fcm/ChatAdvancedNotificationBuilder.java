@@ -15,8 +15,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.service.notification.StatusBarNotification;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 import mega.privacy.android.app.DatabaseHandler;

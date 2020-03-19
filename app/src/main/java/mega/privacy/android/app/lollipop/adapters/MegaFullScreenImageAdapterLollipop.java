@@ -9,10 +9,10 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.Display;
@@ -107,13 +107,18 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			logDebug("PreviewAsyncTask()-doInBackground");
 			handle = params[0];
 			MegaNode node = megaApi.getNodeByHandle(handle);
+			if (node == null) {
+				logWarning("Cannot get the preview because the node is NULL.");
+				return 3;
+			}
+
 			preview = getPreviewFromFolderFullImage(node, activity);
 			
 			if (preview != null){
 				return 0;
 			}
 			else{
-				if (pendingPreviews.contains(node.getHandle())){
+				if (pendingPreviews != null && pendingPreviews.contains(node.getHandle())) {
 					logDebug("The preview is already downloaded or added to the list");
 					return 1;
 				}

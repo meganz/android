@@ -8,11 +8,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -187,10 +187,10 @@ public class BaseActivity extends AppCompatActivity {
             if (megaChatApi == null){
                 megaChatApi = app.getMegaChatApi();
             }
-        }
 
-        if (dbH == null) {
-            dbH = app.getDbH();
+            if (dbH == null) {
+                dbH = app.getDbH();
+            }
         }
     }
 
@@ -461,7 +461,7 @@ public class BaseActivity extends AppCompatActivity {
 
         switch (type) {
             case SNACKBAR_TYPE: {
-                TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+                TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
                 snackbarTextView.setMaxLines(5);
                 snackbar.show();
                 break;
@@ -494,7 +494,7 @@ public class BaseActivity extends AppCompatActivity {
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
         params.setMargins(px2dp(8, outMetrics),0,px2dp(8, outMetrics), px2dp(8, outMetrics));
         snackbarLayout.setLayoutParams(params);
-        TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
         snackbar.show();
     }
