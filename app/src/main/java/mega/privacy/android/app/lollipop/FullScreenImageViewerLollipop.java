@@ -298,7 +298,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(imageHandles.get(positionG)));
 		}
 
-		shareIcon.setVisible(true);
+		shareIcon.setVisible(showShareOption(adapterType, isFolderLink, imageHandles.get(positionG)));
 
 		if (adapterType == OFFLINE_ADAPTER){
 			getlinkIcon.setVisible(false);
@@ -352,7 +352,6 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			removelinkIcon.setVisible(false);
 			propertiesIcon.setVisible(false);
 			downloadIcon.setVisible(true);
-
 		}else if(adapterType == SEARCH_ADAPTER && !fromIncoming){
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
@@ -564,13 +563,6 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				}
 			}
 		}
-
-		if (adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER) {
-            MegaNode node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-            if (node != null && megaApi.getAccess(node) != MegaShare.ACCESS_OWNER) {
-                shareIcon.setVisible(false);
-            }
-        }
 
 		return super.onCreateOptionsMenu(menu);
 	}

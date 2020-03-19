@@ -1230,8 +1230,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         saveForOfflineMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
         chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove);
 
-        shareMenuItem.setVisible(true);
-
         if (!inside){
             propertiesMenuItem.setVisible(false);
             chatMenuItem.setVisible(false);
@@ -1246,8 +1244,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             importMenuItem.setVisible(false);
             saveForOfflineMenuItem.setVisible(false);
             chatRemoveMenuItem.setVisible(false);
-        }
-        else {
+            shareMenuItem.setVisible(true);
+        } else {
             if (nC == null) {
                 nC = new NodeController(this);
             }
@@ -1255,6 +1253,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             if (type == SEARCH_ADAPTER) {
                 fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
             }
+
+            shareMenuItem.setVisible(showShareOption(type, isFolderLink, handle));
 
             if (type == OFFLINE_ADAPTER){
                 getlinkMenuItem.setVisible(false);
@@ -1560,8 +1560,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     chatRemoveMenuItem.setVisible(false);
                 }
             }
-
-            shareMenuItem.setVisible(showShareOption(type, handle));
         }
 
         return super.onCreateOptionsMenu(menu);

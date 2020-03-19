@@ -407,11 +407,14 @@ public class MegaNodeUtil {
      * Checks if the Toolbar option "share" should be visible or not depending on the permissions of the MegaNode
      *
      * @param adapterType   view in which is required the check
+     * @param isFolderLink  if true, the node comes from a folder link
      * @param handle        identifier of the MegaNode to check
      * @return True if the option "share" should be visible, false otherwise
      */
-    public static boolean showShareOption(int adapterType, long handle) {
-        if (adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER) {
+    public static boolean showShareOption(int adapterType, boolean isFolderLink, long handle) {
+        if (isFolderLink || adapterType == FILE_LINK_ADAPTER) {
+            return false;
+        } else if (adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER) {
             MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
             MegaNode node = megaApi.getNodeByHandle(handle);
 

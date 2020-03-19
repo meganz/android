@@ -1929,7 +1929,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         if (!onPlaylist){
             logDebug("NOT on Playlist mode");
             searchMenuItem.setVisible(false);
-            shareMenuItem.setVisible(true);
+            shareMenuItem.setVisible(showShareOption(adapterType, isFolderLink, handle));
 
             if (adapterType == OFFLINE_ADAPTER){
                 logDebug("OFFLINE_ADAPTER");
@@ -2244,8 +2244,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     chatRemoveMenuItem.setVisible(false);
                 }
             }
-
-            shareMenuItem.setVisible(showShareOption(adapterType, handle));
         }
         else {
             logDebug("On Playlist mode");
