@@ -9,10 +9,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import android.text.Html;
 import android.text.Spanned;
 
@@ -72,8 +72,8 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -2046,10 +2046,16 @@ public class ChatController {
         else{
             if (context instanceof ChatActivityLollipop) {
                 ((ChatActivityLollipop) context).storedUnhandledData(messagesSelected, messagesToImport);
+                ((ChatActivityLollipop) context).handleStoredData();
             } else if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
+                if (existsMyChatFilesFolder()) {
+                    ((NodeAttachmentHistoryActivity) context).setMyChatFilesFolder(getMyChatFilesFolder());
+                    ((NodeAttachmentHistoryActivity) context).handleStoredData();
+                } else {
+                    megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
+                }
             }
-            megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
         }
     }
 

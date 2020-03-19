@@ -209,7 +209,7 @@
             android:layout_gravity="center_vertical"
             android:src="@drawable/ic_three_dots" />
 
-        <android.support.v7.widget.SwitchCompat
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switch_pin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -279,13 +279,13 @@
             android:textColor="@color/white" />
     </RelativeLayout>
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/myCoordinatorLayout"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </RelativeLayout>

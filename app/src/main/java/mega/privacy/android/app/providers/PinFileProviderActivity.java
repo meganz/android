@@ -1,6 +1,6 @@
 package mega.privacy.android.app.providers;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import mega.privacy.android.app.PinUtil;
 
 public class PinFileProviderActivity extends AppCompatActivity {

@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -20,7 +20,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -289,21 +288,6 @@ public class ContactInfoBottomSheetDialogFragment extends ContactFileListBottomS
                 boolean firstLevel = true;
                 logDebug("File Info: First LEVEL is: " + firstLevel);
                 i.putExtra("firstLevel", firstLevel);
-                
-                if (node.isFolder()) {
-                    if(node.isInShare()){
-                        i.putExtra("imageId", R.drawable.ic_folder_incoming);
-                    }
-                    else if (node.isOutShare()||megaApi.isPendingShare(node)){
-                        i.putExtra("imageId", R.drawable.ic_folder_outgoing);
-                    }
-                    else{
-                        i.putExtra("imageId", R.drawable.ic_folder);
-                    }
-                }
-                else {
-                    i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
-                }
                 i.putExtra("name", node.getName());
                 context.startActivity(i);
                 dismissAllowingStateLoss();

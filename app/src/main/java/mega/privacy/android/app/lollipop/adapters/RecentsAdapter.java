@@ -2,8 +2,8 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -33,6 +33,7 @@ import nz.mega.sdk.MegaRecentActionBucket;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -180,7 +181,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 holder.sharedIcon.setVisibility(View.VISIBLE);
                 if (parentNode.isInShare()) {
                     holder.sharedIcon.setImageResource(R.drawable.ic_folder_incoming_list);
-                } else if (parentNode.isOutShare()) {
+                } else if (isOutShare(parentNode)) {
                     holder.sharedIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
                 }
             }

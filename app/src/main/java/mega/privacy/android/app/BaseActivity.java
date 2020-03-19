@@ -8,11 +8,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -132,8 +132,8 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         logDebug("onPause");
-        app.activityPaused();
         checkMegaObjects();
+        MegaApplication.activityPaused();
         isPaused = true;
         super.onPause();
     }
@@ -141,11 +141,11 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         logDebug("onResume");
-        app.activityResumed();
         super.onResume();
         setAppFontSize(this);
 
         checkMegaObjects();
+        MegaApplication.activityResumed();
         isPaused = false;
 
         retryConnectionsAndSignalPresence();
@@ -187,10 +187,10 @@ public class BaseActivity extends AppCompatActivity {
             if (megaChatApi == null){
                 megaChatApi = app.getMegaChatApi();
             }
-        }
 
-        if (dbH == null) {
-            dbH = app.getDbH();
+            if (dbH == null) {
+                dbH = app.getDbH();
+            }
         }
     }
 
@@ -425,7 +425,8 @@ public class BaseActivity extends AppCompatActivity {
      *            - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
      * @param view Layout where the snackbar is going to show.
      * @param s Text to shown in the snackbar
-     * @param idChat Chat ID. If this param has a valid value, different to -1, the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat
+     * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
+     *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
      */
     public void showSnackbar (int type, View view, String s, long idChat) {
         logDebug(("showSnackbar: " + s));
@@ -434,7 +435,7 @@ public class BaseActivity extends AppCompatActivity {
         display.getMetrics(outMetrics);
 
         Snackbar snackbar = null;
-        if (type == MESSAGE_SNACKBAR_TYPE && (s==null || s.isEmpty())) {
+        if (type == MESSAGE_SNACKBAR_TYPE) {
             snackbar = Snackbar.make(view, R.string.sent_as_message, Snackbar.LENGTH_LONG);
         }
         else if (type == NOT_SPACE_SNACKBAR_TYPE) {
@@ -460,7 +461,7 @@ public class BaseActivity extends AppCompatActivity {
 
         switch (type) {
             case SNACKBAR_TYPE: {
-                TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+                TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
                 snackbarTextView.setMaxLines(5);
                 snackbar.show();
                 break;
@@ -493,7 +494,7 @@ public class BaseActivity extends AppCompatActivity {
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
         params.setMargins(px2dp(8, outMetrics),0,px2dp(8, outMetrics), px2dp(8, outMetrics));
         snackbarLayout.setLayoutParams(params);
-        TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
         snackbar.show();
     }

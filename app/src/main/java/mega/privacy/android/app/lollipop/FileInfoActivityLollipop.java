@@ -20,18 +20,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.ActionBar;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.widget.NestedScrollView;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
@@ -72,6 +72,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -139,7 +140,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
     FileInfoActivityLollipop fileInfoActivityLollipop = this;
 	boolean firstIncomingLevel=true;
 
-    private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
 
     // The flag to indicate whether select chat is processing
     private static boolean isSelectingChat = false;
@@ -281,7 +282,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 	float scaleH;
 
 	boolean shareIt = true;
-	int imageId;
 	int from;
 
 	DatabaseHandler dbH = null;
@@ -528,12 +528,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
         fileInfoActivityLollipop = this;
         handler = new Handler();
-
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            imageId = extras.getInt("imageId");
-        }
-
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
@@ -552,7 +546,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         cC = new ContactController(this);
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
-        adapterType = getIntent().getIntExtra("adapterType", 0);
+        adapterType = getIntent().getIntExtra("adapterType", FILE_BROWSER_ADAPTER);
         path = getIntent().getStringExtra("path");
 
         setContentView(R.layout.activity_file_info);
@@ -589,7 +583,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         iconToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_icon_layout);
 
         iconToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_icon);
-        iconToolbarView.setImageResource(imageId);
         CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) iconToolbarLayout.getLayoutParams();
         Rect rect = new Rect();
         getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
@@ -755,6 +748,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
             megaApi.addGlobalListener(this);
 
+            Bundle extras = getIntent().getExtras();
             if (extras != null){
                 from = extras.getInt("from");
                 if(from==FROM_INCOMING_SHARES){
@@ -877,6 +871,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             supportInvalidateOptionsMenu();
 
         }
+        setIconResource();
 
         if(savedInstanceState != null){
             long handle = savedInstanceState.getLong(KEY_SELECTED_SHARE_HANDLE, -1);
@@ -1511,8 +1506,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
 			long sizeFile=megaApi.getSize(node);
 			sizeTextView.setText(getSizeString(sizeFile));
-
-			iconToolbarView.setImageResource(imageId);
+			setIconResource();
 
 			if(from==FROM_INCOMING_SHARES){
 				//Show who is the owner
@@ -2766,17 +2760,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 			sizeTextView.setText(getSizeString(sizeFile));
 
 			contentTextView.setText(getInfoFolder(node, this));
-
-			if (node.isInShare()){
-				imageId = R.drawable.ic_folder_incoming;
-			}
-			else if (node.isOutShare()||megaApi.isPendingShare(node)){
-				imageId = R.drawable.ic_folder_outgoing;
-			}
-			else{
-				imageId = R.drawable.ic_folder;
-			}
-			iconToolbarView.setImageResource(imageId);
+			setIconResource();
 			sl = megaApi.getOutShares(node);
 			if (sl != null){
 				if (sl.size() == 0){
@@ -2982,7 +2966,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3029,7 +3013,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3136,7 +3120,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
     }
 
     public void showConfirmationRemoveContactFromShare(final String email) {
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         String message = getResources().getString(R.string.remove_contact_shared_folder, email);
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> removeShare(email))
@@ -3242,4 +3226,23 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         }
     }
 
+    private void setIconResource() {
+        int resource;
+
+        if (adapterType == OFFLINE_ADAPTER) {
+            if (file.isDirectory()) {
+                resource = R.drawable.ic_folder_list;
+            } else {
+                resource = MimeTypeThumbnail.typeForName(file.getName()).getIconResourceId();
+            }
+        } else {
+            if (node.isFolder()) {
+                resource = getFolderIcon(node, adapterType == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE);
+            } else {
+                resource = MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId();
+            }
+        }
+
+        iconToolbarView.setImageResource(resource);
+    }
 }

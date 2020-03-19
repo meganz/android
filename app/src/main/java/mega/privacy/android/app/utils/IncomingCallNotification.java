@@ -8,8 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import android.service.notification.StatusBarNotification;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -44,6 +45,12 @@ public class IncomingCallNotification {
     public static void toSystemSettingNotification(Context context) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         createChannel(notificationManager);
+        for(StatusBarNotification notification : notificationManager.getActiveNotifications()) {
+            if(notification.getId() == TO_SYSTEM_SETTING_ID) {
+                return;
+            }
+        }
+
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
         @NoMeaning int i = 0;
         PendingIntent pendingIntent = PendingIntent.getActivity(context, i, intent, PendingIntent.FLAG_ONE_SHOT);

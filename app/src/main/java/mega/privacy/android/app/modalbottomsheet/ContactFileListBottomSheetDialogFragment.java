@@ -8,9 +8,9 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialogFragment;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -387,21 +386,6 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                 boolean firstLevel = ((ContactFileListActivityLollipop) context).isEmptyParentHandleStack();
                 logDebug("File Info: First LEVEL is: " + firstLevel);
                 i.putExtra("firstLevel", firstLevel);
-
-                if (node.isFolder()) {
-                    if(node.isInShare()){
-                        i.putExtra("imageId", R.drawable.ic_folder_incoming);
-                    }
-                    else if (node.isOutShare()||megaApi.isPendingShare(node)){
-                        i.putExtra("imageId", R.drawable.ic_folder_outgoing);
-                    }
-                    else{
-                        i.putExtra("imageId", R.drawable.ic_folder);
-                    }
-                }
-                else {
-                    i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
-                }
                 i.putExtra("name", node.getName());
                 context.startActivity(i);
                 dismissAllowingStateLoss();
