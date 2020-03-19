@@ -1,11 +1,5 @@
 package mega.privacy.android.app.middlelayer.iab;
 
-
-import androidx.annotation.Nullable;
-
-import com.android.billingclient.api.SkuDetails;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class MegaSku {
@@ -22,25 +16,11 @@ public class MegaSku {
         return type;
     }
 
-    private MegaSku() {
-        // hide constructor, use converter instead
+    public void setSku(String sku) {
+        this.sku = sku;
     }
 
-    public static MegaSku convert(SkuDetails sku) {
-        MegaSku megaSku = new MegaSku();
-        megaSku.sku = sku.getSku();
-        megaSku.type = sku.getType();
-        return megaSku;
-    }
-
-    public static List<MegaSku> convert(@Nullable List<SkuDetails> skus) {
-        if(skus == null) {
-            return null;
-        }
-        List<MegaSku> result = new ArrayList<>(skus.size());
-        for(SkuDetails sku : skus) {
-            result.add(convert(sku));
-        }
-        return result;
+    public void setType(String type) {
+        this.type = type;
     }
 }

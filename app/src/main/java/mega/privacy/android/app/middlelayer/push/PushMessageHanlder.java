@@ -52,6 +52,8 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
 
     private boolean beep;
 
+    private static String TOKEN;
+
     public PushMessageHanlder() {
         app = MegaApplication.getInstance();
         megaApi = app.getMegaApi();
@@ -167,7 +169,12 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
             megaApi = app.getMegaApi();
         }
         logDebug("Push service's token: " + token);
+        TOKEN = token;
         megaApi.registerPushNotifications(DEVICE_ANDROID, token);
+    }
+
+    public static String getToken() {
+        return TOKEN;
     }
 
     private void performLoginProccess(String gSession) {

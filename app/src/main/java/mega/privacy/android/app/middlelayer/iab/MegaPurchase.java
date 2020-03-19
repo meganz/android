@@ -1,13 +1,6 @@
 package mega.privacy.android.app.middlelayer.iab;
 
 
-import androidx.annotation.Nullable;
-
-import com.android.billingclient.api.Purchase;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class MegaPurchase {
 
     private String sku;
@@ -40,28 +33,23 @@ public class MegaPurchase {
         return token;
     }
 
-    private MegaPurchase() {
-        // hide constructor, use converter instead
+    public void setSku(String sku) {
+        this.sku = sku;
     }
 
-    public static MegaPurchase convert(Purchase purchase) {
-        MegaPurchase p = new MegaPurchase();
-        p.sku = purchase.getSku();
-        p.receipt = purchase.getOriginalJson();
-        p.state = purchase.getPurchaseState();
-        p.token = purchase.getPurchaseToken();
-        p.userHandle = purchase.getDeveloperPayload();
-        return p;
+    public void setReceipt(String receipt) {
+        this.receipt = receipt;
     }
 
-    public static List<MegaPurchase> convert(@Nullable List<Purchase> purchases) {
-        if (purchases == null) {
-            return null;
-        }
-        List<MegaPurchase> result = new ArrayList<>(purchases.size());
-        for (Purchase purchase : purchases) {
-            result.add(convert(purchase));
-        }
-        return result;
+    public void setUserHandle(String userHandle) {
+        this.userHandle = userHandle;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

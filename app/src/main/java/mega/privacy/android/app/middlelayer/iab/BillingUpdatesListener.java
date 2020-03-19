@@ -8,9 +8,11 @@ import java.util.List;
  */
 public interface BillingUpdatesListener {
 
+
     void onBillingClientSetupFinished();
 
-    void onPurchasesUpdated(int resultCode, List<MegaPurchase> purchases);
 
-    void onQueryPurchasesFinished(int resultCode, List<MegaPurchase> purchases);
+    void onPurchasesUpdated(boolean isFailed, int resultCode, List<MegaPurchase> purchases);
+
+    void onQueryPurchasesFinished(boolean isFailed, int resultCode, List<MegaPurchase> purchases);
 }

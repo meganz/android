@@ -37,7 +37,7 @@ public class PaymentUtils {
      * @param sku The id of the sku item.
      * @return The level of the sku.
      */
-    static int getProductLevel(String sku) {
+    public static int getProductLevel(String sku) {
         if (TextUtil.isTextEmpty(sku)) {
             return -1;
         }

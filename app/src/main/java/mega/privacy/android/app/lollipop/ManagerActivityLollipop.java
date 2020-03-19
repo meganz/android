@@ -36,6 +36,7 @@ import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
+
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -100,12 +101,6 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsResponseListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.io.File;
@@ -132,7 +127,6 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
@@ -149,7 +143,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -198,6 +191,10 @@ import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
+import mega.privacy.android.app.middlelayer.iab.BillingManager;
+import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
+import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
+import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -209,7 +206,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.billing.BillingManager;
+import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -265,7 +262,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
-        NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
+        NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingUpdatesListener {
 
 	public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
@@ -420,7 +417,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     private final static String STATE_KEY_SMS_DIALOG =  "isSMSDialogShowing";
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 	private BillingManager mBillingManager;
-	private List<SkuDetails> mSkuDetailsList;
+	private List<MegaSku> mSkuDetailsList;
 
     public enum FragmentTag {
 		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
@@ -1209,21 +1206,21 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
     public void launchPayment(String productId) {
         //start purchase/subscription flow
-        SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
-        Purchase purchase = app.getMyAccountInfo().getActiveGooglePlaySubscription();
+        MegaSku skuDetails = getSkuDetails(mSkuDetailsList, productId);
+        MegaPurchase purchase = app.getMyAccountInfo().getActiveGooglePlaySubscription();
         String oldSku = purchase == null ? null : purchase.getSku();
-        String token = purchase == null ? null : purchase.getPurchaseToken();
+        String token = purchase == null ? null : purchase.getToken();
         if (mBillingManager != null) {
             mBillingManager.initiatePurchaseFlow(oldSku, token, skuDetails);
         }
     }
 
-	private SkuDetails getSkuDetails(List<SkuDetails> list, String key) {
+	private MegaSku getSkuDetails(List<MegaSku> list, String key) {
 		if (list == null || list.isEmpty()) {
 			return null;
 		}
 
-		for (SkuDetails details : list) {
+		for (MegaSku details : list) {
 			if (details.getSku().equals(key)) {
 				return details;
 			}
@@ -1231,52 +1228,27 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		return null;
 	}
 
-	private void getInventory() {
-		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
-			@Override
-			public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
-				if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-					logWarning("Failed to get SkuDetails, error code is " + billingResult.getResponseCode());
-				}
-				if (skuDetailsList != null && skuDetailsList.size() > 0) {
-					mSkuDetailsList = skuDetailsList;
-					app.getMyAccountInfo().setAvailableSkus(skuDetailsList);
-				}
-			}
-		};
-
-		List<String> inAppSkus = new ArrayList<>();
-		inAppSkus.add(SKU_PRO_I_MONTH);
-		inAppSkus.add(SKU_PRO_I_YEAR);
-		inAppSkus.add(SKU_PRO_II_MONTH);
-		inAppSkus.add(SKU_PRO_II_YEAR);
-		inAppSkus.add(SKU_PRO_III_MONTH);
-		inAppSkus.add(SKU_PRO_III_YEAR);
-		inAppSkus.add(SKU_PRO_LITE_MONTH);
-		inAppSkus.add(SKU_PRO_LITE_YEAR);
-
-		//we only support subscription for google pay
-		mBillingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, inAppSkus, listener);
-	}
-
 	public void initGooglePlayPayments() {
 		//make sure user logged in
 		MegaUser user = megaApi.getMyUser();
 		if (user != null) {
 			String payload = String.valueOf(user.getHandle());
-			mBillingManager = new BillingManager(this, this, payload);
+			mBillingManager = new BillingManagerImpl(this, this, payload);
 		}
 	}
 
 	@Override
-	public void onBillingClientSetupFinished() {
-		logInfo("Google play billing client setup finished");
-		getInventory();
-	}
+    public void onBillingClientSetupFinished() {
+        logInfo("Google play billing client setup finished");
+        mBillingManager.getInventory(skuList -> {
+            mSkuDetailsList = skuList;
+            app.getMyAccountInfo().setAvailableSkus(skuList);
+        });
+    }
 
 	@Override
-	public void onQueryPurchasesFinished(int resultCode, List<Purchase> purchases) {
-		if (resultCode != BillingClient.BillingResponseCode.OK || purchases == null) {
+	public void onQueryPurchasesFinished(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
+		if (isFailed || purchases == null) {
 			logWarning("Query of purchases failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
 			return;
 		}
@@ -1286,16 +1258,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	@Override
-	public void onPurchasesUpdated(int resultCode, List<Purchase> purchases) {
-        if (resultCode == BillingClient.BillingResponseCode.OK) {
+	public void onPurchasesUpdated(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
+        if (!isFailed) {
             String message;
             if (purchases != null && !purchases.isEmpty()) {
-                Purchase purchase = purchases.get(0);
+                MegaPurchase purchase = purchases.get(0);
                 //payment may take time to process, we will not give privilege until it has been fully processed
                 String sku = purchase.getSku();
                 String subscriptionType = getSubscriptionType(this, sku);
                 String subscriptionRenewalType = getSubscriptionRenewalType(this, sku);
-                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+                if (mBillingManager.isPurchased(purchase)) {
                     //payment has been processed
                     updateAccountInfo(purchases);
                     logDebug("Purchase " + sku + " successfully, subscription type is: " + subscriptionType + ", subscription renewal type is: " + subscriptionRenewalType);
@@ -1320,13 +1292,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
 	}
 
-	private void updateAccountInfo(List<Purchase> purchases) {
+	private void updateAccountInfo(List<MegaPurchase> purchases) {
 		MyAccountInfo myAccountInfo = app.getMyAccountInfo();
 		int highest = -1;
 		int temp = -1;
-		Purchase max = null;
-		for (Purchase purchase : purchases) {
-			logDebug(purchase.getSku() + " (JSON): " + purchase.getOriginalJson());
+		MegaPurchase max = null;
+		for (MegaPurchase purchase : purchases) {
+			logDebug(purchase.getSku() + " (JSON): " + purchase.getReceipt());
 			switch (purchase.getSku()) {
 				case SKU_PRO_LITE_MONTH:
 				case SKU_PRO_LITE_YEAR:
@@ -1352,7 +1324,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             }
 		}
 
-        if(max != null && mBillingManager.isPayloadValid(max.getDeveloperPayload())){
+        if(max != null && mBillingManager.isPayloadValid(max.getUserHandle())){
             myAccountInfo.setActiveGooglePlaySubscription(max);
         }
 
@@ -1366,12 +1338,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo) {
-		Purchase highestGooglePlaySubscription = myAccountInfo.getActiveGooglePlaySubscription();
+		MegaPurchase highestGooglePlaySubscription = myAccountInfo.getActiveGooglePlaySubscription();
 		if (!myAccountInfo.isAccountDetailsFinished() || highestGooglePlaySubscription == null) {
 			return;
 		}
 
-		String json = highestGooglePlaySubscription.getOriginalJson();
+		String json = highestGooglePlaySubscription.getReceipt();
 		logDebug("ORIGINAL JSON:" + json); //Print JSON in logs to help debug possible payments issues
 
 		MegaAttributes attributes = dbH.getAttributes();
@@ -2536,16 +2508,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			dbH.setInvalidateSdkCache(false);
-
-			String token = FirebaseInstanceId.getInstance().getToken();
-			if (token != null) {
-				logDebug("FCM TOKEN: " + token);
-				megaApi.registerPushNotifications(DEVICE_ANDROID, token, this);
-//				Log.d("TOKEN___", token);
-
-//				Toast.makeText(this, "TOKEN: _" + token + "_", Toast.LENGTH_LONG).show();
-			}
-
 
 			nVEmail.setVisibility(View.VISIBLE);
 			nVEmail.setText(megaApi.getMyEmail());

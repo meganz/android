@@ -66,8 +66,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.iid.FirebaseInstanceId;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -124,6 +122,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
+import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
@@ -555,7 +554,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if(position<messages.size()) {
             AndroidMegaChatMessage androidM = messages.get(position);
             StringBuilder messageToShow = new StringBuilder("");
-            String token = FirebaseInstanceId.getInstance().getToken();
+            String token = PushMessageHanlder.getToken();
             if(token!=null){
                 messageToShow.append("FCM TOKEN: " +token);
             }

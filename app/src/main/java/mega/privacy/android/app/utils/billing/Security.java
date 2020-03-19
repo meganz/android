@@ -18,7 +18,6 @@ package mega.privacy.android.app.utils.billing;
 
 import android.text.TextUtils;
 import android.util.Base64;
-import com.android.billingclient.util.BillingHelper;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -41,25 +40,29 @@ public class Security {
     private static final String KEY_FACTORY_ALGORITHM = "RSA";
     private static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
 
+    private static final String BASE64_ENCODED_PUBLIC_KEY_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_3 = "55k9FIh3vDXXTHJn4oM9JwFwbcZf1zmVLyes5ld7+G15SZ7QmCchqfY4N/a/qVcGFsfwqm";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_4 = "RU3VzOUwAYHb4mV/frPctPIRlJbzwCXpe3/mrcsAP+k6ECcd19uIUCPibXhsTkNbAk8CRkZ";
+    private static final String BASE64_ENCODED_PUBLIC_KEY_5 = "KOy+czuZWfjWYx3Mp7srueyQ7xF6/as6FWrED0BlvmhJYj0yhTOTOopAXhGNEk7cUSFxqP2FKYX8e3pHm/uNZvKcSrLXbLUhQnULhn4WmKOQIDAQAB";
+    private static final String BASE_64_ENCODED_PUBLIC_KEY = BASE64_ENCODED_PUBLIC_KEY_1 + BASE64_ENCODED_PUBLIC_KEY_2 + BASE64_ENCODED_PUBLIC_KEY_3 + BASE64_ENCODED_PUBLIC_KEY_4 + BASE64_ENCODED_PUBLIC_KEY_5;
+
     /**
      * Verifies that the data was signed with the given signature, and returns the verified
      * purchase.
-     * @param base64PublicKey the base64-encoded public key to use for verifying.
      * @param signedData the signed JSON string (signed, not encrypted)
      * @param signature the signature for the data, signed with the private key
      * @throws IOException if encoding algorithm is not supported or key specification
      * is invalid
      */
-    public static boolean verifyPurchase(String base64PublicKey, String signedData,
-            String signature) throws IOException {
-        if (TextUtils.isEmpty(signedData) || TextUtils.isEmpty(base64PublicKey)
+    public static boolean verifyPurchase(String signedData, String signature) throws IOException {
+        if (TextUtils.isEmpty(signedData) || TextUtils.isEmpty(BASE_64_ENCODED_PUBLIC_KEY)
                 || TextUtils.isEmpty(signature)) {
-            BillingHelper.logWarn(TAG, "Purchase verification failed: missing data.");
             logWarning("Purchase verification failed: missing data.");
             return false;
         }
 
-        PublicKey key = generatePublicKey(base64PublicKey);
+        PublicKey key = generatePublicKey(BASE_64_ENCODED_PUBLIC_KEY);
         return verify(key, signedData, signature);
     }
 
@@ -81,11 +84,9 @@ public class Security {
             throw new RuntimeException(e);
         } catch (InvalidKeySpecException e) {
             String msg = "Invalid key specification: " + e;
-            BillingHelper.logWarn(TAG, msg);
             logWarning(msg, e);
             throw new IOException(msg);
         } catch (IllegalArgumentException e) {
-            BillingHelper.logWarn(TAG, e.getMessage());
             logWarning(e.getMessage(), e);
             throw new IOException(e.getMessage());
         }
@@ -105,7 +106,6 @@ public class Security {
         try {
             signatureBytes = Base64.decode(signature, Base64.DEFAULT);
         } catch (IllegalArgumentException e) {
-            BillingHelper.logWarn(TAG, "Base64 decoding failed.");
             logWarning("Base64 decoding failed.", e);
             return false;
         }
@@ -114,7 +114,6 @@ public class Security {
             signatureAlgorithm.initVerify(publicKey);
             signatureAlgorithm.update(signedData.getBytes());
             if (!signatureAlgorithm.verify(signatureBytes)) {
-                BillingHelper.logWarn(TAG, "Signature verification failed.");
                 logWarning("Signature verification failed.");
                 return false;
             }
@@ -124,10 +123,8 @@ public class Security {
             logError("RSA is unavailable.", e);
             throw new RuntimeException(e);
         } catch (InvalidKeyException e) {
-            BillingHelper.logWarn(TAG, "Invalid key specification.");
             logWarning("Invalid key specification.", e);
         } catch (SignatureException e) {
-            BillingHelper.logWarn(TAG, "Signature exception.");
             logWarning("Signature exception.", e);
         }
         return false;

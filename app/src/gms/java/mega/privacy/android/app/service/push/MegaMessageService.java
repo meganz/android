@@ -1,5 +1,6 @@
 package mega.privacy.android.app.service.push;
 
+import androidx.annotation.NonNull;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -34,12 +35,12 @@ public class MegaMessageService extends FirebaseMessagingService {
     }
 
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
+    public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         messageHanlder.handleMessage(convert(remoteMessage));
     }
 
     @Override
-    public void onNewToken(String s) {
+    public void onNewToken(@NonNull String s) {
         messageHanlder.sendRegistrationToServer(s);
     }
 }

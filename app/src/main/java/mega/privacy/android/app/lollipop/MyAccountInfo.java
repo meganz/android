@@ -2,9 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.content.Context;
 
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.SkuDetails;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -14,6 +11,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
+import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -68,8 +67,8 @@ public class MyAccountInfo {
 
     public ArrayList<Product> productAccounts;
 
-    private List<SkuDetails> availableSkus = new ArrayList<>();
-    private Purchase activeGooglePlaySubscription = null;
+    private List<MegaSku> availableSkus = new ArrayList<>();
+    private MegaPurchase activeGooglePlaySubscription = null;
 
     MegaPricing pricing;
 
@@ -594,11 +593,11 @@ public class MyAccountInfo {
         return shouldShowBusinessAlert;
     }
 
-    public Purchase getActiveGooglePlaySubscription() {
+    public MegaPurchase getActiveGooglePlaySubscription() {
         return activeGooglePlaySubscription;
     }
 
-    public void setActiveGooglePlaySubscription(Purchase activeGooglePlaySubscription) {
+    public void setActiveGooglePlaySubscription(MegaPurchase activeGooglePlaySubscription) {
         this.activeGooglePlaySubscription = activeGooglePlaySubscription;
     }
 
@@ -613,7 +612,7 @@ public class MyAccountInfo {
         return result;
     }
 
-    public void setAvailableSkus(List<SkuDetails> skuDetailsList) {
+    public void setAvailableSkus(List<MegaSku> skuDetailsList) {
         this.availableSkus = skuDetailsList;
     }
 }
