@@ -10,8 +10,7 @@
 
 package org.webrtc;
 
-import android.support.annotation.Nullable;
-import org.webrtc.MediaStreamTrack;
+import androidx.annotation.Nullable;
 
 /** Java wrapper for a C++ RtpReceiverInterface. */
 public class RtpReceiver {

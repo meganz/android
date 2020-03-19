@@ -3,8 +3,8 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialogFragment;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -15,7 +15,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ContactNicknameBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 

@@ -214,7 +214,7 @@ public class SortUtil {
             }
         };
 
-        Comparator comparator = nameComparator;
+        Comparator<MegaOffline> comparator = nameComparator;
         switch (order) {
             case ORDER_DEFAULT_ASC:
             case ORDER_DEFAULT_DESC: {

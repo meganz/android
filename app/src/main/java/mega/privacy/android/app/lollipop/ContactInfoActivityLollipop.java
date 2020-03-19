@@ -20,16 +20,16 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.graphics.Palette;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.palette.graphics.Palette;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -132,8 +132,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
 
 	ContactController cC;
-    private android.support.v7.app.AlertDialog downloadConfirmationDialog;
-    private android.support.v7.app.AlertDialog renameDialog;
+    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
+    private androidx.appcompat.app.AlertDialog renameDialog;
 
 	private final static int MAX_WIDTH_APPBAR_LAND = 400;
 	private final static int MAX_WIDTH_APPBAR_PORT = 200;
@@ -1962,7 +1962,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             }
         };
         
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         String message= getResources().getString(R.string.confirmation_leave_share_folder);
         builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -1986,7 +1986,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             }
         };
         
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         String message= getResources().getString(R.string.confirmation_leave_share_folder);
         builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -2045,7 +2045,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         if(handleList!=null){
             
             if (handleList.size() > 0){
-                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
                 if (handleList.size() > 1){
                     builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
@@ -2228,7 +2228,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             }
         });
         
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
@@ -2249,7 +2249,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         builder.setView(layout);
         renameDialog = builder.create();
         renameDialog.show();
-        renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+        renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -2320,7 +2320,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         final long [] hashesC = hashes;
         final long sizeC=size;
         
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2367,7 +2367,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         final long [] hashesC = hashes;
         final long sizeC=size;
         
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);

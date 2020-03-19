@@ -4,16 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.provider.DocumentFile;
 
-import mega.privacy.android.app.DatabaseHandler;
+import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.Util;

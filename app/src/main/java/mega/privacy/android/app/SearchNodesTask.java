@@ -2,8 +2,8 @@ package mega.privacy.android.app;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -21,6 +21,7 @@ import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.SortUtil.*;
 
 public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
@@ -258,6 +259,12 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
     }
 
     public static void setSearchProgressView(RelativeLayout contentLayout, ProgressBar searchProgressBar, RecyclerView recyclerView, boolean inProgress) {
+        if (contentLayout == null || searchProgressBar == null || recyclerView == null) {
+            logWarning("Cannot set search progress view, one or more parameters are NULL.");
+            logDebug("contentLayout: " + contentLayout + ", searchProgressBar: " + searchProgressBar + ", recyclerView: " + recyclerView);
+            return;
+        }
+
         contentLayout.setEnabled(!inProgress);
         if (inProgress) {
             contentLayout.setAlpha(0.4f);

@@ -11,17 +11,16 @@
 package org.webrtc;
 
 import android.annotation.TargetApi;
-import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.Nullable;
-import java.nio.ByteBuffer;
+import androidx.annotation.Nullable;
+
 import java.util.concurrent.Callable;
-import org.webrtc.EglBase;
+
 import org.webrtc.VideoFrame.TextureBuffer;
 
 /**

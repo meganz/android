@@ -2,13 +2,12 @@ package mega.privacy.android.app.utils;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Base64;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;

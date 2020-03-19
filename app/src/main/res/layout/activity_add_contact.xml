@@ -8,7 +8,7 @@
     android:focusable="true"
     android:focusableInTouchMode="true">
 
-	<android.support.v7.widget.Toolbar
+	<androidx.appcompat.widget.Toolbar
 		android:id="@+id/add_contact_toolbar"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -209,7 +209,7 @@
 				android:background="@color/white"
 				android:layout_below="@id/add_contact_toolbar">
 
-				<android.support.v7.widget.RecyclerView
+				<androidx.recyclerview.widget.RecyclerView
 					android:id="@+id/contact_adds_recycler_view"
 					android:layout_width="wrap_content"
 					android:layout_height="match_parent"
@@ -321,7 +321,7 @@
 					android:layout_height="wrap_content"
 					android:layout_below="@+id/header_list">
 
-					<android.support.v7.widget.RecyclerView
+					<androidx.recyclerview.widget.RecyclerView
 						android:id="@+id/add_contact_list"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
@@ -344,7 +344,7 @@
 
 	</LinearLayout>
 
-	<android.support.v4.widget.NestedScrollView
+	<androidx.core.widget.NestedScrollView
 		android:id="@+id/new_group_layout"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -363,7 +363,7 @@
 				android:background="@color/white"
 				android:layout_below="@id/add_contact_toolbar">
 
-				<android.support.design.widget.FloatingActionButton
+				<com.google.android.material.floatingactionbutton.FloatingActionButton
 					android:id="@+id/image_group_floating_button"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
@@ -406,7 +406,7 @@
 				android:layout_height="match_parent"
 				android:orientation="vertical">
 
-				<android.support.v7.widget.SwitchCompat
+				<androidx.appcompat.widget.SwitchCompat
 					android:id="@+id/ekr_switch"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
@@ -522,7 +522,7 @@
 						android:layout_height="wrap_content"
 						android:layout_below="@+id/new_group_header_list">
 
-						<android.support.v7.widget.RecyclerView
+						<androidx.recyclerview.widget.RecyclerView
 							android:id="@+id/new_group_add_contact_list"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
@@ -537,9 +537,9 @@
 
 		</LinearLayout>
 
-	</android.support.v4.widget.NestedScrollView>
+	</androidx.core.widget.NestedScrollView>
 
-	<android.support.design.widget.FloatingActionButton
+	<com.google.android.material.floatingactionbutton.FloatingActionButton
 		android:id="@+id/fab_button_next"
 		android:layout_width="@dimen/fab_button_diameter"
 		android:layout_height="@dimen/fab_button_diameter"

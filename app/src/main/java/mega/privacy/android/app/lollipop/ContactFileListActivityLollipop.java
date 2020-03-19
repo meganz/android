@@ -17,12 +17,12 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -104,7 +104,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 	ContactFileListFragmentLollipop cflF;
 
 	NodeController nC;
-	private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+	private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
 
 	CoordinatorLayout coordinatorLayout;
 	Handler handler;
@@ -127,7 +127,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 	private AlertDialog newFolderDialog;
 	DisplayMetrics outMetrics;
 
-	private android.support.v7.app.AlertDialog renameDialog;
+	private androidx.appcompat.app.AlertDialog renameDialog;
 	ProgressDialog statusDialog;
 
 	long lastTimeOnTransferUpdate = -1;
@@ -348,7 +348,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
-		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				String value = input.getText().toString().trim();
@@ -688,7 +688,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			}
 		};
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		String message = getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 			   .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -713,7 +713,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			}
 		};
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		String message = getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 			   .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -957,7 +957,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			}
 		});
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.context_rename) + " " + new String(document.getName()));
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
@@ -978,7 +978,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		builder.setView(layout);
 		renameDialog = builder.create();
 		renameDialog.show();
-		renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+		renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				String value = input.getText().toString().trim();
@@ -1346,7 +1346,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		if (handleList != null) {
 
 			if (handleList.size() > 0) {
-				android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+				androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 				if (handleList.size() > 1) {
 					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
 				} else {
@@ -1633,7 +1633,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		final long[] hashesC = hashes;
 		final long sizeC = size;
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1678,7 +1678,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 		final long[] hashesC = hashes;
 		final long sizeC = size;
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
