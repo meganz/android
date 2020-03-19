@@ -21,9 +21,9 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.widget.RemoteViews;
 
 import com.shockwave.pdfium.PdfDocument;
@@ -156,8 +156,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		canceled = false;
 		isOverquota = 0;
 
-		mapVideoDownsampling = new HashMap();
-		mapProgressTransfers = new HashMap();
+		mapVideoDownsampling = new HashMap<>();
+		mapProgressTransfers = new HashMap<>();
 
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {

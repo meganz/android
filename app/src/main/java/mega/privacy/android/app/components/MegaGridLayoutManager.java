@@ -1,7 +1,7 @@
 package mega.privacy.android.app.components;
 
 import android.content.Context;
-import android.support.v7.widget.GridLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import android.util.AttributeSet;
 
 public class MegaGridLayoutManager extends GridLayoutManager{

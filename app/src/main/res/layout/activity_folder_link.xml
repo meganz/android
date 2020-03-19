@@ -12,7 +12,7 @@
         android:fitsSystemWindows="true"
         android:background="@color/white" >
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_folder_link"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -105,7 +105,7 @@
             android:layout_above="@id/options_folder_link_layout"
             android:background="@color/tour_bar_grey" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/folder_link_list_view_browser"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -123,7 +123,7 @@
         android:fitsSystemWindows="true"
         android:visibility="gone">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_folder_link_file_link"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"

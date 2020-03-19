@@ -19,19 +19,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputFilter;
@@ -1196,11 +1196,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
-        searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
         searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
         searchAutoComplete.setHint(getString(R.string.hint_action_search));
-        View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+        View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
         v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 
         searchView.setIconifiedByDefault(true);
@@ -1216,7 +1216,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         });
 
-        ImageView closeIcon = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+        ImageView closeIcon = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
         closeIcon.setImageDrawable(mutateIcon(this, R.drawable.ic_close_white, R.color.black));
 
         MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
