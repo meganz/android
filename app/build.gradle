@@ -99,9 +99,6 @@ dependencies {
     implementation 'androidx.emoji:emoji-appcompat:1.0.0'
     implementation 'androidx.emoji:emoji-bundled:1.0.0'
     implementation 'androidx.preference:preference:1.1.0'
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
-    implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'net.opacapp:multiline-collapsingtoolbar:27.1.1'
     implementation 'com.github.tony19:named-regexp:0.2.5'
@@ -115,12 +112,17 @@ dependencies {
     gmsImplementation 'com.google.firebase:firebase-messaging:20.1.2'
     gmsImplementation 'com.google.firebase:firebase-core:17.2.3'
     gmsImplementation 'com.android.billingclient:billing:2.1.0'
+    gmsImplementation 'com.google.android.gms:play-services-location:17.0.0'
+    gmsImplementation 'com.google.android.gms:play-services-maps:17.0.0'
+    gmsImplementation 'com.google.maps.android:android-maps-utils:0.5'
 
     //HMS
     hmsImplementation 'com.huawei.hms:push:4.0.2.300'
     hmsImplementation 'com.huawei.hms:location:4.0.2.300'
     hmsImplementation 'com.huawei.hms:maps:4.0.0.302'
     hmsImplementation 'com.huawei.hms:iap:4.0.2.300'
+    hmsImplementation 'com.huawei.hms:maps:4.0.0.302'
+    hmsImplementation 'com.huawei.hms:location:4.0.2.300'
 }
 
 apply plugin: 'com.google.gms.google-services'
