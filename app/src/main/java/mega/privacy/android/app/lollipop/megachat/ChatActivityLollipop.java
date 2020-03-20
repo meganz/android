@@ -174,6 +174,9 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class ChatActivityLollipop extends DownloadableActivity implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
@@ -529,6 +532,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     };
 
+    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) return;
+            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+            if (userHandle != 0) {
+                updateNicknameInChat();
+            }
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
@@ -627,6 +641,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         LocalBroadcastManager.getInstance(this).registerReceiver(dialogConnectReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
         LocalBroadcastManager.getInstance(this).registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
         LocalBroadcastManager.getInstance(this).registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
@@ -1271,7 +1286,21 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void showChat(String textSnackbar){
+    public void updateNicknameInChat() {
+        if (chatRoom.isGroup()) {
+            setChatSubtitle();
+        }
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    private void updateTitle() {
+        initializeInputText();
+        titleToolbar.setText(chatRoom.getTitle());
+    }
+
+    private void showChat(String textSnackbar){
         if(idChat!=-1) {
             //Recover chat
             logDebug("Recover chat with id: " + idChat);
@@ -1281,7 +1310,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 finish();
             }
 
-            initializeInputText();
             megaChatApi.closeChatRoom(idChat, this);
             boolean result = megaChatApi.openChatRoom(idChat, this);
 
@@ -1315,13 +1343,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
             }
             else {
+                initializeInputText();
                 int chatConnection = megaChatApi.getChatConnectionState(idChat);
                 logDebug("Chat connection (" + idChat + ") is: " + chatConnection);
-                if (adapter == null) createAdapter();
+                if (adapter == null) {
+                    createAdapter();
+                }else {
+                    adapter.notifyDataSetChanged();
+                }
                 setPreviewersView();
                 titleToolbar.setText(chatRoom.getTitle());
                 setChatSubtitle();
-
                 if (!chatRoom.isPublic()) {
                     privateIconToolbar.setVisibility(View.VISIBLE);
                 }
@@ -1683,54 +1715,29 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if(i!=0){
                 customSubtitle.append(", ");
             }
-
-            String participantName = chatRoom.getPeerFirstname(i);
-            if(participantName==null){
-                //Get the lastname
-                String participantLastName = chatRoom.getPeerLastname(i);
-                if(participantLastName==null){
-                    //Get the email
-                    String participantEmail = chatRoom.getPeerEmail(i);
-                    customSubtitle.append(participantEmail);
-                }
-                else{
-                    if(participantLastName.trim().isEmpty()){
-                        //Get the email
-                        String participantEmail = chatRoom.getPeerEmail(i);
-                        customSubtitle.append(participantEmail);
-                    }
-                    else{
-                        //Append last name to the title
-                        customSubtitle.append(participantLastName);
-                    }
-                }
-            }
-            else{
-                if(participantName.trim().isEmpty()){
+            String participant;
+            //Check nickname
+            String nickname = getNicknameContact(chatRoom.getPeerHandle(i));
+            if (nickname != null) {
+                participant = nickname;
+            } else {
+                String participantName = chatRoom.getPeerFirstname(i);
+                if (isTextEmpty(participantName)) {
                     //Get the lastname
                     String participantLastName = chatRoom.getPeerLastname(i);
-                    if(participantLastName==null){
+                    if (isTextEmpty(participantLastName)) {
                         //Get the email
-                        String participantEmail = chatRoom.getPeerEmail(i);
-                        customSubtitle.append(participantEmail);
+                        participant = chatRoom.getPeerEmail(i);
+                    } else {
+                        //Append last name to the title
+                        participant = participantLastName;
                     }
-                    else{
-                        if(participantLastName.trim().isEmpty()){
-                            //Get the email
-                            String participantEmail = chatRoom.getPeerEmail(i);
-                            customSubtitle.append(participantEmail);
-                        }
-                        else{
-                            //Append last name to the title
-                            customSubtitle.append(participantLastName);
-                        }
-                    }
-                }
-                else{
+                } else {
                     //Append first name to the title
-                    customSubtitle.append(participantName);
+                    participant = participantName;
                 }
             }
+            customSubtitle.append(participant);
         }
         if (customSubtitle.toString().trim().isEmpty()){
             groupalSubtitleToolbar.setText(null);
@@ -4741,7 +4748,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             supportInvalidateOptionsMenu();
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_TITLE)){
-            logDebug("CHANGE_TYPE_TITLE for the chat: " + chat.getChatId());
+            updateTitle();
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_USER_STOP_TYPING)){
             logDebug("CHANGE_TYPE_USER_STOP_TYPING for the chat: " + chat.getChatId());
@@ -5524,7 +5531,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
 
         if(msg.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
-            logDebug("Change of chat title");
             String newTitle = msg.getContent();
             if(newTitle!=null){
                 titleToolbar.setText(newTitle);
@@ -7245,6 +7251,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(voiceclipDownloadedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(chatArchivedReceiver);
 
         if(megaApi != null) {

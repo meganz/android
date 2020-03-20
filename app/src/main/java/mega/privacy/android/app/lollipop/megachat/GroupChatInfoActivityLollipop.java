@@ -1,9 +1,11 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -79,10 +81,13 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, AdapterView.OnItemClickListener {
 
@@ -155,6 +160,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
 
+    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) return;
+            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+            updateAdapter(userHandle);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -215,7 +229,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             dbH = DatabaseHandler.getDbHandler(getApplicationContext());
             chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
-
             setContentView(R.layout.activity_group_chat_properties);
 
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
@@ -385,6 +398,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 megaChatApi.signalPresenceActivity();
             }
 
+            LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
+                    new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+
             //Set participants
             participants = new ArrayList<>();
 
@@ -481,11 +497,20 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     @Override
     protected void onDestroy(){
         logDebug("onDestroy()");
+        super.onDestroy();
         if (megaChatApi != null) {
             megaChatApi.removeChatListener(this);
         }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
 
-        super.onDestroy();
+    }
+
+    private String checkParticipantName(long handle, int position) {
+        String fullName = getNicknameContact(handle);
+
+        if (fullName == null) fullName = getParticipantFullName(position);
+
+        return fullName;
     }
 
     public void setParticipants(){
@@ -508,8 +533,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
 
             long peerHandle = chat.getPeerHandle(i);
+            String fullName = checkParticipantName(peerHandle, i);
 
-            String fullName = getParticipantFullName(i);
             String participantEmail = chat.getPeerEmail(i);
 
             logDebug(i + " - Handle of the peer: "+ peerHandle + ", Pprivilege: " + peerPrivilege);
@@ -556,30 +581,30 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    public String getParticipantFullName(long i) {
+    private void updateAdapter(long contactHandle) {
+        for (MegaChatParticipant participant : participants) {
+            if (participant.getHandle() == contactHandle) {
+                int pos = participants.indexOf(participant);
+                String fullName = checkParticipantName(contactHandle, pos);
+                participants.get(pos).setFullName(fullName);
+                adapter.updateParticipant(pos, participants);
+                break;
+            }
+        }
+    }
 
-        String fullName = chat.getPeerFullname(i);
-        if(fullName!=null){
-            if(fullName.isEmpty()){
-                logDebug("Put email as fullname");
-                fullName = chat.getPeerEmail(i);
-                return fullName;
-            }
-            else{
-                if (fullName.trim().length() <= 0){
-                    logDebug("Put email as fullname");
-                    fullName = chat.getPeerEmail(i);
-                    return fullName;
-                } else {
-                    return fullName;
-                }
-            }
+    private String getParticipantFullName(long contact) {
+        String nickname = getNicknameContact(contact);
+        if (nickname != null) {
+            return nickname;
         }
-        else{
-            logDebug("Put email as fullname");
-            fullName = chat.getPeerEmail(i);
-            return fullName;
+
+        String fullName = chat.getPeerFullname(contact);
+        if (isTextEmpty(fullName)){
+            return chat.getPeerEmail(contact);
         }
+
+        return fullName;
     }
 
     @Override

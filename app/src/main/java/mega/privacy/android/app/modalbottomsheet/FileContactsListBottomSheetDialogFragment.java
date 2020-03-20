@@ -35,6 +35,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -134,7 +135,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
 
         if(contact!=null){
-            fullName = getFullName(contact);
+            fullName = getMegaUserNameDB(contact);
         }
         else{
             logWarning("Contact NULL");
@@ -193,40 +194,6 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
 
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-    }
-
-    public String getFullName(MegaUser contact){
-        String firstNameText ="";
-        String lastNameText ="";
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
-        if(contactDB!=null){
-            firstNameText = contactDB.getName();
-            lastNameText = contactDB.getLastName();
-
-            String fullName;
-
-            if (firstNameText.trim().length() <= 0){
-                fullName = lastNameText;
-            }
-            else{
-                fullName = firstNameText + " " + lastNameText;
-            }
-
-            if (fullName.trim().length() <= 0){
-                logDebug("Put email as fullname");
-                String email = contact.getEmail();
-                String[] splitEmail = email.split("[@._]");
-                fullName = splitEmail[0];
-            }
-
-            return fullName;
-        }
-        else{
-            String email = contact.getEmail();
-            String[] splitEmail = email.split("[@._]");
-            String fullName = splitEmail[0];
-            return fullName;
-        }
     }
 
     public void addAvatarContactPanel(MegaUser contact){

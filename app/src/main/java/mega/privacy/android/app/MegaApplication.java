@@ -90,8 +90,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
-
 
 public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 
@@ -294,34 +294,26 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-				if (e.getErrorCode() == MegaError.API_OK){
-
-					if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME||request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-						logDebug("Name: " + request.getText());
-						if (megaApi != null){
-							if(request.getEmail()!=null){
-								logDebug("Email: " + request.getEmail());
-								MegaUser user = megaApi.getContact(request.getEmail());
-								if (user != null) {
-									logDebug("User handle: " + user.getHandle());
-									logDebug("Visibility: " + user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
-									if(user.getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
-										logDebug("Non-contact");
-										if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-											dbH.setNonContactEmail(request.getEmail(), user.getHandle()+"");
-											dbH.setNonContactFirstName(request.getText(), user.getHandle()+"");
-										}
-										else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-											dbH.setNonContactLastName(request.getText(), user.getHandle()+"");
-										}
+				if (e.getErrorCode() == MegaError.API_OK) {
+					if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME || request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
+						if (megaApi != null && request.getEmail() != null) {
+							MegaUser user = megaApi.getContact(request.getEmail());
+							if (user != null) {
+								logDebug("User handle: " + user.getHandle());
+								logDebug("Visibility: " + user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
+								if (user.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
+									logDebug("Non-contact");
+									if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
+										dbH.setNonContactEmail(request.getEmail(), user.getHandle() + "");
+										dbH.setNonContactFirstName(request.getText(), user.getHandle() + "");
+									} else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
+										dbH.setNonContactLastName(request.getText(), user.getHandle() + "");
 									}
-									else{
-										logDebug("The user is or was CONTACT: " + user.getEmail());
-									}
+								} else {
+									logDebug("The user is or was CONTACT:");
 								}
-								else{
-									logWarning("User is NULL");
-								}
+							} else {
+								logWarning("User is NULL");
 							}
 						}
 					}
@@ -945,25 +937,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				MegaShare mS = sharesIncoming.get(j);
 				if (mS.getNodeHandle() == n.getHandle()) {
 					MegaUser user = megaApi.getContact(mS.getUser());
-					if (user != null) {
-						MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
 
-						if (contactDB != null) {
-							if (!contactDB.getName().equals("")) {
-								name = contactDB.getName() + " " + contactDB.getLastName();
-
-							} else {
-								name = user.getEmail();
-
-							}
-						} else {
-							logWarning("The contactDB is null: ");
-							name = user.getEmail();
-
-						}
-					} else {
-						name = user.getEmail();
-					}
+					name = getMegaUserNameDB(user);
+					if(name == null) name = "";
 				}
 			}
 

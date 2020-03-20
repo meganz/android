@@ -51,6 +51,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSharedFolderLollipopAdapter.ViewHolderShareList> implements OnClickListener, View.OnLongClickListener {
@@ -270,19 +271,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			MegaUser contact = megaApi.getContact(holder.contactMail);
 
 			if(contact!=null){
-				MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
-				if(contactDB!=null){
-					if(!contactDB.getName().equals("")){
-						holder.textViewContactName.setText(contactDB.getName()+" "+contactDB.getLastName());
-					}
-					else{
-						holder.textViewContactName.setText(holder.contactMail);
-					}
-				}
-				else{
-					logWarning("The contactDB is null: ");
-					holder.textViewContactName.setText(holder.contactMail);
-				}
+				holder.textViewContactName.setText(getMegaUserNameDB(contact));
 
 				holder.stateIcon.setVisibility(View.VISIBLE);
 				if (megaChatApi != null) {

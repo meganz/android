@@ -1643,7 +1643,6 @@ public class Util {
 	}
 
 	public static void hideKeyboard(Activity activity, int flag){
-
 		View v = activity.getCurrentFocus();
 		if (v != null){
 			InputMethodManager imm = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
@@ -1743,6 +1742,16 @@ public class Util {
      */
 	public static String getHexValue(int color){
 		return String.format("#%06X", 0xFFFFFF & color);
+	}
+
+	public static void showKeyboard() {
+		InputMethodManager inputMethodManager = (InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+	}
+
+	public static void hideKeyboard() {
+		InputMethodManager inputMethodManager = (InputMethodManager) MegaApplication.getInstance().getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 	}
 
     public static void showKeyboardDelayed(final View view) {

@@ -36,9 +36,11 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -244,12 +246,13 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             addAvatarParticipantPanel(participantHandle, megaChatApi.getMyEmail(), myFullName);
         }
         else{
-
-            String fullName = selectedChat.getPeerFullnameByHandle(participantHandle);
-            if (fullName == null || fullName.isEmpty() || fullName.equals("")) {
-                fullName = selectedChat.getPeerEmailByHandle(participantHandle);
+            String fullName = getNicknameContact(participantHandle);
+            if (fullName == null) {
+                fullName = selectedChat.getPeerFullnameByHandle(participantHandle);
+                if (isTextEmpty(fullName)) {
+                    fullName = selectedChat.getPeerEmailByHandle(participantHandle);
+                }
             }
-
             titleNameContactChatPanel.setText(fullName);
             titleMailContactChatPanel.setText(selectedChat.getPeerEmailByHandle(participantHandle));
 
