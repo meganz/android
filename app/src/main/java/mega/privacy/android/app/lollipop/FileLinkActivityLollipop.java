@@ -24,7 +24,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -61,6 +60,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -77,8 +77,6 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 	Handler handler;
 	ProgressDialog statusDialog;
 	AlertDialog decryptionKeyDialog;
-
-	MenuItem shareMenuItem;
 
 	File previewFile = null;
 	Bitmap preview = null;
@@ -238,11 +236,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu items for use in the action bar
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.file_link_action, menu);
-		shareMenuItem = menu.findItem(R.id.share_link);
-		shareMenuItem.setVisible(true);
-		menu.findItem(R.id.share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		getMenuInflater().inflate(R.menu.file_folder_link_action, menu);
 
 		collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
 		collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
@@ -263,11 +257,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 				break;
 			}
 			case R.id.share_link: {
-				if(url!=null){
-					shareLink(url);
-				}else{
-					logWarning("url NULL");
-				}
+				shareLink(this, url);
 				break;
 			}
 		}
@@ -719,7 +709,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 			intent.putExtra(EXTRA_SERIALIZE_STRING, serializeString);
 			intent.putExtra("position", 0);
-			intent.putExtra("urlFileLink",url);
+			intent.putExtra(URL_FILE_LINK, url);
 			intent.putExtra("adapterType", FILE_LINK_ADAPTER);
 			intent.putExtra("parentNodeHandle", -1L);
 			intent.putExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
@@ -747,6 +737,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 				mediaIntent.putExtra("adapterType", FILE_LINK_ADAPTER);
 				mediaIntent.putExtra(EXTRA_SERIALIZE_STRING, serializeString);
+				mediaIntent.putExtra(URL_FILE_LINK, url);
 				internalIntent = true;
 			}
 			mediaIntent.putExtra("FILENAME", document.getName());
@@ -809,6 +800,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 			pdfIntent.putExtra(EXTRA_SERIALIZE_STRING, serializeString);
 			pdfIntent.putExtra("inside", true);
 			pdfIntent.putExtra("FILENAME", document.getName());
+			pdfIntent.putExtra(URL_FILE_LINK, url);
 
 			if (isOnline(this)){
 				if (megaApi.httpServerIsRunning() == 0) {
@@ -980,14 +972,6 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 		intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
 		startActivity(intent);
 		finish();
-	}
-
-	public void shareLink(String link){
-		logDebug("Link: " + link);
-		Intent intent = new Intent(Intent.ACTION_SEND);
-		intent.setType("text/plain");
-		intent.putExtra(Intent.EXTRA_TEXT, link);
-		startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
 	}
 
 }

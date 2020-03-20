@@ -95,6 +95,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -277,15 +278,18 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
 		switch (item.getItemId()) {
-	    	// Respond to the action bar's Up/Home button
-		    case android.R.id.home:{
-		    	onBackPressed();
-		    	return true;
-		    }
+			// Respond to the action bar's Up/Home button
+			case android.R.id.home:
+				onBackPressed();
+				break;
+
+			case R.id.share_link:
+				shareLink(this, url);
+				break;
 		}
-	
+
 		return super.onOptionsItemSelected(item);
-    }
+	}
 
 	public void updateScrollPosition(int position) {
 		logDebug("Position: " + position);
@@ -2146,5 +2150,12 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		} catch(Exception ex){}
 
 		finish();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.file_folder_link_action, menu);
+
+		return super.onCreateOptionsMenu(menu);
 	}
 }

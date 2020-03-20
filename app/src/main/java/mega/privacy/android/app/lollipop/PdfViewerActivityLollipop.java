@@ -24,7 +24,6 @@ import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -80,7 +79,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
@@ -1578,6 +1576,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             case R.id.pdf_viewer_share: {
                 if (type == OFFLINE_ADAPTER || type == ZIP_ADAPTER) {
                     shareFile(this, new File(uri.toString()));
+                } else if (type == FILE_LINK_ADAPTER) {
+                    shareLink(this, getIntent().getStringExtra(URL_FILE_LINK));
                 } else {
                     shareNode(this, megaApi.getNodeByHandle(handle));
                 }

@@ -107,7 +107,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
@@ -153,7 +152,6 @@ import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
@@ -2306,6 +2304,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     shareFile(this, getOfflineFile(this, mediaOffList.get(currentWindowIndex)));
                 } else if (adapterType == ZIP_ADAPTER) {
                     shareFile(this, zipMediaFiles.get(currentWindowIndex));
+                } else if (adapterType == FILE_LINK_ADAPTER) {
+                    shareLink(this, getIntent().getStringExtra(URL_FILE_LINK));
                 } else {
                     shareNode(this, megaApi.getNodeByHandle(handle));
                 }

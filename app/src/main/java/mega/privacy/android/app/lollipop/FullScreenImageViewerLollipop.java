@@ -20,7 +20,6 @@ import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
@@ -65,7 +64,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.ExtendedViewPager;
@@ -117,7 +115,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
-import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class FullScreenImageViewerLollipop extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
@@ -698,12 +695,14 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			case R.id.full_image_viewer_share: {
 				logDebug("Share option");
 				if (adapterType == OFFLINE_ADAPTER) {
-				    shareFile(this, getOfflineFile(this, mOffListImages.get(positionG)));
-                } else if (adapterType == ZIP_ADAPTER) {
-				    shareFile(this, zipFiles.get(positionG));
-                } else {
-                    shareNode(this, megaApi.getNodeByHandle(imageHandles.get(positionG)));
-                }
+					shareFile(this, getOfflineFile(this, mOffListImages.get(positionG)));
+				} else if (adapterType == ZIP_ADAPTER) {
+					shareFile(this, zipFiles.get(positionG));
+				} else if (adapterType == FILE_LINK_ADAPTER) {
+					shareLink(this, url);
+				} else {
+					shareNode(this, megaApi.getNodeByHandle(imageHandles.get(positionG)));
+				}
 				break;
 			}
 			case R.id.full_image_viewer_properties: {
@@ -957,7 +956,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			currentNode = mOffListImages.get(positionG);
 			fileNameTextView.setText(currentNode.getName());
 		}else if (adapterType == FILE_LINK_ADAPTER){
-			url = intent.getStringExtra("urlFileLink");
+			url = intent.getStringExtra(URL_FILE_LINK);
 			String serialize = intent.getStringExtra(EXTRA_SERIALIZE_STRING);
 			if(serialize!=null){
 				currentDocument = MegaNode.unserialize(serialize);

@@ -239,6 +239,16 @@ public class MegaNodeUtil {
     }
 
     /**
+     * Shares a link.
+     *
+     * @param context   current Context.
+     * @param fileLink  link to share.
+     */
+    public static void shareLink(Context context, String fileLink) {
+        startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), fileLink);
+    }
+
+    /**
      * Ends the creation of the share intent and starts it.
      *
      * @param context       current Context.
@@ -412,9 +422,9 @@ public class MegaNodeUtil {
      * @return True if the option "share" should be visible, false otherwise
      */
     public static boolean showShareOption(int adapterType, boolean isFolderLink, long handle) {
-        if (isFolderLink || adapterType == FILE_LINK_ADAPTER) {
+        if (isFolderLink) {
             return false;
-        } else if (adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER) {
+        } else if (adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER && adapterType != FILE_LINK_ADAPTER) {
             MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
             MegaNode node = megaApi.getNodeByHandle(handle);
 
