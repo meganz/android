@@ -1,7 +1,7 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 
@@ -115,6 +115,7 @@ public abstract class RotatableFragment extends Fragment {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {

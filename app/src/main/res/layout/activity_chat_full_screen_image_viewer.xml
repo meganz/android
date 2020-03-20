@@ -8,7 +8,7 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:fitsSystemWindows="true">
 
-	<android.support.design.widget.AppBarLayout
+	<com.google.android.material.appbar.AppBarLayout
 		android:id="@+id/app_bar"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
@@ -34,7 +34,7 @@
 			</RelativeLayout>
 
 			<!-- Toolbar -->
-			<android.support.v7.widget.Toolbar
+			<androidx.appcompat.widget.Toolbar
 				android:id="@+id/call_toolbar"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
@@ -66,6 +66,6 @@
 
 		</RelativeLayout>
 
-	</android.support.design.widget.AppBarLayout>
+	</com.google.android.material.appbar.AppBarLayout>
 
 </RelativeLayout>

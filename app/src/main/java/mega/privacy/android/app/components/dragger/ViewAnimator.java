@@ -1,7 +1,7 @@
 package mega.privacy.android.app.components.dragger;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 
 public interface ViewAnimator<D extends DraggableView> {

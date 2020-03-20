@@ -11,7 +11,7 @@
 package org.webrtc;
 
 import android.media.MediaRecorder;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * Base interface for camera1 and camera2 implementations. Extends VideoCapturer with a

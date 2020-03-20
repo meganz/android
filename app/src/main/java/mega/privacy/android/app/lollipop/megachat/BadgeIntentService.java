@@ -5,7 +5,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.R;

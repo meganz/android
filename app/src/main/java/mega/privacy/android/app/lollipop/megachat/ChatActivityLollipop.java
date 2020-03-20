@@ -25,18 +25,18 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -250,7 +250,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private AlertDialog errorOpenChatDialog;
     long numberToLoad = -1;
 
-    private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private AlertDialog chatAlertDialog;
 
     ProgressDialog dialog;
@@ -1292,7 +1292,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if(!result){
                 logError("Error on openChatRoom");
                 if(errorOpenChatDialog==null){
-                    android.support.v7.app.AlertDialog.Builder builder;
+                    androidx.appcompat.app.AlertDialog.Builder builder;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                         builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
                     }
@@ -3172,7 +3172,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         String message= getResources().getString(R.string.text_join_call);
         builder.setTitle(R.string.title_join_call);
         builder.setMessage(message).setPositiveButton(getApplicationContext().getString(R.string.answer_call_incoming).toUpperCase(), dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -3210,7 +3210,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         String message= getResources().getString(R.string.confirmation_open_camera_on_chat);
         builder.setTitle(R.string.title_confirmation_open_camera_on_chat);
         builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -3236,7 +3236,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder;
+        androidx.appcompat.app.AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         }
@@ -3270,7 +3270,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder;
+        androidx.appcompat.app.AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         }
@@ -3303,7 +3303,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         String message= getResources().getString(R.string.confirmation_rejoin_chat_link);
         builder.setMessage(message).setPositiveButton(R.string.action_join, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -7553,7 +7553,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         final long sizeC = size;
         final ChatController chatC = new ChatController(this);
 
-        android.support.v7.app.AlertDialog.Builder builder;
+        androidx.appcompat.app.AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         }
