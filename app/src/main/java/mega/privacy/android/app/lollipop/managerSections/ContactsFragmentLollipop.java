@@ -73,6 +73,7 @@ import nz.mega.sdk.MegaUser;
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -801,7 +802,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		logDebug("onCreate");
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -850,8 +850,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		logDebug("onCreateView");
-
 		if(myAccountInfo == null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
@@ -884,7 +882,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_list_empty_text_first);
-
 			setContacts(megaApi.getContacts());
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
@@ -971,7 +968,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_grid_empty_text_first);
-
 			setContacts(megaApi.getContacts());
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
@@ -1053,24 +1049,12 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
     public void setContacts(ArrayList<MegaUser> contacts){
 		this.contacts = contacts;
-
 		visibleContacts.clear();
-
 		for (int i=0;i<contacts.size();i++){
-			logDebug("Contact: " + contacts.get(i).getHandle() + "_" + contacts.get(i).getVisibility());
 			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-
-				MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contacts.get(i).getHandle()+""));
-				String fullName = "";
-				if(contactDB!=null){
-					ContactController cC = new ContactController(context);
-					fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contacts.get(i).getEmail());
-				}
-				else{
-					//No name, ask for it and later refresh!!
-					fullName = contacts.get(i).getEmail();
-				}
-
+				long contactHandle = contacts.get(i).getHandle();
+				MegaContactDB contactDB = getContactDB(contactHandle);
+				String fullName = getContactNameDB(contactDB);
 				MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
 				visibleContacts.add(megaContactAdapter);
 			}
@@ -1146,6 +1130,40 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
+	}
+
+	public void updateContact(long contactHandle) {
+		int positionVisibleContacts = -1;
+		int positionContacts = -1;
+		for (int i = 0; i < visibleContacts.size(); i++) {
+			if (visibleContacts.get(i).getMegaUser().getHandle() == contactHandle) {
+				positionVisibleContacts = i;
+				break;
+			}
+		}
+		for (int i = 0; i < contacts.size(); i++) {
+			if (contacts.get(i).getHandle() == contactHandle) {
+				positionContacts = i;
+				break;
+			}
+		}
+		if (positionVisibleContacts != -1 && positionContacts != -1) {
+			MegaContactDB contactDB = getContactDB(contactHandle);
+			MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(positionContacts), getContactNameDB(contactDB));
+			visibleContacts.set(positionVisibleContacts, megaContactAdapter);
+
+			if (adapter == null) {
+				if (((ManagerActivityLollipop) context).isList()) {
+					logDebug("isList");
+					adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				} else {
+					adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				}
+			} else {
+				adapter.notifyItemChanged(positionVisibleContacts);
+			}
+			sortBy();
+		}
 	}
 
 	public void updateView () {

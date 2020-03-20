@@ -49,6 +49,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -585,28 +586,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         nodeIconLayout.setVisibility(View.GONE);
                     } else {
                         //Show the owner of the shared folder
-                        ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-                        for (int j = 0; j < sharesIncoming.size(); j++) {
-                            MegaShare mS = sharesIncoming.get(j);
-                            if (mS.getNodeHandle() == node.getHandle()) {
-                                MegaUser user = megaApi.getContact(mS.getUser());
-                                if (user != null) {
-                                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-                                    if (contactDB != null) {
-                                        if (!contactDB.getName().equals("")) {
-                                            nodeInfo.setText(contactDB.getName() + " " + contactDB.getLastName());
-                                        } else {
-                                            nodeInfo.setText(user.getEmail());
-                                        }
-                                    } else {
-                                        logDebug("The contactDB is null: ");
-                                        nodeInfo.setText(user.getEmail());
-                                    }
-                                } else {
-                                    nodeInfo.setText(mS.getUser());
-                                }
-                            }
-                        }
+                        showOwnerSharedFolder();
                         optionLeaveShares.setVisibility(View.VISIBLE);
 
                         switch (accessLevel) {
@@ -861,28 +841,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         nodeIconLayout.setVisibility(View.GONE);
                     } else {
                         //Show the owner of the shared folder
-                        ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-                        for (int j = 0; j < sharesIncoming.size(); j++) {
-                            MegaShare mS = sharesIncoming.get(j);
-                            if (mS.getNodeHandle() == node.getHandle()) {
-                                MegaUser user = megaApi.getContact(mS.getUser());
-                                if (user != null) {
-                                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-                                    if (contactDB != null) {
-                                        if (!contactDB.getName().equals("")) {
-                                            nodeInfo.setText(contactDB.getName() + " " + contactDB.getLastName());
-                                        } else {
-                                            nodeInfo.setText(user.getEmail());
-                                        }
-                                    } else {
-                                        logWarning("The contactDB is null: ");
-                                        nodeInfo.setText(user.getEmail());
-                                    }
-                                } else {
-                                    nodeInfo.setText(mS.getUser());
-                                }
-                            }
-                        }
+                        showOwnerSharedFolder();
                         optionLeaveShares.setVisibility(View.VISIBLE);
 
                         switch (accessLevel) {
@@ -1076,6 +1035,21 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 }
             }
         });
+    }
+
+    private void showOwnerSharedFolder() {
+        ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+        for (int j = 0; j < sharesIncoming.size(); j++) {
+            MegaShare mS = sharesIncoming.get(j);
+            if (mS.getNodeHandle() == node.getHandle()) {
+                MegaUser user = megaApi.getContact(mS.getUser());
+                if (user != null) {
+                    nodeInfo.setText(getMegaUserNameDB(user));
+                } else {
+                    nodeInfo.setText(mS.getUser());
+                }
+            }
+        }
     }
 
     @Override

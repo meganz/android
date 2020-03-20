@@ -121,6 +121,7 @@ import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 @SuppressLint("NewApi")
 public class FileInfoActivityLollipop extends DownloadableActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
@@ -339,6 +340,15 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             if (permissionsDialog != null) {
                 permissionsDialog.dismiss();
             }
+        }
+    };
+
+    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) return;
+            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+            updateAdapter(userHandle);
         }
     };
 
@@ -891,6 +901,9 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
         LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
 	}
 	
 	private String getTranslatedNameForParentNodes(long parentHandle){
@@ -1521,29 +1534,14 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 						MegaUser user= megaApi.getContact(mS.getUser());
 						contactMail=user.getEmail();
 						if(user!=null){
-							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-
-							if(contactDB!=null){
-								if(!contactDB.getName().equals("")){
-									ownerLabel.setText(contactDB.getName()+" "+contactDB.getLastName());
-									ownerInfo.setText(user.getEmail());
-									setOwnerState(user.getHandle());
-									createDefaultAvatar(ownerRoundeImage, user, contactDB.getName());
-								}
-								else{
-									ownerLabel.setText(user.getEmail());
-									ownerInfo.setText(user.getEmail());
-                                    setOwnerState(user.getHandle());
-									createDefaultAvatar(ownerRoundeImage, user, user.getEmail());
-								}
-							}
-							else{
-                                logWarning("The contactDB is null: ");
-								ownerLabel.setText(user.getEmail());
-								ownerInfo.setText(user.getEmail());
-                                setOwnerState(user.getHandle());
-								createDefaultAvatar(ownerRoundeImage, user, user.getEmail());
-							}
+                            String name = getMegaUserNameDB(user);
+                            if (name == null) {
+                                name = user.getEmail();
+                            }
+                            ownerLabel.setText(name);
+                            ownerInfo.setText(user.getEmail());
+                            setOwnerState(user.getHandle());
+                            createDefaultAvatar(ownerRoundeImage, user, name);
 						}
 						else{
 							ownerLabel.setText(mS.getUser());
@@ -2867,7 +2865,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         if (drawableLeave != null) drawableLeave.setColorFilter(null);
         if (drawableCopy != null) drawableCopy.setColorFilter(null);
         if (drawableChat != null) drawableChat.setColorFilter(null);
-
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
     }
 
@@ -3150,7 +3148,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         listContacts = new ArrayList<>();
         if (node != null) {
             fullListContacts = megaApi.getOutShares(node);
-
             if (fullListContacts.size() > MAX_NUMBER_OF_CONTACTS_IN_LIST) {
                 listContacts = new ArrayList<>(fullListContacts.subList(0,MAX_NUMBER_OF_CONTACTS_IN_LIST));
             } else {
@@ -3204,6 +3201,20 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 actionMode = startSupportActionMode(new ActionBarCallBack());
             }
             updateActionModeTitle();
+        }
+    }
+
+    private void updateAdapter(long handleReceived) {
+        if (listContacts != null && !listContacts.isEmpty()) {
+            for (int i = 0; i < listContacts.size(); i++) {
+                String email = listContacts.get(i).getUser();
+                MegaUser contact = megaApi.getContact(email);
+                long handleUser = contact.getHandle();
+                if (handleUser == handleReceived) {
+                    adapter.notifyItemChanged(i);
+                    break;
+                }
+            }
         }
     }
     
