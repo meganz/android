@@ -31,10 +31,9 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 56;
+	private static final int DATABASE_VERSION = 57;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -112,6 +111,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CONTACT_MAIL = "mail";
     private static final String KEY_CONTACT_NAME = "name";
     private static final String KEY_CONTACT_LAST_NAME = "lastname";
+	private static final String KEY_CONTACT_NICKNAME = "nickname";
 	private static final String KEY_PREFERRED_SORT_CLOUD = "preferredsortcloud";
 	private static final String KEY_PREFERRED_SORT_CONTACTS = "preferredsortcontacts";
 	private static final String KEY_PREFERRED_SORT_CAMERA_UPLOAD = "preferredsortcameraupload";
@@ -342,8 +342,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
         String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
-        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CONTACT_HANDLE + " TEXT, " + KEY_CONTACT_MAIL + " TEXT, " +
-        		KEY_CONTACT_NAME+ " TEXT, "+KEY_CONTACT_LAST_NAME+ " TEXT"+")";
+        		+ KEY_ID + " INTEGER PRIMARY KEY, "
+				+ KEY_CONTACT_HANDLE + " TEXT, "
+				+ KEY_CONTACT_MAIL + " TEXT, "
+				+ KEY_CONTACT_NAME+ " TEXT, "
+				+ KEY_CONTACT_LAST_NAME+ " TEXT, "
+				+ KEY_CONTACT_NICKNAME+ " TEXT"+")";
         db.execSQL(CREATE_CONTACTS_TABLE);
 
 		String CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_ITEMS + "("
@@ -791,6 +795,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		if (oldVersion <= 55) {
+			db.execSQL("ALTER TABLE " + TABLE_CONTACTS + " ADD COLUMN " + KEY_CONTACT_NICKNAME + " TEXT;");
+		}
+
+		if (oldVersion <= 56) {
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_OFFLINE + " BOOLEAN;");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_TIMESTAMP + " TEXT;");
 		}
@@ -2049,32 +2057,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setContact (MegaContactDB contact){
-        logDebug("setContacts: " + contact.getMail());
         ContentValues values = new ContentValues();
         values.put(KEY_CONTACT_HANDLE, encrypt(contact.getHandle()));
         values.put(KEY_CONTACT_MAIL, encrypt(contact.getMail()));
         values.put(KEY_CONTACT_NAME, encrypt(contact.getName()));
         values.put(KEY_CONTACT_LAST_NAME, encrypt(contact.getLastName()));
-//        values.put(KEY_CONTACT_HANDLE, (contacts.getHandle()));
-//        values.put(KEY_CONTACT_MAIL, (contacts.getMail()));
-//        values.put(KEY_CONTACT_NAME, (contacts.getName()));
-//        values.put(KEY_CONTACT_LAST_NAME, (contacts.getLastName()));
+        values.put(KEY_CONTACT_NICKNAME, encrypt(contact.getNickname()));
 		db.insert(TABLE_CONTACTS, null, values);
 	}
 
 	public int setContactName (String name, String mail){
-        logDebug("setContactName: " + name + " " + mail);
-
 		ContentValues values = new ContentValues();
 	    values.put(KEY_CONTACT_NAME, encrypt(name));
 	    return db.update(TABLE_CONTACTS, values, KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'", null);
 	}
 
 	public int setContactLastName (String lastName, String mail){
-
 		ContentValues values = new ContentValues();
 	    values.put(KEY_CONTACT_LAST_NAME, encrypt(lastName));
 	    return db.update(TABLE_CONTACTS, values, KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'", null);
+	}
+
+	public int setContactNickname(String nickname, long handle) {
+		ContentValues values = new ContentValues();
+		values.put(KEY_CONTACT_NICKNAME, encrypt(nickname));
+		return db.update(TABLE_CONTACTS, values, KEY_CONTACT_HANDLE + " = '" + encrypt(handle + "") + "'", null);
 	}
 
 	public int getContactsSize(){
@@ -2112,14 +2119,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String _mail = null;
 				String _name = null;
 				String _lastName = null;
+				String _nickname = null;
 
 				_id = Integer.parseInt(cursor.getString(0));
 				_handle = decrypt(cursor.getString(1));
 				_mail = decrypt(cursor.getString(2));
 				_name = decrypt(cursor.getString(3));
 				_lastName = decrypt(cursor.getString(4));
+				_nickname = decrypt(cursor.getString(5));
 
-				contacts = new MegaContactDB(handle, _mail, _name, _lastName);
+				contacts = new MegaContactDB(handle, _mail, _name, _lastName, _nickname);
 				cursor.close();
 				return contacts;
 			}
@@ -2144,14 +2153,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String _mail = null;
 				String _name = null;
 				String _lastName = null;
+				String _nickname = null;
 
 				_id = Integer.parseInt(cursor.getString(0));
 				_handle = decrypt(cursor.getString(1));
 				_mail = decrypt(cursor.getString(2));
 				_name = decrypt(cursor.getString(3));
 				_lastName = decrypt(cursor.getString(4));
+				_nickname = decrypt(cursor.getString(5));
 
-				contacts = new MegaContactDB(_handle, mail, _name, _lastName);
+				contacts = new MegaContactDB(_handle, mail, _name, _lastName, _nickname);
 				cursor.close();
 				return contacts;
 			}
