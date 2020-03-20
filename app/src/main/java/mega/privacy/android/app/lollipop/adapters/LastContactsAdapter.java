@@ -30,9 +30,9 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-
 
 public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapter.ViewHolder> {
     
@@ -145,25 +145,14 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         }
         
     }
-    
+
     private void setDefaultAvatar(MegaUser contact,ViewHolder holder) {
         int color = getColorAvatar(context, megaApi, contact);
-        String fullName = getName(contact);
+        String fullName = getMegaUserNameDB(contact);
         Bitmap bitmap = getDefaultAvatar(context, color, fullName, AVATAR_SIZE, true);
         holder.avatarImage.setImageBitmap(bitmap);
     }
 
-    private String getName(MegaUser contact) {
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
-        String fullName;
-        if (contactDB != null) {
-            ContactController cC = new ContactController(context);
-            fullName = cC.getFullName(contactDB.getName(),contactDB.getLastName(),contact.getEmail());
-        } else {
-            fullName = contact.getEmail();
-        }
-        return fullName;
-    }
     
     @Override
     public int getItemCount() {

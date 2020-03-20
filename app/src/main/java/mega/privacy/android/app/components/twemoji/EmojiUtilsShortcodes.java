@@ -80,6 +80,7 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
      */
     private static String processStringWithRegex(String text, Pattern pattern, int startIndex, boolean recurseEmojify) {
         //System.out.println(text);
+        if(text == null) return null;
         Matcher matcher = pattern.matcher(text);
         StringBuffer sb = new StringBuffer();
         int resetIndex = 0;

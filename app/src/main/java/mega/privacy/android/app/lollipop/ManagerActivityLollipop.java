@@ -150,6 +150,7 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -159,7 +160,6 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
@@ -244,6 +244,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -262,6 +263,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
@@ -937,6 +939,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             }
         }
     };
+
+	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null) return;
+			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+			if (getContactsFragment() != null) {
+				cFLol.updateContact(userHandle);
+			}
+		}
+	};
 
 	private BroadcastReceiver receiverUpdatePosition = new BroadcastReceiver() {
 		@Override
@@ -1823,6 +1836,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
 		if (localBroadcastManager != null) {
+			localBroadcastManager.registerReceiver(nicknameReceiver,
+					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+
 			localBroadcastManager.registerReceiver(receiverUpdatePosition,
 					new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 
@@ -2550,9 +2566,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			nVEmail.setVisibility(View.VISIBLE);
 			nVEmail.setText(megaApi.getMyEmail());
 //				megaApi.getUserData(this);
-
 			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
-
 			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
 
 			this.setDefaultAvatar();
@@ -4401,6 +4415,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
 		isStorageStatusDialogShown = false;
 
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
@@ -4517,7 +4532,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		if (!firstTimeAfterInstallation){
 			logDebug("Its NOT first time");
-
 			int dbContactsSize = dbH.getContactsSize();
 			int sdkContactsSize = megaApi.getContacts().size();
 			if (dbContactsSize != sdkContactsSize){
@@ -5767,18 +5781,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					contacts = megaApi.getContacts();
 					for (int i=0;i<contacts.size();i++){
 						if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-
-							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contacts.get(i).getHandle()+""));
-							String fullName = "";
-							if(contactDB!=null){
-								ContactController cC = new ContactController(this);
-								fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contacts.get(i).getEmail());
-							}
-							else{
-								//No name, ask for it and later refresh!!
-								logWarning("CONTACT DB is null");
-								fullName = contacts.get(i).getEmail();
-							}
 							visibleContacts.add(contacts.get(i));
 						}
 					}
@@ -15239,26 +15241,29 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 							}
 						}
 
-						if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
-							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
+						if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)) {
+							if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
 								logDebug("I change my first name");
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, this);
-							}
-							else{
-								logDebug("The user: "+ user.getHandle() + "changed his first name");
-								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(this));
+							} else {
+								logDebug("The user: " + user.getHandle() + "changed his first name");
+								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new GetAttrUserListener(this));
 							}
 						}
 
-						if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
-							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
+						if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)) {
+							if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
 								logDebug("I change my last name");
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, this);
-							}
-							else{
+							} else {
 								logDebug("The user: " + user.getHandle() + "changed his last name");
-								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(this));
+								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new GetAttrUserListener(this));
 							}
+						}
+
+						if (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)) {
+							logDebug("I changed the user: " + user.getHandle() + " nickname");
+							megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new GetAttrUserListener(this));
 						}
 
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
