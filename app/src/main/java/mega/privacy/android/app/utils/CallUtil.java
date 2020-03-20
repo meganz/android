@@ -30,11 +30,13 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class CallUtil {
 
-    /*Method to know if i'm participating in any A/V call*/
+    /**
+     * Retrieve if there's a call in progress that you're participating in.
+     *
+     * @return True if you're on a call in progress. Otherwise false.
+     */
     public static boolean participatingInACall() {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if(megaChatApi == null)
-            return false;
 
         MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
         MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
@@ -60,31 +62,38 @@ public class CallUtil {
         return true;
     }
 
-    /*Method to know the chat id which A / V call I am participating in*/
+    /**
+     * Retrieve the id of a chat that has a call in progress.
+     *
+     * @return A long data type. It's the id of chat.
+     */
     public static long getChatCallInProgress() {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (megaChatApi != null) {
-            MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
-            if (listCallsRequestSent != null && listCallsRequestSent.size() > 0) {
-                return listCallsRequestSent.get(0);
-            }
-            MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-            if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
-                return listCallsInProgress.get(0);
-            }
-            MegaHandleList listCallsInReconnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RECONNECTING);
-            if (listCallsInReconnecting != null && listCallsInReconnecting.size() > 0) {
-                return listCallsInReconnecting.get(0);
-            }
+        MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
+        if (listCallsRequestSent != null && listCallsRequestSent.size() > 0) {
+            return listCallsRequestSent.get(0);
         }
 
+        MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
+        if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
+            return listCallsInProgress.get(0);
+        }
+
+        MegaHandleList listCallsInReconnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RECONNECTING);
+        if (listCallsInReconnecting != null && listCallsInReconnecting.size() > 0) {
+            return listCallsInReconnecting.get(0);
+        }
         return -1;
     }
 
-    /*Method to return to the call which I am participating*/
+    /**
+     * Open the call that is in progress
+     *
+     * @param context from which the action is done
+     */
     public static void returnCall(Context context) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (megaChatApi == null || megaChatApi.getChatCall(getChatCallInProgress()) == null)
+        if (megaChatApi.getChatCall(getChatCallInProgress()) == null)
             return;
 
         long chatId = getChatCallInProgress();
@@ -97,10 +106,17 @@ public class CallUtil {
         context.startActivity(intent);
     }
 
-    /*Method to show or hide the "Tap to return to call" banner*/
+    /**
+     * Show or hide the "Tap to return to call" banner
+     *
+     * @param context              from which the action is done
+     * @param callInProgressLayout RelativeLayout to be shown or hidden
+     * @param callInProgressChrono Chronometer of the banner to be updated.
+     * @param callInProgressText   Text of the banner to be updated
+     */
     public static void showCallLayout(Context context, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (megaChatApi == null || callInProgressLayout == null) return;
+        if (callInProgressLayout == null) return;
 
         if (!participatingInACall()) {
             callInProgressLayout.setVisibility(View.GONE);
@@ -131,15 +147,27 @@ public class CallUtil {
         callInProgressLayout.setVisibility(View.VISIBLE);
     }
 
-    /*Method to know if I come from a call reconnection to show the layout of returning to the call*/
+    /**
+     * Retrieve if the call was in a reconnecting state or not
+     *
+     * @param context          from which the action is done.
+     * @param layout           Type RelativeLayout.
+     * @param reconnectingText Type TextView.
+     * @return True If the previous status of the call was reconnecting. Otherwise false.
+     */
     public static boolean isAfterReconnecting(Context context, RelativeLayout layout, final TextView reconnectingText) {
         return layout != null && layout.getVisibility() == View.VISIBLE && reconnectingText.getText().toString().equals(context.getString(R.string.reconnecting_message));
     }
 
-    /*Method to know if a call is established*/
+    /**
+     * Know if a call in a specific chat is established.
+     *
+     * @param chatId Id of a chat room that has a call.
+     * @return True if the call is established. Otherwise false.
+     */
     public static boolean isEstablishedCall(long chatId) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (megaChatApi == null || megaChatApi.getChatCall(chatId) == null) return false;
+        if (megaChatApi.getChatCall(chatId) == null) return false;
 
         MegaChatCall call = megaChatApi.getChatCall(chatId);
         return (call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS);
@@ -246,7 +274,6 @@ public class CallUtil {
 
     public static boolean isStatusConnected(Context context, long chatId) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (megaChatApi == null) return false;
         return checkConnection(context) && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED && megaChatApi.getChatConnectionState(chatId) == MegaChatApi.CHAT_CONNECTION_ONLINE;
     }
 
@@ -263,18 +290,15 @@ public class CallUtil {
     private static void disableLocalCamera() {
         long idCall = isNecessaryDisableLocalCamera();
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (megaChatApi == null || idCall == -1) return;
+        if (idCall == -1) return;
 
         megaChatApi.disableVideo(idCall, null);
     }
 
     public static long isNecessaryDisableLocalCamera() {
         long noVideo = -1;
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (megaChatApi == null) {
-            return noVideo;
-        }
 
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         long chatIdCallInProgress = getChatCallInProgress();
         MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
         if (callInProgress == null || !callInProgress.hasLocalVideo()) {
