@@ -85,7 +85,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -187,7 +187,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			return;
 		}
 		if (megaChatApi == null) return;
-		long chatIdCallInProgress = getChatCallInProgress(megaChatApi);
+		long chatIdCallInProgress = getChatCallInProgress();
 		MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
 		if (callInProgress != null && callInProgress.hasLocalVideo()) {
 			logDebug("Disabling local video ... the camera is using by other app");
@@ -1359,7 +1359,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 										}
 									}
 								} else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-									if ((megaChatApi != null) && (participatingInACall(megaChatApi))) {
+									if ((megaChatApi != null) && (participatingInACall())) {
 										logDebug("Several calls - "+callStatusToString(callStatus)+": show notification");
 										checkQueuedCalls();
 									} else {

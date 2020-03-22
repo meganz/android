@@ -36,7 +36,7 @@ import static mega.privacy.android.app.listeners.ShareListener.CHANGE_PERMISSION
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 
 public class ContactController {
 
@@ -114,7 +114,7 @@ public class ContactController {
             }
         }
 
-        if (megaChatApi != null && participatingInACall(megaChatApi)) {
+        if (megaChatApi != null && participatingInACall()) {
             MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(c.getHandle());
             if (chatRoomTo != null) {
                 long chatId = chatRoomTo.getChatId();

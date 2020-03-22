@@ -105,6 +105,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -2951,6 +2952,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         switch (v.getId()) {
             case R.id.layout_scan_qr: {
                 logDebug("Scan QR code pressed");
+                if (isNecessaryDisableLocalCamera() != -1) {
+                    showConfirmationOpenCamera(this, ACTION_OPEN_QR);
+                    break;
+                }
                 initScanQR();
                 break;
             }
@@ -3010,7 +3015,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    private void initScanQR() {
+    public void initScanQR() {
         Intent intent = new Intent(this, QRCodeActivity.class);
         intent.putExtra("inviteContacts", true);
         startActivityForResult(intent, SCAN_QR_FOR_ADD_CONTACTS);

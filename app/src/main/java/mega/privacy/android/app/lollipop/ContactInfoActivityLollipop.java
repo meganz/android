@@ -113,7 +113,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
@@ -879,8 +879,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				i.putExtra(CHAT_ID, chatRoomTo.getChatId());
 				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(i);
-
-			} else if (isStatusConnected(this, megaChatApi, chatRoomTo.getChatId())) {
+			} else if (isStatusConnected(this, chatRoomTo.getChatId())) {
 				startCallWithChatOnline(chatRoomTo);
 			}
 		} else {
@@ -1165,6 +1164,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		startVideo = withVideo;
 		if (checkPermissionsCall()) {
 			startCall();
+
 		}
 	}
 

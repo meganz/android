@@ -54,6 +54,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 
 public final class ChatAdvancedNotificationBuilder {
 
