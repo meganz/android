@@ -1107,7 +1107,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	}
 	
 	public void setContacts (ArrayList<MegaContactAdapter> contacts){
-		logDebug("setContacts");
 		this.contacts = contacts;
 		positionClicked = -1;
 		notifyDataSetChanged();

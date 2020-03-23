@@ -77,8 +77,9 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -86,13 +87,15 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
+
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback {
 
     final private static int REMOTE_VIDEO_NOT_INIT = -1;
     final private static int REMOTE_VIDEO_ENABLED = 1;
     final private static int REMOTE_VIDEO_DISABLED = 0;
     final private static int BIG_LETTER_SIZE = 60;
-    final private static int SMALL_LETTER_SIZE = 40;
     final private static int MIN_PEERS_LIST = 7;
     final private static int MAX_PEERS_GRID = 6;
     final private static int ARROW_ANIMATION = 250;
@@ -719,6 +722,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         } else {
             email = chat.getPeerEmail(0);
             name = chat.getPeerFullname(0);
+            String nickname = getNicknameContact(chat.getPeerHandle(0));
+            if(nickname != null){
+                name = nickname;
+            }
         }
         /*Default Avatar*/
         Bitmap defaultBitmapAvatar = getDefaultAvatar(this, getColorAvatar(this, megaApi, peerId), name, AVATAR_SIZE, true);
@@ -2611,7 +2618,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private void userLeft(MegaChatCall call) {
         logDebug("Participant left the group call");
-
         long userPeerId = call.getPeeridCallCompositionChange();
         long userClientId = call.getClientidCallCompositionChange();
 

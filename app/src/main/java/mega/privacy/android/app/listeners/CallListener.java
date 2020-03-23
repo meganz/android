@@ -12,7 +12,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatSession;
 
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CallListener implements MegaChatCallListenerInterface {
