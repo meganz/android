@@ -43,6 +43,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -175,7 +176,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             }
             else{
                 long nodeSize = file.length();
-                nodeInfo.setText(getSizeString(nodeSize));
+                nodeInfo.setText(getSizeString(nodeSize) + " . " + formatLongDateTime(file.lastModified()));
             }
 
             if (file.isFile()){

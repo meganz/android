@@ -792,10 +792,10 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 if (from == FROM_INCOMING_SHARES){
                     fragmentHandle = -1;
                     if (megaApi.getParentNode(node) != null){
-                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.tab_incoming_shares) +")");
                     }
                     else {
-                        locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer));
+                        locationTextView.setText(getResources().getString(R.string.tab_incoming_shares));
                     }
                 }
                 else{
@@ -810,7 +810,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                     }
 
                     if (megaApi.getParentNode(node) == null){ // It is because of the parent node is Incoming Shares
-                        locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer));
+                        locationTextView.setText(getResources().getString(R.string.tab_incoming_shares));
                     }
                     else if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
                             parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
@@ -823,7 +823,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                         }
                     }
                     else {
-                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.tab_incoming_shares) +")");
                     }
                 }
 

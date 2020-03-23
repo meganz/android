@@ -5233,19 +5233,19 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		switch (tabSelected) {
 			case OUTGOING_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(managerActivity, R.drawable.ic_incoming_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIconSecondary(managerActivity, R.drawable.ic_outgoing_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(managerActivity, R.drawable.link_ic, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.dark_primary_color));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.mail_my_account));
 				break;
 			case LINKS_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(managerActivity, R.drawable.ic_incoming_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(managerActivity, R.drawable.ic_outgoing_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIconSecondary(managerActivity, R.drawable.link_ic, R.color.dark_primary_color));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.link_ic, R.color.dark_primary_color));
 				break;
 			default:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIconSecondary(managerActivity, R.drawable.ic_incoming_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(managerActivity, R.drawable.ic_outgoing_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(managerActivity, R.drawable.link_ic, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.dark_primary_color));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.mail_my_account));
 
 		}
 	}

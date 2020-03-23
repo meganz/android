@@ -27,10 +27,8 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -48,6 +46,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 
@@ -265,7 +264,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionSendChat.setVisibility(View.GONE);
             } else {
                 long nodeSize = node.getSize();
-                nodeInfo.setText(getSizeString(nodeSize));
+                nodeInfo.setText(getSizeString(nodeSize) + " . " + formatLongDateTime(node.getCreationTime()));
 
                 if (megaApi.hasVersions(node)) {
                     nodeVersionsIcon.setVisibility(View.VISIBLE);
@@ -746,8 +745,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                     if (node.isExported()) {
                         //Node has public link
-                        nodeIconLayout.setVisibility(View.VISIBLE);
-                        nodeIcon.setImageResource(R.drawable.link_ic);
+                        if (((ManagerActivityLollipop) context).getDeepBrowserTreeLinks() > 0) {
+                            nodeIconLayout.setVisibility(View.VISIBLE);
+                            nodeIcon.setImageResource(R.drawable.link_ic);
+                        } else {
+                            nodeIconLayout.setVisibility(View.GONE);
+                        }
 
                         optionLinkText.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
