@@ -2223,7 +2223,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void hideRecordingLayout(){
-        if(recordingLayout.getVisibility() == View.GONE) return;
+        if(recordingLayout == null || recordingLayout.getVisibility() == View.GONE) return;
         recordingChrono.setText("00:00");
         recordingLayout.setVisibility(View.GONE);
     }
