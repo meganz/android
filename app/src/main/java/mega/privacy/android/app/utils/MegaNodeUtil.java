@@ -336,4 +336,15 @@ public class MegaNodeUtil {
             return R.drawable.ic_folder_list;
         }
     }
+
+    /**
+     * Checks if it is on Links section and in root level.
+     *
+     * @param adapterType   current section
+     * @param parentHandle  current parent handle
+     * @return true if it is on Links section and it is in root level, false otherwise
+     */
+    public static boolean isInRootLinksLevel(int adapterType, long parentHandle) {
+        return adapterType == LINKS_ADAPTER && parentHandle == INVALID_HANDLE;
+    }
 }

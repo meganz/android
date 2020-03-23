@@ -150,8 +150,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		managerActivity.supportInvalidateOptionsMenu();
 
 		visibilityFastScroller();
-		clearSelections();
-		hideMultipleSelect();
+		hideActionMode();
 		setEmptyView();
 	}
 

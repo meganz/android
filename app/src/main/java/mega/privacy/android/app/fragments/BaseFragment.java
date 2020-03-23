@@ -26,10 +26,12 @@ public class BaseFragment extends Fragment {
 
     public BaseFragment() {
         app = MegaApplication.getInstance();
-        megaApi = app.getMegaApi();
-        megaApiFolder = app.getMegaApiFolder();
-        megaChatApi = app.getMegaChatApi();
-        dbH = app.getDbH();
+        if (app != null) {
+            megaApi = app.getMegaApi();
+            megaApiFolder = app.getMegaApiFolder();
+            megaChatApi = app.getMegaChatApi();
+            dbH = app.getDbH();
+        }
     }
 
     @Override

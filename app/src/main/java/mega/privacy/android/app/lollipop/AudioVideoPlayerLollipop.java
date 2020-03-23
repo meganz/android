@@ -927,7 +927,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     if (parentNode != null) {
                         nodes = megaApiFolder.getChildren(parentNode, orderGetChildren);
                     }
-                } else if (adapterType == LINKS_ADAPTER && parentNodeHandle == INVALID_HANDLE) {
+                } else if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
                     nodes = megaApi.getPublicLinks(orderGetChildren);
                 } else {
                     if (parentNodeHandle == -1) {
@@ -1412,7 +1412,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
         else {
             ArrayList<MegaNode> listNodes;
-            if (adapterType == LINKS_ADAPTER && parentNodeHandle == INVALID_HANDLE) {
+            if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
                 listNodes = megaApi.getPublicLinks(orderGetChildren);
             } else {
                 MegaNode parentNode;
@@ -1468,7 +1468,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
         else {
             ArrayList<MegaNode> listNodes;
-            if (adapterType == LINKS_ADAPTER && parentNodeHandle == INVALID_HANDLE) {
+            if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
                 listNodes = megaApi.getPublicLinks(orderGetChildren);
             } else {
                 MegaNode parentNode;

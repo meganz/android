@@ -5203,13 +5203,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (viewPagerShares != null){
 					switch (indexShares) {
 						case INCOMING_TAB:
-							viewPagerShares.setCurrentItem(INCOMING_TAB);
-							break;
 						case OUTGOING_TAB:
-							viewPagerShares.setCurrentItem(OUTGOING_TAB);
-							break;
 						case LINKS_TAB:
-							viewPagerShares.setCurrentItem(LINKS_TAB);
+							viewPagerShares.setCurrentItem(indexShares);
 							break;
 					}
 				}
@@ -5989,7 +5985,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
             case SHARED_ITEMS: {
             	if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) inSFLol.checkScroll();
             	else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) outSFLol.checkScroll();
-            	else if (getTabItemShares() == OUTGOING_TAB && isLinksAdded()) lF.checkScroll();
+            	else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) lF.checkScroll();
                 break;
             }
             case CONTACTS: {
@@ -6289,7 +6285,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				logDebug("onQueryTextSubmit: " + query);
 				if (drawerItem == DrawerItem.CHAT) {
 					hideKeyboard(managerActivity, 0);
 				} else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE) {
@@ -6402,8 +6397,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (bNVMenu != null) {
 				if (drawerItem == null) {
 					drawerItem = DrawerItem.CLOUD_DRIVE;
-					setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
-				} else if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+				}
+
+				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 					setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
 				}
 			}
@@ -10459,29 +10455,36 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			return;
 		}
 
-		showConfirmationRemoveSeveralPublicLinks(n, null);
+		ArrayList<MegaNode> nodes = new ArrayList<>();
+		nodes.add(n);
+		showConfirmationRemoveSeveralPublicLinks(nodes);
 	}
 
-	public void showConfirmationRemoveSeveralPublicLinks(MegaNode node, ArrayList<MegaNode> nodes) {
-		String message = null;
-
-		if (node != null) {
-			message = getResources().getQuantityString(R.plurals.remove_links_warning_text, 1);
-		} else if (nodes != null){
-			message = getResources().getQuantityString(R.plurals.remove_links_warning_text, nodes.size());;
+	public void showConfirmationRemoveSeveralPublicLinks(ArrayList<MegaNode> nodes) {
+		if (nodes == null) {
+			logWarning("nodes == NULL");
 		}
 
-		if (message == null) return;
+		String message;
+		MegaNode node = null;
+
+		if (nodes.size() == 1) {
+			node = nodes.get(0);
+			message = getResources().getQuantityString(R.plurals.remove_links_warning_text, 1);
+		} else {
+			message = getResources().getQuantityString(R.plurals.remove_links_warning_text, nodes.size());
+		}
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MegaNode finalNode = node;
 		builder.setMessage(message)
 				.setPositiveButton(R.string.general_remove, (dialog, which) -> {
-					if (node != null) {
+					if (finalNode != null) {
 						if (!isOnline(managerActivity)){
 							showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 							return;
 						}
-						nC.removeLink(node, new ExportListener(managerActivity, true, 1));
+						nC.removeLink(finalNode, new ExportListener(managerActivity, true, 1));
 					} else {
 						nC.removeLinks(nodes);
 					}
@@ -10943,7 +10946,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void refreshSharesPageAdapter() {
-		if(sharesPageAdapter!=null){
+		if (sharesPageAdapter != null) {
 			sharesPageAdapter.notifyDataSetChanged();
 			setSharesTabIcons(getTabItemShares());
 		}

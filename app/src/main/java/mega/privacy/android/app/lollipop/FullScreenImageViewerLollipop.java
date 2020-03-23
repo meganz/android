@@ -1194,7 +1194,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
-		} else if (adapterType == LINKS_ADAPTER && parentNodeHandle == INVALID_HANDLE) {
+		} else if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
 			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
 		} else {
 			if (parentNodeHandle == -1){
@@ -1501,7 +1501,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
         else {
             Long handle = adapterMega.getImageHandle(positionG);
             ArrayList<MegaNode> listNodes;
-            if (adapterType == LINKS_ADAPTER && parentNodeHandle == INVALID_HANDLE) {
+            if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
             	listNodes = megaApi.getPublicLinks(orderGetChildren);
 			} else {
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
@@ -1577,7 +1577,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
         else {
             Long handle = adapterMega.getImageHandle(positionG);
 			ArrayList<MegaNode> listNodes;
-			if (adapterType == LINKS_ADAPTER && parentNodeHandle == INVALID_HANDLE) {
+			if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
 				listNodes = megaApi.getPublicLinks(orderGetChildren);
 			} else {
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));

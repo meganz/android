@@ -233,8 +233,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
     @Override
     public void refresh() {
-        clearSelections();
-        hideMultipleSelect();
+        hideActionMode();
 
         if (managerActivity.getParentHandleLinks() == INVALID_HANDLE
                 || megaApi.getNodeByHandle(managerActivity.getParentHandleLinks()) == null) {

@@ -56,7 +56,7 @@ import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaError.*;
@@ -99,7 +99,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected abstract void itemClick(int position, int[] screenPosition, ImageView imageView);
 
     protected abstract void refresh();
-
 
     public MegaNodeBaseFragment() {
         prefs = dbH.getPreferences();
@@ -144,7 +143,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             logDebug("onActionItemClicked");
-            ArrayList<Long> handleList = new ArrayList<Long>();
+            ArrayList<Long> handleList = new ArrayList<>();
             for (MegaNode node : selected) {
                 handleList.add(node.getHandle());
             }
@@ -162,26 +161,22 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                         break;
                     }
                     managerActivity.showRenameDialog(selected.get(0), selected.get(0).getName());
-                    clearSelections();
-                    hideMultipleSelect();
+                    hideActionMode();
                     break;
 
                 case R.id.cab_menu_copy:
                     nC.chooseLocationToCopyNodes(handleList);
-                    clearSelections();
-                    hideMultipleSelect();
+                    hideActionMode();
                     break;
 
                 case R.id.cab_menu_move:
                     nC.chooseLocationToMoveNodes(handleList);
-                    clearSelections();
-                    hideMultipleSelect();
+                    hideActionMode();
                     break;
 
                 case R.id.cab_menu_share:
                     nC.selectContactToShareFolders(handleList);
-                    clearSelections();
-                    hideMultipleSelect();
+                    hideActionMode();
                     break;
 
                 case R.id.cab_menu_share_link:
@@ -190,8 +185,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                         break;
                     }
                     managerActivity.showGetLinkActivity(selected.get(0).getHandle());
-                    clearSelections();
-                    hideMultipleSelect();
+                    hideActionMode();
                     break;
 
                 case R.id.cab_menu_share_link_remove:
@@ -202,9 +196,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
                     ArrayList<MegaNode> nodes = new ArrayList<>();
                     nodes.addAll(selected);
-                    managerActivity.showConfirmationRemoveSeveralPublicLinks(null, nodes);
-                    clearSelections();
-                    hideMultipleSelect();
+                    managerActivity.showConfirmationRemoveSeveralPublicLinks(nodes);
+                    hideActionMode();
                     break;
 
                 case R.id.cab_menu_edit_link:
@@ -214,8 +207,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     }
 
                     managerActivity.showGetLinkActivity(selected.get(0).getHandle());
-                    clearSelections();
-                    hideMultipleSelect();
+                    hideActionMode();
                     break;
 
                 case R.id.cab_menu_leave_multiple_share:
@@ -224,8 +216,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
                 case R.id.cab_menu_send_to_chat:
                     nC.checkIfNodesAreMineAndSelectChatsToSendNodes(adapter.getArrayListSelectedNodes());
-                    clearSelections();
-                    hideMultipleSelect();
+                    hideActionMode();
                     break;
 
                 case R.id.cab_menu_trash:
@@ -237,8 +228,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     break;
 
                 case R.id.cab_menu_unselect_all:
-                    clearSelections();
-                    hideMultipleSelect();
+                    hideActionMode();
                     break;
 
                 case R.id.cab_menu_remove_share:
@@ -273,7 +263,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             showEditLink = false;
             showSendToChat = true;
             showTrash = true;
-
 
             for (MegaNode node : selected) {
                 if (!node.isFile()) {
@@ -459,14 +448,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     }
 
     public void visibilityFastScroller() {
-        if (adapter == null) {
+        if (adapter == null || adapter.getItemCount() < MIN_ITEMS_SCROLLBAR) {
             fastScroller.setVisibility(View.GONE);
         } else {
-            if (adapter.getItemCount() < MIN_ITEMS_SCROLLBAR) {
-                fastScroller.setVisibility(View.GONE);
-            } else {
-                fastScroller.setVisibility(View.VISIBLE);
-            }
+            fastScroller.setVisibility(View.VISIBLE);
         }
     }
 
@@ -515,7 +500,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             }
         }
 
-        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
+        if (type == ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
                 spanCount = ((NewGridRecyclerView) recyclerView).getSpanCount();
@@ -638,10 +623,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
                 File mediaFile = new File(localPath);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                    logDebug("itemClick:FileProviderOption");
-                    Uri mediaFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                    logDebug("FileProviderOption");
+                    Uri mediaFileUri = FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, mediaFile);
                     if (mediaFileUri == null) {
-                        logDebug("itemClick:ERROR:NULLmediaFileUri");
+                        logDebug("ERROR:NULLmediaFileUri");
                         managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                     } else {
                         mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
@@ -649,7 +634,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 } else {
                     Uri mediaFileUri = Uri.fromFile(mediaFile);
                     if (mediaFileUri == null) {
-                        logError("itemClick:ERROR:NULLmediaFileUri");
+                        logError("ERROR:NULLmediaFileUri");
                         managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                     } else {
                         mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
@@ -657,12 +642,12 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 }
                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             } else {
-                logDebug("itemClick:localPathNULL");
+                logDebug("localPathNULL");
 
                 if (megaApi.httpServerIsRunning() == 0) {
                     megaApi.httpServerStart();
                 } else {
-                    logWarning("itemClick:ERROR:httpServerAlreadyRunning");
+                    logWarning("ERROR:httpServerAlreadyRunning");
                 }
 
                 ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -670,10 +655,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 activityManager.getMemoryInfo(mi);
 
                 if (mi.totalMem > BUFFER_COMP) {
-                    logDebug("itemClick:total mem: " + mi.totalMem + " allocate 32 MB");
+                    logDebug("total mem: " + mi.totalMem + " allocate 32 MB");
                     megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
                 } else {
-                    logDebug("itemClick:total mem: " + mi.totalMem + " allocate 16 MB");
+                    logDebug("total mem: " + mi.totalMem + " allocate 16 MB");
                     megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                 }
 
@@ -683,11 +668,11 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     if (parsedUri != null) {
                         mediaIntent.setDataAndType(parsedUri, mimeType);
                     } else {
-                        logError("itemClick:ERROR:httpServerGetLocalLink");
+                        logError("ERROR:httpServerGetLocalLink");
                         managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                     }
                 } else {
-                    logError("itemClick:ERROR:httpServerGetLocalLink");
+                    logError("ERROR:httpServerGetLocalLink");
                     managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                 }
             }
@@ -699,11 +684,11 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             if (internalIntent) {
                 context.startActivity(mediaIntent);
             } else {
-                logDebug("itemClick:externalIntent");
+                logDebug("externalIntent");
                 if (isIntentAvailable(context, mediaIntent)) {
                     context.startActivity(mediaIntent);
                 } else {
-                    logWarning("itemClick:noAvailableIntent");
+                    logWarning("noAvailableIntent");
                     managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 
                     ArrayList<Long> handleList = new ArrayList<Long>();
@@ -752,7 +737,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                             logDebug("Not expected format: Exception on processing url file");
                             Intent intent = new Intent(Intent.ACTION_VIEW);
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+                                intent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, f), "text/plain");
                             } else {
                                 intent.setDataAndType(Uri.fromFile(f), "text/plain");
                             }
@@ -771,7 +756,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+                        intent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, f), "text/plain");
                     } else {
                         intent.setDataAndType(Uri.fromFile(f), "text/plain");
                     }
@@ -800,7 +785,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 nC.prepareForDownload(handleList, true);
             }
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
-            logDebug("itemClick:isFile:isPdf");
+            logDebug("isFile:isPdf");
             MegaNode file = node;
 
             String mimeType = MimeTypeList.typeForName(file.getName()).getType();
@@ -819,7 +804,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
                 File mediaFile = new File(localPath);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                    pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                    pdfIntent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                 } else {
                     pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                 }
@@ -859,7 +844,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             }
             managerActivity.overridePendingTransition(0, 0);
         } else {
-            logDebug("itemClick:isFile:otherOption");
+            logDebug("isFile:otherOption");
             ArrayList<Long> handleList = new ArrayList<Long>();
             handleList.add(node.getHandle());
             NodeController nC = new NodeController(context);
@@ -963,5 +948,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
         emptyTextViewFirst.setText(getSpannedHtmlText(text));
         checkEmptyView();
+    }
+
+    protected void hideActionMode() {
+        clearSelections();
+        hideMultipleSelect();
     }
 }

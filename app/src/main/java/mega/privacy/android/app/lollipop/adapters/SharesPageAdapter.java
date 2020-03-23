@@ -26,35 +26,32 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         logDebug("Position: " + position);
-        switch (position){
-            case 0: {
+        switch (position) {
+            case 0:
                 IncomingSharesFragmentLollipop isF = (IncomingSharesFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.INCOMING_SHARES.getTag());
                 if (isF != null) {
                     return isF;
                 }
-                else {
-                    return IncomingSharesFragmentLollipop.newInstance();
-                }
-            }
-            case 1:{
+
+                return IncomingSharesFragmentLollipop.newInstance();
+
+            case 1:
                 OutgoingSharesFragmentLollipop osF = (OutgoingSharesFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.OUTGOING_SHARES.getTag());
-                if (osF != null)  {
+                if (osF != null) {
                     return osF;
                 }
-                else {
-                    return OutgoingSharesFragmentLollipop.newInstance();
-                }
-            }
-            case 2:{
+
+                return OutgoingSharesFragmentLollipop.newInstance();
+
+            case 2:
                 LinksFragment lF = (LinksFragment) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.LINKS.getTag());
-                if (lF != null)  {
+                if (lF != null) {
                     return lF;
                 }
-                else {
-                    return LinksFragment.newInstance();
-                }
-            }
+
+                return LinksFragment.newInstance();
         }
+
         return null;
     }
 
@@ -66,17 +63,18 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         // Generate title based on item position
-        switch (position){
-            case 0: {
+        switch (position) {
+            case 0:
                 return context.getString(R.string.tab_incoming_shares);
-            }
-            case 1:{
+
+            case 1:
                 return context.getString(R.string.tab_outgoing_shares);
-            }
-            case 2:{
+
+            case 2:
                 return context.getString(R.string.tab_links_shares);
-            }
+
         }
+
         return null;
     }
 
