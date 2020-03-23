@@ -6,12 +6,10 @@
 
     <application tools:node="merge">
 
-
-
         <service
             android:name=".service.push.MegaMessageService">
             <intent-filter>
-                <action android:name="com.huawei.push.action.MESSAGING_EVENT"/>
+                <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
             </intent-filter>
         </service>
     </application>
