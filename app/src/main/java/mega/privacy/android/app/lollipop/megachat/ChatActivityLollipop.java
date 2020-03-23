@@ -8108,12 +8108,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             hideCallInProgressLayout(call);
             return;
         }
+
         if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && isAfterReconnecting(this, callInProgressLayout, callInProgressText)) {
             return;
         }
+
         if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
             MegaApplication.setCallLayoutStatus(idChat, false);
         }
+
         showCallLayout(call);
     }
 
@@ -8578,6 +8581,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     public long getCurrentChatid() {
         return idChat;
     }
+
     Runnable updateVisualizer = new Runnable() {
         @Override
         public void run() {
