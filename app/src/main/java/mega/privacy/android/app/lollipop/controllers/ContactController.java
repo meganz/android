@@ -11,12 +11,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
@@ -24,6 +24,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
@@ -35,7 +36,7 @@ import static mega.privacy.android.app.listeners.ShareListener.CHANGE_PERMISSION
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 
 public class ContactController {
 
@@ -113,7 +114,7 @@ public class ContactController {
             }
         }
 
-        if (megaChatApi != null && participatingInACall(megaChatApi)) {
+        if (megaChatApi != null && participatingInACall()) {
             MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(c.getHandle());
             if (chatRoomTo != null) {
                 long chatId = chatRoomTo.getChatId();
@@ -371,29 +372,19 @@ public class ContactController {
         }
     }
 
-
-    public void addContactDB(String email){
-        logDebug("addContactDB");
-
+    public void addContactDB(String email) {
         MegaUser user = megaApi.getContact(email);
-        if(user!=null){
-            logDebug("User to add: " + user.getEmail());
-            //Check the user is not previously in the DB
-            if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
-                logDebug("The contact NOT exists -> add to DB");
-                MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "");
-                dbH.setContact(megaContactDB);
-                megaApi.getUserAttribute(user, 1, new ContactNameListener(context));
-                megaApi.getUserAttribute(user, 2, new ContactNameListener(context));
-            }
-            else{
-                logDebug("The contact already exists -> update");
-                megaApi.getUserAttribute(user, 1, new ContactNameListener(context));
-                megaApi.getUserAttribute(user, 2, new ContactNameListener(context));
-            }
+        if (user == null) return;
+        //Check the user is not previously in the DB
+        if (dbH.findContactByHandle(String.valueOf(user.getHandle())) == null) {
+            MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "");
+            dbH.setContact(megaContactDB);
         }
+        GetAttrUserListener listener = new GetAttrUserListener(context);
+        megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, listener);
+        megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, listener);
+        megaApi.getUserAlias(user.getHandle(), listener);
     }
-
 
     public void acceptInvitationContact(MegaContactRequest c){
         logDebug("acceptInvitationContact");
@@ -418,48 +409,6 @@ public class ContactController {
     public void removeInvitationContact(MegaContactRequest c){
         logDebug("removeInvitationContact");
         megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, (ManagerActivityLollipop) context);
-    }
-
-    public String getContactFullName(long userHandle){
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
-        if(contactDB!=null){
-
-            String name = contactDB.getName();
-            String lastName = contactDB.getLastName();
-
-            if(name==null){
-                name="";
-            }
-            if(lastName==null){
-                lastName="";
-            }
-            String fullName = "";
-
-            if (name.trim().length() <= 0){
-                fullName = lastName;
-            }
-            else{
-                fullName = name + " " + lastName;
-            }
-
-            if (fullName.trim().length() <= 0){
-                logWarning("Full name empty");
-                logDebug("Put email as fullname");
-                String mail = contactDB.getMail();
-                if(mail==null){
-                    mail="";
-                }
-                if (mail.trim().length() <= 0){
-                    return "";
-                }
-                else{
-                    return mail;
-                }
-            }
-
-            return fullName;
-        }
-        return "";
     }
 
     public String getFullName(String name, String lastName, String mail){

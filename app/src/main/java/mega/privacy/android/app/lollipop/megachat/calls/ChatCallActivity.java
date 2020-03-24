@@ -76,14 +76,16 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback {
 
@@ -91,7 +93,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     final private static int REMOTE_VIDEO_ENABLED = 1;
     final private static int REMOTE_VIDEO_DISABLED = 0;
     final private static int BIG_LETTER_SIZE = 60;
-    final private static int SMALL_LETTER_SIZE = 40;
     final private static int MIN_PEERS_LIST = 7;
     final private static int MAX_PEERS_GRID = 6;
     final private static int ARROW_ANIMATION = 250;
@@ -810,6 +811,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         } else {
             email = chat.getPeerEmail(0);
             name = chat.getPeerFullname(0);
+            String nickname = getNicknameContact(chat.getPeerHandle(0));
+            if(nickname != null){
+                name = nickname;
+            }
         }
         /*Default Avatar*/
         Bitmap defaultBitmapAvatar = getDefaultAvatar(this, getColorAvatar(this, megaApi, peerId), name, AVATAR_SIZE, true);
@@ -3073,14 +3078,20 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             mutateContactCallLayout.setVisibility(View.GONE);
         } else {
             String name = chat.getPeerFirstname(0);
-            if ((name == null) || (name == " ")) {
+            if (isTextEmpty(name)) {
                 if (megaChatApi != null) {
                     name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
                 }
                 if (name == null) {
-                    name = " ";
+                    name = getString(R.string.unknown_name_label);
                 }
             }
+
+            String nickname = getNicknameContact(chat.getPeerHandle(0));
+            if (nickname != null) {
+                name = nickname;
+            }
+
             mutateCallText.setText(getString(R.string.muted_contact_micro, name));
             mutateContactCallLayout.setVisibility(View.VISIBLE);
         }

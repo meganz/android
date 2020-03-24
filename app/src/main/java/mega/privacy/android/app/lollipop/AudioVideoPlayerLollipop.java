@@ -152,7 +152,7 @@ import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1100,7 +1100,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                     logDebug("playbackState: " + playbackState);
 
-                    if (playWhenReady && participatingInACall(megaChatApi)) {
+                    if (playWhenReady && participatingInACall()) {
                         //Not allow to play content when a call is in progress
                         player.setPlayWhenReady(false);
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);
