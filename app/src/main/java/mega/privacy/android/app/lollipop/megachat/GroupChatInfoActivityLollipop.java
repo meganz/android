@@ -40,6 +40,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ListIterator;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -50,6 +51,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
@@ -74,6 +76,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
@@ -150,6 +153,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     TextView participantsTitle;
     long participantsCount;
     RecyclerView recyclerView;
+    private LinearLayoutManager linearLayoutManager;
     MegaParticipantsChatLollipopAdapter adapter;
     ArrayList<MegaChatParticipant> participants;
     Toolbar toolbar;
@@ -157,6 +161,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     private RoundedImageView avatarImageView;
     private EmojiTextView infoTitleChatText;
     private MegaApiAndroid megaApi = null;
+
+    private HashMap<Integer, MegaChatParticipant> participantRequests = new HashMap<>();
 
     private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
 
@@ -244,15 +250,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             aB.setTitle(getString(R.string.group_chat_info_label).toUpperCase());
 
             scrollView = findViewById(R.id.scroll_view_group_chat_properties);
-            new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
-                @Override
-                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                    if (scrollView.canScrollVertically(-1)) {
-                        changeActionBarElevation(true);
-                    } else {
-                        changeActionBarElevation(false);
-                    }
-                }
+            new ListenScrollChangesHelper().addViewToListen(scrollView, (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                changeActionBarElevation(scrollView.canScrollVertically(-1));
             });
 
             //Info Layout
@@ -338,7 +337,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             recyclerView = findViewById(R.id.chat_group_contact_properties_list);
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
             recyclerView.setHasFixedSize(true);
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+            linearLayoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(linearLayoutManager);
             recyclerView.setFocusable(false);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -1789,5 +1788,49 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             logDebug("Date last green: " + formattedDate);
         }
+    }
+
+    public String getAutorithationToken() {
+        return chat.getAuthorizationToken();
+    }
+
+    public void addParticipantRequest(int position, MegaChatParticipant participant) {
+        participantRequests.put(position, participant);
+    }
+
+    private void sendParticipantsRequest() {
+        if (!participantRequests.isEmpty()) {
+            MegaHandleList handleList = MegaHandleList.createInstance();
+
+            for (Integer position : participantRequests.keySet()) {
+                handleList.addMegaHandle(participantRequests.get(position).getHandle());
+            }
+
+            megaChatApi.loadUserAttributes(chatHandle, handleList, getAutorithationToken(), new GetPeerAttributesListener(this, participantRequests));
+            participantRequests.clear();
+        }
+    }
+
+    public void updateParticipants(long chatHandle, final HashMap<Integer, MegaChatParticipant> participantUpdates, MegaHandleList handleList) {
+        if (chatHandle != chat.getChatId() || megaChatApi.getChatRoom(chatHandle) == null || adapter == null) return;
+
+        chat = megaChatApi.getChatRoom(chatHandle);
+
+        new Thread(() -> {
+            for (int i = 0; i < handleList.size(); i++) {
+                long handle = handleList.get(i);
+
+                for(Integer position : participantUpdates.keySet()) {
+                    if (participantUpdates.get(position).getHandle() == handle) {
+                        String email = chat.getPeerEmailByHandle(handle);
+                        String fullName = chat.getPeerFullnameByHandle(handle);
+                        int privilege = chat.getPeerPrivilegeByHandle(handle);
+
+                        adapter.updateParticipant(position, new MegaChatParticipant(handle, null, null, fullName, email, privilege));
+                        break;
+                    }
+                }
+            }
+        }).start();
     }
 }

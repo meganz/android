@@ -40,6 +40,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
@@ -178,15 +179,21 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		logDebug("position: " + position + ", itemType: "+itemType);
 
 		if(itemType==ITEM_VIEW_TYPE_NORMAL) {
-			((ViewHolderParticipantsList)holder).currentPosition = position;
-			((ViewHolderParticipantsList)holder).imageView.setImageBitmap(null);
+			ViewHolderParticipantsList holderParticipantsList = (ViewHolderParticipantsList) holder;
 
-			MegaChatParticipant participant = (MegaChatParticipant) getItem(position);
-			((ViewHolderParticipantsList)holder).contactMail = participant.getEmail();
+			holderParticipantsList.currentPosition = position;
+			holderParticipantsList.imageView.setImageBitmap(null);
+
+			MegaChatParticipant participant = getItem(position);
+			if (participant == null) return;
+
+
+            checkParticipant(position, participant);
+			holderParticipantsList.contactMail = participant.getEmail();
 			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(participant.getHandle());
-			((ViewHolderParticipantsList)holder).userHandle = userHandleEncoded;
+			holderParticipantsList.userHandle = userHandleEncoded;
 			logDebug("participant: " + participant.getEmail() + ", handle: " + participant.getHandle());
-			((ViewHolderParticipantsList)holder).fullName = participant.getFullName();
+			holderParticipantsList.fullName = participant.getFullName();
 
 			int userStatus;
 
@@ -199,47 +206,47 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 			if(userStatus == MegaChatApi.STATUS_ONLINE){
 				logDebug("This user is connected");
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
-				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.online_status));
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
+				holderParticipantsList.statusImage.setVisibility(View.VISIBLE);
+				holderParticipantsList.statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+				holderParticipantsList.textViewContent.setText(context.getString(R.string.online_status));
+				holderParticipantsList.textViewContent.setVisibility(View.VISIBLE);
 			}
 			else if(userStatus == MegaChatApi.STATUS_AWAY){
 				logDebug("This user is away");
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
-				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
-				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.away_status));
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
+				holderParticipantsList.statusImage.setVisibility(View.VISIBLE);
+				holderParticipantsList.statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+				holderParticipantsList.textViewContent.setText(context.getString(R.string.away_status));
+				holderParticipantsList.textViewContent.setVisibility(View.VISIBLE);
 			}
 			else if(userStatus == MegaChatApi.STATUS_BUSY){
 				logDebug("This user is busy");
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
-				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
-				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.busy_status));
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
+				holderParticipantsList.statusImage.setVisibility(View.VISIBLE);
+				holderParticipantsList.statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+				holderParticipantsList.textViewContent.setText(context.getString(R.string.busy_status));
+				holderParticipantsList.textViewContent.setVisibility(View.VISIBLE);
 			}
 			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 				logDebug("This user is offline");
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
-				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.offline_status));
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
+				holderParticipantsList.statusImage.setVisibility(View.VISIBLE);
+				holderParticipantsList.statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+				holderParticipantsList.textViewContent.setText(context.getString(R.string.offline_status));
+				holderParticipantsList.textViewContent.setVisibility(View.VISIBLE);
 			}
 			else if(userStatus == MegaChatApi.STATUS_INVALID){
 				logWarning("INVALID status: " + userStatus);
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.GONE);
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.GONE);
+				holderParticipantsList.statusImage.setVisibility(View.GONE);
+				holderParticipantsList.textViewContent.setVisibility(View.GONE);
 			}
 			else{
 				logDebug("This user status is: " + userStatus);
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.GONE);
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.GONE);
+				holderParticipantsList.statusImage.setVisibility(View.GONE);
+				holderParticipantsList.textViewContent.setVisibility(View.GONE);
 			}
 
 			if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
 				if(!participant.getLastGreen().isEmpty()){
-					((ViewHolderParticipantsList)holder).textViewContent.setText(participant.getLastGreen());
-					((ViewHolderParticipantsList)holder).textViewContent.isMarqueeIsNecessary(context);
+					holderParticipantsList.textViewContent.setText(participant.getLastGreen());
+					holderParticipantsList.textViewContent.isMarqueeIsNecessary(context);
 				}
 			}
 			if (isMultipleSelect() && isItemChecked(position)) {
@@ -249,19 +256,19 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 			}
 
-			holder.textViewContactName.setText(((ViewHolderParticipantsList)holder).fullName);
-			((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(this);
+			holder.textViewContactName.setText(holderParticipantsList.fullName);
+			holderParticipantsList.threeDotsLayout.setOnClickListener(this);
 
 			/*Default Avatar*/
-			int color = getColorAvatar(context, megaApi, ((ViewHolderParticipantsList) holder).userHandle);
-			String name = ((ViewHolderParticipantsList) holder).fullName;
-			((ViewHolderParticipantsList) holder).imageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, true));
+			int color = getColorAvatar(context, megaApi, holderParticipantsList.userHandle);
+			String name = holderParticipantsList.fullName;
+			holderParticipantsList.imageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, true));
 
 			/*Avatar*/
 			String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
-			if((((ViewHolderParticipantsList)holder).userHandle).equals(myUserHandleEncoded)){
+			if((holderParticipantsList.userHandle).equals(myUserHandleEncoded)){
 				logDebug("It's me!!!");
-				File avatar = buildAvatarFile(context,((ViewHolderParticipantsList)holder).contactMail + ".jpg");
+				File avatar = buildAvatarFile(context,holderParticipantsList.contactMail + ".jpg");
 				Bitmap bitmap = null;
 				if(avatar!=null){
 					if (avatar.exists()) {
@@ -269,7 +276,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 							BitmapFactory.Options bOpts = new BitmapFactory.Options();
 							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 							if (bitmap != null) {
-								((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
+								holderParticipantsList.imageView.setImageBitmap(bitmap);
 							}
 						}
 					}
@@ -281,18 +288,18 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 					logWarning("My avatar NULL");
 				}
 
-				((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
-				((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(this);
+				holderParticipantsList.imageButtonThreeDots.setColorFilter(null);
+				holderParticipantsList.threeDotsLayout.setOnClickListener(this);
 			}
 			else{
 				logDebug("NOOOT me!!!");
-				ChatParticipantAvatarListener listener = new ChatParticipantAvatarListener(context, ((ViewHolderParticipantsList)holder), this);
-				if (((ViewHolderParticipantsList)holder).contactMail != null) {
+				ChatParticipantAvatarListener listener = new ChatParticipantAvatarListener(context, holderParticipantsList, this);
+				if (holderParticipantsList.contactMail != null) {
 					logDebug("The participant is contact!!");
 
-					MegaUser contact = megaApi.getContact(((ViewHolderParticipantsList)holder).contactMail);
+					MegaUser contact = megaApi.getContact(holderParticipantsList.contactMail);
 					if(contact!=null){
-						File avatar = buildAvatarFile(context,((ViewHolderParticipantsList)holder).contactMail + ".jpg");
+						File avatar = buildAvatarFile(context,holderParticipantsList.contactMail + ".jpg");
 						Bitmap bitmap = null;
 						if (isFileAvailable(avatar)) {
 							if (avatar.length() > 0) {
@@ -304,7 +311,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 									avatar.delete();
                                     megaApi.getUserAvatar(contact,buildAvatarFile(context,contact.getEmail() + ".jpg").getAbsolutePath(),listener);
                                 } else {
-									((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
+									holderParticipantsList.imageView.setImageBitmap(bitmap);
 								}
 							} else {
                                 megaApi.getUserAvatar(contact,buildAvatarFile(context,contact.getEmail() + ".jpg").getAbsolutePath(),listener);
@@ -312,41 +319,41 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 						} else {
                             megaApi.getUserAvatar(contact,buildAvatarFile(context,contact.getEmail() + ".jpg").getAbsolutePath(),listener);
 						}
-						((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
+						holderParticipantsList.imageButtonThreeDots.setColorFilter(null);
 					}
 					else{
 						logDebug("Participant is NOT contact");
-                        megaApi.getUserAvatar(((ViewHolderParticipantsList)holder).contactMail,buildAvatarFile(context,((ViewHolderParticipantsList)holder).contactMail + ".jpg").getAbsolutePath(),listener);
+                        megaApi.getUserAvatar(holderParticipantsList.contactMail,buildAvatarFile(context,holderParticipantsList.contactMail + ".jpg").getAbsolutePath(),listener);
 					}
 
 				} else {
 					logDebug("NOT email- Participant is NOT contact");
 					if(position!=0){
-						((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
-						((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(null);
+						holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
+						holderParticipantsList.threeDotsLayout.setOnClickListener(null);
 					}
 
-                    megaApi.getUserAvatar(((ViewHolderParticipantsList)holder).userHandle,buildAvatarFile(context,((ViewHolderParticipantsList)holder).userHandle + ".jpg").getAbsolutePath(),listener);
+                    megaApi.getUserAvatar(holderParticipantsList.userHandle,buildAvatarFile(context,holderParticipantsList.userHandle + ".jpg").getAbsolutePath(),listener);
 				}
 			}
 
 			if(isPreview && megaChatApi.getInitState() == MegaChatApi.INIT_ANONYMOUS){
-				((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
-				((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(null);
-				((ViewHolderParticipantsList)holder).itemLayout.setOnClickListener(null);
+				holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
+				holderParticipantsList.threeDotsLayout.setOnClickListener(null);
+				holderParticipantsList.itemLayout.setOnClickListener(null);
 			}
 
 			int permission = participant.getPrivilege();
 
 			if (permission == MegaChatRoom.PRIV_STANDARD) {
-				((ViewHolderParticipantsList)holder).permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
+				holderParticipantsList.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
 			} else if (permission == MegaChatRoom.PRIV_MODERATOR) {
-				((ViewHolderParticipantsList)holder).permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
+				holderParticipantsList.permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
 			} else {
-				((ViewHolderParticipantsList)holder).permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
+				holderParticipantsList.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
 			}
 
-			((ViewHolderParticipantsList)holder).threeDotsLayout.setTag(holder);
+			holderParticipantsList.threeDotsLayout.setTag(holder);
 		}
 		else{
 			logDebug("Bind item add participant");
@@ -402,24 +409,16 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		}
 	}
 
-	public Object getItem(int position) {
+	public MegaChatParticipant getItem(int position) {
 		logDebug("position: " + position);
-		if (isPreview) {
-			return participants.get(position);
-		}
-		else {
-			int size = participants.size();
-			logDebug("Participants size: " + size);
-			int permission = participants.get(size-1).getPrivilege();
+		if (position < 0 || position > participants.size()) return null;
 
-			if (permission == MegaChatRoom.PRIV_MODERATOR) {
-				logDebug("Moderator type");
-				return participants.get(position-1);
-			}
-			else {
-				return participants.get(position);
-			}
+		int permission = participants.get(participants.size() - 1).getPrivilege();
+		if (permission == MegaChatRoom.PRIV_MODERATOR) {
+			return participants.get(position - 1);
 		}
+
+		return participants.get(position);
 	}
 
 	@Override
@@ -542,7 +541,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				logDebug("contact_list_three_dots");
 				ViewHolderParticipantsList holder = (ViewHolderParticipantsList) v.getTag();
 				int currentPosition = holder.currentPosition;
-				MegaChatParticipant p = (MegaChatParticipant) getItem(currentPosition);
+				MegaChatParticipant p = getItem(currentPosition);
 				if(p==null){
 					logWarning("Participant is null");
 				}
@@ -629,5 +628,21 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 	public void setListFragment(RecyclerView listFragment) {
 		this.listFragment = listFragment;
+	}
+
+	private void checkParticipant(int position, MegaChatParticipant participant) {
+		if (isTextEmpty(participant.getEmail()) && isTextEmpty(participant.getFullName())) {
+			if (context instanceof GroupChatInfoActivityLollipop) {
+				((GroupChatInfoActivityLollipop) context).addParticipantRequest(position, participant);
+			}
+		}
+	}
+
+	public void updateParticipant(int position, MegaChatParticipant participant) {
+		MegaChatParticipant adapterParticipant = getItem(position);
+		if (adapterParticipant != null && participant.getHandle() == adapterParticipant.getHandle()) {
+			participants.set(position, participant);
+			notifyItemChanged(position);
+		}
 	}
 }
