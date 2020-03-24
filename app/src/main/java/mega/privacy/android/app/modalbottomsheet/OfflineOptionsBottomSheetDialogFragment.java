@@ -176,7 +176,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             }
             else{
                 long nodeSize = file.length();
-                nodeInfo.setText(getSizeString(nodeSize) + " . " + formatLongDateTime(file.lastModified()));
+                nodeInfo.setText(getSizeString(nodeSize) + " . " + formatLongDateTime(file.lastModified() / 1000));
             }
 
             if (file.isFile()){
