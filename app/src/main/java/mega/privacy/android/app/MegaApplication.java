@@ -49,6 +49,7 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GlobalListener;
+import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -64,7 +65,6 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -86,12 +86,11 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
-import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -99,7 +98,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
-public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
+public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 
 	final String TAG = "MegaApplication";
 
@@ -471,6 +470,60 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		e.printStackTrace();
 	}
 
+	private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			stopService(new Intent(getInstance(), IncomingCallService.class));
+
+			int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+			long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+			long callId = intent.getLongExtra(UPDATE_CALL_ID, -1);
+
+			if (callStatus == -1 || chatId == -1 || callId == -1)
+				return;
+
+			switch (callStatus) {
+				case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
+					removeValues(chatId);
+					clearCameraHandle();
+					break;
+
+				case MegaChatCall.CALL_STATUS_DESTROYED:
+					checkCallDestroyed(chatId);
+					break;
+
+				case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+				case MegaChatCall.CALL_STATUS_RING_IN:
+				case MegaChatCall.CALL_STATUS_JOINING:
+				case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+				case MegaChatCall.CALL_STATUS_RECONNECTING:
+					MegaHandleList listAllCalls = megaChatApi.getChatCalls();
+					if (listAllCalls == null || listAllCalls.size() == 0) return;
+
+					checkDeviceCamera();
+
+					if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+						setAudioManagerValues(callStatus);
+					}
+
+					if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
+						removeChatAudioManager();
+						clearIncomingCallNotification(callId);
+					}
+
+					if (listAllCalls.size() == 1) {
+						checkOneCall(listAllCalls.get(0));
+					} else {
+						checkSeveralCall(listAllCalls, callStatus);
+					}
+					break;
+			}
+		}
+	};
+
 	public static MegaApplication getInstance() {
 		return singleApplicationInstance;
 	}
@@ -596,6 +649,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
+		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+		filter.addAction(ACTION_CALL_STATUS_UPDATE);
+		LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
 
 		logoutReceiver = new BroadcastReceiver() {
             @Override
@@ -753,8 +809,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				logDebug("Add listeners of megaChatApi");
 				megaChatApi.addChatRequestListener(this);
 				megaChatApi.addChatNotificationListener(this);
-				megaChatApi.addChatCallListener(this);
 				megaChatApi.addChatListener(this);
+				megaChatApi.addChatCallListener(new CallListener());
 				registeredChatListeners = true;
 			}
 		}
@@ -767,7 +823,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			if (megaChatApi != null) {
 				megaChatApi.removeChatRequestListener(this);
 				megaChatApi.removeChatNotificationListener(this);
-				megaChatApi.removeChatCallListener(this);
 				megaChatApi.removeChatListener(this);
 				registeredChatListeners = false;
 			}
@@ -808,7 +863,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			megaApi.addRequestListener(requestListener);
 
 			megaApi.addGlobalListener(new GlobalListener());
-
 			megaChatApi = getMegaChatApi();
 
 			String language = Locale.getDefault().toString();
@@ -1072,7 +1126,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				if (megaChatApi != null){
 					megaChatApi.removeChatRequestListener(this);
 					megaChatApi.removeChatNotificationListener(this);
-					megaChatApi.removeChatCallListener(this);
 					megaChatApi.removeChatListener(this);
 					registeredChatListeners = false;
 				}
@@ -1346,52 +1399,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 	}
 
-
-	@Override
-	public void onChatSessionUpdate(MegaChatApiJava api, long chatid, long callid, MegaChatSession session) {
-
-	}
-
-	@Override
-	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		stopService(new Intent(this, IncomingCallService.class));
-		if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
-			int callStatus = call.getStatus();
-			logDebug("Call status changed, current status: " + callStatusToString(call.getStatus()));
-			if (callStatus == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
-				removeValues(call.getChatid());
-				clearCameraHandle();
-			}
-			if (callStatus == MegaChatCall.CALL_STATUS_DESTROYED) {
-				checkCallDestroyed(call);
-			}
-			if ((callStatus >= MegaChatCall.CALL_STATUS_REQUEST_SENT && callStatus < MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
-				MegaHandleList listAllCalls = megaChatApi.getChatCalls();
-				if (listAllCalls == null || listAllCalls.size() == 0) return;
-				checkDeviceCamera();
-				if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-					setAudioManagerValues(call);
-				}
-				if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
-					removeChatAudioManager();
-					clearIncomingCallNotification(call.getId());
-				}
-				if (listAllCalls.size() == 1) {
-					checkOneCall(listAllCalls.get(0));
-				} else {
-					checkSeveralCall(listAllCalls, callStatus);
-				}
-			}
-		}
-	}
-
 	private void removeValues(long id) {
 		removeStatusVideoAndSpeaker(id);
 		removeChatAudioManager();
 	}
 
-	public void checkCallDestroyed(MegaChatCall call) {
-		removeValues(call.getChatid());
+	public void checkCallDestroyed(long chatId) {
+		removeValues(chatId);
 
 		if (shouldNotify(this)) {
 			toSystemSettingNotification(this);
@@ -1400,9 +1414,11 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		if (wakeLock != null && wakeLock.isHeld()) {
 			wakeLock.release();
 		}
+		MegaChatCall call = megaChatApi.getChatCallByCallId(chatId);
 		clearIncomingCallNotification(call.getId());
 		//Show missed call if time out ringing (for incoming calls)
 		try {
+
 			if (((call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))) {
 				logDebug("TERM_CODE_ANSWER_TIMEOUT");
 				if (call.isLocalTermCode() == false) {
@@ -1436,12 +1452,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		chatAudioManager = null;
 	}
 
-	public void setAudioManagerValues(MegaChatCall call){
+	public void setAudioManagerValues(int callStatus){
 		createChatAudioManager();
 		if(chatAudioManager != null) {
 			MegaHandleList listCallsRequest = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
 			MegaHandleList listCallsRing = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
-			chatAudioManager.setAudioManagerValues(call, listCallsRequest, listCallsRing);
+			chatAudioManager.setAudioManagerValues(callStatus, listCallsRequest, listCallsRing);
 		}
 	}
 
@@ -1602,7 +1618,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     public void unregisterReceiver(BroadcastReceiver receiver) {
         super.unregisterReceiver(receiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(logoutReceiver);
-    }
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
+
+	}
 
     public static boolean isVerifySMSShowed() {
 		return isVerifySMSShowed;

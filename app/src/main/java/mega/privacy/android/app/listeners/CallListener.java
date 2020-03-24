@@ -1,12 +1,10 @@
 package mega.privacy.android.app.listeners;
 
-import android.content.Context;
+import android.content.Intent;
 
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.calls.CallService;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatCallListenerInterface;
@@ -14,106 +12,35 @@ import nz.mega.sdk.MegaChatSession;
 
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class CallListener implements MegaChatCallListenerInterface {
 
-    Context context;
+    private MegaApplication megaApplication;
 
-    public CallListener(Context context) {
-        this.context = context;
+    public CallListener() {
+        megaApplication = MegaApplication.getInstance();
     }
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        if (call == null
-                || (context instanceof ChatActivityLollipop && call.getChatid() != ((ChatActivityLollipop) context).getCurrentChatid())
-                || (context instanceof ChatCallActivity && call.getChatid() != ((ChatCallActivity) context).getCurrentChatid())) {
-            logWarning("Call null or different chat");
+        if (call == null) {
+            logWarning("Call null");
             return;
         }
 
-        logDebug("Call Status is " + callStatusToString(call.getStatus()));
-        if (context instanceof ChatActivityLollipop && call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS) && call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-            ((ChatActivityLollipop) context).cancelRecording();
-        } else if (context instanceof ChatCallActivity) {
-            ((ChatCallActivity) context).updateCall(call);
-        }
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CALL_UPDATE);
 
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
             int callStatus = call.getStatus();
-            logDebug("Call status changed, current status is " + callStatusToString(call.getStatus()));
-            if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).updateLayout(call);
-            } else if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).checkCall(call);
-            }
-
-            if (callStatus == MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM && context instanceof ChatCallActivity) {
-                ((ChatCallActivity) context).updateLocalAV();
-            }
-
-            if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-                if (context instanceof CallService) {
-                    ((CallService) context).updateNotificationContent(call);
-                } else if (context instanceof AudioVideoPlayerLollipop) {
-                    ((AudioVideoPlayerLollipop) context).checkCall();
-                }
-            }
-
-            if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-                if (context instanceof CallService) {
-                    ((CallService) context).updateNotificationContent(call);
-                } else if (context instanceof AudioVideoPlayerLollipop) {
-                    ((AudioVideoPlayerLollipop) context).checkCall();
-                }
-            }
-
-            if (callStatus == MegaChatCall.CALL_STATUS_JOINING && context instanceof CallService) {
-                ((CallService) context).updateNotificationContent(call);
-            }
-
-            if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                if (context instanceof CallService) {
-                    ((CallService) context).updateNotificationContent(call);
-                } else if (context instanceof ChatCallActivity) {
-                    ((ChatCallActivity) context).checkInprogressCall(call.getId());
-                }
-            }
-
-            if (callStatus == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
-                if (context instanceof ChatCallActivity) {
-                    ((ChatCallActivity) context).checkTerminatingCall(call);
-                } else if (context instanceof CallService) {
-                    ((CallService) context).checkDestroyCall();
-                }
-            }
-
-            if (callStatus == MegaChatCall.CALL_STATUS_DESTROYED) {
-                if (context instanceof ChatCallActivity) {
-                    ((ChatCallActivity) context).checkTerminatingCall(call);
-                } else if (context instanceof CallService) {
-                    ((CallService) context).checkDestroyCall();
-                } else if (context instanceof ChatActivityLollipop) {
-                    ((ChatActivityLollipop) context).usersWithVideo(call);
-                }
-            }
-
-            if (callStatus == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && context instanceof ChatCallActivity) {
-                ((ChatCallActivity) context).checkUserNoPresentInCall(call.getId());
-            }
-
-            if (callStatus == MegaChatCall.CALL_STATUS_RECONNECTING && context instanceof ChatCallActivity) {
-                ((ChatCallActivity) context).checkReconnectingCall(call);
-            }
+            logDebug("Call status changed, current status is " + callStatusToString(callStatus));
+            intent.setAction(ACTION_CALL_STATUS_UPDATE);
+            intent.putExtra(UPDATE_CALL_STATUS, callStatus);
         }
 
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)) {
             logDebug("Changes in local av flags ");
-            if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).usersWithVideo(call);
-            } else if (context instanceof ChatCallActivity) {
-                ((ChatCallActivity) context).updateLocalAV();
-            }
+            intent.setAction(ACTION_CHANGE_LOCAL_AVFLAGS);
         }
 
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION)) {
@@ -123,65 +50,50 @@ public class CallListener implements MegaChatCallListenerInterface {
             }
 
             logDebug("Call composition changed. Call status is " + callStatusToString(call.getStatus()) + ". Num of participants is " + call.getPeeridParticipants().size());
-            if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).usersWithVideo(call);
-            } else if (context instanceof ChatCallActivity) {
-                ((ChatCallActivity) context).checkCompositionChanges(call);
-            }
+            intent.setAction(ACTION_CHANGE_COMPOSITION);
         }
+
+        intent.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
+        intent.putExtra(UPDATE_CALL_ID, call.getId());
+        LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
     }
 
     @Override
     public void onChatSessionUpdate(MegaChatApiJava api, long chatid, long callid, MegaChatSession session) {
-        if (session == null || (context instanceof ChatCallActivity && chatid != ((ChatCallActivity) context).getCurrentChatid()) || (context instanceof ChatActivityLollipop && chatid != ((ChatActivityLollipop) context).getCurrentChatid())) {
-            logDebug("Session null or different chat");
+        if (session == null) {
+            logDebug("Session null");
             return;
         }
 
-        if (context instanceof ChatCallActivity) {
-            ((ChatCallActivity) context).updateCall(api.getChatCall(chatid));
-        }
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
 
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_REMOTE_AVFLAGS)) {
-            logDebug("Changes in remote AV flags");
-            if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).usersWithVideo(api.getChatCall(chatid));
-            } else if (context instanceof ChatCallActivity) {
-                ((ChatCallActivity) context).updateRemoteAV(session);
-            }
+            intent.setAction(ACTION_CHANGE_REMOTE_AVFLAGS);
         }
 
-        if (!(context instanceof ChatCallActivity)) return;
-
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_AUDIO_LEVEL)) {
-            ((ChatCallActivity) context).checkAudioLevel(session);
+            intent.setAction(ACTION_CHANGE_AUDIO_LEVEL);
         }
 
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_NETWORK_QUALITY)) {
-            ((ChatCallActivity) context).checkNetworkQuality(session);
+            intent.setAction(ACTION_CHANGE_NETWORK_QUALITY);
         }
 
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_STATUS)) {
             logDebug("Session status changed, current status is " + sessionStatusToString(session.getStatus()));
+            intent.setAction(ACTION_SESSION_STATUS_UPDATE);
+            intent.putExtra(UPDATE_SESSION_STATUS, session.getStatus());
+
             if (session.getStatus() == MegaChatSession.SESSION_STATUS_DESTROYED) {
                 logDebug("Term code is " + session.getTermCode());
-                if (session.getTermCode() == MegaChatCall.TERM_CODE_ERROR) {
-                    if (context instanceof ChatCallActivity) {
-                        ((ChatCallActivity) context).checkReconnectingCall(api.getChatCall(chatid));
-                    }
-                    return;
-                }
-
-                if (session.getTermCode() == MegaChatCall.TERM_CODE_USER_HANGUP && context instanceof ChatCallActivity) {
-                    ((ChatCallActivity) context).checkTerminatingCall(api.getChatCall(chatid));
-                }
-            }
-
-            if (session.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS && context instanceof ChatCallActivity) {
-                ((ChatCallActivity) context).hideReconnecting();
-                ((ChatCallActivity) context).updateAVFlags(session);
-
+                intent.putExtra(UPDATE_SESSION_TERM_CODE, session.getTermCode());
             }
         }
+
+        intent.putExtra(UPDATE_CHAT_CALL_ID, chatid);
+        intent.putExtra(UPDATE_CALL_ID, callid);
+        intent.putExtra(UPDATE_SESSION_PEER_ID, session.getPeerid());
+        intent.putExtra(UPDATE_SESSION_CLIENT_ID, session.getClientid());
+        LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
     }
 }

@@ -4,7 +4,10 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -17,6 +20,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -54,7 +58,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
-import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
@@ -86,9 +89,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
-
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback {
 
@@ -193,7 +194,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private MenuItem cameraSwapMenuItem;
     private MegaApplication application =  MegaApplication.getInstance();
     private boolean inTemporaryState = false;
-    private CallListener callListener = new CallListener(this);
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -261,11 +261,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         //Contact's avatar
         if (chatId == -1 || megaChatApi == null) return;
 
-        megaChatApi.addChatCallListener(callListener);
         chat = megaChatApi.getChatRoom(chatId);
         callChat = megaChatApi.getChatCall(chatId);
         if (callChat == null) {
-            megaChatApi.removeChatCallListener(callListener);
             finishActivity();
             return;
         }
@@ -352,6 +350,110 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             initialUI(chatId);
         }
     }
+
+    private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null)
+                return;
+
+            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+            if (chatId != getCurrentChatid()){
+                logWarning("Call different chat");
+                return;
+            }
+
+            long callId = intent.getLongExtra(UPDATE_CALL_ID, -1);
+            updateCall(callId);
+
+            if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
+                int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+                if (callStatus != -1) {
+                    switch (callStatus) {
+                        case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM:
+                            updateLocalAV();
+                            break;
+
+                        case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+                            checkInprogressCall(callId);
+                            break;
+
+                        case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
+                        case MegaChatCall.CALL_STATUS_DESTROYED:
+                            checkTerminatingCall(callId);
+                            break;
+
+                        case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
+                            checkUserNoPresentInCall(callId);
+                            break;
+
+                        case MegaChatCall.CALL_STATUS_RECONNECTING:
+                            checkReconnectingCall(callId);
+                            break;
+                    }
+                }
+            }
+
+            if (intent.getAction().equals(ACTION_CHANGE_LOCAL_AVFLAGS)) {
+                updateLocalAV();
+            }
+
+            if (intent.getAction().equals(ACTION_CHANGE_COMPOSITION)) {
+                checkCompositionChanges(callId);
+            }
+        }
+    };
+
+    private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null)
+                return;
+
+            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+            long callId = intent.getLongExtra(UPDATE_CALL_ID, -1);
+
+            if (chatId != getCurrentChatid() || callId != callChat.getId()) {
+                logWarning("Call different chat");
+                return;
+            }
+            long peerId = intent.getLongExtra(UPDATE_SESSION_PEER_ID, -1);
+            long clientId = intent.getLongExtra(UPDATE_SESSION_CLIENT_ID, -1);
+            MegaChatSession session = getSesionCall(callId, peerId, clientId);
+
+            if (intent.getAction().equals(ACTION_CHANGE_REMOTE_AVFLAGS)) {
+                updateRemoteAV(session);
+            }
+
+            if (intent.getAction().equals(ACTION_CHANGE_AUDIO_LEVEL)) {
+                checkAudioLevel(session);
+            }
+
+            if (intent.getAction().equals(ACTION_CHANGE_NETWORK_QUALITY)) {
+                checkNetworkQuality(session);
+            }
+
+            if (intent.getAction().equals(ACTION_SESSION_STATUS_UPDATE)) {
+
+                int sessionStatus = intent.getIntExtra(UPDATE_SESSION_STATUS, -1);
+                if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
+
+                    hideReconnecting();
+                    updateAVFlags(session);
+                } else if (sessionStatus == MegaChatSession.SESSION_STATUS_DESTROYED) {
+
+                    int termCode = intent.getIntExtra(UPDATE_SESSION_TERM_CODE, -1);
+                    if (termCode == MegaChatCall.TERM_CODE_ERROR) {
+                        checkReconnectingCall(callId);
+                        return;
+
+                    } else if (termCode == MegaChatCall.TERM_CODE_USER_HANGUP) {
+                        checkTerminatingCall(callId);
+                    }
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -597,6 +699,18 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             initialUI(chatId);
         }
 
+        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+        filter.addAction(ACTION_CALL_STATUS_UPDATE);
+        filter.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
+        filter.addAction(ACTION_CHANGE_COMPOSITION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
+
+        IntentFilter filterSession = new IntentFilter(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
+        filterSession.addAction(ACTION_SESSION_STATUS_UPDATE);
+        filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
+        filterSession.addAction(ACTION_CHANGE_AUDIO_LEVEL);
+        filterSession.addAction(ACTION_CHANGE_NETWORK_QUALITY);
+        LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
     }
 
     private void setAvatarLayout() {
@@ -869,10 +983,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         activateChrono(false, callInProgressChrono, callChat);
         restoreHeightAndWidth();
 
-        if (megaChatApi != null) {
-            megaChatApi.removeChatCallListener(callListener);
-        }
-
         clearSurfacesViews();
         peerSelected = null;
         if (adapterList != null) {
@@ -888,6 +998,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (bigRecyclerView != null) {
             bigRecyclerView.setAdapter(null);
         }
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatSessionUpdateReceiver);
+
         super.onDestroy();
     }
 
@@ -1356,8 +1470,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         bigRecyclerViewLayout.requestLayout();
     }
 
-
-    public void updateLocalAV() {
+    private void updateLocalAV() {
         updateLocalVideoStatus();
         updateLocalAudioStatus();
         updateSubtitleNumberOfVideos();
@@ -1708,7 +1821,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void updateLocalSpeakerStatus() {
-        if (getCall() == null || !statusCallInProgress(callChat)) return;
+        if (getCall() == null || !statusCallInProgress(callChat.getStatus())) return;
         boolean isSpeakerOn = application.getSpeakerStatus(callChat.getChatid());
         if(rtcAudioManager == null){
             createAppRTCAudioManager(isSpeakerOn);
@@ -1724,7 +1837,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             speakerFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_speaker_off));
         }
         speakerFAB.show();
-        application.setAudioManagerValues(callChat);
+        application.setAudioManagerValues(callChat.getStatus());
     }
 
 
@@ -1956,7 +2069,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void updateSubtitleNumberOfVideos() {
         logDebug("updateSubtitleNumberOfVideos");
         if (chat == null || callChat == null) return;
-        if (!chat.isGroup() || !statusCallInProgress(callChat)) {
+        if (!chat.isGroup() || !statusCallInProgress(callChat.getStatus())) {
             linearParticipants.setVisibility(View.GONE);
             return;
         }
@@ -2025,7 +2138,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private void updateUserSelected() {
         logDebug("updateUserSelected");
-        if (!statusCallInProgress(callChat)) {
+        if (!statusCallInProgress(callChat.getStatus())) {
             //I'M NOT IN THE CALL
             logDebug("INCOMING");
             if (peerSelected != null) return;
@@ -2276,8 +2389,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         return chatId;
     }
 
-    public void updateCall(MegaChatCall call) {
-        this.callChat = call;
+    private void updateCall(long callId) {
+        this.callChat = megaChatApi.getChatCallByCallId(callId);
     }
 
     private MegaChatCall getCall() {
@@ -2289,23 +2402,33 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         return callChat.getMegaChatSession(callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
     }
 
-    private boolean statusCallInProgress(MegaChatCall call) {
-        return call.getStatus() != MegaChatCall.CALL_STATUS_RING_IN &&
-                (call.getStatus() < MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION ||
-                        call.getStatus() > MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
+    private MegaChatSession getSesionCall(long callId, long peerId, long clientId) {
+        if (callId != callChat.getId()) return null;
+        return callChat.getMegaChatSession(peerId, clientId);
+    }
+
+    private boolean statusCallInProgress(int callStatus) {
+        return callStatus != MegaChatCall.CALL_STATUS_RING_IN &&
+                (callStatus < MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION ||
+                        callStatus > MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
     }
 
     /*
      * Check the different call status
      */
-    public void checkCompositionChanges(MegaChatCall call) {
-        if (call.getId() != callChat.getId() || !chat.isGroup()) return;
+    private void checkCompositionChanges(long callId) {
+        if (callId != callChat.getId() || !chat.isGroup())
+            return;
 
+        MegaChatCall call = megaChatApi.getChatCallByCallId(callId);
         long change = call.getCallCompositionChange();
+
         if (change == TYPE_JOIN) {
             userJoined(call);
         } else if (change == TYPE_LEFT) {
             userLeft(call);
+        }else {
+            return;
         }
 
         updateSubTitle();
@@ -2332,7 +2455,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    public void checkInprogressCall(long callid) {
+    private void checkInprogressCall(long callid) {
         if (getCall() == null || callid != callChat.getId()) return;
 
         if (reconnectingLayout.isShown()) {
@@ -2341,6 +2464,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             updateSubTitle();
             return;
         }
+
         if (!chat.isGroup()) {
             setProfileAvatar(megaChatApi.getMyUserHandle());
             setProfileAvatar(chat.getPeerHandle(0));
@@ -2349,6 +2473,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             fragmentContainerLocalCameraFS.setVisibility(View.GONE);
             updateAVFlags(getSesionIndividualCall());
         }
+
         answerCallFAB.setOnTouchListener(null);
         videoFAB.setOnTouchListener(null);
         videoFAB.setOnClickListener(this);
@@ -2358,36 +2483,36 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     }
 
-    public void checkTerminatingCall(MegaChatCall call) {
-        if (megaChatApi == null || callChat == null || call.getId() != callChat.getId() || (statusCallInProgress(call) && call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING)) {
+    private void checkTerminatingCall(long callId) {
+        if (megaChatApi == null || callChat == null || callId != callChat.getId() || (statusCallInProgress(callChat.getStatus()) && callChat.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING))
             return;
-        }
 
         clearHandlers();
         stopSpeakerAudioManger();
-        MegaApplication.setSpeakerStatus(call.getChatid(), false);
-        if (megaChatApi != null) {
-            megaChatApi.removeChatCallListener(callListener);
-        }
+        MegaApplication.setSpeakerStatus(callId, false);
+
         finishActivity();
     }
 
-    public void checkUserNoPresentInCall(long callid) {
-        if (getCall() == null || callid != callChat.getId() || reconnectingLayout.isShown()) return;
+    private void checkUserNoPresentInCall(long callId) {
+        if (getCall() == null || callId != callChat.getId() || reconnectingLayout.isShown())
+            return;
+
         clearHandlers();
     }
 
-    public void checkReconnectingCall(MegaChatCall call) {
-        if (getCall() == null || call.getId() != callChat.getId() || (chat.isGroup() && call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING) || reconnectingLayout.isShown())
+    private void checkReconnectingCall(long callId) {
+        if (getCall() == null || callId != callChat.getId() || (chat.isGroup() && callChat.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING) || reconnectingLayout.isShown())
             return;
         activateChrono(false, callInProgressChrono, callChat);
         subtitleToobar.setVisibility(View.GONE);
         showReconnecting();
     }
 
-    public void checkNetworkQuality(MegaChatSession session) {
-        if (!chat.isGroup() || peersOnCall.isEmpty() || session.getStatus() != MegaChatSession.SESSION_STATUS_IN_PROGRESS)
+    private void checkNetworkQuality(MegaChatSession session) {
+        if (!chat.isGroup() || peersOnCall.isEmpty() || session == null || session.getStatus() != MegaChatSession.SESSION_STATUS_IN_PROGRESS)
             return;
+
         logDebug("Network quality changed");
         int qualityLevel = session.getNetworkQuality();
         for (int i = 0; i < peersOnCall.size(); i++) {
@@ -2412,8 +2537,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         }
     }
-    public void checkAudioLevel(MegaChatSession session) {
-        if (!chat.isGroup() || peersOnCall.isEmpty() || peersOnCall.size() <= MAX_PEERS_GRID || isManualMode || !session.getAudioDetected())
+
+    private void checkAudioLevel(MegaChatSession session) {
+        if (!chat.isGroup() || peersOnCall.isEmpty() || peersOnCall.size() <= MAX_PEERS_GRID || isManualMode || session == null || !session.getAudioDetected())
             return;
 
         for (int i = 0; i < peersOnCall.size(); i++) {
@@ -2461,7 +2587,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         if (changes) updateUI();
 
-        if (peersOnCall.isEmpty() || !statusCallInProgress(callChat)) return;
+        if (peersOnCall.isEmpty() || !statusCallInProgress(callChat.getStatus())) return;
 
         logDebug("Update Video&Audio local&remote");
         updateSubTitle();
@@ -2545,7 +2671,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
         logDebug("Updating the UI, number of participants = " + peersOnCall.size());
-        if (!statusCallInProgress(callChat)) {
+        if (!statusCallInProgress(callChat.getStatus())) {
             linearParticipants.setVisibility(View.GONE);
         }
 
@@ -2626,14 +2752,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
         if (!containsUser) {
             addContactIntoArray(userPeerId, userClientId);
-
-            if (statusCallInProgress(call) && call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING) {
+            int callStatus = call.getStatus();
+            if (statusCallInProgress(callStatus) && callStatus != MegaChatCall.CALL_STATUS_RECONNECTING) {
                 updateInfoUsersBar(getString(R.string.contact_joined_the_call, getName(userPeerId)));
             }
 
             checkParticipantChanges(true, -1);
 
-            if (statusCallInProgress(call)) {
+            if (statusCallInProgress(callStatus)) {
                 updateRemoteAV(call.getMegaChatSession(userPeerId, userClientId));
             }
         }
@@ -2648,7 +2774,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         for (InfoPeerGroupCall peer : peersOnCall) {
             if (peer.getPeerId() == userPeerId && peer.getClientId() == userClientId) {
-                if (statusCallInProgress(call) && call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING){
+                int callStatus = call.getStatus();
+
+                if (statusCallInProgress(callStatus) && callStatus != MegaChatCall.CALL_STATUS_RECONNECTING){
                     updateInfoUsersBar(getString(R.string.contact_left_the_call, getName(userPeerId)));
                 }
 

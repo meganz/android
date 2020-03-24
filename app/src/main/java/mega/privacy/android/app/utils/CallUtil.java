@@ -174,16 +174,16 @@ public class CallUtil {
         return (call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS);
     }
 
-    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall callChat) {
+    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall call) {
         if (chronometer == null) return;
         if (!activateChrono) {
             chronometer.stop();
             chronometer.setVisibility(View.GONE);
             return;
         }
-        if (callChat != null) {
+        if (call != null) {
             chronometer.setVisibility(View.VISIBLE);
-            chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration() * 1000));
+            chronometer.setBase(SystemClock.elapsedRealtime() - (call.getDuration()* 1000));
             chronometer.start();
             chronometer.setFormat(" %s");
         }

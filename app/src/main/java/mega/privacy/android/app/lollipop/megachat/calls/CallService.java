@@ -5,8 +5,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,10 +23,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import java.io.File;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.listeners.CallListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
@@ -35,13 +38,13 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class CallService extends Service{
 
     MegaApplication app;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
-
     long chatId;
 
     private Notification.Builder mBuilder;
@@ -51,7 +54,35 @@ public class CallService extends Service{
 
     private String notificationChannelId = NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
     private String notificationChannelName = NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
-    private CallListener callListener = new CallListener(this);
+
+    private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null)
+                return;
+
+            int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+            if(callStatus == -1 || chatId == -1)
+                return;
+
+            switch (callStatus){
+                case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+                case MegaChatCall.CALL_STATUS_RING_IN:
+                case MegaChatCall.CALL_STATUS_JOINING:
+                case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+                    updateNotificationContent(chatId);
+                    break;
+
+                case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
+                case MegaChatCall.CALL_STATUS_DESTROYED:
+                    stopForeground(true);
+                    mNotificationManager.cancel(NOTIFICATION_CALL_IN_PROGRESS);
+                    stopSelf();
+                    break;
+            }
+        }
+    };
 
     public void onCreate() {
         super.onCreate();
@@ -60,13 +91,16 @@ public class CallService extends Service{
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-        megaChatApi.addChatCallListener(callListener);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
             mBuilder = new Notification.Builder(this);
         mBuilderCompat = new NotificationCompat.Builder(this);
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+        filter.addAction(ACTION_CALL_STATUS_UPDATE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
     }
 
     @Override
@@ -90,9 +124,9 @@ public class CallService extends Service{
         return START_NOT_STICKY;
     }
 
-    public void updateNotificationContent(MegaChatCall call) {
-        logDebug("updateNotification");
+    private void updateNotificationContent(long chatId) {
         Notification notif;
+        MegaChatCall call = megaChatApi.getChatCall(chatId);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (call == null) {
                 mBuilderCompatO.setContentText(getString(R.string.action_notification_call_in_progress));
@@ -173,8 +207,7 @@ public class CallService extends Service{
                 }
 
                 mBuilderCompatO.setContentTitle(title);
-                MegaChatCall call = megaChatApi.getChatCall(chatId);
-                updateNotificationContent(call);
+                updateNotificationContent(chatId);
 
             } else {
                 mBuilderCompatO.setContentTitle(getString(R.string.title_notification_call_in_progress));
@@ -229,8 +262,7 @@ public class CallService extends Service{
                 }
 
                 mBuilderCompat.setContentTitle(title);
-                MegaChatCall call = megaChatApi.getChatCall(chatId);
-                updateNotificationContent(call);
+                updateNotificationContent(chatId);
 
             } else {
                 mBuilderCompat.setContentTitle(getString(R.string.title_notification_call_in_progress));
@@ -297,22 +329,13 @@ public class CallService extends Service{
         return getDefaultAvatar(this, color, fullName, AVATAR_SIZE, true);
     }
 
-    public void checkDestroyCall() {
-        stopForeground(true);
-        mNotificationManager.cancel(NOTIFICATION_CALL_IN_PROGRESS);
-        stopSelf();
-    }
-
     @Override
     public void onDestroy() {
         logDebug("onDestroy");
 
-        if (megaChatApi != null) {
-            megaChatApi.removeChatCallListener(callListener);
-        }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 
         mNotificationManager.cancel(NOTIFICATION_CALL_IN_PROGRESS);
-
         MegaApplication.setOpenCallChatId(-1);
 
         super.onDestroy();
