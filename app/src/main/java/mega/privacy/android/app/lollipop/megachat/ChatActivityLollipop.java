@@ -7074,7 +7074,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
                 idChat = request.getChatHandle();
 
-                if (e.getErrorCode() == MegaChatError.ERROR_OK && idChat != MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE) {
+                if (idChat != MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE) {
                     dbH.setLastPublicHandle(idChat);
                     dbH.setLastPublicHandleTimeStamp();
                     dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CHAT);
