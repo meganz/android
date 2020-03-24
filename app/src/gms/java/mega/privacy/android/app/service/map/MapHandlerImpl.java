@@ -1,23 +1,20 @@
 package mega.privacy.android.app.service.map;
 
-import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Location;
-import android.text.Html;
-import android.text.Spanned;
-import android.util.DisplayMetrics;
 import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.*;
+import com.google.android.gms.maps.GoogleMap.OnCameraIdleListener;
+import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,8 +25,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.SphericalUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -38,34 +33,28 @@ import java.util.List;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.MapAddress;
 import mega.privacy.android.app.lollipop.megachat.MapsActivity;
+import mega.privacy.android.app.middlelayer.map.AbstractMapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
 
-import static mega.privacy.android.app.lollipop.megachat.MapsActivity.DEFAULT_ZOOM;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.getAddresses;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.Util.px2dp;
 
-public class MapHandlerImpl implements OnMapReadyCallback, OnMyLocationClickListener, OnMyLocationButtonClickListener, OnCameraMoveStartedListener, OnCameraIdleListener, OnMarkerClickListener, OnInfoWindowClickListener {
+public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCallback, OnMyLocationClickListener, OnMyLocationButtonClickListener, OnCameraMoveStartedListener, OnCameraIdleListener, OnMarkerClickListener, OnInfoWindowClickListener {
 
-    private final static int MAX_SIZE = 45000;
-    private final static int SNAPSHOT_SIZE = 750;
-
-    private MapsActivity activity;
     private GoogleMap mMap;
-    private MapView mapView;
-    private SupportMapFragment mapFragment;
-    private FusedLocationProviderClient fusedLocationProviderClient;
-    private LatLng myLocation;
-    private Marker fullScreenMarker;
-    private MapAddress fullScreenAddress;
-    private List<Address> addresses;
-    private DisplayMetrics outMetrics;
 
-    public MapHandlerImpl(MapsActivity activity, DisplayMetrics outMetrics) {
-        this.activity = activity;
-        this.outMetrics = outMetrics;
-        mapFragment = (SupportMapFragment) activity.getSupportFragmentManager().findFragmentById(R.id.map);
+    private MapView mapView;
+
+    private FusedLocationProviderClient fusedLocationProviderClient;
+
+    private Marker fullScreenMarker;
+
+    private MapAddress fullScreenAddress;
+
+    public MapHandlerImpl(MapsActivity activity, Bitmap fullscreenIconMarker) {
+        super(activity, fullscreenIconMarker);
+        SupportMapFragment mapFragment = (SupportMapFragment) activity.getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
@@ -90,7 +79,7 @@ public class MapHandlerImpl implements OnMapReadyCallback, OnMyLocationClickList
 
     @Override
     public void onCameraIdle() {
-        if (activity.isFullScreenEnabled && fullScreenMarker != null) {
+        if (isFullScreen() && fullScreenMarker != null) {
             getMarkerInfo();
         }
     }
@@ -103,32 +92,35 @@ public class MapHandlerImpl implements OnMapReadyCallback, OnMyLocationClickList
     @Override
     public void onInfoWindowClick(Marker marker) {
         logDebug("onInfoWindowClick");
-        if (activity.isFullScreenEnabled && marker.equals(fullScreenMarker)) {
-            activity.setActivityResult(fullScreenAddress);
+        if (isFullScreen() && marker.equals(fullScreenMarker)) {
+            setAddress(fullScreenAddress);
         }
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if (activity.isFullScreenEnabled && marker.equals(fullScreenMarker)) {
-            activity.setActivityResult(fullScreenAddress);
+        if (isFullScreen() && marker.equals(fullScreenMarker)) {
+            setAddress(fullScreenAddress);
             return true;
         }
         return false;
     }
 
+    @Override
     public boolean isMapNull() {
         return mMap == null;
     }
 
-    public void clear(){
-        if(!isMapNull()) {
+    @Override
+    public void clearMap() {
+        if (!isMapNull()) {
             mMap.clear();
         }
     }
 
+    @Override
     public void setMyLocationEnabled(boolean enable) {
-        if(!isMapNull()) {
+        if (!isMapNull()) {
             mMap.setMyLocationEnabled(enable);
         }
     }
@@ -148,27 +140,25 @@ public class MapHandlerImpl implements OnMapReadyCallback, OnMyLocationClickList
     public void onMapReady(GoogleMap googleMap) {
         logDebug("onMapReady");
         mMap = googleMap;
-
-        activity.enableLocationUpdates();
-
-        if (!activity.isGPSEnabled()) {
-            activity.showEnableLocationDialog();
+        enableLocationUpdates();
+        if (!isGPSEnabled()) {
+            askForGPS();
         } else {
             initMap();
         }
-
-        activity.setCurrentLocationVisibility();
+        setCurrentLocationVisibility();
     }
 
-    public void createSnapshot(double lati, double longi, int mapWidth, MapsActivity.OnSnapshotReady callback) {
-        LatLng location = new LatLng(lati, longi);
+    @Override
+    public void createSnapshot(double latitude, double longitude, int mapWidth) {
+        LatLng location = new LatLng(latitude, longitude);
         GoogleMapOptions options = new GoogleMapOptions()
                 .compassEnabled(false)
                 .mapToolbarEnabled(false)
                 .camera(CameraPosition.fromLatLngZoom(location, DEFAULT_ZOOM))
                 .liteMode(true);
 
-        mapView = new MapView(activity, options);
+        mapView = new MapView(getContext(), options);
         mapView.onCreate(null);
         mapView.getMapAsync(googleMap -> {
             googleMap.addMarker(new MarkerOptions().position(location));
@@ -177,7 +167,7 @@ public class MapHandlerImpl implements OnMapReadyCallback, OnMyLocationClickList
                     View.MeasureSpec.makeMeasureSpec(mapWidth, View.MeasureSpec.EXACTLY));
             mapView.layout(0, 0, mapWidth, mapWidth);
 
-            LatLngBounds latLngBounds = getLatLngBounds(500, location);
+            LatLngBounds latLngBounds = getLatLngBounds(RADIUS, location);
             googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 0));
             googleMap.setOnMapLoadedCallback(() -> {
                 mapView.setDrawingCacheEnabled(true);
@@ -200,8 +190,7 @@ public class MapHandlerImpl implements OnMapReadyCallback, OnMyLocationClickList
                     byteArray = stream.toByteArray();
                 }
                 logDebug("The bitmaps has " + byteArray.length + " final size with quality: " + quality);
-                activity.onSnapshotReady(byteArray, lati, longi);
-                callback.onSnapshotReady(byteArray, lati, longi);
+                sendSnapshot(byteArray, latitude, longitude);
             });
         });
     }
@@ -209,34 +198,13 @@ public class MapHandlerImpl implements OnMapReadyCallback, OnMyLocationClickList
     /**
      * This method sets all the necessary map views
      */
+    @Override
     public void initMap() {
-
         if (mMap == null) {
             return;
         }
-
-        if (activity.isFullScreenEnabled) {
-            activity.progressBar.setVisibility(View.GONE);
-        }
-
-        if (activity.isGPSEnabled()) {
-            if (activity.myLocationFab.getVisibility() != View.VISIBLE) {
-                activity.myLocationFab.setVisibility(View.VISIBLE);
-            }
-            if (activity.setFullScreenFab.getVisibility() != View.VISIBLE) {
-                activity.setFullScreenFab.setVisibility(View.VISIBLE);
-            }
-            mMap.setMyLocationEnabled(true);
-        } else {
-            if (activity.myLocationFab.getVisibility() != View.GONE) {
-                activity.myLocationFab.setVisibility(View.GONE);
-            }
-            if (activity.setFullScreenFab.getVisibility() != View.GONE) {
-                activity.setFullScreenFab.setVisibility(View.GONE);
-            }
-            activity.isFullScreenEnabled = true;
-            mMap.setMyLocationEnabled(false);
-        }
+        dismissProgress();
+        mMap.setMyLocationEnabled(getInitResult());
 
         mMap.setOnCameraIdleListener(this);
         mMap.setOnCameraMoveStartedListener(this);
@@ -246,50 +214,23 @@ public class MapHandlerImpl implements OnMapReadyCallback, OnMyLocationClickList
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
 
-        if (activity.isGPSEnabled()) {
-            if (activity.isFullScreenEnabled) {
-                activity.setMyLocation(false);
-            } else {
-                activity.setMyLocation(true);
-            }
-        }
+        setMyLocationAnimate();
         setFullScreen();
     }
 
-    /**
-     * This method establishes the corresponding view depending on
-     * if the full screen mode is enabled or not
-     */
-    public void setFullScreen() {
-        activity.setLocationFabDrawable();
-        if (activity.isFullScreenEnabled) {
-            getMarkerInfo();
-        } else {
-            activity.fullscreenMarkerIcon.setVisibility(View.INVISIBLE);
-            activity.fullscreenMarkerIconShadow.setVisibility(View.GONE);
-            setMyLocation(false);
-
-            try {
-                fullScreenMarker.remove();
-            } catch (Exception e) {
-            }
-
-            fullScreenMarker = null;
-        }
-    }
-
-    public void setMyLocation(final boolean animateCamera) {
+    @Override
+    public void setMyLocation(boolean animateCamera) {
         if (mMap == null) {
             return;
         }
 
         fusedLocationProviderClient.getLastLocation().addOnFailureListener(e -> {
             logError("getLastLocation() onFailure: " + e.getMessage());
-            activity.showError();
+            showError();
         }).addOnSuccessListener(location -> {
             if (location != null) {
                 logDebug("getLastLocation() onSuccess");
-                activity.onGetLastLocation(location.getLatitude(), location.getLongitude());
+                onGetLastLocation(location.getLatitude(), location.getLongitude());
                 if (animateCamera) {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
                 }
@@ -297,10 +238,22 @@ public class MapHandlerImpl implements OnMapReadyCallback, OnMyLocationClickList
         });
     }
 
+    @Override
+    public void removeMarker() {
+        try {
+            fullScreenMarker.remove();
+        } catch (Exception e) {
+            logError(e.getMessage(), e);
+            e.printStackTrace();
+        }
+        fullScreenMarker = null;
+    }
+
     /**
      * This method sets the attributes of the full screen marker
      * depending on if the mode is enabled or not
      */
+    @Override
     public void getMarkerInfo() {
         if (mMap == null) {
             return;
@@ -309,60 +262,48 @@ public class MapHandlerImpl implements OnMapReadyCallback, OnMyLocationClickList
         LatLng latLng = mMap.getCameraPosition().target;
         if (latLng == null) return;
 
-        addresses = getAddresses(activity, latLng.latitude, latLng.longitude);
-        String title = activity.getString(R.string.title_marker_maps);
+        List<Address> addresses = getAddresses(getContext(), latLng.latitude, latLng.longitude);
+        String title = getInfoTitle();
 
         if (addresses != null && addresses.size() > 0) {
             String address = addresses.get(0).getAddressLine(0);
             fullScreenAddress = new MapAddress(new MegaLatLng(latLng.latitude, latLng.longitude), null, address);
             if (fullScreenMarker == null) {
-                fullScreenMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(title).snippet(address).icon(BitmapDescriptorFactory.fromBitmap(activity.fullscreenIconMarker)));
-                activity.fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
+                fullScreenMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(title).snippet(address).icon(BitmapDescriptorFactory.fromBitmap(fullscreenIconMarker)));
             } else {
                 fullScreenMarker.setPosition(latLng);
                 fullScreenMarker.setSnippet(address);
-                activity.fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
             }
+            showIconShadow();
             if (!fullScreenMarker.isVisible()) {
-                if (activity.fullscreenMarkerIcon.getVisibility() == View.VISIBLE) {
-                    activity.fullscreenMarkerIcon.animate().translationY(0).setDuration(100L).withEndAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            fullScreenMarker.setVisible(true);
-                            fullScreenMarker.showInfoWindow();
-                        }
-                    }).start();
-                } else {
-                    fullScreenMarker.setVisible(true);
-                }
+                showMarker();
             }
             fullScreenMarker.showInfoWindow();
         } else {
             fullScreenAddress = new MapAddress(new MegaLatLng(latLng.latitude, latLng.longitude), null, null);
             if (fullScreenMarker == null) {
-                fullScreenMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(title).snippet("").icon(BitmapDescriptorFactory.fromBitmap(activity.fullscreenIconMarker)));
-                activity.fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
+                fullScreenMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(title).snippet("").icon(BitmapDescriptorFactory.fromBitmap(fullscreenIconMarker)));
             } else {
                 fullScreenMarker.setPosition(latLng);
                 fullScreenMarker.setSnippet("");
-                activity.fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
             }
+            showIconShadow();
             setAnimatingMarker(0);
         }
     }
 
-    /**
-     * This method starts an animation of the full screen marker
-     * with a duration received by the duration parameter
-     *
-     * @param duration length of the animation
-     */
-    public void setAnimatingMarker(long duration) {
-        if (activity.isFullScreenEnabled && fullScreenMarker != null) {
+    @Override
+    public void displayFullScreenMarker() {
+        fullScreenMarker.setVisible(true);
+        fullScreenMarker.showInfoWindow();
+    }
+
+    @Override
+    public boolean hideMarker() {
+        if (fullScreenMarker != null) {
             fullScreenMarker.setVisible(false);
-            activity.fullscreenMarkerIcon.setVisibility(View.VISIBLE);
-            activity.fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
-            activity.fullscreenMarkerIcon.animate().translationY(-px2dp(12, outMetrics)).setDuration(duration).start();
+            return true;
         }
+        return false;
     }
 }
