@@ -2467,6 +2467,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      */
     public void setRecordingNow(boolean recordingNow) {
         logDebug("recordingNow: " + recordingNow);
+        if (recordView == null) return;
+
         recordView.setRecordingNow(recordingNow);
         if (recordView.isRecordingNow()) {
             recordButtonStates(RECORD_BUTTON_ACTIVATED);
