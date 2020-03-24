@@ -3211,10 +3211,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     		return;
 		}
 
-		dbH.setLastPublicHandle(handle);
-		dbH.setLastPublicHandleTimeStamp();
-		dbH.setLastPublicHandleType(AFFILIATE_TYPE_CONTACT);
-
 		handleInviteContact = handle;
     	dismissOpenLinkDialog();
 		logDebug("Handle to invite a contact: " + handle);
