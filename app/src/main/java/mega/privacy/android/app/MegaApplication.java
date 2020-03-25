@@ -102,7 +102,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.4_294";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.4_297";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -1619,7 +1619,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         super.unregisterReceiver(receiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(logoutReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
-
 	}
 
     public static boolean isVerifySMSShowed() {
