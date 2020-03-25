@@ -2223,7 +2223,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void hideRecordingLayout(){
-        if(recordingLayout.getVisibility() == View.GONE) return;
+        if(recordingLayout == null || recordingLayout.getVisibility() == View.GONE) return;
         recordingChrono.setText("00:00");
         recordingLayout.setVisibility(View.GONE);
     }
@@ -2454,6 +2454,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      */
     public void setRecordingNow(boolean recordingNow) {
         logDebug("recordingNow: " + recordingNow);
+        if (recordView == null) return;
+
         recordView.setRecordingNow(recordingNow);
         if (recordView.isRecordingNow()) {
             recordButtonStates(RECORD_BUTTON_ACTIVATED);

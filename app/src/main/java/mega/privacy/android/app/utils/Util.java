@@ -1651,7 +1651,6 @@ public class Util {
 	}
 
 	public static void hideKeyboardView(Context context, View v, int flag){
-
 		if (v != null){
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
@@ -1744,27 +1743,13 @@ public class Util {
 		return String.format("#%06X", 0xFFFFFF & color);
 	}
 
-	public static void showKeyboard() {
-		InputMethodManager inputMethodManager = (InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-	}
-
-	public static void hideKeyboard() {
-		InputMethodManager inputMethodManager = (InputMethodManager) MegaApplication.getInstance().getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-	}
-
     public static void showKeyboardDelayed(final View view) {
-		logDebug("showKeyboardDelayed");
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                InputMethodManager imm =
-						(InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-            }
-        }, 50);
+		Handler handler = new Handler();
+        handler.postDelayed(() -> {
+			InputMethodManager imm =
+					(InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+		}, 50);
     }
 
     public static Spanned getSpannedHtmlText(String string) {
