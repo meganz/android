@@ -4272,7 +4272,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     public void itemClick(int positionInAdapter, int [] screenPosition) {
         int positionInMessages = positionInAdapter-1;
-
+        logDebug("itemClick:: positionInMessages = "+positionInMessages);
         if(positionInMessages < messages.size()){
             AndroidMegaChatMessage m = messages.get(positionInMessages);
 

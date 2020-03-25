@@ -9,7 +9,7 @@
 
     <!-- Title -->
     <LinearLayout
-        android:id="@+id/bottom_sheet_text_msg_title_layout"
+        android:id="@+id/reactions_layout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:gravity="center_vertical"
@@ -22,7 +22,14 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
-    <android.support.v4.widget.NestedScrollView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:background="@color/chat_sliding_panel_separator"/>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical">
@@ -46,7 +53,6 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="32dp"
                     android:layout_gravity="center_vertical"
@@ -64,7 +70,76 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/reply_separator_info"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/chat_sliding_panel_separator"/>
 
+            <LinearLayout
+                android:id="@+id/reply_layout"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/reply_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_forward_grey"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/reply_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="15dp"
+                    android:text="@string/context_copy"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/edit_separator_info"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/chat_sliding_panel_separator"/>
+
+            <LinearLayout
+                android:id="@+id/edit_layout"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/edit_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_copy_grey"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/edit_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="15dp"
+                    android:text="@string/context_copy"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
             <LinearLayout
                 android:id="@+id/copy_layout"
                 android:layout_width="match_parent"
@@ -92,9 +167,44 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/delete_separator_info"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/chat_sliding_panel_separator"/>
+
+            <LinearLayout
+                android:id="@+id/delete_layout"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/delete_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_copy_grey"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/delete_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="15dp"
+                    android:text="@string/context_copy"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
         </LinearLayout>
 
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>
