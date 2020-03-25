@@ -13,6 +13,8 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -42,7 +44,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -616,31 +617,24 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
         loginActivity = this;
 
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:{
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                            if (!hasStoragePermission) {
-                                loggerPermissionKarere = true;
-                                ActivityCompat.requestPermissions(loginActivity,
-                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        REQUEST_WRITE_STORAGE);
-                            } else {
-                                enableLogsKarere();
-                            }
-                        } else {
-                            enableLogsKarere();
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                        if (!hasStoragePermission) {
+                            loggerPermissionKarere = true;
+                            ActivityCompat.requestPermissions(loginActivity,
+                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    REQUEST_WRITE_STORAGE);
+                            break;
                         }
-                        break;
                     }
+                    setStatusLoggerKarere(loginActivity, true);
+                    break;
 
-                    case DialogInterface.BUTTON_NEGATIVE: {
-                        break;
-                    }
-                }
+                case DialogInterface.BUTTON_NEGATIVE:
+                    break;
             }
         };
 
@@ -659,31 +653,24 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
         loginActivity = this;
 
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:{
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                            if (!hasStoragePermission) {
-                                loggerPermissionSDK = true;
-                                ActivityCompat.requestPermissions(loginActivity,
-                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        REQUEST_WRITE_STORAGE);
-                            } else {
-                                enableLogsSDK();
-                            }
-                        } else {
-                            enableLogsSDK();
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                        if (!hasStoragePermission) {
+                            loggerPermissionSDK = true;
+                            ActivityCompat.requestPermissions(loginActivity,
+                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    REQUEST_WRITE_STORAGE);
+                            break;
                         }
-                        break;
                     }
+                    setStatusLoggerSDK(loginActivity, true);
+                    break;
 
-                    case DialogInterface.BUTTON_NEGATIVE: {
-                        break;
-                    }
-                }
+                case DialogInterface.BUTTON_NEGATIVE:
+                    break;
             }
         };
 
@@ -694,41 +681,22 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         logDebug("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
-            case REQUEST_WRITE_STORAGE:{
-                if (loggerPermissionKarere){
-                    loggerPermissionKarere = false;
-                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                        enableLogsKarere();
-                    }
+        if (requestCode == REQUEST_WRITE_STORAGE) {
+            if (loggerPermissionKarere) {
+                loggerPermissionKarere = false;
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setStatusLoggerKarere(loginActivity, true);
                 }
-                else if (loggerPermissionSDK){
-                    loggerPermissionSDK = false;
-                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                        enableLogsSDK();
-                    }
+            } else if (loggerPermissionSDK) {
+                loggerPermissionSDK = false;
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setStatusLoggerSDK(loginActivity, true);
                 }
             }
         }
-    }
-
-    public void enableLogsSDK() {
-        dbH.setFileLoggerSDK(true);
-        setFileLoggerSDK(true);
-        MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-        showSnackbar(getString(R.string.settings_enable_logs));
-        logInfo("App Version: " + getVersion(this));
-    }
-
-    public void enableLogsKarere() {
-        dbH.setFileLoggerKarere(true);
-        setFileLoggerKarere(true);
-        MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-        showSnackbar(getString(R.string.settings_enable_logs));
-        logInfo("App Version: " + getVersion(this));
     }
 
     public void setWaitingForConfirmAccount(boolean waitingForConfirmAccount) {

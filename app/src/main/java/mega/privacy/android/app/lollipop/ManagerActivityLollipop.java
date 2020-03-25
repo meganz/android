@@ -132,7 +132,6 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
@@ -149,7 +148,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -2344,8 +2342,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		putTransfersWidget();
 
 		///Check the MK or RK file
-		int versionApp = getVersion(this);
-		logInfo("Version app: " + versionApp);
+		logInfo("App version: " + getVersion());
 		final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
 		final File fRKOld = buildExternalStorageFile(OLD_RK_FILE);
 		if (isFileAvailable(fMKOld)) {
@@ -12188,7 +12185,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
-						enableLogsSDK();
+						setStatusLoggerSDK(managerActivity, true);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -12210,18 +12207,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if(getSettingsFragment() != null){
 			sttFLol.numberOfClicksKarere = 0;
 		}
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						enableLogsKarere();
-						break;
 
-					case DialogInterface.BUTTON_NEGATIVE:
+		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+			switch (which) {
+				case DialogInterface.BUTTON_POSITIVE:
+					setStatusLoggerKarere(managerActivity, true);
+					break;
 
-						break;
-				}
+				case DialogInterface.BUTTON_NEGATIVE:
+					break;
 			}
 		};
 
@@ -12229,26 +12223,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
-	}
-
-	public void enableLogsSDK(){
-		logDebug("enableLogsSDK");
-
-		dbH.setFileLoggerSDK(true);
-		setFileLoggerSDK(true);
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-		showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_enable_logs), -1);
-		logInfo("App Version: " + getVersion(this));
-	}
-
-	public void enableLogsKarere(){
-		logDebug("enableLogsKarere");
-
-		dbH.setFileLoggerKarere(true);
-		setFileLoggerKarere(true);
-		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-		showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_enable_logs), -1);
-		logInfo("App Version: " + getVersion(this));
 	}
 
 	public void showConfirmationDeleteAvatar(){
@@ -14006,7 +13980,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (app != null){
 				app.disableMegaChatApi();
 			}
-			resetAndroidLogger();
+			resetLoggerSDK();
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK) {

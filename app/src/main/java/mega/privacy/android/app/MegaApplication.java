@@ -498,35 +498,18 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
 
-		boolean staging = false;
-		boolean fileLoggerSDK = false;
-		boolean fileLoggerKarere = false;
-		if (dbH != null) {
-			MegaAttributes attrs = dbH.getAttributes();
-			if (attrs != null) {
-				if (attrs.getFileLoggerSDK() != null) {
-					fileLoggerSDK = Boolean.parseBoolean(attrs.getFileLoggerSDK());
-				}
-
-				if (attrs.getFileLoggerKarere() != null) {
-					fileLoggerKarere = Boolean.parseBoolean(attrs.getFileLoggerKarere());
-				}
-
-				if (attrs.getStaging() != null) {
-					staging = Boolean.parseBoolean(attrs.getStaging());
-				}
-			}
-		}
-
-        setFileLoggerSDK(fileLoggerSDK);
-		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
-		MegaApiAndroid.setLogLevel(DEBUG || fileLoggerSDK ? MegaApiAndroid.LOG_LEVEL_MAX : MegaApiAndroid.LOG_LEVEL_FATAL);
-
-		setFileLoggerKarere(fileLoggerKarere);
-		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, fileLoggerKarere));
-		MegaChatApiAndroid.setLogLevel(DEBUG || fileLoggerKarere ? MegaChatApiAndroid.LOG_LEVEL_MAX : MegaChatApiAndroid.LOG_LEVEL_ERROR);
+		initLoggerSDK();
+		initLoggerKarere();
 
 		checkAppUpgrade();
+
+		boolean staging = false;
+		if (dbH != null) {
+			MegaAttributes attrs = dbH.getAttributes();
+			if (attrs != null && attrs.getStaging() != null) {
+				staging = Boolean.parseBoolean(attrs.getStaging());
+			}
+		}
 
 		if (staging) {
 			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
