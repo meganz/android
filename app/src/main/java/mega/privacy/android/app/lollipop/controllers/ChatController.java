@@ -9,10 +9,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import android.text.Html;
 import android.text.Spanned;
 
@@ -74,8 +74,9 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class ChatController {
@@ -1076,7 +1077,7 @@ public class ChatController {
             if(contact!=null){
                 if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
                     logDebug("Is contact!");
-                    return getContactFirstName(userHandle);
+                    return getFirstNameDB(userHandle);
                 }
                 else{
                     logDebug("Old contact");
@@ -1117,7 +1118,12 @@ public class ChatController {
             MegaUser contact = megaApi.getContact(handleString);
             if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
                 logDebug("Is contact!");
-                return getContactFullName(userHandle);
+                String nameContact = getContactNameDB(userHandle);
+                if (nameContact != null) {
+                    return nameContact;
+                }
+
+                return "";
             }
             else{
                 logDebug("Non contact");
@@ -1128,90 +1134,6 @@ public class ChatController {
             logDebug("Is participant");
             return getParticipantFullName(userHandle, chatRoom);
         }
-    }
-
-    public String getContactFirstName(long userHandle){
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
-        if(contactDB!=null){
-
-            String name = contactDB.getName();
-
-            if(name==null){
-                name="";
-            }
-
-            if (name.trim().length() <= 0){
-                String lastName = contactDB.getLastName();
-                if(lastName==null){
-                    lastName="";
-                }
-                if (lastName.trim().length() <= 0){
-                    logWarning("Full name empty");
-                    logDebug("Put email as fullname");
-                    String mail = contactDB.getMail();
-                    if(mail==null){
-                        mail="";
-                    }
-                    if (mail.trim().length() <= 0){
-                        return "";
-                    }
-                    else{
-                        return mail;
-                    }
-                }
-                else{
-                    return lastName;
-                }
-
-            }
-            else{
-                return name;
-            }
-        }
-        return "";
-    }
-
-    public String getContactFullName(long userHandle){
-        logDebug("User Handle: " + userHandle);
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
-        if(contactDB!=null){
-            logWarning("Contact DB found!");
-            String name = contactDB.getName();
-            String lastName = contactDB.getLastName();
-
-            if(name==null){
-                name="";
-            }
-            if(lastName==null){
-                lastName="";
-            }
-            String fullName = "";
-
-            if (name.trim().length() <= 0){
-                fullName = lastName;
-            }
-            else{
-                fullName = name + " " + lastName;
-            }
-
-            if (fullName.trim().length() <= 0){
-                logWarning("Full name empty");
-                logDebug("Put email as fullname");
-                String mail = contactDB.getMail();
-                if(mail==null){
-                    mail="";
-                }
-                if (mail.trim().length() <= 0){
-                    return "";
-                }
-                else{
-                    return mail;
-                }
-            }
-
-            return fullName;
-        }
-        return "";
     }
 
     public String getNonContactFirstName(long userHandle){
@@ -1275,55 +1197,43 @@ public class ChatController {
         return "";
     }
 
-    public String getParticipantFirstName(long userHandle, MegaChatRoom chatRoom){
+    public String getParticipantFirstName(long userHandle, MegaChatRoom chatRoom) {
         logDebug("User handle: " + userHandle + ", Chat ID: " + chatRoom.getChatId());
-        String firstName = chatRoom.getPeerFirstnameByHandle(userHandle);
+        String firstName = getFirstNameDB(userHandle);
+        if (firstName == null) firstName = chatRoom.getPeerFirstnameByHandle(userHandle);
 
-        if(firstName==null){
-            firstName="";
-        }
-
-        if (firstName.trim().length() <= 0){
+        if (isTextEmpty(firstName)) {
             String lastName = chatRoom.getPeerLastnameByHandle(userHandle);
-            if(lastName==null){
-                lastName="";
-            }
-            if (lastName.trim().length() <= 0){
+            if (isTextEmpty(lastName)) {
                 logWarning("Full name empty");
                 logDebug("Put email as fullname");
                 String mail = chatRoom.getPeerEmailByHandle(userHandle);
-                if(mail==null){
-                    mail="";
-                }
-                if (mail.trim().length() <= 0){
+                if (isTextEmpty(mail)) {
                     return "";
-                }
-                else{
+                } else {
                     return mail;
                 }
-            }
-            else{
+            } else {
                 return lastName;
             }
 
-        }
-        else{
+        } else {
             return firstName;
         }
     }
 
-    public String getParticipantFullName(long userHandle, MegaChatRoom chatRoom){
+    public String getParticipantFullName(long userHandle, MegaChatRoom chatRoom) {
         logDebug("User handle: " + userHandle + ", Chat ID: " + chatRoom.getChatId());
-        String fullName = chatRoom.getPeerFullnameByHandle(userHandle);
 
-        if(fullName!=null && !fullName.trim().isEmpty()) {
-            return fullName;
+        String fullName = getNicknameContact(userHandle);
+        if (fullName == null) {
+            fullName = chatRoom.getPeerFullnameByHandle(userHandle);
         }
-        else {
-            logDebug("Put email as fullname");
-            String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
-            return participantEmail;
+        if (isTextEmpty(fullName)) {
+            fullName = chatRoom.getPeerEmailByHandle(userHandle);
         }
+
+        return fullName;
     }
 
     public String getMyFullName(){

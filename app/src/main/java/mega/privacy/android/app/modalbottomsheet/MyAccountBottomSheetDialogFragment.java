@@ -5,8 +5,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialogFragment;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -17,12 +17,8 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaHandleList;
-
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -144,36 +140,10 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
                 ((ManagerActivityLollipop) context).showConfirmationDeleteAvatar();
                 break;
             }
-            case R.id.my_account_my_QR_code: {
+            case R.id.my_account_my_QR_code:
                 logDebug("Option QR code");
-                //Check if there is a in progress call:
-                boolean activeCall = false;
-                if(megaChatApi!=null){
-                    MegaHandleList listCalls = megaChatApi.getChatCalls();
-                    int contCallNotPresent = 0;
-                    if((listCalls!=null)&&(listCalls.size()>0)){
-                        for(int i=0; i<listCalls.size(); i++){
-                            MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-                            if(call!=null){
-                                if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-                                    contCallNotPresent ++ ;
-                                }
-                            }
-                        }
-                        if(contCallNotPresent == listCalls.size()){
-                            activeCall = false;
-                        }else{
-                            activeCall = true;
-                        }
-                    }
-                }
-                if(!activeCall){
-                    Intent intent = new Intent(context, QRCodeActivity.class);
-                    startActivity(intent);
-                }
-
+                ((ManagerActivityLollipop) context).checkBeforeOpeningQR();
                 break;
-            }
         }
 
 //        dismiss();

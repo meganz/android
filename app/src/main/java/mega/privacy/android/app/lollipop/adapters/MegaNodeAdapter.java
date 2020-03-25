@@ -6,10 +6,10 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -64,6 +64,7 @@ import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownDialogHandler.*;
 
 public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter, nodeTakenDownDialogListener {
@@ -676,17 +677,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     if (mS.getNodeHandle() == node.getHandle()) {
                         MegaUser user = megaApi.getContact(mS.getUser());
                         if (user != null) {
-                            MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-                            if (contactDB != null) {
-                                if (!contactDB.getName().equals("")) {
-                                    holder.textViewFileSize.setText(contactDB.getName() + " " + contactDB.getLastName());
-                                } else {
-                                    holder.textViewFileSize.setText(user.getEmail());
-                                }
-                            } else {
-                                logWarning("The contactDB is null: ");
-                                holder.textViewFileSize.setText(user.getEmail());
-                            }
+                            holder.textViewFileSize.setText(getMegaUserNameDB(user));
                         } else {
                             holder.textViewFileSize.setText(mS.getUser());
                         }
@@ -916,17 +907,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     if (mS.getNodeHandle() == node.getHandle()) {
                         MegaUser user = megaApi.getContact(mS.getUser());
                         if (user != null) {
-                            MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-                            if (contactDB != null) {
-                                if (!contactDB.getName().equals("")) {
-                                    holder.textViewFileSize.setText(contactDB.getName() + " " + contactDB.getLastName());
-                                } else {
-                                    holder.textViewFileSize.setText(user.getEmail());
-                                }
-                            } else {
-                                logWarning("The contactDB is null: ");
-                                holder.textViewFileSize.setText(user.getEmail());
-                            }
+                            holder.textViewFileSize.setText(getMegaUserNameDB(user));
                         } else {
                             holder.textViewFileSize.setText(mS.getUser());
                         }
@@ -1414,7 +1395,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 subtitle = sl.get(0).getUser();
                 MegaContactDB contactDB = dbH.findContactByEmail(subtitle);
                 if (contactDB != null) {
-                    String fullName = new ContactController(context).getFullName(contactDB.getName(), contactDB.getLastName(), contactDB.getMail());
+                    String fullName = getContactNameDB(contactDB);
                     if (fullName != null) {
                         subtitle = fullName;
                     }

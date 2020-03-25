@@ -5,11 +5,10 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -36,6 +34,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -189,63 +189,41 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
 		ReferralBonus referralBonus = (ReferralBonus) getItem(position);
 		holder.contactMail = referralBonus.getEmails().get(0);
 		MegaUser contact = megaApi.getContact(holder.contactMail);
-		MegaContactDB contactDB = null;
 
-        //is full contact
-        if (contact != null) {
-            long handle = contact.getHandle();
-            contactDB = dbH.findContactByHandle(handle + "");
-        }
+		if (contact != null) {
+			long handle = contact.getHandle();
+			String fullName = getContactNameDB(handle);
+			if (fullName == null) fullName = holder.contactMail;
+			holder.textViewContactName.setText(fullName);
 
-		String fullName = "";
-		if(contactDB!=null){
-			ContactController cC = new ContactController(context);
-			fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), holder.contactMail);
-		}
-		else{
-			//No name, ask for it and later refresh!!
-			logWarning("CONTACT DB is null");
-			fullName = holder.contactMail;
-		}
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
 
+			Bitmap defaultAvatar = getDefaultAvatar(context, getColorAvatar(context, megaApi, contact), fullName, AVATAR_SIZE, true);
+			((ViewHolderReferralBonusesList) holder).imageView.setImageBitmap(defaultAvatar);
 
-		logDebug("Contact: " + holder.contactMail + " name: " + fullName);
+			UserAvatarListenerList listener = new UserAvatarListenerList(context, ((ViewHolderReferralBonusesList) holder), this);
 
-
-		holder.textViewContactName.setText(fullName);
-
-		holder.itemLayout.setBackgroundColor(Color.WHITE);
-
-		Bitmap defaultAvatar = getDefaultAvatar(context, getColorAvatar(context, megaApi, contact), fullName, AVATAR_SIZE, true);
-		((ViewHolderReferralBonusesList)holder).imageView.setImageBitmap(defaultAvatar);
-
-		UserAvatarListenerList listener = new UserAvatarListenerList(context, ((ViewHolderReferralBonusesList)holder), this);
-
-		File avatar = buildAvatarFile(context,holder.contactMail + ".jpg");
-        Bitmap bitmap = null;
-        if (isFileAvailable(avatar)){
-			if (avatar.length() > 0){
-				BitmapFactory.Options bOpts = new BitmapFactory.Options();
-				bOpts.inPurgeable = true;
-				bOpts.inInputShareable = true;
-				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-				if (bitmap == null) {
-					avatar.delete();
-                    megaApi.getUserAvatar(holder.contactMail,buildAvatarFile(context,holder.contactMail + ".jpg").getAbsolutePath(),listener);
-                }
-				else{
-					logDebug("Do not ask for user avatar - its in cache: " + avatar.getAbsolutePath());
-					((ViewHolderReferralBonusesList)holder).imageView.setImageBitmap(bitmap);
+			File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
+			Bitmap bitmap = null;
+			if (isFileAvailable(avatar)) {
+				if (avatar.length() > 0) {
+					BitmapFactory.Options bOpts = new BitmapFactory.Options();
+					bOpts.inPurgeable = true;
+					bOpts.inInputShareable = true;
+					bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+					if (bitmap == null) {
+						avatar.delete();
+						megaApi.getUserAvatar(holder.contactMail, buildAvatarFile(context, holder.contactMail + ".jpg").getAbsolutePath(), listener);
+					} else {
+						((ViewHolderReferralBonusesList) holder).imageView.setImageBitmap(bitmap);
+					}
+				} else {
+					megaApi.getUserAvatar(holder.contactMail, buildAvatarFile(context, holder.contactMail + ".jpg").getAbsolutePath(), listener);
 				}
-			}
-			else{
-                megaApi.getUserAvatar(holder.contactMail,buildAvatarFile(context,holder.contactMail + ".jpg").getAbsolutePath(),listener);
+			} else {
+				megaApi.getUserAvatar(holder.contactMail, buildAvatarFile(context, holder.contactMail + ".jpg").getAbsolutePath(), listener);
 			}
 		}
-		else{
-            megaApi.getUserAvatar(holder.contactMail,buildAvatarFile(context,holder.contactMail + ".jpg").getAbsolutePath(),listener);
-		}
-
 
 		holder.textViewStorage.setText(getSizeString(referralBonus.getStorage()));
 		holder.textViewTransfer.setText(getSizeString(referralBonus.getTransfer()));

@@ -48,25 +48,25 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <android.support.design.widget.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_name_text_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="7dp"
+                            android:hint="@string/first_name_text"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                            <android.support.v7.widget.AppCompatEditText
+                            <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_name_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="text|textCapWords"
-                                android:hint="@string/first_name_text"
                                 android:theme="@style/ColorControlStyle"/>
 
-                        </android.support.design.widget.TextInputLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
                             android:id="@+id/create_account_name_text_error_icon"
@@ -84,25 +84,25 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <android.support.design.widget.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_last_name_text_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
+                            android:hint="@string/lastname_text"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                            <android.support.v7.widget.AppCompatEditText
+                            <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_last_name_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="text|textCapWords"
-                                android:hint="@string/lastname_text"
                                 android:theme="@style/ColorControlStyle"/>
 
-                        </android.support.design.widget.TextInputLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
                             android:id="@+id/create_account_last_name_text_error_icon"
@@ -120,25 +120,25 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <android.support.design.widget.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_email_text_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
+                            android:hint="@string/email_text"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                            <android.support.v7.widget.AppCompatEditText
+                            <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_email_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="textEmailAddress"
-                                android:hint="@string/email_text"
                                 android:theme="@style/ColorControlStyle"/>
 
-                        </android.support.design.widget.TextInputLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
                             android:id="@+id/create_account_email_text_error_icon"
@@ -156,27 +156,26 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <android.support.design.widget.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_password_text_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
+                            android:hint="@string/password_text"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError"
-                            app:passwordToggleDrawable="@drawable/password_toggle"
-                            app:passwordToggleTint="@color/password_color_toggle">
+                            app:endIconTint="@color/password_color_toggle">
 
-                            <android.support.v7.widget.AppCompatEditText
+                            <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_password_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:imeOptions="actionNext"
                                 android:inputType="textPassword"
-                                android:hint="@string/password_text"
                                 android:theme="@style/ColorControlStyle"/>
 
-                        </android.support.design.widget.TextInputLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
                             android:layout_width="wrap_content"
@@ -273,27 +272,26 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <android.support.design.widget.TextInputLayout
+                        <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_password_text_confirm_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
+                            android:hint="@string/confirm_password_text"
                             app:errorEnabled="true"
                             app:errorTextAppearance="@style/InputTextAppearanceError"
-                            app:passwordToggleDrawable="@drawable/password_toggle"
-                            app:passwordToggleTint="@color/password_color_toggle">
+                            app:endIconTint="@color/password_color_toggle">
 
-                            <android.support.v7.widget.AppCompatEditText
+                            <androidx.appcompat.widget.AppCompatEditText
                                 android:id="@+id/create_account_password_text_confirm"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textSize="16sp"
                                 android:imeOptions="actionDone"
                                 android:inputType="textPassword"
-                                android:hint="@string/confirm_password_text"
                                 android:theme="@style/ColorControlStyle"/>
 
-                        </android.support.design.widget.TextInputLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
                             android:layout_width="wrap_content"

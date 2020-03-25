@@ -33,14 +33,14 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.Nullable;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.core.content.ContextCompat;
 import android.text.Html;
-import android.support.v7.app.ActionBar;
+import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
-import android.support.v4.content.FileProvider;
+import androidx.core.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -107,6 +107,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1642,7 +1643,6 @@ public class Util {
 	}
 
 	public static void hideKeyboard(Activity activity, int flag){
-
 		View v = activity.getCurrentFocus();
 		if (v != null){
 			InputMethodManager imm = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
@@ -1744,6 +1744,16 @@ public class Util {
 		return String.format("#%06X", 0xFFFFFF & color);
 	}
 
+	public static void showKeyboard() {
+		InputMethodManager inputMethodManager = (InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+	}
+
+	public static void hideKeyboard() {
+		InputMethodManager inputMethodManager = (InputMethodManager) MegaApplication.getInstance().getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+	}
+
     public static void showKeyboardDelayed(final View view) {
 		logDebug("showKeyboardDelayed");
         Handler handler = new Handler();
@@ -1766,12 +1776,24 @@ public class Util {
 		return Html.fromHtml(string);
 	}
 
+	public static void checkTakePicture(Activity activity, int option) {
+		if (isNecessaryDisableLocalCamera() != -1) {
+			if(option == TAKE_PHOTO_CODE) {
+				showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE);
+			}else if(option == TAKE_PICTURE_PROFILE_CODE){
+				showConfirmationOpenCamera(activity, ACTION_TAKE_PROFILE_PICTURE);
+			}
+			return;
+		}
+		takePicture(activity, option);
+	}
+
 	/**
 	 * This method is to start camera from Activity
 	 *
 	 * @param activity the activity the camera would start from
 	 */
-	public static void takePicture(Activity activity) {
+	public static void takePicture(Activity activity, int option) {
 		logDebug("takePicture");
 		File newFile = buildTempFile(activity, "picture.jpg");
 		try {
@@ -1784,7 +1806,7 @@ public class Util {
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 		cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		activity.startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+		activity.startActivityForResult(cameraIntent, option);
 	}
 
 	public static void resetActionBar(ActionBar aB) {

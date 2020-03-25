@@ -32,7 +32,7 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/layout_lock"
         style="@style/CardViewTheme"
         android:layout_width="48dp"
@@ -63,7 +63,7 @@
                 android:tint="@color/gradient_avatar_chat"
                 android:src="@drawable/ic_collapse_white" />
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
     <ImageView
         android:id="@+id/glowing_mic"

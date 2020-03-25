@@ -10,9 +10,8 @@
 
 package org.webrtc;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class NV21Buffer implements VideoFrame.Buffer {
   private final byte[] data;
