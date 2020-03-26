@@ -372,8 +372,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						case BUSINESS: {
 							textToShow = getPriceString(df, account, true);
-							String unlimitedSpace = getString(R.string.unlimited_space, storageOrTransferLabel(TYPE_STORAGE_LABEL));
-							String unlimitedTransfer = getString(R.string.unlimited_space, storageOrTransferLabel(TYPE_TRANSFER_LABEL));
+							String unlimitedSpace = getString(R.string.unlimited_space);
+							String unlimitedTransfer = getString(R.string.unlimited_transfer_quota);
 
 							try{
 								textToShow = textToShow.replace("[A]", "<font color=\'#2ba6de\'>");
