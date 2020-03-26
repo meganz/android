@@ -253,6 +253,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             updateLocalAV();
             updateRemoteAV(session);
         }
+
         updateSubTitle();
     }
 
@@ -357,39 +358,41 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (intent == null || intent.getAction() == null)
                 return;
 
-            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
-            if (chatId != getCurrentChatid()){
-                logWarning("Call different chat");
+            long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+            if (chatIdReceived != getCurrentChatid()) {
+                logWarning("Call in different chat");
                 return;
             }
 
             long callId = intent.getLongExtra(UPDATE_CALL_ID, -1);
+            if (callId == -1) {
+                logWarning("Call recovered is incorrect");
+                return;
+            }
+
             updateCall(callId);
 
             if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+                logDebug("The call status is "+callStatusToString(callStatus));
                 if (callStatus != -1) {
                     switch (callStatus) {
                         case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM:
                             updateLocalAV();
                             break;
-
                         case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                            checkInprogressCall(callId);
+                            checkInProgressCall();
                             break;
-
                         case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
                         case MegaChatCall.CALL_STATUS_DESTROYED:
-                            checkTerminatingCall(callId);
+                            checkTerminatingCall();
                             break;
-
                         case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-                            checkUserNoPresentInCall(callId);
+                            checkUserNoPresentInCall();
                             break;
-
                         case MegaChatCall.CALL_STATUS_RECONNECTING:
-                            checkReconnectingCall(callId);
-                            break;
+                            checkReconnectingCall();
+
                     }
                 }
             }
@@ -399,7 +402,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
 
             if (intent.getAction().equals(ACTION_CHANGE_COMPOSITION)) {
-                checkCompositionChanges(callId);
+                int typeChange = intent.getIntExtra(TYPE_CHANGE_COMPOSITION, 0);
+                long peerIdReceived = intent.getLongExtra(UPDATE_PEER_ID, -1);
+                long clientIdReceived = intent.getLongExtra(UPDATE_CLIENT_ID, -1);
+                checkCompositionChanges(typeChange, peerIdReceived, clientIdReceived);
             }
         }
     };
@@ -410,45 +416,56 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (intent == null || intent.getAction() == null)
                 return;
 
-            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
-            long callId = intent.getLongExtra(UPDATE_CALL_ID, -1);
-
-            if (chatId != getCurrentChatid() || callId != callChat.getId()) {
-                logWarning("Call different chat");
+            long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+            if (chatIdReceived != getCurrentChatid()) {
+                logWarning("Call in different chat");
                 return;
             }
-            long peerId = intent.getLongExtra(UPDATE_SESSION_PEER_ID, -1);
-            long clientId = intent.getLongExtra(UPDATE_SESSION_CLIENT_ID, -1);
-            MegaChatSession session = getSesionCall(callId, peerId, clientId);
 
-            if (intent.getAction().equals(ACTION_CHANGE_REMOTE_AVFLAGS)) {
-                updateRemoteAV(session);
+            long callId = intent.getLongExtra(UPDATE_CALL_ID, -1);
+            if (callId == -1) {
+                logWarning("Call recovered is incorrect");
+                return;
             }
 
-            if (intent.getAction().equals(ACTION_CHANGE_AUDIO_LEVEL)) {
-                checkAudioLevel(session);
-            }
+            updateCall(callId);
+            if(!intent.getAction().equals(ACTION_UPDATE_CALL)){
 
-            if (intent.getAction().equals(ACTION_CHANGE_NETWORK_QUALITY)) {
-                checkNetworkQuality(session);
-            }
+                long peerId = intent.getLongExtra(UPDATE_PEER_ID, -1);
+                long clientId = intent.getLongExtra(UPDATE_CLIENT_ID, -1);
+                MegaChatSession session = getSesionCall(peerId, clientId);
 
-            if (intent.getAction().equals(ACTION_SESSION_STATUS_UPDATE)) {
+                if (intent.getAction().equals(ACTION_CHANGE_REMOTE_AVFLAGS)) {
+                    updateRemoteAV(session);
+                }
 
-                int sessionStatus = intent.getIntExtra(UPDATE_SESSION_STATUS, -1);
-                if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
+                if (intent.getAction().equals(ACTION_CHANGE_AUDIO_LEVEL)) {
+                    checkAudioLevel(session);
+                }
 
-                    hideReconnecting();
-                    updateAVFlags(session);
-                } else if (sessionStatus == MegaChatSession.SESSION_STATUS_DESTROYED) {
+                if (intent.getAction().equals(ACTION_CHANGE_NETWORK_QUALITY)) {
+                    checkNetworkQuality(session);
+                }
 
-                    int termCode = intent.getIntExtra(UPDATE_SESSION_TERM_CODE, -1);
-                    if (termCode == MegaChatCall.TERM_CODE_ERROR) {
-                        checkReconnectingCall(callId);
-                        return;
+                if (intent.getAction().equals(ACTION_SESSION_STATUS_UPDATE)) {
 
-                    } else if (termCode == MegaChatCall.TERM_CODE_USER_HANGUP) {
-                        checkTerminatingCall(callId);
+                    int sessionStatus = intent.getIntExtra(UPDATE_SESSION_STATUS, -1);
+                    logDebug("The session status changed to "+sessionStatusToString(sessionStatus));
+
+                    if (sessionStatus == MegaChatSession.SESSION_STATUS_DESTROYED) {
+                        int termCode = intent.getIntExtra(UPDATE_SESSION_TERM_CODE, -1);
+                        if (termCode == MegaChatCall.TERM_CODE_ERROR) {
+                            checkReconnectingCall();
+                            return;
+                        }
+
+                        if (termCode == MegaChatCall.TERM_CODE_USER_HANGUP) {
+                            checkHangCall(callId);
+                        }
+                    }
+                    if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
+                        hideReconnecting();
+                        updateAVFlags(session);
                     }
                 }
             }
@@ -699,13 +716,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             initialUI(chatId);
         }
 
-        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-        filter.addAction(ACTION_CALL_STATUS_UPDATE);
-        filter.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
-        filter.addAction(ACTION_CHANGE_COMPOSITION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
+        IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+        filterCall.addAction(ACTION_UPDATE_CALL);
+        filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
+        filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
+        filterCall.addAction(ACTION_CHANGE_COMPOSITION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filterCall);
 
         IntentFilter filterSession = new IntentFilter(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
+        filterSession.addAction(ACTION_UPDATE_CALL);
         filterSession.addAction(ACTION_SESSION_STATUS_UPDATE);
         filterSession.addAction(ACTION_CHANGE_REMOTE_AVFLAGS);
         filterSession.addAction(ACTION_CHANGE_AUDIO_LEVEL);
@@ -2402,8 +2421,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         return callChat.getMegaChatSession(callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
     }
 
-    private MegaChatSession getSesionCall(long callId, long peerId, long clientId) {
-        if (callId != callChat.getId()) return null;
+    private MegaChatSession getSesionCall(long peerId, long clientId) {
+        if(callChat == null)
+            return null;
+
         return callChat.getMegaChatSession(peerId, clientId);
     }
 
@@ -2416,18 +2437,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     /*
      * Check the different call status
      */
-    private void checkCompositionChanges(long callId) {
-        if (callId != callChat.getId() || !chat.isGroup())
+    private void checkCompositionChanges(int typeChange, long peerIdReceived, long clientIdReceived) {
+        if (getCall() == null || !chat.isGroup())
             return;
 
-        MegaChatCall call = megaChatApi.getChatCallByCallId(callId);
-        long change = call.getCallCompositionChange();
-
-        if (change == TYPE_JOIN) {
-            userJoined(call);
-        } else if (change == TYPE_LEFT) {
-            userLeft(call);
-        }else {
+        logDebug("The type of changes in composition is " + typeChange);
+        if (typeChange == TYPE_JOIN) {
+            userJoined(peerIdReceived, clientIdReceived);
+        } else if (typeChange == TYPE_LEFT) {
+            userLeft(peerIdReceived, clientIdReceived);
+        } else {
             return;
         }
 
@@ -2455,8 +2474,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    private void checkInprogressCall(long callid) {
-        if (getCall() == null || callid != callChat.getId()) return;
+    private void checkInProgressCall() {
+        if (getCall() == null)
+            return;
 
         if (reconnectingLayout.isShown()) {
             hideReconnecting();
@@ -2480,30 +2500,34 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         showInitialFABConfiguration();
         updateSubtitleNumberOfVideos();
         updateLocalSpeakerStatus();
-
     }
 
-    private void checkTerminatingCall(long callId) {
-        if (megaChatApi == null || callChat == null || callId != callChat.getId() || (statusCallInProgress(callChat.getStatus()) && callChat.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING))
+    private void checkHangCall(long callId){
+        MegaChatCall call = megaChatApi.getChatCallByCallId(callId);
+        if(call != null && statusCallInProgress(call.getStatus()) && call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING){
             return;
+        }
+        checkTerminatingCall();
+    }
 
+    private void checkTerminatingCall() {
         clearHandlers();
         stopSpeakerAudioManger();
-        MegaApplication.setSpeakerStatus(callId, false);
-
+        MegaApplication.setSpeakerStatus(chatId, false);
         finishActivity();
     }
 
-    private void checkUserNoPresentInCall(long callId) {
-        if (getCall() == null || callId != callChat.getId() || reconnectingLayout.isShown())
+    private void checkUserNoPresentInCall() {
+        if (getCall() == null || reconnectingLayout.isShown())
             return;
 
         clearHandlers();
     }
 
-    private void checkReconnectingCall(long callId) {
-        if (getCall() == null || callId != callChat.getId() || (chat.isGroup() && callChat.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING) || reconnectingLayout.isShown())
+    private void checkReconnectingCall() {
+        if (getCall() == null || (chat.isGroup() && callChat.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING) || reconnectingLayout.isShown())
             return;
+
         activateChrono(false, callInProgressChrono, callChat);
         subtitleToobar.setVisibility(View.GONE);
         showReconnecting();
@@ -2733,16 +2757,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    private void userJoined(MegaChatCall call) {
+    private void userJoined(long userPeerId, long userClientId) {
         logDebug("Participant joined the group call");
-
-        long userPeerId = call.getPeeridCallCompositionChange();
-        long userClientId = call.getClientidCallCompositionChange();
 
         if (peersOnCall.isEmpty()) {
             addContactIntoArray(userPeerId, userClientId);
             return;
         }
+
         boolean containsUser = false;
         for (InfoPeerGroupCall peer : peersOnCall) {
             if (peer.getPeerId() == userPeerId && peer.getClientId() == userClientId) {
@@ -2750,33 +2772,33 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 break;
             }
         }
+
         if (!containsUser) {
             addContactIntoArray(userPeerId, userClientId);
-            int callStatus = call.getStatus();
-            if (statusCallInProgress(callStatus) && callStatus != MegaChatCall.CALL_STATUS_RECONNECTING) {
+            int callStatus = callChat.getStatus();
+            if ((statusCallInProgress(callStatus) && callStatus != MegaChatCall.CALL_STATUS_RECONNECTING) && (userPeerId != megaChatApi.getMyUserHandle() || userClientId != megaChatApi.getMyClientidHandle(chatId))) {
                 updateInfoUsersBar(getString(R.string.contact_joined_the_call, getName(userPeerId)));
             }
 
             checkParticipantChanges(true, -1);
 
             if (statusCallInProgress(callStatus)) {
-                updateRemoteAV(call.getMegaChatSession(userPeerId, userClientId));
+                updateRemoteAV(callChat.getMegaChatSession(userPeerId, userClientId));
             }
         }
     }
 
-    private void userLeft(MegaChatCall call) {
+    private void userLeft(long userPeerId, long userClientId) {
         logDebug("Participant left the group call");
-        long userPeerId = call.getPeeridCallCompositionChange();
-        long userClientId = call.getClientidCallCompositionChange();
 
-        if (peersOnCall.isEmpty()) return;
+        if (peersOnCall.isEmpty())
+            return;
 
         for (InfoPeerGroupCall peer : peersOnCall) {
             if (peer.getPeerId() == userPeerId && peer.getClientId() == userClientId) {
-                int callStatus = call.getStatus();
+                int callStatus = callChat.getStatus();
 
-                if (statusCallInProgress(callStatus) && callStatus != MegaChatCall.CALL_STATUS_RECONNECTING){
+                if ((statusCallInProgress(callStatus) && callStatus != MegaChatCall.CALL_STATUS_RECONNECTING) && (userPeerId != megaChatApi.getMyUserHandle() || userClientId != megaChatApi.getMyClientidHandle(chatId))) {
                     updateInfoUsersBar(getString(R.string.contact_left_the_call, getName(userPeerId)));
                 }
 

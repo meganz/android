@@ -29,71 +29,105 @@ public class CallListener implements MegaChatCallListenerInterface {
             return;
         }
 
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+        Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+        intentGeneral.setAction(ACTION_UPDATE_CALL);
+        intentGeneral.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
+        intentGeneral.putExtra(UPDATE_CALL_ID, call.getId());
+        LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentGeneral);
 
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
             int callStatus = call.getStatus();
             logDebug("Call status changed, current status is " + callStatusToString(callStatus));
-            intent.setAction(ACTION_CALL_STATUS_UPDATE);
-            intent.putExtra(UPDATE_CALL_STATUS, callStatus);
+            Intent intentStatus = new Intent(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+            intentStatus.setAction(ACTION_CALL_STATUS_UPDATE);
+            intentStatus.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
+            intentStatus.putExtra(UPDATE_CALL_ID, call.getId());
+            intentStatus.putExtra(UPDATE_CALL_STATUS, callStatus);
+            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentStatus);
         }
 
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)) {
             logDebug("Changes in local av flags ");
-            intent.setAction(ACTION_CHANGE_LOCAL_AVFLAGS);
+            Intent intentLocalFlags = new Intent(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+            intentLocalFlags.setAction(ACTION_CHANGE_LOCAL_AVFLAGS);
+            intentLocalFlags.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
+            intentLocalFlags.putExtra(UPDATE_CALL_ID, call.getId());
+            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentLocalFlags);
         }
 
-        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION)) {
-            if (call.getCallCompositionChange() == 0) {
-                logDebug("No changes in the call composition");
-                return;
-            }
-
+        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION) && call.getCallCompositionChange() != 0) {
             logDebug("Call composition changed. Call status is " + callStatusToString(call.getStatus()) + ". Num of participants is " + call.getPeeridParticipants().size());
-            intent.setAction(ACTION_CHANGE_COMPOSITION);
+            Intent intentComposition = new Intent(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+            intentComposition.setAction(ACTION_CHANGE_COMPOSITION);
+            intentComposition.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
+            intentComposition.putExtra(UPDATE_CALL_ID, call.getId());
+            intentComposition.putExtra(TYPE_CHANGE_COMPOSITION, call.getCallCompositionChange());
+            intentComposition.putExtra(UPDATE_PEER_ID, call.getPeeridCallCompositionChange());
+            intentComposition.putExtra(UPDATE_CLIENT_ID, call.getClientidCallCompositionChange());
+            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentComposition);
         }
-
-        intent.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
-        intent.putExtra(UPDATE_CALL_ID, call.getId());
-        LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
     }
 
     @Override
     public void onChatSessionUpdate(MegaChatApiJava api, long chatid, long callid, MegaChatSession session) {
         if (session == null) {
-            logDebug("Session null");
+            logWarning("Session null");
             return;
         }
 
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
+        Intent intentGeneral = new Intent(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
+        intentGeneral.setAction(ACTION_UPDATE_CALL);
+        intentGeneral.putExtra(UPDATE_CHAT_CALL_ID, chatid);
+        intentGeneral.putExtra(UPDATE_CALL_ID, callid);
+        LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentGeneral);
 
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_REMOTE_AVFLAGS)) {
-            intent.setAction(ACTION_CHANGE_REMOTE_AVFLAGS);
+            logDebug("Changes in remote av flags ");
+            Intent intentRemoteFlags = new Intent(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
+            intentRemoteFlags.setAction(ACTION_CHANGE_REMOTE_AVFLAGS);
+            intentRemoteFlags.putExtra(UPDATE_CHAT_CALL_ID, chatid);
+            intentRemoteFlags.putExtra(UPDATE_CALL_ID, callid);
+            intentRemoteFlags.putExtra(UPDATE_PEER_ID, session.getPeerid());
+            intentRemoteFlags.putExtra(UPDATE_CLIENT_ID, session.getClientid());
+            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentRemoteFlags);
         }
 
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_AUDIO_LEVEL)) {
-            intent.setAction(ACTION_CHANGE_AUDIO_LEVEL);
+            Intent intentAudio = new Intent(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
+            intentAudio.setAction(ACTION_CHANGE_AUDIO_LEVEL);
+            intentAudio.putExtra(UPDATE_CHAT_CALL_ID, chatid);
+            intentAudio.putExtra(UPDATE_CALL_ID, callid);
+            intentAudio.putExtra(UPDATE_PEER_ID, session.getPeerid());
+            intentAudio.putExtra(UPDATE_CLIENT_ID, session.getClientid());
+            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentAudio);
         }
 
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_NETWORK_QUALITY)) {
-            intent.setAction(ACTION_CHANGE_NETWORK_QUALITY);
+            Intent intentNetwork = new Intent(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
+            intentNetwork.setAction(ACTION_CHANGE_NETWORK_QUALITY);
+            intentNetwork.putExtra(UPDATE_CHAT_CALL_ID, chatid);
+            intentNetwork.putExtra(UPDATE_CALL_ID, callid);
+            intentNetwork.putExtra(UPDATE_PEER_ID, session.getPeerid());
+            intentNetwork.putExtra(UPDATE_CLIENT_ID, session.getClientid());
+            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentNetwork);
         }
 
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_STATUS)) {
             logDebug("Session status changed, current status is " + sessionStatusToString(session.getStatus()));
-            intent.setAction(ACTION_SESSION_STATUS_UPDATE);
-            intent.putExtra(UPDATE_SESSION_STATUS, session.getStatus());
+            Intent intentStatus = new Intent(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
+            intentStatus.setAction(ACTION_SESSION_STATUS_UPDATE);
+            intentStatus.putExtra(UPDATE_SESSION_STATUS, session.getStatus());
 
             if (session.getStatus() == MegaChatSession.SESSION_STATUS_DESTROYED) {
                 logDebug("Term code is " + session.getTermCode());
-                intent.putExtra(UPDATE_SESSION_TERM_CODE, session.getTermCode());
+                intentStatus.putExtra(UPDATE_SESSION_TERM_CODE, session.getTermCode());
             }
-        }
 
-        intent.putExtra(UPDATE_CHAT_CALL_ID, chatid);
-        intent.putExtra(UPDATE_CALL_ID, callid);
-        intent.putExtra(UPDATE_SESSION_PEER_ID, session.getPeerid());
-        intent.putExtra(UPDATE_SESSION_CLIENT_ID, session.getClientid());
-        LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+            intentStatus.putExtra(UPDATE_CHAT_CALL_ID, chatid);
+            intentStatus.putExtra(UPDATE_CALL_ID, callid);
+            intentStatus.putExtra(UPDATE_PEER_ID, session.getPeerid());
+            intentStatus.putExtra(UPDATE_CLIENT_ID, session.getClientid());
+            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentStatus);
+        }
     }
 }

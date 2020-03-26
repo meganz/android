@@ -61,25 +61,28 @@ public class CallService extends Service{
             if (intent == null || intent.getAction() == null)
                 return;
 
-            int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
-            long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
-            if(callStatus == -1 || chatId == -1)
+            long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+            if (chatIdReceived == -1 || chatIdReceived != chatId)
                 return;
 
-            switch (callStatus){
-                case MegaChatCall.CALL_STATUS_REQUEST_SENT:
-                case MegaChatCall.CALL_STATUS_RING_IN:
-                case MegaChatCall.CALL_STATUS_JOINING:
-                case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                    updateNotificationContent(chatId);
-                    break;
+            if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
 
-                case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-                case MegaChatCall.CALL_STATUS_DESTROYED:
-                    stopForeground(true);
-                    mNotificationManager.cancel(NOTIFICATION_CALL_IN_PROGRESS);
-                    stopSelf();
-                    break;
+                int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+
+                switch (callStatus) {
+                    case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+                    case MegaChatCall.CALL_STATUS_RING_IN:
+                    case MegaChatCall.CALL_STATUS_JOINING:
+                    case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+                        updateNotificationContent(chatId);
+                        break;
+                    case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
+                    case MegaChatCall.CALL_STATUS_DESTROYED:
+                        stopForeground(true);
+                        mNotificationManager.cancel(NOTIFICATION_CALL_IN_PROGRESS);
+                        stopSelf();
+                        break;
+                }
             }
         }
     };
@@ -127,10 +130,12 @@ public class CallService extends Service{
     private void updateNotificationContent(long chatId) {
         Notification notif;
         MegaChatCall call = megaChatApi.getChatCall(chatId);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (call == null) {
                 mBuilderCompatO.setContentText(getString(R.string.action_notification_call_in_progress));
             } else {
+
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
                     mBuilderCompatO.setContentText(getString(R.string.outgoing_call_starting));
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {

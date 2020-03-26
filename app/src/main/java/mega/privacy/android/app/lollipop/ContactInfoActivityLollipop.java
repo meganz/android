@@ -874,6 +874,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void startCall() {
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if (chatRoomTo != null) {
+
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
 				Intent i = new Intent(this, ChatCallActivity.class);
 				i.putExtra(CHAT_ID, chatRoomTo.getChatId());

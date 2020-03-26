@@ -548,29 +548,27 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 return;
 
             long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
-            if (chatId != getCurrentChatid()){
+            if (chatId != getCurrentChatid()) {
                 logWarning("Call different chat");
                 return;
             }
 
             if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
-                updateLayout(chatId, callStatus);
-                if (callStatus != -1) {
-                    switch (callStatus) {
-                        case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                            cancelRecording();
-                            break;
+                updateLayout(callStatus);
 
-                        case MegaChatCall.CALL_STATUS_DESTROYED:
-                            usersWithVideo(chatId);
-                            break;
-                    }
+                switch (callStatus) {
+                    case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+                        cancelRecording();
+                        break;
+                    case MegaChatCall.CALL_STATUS_DESTROYED:
+                        usersWithVideo();
+                        break;
                 }
             }
 
             if (intent.getAction().equals(ACTION_CHANGE_LOCAL_AVFLAGS) || intent.getAction().equals(ACTION_CHANGE_COMPOSITION)) {
-                usersWithVideo(chatId);
+                usersWithVideo();
             }
         }
     };
@@ -588,7 +586,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
 
             if (intent.getAction().equals(ACTION_CHANGE_REMOTE_AVFLAGS)) {
-                usersWithVideo(chatId);
+                usersWithVideo();
             }
         }
     };
@@ -7823,7 +7821,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
 
             activityVisible = true;
-            showCallLayout(idChat);
+            showCallLayout();
             if(aB != null && aB.getTitle() != null){
                 titleToolbar.setText(adjustForLargeFont(titleToolbar.getText().toString()));
             }
@@ -8159,10 +8157,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void updateLayout(long chatId, int callStatus) {
+    private void updateLayout(int callStatus) {
         if (callStatus == MegaChatCall.CALL_STATUS_DESTROYED) {
             setSubtitleVisibility();
-            MegaChatCall call = megaChatApi.getChatCall(chatId);
+            MegaChatCall call = megaChatApi.getChatCall(idChat);
             hideCallInProgressLayout(call);
             return;
         }
@@ -8175,20 +8173,23 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             MegaApplication.setCallLayoutStatus(idChat, false);
         }
 
-        showCallLayout(chatId);
+        showCallLayout();
     }
 
-    private void showCallLayout(long idChatReceived) {
-        if (megaChatApi == null || idChat != idChatReceived) return;
+    private void showCallLayout() {
+        if (megaChatApi == null)
+            return;
+
         MegaChatCall call = megaChatApi.getChatCall(idChat);
-        if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING && !isStatusConnected(this, idChat))) return;
+        if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING && !isStatusConnected(this, idChat)))
+            return;
 
         logDebug("Call status "+callStatusToString(call.getStatus())+". Group chat: "+isGroup());
         switch (call.getStatus()){
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-            case MegaChatCall.CALL_STATUS_RING_IN:{
+            case MegaChatCall.CALL_STATUS_RING_IN:
                 if (isGroup()) {
-                    usersWithVideo(idChat);
+                    usersWithVideo();
 
                     long callerHandle = call.getCaller();
                     String textLayout;
@@ -8198,42 +8199,43 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         textLayout = getString(R.string.join_call_layout);
                     }
                     tapToReturnLayout(call, textLayout);
-                    return;
+                    break;
                 }
 
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && app.getCallLayoutStatus(idChat)) {
                     tapToReturnLayout(call, getString(R.string.call_in_progress_layout));
-                    return;
+                    break;
                 }
 
-                if(isAfterReconnecting(this, callInProgressLayout, callInProgressText)) return;
+                if(isAfterReconnecting(this, callInProgressLayout, callInProgressText))
+                    break;
 
                 hideCallInProgressLayout(call);
-                return;
+                break;
 
-            }
-            case MegaChatCall.CALL_STATUS_REQUEST_SENT:{
+            case MegaChatCall.CALL_STATUS_REQUEST_SENT:
                 if (MegaApplication.getCallLayoutStatus(idChat)) {
                     tapToReturnLayout(call, getString(R.string.call_in_progress_layout));
-                    return;
+                    break;
                 }
 
                 hideCallInProgressLayout(call);
-                return;
-            }
-            case MegaChatCall.CALL_STATUS_RECONNECTING:{
+                break;
+
+            case MegaChatCall.CALL_STATUS_RECONNECTING:
                 activateChrono(false, subtitleChronoCall, call);
                 callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
                 showCallInProgressLayout(getString(R.string.reconnecting_message), false, call);
                 callInProgressLayout.setOnClickListener(this);
-                return;
-            }
-            case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
+                break;
+
+            case MegaChatCall.CALL_STATUS_IN_PROGRESS:
                 callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
                 if(!isAfterReconnecting(this, callInProgressLayout, callInProgressText)){
                     updateCallInProgressLayout();
-                    return;
+                    break;
                 }
+
                 callInProgressLayout.setOnClickListener(null);
                 showCallInProgressLayout(getString(R.string.connected_message), false, call);
                 callInProgressLayout.setAlpha(1);
@@ -8248,8 +8250,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 updateCallInProgressLayout();
                             }
                         });
-                return;
-            }
+                break;
+
         }
     }
 
@@ -8270,21 +8272,19 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             individualSubtitleToobar.setVisibility(View.GONE);
             groupalSubtitleToolbar.setVisibility(View.GONE);
         }
-        usersWithVideo(idChat);
+        usersWithVideo();
         activateChrono(true, subtitleChronoCall, call);
         invalidateOptionsMenu();
     }
 
-    public void usersWithVideo(long idChatReceived) {
+    public void usersWithVideo() {
         if (megaChatApi == null || !isGroup() || subtitleCall.getVisibility() != View.VISIBLE)
             return;
 
-        if(idChat != idChatReceived){
-            participantsLayout.setVisibility(View.GONE);
-            return;
-        }
-
         MegaChatCall call = megaChatApi.getChatCall(idChat);
+        if(call == null)
+            return;
+
         int usersWithVideo = call.getNumParticipants(MegaChatCall.VIDEO);
         int totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
         if (usersWithVideo <= 0 || totalVideosAllowed == 0) {

@@ -117,7 +117,9 @@ public class CallUtil {
      */
     public static void showCallLayout(Context context, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (callInProgressLayout == null) return;
+        if (callInProgressLayout == null){
+            return;
+        }
 
         if (!participatingInACall()) {
             callInProgressLayout.setVisibility(View.GONE);
@@ -126,7 +128,9 @@ public class CallUtil {
         }
 
         long chatId = getChatCallInProgress();
-        if (chatId == -1) return;
+        if (chatId == -1){
+            return;
+        }
 
         MegaChatCall call = megaChatApi.getChatCall(chatId);
         if (call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
@@ -134,6 +138,7 @@ public class CallUtil {
             activateChrono(false, callInProgressChrono, null);
             callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.reconnecting_bar));
             callInProgressText.setText(context.getString(R.string.reconnecting_message));
+
         } else {
             logDebug("Displayed the layout to return to the call");
             callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
@@ -145,6 +150,7 @@ public class CallUtil {
                 activateChrono(false, callInProgressChrono, null);
             }
         }
+
         callInProgressLayout.setVisibility(View.VISIBLE);
     }
 
@@ -175,12 +181,15 @@ public class CallUtil {
     }
 
     public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall call) {
-        if (chronometer == null) return;
+        if (chronometer == null)
+            return;
+
         if (!activateChrono) {
             chronometer.stop();
             chronometer.setVisibility(View.GONE);
             return;
         }
+
         if (call != null) {
             chronometer.setVisibility(View.VISIBLE);
             chronometer.setBase(SystemClock.elapsedRealtime() - (call.getDuration()* 1000));

@@ -1225,17 +1225,34 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (intent == null || intent.getAction() == null)
 				return;
 
-			long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
+				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
 
-			rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-			if (rChatFL != null && rChatFL.isVisible()) {
-				rChatFL.refreshNode(megaChatApi.getChatListItem(chatId));
-			}
+				if (chatIdReceived == -1)
+					return;
 
-			if (isScreenInPortrait(ManagerActivityLollipop.this)) {
-				setCallWidget();
-			} else {
-				supportInvalidateOptionsMenu();
+				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+				switch (callStatus) {
+					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+					case MegaChatCall.CALL_STATUS_RING_IN:
+					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+					case MegaChatCall.CALL_STATUS_RECONNECTING:
+					case MegaChatCall.CALL_STATUS_JOINING:
+					case MegaChatCall.CALL_STATUS_DESTROYED:
+					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
+						rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+						if (rChatFL != null && rChatFL.isVisible()) {
+							rChatFL.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
+						}
+
+						if (isScreenInPortrait(ManagerActivityLollipop.this)) {
+							setCallWidget();
+						} else {
+							supportInvalidateOptionsMenu();
+						}
+
+						break;
+				}
 			}
 		}
 	};
@@ -17423,10 +17440,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	 */
 	private void setCallWidget() {
 		setCallBadge();
+
 		if (drawerItem != DrawerItem.CLOUD_DRIVE && drawerItem != DrawerItem.SHARED_ITEMS && drawerItem != DrawerItem.CHAT || !isScreenInPortrait(this)) {
 			hideCallWidget();
 			return;
 		}
+
 		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
 	}
 

@@ -355,12 +355,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             if (intent == null || intent.getAction() == null)
                 return;
 
-            int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
-
-            if (callStatus != -1
-                    && (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT || callStatus == MegaChatCall.CALL_STATUS_RING_IN)
-                    && player != null && player.getPlayWhenReady()) {
-                player.setPlayWhenReady(false);
+            if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
+                int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+                if ((callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT || callStatus == MegaChatCall.CALL_STATUS_RING_IN)
+                        && player != null && player.getPlayWhenReady()) {
+                    player.setPlayWhenReady(false);
+                }
             }
         }
     };

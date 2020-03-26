@@ -22,6 +22,8 @@ public class BroadcastConstants {
     public static final String ACTION_CHANGE_REMOTE_AVFLAGS = "ACTION_CHANGE_REMOTE_AVFLAGS";
     public static final String ACTION_CHANGE_AUDIO_LEVEL = "ACTION_CHANGE_AUDIO_LEVEL";
     public static final String ACTION_CHANGE_NETWORK_QUALITY = "ACTION_CHANGE_NETWORK_QUALITY";
+    public static final String ACTION_UPDATE_CALL = "ACTION_UPDATE_CALL";
+
 
     //    Broadcasts' extras
     public static final String EVENT_TEXT = "EVENT_TEXT";
@@ -34,9 +36,10 @@ public class BroadcastConstants {
     public static final String UPLOAD_TRANSFER = "UPLOAD_TRANSFER";
     public static final String UPDATE_CHAT_CALL_ID = "UPDATE_CHAT_CALL_ID";
     public static final String UPDATE_CALL_ID = "UPDATE_CALL_ID";
+    public static final String TYPE_CHANGE_COMPOSITION = "TYPE_CHANGE_COMPOSITION";
     public static final String UPDATE_CALL_STATUS = "UPDATE_CALL_STATUS";
-    public static final String UPDATE_SESSION_PEER_ID = "UPDATE_SESSION_PEER_ID";
-    public static final String UPDATE_SESSION_CLIENT_ID = "UPDATE_SESSION_CLIENT_ID";
+    public static final String UPDATE_PEER_ID = "UPDATE_PEER_ID";
+    public static final String UPDATE_CLIENT_ID = "UPDATE_CLIENT_ID";
     public static final String UPDATE_SESSION_STATUS = "UPDATE_SESSION_STATUS";
     public static final String UPDATE_SESSION_TERM_CODE = "UPDATE_SESSION_TERM_CODE";
 }
