@@ -99,11 +99,11 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         else{
             logWarning("Bundle NULL");
 
-            chatId = ((GroupChatInfoActivityLollipop) context).chatHandle;
+            chatId = ((GroupChatInfoActivityLollipop) context).getChatHandle();
             selectedChat = megaChatApi.getChatRoom(chatId);
             logDebug("Handle of the chat: " + chatId);
 
-            participantHandle = ((GroupChatInfoActivityLollipop) context).selectedHandleParticipant;
+            participantHandle = ((GroupChatInfoActivityLollipop) context).getSelectedHandleParticipant();
             logDebug("Handle of the participant: " + participantHandle);
         }
     }
@@ -439,7 +439,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
             case R.id.leave_group_participants_chat_layout: {
                 logDebug("Leave chat participants panel");
-                ((GroupChatInfoActivityLollipop) context).showConfirmationLeaveChat(selectedChat);
+                ((GroupChatInfoActivityLollipop) context).showConfirmationLeaveChat();
                 break;
             }
 

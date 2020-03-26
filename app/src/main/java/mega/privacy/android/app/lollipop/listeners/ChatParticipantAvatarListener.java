@@ -39,9 +39,9 @@ public class ChatParticipantAvatarListener implements MegaRequestListenerInterfa
         if (e.getErrorCode() == MegaError.API_OK){
             boolean avatarExists = false;
 
-            if (holder.contactMail != null) {
-                if (holder.contactMail.compareTo(request.getEmail()) == 0){
-                    File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
+            if (holder.getContactMail() != null) {
+                if (holder.getContactMail().compareTo(request.getEmail()) == 0){
+                    File avatar = buildAvatarFile(context, holder.getContactMail() + ".jpg");
                     Bitmap bitmap = null;
                     if (isFileAvailable(avatar)){
                         if (avatar.length() > 0){
@@ -60,8 +60,8 @@ public class ChatParticipantAvatarListener implements MegaRequestListenerInterfa
                 }
             }
             else{
-                if (holder.userHandle.compareTo(request.getEmail()) == 0){
-                    File avatar = buildAvatarFile(context, holder.userHandle + ".jpg");
+                if (holder.getUserHandle().compareTo(request.getEmail()) == 0){
+                    File avatar = buildAvatarFile(context, holder.getUserHandle() + ".jpg");
                     Bitmap bitmap = null;
                     if (isFileAvailable(avatar)){
                         if (avatar.length() > 0){
