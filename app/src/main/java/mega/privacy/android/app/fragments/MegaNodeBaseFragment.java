@@ -793,7 +793,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 
             pdfIntent.putExtra("inside", true);
-            pdfIntent.putExtra("adapterType", FILE_BROWSER_ADAPTER);
+            pdfIntent.putExtra("adapterType", fragmentAdapter);
             boolean isOnMegaDownloads = false;
             String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
             File f = new File(downloadLocationDefaultPath, file.getName());
