@@ -2548,11 +2548,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void startCall(){
-        logDebug("startCall ");
         stopReproductions();
         hideKeyboard();
 
-        if(megaChatApi == null) return;
+        if (megaChatApi == null)
+            return;
 
         MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
 
@@ -2594,11 +2594,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
 
         if (!participatingInACall()) {
-            logDebug("There is not a call in this chat and I am not in another call");
+            logDebug("There is not a call in this chat and I am NOT in another call");
             MegaApplication.setCallLayoutStatus(idChat, false);
             MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
             checkCamera();
             megaChatApi.startChatCall(idChat, startVideo, this);
+        }else{
+            logDebug("There is not a call in this chat and I am in another call");
         }
 
     }

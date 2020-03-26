@@ -387,7 +387,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             break;
                         case MegaChatCall.CALL_STATUS_RECONNECTING:
                             checkReconnectingCall();
-
+                            break;
                     }
                 }
             }
@@ -458,6 +458,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             checkHangCall(callId);
                         }
                     }
+
                     if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
                         hideReconnecting();
                         updateAVFlags(session);
@@ -2434,7 +2435,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Check the different call status
      */
     private void checkCompositionChanges(int typeChange, long peerIdReceived, long clientIdReceived) {
-        if (getCall() == null || !chat.isGroup())
+        if (getCall() == null || !chat.isGroup() || reconnectingLayout.isShown())
             return;
 
         logDebug("The type of changes in composition is " + typeChange);
