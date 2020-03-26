@@ -107,6 +107,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static com.google.android.material.textfield.TextInputLayout.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
@@ -1813,7 +1814,11 @@ public class Util {
 	}
 
 	public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus){
-		textInputLayout.setPasswordVisibilityToggleEnabled(focus);
+		if (focus) {
+			textInputLayout.setEndIconMode(END_ICON_PASSWORD_TOGGLE);
+			textInputLayout.setEndIconDrawable(R.drawable.password_toggle);
+		} else {
+			textInputLayout.setEndIconMode(END_ICON_NONE);
+		}
 	}
-
 }
