@@ -25,6 +25,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -35,15 +36,12 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import androidx.annotation.Nullable;
 import com.google.android.material.textfield.TextInputLayout;
-
-import androidx.appcompat.app.ActionBar;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.exifinterface.media.ExifInterface;
-
 import android.text.Html;
+import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
+import androidx.core.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -111,6 +109,7 @@ import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.google.android.material.textfield.TextInputLayout.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -122,13 +121,13 @@ public class Util {
 
     public static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd HH.mm.ss";
     public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 1000;
-
+	
 	public static float dpWidthAbs = 360;
 	public static float dpHeightAbs = 592;
-
+	
 	public static double percScreenLogin = 0.596283784; //The dimension of the grey zone (Login and Tour)
 	public static double percScreenLoginReturning = 0.8;
-
+	
 	// Debug flag to enable logging and some other things
 	public static boolean DEBUG = false;
 
@@ -155,8 +154,8 @@ public class Util {
 		if(activity == null){
 			return;
 		}
-
-		try{
+		
+		try{ 
 			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
 			dialogBuilder.setPositiveButton(
 				activity.getString(android.R.string.ok),
@@ -177,21 +176,21 @@ public class Util {
 					}
 				}
 			});
-
-
+		
+		
 			AlertDialog dialog = dialogBuilder.create();
-			dialog.show();
+			dialog.show(); 
 			brandAlertDialog(dialog);
 		}
 		catch(Exception ex){
-			Util.showToast(activity, message);
+			Util.showToast(activity, message); 
 		}
 	}
-
+	
 	public static void showErrorAlertDialog(MegaError error, Activity activity) {
 		showErrorAlertDialog(error.getErrorString(), false, activity);
 	}
-
+	
 	public static void showErrorAlertDialog(int errorCode, Activity activity) {
 		showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
 	}
@@ -229,11 +228,11 @@ public class Util {
 
 		return count;
 	}
-
+	
 	public static boolean showMessageRandom(){
 		Random r = new Random(System.currentTimeMillis());
 		int randomInt = r.nextInt(100) + 1;
-
+		
 		if(randomInt<5){
 			return true;
 		}
@@ -293,7 +292,7 @@ public class Util {
 
 		return numChilden;
 	}
-
+	
 	public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
 
         Matrix matrix = new Matrix();
@@ -342,14 +341,14 @@ public class Util {
 			return null;
 		}
 	}
-
+	
 	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
 		// Raw height and width of image
 	    final int height = options.outHeight;
 	    final int width = options.outWidth;
-
+	    
 	    int inSampleSize = 1;
-
+	    
 	    if (height > reqHeight || width > reqWidth) {
 
 	        final int halfHeight = height / 2;
@@ -365,7 +364,7 @@ public class Util {
 
 	    return inSampleSize;
 	}
-
+	
 	/*
 	 * Build custom dialog
 	 * @param activity Source activity
@@ -408,32 +407,32 @@ public class Util {
 	public static void showToast(Context context, String message) {
 		try { Toast.makeText(context, message, Toast.LENGTH_LONG).show(); } catch(Exception ex) {};
 	}
-
+	
 	public static float getScaleW(DisplayMetrics outMetrics, float density){
-
+		
 		float scale = 0;
-
-		float dpWidth  = outMetrics.widthPixels / density;
-	    scale = dpWidth / dpWidthAbs;
-
+		
+		float dpWidth  = outMetrics.widthPixels / density;		
+	    scale = dpWidth / dpWidthAbs;	    
+		
 	    return scale;
 	}
-
+	
 	public static float getScaleH(DisplayMetrics outMetrics, float density){
-
+		
 		float scale = 0;
-
-		float dpHeight  = outMetrics.heightPixels / density;
-	    scale = dpHeight / dpHeightAbs;
-
+		
+		float dpHeight  = outMetrics.heightPixels / density;		
+	    scale = dpHeight / dpHeightAbs;	    
+		
 	    return scale;
 	}
-
+	
 	public static int px2dp (float dp, DisplayMetrics outMetrics){
-
+	
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
 	}
-
+	
 	/*
 	 * AES encryption
 	 */
@@ -444,7 +443,7 @@ public class Util {
 		byte[] encrypted = cipher.doFinal(clear);
 		return encrypted;
 	}
-
+	
 	/*
 	 * AES decryption
 	 */
@@ -456,7 +455,7 @@ public class Util {
 		byte[] decrypted = cipher.doFinal(encrypted);
 		return decrypted;
 	}
-
+	
 	/*
 	 * Check is device on WiFi
 	 */
@@ -487,7 +486,7 @@ public class Util {
 
 	static public boolean isOnline(Context context) {
 	    if(context == null) return true;
-
+		
 		ConnectivityManager cm =
 	        (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -496,7 +495,7 @@ public class Util {
 	    }
 	    return false;
 	}
-
+	
 	public static String getSizeString(long size){
 		String sizeString = "";
 		DecimalFormat decf = new DecimalFormat("###.##");
@@ -522,7 +521,7 @@ public class Util {
 		else{
 			sizeString = decf.format(size/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
 		}
-
+		
 		return sizeString;
 	}
 
@@ -550,7 +549,7 @@ public class Util {
 	        int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
 
 	        TextView alertTitle = (TextView) dialog.getWindow().getDecorView().findViewById(alertTitleId);
-	        if (alertTitle != null){
+	        if (alertTitle != null){	        	
 	        	alertTitle.setTextColor(ContextCompat.getColor(dialog.getContext(), R.color.mega)); // change title text color
 	        }
 
@@ -574,7 +573,7 @@ public class Util {
 				getSizeString(progress),
 				getSizeString(size));
 	}
-
+	
 	/*
 	 * Set alpha transparency for view
 	 */
@@ -589,7 +588,7 @@ public class Util {
 			view.startAnimation(anim);
 		}
 	}
-
+	
 	/*
 	 * Make part of the string bold
 	 */
@@ -605,7 +604,7 @@ public class Util {
 		String speedString = "";
 		double speedDouble = 0;
 		DecimalFormat df = new DecimalFormat("#.##");
-
+		
 		if (speed > 1024){
 			if (speed > 1024*1024){
 				if (speed > 1024*1024*1024){
@@ -619,14 +618,14 @@ public class Util {
 			}
 			else{
 				speedDouble = speed / 1024.0;
-				speedString = df.format(speedDouble) + " KB/s";
+				speedString = df.format(speedDouble) + " KB/s";	
 			}
 		}
 		else{
 			speedDouble = speed;
 			speedString = df.format(speedDouble) + " B/s";
 		}
-
+		
 		return speedString;
 	}
 
@@ -636,7 +635,7 @@ public class Util {
         DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
         return sdf.format(new Date(timeStamp)) + fileName.substring(fileName.lastIndexOf('.'));
 	}
-
+	
 	public static String getPhotoSyncNameWithIndex (long timeStamp, String fileName, int photoIndex){
         if(photoIndex == 0) {
             return getPhotoSyncName(timeStamp, fileName);
@@ -644,10 +643,10 @@ public class Util {
         DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
         return sdf.format(new Date(timeStamp)) + "_" + photoIndex + fileName.substring(fileName.lastIndexOf('.'));
 	}
-
+	
 	public static int getNumberOfNodes (MegaNode parent, MegaApiAndroid megaApi){
 		int numberOfNodes = 0;
-
+		
 		ArrayList<MegaNode> children = megaApi.getChildren(parent);
 		for (int i=0; i<children.size(); i++){
 			if (children.get(i).isFile()){
@@ -657,10 +656,10 @@ public class Util {
 				numberOfNodes = numberOfNodes + getNumberOfNodes(children.get(i), megaApi);
 			}
 		}
-
+		
 		return numberOfNodes;
 	}
-
+	
 	public static String getLocalIpAddress(Context context)
   {
 		  try {
@@ -696,8 +695,8 @@ public class Util {
 		  }
 		  return null;
    }
-
-	@SuppressLint("InlinedApi")
+	
+	@SuppressLint("InlinedApi") 
 	public static boolean isCharging(Context context) {
 		final Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 		int status = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
@@ -709,7 +708,7 @@ public class Util {
 		}
 
 	}
-
+	
 	/** Returns the consumer friendly device name */
 	public static String getDeviceName() {
 	    final String manufacturer = Build.MANUFACTURER;
@@ -723,18 +722,18 @@ public class Util {
 	    }
 	    return manufacturer + " " + model;
 	}
-
+	
 	public static String getCountryCode(String countryString){
 		String countryCode= "";
-
+		
 		countryCode = countryCodeDisplay.get(countryString);
-
+		
 		return countryCode;
 	}
-
+	
 	public static ArrayList<String> getCountryList(Context context){
 		ArrayList<String> countryCodes = new ArrayList<String>();
-
+		
 		countryCodes.add("US");
 		countryCodes.add("GB");
 		countryCodes.add("CA");
@@ -981,28 +980,28 @@ public class Util {
 		countryCodes.add("YE");
 		countryCodes.add("ZM");
 		countryCodes.add("ZW");
-
+		
 		Locale currentLocale = Locale.getDefault();
 //		Toast.makeText(context, currentLocale.getLanguage(), Toast.LENGTH_LONG).show();
-
+		
 		countryCodeDisplay = new HashMap<String, String>();
-
+		
 		ArrayList<String> countryList = new ArrayList<String>();
 		for (int i=0;i<countryCodes.size();i++){
 			Locale l = new Locale (currentLocale.getLanguage(), countryCodes.get(i));
 			String country = l.getDisplayCountry();
 			if (country.length() > 0 && !countryList.contains(country)){
 				countryList.add(country);
-				countryCodeDisplay.put(country, countryCodes.get(i));
+				countryCodeDisplay.put(country, countryCodes.get(i));				
 			}
 		}
-
+		
 //		Toast.makeText(context, "CONTRYLIST: " + countryList.size() + "___ " + countryCodes.size(), Toast.LENGTH_LONG).show();
 		Collections.sort(countryList, String.CASE_INSENSITIVE_ORDER);
 		countryList.add(0, context.getString(R.string.country_cc));
-
+		
 		return countryList;
-
+		
 //		Locale[] locale = Locale.getAvailableLocales();
 //		String country;
 //		Toast.makeText(context, "LOCALEAAAAAA: " + locale.length, Toast.LENGTH_LONG).show();
@@ -1013,19 +1012,19 @@ public class Util {
 //			}
 //		}
 //		Toast.makeText(context, "CONTRYLIST: " + countryList.size(), Toast.LENGTH_LONG).show();
-//
+//				
 //		Collections.sort(countryList, String.CASE_INSENSITIVE_ORDER);
 //		countryList.add(0, context.getString(R.string.country_cc));
-//
+//		
 //		return countryList;
-
+		
 	}
-
+	
 	public static ArrayList<String> getMonthListInt(Context context){
 		ArrayList<String> monthList = new ArrayList<String>();
-
+		
 		monthList.add(context.getString(R.string.month_cc));
-
+		
 		monthList.add("01");
 		monthList.add("02");
 		monthList.add("03");
@@ -1038,22 +1037,22 @@ public class Util {
 		monthList.add("10");
 		monthList.add("11");
 		monthList.add("12");
-
+		
 		return monthList;
 	}
-
+	
 	public static ArrayList<String> getYearListInt(Context context){
 		ArrayList<String> yearList = new ArrayList<String>();
-
+		
 		yearList.add(context.getString(R.string.year_cc));
-
+		
 		Calendar calendar = Calendar.getInstance();
 		int year = calendar.get(Calendar.YEAR);
-
+		
 		for (int i=year;i<=(year+20);i++){
 			yearList.add(i+"");
 		}
-
+		
 		return yearList;
 	}
 
@@ -1105,7 +1104,7 @@ public class Util {
 	    }
 	    return bits;
 	}
-
+	
 	public static boolean checkBitSet(BitSet paymentBitSet, int position){
 		logDebug("checkBitSet");
 		if (paymentBitSet != null){
@@ -1120,9 +1119,9 @@ public class Util {
 			return false;
 		}
 	}
-
+	
 	public static boolean isPaymentMethod(BitSet paymentBitSet, int plan){
-
+		
 		boolean r = false;
 		if (paymentBitSet != null){
 			if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
@@ -1142,21 +1141,21 @@ public class Util {
 				}
 			}
 		}
-
+		
 		return r;
 	}
-
+	
 	public static int scaleHeightPx(int px, DisplayMetrics metrics){
 		int myHeightPx = metrics.heightPixels;
-
-		return px*myHeightPx/548; //Based on Eduardo's measurements
+		
+		return px*myHeightPx/548; //Based on Eduardo's measurements				
 	}
-
+	
 	public static int scaleWidthPx(int px, DisplayMetrics metrics){
 		int myWidthPx = metrics.widthPixels;
-
-		return px*myWidthPx/360; //Based on Eduardo's measurements
-
+		
+		return px*myWidthPx/360; //Based on Eduardo's measurements		
+		
 	}
 
 	/*
@@ -1339,7 +1338,7 @@ public class Util {
 		metrics.scaledDensity = configuration.fontScale * metrics.density;
 		activity.getBaseContext().getResources().updateConfiguration(configuration, metrics);
 	}
-
+    
     //reduce font size for scale mode to prevent title and subtitle overlap
     public static SpannableString adjustForLargeFont(String original) {
 		Context context = MegaApplication.getInstance().getApplicationContext();
@@ -1613,7 +1612,6 @@ public class Util {
 	}
 
 	public static void hideKeyboard(Activity activity, int flag){
-
 		View v = activity.getCurrentFocus();
 		if (v != null){
 			InputMethodManager imm = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
@@ -1622,7 +1620,6 @@ public class Util {
 	}
 
 	public static void hideKeyboardView(Context context, View v, int flag){
-
 		if (v != null){
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
@@ -1716,16 +1713,12 @@ public class Util {
 	}
 
     public static void showKeyboardDelayed(final View view) {
-		logDebug("showKeyboardDelayed");
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                InputMethodManager imm =
-						(InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-            }
-        }, 50);
+		Handler handler = new Handler();
+        handler.postDelayed(() -> {
+			InputMethodManager imm =
+					(InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+		}, 50);
     }
 
     public static Spanned getSpannedHtmlText(String string) {
@@ -1737,12 +1730,24 @@ public class Util {
 		return Html.fromHtml(string);
 	}
 
+	public static void checkTakePicture(Activity activity, int option) {
+		if (isNecessaryDisableLocalCamera() != -1) {
+			if(option == TAKE_PHOTO_CODE) {
+				showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE);
+			}else if(option == TAKE_PICTURE_PROFILE_CODE){
+				showConfirmationOpenCamera(activity, ACTION_TAKE_PROFILE_PICTURE);
+			}
+			return;
+		}
+		takePicture(activity, option);
+	}
+
 	/**
 	 * This method is to start camera from Activity
 	 *
 	 * @param activity the activity the camera would start from
 	 */
-	public static void takePicture(Activity activity) {
+	public static void takePicture(Activity activity, int option) {
 		logDebug("takePicture");
 		File newFile = buildTempFile(activity, "picture.jpg");
 		try {
@@ -1755,7 +1760,7 @@ public class Util {
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 		cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		activity.startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+		activity.startActivityForResult(cameraIntent, option);
 	}
 
 	public static void resetActionBar(ActionBar aB) {
@@ -1784,5 +1789,4 @@ public class Util {
 			textInputLayout.setEndIconMode(END_ICON_NONE);
 		}
 	}
-
 }

@@ -86,8 +86,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
-
 
 public class ContactFileListActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight, UploadBottomSheetDialogActionListener {
 
@@ -225,7 +225,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			return;
 		}
-		takePicture(this);
+		checkTakePicture(this, TAKE_PHOTO_CODE);
 	}
 
 	@Override
@@ -581,9 +581,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			if (contact == null) {
 				finish();
 			}
-
-			ContactController cC = new ContactController(this);
-			fullName = cC.getContactFullName(contact.getHandle());
+			fullName = getMegaUserNameDB(contact);
 
 			if (aB != null) {
 				aB.setDisplayHomeAsUpEnabled(true);
