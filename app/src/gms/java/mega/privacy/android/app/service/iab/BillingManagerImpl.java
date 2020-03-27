@@ -16,6 +16,7 @@
 package mega.privacy.android.app.service.iab;
 
 import android.app.Activity;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -173,6 +174,25 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     }
 
     /**
+     * Unused for GMS
+     *
+     * @param data
+     * @return
+     */
+    @Override
+    public int getPurchaseResult(Intent data) {
+        return -1;
+    }
+
+    /**
+     * Unused for GMS
+     */
+    @Override
+    public void updatePurchase() {
+
+    }
+
+    /**
      * Query all the available skus of MEGA in Play Store.
      *
      * @param itemType The type of sku, for MEGA it should always be {@link BillingClient.SkuType#SUBS}
@@ -295,7 +315,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         if (resultCode == BillingResponseCode.OK) {
             handlePurchaseList(result.getPurchasesList());
         }
-        mBillingUpdatesListener.onQueryPurchasesFinished( resultCode != BillingResponseCode.OK, resultCode, Converter.convertPurchases(mPurchases));
+        mBillingUpdatesListener.onQueryPurchasesFinished(resultCode != BillingResponseCode.OK, resultCode, Converter.convertPurchases(mPurchases));
     }
 
     /**
@@ -315,7 +335,8 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      * Query purchases across various use cases and deliver the result in a formalized way through
      * a listener
      */
-    private void queryPurchases() {
+    @Override
+    public void queryPurchases() {
         Runnable queryToExecute = new Runnable() {
             @Override
             public void run() {
@@ -395,7 +416,8 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      * @param signature  the signature of a purchase.
      * @return If the purchase is valid.
      */
-    private boolean verifyValidSignature(String signedData, String signature) {
+    @Override
+    public boolean verifyValidSignature(String signedData, String signature) {
         try {
             return Security.verifyPurchase(signedData, signature);
         } catch (IOException e) {
@@ -434,7 +456,6 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         public static MegaSku convert(SkuDetails sku) {
             MegaSku megaSku = new MegaSku();
             megaSku.setSku(sku.getSku());
-            megaSku.setType(sku.getType());
             return megaSku;
         }
 

@@ -7,7 +7,8 @@
     <application tools:node="merge">
 
         <service
-            android:name=".service.push.MegaMessageService">
+            android:name=".service.push.MegaMessageService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
             </intent-filter>
