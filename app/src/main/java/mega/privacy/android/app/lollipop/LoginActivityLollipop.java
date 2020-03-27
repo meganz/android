@@ -605,98 +605,24 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         setIntent(null);
     }
 
-    boolean loggerPermissionKarere = false;
-    boolean loggerPermissionSDK = false;
-
+    @Override
     public void showConfirmationEnableLogsKarere() {
-        logDebug("showConfirmationEnableLogsKarere");
-
         if (loginFragment != null) {
             loginFragment.numberOfClicksKarere = 0;
         }
 
         loginActivity = this;
-
-        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                        if (!hasStoragePermission) {
-                            loggerPermissionKarere = true;
-                            ActivityCompat.requestPermissions(loginActivity,
-                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                    REQUEST_WRITE_STORAGE);
-                            break;
-                        }
-                    }
-                    setStatusLoggerKarere(loginActivity, true);
-                    break;
-
-                case DialogInterface.BUTTON_NEGATIVE:
-                    break;
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+        super.showConfirmationEnableLogsKarere();
     }
 
+    @Override
     public void showConfirmationEnableLogsSDK() {
-        logDebug("showConfirmationEnableLogsSDK");
-
         if (loginFragment != null) {
             loginFragment.numberOfClicksSDK = 0;
         }
 
         loginActivity = this;
-
-        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                        if (!hasStoragePermission) {
-                            loggerPermissionSDK = true;
-                            ActivityCompat.requestPermissions(loginActivity,
-                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                    REQUEST_WRITE_STORAGE);
-                            break;
-                        }
-                    }
-                    setStatusLoggerSDK(loginActivity, true);
-                    break;
-
-                case DialogInterface.BUTTON_NEGATIVE:
-                    break;
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        logDebug("onRequestPermissionsResult");
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_WRITE_STORAGE) {
-            if (loggerPermissionKarere) {
-                loggerPermissionKarere = false;
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setStatusLoggerKarere(loginActivity, true);
-                }
-            } else if (loggerPermissionSDK) {
-                loggerPermissionSDK = false;
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setStatusLoggerSDK(loginActivity, true);
-                }
-            }
-        }
+        super.showConfirmationEnableLogsSDK();
     }
 
     public void setWaitingForConfirmAccount(boolean waitingForConfirmAccount) {

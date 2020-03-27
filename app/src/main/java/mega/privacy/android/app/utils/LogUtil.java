@@ -24,6 +24,11 @@ public class LogUtil {
     private static boolean statusLoggerSDK = false;
     private static boolean statusLoggerKarere = false;
 
+    //Indicates if app is requesting the required permissions to enable the SDK logger
+    private static boolean permissionLoggerSDK = false;
+    //Indicates if app is requesting the required permissions to enable the Karere logger
+    private static boolean permissionLoggerKarere = false;
+
     /**
      * Send a log message with FATAL level to the logging system.
      *
@@ -239,12 +244,14 @@ public class LogUtil {
 
         MegaApiAndroid.addLoggerObject(loggerSDK);
         MegaApiAndroid.setLogLevel(DEBUG || statusLoggerSDK ? MegaApiAndroid.LOG_LEVEL_MAX : MegaApiAndroid.LOG_LEVEL_FATAL);
+        logInfo("SDK logger initialized");
     }
 
     /**
      * Reset the current SDK logger.
      */
     public static void resetLoggerSDK() {
+        logInfo("Resetting SDK logger...");
         if (loggerSDK != null) {
             MegaApiAndroid.removeLoggerObject(loggerSDK);
         }
@@ -269,5 +276,6 @@ public class LogUtil {
 
         MegaChatApiAndroid.setLoggerObject(loggerKarere);
         MegaChatApiAndroid.setLogLevel(DEBUG || statusLoggerKarere ? MegaChatApiAndroid.LOG_LEVEL_MAX : MegaChatApiAndroid.LOG_LEVEL_ERROR);
+        logInfo("Karere logger initialized");
     }
 }

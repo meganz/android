@@ -1386,10 +1386,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	@Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		logDebug("onRequestPermissionsResult");
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		logDebug("request Code "+requestCode);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
 		switch(requestCode){
 			case REQUEST_READ_CONTACTS:{
@@ -12172,57 +12170,20 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-
-
+	@Override
 	public void showConfirmationEnableLogsSDK(){
-		logDebug("showConfirmationEnableLogsSDK");
-
 		if(getSettingsFragment() != null){
 			sttFLol.numberOfClicksSDK = 0;
 		}
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						setStatusLoggerSDK(managerActivity, true);
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+		super.showConfirmationEnableLogsSDK();
 	}
 
+	@Override
 	public void showConfirmationEnableLogsKarere(){
-		logDebug("showConfirmationEnableLogsKarere");
-
 		if(getSettingsFragment() != null){
 			sttFLol.numberOfClicksKarere = 0;
 		}
-
-		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-			switch (which) {
-				case DialogInterface.BUTTON_POSITIVE:
-					setStatusLoggerKarere(managerActivity, true);
-					break;
-
-				case DialogInterface.BUTTON_NEGATIVE:
-					break;
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+		super.showConfirmationEnableLogsKarere();
 	}
 
 	public void showConfirmationDeleteAvatar(){
