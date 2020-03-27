@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
@@ -19,7 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -27,11 +25,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.listeners.ChatParticipantAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.utils.AvatarUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -42,7 +41,6 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaChatApi.*;
@@ -64,7 +62,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
 
-    private MegaChatRoom chat;
     private long chatId;
     private boolean isPreview;
 
@@ -72,7 +69,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         this.groupChatInfoActivity = groupChatInfoActivity;
         this.participants = participants;
         this.listFragment = listView;
-        this.chat = groupChatInfoActivity.getChat();
         this.chatId = groupChatInfoActivity.getChatHandle();
         this.isPreview = groupChatInfoActivity.getChat().isPreview();
 
@@ -290,20 +286,17 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
     @Override
     public void onBindViewHolder(ViewHolderParticipants holder, int position) {
-        final int itemType = getItemViewType(position);
-        logDebug("position: " + position + ", itemType: " + itemType);
-
         switch (getItemViewType(position)) {
             case ITEM_VIEW_TYPE_HEADER:
                 ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) holder;
 
                 int color = ContextCompat.getColor(groupChatInfoActivity, R.color.divider_upgrade_account);
-                String title = chat.getTitle();
+                String title = getChat().getTitle();
                 holderHeader.avatarImageView.setImageBitmap(getDefaultAvatar(groupChatInfoActivity, color, title, AVATAR_SIZE, true));
 
-                holderHeader.infoTitleChatText.setText(chat.getTitle());
+                holderHeader.infoTitleChatText.setText(getChat().getTitle());
 
-                if (chat.isArchived()) {
+                if (getChat().isArchived()) {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
                     holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_unarchive));
                 } else {
@@ -311,7 +304,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_archive));
                 }
 
-                long participantsCount = chat.getPeerCount();
+                long participantsCount = getChat().getPeerCount();
 
                 if (isPreview) {
                     holderHeader.notificationsLayout.setVisibility(View.GONE);
@@ -330,18 +323,18 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 } else {
                     participantsCount++;
 
-                    if (chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) {
+                    if (getChat().getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) {
                         holderHeader.editImageView.setVisibility(View.VISIBLE);
                         holderHeader.dividerClearLayout.setVisibility(View.VISIBLE);
                         holderHeader.clearChatLayout.setVisibility(View.VISIBLE);
                         holderHeader.dividerLeaveLayout.setVisibility(View.VISIBLE);
 
-                        if (chat.isPublic()) {
+                        if (getChat().isPublic()) {
                             holderHeader.privateLayout.setVisibility(View.VISIBLE);
                             holderHeader.privateLayout.setOnClickListener(this);
                             holderHeader.privateSeparator.setVisibility(View.VISIBLE);
                         } else {
-                            logDebug("Private chat");
+                            logDebug("Private getChat()");
                             holderHeader.privateLayout.setVisibility(View.GONE);
                             holderHeader.privateSeparator.setVisibility(View.GONE);
                         }
@@ -352,13 +345,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                         holderHeader.privateLayout.setVisibility(View.GONE);
                         holderHeader.privateSeparator.setVisibility(View.GONE);
 
-                        if (chat.getOwnPrivilege() < MegaChatRoom.PRIV_RO) {
+                        if (getChat().getOwnPrivilege() < MegaChatRoom.PRIV_RO) {
                             holderHeader.leaveChatLayout.setVisibility(View.GONE);
                             holderHeader.dividerLeaveLayout.setVisibility(View.GONE);
                         }
                     }
 
-                    if (chat.isPublic() && chat.getOwnPrivilege() >= MegaChatRoom.PRIV_RO) {
+                    if (getChat().isPublic() && getChat().getOwnPrivilege() >= MegaChatRoom.PRIV_RO) {
                         holderHeader.chatLinkLayout.setVisibility(View.VISIBLE);
                         holderHeader.chatLinkLayout.setOnClickListener(this);
                         holderHeader.chatLinkSeparator.setVisibility(View.VISIBLE);
@@ -368,7 +361,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                         groupChatInfoActivity.setChatLink(null);
                     }
 
-                    if (chat.isArchived()) {
+                    if (getChat().isArchived()) {
                         holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
                         holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_unarchive));
                     } else {
@@ -381,13 +374,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 holderHeader.infoNumParticipantsText.setText(groupChatInfoActivity.getString(R.string.number_of_participants, participantsCount));
 
-                if (chat.getNumPreviewers() < 1) {
+                if (getChat().getNumPreviewers() < 1) {
                     holderHeader.observersSeparator.setVisibility(View.GONE);
                     holderHeader.observersLayout.setVisibility(View.GONE);
                 } else {
                     holderHeader.observersSeparator.setVisibility(View.VISIBLE);
                     holderHeader.observersLayout.setVisibility(View.VISIBLE);
-                    holderHeader.observersNumberText.setText(chat.getNumPreviewers() + "");
+                    holderHeader.observersNumberText.setText(getChat().getNumPreviewers() + "");
                 }
                 break;
 
@@ -411,7 +404,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 } else {
                     userStatus = megaChatApi.getUserOnlineStatus(participant.getHandle());
                 }
-
 
                 holderParticipantsList.statusImage.setVisibility(View.VISIBLE);
                 holderParticipantsList.textViewContent.setVisibility(View.VISIBLE);
@@ -450,6 +442,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 holderParticipantsList.textViewContactName.setText(holderParticipantsList.fullName);
                 holderParticipantsList.threeDotsLayout.setOnClickListener(this);
+                holderParticipantsList.imageButtonThreeDots.setColorFilter(null);
 
                 /*Default Avatar*/
                 int avatarColor = getColorAvatar(groupChatInfoActivity, megaApi, holderParticipantsList.userHandle);
@@ -458,48 +451,37 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 /*Avatar*/
                 String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
                 if ((holderParticipantsList.userHandle).equals(myUserHandleEncoded)) {
-                    File avatar = buildAvatarFile(groupChatInfoActivity, holderParticipantsList.contactMail + ".jpg");
-                    Bitmap bitmap;
-                    if (isFileAvailable(avatar) && avatar.length() > 0) {
-                        BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                        bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                        if (bitmap != null) {
-                            holderParticipantsList.imageView.setImageBitmap(bitmap);
-                        }
+                    Bitmap bitmap = getAvatarBitmap(holderParticipantsList.contactMail);
+                    if (bitmap != null) {
+                        holderParticipantsList.setImageView(bitmap);
                     }
-
-                    holderParticipantsList.imageButtonThreeDots.setColorFilter(null);
-                    holderParticipantsList.threeDotsLayout.setOnClickListener(this);
                 } else {
-                    ChatParticipantAvatarListener listener = new ChatParticipantAvatarListener(groupChatInfoActivity, holderParticipantsList, this);
-                    if (holderParticipantsList.contactMail != null) {
-                        MegaUser contact = megaApi.getContact(holderParticipantsList.contactMail);
-                        if (contact != null) {
-                            File avatar = buildAvatarFile(groupChatInfoActivity, holderParticipantsList.contactMail + ".jpg");
-                            Bitmap bitmap;
-                            if (isFileAvailable(avatar) && avatar.length() > 0) {
-                                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), new BitmapFactory.Options());
-                                if (bitmap == null) {
-                                    avatar.delete();
-                                    megaApi.getUserAvatar(contact, buildAvatarFile(groupChatInfoActivity, contact.getEmail() + ".jpg").getAbsolutePath(), listener);
-                                } else {
-                                    holderParticipantsList.imageView.setImageBitmap(bitmap);
-                                }
-                            } else {
-                                megaApi.getUserAvatar(contact, buildAvatarFile(groupChatInfoActivity, contact.getEmail() + ".jpg").getAbsolutePath(), listener);
-                            }
-
-                            holderParticipantsList.imageButtonThreeDots.setColorFilter(null);
-                        } else {
-                            megaApi.getUserAvatar(holderParticipantsList.contactMail, buildAvatarFile(groupChatInfoActivity, holderParticipantsList.contactMail + ".jpg").getAbsolutePath(), listener);
-                        }
+                    String nameFileHandle = holderParticipantsList.userHandle;
+                    String nameFileEmail = holderParticipantsList.contactMail;
+                    MegaUser contact = null;
+                    Bitmap bitmap;
+                    
+                    if (holderParticipantsList.contactMail == null) {
+                        holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
+                        holderParticipantsList.threeDotsLayout.setOnClickListener(null);
+                        bitmap = getAvatarBitmap(nameFileHandle);
                     } else {
-                        if (position != 0) {
-                            holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
-                            holderParticipantsList.threeDotsLayout.setOnClickListener(null);
+                        contact = megaApi.getContact(holderParticipantsList.contactMail);
+                        bitmap = getUserAvatar(nameFileHandle, nameFileEmail);
+                    }
+                    
+                    if (bitmap != null) {
+                        holderParticipantsList.setImageView(bitmap);
+                    } else {
+                        GetAttrUserListener listener = new GetAttrUserListener(groupChatInfoActivity, holderParticipantsList, this);
+                        
+                        if (contact != null) {
+                            megaApi.getUserAvatar(contact, buildAvatarFile(groupChatInfoActivity, nameFileEmail + JPG_EXTENSION).getAbsolutePath(), listener);
+                        } else if (participant.getEmail() != null) {
+                            megaApi.getUserAvatar(participant.getEmail(), buildAvatarFile(groupChatInfoActivity, nameFileEmail + JPG_EXTENSION).getAbsolutePath(), listener);
+                        } else {
+                            megaApi.getUserAvatar(holderParticipantsList.userHandle, buildAvatarFile(groupChatInfoActivity, nameFileHandle + JPG_EXTENSION).getAbsolutePath(), listener);
                         }
-
-                        megaApi.getUserAvatar(holderParticipantsList.userHandle, buildAvatarFile(groupChatInfoActivity, holderParticipantsList.userHandle + ".jpg").getAbsolutePath(), listener);
                     }
                 }
 
@@ -528,13 +510,31 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         }
     }
 
-    public boolean isLastParticipantModerator() {
-        return participants.get(participants.size() - 1).getPrivilege() == MegaChatRoom.PRIV_MODERATOR;
+    /**
+     * Checks if the user is previewing the chat and if is moderator.
+     * If the user is moderator, they appears in the last position of the participants list.
+     *
+     * @return True if the current chat is not a preview and if the user is moderator, false otherwise.
+     */
+    private boolean isNotPreviewAndLastParticipantModerator() {
+        return !isPreview && participants.get(participants.size() - 1).getPrivilege() == MegaChatRoom.PRIV_MODERATOR;
     }
 
+    /**
+     * Gets the number of items in the adapter.
+     * It depends on the user:
+     *
+     * If they is not previewing the chat and they are a moderator there are two more views in the adapter (Header + Add participant views),
+     *      so the count in the adapter is the same as in the array plus 2.
+     *
+     * Otherwise, there is only one more view in the adapter (Header),
+     *      so the count in the adapter is the same as in the array plus 1.
+     *
+     * @return Number of items in the adapter.
+     */
     @Override
     public int getItemCount() {
-        if (!isPreview && isLastParticipantModerator()) {
+        if (isNotPreviewAndLastParticipantModerator()) {
             return participants.size() + 2;
         } else {
             return participants.size() + 1;
@@ -545,15 +545,28 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
     public int getItemViewType(int position) {
         if (position == 0) {
             return ITEM_VIEW_TYPE_HEADER;
-        } else if (position == 1 && !isPreview && isLastParticipantModerator()) {
+        } else if (position == 1 && isNotPreviewAndLastParticipantModerator()) {
             return ITEM_VIEW_TYPE_ADD_PARTICIPANT;
         } else {
             return ITEM_VIEW_TYPE_NORMAL;
         }
     }
 
+    /**
+     * Gets the position of the participant in the array.
+     * It depends on the user:
+     *
+     * If they is not previewing the chat and they are a moderator there are two more views in the adapter (Header + Add participant views),
+     *      so the position in the array is the same as in the adapter minus 2.
+     *
+     * Otherwise, there is only one more view in the adapter (Header),
+     *      so the position in the array is the same as in the adapter minus 1.
+     *
+     * @param adapterPosition   the position of the participant in the adapter.
+     * @return The position of the participant in the array.
+     */
     public int getParticipantPositionInArray(int adapterPosition) {
-        if (!isPreview && isLastParticipantModerator()) {
+        if (isNotPreviewAndLastParticipantModerator()) {
             return adapterPosition - 2;
         } else {
             return adapterPosition - 1;
@@ -694,20 +707,20 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         }
     }
 
-    public RecyclerView getListFragment() {
-        return listFragment;
-    }
-
-
-    public void setListFragment(RecyclerView listFragment) {
-        this.listFragment = listFragment;
-    }
-
+    /**
+     * Checks if the participant has attributes.
+     * If not, it stores the participant to ask for their when necessary.
+     *
+     * @param position      the position of the participant in the adapter.
+     * @param participant   the participant to check.
+     */
     private void checkParticipant(int position, MegaChatParticipant participant) {
-        if (isTextEmpty(participant.getEmail()) && isTextEmpty(participant.getFullName())) {
-            if (groupChatInfoActivity instanceof GroupChatInfoActivityLollipop) {
-                groupChatInfoActivity.addParticipantRequest(position, participant);
-            }
+        if (!groupChatInfoActivity.hasParticipantAttributes(participant)) {
+            groupChatInfoActivity.addParticipantRequest(position, participant);
         }
+    }
+
+    private MegaChatRoom getChat() {
+        return groupChatInfoActivity.getChat();
     }
 }

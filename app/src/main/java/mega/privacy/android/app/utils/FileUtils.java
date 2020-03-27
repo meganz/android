@@ -53,6 +53,8 @@ public class FileUtils {
 
     public static final String OLD_RK_FILE = MAIN_DIR + File.separator + "MEGARecoveryKey.txt";
 
+    public static final String JPG_EXTENSION = ".jpg";
+
     public static String getRecoveryKeyFileName() {
         return MegaApplication.getInstance().getApplicationContext().getString(R.string.general_rk) + ".txt";
     }

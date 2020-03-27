@@ -1816,4 +1816,20 @@ public class Util {
 		textInputLayout.setPasswordVisibilityToggleEnabled(focus);
 	}
 
+	/**
+	 * Changes the elevation of the the ActionBar passed as parameter.
+	 *
+	 * @param aB				ActionBar in which the elevation has to be applied.
+	 * @param withElevation	true if should apply elevation, false otherwise.
+	 * @param outMetrics	DisplayMetrics of the current device.
+	 */
+	public static void changeViewElevation(ActionBar aB, boolean withElevation, DisplayMetrics outMetrics) {
+		float elevation = px2dp(4, outMetrics);
+
+		if (withElevation) {
+			aB.setElevation(elevation);
+		} else {
+			aB.setElevation(0);
+		}
+	}
 }

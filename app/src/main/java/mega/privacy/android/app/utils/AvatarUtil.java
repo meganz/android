@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
@@ -193,14 +194,9 @@ public class AvatarUtil {
 
         if(contact.isPhoneContact() || contact.isMegaContact()) {
             /*Avatar*/
-            File avatar = buildAvatarFile(context, mail + ".jpg");
-            Bitmap bitmap;
-            if (isFileAvailable(avatar) && avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap != null) {
-                    return getCircleBitmap(bitmap);
-                }
+            Bitmap bitmap = getAvatarBitmap(mail);
+            if (bitmap != null) {
+                return getCircleBitmap(bitmap);
             }
         }
 
@@ -208,4 +204,41 @@ public class AvatarUtil {
         return getDefaultAvatar(context, color, fullName, AVATAR_SIZE, true);
     }
 
+    /**
+     * Gets the bitmap of an avatar file.
+     *
+     * @param avatarName    name of the avatar file
+     * @return Bitmap of the avatar if the file exists.
+     */
+    public static Bitmap getAvatarBitmap(String avatarName) {
+        Bitmap bitmap = null;
+        File avatar = buildAvatarFile(MegaApplication.getInstance(), avatarName + JPG_EXTENSION);
+
+        if (isFileAvailable(avatar) && avatar.length() > 0) {
+            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), new BitmapFactory.Options());
+            if (bitmap == null) {
+                avatar.delete();
+            }
+        }
+
+        return bitmap;
+    }
+
+    /**
+     * Checks if already exists the avatar of a participant.
+     * First with the handle and if not exists, then with the email.
+     *
+     * @param nameFileHandle
+     * @param nameFileEmail
+     * @return
+     */
+    public static Bitmap getUserAvatar(String nameFileHandle, String nameFileEmail) {
+        Bitmap bitmap = getAvatarBitmap(nameFileHandle);
+
+        if (bitmap == null) {
+            bitmap = getAvatarBitmap(nameFileEmail);
+        }
+
+        return bitmap;
+    }
 }
