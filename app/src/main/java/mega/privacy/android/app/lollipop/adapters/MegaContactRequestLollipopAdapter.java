@@ -190,8 +190,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 	
 	private void createDefaultAvatar(ViewHolderContactsRequestList holder){
-		int color = ContextCompat.getColor(context, R.color.lollipop_primary_color);
-		Bitmap defaultAvatar = getDefaultAvatar(context, color, holder.contactMail , AVATAR_SIZE, true);
+		Bitmap defaultAvatar = getDefaultAvatar(getSpecificColor(AVATAR_PRIMARY_COLOR), holder.contactMail , AVATAR_SIZE, true);
 		holder.imageView.setImageBitmap(defaultAvatar);
 	}
 		

@@ -253,9 +253,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(this);
 
 			/*Default Avatar*/
-			int color = getColorAvatar(context, megaApi, ((ViewHolderParticipantsList) holder).userHandle);
+			int color = getColorAvatar(((ViewHolderParticipantsList) holder).userHandle);
 			String name = ((ViewHolderParticipantsList) holder).fullName;
-			((ViewHolderParticipantsList) holder).imageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, true));
+			((ViewHolderParticipantsList) holder).imageView.setImageBitmap(getDefaultAvatar(color, name, AVATAR_SIZE, true));
 
 			/*Avatar*/
 			String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());

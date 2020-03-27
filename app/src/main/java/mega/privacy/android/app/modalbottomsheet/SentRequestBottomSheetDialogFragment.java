@@ -129,7 +129,7 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     public void addAvatarRequestPanel(MegaContactRequest request){
         /*Default Avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(context, getColorAvatar(context, megaApi, -1), request.getTargetEmail(), AVATAR_SIZE, true));
+        contactImageView.setImageBitmap(getDefaultAvatar(getSpecificColor(AVATAR_PRIMARY_COLOR), request.getTargetEmail(), AVATAR_SIZE, true));
     }
 
     @Override

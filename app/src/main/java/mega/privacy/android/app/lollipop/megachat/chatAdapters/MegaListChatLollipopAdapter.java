@@ -409,14 +409,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public void setUserAvatar(ViewHolderChatList holder, String userHandle){
 
 		/*Default Avatar*/
-		int color = getColorAvatar(context, megaApi, userHandle);
 		String name = null;
 		if (((ViewHolderNormalChatList)holder).fullName != null && ((ViewHolderNormalChatList)holder).fullName.trim().length() > 0){
 			name = ((ViewHolderNormalChatList)holder).fullName;
 		}else if(((ViewHolderNormalChatList)holder).contactMail != null && ((ViewHolderNormalChatList)holder).contactMail.length() > 0){
 			name = ((ViewHolderNormalChatList)holder).contactMail;
 		}
-		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, true));
+		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(getDefaultAvatar(getColorAvatar(userHandle), name, AVATAR_SIZE, true));
 
 		/*Avatar*/
 		ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
@@ -609,10 +608,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	}
 
 	public void createGroupChatAvatar(ViewHolderChatList holder, String chatTitle){
-		int color = ContextCompat.getColor(context,R.color.divider_upgrade_account);
-		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(getDefaultAvatar(context, color, chatTitle, AVATAR_SIZE, true));
+		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(getDefaultAvatar(getSpecificColor(AVATAR_GROUP_CHAT_COLOR), chatTitle, AVATAR_SIZE, true));
 	}
-
 
 	@Override
 	public int getItemCount() {

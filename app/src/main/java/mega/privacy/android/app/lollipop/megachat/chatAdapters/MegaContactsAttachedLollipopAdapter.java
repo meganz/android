@@ -479,15 +479,15 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 	}
 
 	public void createDefaultAvatar(ViewHolderContacts holder, MegaContactDB contact){
-		int color = getColorAvatar(context, megaApi, contact.getHandle());
+		int color = getColorAvatar(contact.getHandle());
 		String fullName = contact.getName();
 
 		if (holder instanceof ViewHolderContactsList){
-			Bitmap bitmap = getDefaultAvatar(context, color, fullName, AVATAR_SIZE, true);
+			Bitmap bitmap = getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
 			((ViewHolderContactsList)holder).imageView.setImageBitmap(bitmap);
 		}
 		else if (holder instanceof ViewHolderContactsGrid){
-			Bitmap bitmap = getDefaultAvatar(context, color, fullName, AVATAR_SIZE_GRID, false);
+			Bitmap bitmap = getDefaultAvatar(color, fullName, AVATAR_SIZE_GRID, false);
 			((ViewHolderContactsGrid)holder).imageView.setImageBitmap(bitmap);
 		}
 	}

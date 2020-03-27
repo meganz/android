@@ -776,8 +776,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
             String name = contact.getLocalName();
             String email = contact.getEmail();
             String handle = contact.getId();
-            int color = getColorAvatar(this, megaApi, handle);
-            InvitationContactInfo info = new InvitationContactInfo(id, name, TYPE_MEGA_CONTACT, null, email, color);
+            InvitationContactInfo info = new InvitationContactInfo(id, name, TYPE_MEGA_CONTACT, null, email, getColorAvatar(handle));
             info.setHandle(handle);
             result.add(info);
         }

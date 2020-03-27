@@ -4014,7 +4014,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void setDefaultAvatar(){
 		logDebug("setDefaultAvatar");
-		nVPictureProfile.setImageBitmap(getDefaultAvatar(this, getColorAvatar(this, megaApi, megaApi.getMyUser()), MegaApplication.getInstance().getMyAccountInfo().getFullName(), AVATAR_SIZE, true));
+		nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(megaApi.getMyUser()), MegaApplication.getInstance().getMyAccountInfo().getFullName(), AVATAR_SIZE, true));
 	}
 
 	public void setOfflineAvatar(String email, long myHandle, String name){
@@ -4059,7 +4059,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		if (nVPictureProfile != null){
-			nVPictureProfile.setImageBitmap(getDefaultAvatar(this, getColorAvatar(this, megaApi, myHandle), name, AVATAR_SIZE, true));
+			nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(myHandle), name, AVATAR_SIZE, true));
 		}
 	}
 

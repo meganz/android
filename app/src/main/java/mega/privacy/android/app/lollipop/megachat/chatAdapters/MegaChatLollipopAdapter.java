@@ -5650,8 +5650,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageContactEmail.setText(name);
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 holder.contentOwnMessageContactName.setText(email);
-                int color = getColorAvatar(context, megaApi, -1);
-                Bitmap bitmapDefaultAvatar = getDefaultAvatar(context, color, userCount + "", AVATAR_SIZE, true);
+                Bitmap bitmapDefaultAvatar = getDefaultAvatar(getSpecificColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
                 holder.contentOwnMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
             }
 
@@ -5767,8 +5766,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentContactMessageContactEmail.setText(name);
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 holder.contentContactMessageContactName.setText(email);
-                int color = getColorAvatar(context, megaApi, -1);
-                Bitmap bitmap = getDefaultAvatar(context, color, userCount + "", AVATAR_SIZE, true);
+                Bitmap bitmap = getDefaultAvatar(getSpecificColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
                 holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
             }
 
@@ -6529,8 +6527,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(message.getUserHandle(0));
 
         ChatAttachmentAvatarListener listener;
-        int color = getColorAvatar(context, megaApi, userHandleEncoded);
-        Bitmap bitmapDefaultAvatar = getDefaultAvatar(context, color, name, AVATAR_SIZE, true);
+        int color = getColorAvatar(userHandleEncoded);
+        Bitmap bitmapDefaultAvatar = getDefaultAvatar(color, name, AVATAR_SIZE, true);
         if (myUserHandle == message.getUserHandle()) {
             holder.contentOwnMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
             listener = new ChatAttachmentAvatarListener(context, holder, this, true);
@@ -6585,8 +6583,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private void setContactAvatar(ViewHolderMessageChat holder, long userHandle, String name) {
         /*Default Avatar*/
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
-        int color = getColorAvatar(context, megaApi, userHandle);
-        holder.contactImageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, true));
+        holder.contactImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(userHandle), name, AVATAR_SIZE, true));
 
         /*Avatar*/
         ChatAttachmentAvatarListener listener = new ChatAttachmentAvatarListener(context, holder, this, false);

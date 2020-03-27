@@ -589,11 +589,12 @@ public final class ChatAdvancedNotificationBuilder {
 
         int color;
         if(chat.isGroup()){
-            color = ContextCompat.getColor(context, R.color.divider_upgrade_account);
+            color = getSpecificColor(AVATAR_GROUP_CHAT_COLOR);
         }else{
-            color = getColorAvatar(context, megaApi, chat.getPeerHandle(0));
+            color = getColorAvatar(chat.getPeerHandle(0));
         }
-        return getDefaultAvatar(context, color, chat.getTitle(), AVATAR_SIZE, true, true);
+
+        return getDefaultAvatar(color, chat.getTitle(), AVATAR_SIZE, true, true);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
