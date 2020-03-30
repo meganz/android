@@ -2302,10 +2302,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     /*
      * Cancel recording and reset the audio recorder
      */
-    public void cancelRecording() {
-        logDebug("cancelRecording");
+    private void cancelRecording() {
+        if (!isRecordingNow() || myAudioRecorder == null)
+            return;
 
-        if (!isRecordingNow() || myAudioRecorder == null) return;
         hideRecordingLayout();
         handlerVisualizer.removeCallbacks(updateVisualizer);
 

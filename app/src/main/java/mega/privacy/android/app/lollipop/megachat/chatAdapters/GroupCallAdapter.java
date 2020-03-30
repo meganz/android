@@ -782,12 +782,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
     }
 
-    public void changesInAudio(int position, ViewHolderGroupCall holder){
+    public void changesInAudio(int position){
         logDebug("changesInAudio");
 
-        if(holder == null){
-            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
-        }
+        ViewHolderGroupCall holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+
         if(holder!=null){
             InfoPeerGroupCall peer = getNodeAt(position);
             if (peer == null){

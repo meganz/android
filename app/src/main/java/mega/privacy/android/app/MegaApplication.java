@@ -5,7 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -20,13 +19,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.provider.CallLog;
 import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -74,7 +71,6 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
@@ -169,6 +165,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private CameraManager cameraManager = null;
 	private CameraManager.AvailabilityCallback cameraCallback = null;
 	private boolean localCameraEnabled = false;
+
+	private CallListener callListener = new CallListener();
 
     @Override
 	public void networkAvailable() {
@@ -817,7 +815,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				megaChatApi.addChatRequestListener(this);
 				megaChatApi.addChatNotificationListener(this);
 				megaChatApi.addChatListener(this);
-				megaChatApi.addChatCallListener(new CallListener());
+				megaChatApi.addChatCallListener(callListener);
 				registeredChatListeners = true;
 			}
 		}
@@ -831,6 +829,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				megaChatApi.removeChatRequestListener(this);
 				megaChatApi.removeChatNotificationListener(this);
 				megaChatApi.removeChatListener(this);
+				megaChatApi.removeChatCallListener(callListener);
 				registeredChatListeners = false;
 			}
 		}
@@ -1134,6 +1133,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					megaChatApi.removeChatRequestListener(this);
 					megaChatApi.removeChatNotificationListener(this);
 					megaChatApi.removeChatListener(this);
+					megaChatApi.removeChatCallListener(callListener);
 					registeredChatListeners = false;
 				}
 			}
