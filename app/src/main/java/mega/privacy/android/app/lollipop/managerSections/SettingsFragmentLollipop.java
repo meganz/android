@@ -1144,90 +1144,64 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
     @Override
 	public boolean onPreferenceClick(Preference preference) {
-		logDebug("onPreferenceClick");
-
 		prefs = dbH.getPreferences();
-		logDebug("KEY = " + preference.getKey());
-		if (preference.getKey().compareTo(KEY_ABOUT_SDK_VERSION) == 0){
-			logDebug("KEY_ABOUT_SDK_VERSION pressed");
+		logDebug("KEY pressed: " + preference.getKey());
+		if (preference.getKey().compareTo(KEY_ABOUT_SDK_VERSION) == 0) {
 			numberOfClicksSDK++;
-			if (numberOfClicksSDK == 5){
+			if (numberOfClicksSDK == 5) {
 				MegaAttributes attrs = dbH.getAttributes();
-				if (attrs.getFileLoggerSDK() != null){
-					try {
-						if (Boolean.parseBoolean(attrs.getFileLoggerSDK()) == false) {
-							((ManagerActivityLollipop)context).showConfirmationEnableLogsSDK();
-						}
-						else{
-							dbH.setFileLoggerSDK(false);
-							setFileLoggerSDK(false);
-							numberOfClicksSDK = 0;
-							MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-                            ((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
-						}
+				if (attrs != null && attrs.getFileLoggerSDK() != null) {
+					if (Boolean.parseBoolean(attrs.getFileLoggerSDK())) {
+						numberOfClicksSDK = 0;
+						setStatusLoggerSDK(context, false);
+					} else {
+						((ManagerActivityLollipop) context).showConfirmationEnableLogsSDK();
 					}
-					catch(Exception e){
-						((ManagerActivityLollipop)context).showConfirmationEnableLogsSDK();
-					}
-				}
-				else{
-					((ManagerActivityLollipop)context).showConfirmationEnableLogsSDK();
+				} else {
+					logWarning("SDK file logger attribute is NULL");
+					((ManagerActivityLollipop) context).showConfirmationEnableLogsSDK();
 				}
 			}
-		}
-		else{
+		} else {
 			numberOfClicksSDK = 0;
 		}
 
-		if (preference.getKey().compareTo(KEY_ABOUT_KARERE_VERSION) == 0){
-			logDebug("KEY_ABOUT_KARERE_VERSION pressed");
+		if (preference.getKey().compareTo(KEY_ABOUT_KARERE_VERSION) == 0) {
 			numberOfClicksKarere++;
-			if (numberOfClicksKarere == 5){
+			if (numberOfClicksKarere == 5) {
 				MegaAttributes attrs = dbH.getAttributes();
-				if (attrs.getFileLoggerKarere() != null){
-					try {
-						if (Boolean.parseBoolean(attrs.getFileLoggerKarere()) == false) {
-							((ManagerActivityLollipop)context).showConfirmationEnableLogsKarere();
-						}
-						else{
-							dbH.setFileLoggerKarere(false);
-							setFileLoggerKarere(false);
-							numberOfClicksKarere = 0;
-							MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
-							((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
-						}
+				if (attrs != null && attrs.getFileLoggerKarere() != null) {
+					if (Boolean.parseBoolean(attrs.getFileLoggerKarere())) {
+						numberOfClicksKarere = 0;
+						setStatusLoggerKarere(context, false);
+					} else {
+						((ManagerActivityLollipop) context).showConfirmationEnableLogsKarere();
 					}
-					catch(Exception e){
-						((ManagerActivityLollipop)context).showConfirmationEnableLogsKarere();
-					}
-				}
-				else{
-					((ManagerActivityLollipop)context).showConfirmationEnableLogsKarere();
+				} else {
+					logWarning("Karere file logger attribute is NULL");
+					((ManagerActivityLollipop) context).showConfirmationEnableLogsKarere();
 				}
 			}
-		}
-		else{
+		} else {
 			numberOfClicksKarere = 0;
 		}
 
-		if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) == 0){
+		if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) == 0) {
 			logDebug("KEY_ABOUT_APP_VERSION pressed");
 			numberOfClicksAppVersion++;
-			if (numberOfClicksAppVersion == 5){
+			if (numberOfClicksAppVersion == 5) {
 
-				if (MegaApplication.isShowInfoChatMessages() == false) {
+				if (!MegaApplication.isShowInfoChatMessages()) {
 					MegaApplication.setShowInfoChatMessages(true);
 					numberOfClicksAppVersion = 0;
-					((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is enabled", -1);
-				}
-				else{
+					((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is enabled", -1);
+				} else {
 					MegaApplication.setShowInfoChatMessages(false);
 					numberOfClicksAppVersion = 0;
-					((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is disabled", -1);
+					((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is disabled", -1);
 				}
 			}
-		}
-		else{
+		} else {
 			numberOfClicksAppVersion = 0;
 		}
 

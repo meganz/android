@@ -7,7 +7,7 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ChatLogoutListener extends ChatBaseListener{
 
@@ -19,8 +19,8 @@ public class ChatLogoutListener extends ChatBaseListener{
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         if (request.getType() != MegaChatRequest.TYPE_LOGOUT) return;
 
-//        Code for LoginFragment
+        // Code for LoginFragment
         MegaApplication.getInstance().disableMegaChatApi();
-        resetAndroidLogger();
+        resetLoggerSDK();
     }
 }

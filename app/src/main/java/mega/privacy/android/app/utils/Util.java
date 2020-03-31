@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -129,9 +130,6 @@ public class Util {
 	
 	// Debug flag to enable logging and some other things
 	public static boolean DEBUG = false;
-
-	public static boolean fileLoggerSDK = false;
-	public static boolean fileLoggerKarere = false;
 
 	public static HashMap<String, String> countryCodeDisplay;
 
@@ -542,22 +540,6 @@ public class Util {
         }
 
         return sizeString;
-    }
-
-	public static void setFileLoggerSDK(boolean fL){
-		fileLoggerSDK = fL;
-	}
-
-	public static boolean getFileLoggerSDK(){
-		return fileLoggerSDK;
-	}
-
-	public static void setFileLoggerKarere(boolean fL){
-		fileLoggerKarere = fL;
-	}
-
-    public static boolean getFileLoggerKarere(){
-        return fileLoggerKarere;
     }
 
 	public static void brandAlertDialog(AlertDialog dialog) {
@@ -1243,12 +1225,37 @@ public class Util {
 		return difference;
 	}
 
-	public static int getVersion(Context context) {
+	public static int getVersion() {
 		try {
+			Context context = MegaApplication.getInstance().getApplicationContext();
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_META_DATA);
 			return pInfo.versionCode;
 		} catch (PackageManager.NameNotFoundException e) {
 			return 0;
+		}
+	}
+
+	/**
+	 * Checks if the app has been upgraded and store the new version code.
+	 */
+	public static void checkAppUpgrade() {
+		final String APP_INFO_FILE = "APP_INFO";
+		final String APP_VERSION_CODE_KEY = "APP_VERSION_CODE";
+
+		Context context = MegaApplication.getInstance().getApplicationContext();
+		SharedPreferences preferences = context.getSharedPreferences(APP_INFO_FILE, Context.MODE_PRIVATE);
+
+		int oldVersionCode = preferences.getInt(APP_VERSION_CODE_KEY, 0);
+		int newVersionCode = getVersion();
+		if (oldVersionCode == 0 || oldVersionCode < newVersionCode) {
+			if (oldVersionCode == 0) {
+				logInfo("App Version: " + newVersionCode);
+			} else {
+				logInfo("App upgraded from " + oldVersionCode + " to " + newVersionCode);
+			}
+			preferences.edit().putInt(APP_VERSION_CODE_KEY, newVersionCode).apply();
+		} else {
+			logInfo("App Version: " + newVersionCode);
 		}
 	}
 
@@ -1285,45 +1292,6 @@ public class Util {
 	    boolean allowVerify = api.smsAllowedState() == 2;
 	    return hasNotVerified && allowVerify;
     }
-
-	public static void resetAndroidLogger(){
-
-		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-
-		boolean fileLogger = false;
-
-		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-
-		if (dbH != null) {
-			MegaAttributes attrs = dbH.getAttributes();
-			if (attrs != null) {
-				if (attrs.getFileLoggerSDK() != null) {
-					try {
-						fileLogger = Boolean.parseBoolean(attrs.getFileLoggerSDK());
-					} catch (Exception e) {
-						fileLogger = false;
-					}
-				} else {
-					fileLogger = false;
-				}
-			} else {
-				fileLogger = false;
-			}
-		}
-
-		if (Util.DEBUG){
-			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-		}
-		else {
-			setFileLoggerSDK(fileLogger);
-			if (fileLogger) {
-				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-			} else {
-				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-			}
-		}
-	}
 
 	public static Bitmap getCircleBitmap(Bitmap bitmap) {
 		final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
