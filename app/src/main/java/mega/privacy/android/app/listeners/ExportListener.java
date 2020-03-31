@@ -17,10 +17,10 @@ import static nz.mega.sdk.MegaRequest.*;
 public class ExportListener extends BaseListener {
     private Intent shareIntent;
 
-    boolean removeExport;
-    int numberRemove;
-    int pendingRemove;
-    int numberError;
+    private boolean removeExport;
+    private int numberRemove;
+    private int pendingRemove;
+    private int numberError;
 
     /**
      * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
@@ -34,8 +34,16 @@ public class ExportListener extends BaseListener {
         this.shareIntent = shareIntent;
     }
 
+    /**
+     * Constructor used for the purpose of remove links of one or more nodes
+     *
+     * @param context       current Context
+     * @param removeExport  true if the request is to remove links
+     * @param numberRemove  number of nodes to remove the link
+     */
     public ExportListener(Context context, boolean removeExport, int numberRemove) {
         super(context);
+
         this.removeExport = removeExport;
         this.numberRemove = this.pendingRemove = numberRemove;
     }
