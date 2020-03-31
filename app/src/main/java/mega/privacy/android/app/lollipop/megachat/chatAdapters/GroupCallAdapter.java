@@ -44,8 +44,10 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
-    private static final int MARGIN = 15;
-    private static final int SIZE_MUTE_ICON = 24;
+    private static final int MARGIN_MUTE_ICON_SMALL = 7;
+    private static final int MARGIN_MUTE_ICON_LARGE = 15;
+    private static final int SIZE_MUTE_ICON_SMALL = 15;
+    private static final int SIZE_MUTE_ICON_LARGE = 24;
 
     Context context;
     MegaApiAndroid megaApi;
@@ -462,9 +464,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.surfaceMicroLayout.setVisibility(View.VISIBLE);
 
             //Audio icon:
+            displayMuteIcon(holder.microSurface, peer);
             if(peers.size() < 7){
-                displayMuteIcon(holder.microSurface, peer);
-
                 RelativeLayout.LayoutParams paramsQuality = new RelativeLayout.LayoutParams(holder.qualityIcon.getLayoutParams());
                 paramsQuality.height = scaleWidthPx(24, outMetrics);
                 paramsQuality.width = scaleWidthPx(24, outMetrics);
@@ -473,14 +474,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_LEFT,  RelativeLayout.TRUE);
                 holder.qualityIcon.setLayoutParams(paramsQuality);
             }else{
-                RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
-                paramsMicroSurface.height = scaleWidthPx(15, outMetrics);
-                paramsMicroSurface.width = scaleWidthPx(15, outMetrics);
-                paramsMicroSurface.setMargins(0,  scaleWidthPx(7, outMetrics),  scaleWidthPx(7, outMetrics), 0);
-                paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
-                paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
-                holder.microSurface.setLayoutParams(paramsMicroSurface);
-
                 RelativeLayout.LayoutParams paramsQuality = new RelativeLayout.LayoutParams(holder.qualityIcon.getLayoutParams());
                 paramsQuality.height = scaleWidthPx(20, outMetrics);
                 paramsQuality.width = scaleWidthPx(20, outMetrics);
@@ -780,21 +773,22 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     private ViewHolderGroupCall getHolder(int position) {
-        ViewHolderGroupCall holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
-        return holder;
+        return (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
     }
 
     private void displayMuteIcon(final ImageView microSurface, InfoPeerGroupCall peer) {
-        RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(microSurface.getLayoutParams());
-        paramsMicroSurface.height = scaleWidthPx(SIZE_MUTE_ICON, outMetrics);
-        paramsMicroSurface.width = scaleWidthPx(SIZE_MUTE_ICON, outMetrics);
-        int marginTop;
-        if (((ChatCallActivity) context).isActionBarShowing() && peer.getPeerId() != megaChatApi.getMyUserHandle() && peer.getClientId() != megaChatApi.getMyClientidHandle(chatId)) {
-            marginTop = (getActionBarHeight() + scaleWidthPx(MARGIN, outMetrics));
-        } else {
-            marginTop = scaleWidthPx(MARGIN, outMetrics);
+        boolean smallIcon = !(peers.size() < 7);
+        int iconSize = smallIcon ? SIZE_MUTE_ICON_SMALL : SIZE_MUTE_ICON_LARGE;
+        int iconRightMargin = scaleWidthPx(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
+        int iconTopMargin = scaleWidthPx(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
+        if (!smallIcon && ((ChatCallActivity) context).isActionBarShowing() && peer.getPeerId() != megaChatApi.getMyUserHandle() && peer.getClientId() != megaChatApi.getMyClientidHandle(chatId)) {
+            iconTopMargin += getActionBarHeight();
         }
-        paramsMicroSurface.setMargins(0, marginTop, scaleWidthPx(MARGIN, outMetrics), 0);
+
+        RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(microSurface.getLayoutParams());
+        paramsMicroSurface.height = scaleWidthPx(iconSize, outMetrics);
+        paramsMicroSurface.width = scaleWidthPx(iconSize, outMetrics);
+        paramsMicroSurface.setMargins(0, iconTopMargin, iconRightMargin, 0);
         paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
         paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
         microSurface.setLayoutParams(paramsMicroSurface);
@@ -871,17 +865,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     holder.microSurface.setVisibility(View.VISIBLE);
 
                     //Audio icon:
-                    if(peers.size() < 7){
-                        displayMuteIcon(holder.microSurface, peer);
-                    }else{
-                        RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
-                        paramsMicroSurface.height = scaleWidthPx(15, outMetrics);
-                        paramsMicroSurface.width = scaleWidthPx(15, outMetrics);
-                        paramsMicroSurface.setMargins(0,  scaleWidthPx(7, outMetrics),  scaleWidthPx(7, outMetrics), 0);
-                        paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
-                        paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
-                        holder.microSurface.setLayoutParams(paramsMicroSurface);
-                    }
+                    displayMuteIcon(holder.microSurface, peer);
                 }
             }
         }else{
