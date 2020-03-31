@@ -484,16 +484,17 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		megaApi = getMegaApi();
-		megaApiFolder = getMegaApiFolder();
-		megaChatApi = getMegaChatApi();
-        scheduleCameraUploadJob(getApplicationContext());
-        storageState = dbH.getStorageState();
 
 		initLoggerSDK();
 		initLoggerKarere();
 
 		checkAppUpgrade();
+
+		megaApi = getMegaApi();
+		megaApiFolder = getMegaApiFolder();
+		megaChatApi = getMegaChatApi();
+        scheduleCameraUploadJob(getApplicationContext());
+        storageState = dbH.getStorageState();
 
 		boolean staging = false;
 		if (dbH != null) {
