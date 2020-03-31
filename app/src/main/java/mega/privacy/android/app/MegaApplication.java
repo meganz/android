@@ -85,7 +85,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -187,7 +187,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			return;
 		}
 		if (megaChatApi == null) return;
-		long chatIdCallInProgress = getChatCallInProgress(megaChatApi);
+		long chatIdCallInProgress = getChatCallInProgress();
 		MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
 		if (callInProgress != null && callInProgress.hasLocalVideo()) {
 			logDebug("Disabling local video ... the camera is using by other app");
@@ -490,86 +490,22 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
 
-		boolean fileLoggerSDK = false;
+		initLoggerSDK();
+		initLoggerKarere();
+
+		checkAppUpgrade();
+
 		boolean staging = false;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
-			if (attrs != null) {
-				if (attrs.getFileLoggerSDK() != null) {
-					try {
-						fileLoggerSDK = Boolean.parseBoolean(attrs.getFileLoggerSDK());
-					} catch (Exception e) {
-						fileLoggerSDK = false;
-					}
-				} else {
-					fileLoggerSDK = false;
-				}
-
-				if (attrs.getStaging() != null){
-					try{
-						staging = Boolean.parseBoolean(attrs.getStaging());
-					} catch (Exception e){ staging = false;}
-				}
-			}
-			else {
-				fileLoggerSDK = false;
-				staging = false;
+			if (attrs != null && attrs.getStaging() != null) {
+				staging = Boolean.parseBoolean(attrs.getStaging());
 			}
 		}
 
-        setFileLoggerSDK(fileLoggerSDK);
-		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-
-		if (staging){
+		if (staging) {
 			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
-		}
-		else{
-            megaApi.changeApiUrl("https://g.api.mega.co.nz/");
-		}
-
-		if (DEBUG){
-			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-		}
-		else {
-			if (fileLoggerSDK) {
-				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-			} else {
-				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-			}
-		}
-
-		boolean fileLoggerKarere = false;
-		if (dbH != null) {
-			MegaAttributes attrs = dbH.getAttributes();
-			if (attrs != null) {
-				if (attrs.getFileLoggerKarere() != null) {
-					try {
-						fileLoggerKarere = Boolean.parseBoolean(attrs.getFileLoggerKarere());
-					} catch (Exception e) {
-						fileLoggerKarere = false;
-					}
-				} else {
-					fileLoggerKarere = false;
-				}
-			} else {
-				fileLoggerKarere = false;
-			}
-		}
-
-        setFileLoggerKarere(fileLoggerKarere);
-		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, fileLoggerKarere));
-		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-
-		if (DEBUG){
-			MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-		}
-		else {
-			if (fileLoggerKarere) {
-				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-			} else {
-				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
-			}
+			megaApiFolder.changeApiUrl("https://staging.api.mega.co.nz/");
 		}
 
 		boolean useHttpsOnly = false;
@@ -1359,7 +1295,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 										}
 									}
 								} else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-									if ((megaChatApi != null) && (participatingInACall(megaChatApi))) {
+									if ((megaChatApi != null) && (participatingInACall())) {
 										logDebug("Several calls - "+callStatusToString(callStatus)+": show notification");
 										checkQueuedCalls();
 									} else {

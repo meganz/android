@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -235,6 +234,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		return START_NOT_STICKY;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void onHandleIntent(final Intent intent) {
 		if (intent == null) return;
 

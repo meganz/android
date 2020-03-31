@@ -34,7 +34,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
-import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
@@ -51,7 +50,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.MenuItemCompat;
 import androidx.viewpager.widget.ViewPager;
@@ -132,7 +130,6 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
@@ -253,7 +250,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HA
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -1425,10 +1422,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	@Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		logDebug("onRequestPermissionsResult");
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		logDebug("request Code "+requestCode);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
 		switch(requestCode){
 			case REQUEST_READ_CONTACTS:{
@@ -1454,7 +1449,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									REQUEST_WRITE_STORAGE);
 		        		}
 		        		else{
-		        			takePicture(this);
+							checkTakePicture(this, TAKE_PHOTO_CODE);
 							typesCameraPermission = -1;
 		        		}
 		        	}
@@ -1474,7 +1469,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}else if(typesCameraPermission == START_CALL_PERMISSIONS){
 					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 						if(checkPermissionsCall()){
-							returnCall(this, megaChatApi);
+							returnCall(this);
 						}
 						typesCameraPermission = -1;
 					}
@@ -1502,7 +1497,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
 							}
 							else{
-								takePicture(this);
+								checkTakePicture(this, TAKE_PHOTO_CODE);
 								typesCameraPermission = -1;
 							}
 						}
@@ -1529,7 +1524,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 									REQUEST_CAMERA);
 						}
 						else{
-							takePicture(this);
+							checkTakePicture(this, TAKE_PHOTO_CODE);
 							typesCameraPermission = -1;
 						}
 					}
@@ -1605,7 +1600,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case RECORD_AUDIO: {
 				if(typesCameraPermission == START_CALL_PERMISSIONS && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 					if(checkPermissionsCall()){
-						returnCall(this, megaChatApi);
+						returnCall(this);
 					}
 					typesCameraPermission = -1;
 				}
@@ -2412,8 +2407,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		putTransfersWidget();
 
 		///Check the MK or RK file
-		int versionApp = getVersion(this);
-		logInfo("Version app: " + versionApp);
+		logInfo("App version: " + getVersion());
 		final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
 		final File fRKOld = buildExternalStorageFile(OLD_RK_FILE);
 		if (isFileAvailable(fMKOld)) {
@@ -3797,7 +3791,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     			}
     			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
 					logDebug("Intent take selfie");
-    				takePicture(this);
+					checkTakePicture(this, TAKE_PHOTO_CODE);
     			}
 				else if (intent.getAction().equals(SHOW_REPEATED_UPLOAD)){
 					logDebug("Intent SHOW_REPEATED_UPLOAD");
@@ -6896,11 +6890,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					}
 
 					if (hasStoragePermission && hasCameraPermission){
-						takePicture(this);
+						checkTakePicture(this, TAKE_PHOTO_CODE);
 					}
 				}
 		    	else{
-		    		takePicture(this);
+					checkTakePicture(this, TAKE_PHOTO_CODE);
 		    	}
 
 		    	return true;
@@ -7276,22 +7270,13 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.action_scan_qr: {
 				logDebug("Action menu scan QR code pressed");
                 //Check if there is a in progress call:
-				if(megaChatApi!=null) {
-
-					if (!participatingInACall(megaChatApi)) {
-						ScanCodeFragment fragment = new ScanCodeFragment();
-						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
-						Intent intent = new Intent(this, QRCodeActivity.class);
-						intent.putExtra("contacts", true);
-						startActivity(intent);
-					}
-				}
+				checkBeforeOpeningQR();
 				return true;
 			}
 			case R.id.action_return_call:{
 				logDebug("Action menu return to call in progress pressed");
 				if(checkPermissionsCall()){
-					returnCall(this, megaChatApi);
+					returnCall(this);
 				}
 				return true;
 			}
@@ -7299,6 +7284,22 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	            return super.onOptionsItemSelected(item);
             }
 		}
+	}
+
+	public void checkBeforeOpeningQR(){
+		if (isNecessaryDisableLocalCamera() != -1) {
+			showConfirmationOpenCamera(this, ACTION_OPEN_QR);
+			return;
+		}
+		openQR();
+	}
+
+	public void openQR(){
+		ScanCodeFragment fragment = new ScanCodeFragment();
+		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
+		Intent intent = new Intent(this, QRCodeActivity.class);
+		intent.putExtra("contacts", true);
+		startActivity(intent);
 	}
 
 	private void updateView (boolean isList) {
@@ -9217,24 +9218,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void takeProfilePicture(){
-		File newFile = buildTempFile(this, "picture.jpg");
-		try {
-			newFile.createNewFile();
-		} catch (IOException e) {}
-
-		Uri outputFileUri;
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
-		}
-		else{
-			outputFileUri = Uri.fromFile(newFile);
-		}
-
-		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-		cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		startActivityForResult(cameraIntent, TAKE_PICTURE_PROFILE_CODE);
+		checkTakePicture(this, TAKE_PICTURE_PROFILE_CODE);
 	}
 
 	public void showCancelMessage(){
@@ -9386,7 +9370,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			return;
 		}
-		takePicture(this);
+		checkTakePicture(this, TAKE_PHOTO_CODE);
 	}
 
 	@Override
@@ -11276,7 +11260,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			case R.id.call_in_progress_layout:{
 				if(checkPermissionsCall()){
-					returnCall(this, megaChatApi);
+					returnCall(this);
 				}
 				break;
 			}
@@ -11402,80 +11386,20 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-
-
+	@Override
 	public void showConfirmationEnableLogsSDK(){
-		logDebug("showConfirmationEnableLogsSDK");
-
 		if(getSettingsFragment() != null){
 			sttFLol.numberOfClicksSDK = 0;
 		}
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						enableLogsSDK();
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+		super.showConfirmationEnableLogsSDK();
 	}
 
+	@Override
 	public void showConfirmationEnableLogsKarere(){
-		logDebug("showConfirmationEnableLogsKarere");
-
 		if(getSettingsFragment() != null){
 			sttFLol.numberOfClicksKarere = 0;
 		}
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						enableLogsKarere();
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
-	}
-
-	public void enableLogsSDK(){
-		logDebug("enableLogsSDK");
-
-		dbH.setFileLoggerSDK(true);
-		setFileLoggerSDK(true);
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-		showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_enable_logs), -1);
-		logInfo("App Version: " + getVersion(this));
-	}
-
-	public void enableLogsKarere(){
-		logDebug("enableLogsKarere");
-
-		dbH.setFileLoggerKarere(true);
-		setFileLoggerKarere(true);
-		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-		showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_enable_logs), -1);
-		logInfo("App Version: " + getVersion(this));
+		super.showConfirmationEnableLogsKarere();
 	}
 
 	public void showConfirmationDeleteAvatar(){
@@ -13203,7 +13127,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (app != null){
 				app.disableMegaChatApi();
 			}
-			resetAndroidLogger();
+			resetLoggerSDK();
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK) {
@@ -16100,7 +16024,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	private void setCallBadge(){
-		if (!isOnline(this) || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall(megaChatApi))) {
+		if (!isOnline(this) || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall())) {
 			callBadge.setVisibility(View.GONE);
 			return;
 		}
@@ -16631,7 +16555,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			hideCallWidget();
 			return;
 		}
-		showCallLayout(this, megaChatApi, callInProgressLayout, callInProgressChrono, callInProgressText);
+		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
 	}
 
 	private void hideCallWidget() {
@@ -16649,10 +16573,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	 */
 	private void setCallMenuItem(){
 		if((drawerItem == DrawerItem.CHAT || drawerItem == DrawerItem.CLOUD_DRIVE || drawerItem == DrawerItem.SHARED_ITEMS)
-				&& !isScreenInPortrait(this) && participatingInACall(megaChatApi) && getChatCallInProgress(megaChatApi) != -1){
+				&& !isScreenInPortrait(this) && participatingInACall() && getChatCallInProgress() != -1){
 			returnCallMenuItem.setVisible(true);
 
-			MegaChatCall call = megaChatApi.getChatCall(getChatCallInProgress(megaChatApi));
+			MegaChatCall call = megaChatApi.getChatCall(getChatCallInProgress());
 			int callStatus = call.getStatus();
 
 			if(callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){

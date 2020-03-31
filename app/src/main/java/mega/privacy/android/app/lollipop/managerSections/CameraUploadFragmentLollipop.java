@@ -1826,7 +1826,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 	}
 
-	public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
+	public String getPath(String fileName, long fileSize, String destDir, MegaNode file) {
 		logDebug("getPath");
 		String path = null;
 		if (destDir != null) {
@@ -1837,25 +1837,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				for (int i = 0; i < listFiles.length; i++) {
 					if (listFiles[i].isDirectory()) {
 						path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath(), file);
-						if (path != null) {
-							return path;
-						}
 					} else {
-						boolean isOnMegaDownloads = false;
-						path = getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
-						File f = new File(downloadLocationDefaultPath, file.getName());
-						if (f.exists() && (f.length() == file.getSize())) {
-							isOnMegaDownloads = true;
-						}
-						if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))) {
-							return path;
-						}
+						path = getLocalFile(context, fileName, fileSize);
 					}
 				}
 			}
 		}
 
-		return null;
+		return path;
 	}
 
 	private void clearSelections() {

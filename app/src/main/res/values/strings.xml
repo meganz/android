@@ -917,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs are now enabled</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logs have not been enabled because you denied the required permissions</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Open location</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">This process is taking longer than expected. Please wait.</string>
