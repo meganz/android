@@ -348,6 +348,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
     public static final String CHAT_FOLDER = "My chat files";
     public static final String AUTHORITY_STRING_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider";
+    public static final String TYPE_TEXT_PLAIN = "text/plain";
 
     public static final int RICH_WARNING_TRUE = 1;
     public static final int RICH_WARNING_FALSE = 0;
@@ -433,6 +434,7 @@ public class Constants {
     public static final String SELECTED_USERS = "SELECTED_USERS";
     public static final String ID_MESSAGES = "ID_MESSAGES";
     public static final String USER_HANDLES = "USER_HANDLES";
+    public static final String URL_FILE_LINK = "URL_FILE_LINK";
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
