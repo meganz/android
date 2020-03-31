@@ -260,7 +260,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         }
 
-
         holder.avatarImage.setImageBitmap(null);
         holder.avatarInitialLetter.setText("");
 
@@ -777,12 +776,16 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     private void displayMuteIcon(final ImageView microSurface, InfoPeerGroupCall peer) {
+        int peerPosition = peers.indexOf(peer);
         boolean smallIcon = !(peers.size() < 7);
         int iconSize = smallIcon ? SIZE_MUTE_ICON_SMALL : SIZE_MUTE_ICON_LARGE;
         int iconRightMargin = scaleWidthPx(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
         int iconTopMargin = scaleWidthPx(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
-        if (!smallIcon && ((ChatCallActivity) context).isActionBarShowing() && peer.getPeerId() != megaChatApi.getMyUserHandle() && peer.getClientId() != megaChatApi.getMyClientidHandle(chatId)) {
-            iconTopMargin += getActionBarHeight();
+
+        if (!smallIcon && ((ChatCallActivity) context).isActionBarShowing() && (peers.size() == 2 || peers.size() == 5 || peers.size() == 6)) {
+            if (peerPosition == 0 || (peerPosition == 1 && peers.size() != 2)) {
+                iconTopMargin += getActionBarHeight();
+            }
         }
 
         RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(microSurface.getLayoutParams());
@@ -795,9 +798,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     public void updateMuteIcon() {
-        if (peers.size() != 2)
-            return;
-
         for (InfoPeerGroupCall peer : peers) {
             ViewHolderGroupCall holder = getHolder(peers.indexOf(peer));
             if (!peer.isAudioOn() && peer.isVideoOn()) {

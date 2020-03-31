@@ -865,7 +865,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
         tB.animate().translationY(-220).setDuration(DURATION_TOOLBAR_ANIMATION).withEndAction(() -> {
             aB.hide();
-            if (chat.isGroup() && adapterGrid != null) {
+            if (checkIfNecessaryUpdateMuteIcon()) {
                 adapterGrid.updateMuteIcon();
             }
         }).start();
@@ -880,10 +880,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         tB.animate().translationY(0).setDuration(DURATION_TOOLBAR_ANIMATION).withEndAction(() -> {
             aB.show();
-            if (chat.isGroup() && adapterGrid != null) {
+            if (checkIfNecessaryUpdateMuteIcon()) {
                 adapterGrid.updateMuteIcon();
             }
         }).start();
+    }
+
+    private boolean checkIfNecessaryUpdateMuteIcon() {
+        return chat.isGroup() && adapterGrid != null && (peersOnCall.size() == 2 || peersOnCall.size() == 5 || peersOnCall.size() == 6);
     }
 
     private void hideFABs() {
@@ -2566,7 +2570,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         adapterGrid.notifyDataSetChanged();
                     }
                 }
-
+                adapterGrid.updateMuteIcon();
             } else {
                 logDebug("peersOnCall LIST ");
                 //7 + users
@@ -2599,6 +2603,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         adapterList.notifyDataSetChanged();
                     }
                 }
+                adapterList.updateMuteIcon();
                 updateUserSelected();
             }
             if (notYetJoinedTheCall) {
