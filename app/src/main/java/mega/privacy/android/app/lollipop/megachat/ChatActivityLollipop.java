@@ -4371,16 +4371,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                         mediaIntent.putExtra("chatId", idChat);
                                         mediaIntent.putExtra("FILENAME", node.getName());
 
-                                        String downloadLocationDefaultPath = getDownloadLocation(this);
-                                        String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+                                        String localPath = getLocalFile(this, node.getName(), node.getSize());
 
-                                        File f = new File(downloadLocationDefaultPath, node.getName());
-                                        boolean isOnMegaDownloads = false;
-                                        if(f.exists() && (f.length() == node.getSize())){
-                                            isOnMegaDownloads = true;
-                                        }
-                                        logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
-                                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+                                        if (localPath != null){
                                             logDebug("localPath != null");
 
                                             File mediaFile = new File(localPath);
@@ -4481,15 +4474,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                         pdfIntent.putExtra("msgId", m.getMessage().getMsgId());
                                         pdfIntent.putExtra("chatId", idChat);
 
-                                        String downloadLocationDefaultPath = getDownloadLocation(this);
-                                        String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
-                                        File f = new File(downloadLocationDefaultPath, node.getName());
-                                        boolean isOnMegaDownloads = false;
-                                        if(f.exists() && (f.length() == node.getSize())){
-                                            isOnMegaDownloads = true;
-                                        }
-                                        logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
-                                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+                                        String localPath = getLocalFile(this, node.getName(), node.getSize());
+
+                                        if (localPath != null){
                                             File mediaFile = new File(localPath);
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                                 logDebug("FileProviderOption");

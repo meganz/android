@@ -893,7 +893,7 @@ public class ChatFullScreenImageViewer extends DownloadableActivity implements O
 				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
 				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
 					logDebug("ISFILE");
-					String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
+					String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize());
 					if(localPath != null){	
 						try { 
 							copyFile(new File(localPath), new File(parentPath, tempNode.getName()));

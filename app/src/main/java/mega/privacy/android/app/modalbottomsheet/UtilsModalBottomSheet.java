@@ -94,14 +94,9 @@ public class UtilsModalBottomSheet {
         mediaIntent.putExtra("HANDLE", node.getHandle());
         mediaIntent.putExtra("FILENAME", node.getName());
 
-        String downloadLocationDefaultPath = getDownloadLocation(context);
-        boolean isOnMegaDownloads = false;
-        String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
-        File f = new File(downloadLocationDefaultPath, node.getName());
-        if(f.exists() && (f.length() == node.getSize())){
-            isOnMegaDownloads = true;
-        }
-        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))) {
+        String localPath = getLocalFile(context, node.getName(), node.getSize());
+
+        if (localPath != null) {
             File mediaFile = new File(localPath);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(node.getName()).getType());

@@ -107,7 +107,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
@@ -153,7 +152,6 @@ import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
@@ -1929,12 +1927,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         if (!onPlaylist){
             logDebug("NOT on Playlist mode");
             searchMenuItem.setVisible(false);
+            shareMenuItem.setVisible(showShareOption(adapterType, isFolderLink, handle));
 
             if (adapterType == OFFLINE_ADAPTER){
                 logDebug("OFFLINE_ADAPTER");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(true);
                 propertiesMenuItem.setVisible(true);
                 downloadMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
@@ -1951,12 +1949,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 logDebug("SEARCH_ADAPTER");
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
-                if (isUrl){
-                    shareMenuItem.setVisible(false);
-                }
-                else {
-                    shareMenuItem.setVisible(true);
-                }
                 if(node.isExported()){
                     removelinkMenuItem.setVisible(true);
                     getlinkMenuItem.setVisible(false);
@@ -1995,7 +1987,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 logDebug("FROM_CHAT");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
                 moveMenuItem.setVisible(false);
                 copyMenuItem.setVisible(false);
@@ -2045,7 +2036,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 logDebug("FILE_LINK_ADAPTER");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(true);
                 renameMenuItem.setVisible(false);
@@ -2061,7 +2051,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             else if (adapterType == ZIP_ADAPTER) {
                 propertiesMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
-                shareMenuItem.setVisible(true);
                 downloadMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
@@ -2085,13 +2074,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(true);
-
-                if (isUrl){
-                    shareMenuItem.setVisible(false);
-                }
-                else {
-                    shareMenuItem.setVisible(true);
-                }
 
                 MegaNode node = megaApi.getNodeByHandle(handle);
                 int accessLevel = megaApi.getAccess(node);
@@ -2121,12 +2103,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 chatRemoveMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
-                if (!isUrl) {
-                    shareMenuItem.setVisible(true);
-                }
-                else {
-                    shareMenuItem.setVisible(false);
-                }
                 removelinkMenuItem.setVisible(false);
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
@@ -2153,14 +2129,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             else {
                 logDebug("else");
                 boolean shareVisible = true;
-                shareMenuItem.setVisible(true);
 
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if (node == null){
                     getlinkMenuItem.setVisible(false);
                     removelinkMenuItem.setVisible(false);
-                    shareMenuItem.setVisible(false);
                     propertiesMenuItem.setVisible(false);
                     downloadMenuItem.setVisible(false);
                     renameMenuItem.setVisible(false);
@@ -2174,16 +2148,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     chatRemoveMenuItem.setVisible(false);
                 }
                 else {
-                    if(adapterType==CONTACT_FILE_ADAPTER){
-                        shareMenuItem.setVisible(false);
-                        shareVisible = false;
-                    }
-                    else{
-                        if(isFolderLink){
-                            shareMenuItem.setVisible(false);
-                            shareVisible = false;
-                        }
-                    }
                     copyMenuItem.setVisible(true);
 
                     if(node.isExported()){
@@ -2273,12 +2237,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
 
                     downloadMenuItem.setVisible(true);
-                    if (isUrl){
-                        shareMenuItem.setVisible(false);
-                    }
-                    else if (shareVisible){
-                        shareMenuItem.setVisible(true);
-                    }
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
                     chatRemoveMenuItem.setVisible(false);
@@ -2342,16 +2300,15 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
             case R.id.full_video_viewer_share: {
                 logDebug("Share option");
-                Uri newUri = uri;
-                if (uri.toString().contains(VOICE_CLIP_FOLDER)) {
-                    MegaNode file = megaApi.getNodeByHandle(handle);
-                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
-                    if (localPath == null) break;
-                    File voiceClipFile = new File(localPath);
-                    newUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", voiceClipFile);
+                if (adapterType == OFFLINE_ADAPTER) {
+                    shareFile(this, getOfflineFile(this, mediaOffList.get(currentWindowIndex)));
+                } else if (adapterType == ZIP_ADAPTER) {
+                    shareFile(this, zipMediaFiles.get(currentWindowIndex));
+                } else if (adapterType == FILE_LINK_ADAPTER) {
+                    shareLink(this, getIntent().getStringExtra(URL_FILE_LINK));
+                } else {
+                    shareNode(this, megaApi.getNodeByHandle(handle));
                 }
-
-                intentToSendFile(newUri);
                 break;
             }
             case R.id.full_video_viewer_properties: {
@@ -3117,28 +3074,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
     }
 
-    public void intentToSendFile(Uri uri){
-        logDebug("intentToSendFile");
-
-        if(uri!=null){
-            if (!isUrl) {
-                Intent share = new Intent(android.content.Intent.ACTION_SEND);
-                share.setType(MimeTypeList.typeForName(fileName).getType()+"/*");
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    logDebug("Use provider to share");
-                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
-                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                } else {
-                    share.putExtra(Intent.EXTRA_STREAM, uri);
-                }
-                startActivity(Intent.createChooser(share, getString(R.string.context_share)));
-            }
-            else{
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.not_download), -1);
-            }
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -3462,7 +3397,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     setTitle(fileName);
 
                     boolean isOnMegaDownloads = false;
-                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                    String localPath = getLocalFile(this, file.getName(), file.getSize());
                     File f = new File(downloadLocationDefaultPath, file.getName());
                     if(f.exists() && (f.length() == file.getSize())){
                         isOnMegaDownloads = true;
@@ -4261,7 +4196,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                         }
                         mSource = null;
                         boolean isOnMegaDownloads = false;
-                        localPath = getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
+                        localPath = getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize());
                         File f = new File(downloadLocationDefaultPath, n.getName());
                         if (f.exists() && (f.length() == n.getSize())) {
                             isOnMegaDownloads = true;
