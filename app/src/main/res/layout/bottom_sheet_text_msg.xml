@@ -7,27 +7,28 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <!-- Title -->
     <LinearLayout
         android:id="@+id/reactions_layout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:gravity="center_vertical"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal" >
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <include layout="@layout/add_reaction_layout"
-            android:id="@+id/first_possible_reaction"
+        <include
+            layout="@layout/add_reaction_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/reaction_separator_info"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:background="@color/chat_sliding_panel_separator"/>
+        android:background="@color/chat_sliding_panel_separator"
+        android:orientation="horizontal" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -46,16 +47,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:visibility="gone"
+                android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/forward_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="32dp"
-                    android:layout_gravity="center_vertical"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_forward_grey"
                     android:visibility="visible" />
@@ -68,66 +70,34 @@
                     android:layout_marginRight="15dp"
                     android:text="@string/forward_menu_item"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/reply_separator_info"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/chat_sliding_panel_separator"/>
 
-            <LinearLayout
-                android:id="@+id/reply_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-                <ImageView
-                    android:id="@+id/reply_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="32dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_forward_grey"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/reply_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="15dp"
-                    android:text="@string/context_copy"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
-            </LinearLayout>
             <LinearLayout
                 android:id="@+id/edit_separator_info"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/chat_sliding_panel_separator"/>
+                android:background="@color/chat_sliding_panel_separator"
+                android:orientation="vertical" />
 
             <LinearLayout
                 android:id="@+id/edit_layout"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:visibility="gone"
+                android:orientation="horizontal">
+
                 <ImageView
                     android:id="@+id/edit_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="32dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_copy_grey"
+                    android:src="@drawable/ic_edit_msg"
                     android:visibility="visible" />
 
                 <TextView
@@ -136,24 +106,27 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="15dp"
-                    android:text="@string/context_copy"
+                    android:text="@string/context_edit"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/copy_layout"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:visibility="gone"
+                android:orientation="horizontal">
+
                 <ImageView
                     android:id="@+id/copy_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="32dp"
-                    android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_copy_grey"
                     android:visibility="visible" />
 
@@ -165,31 +138,34 @@
                     android:layout_marginRight="15dp"
                     android:text="@string/context_copy"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/delete_separator_info"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/chat_sliding_panel_separator"/>
+                android:background="@color/chat_sliding_panel_separator"
+                android:orientation="vertical" />
 
             <LinearLayout
                 android:id="@+id/delete_layout"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:visibility="gone"
+                android:orientation="horizontal">
+
                 <ImageView
                     android:id="@+id/delete_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="32dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_copy_grey"
+                    android:src="@drawable/ic_delete_msg"
                     android:visibility="visible" />
 
                 <TextView
@@ -198,9 +174,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="15dp"
-                    android:text="@string/context_copy"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:text="@string/delete_button"
+                    android:textColor="@color/dark_primary_color"
+                    android:textSize="16sp" />
             </LinearLayout>
 
         </LinearLayout>

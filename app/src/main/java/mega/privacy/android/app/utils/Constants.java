@@ -433,6 +433,7 @@ public class Constants {
     public static final String SELECTED_USERS = "SELECTED_USERS";
     public static final String ID_MESSAGES = "ID_MESSAGES";
     public static final String USER_HANDLES = "USER_HANDLES";
+    public static final String MESSAGE_ID = "MESSAGE_ID";
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";

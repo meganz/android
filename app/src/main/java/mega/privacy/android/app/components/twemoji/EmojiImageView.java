@@ -87,7 +87,7 @@ public final class EmojiImageView extends AppCompatImageView {
     }
   }
 
-  void setEmoji(@NonNull final Emoji emoji) {
+  public void setEmoji(@NonNull final Emoji emoji) {
     if (!emoji.equals(currentEmoji)) {
       setImageDrawable(null);
 

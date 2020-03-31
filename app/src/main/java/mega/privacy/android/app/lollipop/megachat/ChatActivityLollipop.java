@@ -130,7 +130,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.textMsgBottomSheet;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NormalMessageBottomSheet;
 import mega.privacy.android.app.utils.TimeUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -473,6 +473,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         preservedMsgSelected = messagesSelected;
         preservedMsgToImport = messagesToImport;
         preservedMessagesSelected = null;
+    }
+
+    public boolean hasMessagesRemoved(MegaChatMessage messageSelected) {
+        if(removedMessages != null && !removedMessages.isEmpty()){
+            for(int i=0; i<removedMessages.size(); i++){
+                if(messageSelected.getMsgId() == removedMessages.get(i).msgId){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private class UserTyping {
@@ -2754,6 +2765,27 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         checkIfIsNeededToAskForMyChatFilesFolder();
     }
 
+    public void editMessagesOption(ArrayList<AndroidMegaChatMessage> messagesSelected){
+        if (!messagesSelected.isEmpty() && messagesSelected.get(0) != null) {
+            editingMessage = true;
+            MegaChatMessage msg = messagesSelected.get(0).getMessage();
+            MegaChatContainsMeta meta = msg.getContainsMeta();
+            messageToEdit = msg;
+            textChat.setText(messageToEdit.getContent());
+            textChat.setSelection(textChat.getText().length());
+            if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+                sendLocation();
+                clearSelections();
+                hideMultipleSelect();
+                actionMode.invalidate();
+            }
+            else {
+                textChat.setText(messageToEdit.getContent());
+                textChat.setSelection(textChat.getText().length());
+            }
+        }
+    }
+
     public void proceedWithAction() {
         if (isForwardingMessage) {
             stopReproductions();
@@ -3735,29 +3767,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             switch(item.getItemId()){
                 case R.id.chat_cab_menu_edit:{
-                    logDebug("Edit text");
-                    if (!messagesSelected.isEmpty() && messagesSelected.get(0) != null) {
-                        editingMessage = true;
-                        MegaChatMessage msg = messagesSelected.get(0).getMessage();
-                        MegaChatContainsMeta meta = msg.getContainsMeta();
-                        messageToEdit = msg;
-                        textChat.setText(messageToEdit.getContent());
-                        textChat.setSelection(textChat.getText().length());
-                        if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
-                            sendLocation();
-                            clearSelections();
-                            hideMultipleSelect();
-                            actionMode.invalidate();
-                        }
-                        else {
-                            textChat.setText(messageToEdit.getContent());
-                            textChat.setSelection(textChat.getText().length());
-                        }
-                    }
+                    editMessagesOption(messagesSelected);
                     break;
                 }
                 case R.id.chat_cab_menu_forward:{
-                    logDebug("Forward message");
                     forwardMessages(messagesSelected);
                     break;
                 }
@@ -3782,7 +3795,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         clipboard.setPrimaryClip(clip);
                     }
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.messages_copied_clipboard), -1);
-
                     break;
                 }
                 case R.id.chat_cab_menu_delete:{
@@ -3866,17 +3878,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             editingMessage = false;
             clearSelections();
             changeStatusBarColorActionMode(chatActivity, getWindow(), handler, 0);
-        }
-
-        private boolean hasMessagesRemoved(MegaChatMessage messageSelected){
-            if(removedMessages != null && !removedMessages.isEmpty()){
-                for(int i=0; i<removedMessages.size(); i++){
-                    if(messageSelected.getMsgId() == removedMessages.get(i).msgId){
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
 
         @Override
@@ -4154,6 +4155,20 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return adapter.isMultipleSelect();
         }
         return false;
+    }
+
+    public void optionCopy(AndroidMegaChatMessage message){
+        String text = chatC.createSingleManagementString(message, chatRoom);
+
+        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+            clipboard.setPrimaryClip(clip);
+        }
+        showSnackbar(SNACKBAR_TYPE, getString(R.string.messages_copied_clipboard), -1);
     }
 
     public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messages, final MegaChatRoom chat){
@@ -4621,7 +4636,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                                 startActivity(browserIntent);
 
-                            } else if(m.getMessage().getType() == MegaChatMessage.TYPE_NORMAL && m.getRichLinkMessage()!=null){
+                            } else if(m.getMessage().getType() == MegaChatMessage.TYPE_NORMAL){
                                 if(m.getRichLinkMessage() != null){
                                     logDebug("TYPE_NORMAL");
                                     AndroidMegaRichLinkMessage richLinkMessage = m.getRichLinkMessage();
@@ -4649,7 +4664,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                         }
                                     }
                                 }else{
-                                    logDebug("Clicked text message");
                                     showNormalMessageBottomSheet(m, positionInMessages);
                                 }
                             }
@@ -6801,13 +6815,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     public void showNormalMessageBottomSheet(AndroidMegaChatMessage message, int position){
-        logDebug("showNormalMessageBottomSheet: "+position);
         selectedPosition = position;
 
         if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
         selectedMessageId = message.getMessage().getMsgId();
-        bottomSheetDialogFragment = new textMsgBottomSheet();
+        bottomSheetDialogFragment = new NormalMessageBottomSheet();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 

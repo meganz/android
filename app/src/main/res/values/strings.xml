@@ -2741,4 +2741,7 @@
 
     <string name="download_location" context="Download location label">Download location</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
+
+    <string name="context_edit" context="Item menu option to edit a chat message.">Edit</string>
+
 </resources>
