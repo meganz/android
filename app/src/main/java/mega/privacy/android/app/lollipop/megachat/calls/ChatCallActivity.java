@@ -1464,6 +1464,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             case R.id.video_fab: {
                 logDebug("Video FAB");
                 if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+                    if (canNotJoinCall(this, callChat)) break;
+
                     displayLinearFAB(false);
                     application.manuallyActivatedLocalCamera();
                     megaChatApi.answerChatCall(chatId, true, this);
@@ -1514,6 +1516,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             case R.id.answer_call_fab: {
                 logDebug("Click on answer fab");
                 if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+                    if (canNotJoinCall(this, callChat)) break;
+
                     displayLinearFAB(false);
                     megaChatApi.answerChatCall(chatId, false, this);
                     clearHandlers();

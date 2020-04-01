@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import androidx.appcompat.widget.Toolbar;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.util.TypedValue;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.LinearLayout;
@@ -81,7 +78,8 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
 
-    private final static int MAX_LENGTH_CHAT_TITLE = 60;
+    private static final int MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100;
+    private static final int MAX_LENGTH_CHAT_TITLE = 60;
 
     private ChatController chatC;
     private long chatHandle;
@@ -1090,7 +1088,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         actionButton.setOnClickListener(v -> {
             chatLinkDialog.dismiss();
-            megaChatApi.setPublicChatToPrivate(chatHandle, groupChatInfoActivity);
+            if (chat.getPeerCount() + 1 > MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE) {
+                showSnackbar(getString(R.string.warning_make_chat_private));
+            } else {
+                megaChatApi.setPublicChatToPrivate(chatHandle, groupChatInfoActivity);
+            }
         });
 
         chatLinkDialog.show();

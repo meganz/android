@@ -2079,7 +2079,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 break;
             }
             case R.id.cab_menu_call_chat:{
-                if(recordView.isRecordingNow()) break;
+                if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
 
                 startVideo = false;
                 if(checkPermissionsCall()){
@@ -2089,7 +2089,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
             case R.id.cab_menu_video_chat:{
                 logDebug("cab_menu_video_chat");
-                if(recordView.isRecordingNow()) break;
+                if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
 
                 startVideo = true;
                 if(checkPermissionsCall()){
@@ -2514,6 +2514,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 showConfirmationToJoinCall(chatRoom);
                 return;
             }
+
+            if (canNotJoinCall(this, callInThisChat)) return;
 
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                 logDebug("The call in this chat is Ring in");
