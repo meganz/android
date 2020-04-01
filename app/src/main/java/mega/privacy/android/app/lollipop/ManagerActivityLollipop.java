@@ -34,7 +34,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
-import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
@@ -51,7 +50,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.MenuItemCompat;
 import androidx.viewpager.widget.ViewPager;
@@ -132,7 +130,6 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
@@ -1438,10 +1435,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	@Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		logDebug("onRequestPermissionsResult");
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		logDebug("request Code "+requestCode);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
 		switch(requestCode){
 			case REQUEST_READ_CONTACTS:{
@@ -2399,8 +2394,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		putTransfersWidget();
 
 		///Check the MK or RK file
-		int versionApp = getVersion(this);
-		logInfo("Version app: " + versionApp);
+		logInfo("App version: " + getVersion());
 		final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
 		final File fRKOld = buildExternalStorageFile(OLD_RK_FILE);
 		if (isFileAvailable(fMKOld)) {
@@ -12204,80 +12198,20 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-
-
+	@Override
 	public void showConfirmationEnableLogsSDK(){
-		logDebug("showConfirmationEnableLogsSDK");
-
 		if(getSettingsFragment() != null){
 			sttFLol.numberOfClicksSDK = 0;
 		}
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						enableLogsSDK();
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+		super.showConfirmationEnableLogsSDK();
 	}
 
+	@Override
 	public void showConfirmationEnableLogsKarere(){
-		logDebug("showConfirmationEnableLogsKarere");
-
 		if(getSettingsFragment() != null){
 			sttFLol.numberOfClicksKarere = 0;
 		}
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						enableLogsKarere();
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
-	}
-
-	public void enableLogsSDK(){
-		logDebug("enableLogsSDK");
-
-		dbH.setFileLoggerSDK(true);
-		setFileLoggerSDK(true);
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-		showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_enable_logs), -1);
-		logInfo("App Version: " + getVersion(this));
-	}
-
-	public void enableLogsKarere(){
-		logDebug("enableLogsKarere");
-
-		dbH.setFileLoggerKarere(true);
-		setFileLoggerKarere(true);
-		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-		showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_enable_logs), -1);
-		logInfo("App Version: " + getVersion(this));
+		super.showConfirmationEnableLogsKarere();
 	}
 
 	public void showConfirmationDeleteAvatar(){
@@ -14035,7 +13969,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			if (app != null){
 				app.disableMegaChatApi();
 			}
-			resetAndroidLogger();
+			resetLoggerSDK();
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK) {

@@ -1123,13 +1123,10 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			mediaIntent.putExtra("FILENAME", file.getName());
 			mediaIntent.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
 			imageDrag = imageView;
-			boolean isOnMegaDownloads = false;
-			String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-			File f = new File(downloadLocationDefaultPath, file.getName());
-			if (f.exists() && (f.length() == file.getSize())) {
-				isOnMegaDownloads = true;
-			}
-			if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
+
+			String localPath = getLocalFile(context, file.getName(), file.getSize());
+
+			if (localPath != null) {
 				File mediaFile = new File(localPath);
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 					mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -1184,13 +1181,10 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 
 			pdfIntent.putExtra("inside", true);
 			pdfIntent.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
-			boolean isOnMegaDownloads = false;
-			String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-			File f = new File(downloadLocationDefaultPath, file.getName());
-			if (f.exists() && (f.length() == file.getSize())) {
-				isOnMegaDownloads = true;
-			}
-			if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
+
+			String localPath = getLocalFile(context, file.getName(), file.getSize());
+
+			if (localPath != null) {
 				File mediaFile = new File(localPath);
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 					pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -1236,20 +1230,15 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			logDebug("Is URL file");
 			MegaNode file = nodes.get(position);
 
-			boolean isOnMegaDownloads = false;
-			String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-			File f = new File(downloadLocationDefaultPath, file.getName());
-			if (f.exists() && (f.length() == file.getSize())) {
-				isOnMegaDownloads = true;
-			}
-			logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
-			if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
+			String localPath = getLocalFile(context, file.getName(), file.getSize());
+
+			if (localPath != null) {
 				File mediaFile = new File(localPath);
 				InputStream instream = null;
 
 				try {
 					// open the file for reading
-					instream = new FileInputStream(f.getAbsolutePath());
+					instream = new FileInputStream(mediaFile.getAbsolutePath());
 
 					// if file the available for reading
 					if (instream != null) {
@@ -1271,9 +1260,9 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 							logDebug("Not expected format: Exception on processing url file");
 							Intent intent = new Intent(Intent.ACTION_VIEW);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+								intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), "text/plain");
 							} else {
-								intent.setDataAndType(Uri.fromFile(f), "text/plain");
+								intent.setDataAndType(Uri.fromFile(mediaFile), "text/plain");
 							}
 							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
@@ -1291,9 +1280,9 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 
 					Intent intent = new Intent(Intent.ACTION_VIEW);
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-						intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+						intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), "text/plain");
 					} else {
-						intent.setDataAndType(Uri.fromFile(f), "text/plain");
+						intent.setDataAndType(Uri.fromFile(mediaFile), "text/plain");
 					}
 					intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 

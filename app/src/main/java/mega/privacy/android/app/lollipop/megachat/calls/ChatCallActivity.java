@@ -104,6 +104,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     final private static int MOVE_ANIMATION = 500;
     final private static int ALPHA_ANIMATION = 600;
     final private static int ALPHA_ARROW_ANIMATION = 1000;
+    final private static int DURATION_TOOLBAR_ANIMATION = 500;
     final private static int NECESSARY_CHANGE_OF_SIZES = 4;
     final private static int TYPE_JOIN = 1;
     final private static int TYPE_LEFT = -1;
@@ -897,25 +898,41 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         avatarBigCameraGroupCallImage.setImageBitmap(bitmap);
     }
 
+    public boolean isActionBarShowing() {
+        return aB.isShowing();
+    }
+
     private void hideActionBar() {
-        if (aB == null || !aB.isShowing()) return;
+        if (aB == null || !isActionBarShowing()) return;
         if (tB == null) {
             aB.hide();
             return;
         }
-        tB.animate().translationY(-220).setDuration(800L).withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                aB.hide();
+        tB.animate().translationY(-220).setDuration(DURATION_TOOLBAR_ANIMATION).withEndAction(() -> {
+            aB.hide();
+            if (checkIfNecessaryUpdateMuteIcon()) {
+                adapterGrid.updateMuteIcon();
             }
         }).start();
     }
 
     private void showActionBar() {
-        if (aB == null || aB.isShowing()) return;
-        aB.show();
-        if (tB == null) return;
-        tB.animate().translationY(0).setDuration(800L).start();
+        if (aB == null || isActionBarShowing()) return;
+        if (tB == null) {
+            aB.show();
+            return;
+        }
+
+        tB.animate().translationY(0).setDuration(DURATION_TOOLBAR_ANIMATION).withEndAction(() -> {
+            aB.show();
+            if (checkIfNecessaryUpdateMuteIcon()) {
+                adapterGrid.updateMuteIcon();
+            }
+        }).start();
+    }
+
+    private boolean checkIfNecessaryUpdateMuteIcon() {
+        return chat.isGroup() && adapterGrid != null && (peersOnCall.size() == 2 || peersOnCall.size() == 5 || peersOnCall.size() == 6);
     }
 
     private void hideFABs() {
@@ -2701,13 +2718,17 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
 
             if (adapterGrid == null) {
-                logDebug("Necessary to create the adapter");
+                logDebug("Need to create the adapter");
                 recyclerView.setAdapter(null);
                 adapterGrid = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, true);
                 recyclerView.setAdapter(adapterGrid);
             } else {
                 logDebug("Notify of changes");
                 adapterGrid.notifyDataSetChanged();
+            }
+
+            if (statusCallInProgress(callChat.getStatus())) {
+                adapterGrid.updateMuteIcon();
             }
         } else {
 
@@ -2721,13 +2742,17 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             bigRecyclerView.setVisibility(View.VISIBLE);
 
             if (adapterList == null) {
-                logDebug("Necessary to create the adapter.\n");
+                logDebug("Need to create the adapter");
                 bigRecyclerView.setAdapter(null);
                 adapterList = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, false);
                 bigRecyclerView.setAdapter(adapterList);
             } else {
                 logDebug("Notify of changes");
                 adapterList.notifyDataSetChanged();
+            }
+
+            if (statusCallInProgress(callChat.getStatus())) {
+                adapterList.updateMuteIcon();
             }
             updateUserSelected();
         }
