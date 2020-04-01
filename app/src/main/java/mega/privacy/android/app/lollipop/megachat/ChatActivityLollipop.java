@@ -683,7 +683,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         individualSubtitleToobar.setText("");
         individualSubtitleToobar.setVisibility(View.GONE);
         groupalSubtitleToolbar.setText("");
-        groupalSubtitleToolbar.setVisibility(View.GONE);
+        setGroupalSubtitleToolbarVisibility(false);
         subtitleCall.setVisibility(View.GONE);
         subtitleChronoCall.setVisibility(View.GONE);
         participantsLayout.setVisibility(View.GONE);
@@ -1449,27 +1449,48 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         logDebug("END:numberToLoad: " + numberToLoad);
     }
 
+    /**
+     * Sets the visibility of the groupalSubtitleToolbar view.
+     * If it is visible some attributes of the layout should be updated due to the marquee behaviour.
+     *
+     * This method should be used always the visibility of groupalSubtitleToolbar
+     * changes instead of change the visibility directly.
+     *
+     * @param visible   true if visible, false otherwise
+     */
+    private void setGroupalSubtitleToolbarVisibility(boolean visible) {
+        groupalSubtitleToolbar.setVisibility(visible ? View.VISIBLE : View.GONE);
+
+        if (visible) {
+            groupalSubtitleToolbar.setSelected(true);
+            groupalSubtitleToolbar.setHorizontallyScrolling(true);
+            groupalSubtitleToolbar.setFocusable(true);
+            groupalSubtitleToolbar.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+            groupalSubtitleToolbar.setMarqueeRepeatLimit(-1);
+            groupalSubtitleToolbar.setSingleLine(true);
+            groupalSubtitleToolbar.setHorizontallyScrolling(true);
+        }
+    }
+
     private void setSubtitleVisibility() {
+        boolean isGroup = chatRoom.isGroup();
+
+        individualSubtitleToobar.setVisibility(isGroup ? View.GONE : View.VISIBLE);
+        setGroupalSubtitleToolbarVisibility(isGroup);
+
         if (chatRoom.isGroup()) {
-            individualSubtitleToobar.setVisibility(View.GONE);
-            groupalSubtitleToolbar.setVisibility(View.VISIBLE);
             iconStateToolbar.setVisibility(View.GONE);
         }
-        else {
-            individualSubtitleToobar.setVisibility(View.VISIBLE);
-            groupalSubtitleToolbar.setVisibility(View.GONE);
-        }
+
         subtitleCall.setVisibility(View.GONE);
     }
 
-    private void setPreviewGroupalSubtitle () {
+    private void setPreviewGroupalSubtitle() {
         long participants = chatRoom.getPeerCount();
+
+        setGroupalSubtitleToolbarVisibility(participants > 0);
         if (participants > 0) {
-            groupalSubtitleToolbar.setVisibility(View.VISIBLE);
             groupalSubtitleToolbar.setText(adjustForLargeFont(getString(R.string.number_of_participants, participants)));
-        }
-        else {
-            groupalSubtitleToolbar.setVisibility(View.GONE);
         }
     }
 
@@ -1565,7 +1586,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         }
                         else {
                             groupalSubtitleToolbar.setText(null);
-                            groupalSubtitleToolbar.setVisibility(View.GONE);
+                            setGroupalSubtitleToolbarVisibility(false);
                         }
                     }
                     else{
@@ -1733,7 +1754,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
         if (customSubtitle.toString().trim().isEmpty()){
             groupalSubtitleToolbar.setText(null);
-            groupalSubtitleToolbar.setVisibility(View.GONE);
+            setGroupalSubtitleToolbarVisibility(false);
         }
         else {
             groupalSubtitleToolbar.setText(adjustForLargeFont(customSubtitle.toString()));
@@ -8253,7 +8274,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (isGroup()) {
             subtitleCall.setVisibility(View.VISIBLE);
             individualSubtitleToobar.setVisibility(View.GONE);
-            groupalSubtitleToolbar.setVisibility(View.GONE);
+            setGroupalSubtitleToolbarVisibility(false);
         }
         usersWithVideo();
         activateChrono(true, subtitleChronoCall, call);
