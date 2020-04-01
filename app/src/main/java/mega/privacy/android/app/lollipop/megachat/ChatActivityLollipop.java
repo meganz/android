@@ -1920,7 +1920,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 archiveMenuItem.setVisible(false);
             }else {
 
-                if (megaChatApi.getNumCalls() <= 0 || (megaChatApi != null && !participatingInACall() && !megaChatApi.hasCallInChatRoom(chatRoom.getChatId()))) {
+                if (megaChatApi != null && (megaChatApi.getNumCalls() <= 0 || (!participatingInACall() && !megaChatApi.hasCallInChatRoom(chatRoom.getChatId())))) {
                     if (!chatRoom.isGroup() || chatRoom.getPeerCount() > 0) {
                         callMenuItem.setEnabled(true);
                         callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
