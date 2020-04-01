@@ -138,7 +138,8 @@
             android:textColor="@color/file_list_second_row"
             android:maxLines="1"
             android:textSize="14sp"
-            rounded:emojiSize="14sp"/>
+            rounded:emojiSize="14sp"
+            android:layout_toRightOf="@id/file_list_versions_icon"/>
     </RelativeLayout>
 
 </RelativeLayout>
