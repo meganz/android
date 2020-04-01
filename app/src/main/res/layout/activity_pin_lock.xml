@@ -37,17 +37,18 @@
             android:text="@string/pin_lock_alert"
             android:textColor="@color/black" />
     </LinearLayout>
-    
+
     <TextView
         android:id="@+id/unlock_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_below="@id/warning_layout"
-        android:textSize="24sp"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="20dp"
-        android:textColor="@color/lollipop_primary_color" />
+        android:gravity="center_horizontal"
+        android:textColor="@color/lollipop_primary_color"
+        android:textSize="24sp" />
 
     <LinearLayout
         android:id="@+id/four_pin_layout"
