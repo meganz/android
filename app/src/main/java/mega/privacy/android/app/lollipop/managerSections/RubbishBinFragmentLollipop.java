@@ -10,13 +10,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -911,13 +911,10 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					else{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					boolean isOnMegaDownloads = false;
-					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if(f.exists() && (f.length() == file.getSize())){
-						isOnMegaDownloads = true;
-					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+
+					String localPath = getLocalFile(context, file.getName(), file.getSize());
+
+					if (localPath != null){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -985,13 +982,10 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					pdfIntent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("APP", true);
-					boolean isOnMegaDownloads = false;
-					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if(f.exists() && (f.length() == file.getSize())){
-						isOnMegaDownloads = true;
-					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+
+					String localPath = getLocalFile(context, file.getName(), file.getSize());
+
+					if (localPath != null){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -1042,20 +1036,15 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					logDebug("Is URL file");
 					MegaNode file = nodes.get(position);
 
-					boolean isOnMegaDownloads = false;
-					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if (f.exists() && (f.length() == file.getSize())) {
-						isOnMegaDownloads = true;
-					}
-					logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
+					String localPath = getLocalFile(context, file.getName(), file.getSize());
+
+					if (localPath != null) {
 						File mediaFile = new File(localPath);
 						InputStream instream = null;
 
 						try {
 							// open the file for reading
-							instream = new FileInputStream(f.getAbsolutePath());
+							instream = new FileInputStream(mediaFile.getAbsolutePath());
 
 							// if file the available for reading
 							if (instream != null) {
@@ -1077,9 +1066,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 									logWarning("Not expected format: Exception on processing url file");
 									Intent intent = new Intent(Intent.ACTION_VIEW);
 									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), "text/plain");
 									} else {
-										intent.setDataAndType(Uri.fromFile(f), "text/plain");
+										intent.setDataAndType(Uri.fromFile(mediaFile), "text/plain");
 									}
 									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
@@ -1097,9 +1086,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 							Intent intent = new Intent(Intent.ACTION_VIEW);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+								intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), "text/plain");
 							} else {
-								intent.setDataAndType(Uri.fromFile(f), "text/plain");
+								intent.setDataAndType(Uri.fromFile(mediaFile), "text/plain");
 							}
 							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 

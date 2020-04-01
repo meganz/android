@@ -12,13 +12,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -1413,40 +1413,25 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
     }
 
-    public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
+    public String getPath(String fileName, long fileSize, String destDir, MegaNode file) {
         logDebug("getPath");
         String path = null;
-        if (destDir != null){
+        if (destDir != null) {
             File dir = new File(destDir);
-            File [] listFiles = dir.listFiles();
+            File[] listFiles = dir.listFiles();
 
-            if (listFiles != null){
-                for (int i=0; i<listFiles.length; i++){
-//                    log("listFiles[]: "+listFiles[i].getAbsolutePath());
-                    if (listFiles[i].isDirectory()){
+            if (listFiles != null) {
+                for (int i = 0; i < listFiles.length; i++) {
+                    if (listFiles[i].isDirectory()) {
                         path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath(), file);
-                        if (path != null) {
-//                            log("path number X: "+path);
-                            return path;
-                        }
-                    }
-                    else {
-                        boolean isOnMegaDownloads = false;
-                        path = getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
-                        File f = new File(downloadLocationDefaultPath, file.getName());
-                        if(f.exists() && (f.length() == file.getSize())){
-                            isOnMegaDownloads = true;
-                        }
-                        if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))){
-//                            log("path number X: "+path);
-                            return path;
-                        }
+                    } else {
+                        path = getLocalFile(context, fileName, fileSize);
                     }
                 }
             }
         }
 
-        return null;
+        return path;
     }
 
     public String getRealName (String photoSyncName) {

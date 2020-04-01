@@ -9,10 +9,10 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.Display;
@@ -516,10 +516,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 					drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 				}
 
-				boolean isOnMegaDownloads = false;
-				String localPath = getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
-				logDebug("isOnMegaDownloads: " + isOnMegaDownloads + " nodeName: " + node.getName() + " localPath: " + localPath);
-				if (localPath != null && megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))) {
+				String localPath = getLocalFile(context, node.getName(), node.getSize());
+				if (localPath != null) {
 
 					if (drawable != null) {
 						Glide.with(context)

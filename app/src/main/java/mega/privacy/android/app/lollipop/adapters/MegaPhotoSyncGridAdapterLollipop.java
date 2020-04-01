@@ -9,11 +9,11 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -518,13 +518,10 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 						mediaIntent.putExtra("HANDLE", file.getHandle());
 						mediaIntent.putExtra("FILENAME", file.getName());
-						boolean isOnMegaDownloads = false;
-						String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-						File f = new File(downloadLocationDefaultPath, file.getName());
-						if(f.exists() && (f.length() == file.getSize())){
-							isOnMegaDownloads = true;
-						}
-						if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+
+						String localPath = getLocalFile(context, file.getName(), file.getSize());
+
+						if (localPath != null){
 							File mediaFile = new File(localPath);
 							//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {

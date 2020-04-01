@@ -1,7 +1,7 @@
 package mega.privacy.android.app.components.twemoji.emoji;
 
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 
 /*Interface for defining a category.*/
 public interface EmojiCategory {

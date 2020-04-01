@@ -1,24 +1,22 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -83,10 +81,13 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnClickListener, MegaRequestListenerInterface, AdapterView.OnItemClickListener {
 
@@ -117,7 +118,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     ChatSettings chatSettings = null;
     boolean generalChatNotifications = true;
     CoordinatorLayout fragmentContainer;
-    android.support.v4.widget.NestedScrollView scrollView;
+    androidx.core.widget.NestedScrollView scrollView;
     LinearLayout infoLayout;
     RelativeLayout avatarLayout;
     TextView infoNumParticipantsText;
@@ -158,6 +159,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     private MegaApiAndroid megaApi = null;
 
     private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
+
+    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) return;
+            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+            updateAdapter(userHandle);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -219,7 +229,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             dbH = DatabaseHandler.getDbHandler(getApplicationContext());
             chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
-
             setContentView(R.layout.activity_group_chat_properties);
 
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
@@ -389,6 +398,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 megaChatApi.signalPresenceActivity();
             }
 
+            LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
+                    new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
+
             //Set participants
             participants = new ArrayList<>();
 
@@ -485,11 +497,20 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     @Override
     protected void onDestroy(){
         logDebug("onDestroy()");
+        super.onDestroy();
         if (megaChatApi != null) {
             megaChatApi.removeChatListener(this);
         }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
 
-        super.onDestroy();
+    }
+
+    private String checkParticipantName(long handle, int position) {
+        String fullName = getNicknameContact(handle);
+
+        if (fullName == null) fullName = getParticipantFullName(position);
+
+        return fullName;
     }
 
     public void setParticipants(){
@@ -512,8 +533,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
 
             long peerHandle = chat.getPeerHandle(i);
+            String fullName = checkParticipantName(peerHandle, i);
 
-            String fullName = getParticipantFullName(i);
             String participantEmail = chat.getPeerEmail(i);
 
             logDebug(i + " - Handle of the peer: "+ peerHandle + ", Pprivilege: " + peerPrivilege);
@@ -560,30 +581,30 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    public String getParticipantFullName(long i) {
+    private void updateAdapter(long contactHandle) {
+        for (MegaChatParticipant participant : participants) {
+            if (participant.getHandle() == contactHandle) {
+                int pos = participants.indexOf(participant);
+                String fullName = checkParticipantName(contactHandle, pos);
+                participants.get(pos).setFullName(fullName);
+                adapter.updateParticipant(pos, participants);
+                break;
+            }
+        }
+    }
 
-        String fullName = chat.getPeerFullname(i);
-        if(fullName!=null){
-            if(fullName.isEmpty()){
-                logDebug("Put email as fullname");
-                fullName = chat.getPeerEmail(i);
-                return fullName;
-            }
-            else{
-                if (fullName.trim().length() <= 0){
-                    logDebug("Put email as fullname");
-                    fullName = chat.getPeerEmail(i);
-                    return fullName;
-                } else {
-                    return fullName;
-                }
-            }
+    private String getParticipantFullName(long contact) {
+        String nickname = getNicknameContact(contact);
+        if (nickname != null) {
+            return nickname;
         }
-        else{
-            logDebug("Put email as fullname");
-            fullName = chat.getPeerEmail(i);
-            return fullName;
+
+        String fullName = chat.getPeerFullname(contact);
+        if (isTextEmpty(fullName)){
+            return chat.getPeerEmail(contact);
         }
+
+        return fullName;
     }
 
     @Override
@@ -689,7 +710,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(groupChatInfoActivity, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(groupChatInfoActivity, R.style.AppCompatAlertDialogStyle);
         String name = chatToChange.getPeerFullnameByHandle(handle);
         String message = getResources().getString(R.string.confirmation_remove_chat_contact, name);
         builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
@@ -1058,7 +1079,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         changeTitleDialog = builder.create();
         changeTitleDialog.show();
 
-        changeTitleDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+        changeTitleDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 logDebug("OK BTTN CHANGE");
@@ -1109,7 +1130,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         String message = getResources().getString(R.string.confirmation_clear_group_chat);
         builder.setTitle(R.string.title_confirmation_clear_group_chat);
         builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
@@ -1134,7 +1155,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
         String message = getResources().getString(R.string.confirmation_leave_group_chat);
         builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)

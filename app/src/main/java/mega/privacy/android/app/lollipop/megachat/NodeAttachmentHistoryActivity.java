@@ -11,15 +11,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -103,7 +103,7 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 	Toolbar tB;
 	NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;
 
-    private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     DatabaseHandler dbH = null;
     public boolean isList = true;
 
@@ -516,16 +516,10 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 							mediaIntent.putExtra("chatId", chatId);
 
 							mediaIntent.putExtra("FILENAME", node.getName());
-							MegaPreferences prefs = dbH.getPreferences();
-							String downloadLocationDefaultPath = getDownloadLocation(this);
-							String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
-							File f = new File(downloadLocationDefaultPath, node.getName());
-							boolean isOnMegaDownloads = false;
-							if(f.exists() && (f.length() == node.getSize())){
-								isOnMegaDownloads = true;
-							}
-							logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
-							if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+
+							String localPath = getLocalFile(this, node.getName(), node.getSize());
+
+							if (localPath != null){
 								File mediaFile = new File(localPath);
 								//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -626,14 +620,9 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 							MegaPreferences prefs = dbH.getPreferences();
 							String downloadLocationDefaultPath = getDownloadLocation(this);
 
-							String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
-							File f = new File(downloadLocationDefaultPath, node.getName());
-							boolean isOnMegaDownloads = false;
-							if(f.exists() && (f.length() == node.getSize())){
-								isOnMegaDownloads = true;
-							}
-							logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
-							if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+							String localPath = getLocalFile(this, node.getName(), node.getSize());
+
+							if (localPath != null){
 								File mediaFile = new File(localPath);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 									logDebug("File Provider Option");
@@ -1570,7 +1559,7 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 		final ArrayList<MegaNode> nodeListC = nodeList;
 		final long sizeC = size;
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);

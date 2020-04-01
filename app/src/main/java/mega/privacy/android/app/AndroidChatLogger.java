@@ -5,11 +5,13 @@ import android.util.Log;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatLoggerInterface;
 
+import static mega.privacy.android.app.utils.LogUtil.*;
+
 public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInterface {
     public static final String LOG_FILE_NAME = "logKarere.txt";
 
-    public AndroidChatLogger(String fileName, boolean fileLogger) {
-        super(fileName, fileLogger);
+    public AndroidChatLogger(String fileName) {
+        super(fileName);
     }
 
     public void log(int logLevel, String message) {
@@ -20,7 +22,7 @@ public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInter
         }
 
         //save to log file
-        if (isReadyToWriteToFile(Util.getFileLoggerKarere())) {
+        if (isReadyToWriteToFile(getStatusLoggerKarere())) {
             fileLogQueue.add(message);
         }
     }

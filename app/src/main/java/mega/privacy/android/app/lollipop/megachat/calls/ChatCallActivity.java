@@ -10,15 +10,15 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -76,14 +76,16 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback {
 
@@ -91,7 +93,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     final private static int REMOTE_VIDEO_ENABLED = 1;
     final private static int REMOTE_VIDEO_DISABLED = 0;
     final private static int BIG_LETTER_SIZE = 60;
-    final private static int SMALL_LETTER_SIZE = 40;
     final private static int MIN_PEERS_LIST = 7;
     final private static int MAX_PEERS_GRID = 6;
     final private static int ARROW_ANIMATION = 250;
@@ -99,6 +100,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     final private static int MOVE_ANIMATION = 500;
     final private static int ALPHA_ANIMATION = 600;
     final private static int ALPHA_ARROW_ANIMATION = 1000;
+    final private static int DURATION_TOOLBAR_ANIMATION = 500;
     final private static int NECESSARY_CHANGE_OF_SIZES = 4;
     private final static int TITLE_TOOLBAR = 250;
     private float widthScreenPX, heightScreenPX;
@@ -805,6 +807,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         } else {
             email = chat.getPeerEmail(0);
             name = chat.getPeerFullname(0);
+            String nickname = getNicknameContact(chat.getPeerHandle(0));
+            if(nickname != null){
+                name = nickname;
+            }
         }
         /*Default Avatar*/
         Bitmap defaultBitmapAvatar = getDefaultAvatar(this, getColorAvatar(this, megaApi, peerId), name, AVATAR_SIZE, true);
@@ -847,25 +853,41 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         avatarBigCameraGroupCallImage.setImageBitmap(bitmap);
     }
 
+    public boolean isActionBarShowing() {
+        return aB.isShowing();
+    }
+
     private void hideActionBar() {
-        if (aB == null || !aB.isShowing()) return;
+        if (aB == null || !isActionBarShowing()) return;
         if (tB == null) {
             aB.hide();
             return;
         }
-        tB.animate().translationY(-220).setDuration(800L).withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                aB.hide();
+        tB.animate().translationY(-220).setDuration(DURATION_TOOLBAR_ANIMATION).withEndAction(() -> {
+            aB.hide();
+            if (checkIfNecessaryUpdateMuteIcon()) {
+                adapterGrid.updateMuteIcon();
             }
         }).start();
     }
 
     private void showActionBar() {
-        if (aB == null || aB.isShowing()) return;
-        aB.show();
-        if (tB == null) return;
-        tB.animate().translationY(0).setDuration(800L).start();
+        if (aB == null || isActionBarShowing()) return;
+        if (tB == null) {
+            aB.show();
+            return;
+        }
+
+        tB.animate().translationY(0).setDuration(DURATION_TOOLBAR_ANIMATION).withEndAction(() -> {
+            aB.show();
+            if (checkIfNecessaryUpdateMuteIcon()) {
+                adapterGrid.updateMuteIcon();
+            }
+        }).start();
+    }
+
+    private boolean checkIfNecessaryUpdateMuteIcon() {
+        return chat.isGroup() && adapterGrid != null && (peersOnCall.size() == 2 || peersOnCall.size() == 5 || peersOnCall.size() == 6);
     }
 
     private void hideFABs() {
@@ -2541,7 +2563,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         adapterGrid.notifyDataSetChanged();
                     }
                 }
-
+                adapterGrid.updateMuteIcon();
             } else {
                 logDebug("peersOnCall LIST ");
                 //7 + users
@@ -2574,6 +2596,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         adapterList.notifyDataSetChanged();
                     }
                 }
+                adapterList.updateMuteIcon();
                 updateUserSelected();
             }
             if (notYetJoinedTheCall) {
@@ -3061,14 +3084,20 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             mutateContactCallLayout.setVisibility(View.GONE);
         } else {
             String name = chat.getPeerFirstname(0);
-            if ((name == null) || (name == " ")) {
+            if (isTextEmpty(name)) {
                 if (megaChatApi != null) {
                     name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
                 }
                 if (name == null) {
-                    name = " ";
+                    name = getString(R.string.unknown_name_label);
                 }
             }
+
+            String nickname = getNicknameContact(chat.getPeerHandle(0));
+            if (nickname != null) {
+                name = nickname;
+            }
+
             mutateCallText.setText(getString(R.string.muted_contact_micro, name));
             mutateContactCallLayout.setVisibility(View.VISIBLE);
         }

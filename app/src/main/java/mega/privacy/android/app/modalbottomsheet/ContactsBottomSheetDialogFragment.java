@@ -7,15 +7,12 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -48,6 +45,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -106,16 +104,11 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
             logDebug("Email of the contact: " + email);
             if(email!=null){
                 MegaUser megaUser = megaApi.getContact(email);
-                MegaContactDB contactDB = dbH.findContactByHandle(megaUser.getHandle()+"");
-                String fullName = "";
-                if(contactDB!=null){
-                    fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), megaUser.getEmail());
-                }
-                else{
+                String fullName = getMegaUserNameDB(megaUser);
+                if (fullName == null) {
                     fullName = megaUser.getEmail();
                 }
-
-                contact = new MegaContactAdapter(contactDB, megaUser, fullName);
+                contact = new MegaContactAdapter(getContactDB(megaUser.getHandle()), megaUser, fullName);
             }
         }
         else{
@@ -307,40 +300,6 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
             logWarning("Contact NULL");
         }
     }
-
-//    public String getFullName(MegaUser contact){
-//        String firstNameText ="";
-//        String lastNameText ="";
-//        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
-//        if(contactDB!=null){
-//            firstNameText = contactDB.getName();
-//            lastNameText = contactDB.getLastName();
-//
-//            String fullName;
-//
-//            if (firstNameText.trim().length() <= 0){
-//                fullName = lastNameText;
-//            }
-//            else{
-//                fullName = firstNameText + " " + lastNameText;
-//            }
-//
-//            if (fullName.trim().length() <= 0){
-//                log("Put email as fullname");
-//                String email = contact.getEmail();
-//                String[] splitEmail = email.split("[@._]");
-//                fullName = splitEmail[0];
-//            }
-//
-//            return fullName;
-//        }
-//        else{
-//            String email = contact.getEmail();
-//            String[] splitEmail = email.split("[@._]");
-//            String fullName = splitEmail[0];
-//            return fullName;
-//        }
-//    }
 
     public void addAvatarContactPanel(MegaContactAdapter contact){
         /*Default Avatar*/

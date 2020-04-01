@@ -8,9 +8,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -493,7 +493,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
         }
 	    //need re-calculate
 	    folderCount = 0;
-        CopyOnWriteArrayList<MegaOffline> safeList = new CopyOnWriteArrayList(nodes);
+        CopyOnWriteArrayList<MegaOffline> safeList = new CopyOnWriteArrayList<>(nodes);
         for (MegaOffline node : safeList) {
             if (node == null) {
                 safeList.remove(node);

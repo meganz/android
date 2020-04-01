@@ -9,7 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_file_contact_list"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -21,7 +21,7 @@
         app:theme="@style/Theme.Megaactionbar.InfoScreens"
         tools:context=".FolderLinkActivityLollipop" />
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout_file_contact_list"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:background="@color/white"
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/separator_file_contact_list" >
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/file_contact_list_view_browser"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -115,7 +115,7 @@
 
         </RelativeLayout>
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floating_button_file_contact_list"
             android:layout_width="@dimen/fab_button_diameter"
             android:layout_height="@dimen/fab_button_diameter"
@@ -126,6 +126,6 @@
             android:tint="@android:color/white"
             android:layout_alignParentBottom="true"
             android:layout_gravity="bottom|right|end"/>
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
     
  </RelativeLayout>

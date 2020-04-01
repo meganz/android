@@ -18,15 +18,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.support.annotation.Nullable;
-import android.support.multidex.MultiDexApplication;
-import android.support.text.emoji.EmojiCompat;
-import android.support.text.emoji.FontRequestEmojiCompatConfig;
-import android.support.text.emoji.bundled.BundledEmojiCompatConfig;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.provider.FontRequest;
+import androidx.annotation.Nullable;
+import androidx.multidex.MultiDexApplication;
+import androidx.emoji.text.EmojiCompat;
+import androidx.emoji.text.FontRequestEmojiCompatConfig;
+import androidx.emoji.bundled.BundledEmojiCompatConfig;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
@@ -84,13 +84,13 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
-
 
 public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 
@@ -236,34 +236,26 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-				if (e.getErrorCode() == MegaError.API_OK){
-
-					if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME||request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-						logDebug("Name: " + request.getText());
-						if (megaApi != null){
-							if(request.getEmail()!=null){
-								logDebug("Email: " + request.getEmail());
-								MegaUser user = megaApi.getContact(request.getEmail());
-								if (user != null) {
-									logDebug("User handle: " + user.getHandle());
-									logDebug("Visibility: " + user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
-									if(user.getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
-										logDebug("Non-contact");
-										if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-											dbH.setNonContactEmail(request.getEmail(), user.getHandle()+"");
-											dbH.setNonContactFirstName(request.getText(), user.getHandle()+"");
-										}
-										else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-											dbH.setNonContactLastName(request.getText(), user.getHandle()+"");
-										}
+				if (e.getErrorCode() == MegaError.API_OK) {
+					if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME || request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
+						if (megaApi != null && request.getEmail() != null) {
+							MegaUser user = megaApi.getContact(request.getEmail());
+							if (user != null) {
+								logDebug("User handle: " + user.getHandle());
+								logDebug("Visibility: " + user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
+								if (user.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
+									logDebug("Non-contact");
+									if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
+										dbH.setNonContactEmail(request.getEmail(), user.getHandle() + "");
+										dbH.setNonContactFirstName(request.getText(), user.getHandle() + "");
+									} else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
+										dbH.setNonContactLastName(request.getText(), user.getHandle() + "");
 									}
-									else{
-										logDebug("The user is or was CONTACT: " + user.getEmail());
-									}
+								} else {
+									logDebug("The user is or was CONTACT:");
 								}
-								else{
-									logWarning("User is NULL");
-								}
+							} else {
+								logWarning("User is NULL");
 							}
 						}
 					}
@@ -434,92 +426,29 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+
+		initLoggerSDK();
+		initLoggerKarere();
+
+		checkAppUpgrade();
+
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
 
-		boolean fileLoggerSDK = false;
 		boolean staging = false;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
-			if (attrs != null) {
-				if (attrs.getFileLoggerSDK() != null) {
-					try {
-						fileLoggerSDK = Boolean.parseBoolean(attrs.getFileLoggerSDK());
-					} catch (Exception e) {
-						fileLoggerSDK = false;
-					}
-				} else {
-					fileLoggerSDK = false;
-				}
-
-				if (attrs.getStaging() != null){
-					try{
-						staging = Boolean.parseBoolean(attrs.getStaging());
-					} catch (Exception e){ staging = false;}
-				}
-			}
-			else {
-				fileLoggerSDK = false;
-				staging = false;
+			if (attrs != null && attrs.getStaging() != null) {
+				staging = Boolean.parseBoolean(attrs.getStaging());
 			}
 		}
 
-        setFileLoggerSDK(fileLoggerSDK);
-		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-
-		if (staging){
+		if (staging) {
 			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
-		}
-		else{
-            megaApi.changeApiUrl("https://g.api.mega.co.nz/");
-		}
-
-		if (DEBUG){
-			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-		}
-		else {
-			if (fileLoggerSDK) {
-				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-			} else {
-				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-			}
-		}
-
-		boolean fileLoggerKarere = false;
-		if (dbH != null) {
-			MegaAttributes attrs = dbH.getAttributes();
-			if (attrs != null) {
-				if (attrs.getFileLoggerKarere() != null) {
-					try {
-						fileLoggerKarere = Boolean.parseBoolean(attrs.getFileLoggerKarere());
-					} catch (Exception e) {
-						fileLoggerKarere = false;
-					}
-				} else {
-					fileLoggerKarere = false;
-				}
-			} else {
-				fileLoggerKarere = false;
-			}
-		}
-
-        setFileLoggerKarere(fileLoggerKarere);
-		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, fileLoggerKarere));
-		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-
-		if (DEBUG){
-			MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-		}
-		else {
-			if (fileLoggerKarere) {
-				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-			} else {
-				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
-			}
+			megaApiFolder.changeApiUrl("https://staging.api.mega.co.nz/");
 		}
 
 		boolean useHttpsOnly = false;
@@ -887,25 +816,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				MegaShare mS = sharesIncoming.get(j);
 				if (mS.getNodeHandle() == n.getHandle()) {
 					MegaUser user = megaApi.getContact(mS.getUser());
-					if (user != null) {
-						MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
 
-						if (contactDB != null) {
-							if (!contactDB.getName().equals("")) {
-								name = contactDB.getName() + " " + contactDB.getLastName();
-
-							} else {
-								name = user.getEmail();
-
-							}
-						} else {
-							logWarning("The contactDB is null: ");
-							name = user.getEmail();
-
-						}
-					} else {
-						name = user.getEmail();
-					}
+					name = getMegaUserNameDB(user);
+					if(name == null) name = "";
 				}
 			}
 
@@ -1324,7 +1237,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 										}
 									}
 								} else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-									if ((megaChatApi != null) && (participatingInACall(megaChatApi))) {
+									if ((megaChatApi != null) && (participatingInACall())) {
 										logDebug("Several calls - "+callStatusToString(callStatus)+": show notification");
 										checkQueuedCalls();
 									} else {

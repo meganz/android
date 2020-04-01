@@ -19,19 +19,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputFilter;
@@ -105,11 +105,12 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaGlobalListenerInterface {
 
@@ -1196,11 +1197,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
-        searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
         searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
         searchAutoComplete.setHint(getString(R.string.hint_action_search));
-        View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+        View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
         v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 
         searchView.setIconifiedByDefault(true);
@@ -1216,7 +1217,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         });
 
-        ImageView closeIcon = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+        ImageView closeIcon = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
         closeIcon.setImageDrawable(mutateIcon(this, R.drawable.ic_close_white, R.color.black));
 
         MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
@@ -2396,6 +2397,16 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
+    private MegaContactAdapter createMegaContact(MegaUser contact) {
+        MegaContactDB contactDB = getContactDB(contact.getHandle());
+        String fullName = getContactNameDB(contactDB);
+        if (fullName == null) {
+            fullName = contact.getEmail();
+        }
+
+        return new MegaContactAdapter(contactDB, contact, fullName);
+    }
+
     private void getVisibleMEGAContacts () {
         contactsMEGA = megaApi.getContacts();
         visibleContactsMEGA.clear();
@@ -2425,34 +2436,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             }
 
                             if(!found){
-                                MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
-                                String fullName = "";
-                                if(contactDB!=null){
-                                    ContactController cC = new ContactController(this);
-                                    fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
-                                }
-                                else{
-                                    //No name, ask for it and later refresh!!
-                                    fullName = contactsMEGA.get(i).getEmail();
-                                }
-
-                                logDebug("Added to list: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
-                                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
-                                visibleContactsMEGA.add(megaContactAdapter);
+                                visibleContactsMEGA.add(createMegaContact(contactsMEGA.get(i)));
                             }
                             else{
-                                MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
-                                String fullName = "";
-                                if(contactDB!=null){
-                                    ContactController cC = new ContactController(this);
-                                    fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
-                                }
-                                else{
-                                    //No name, ask for it and later refresh!!
-                                    fullName = contactsMEGA.get(i).getEmail();
-                                }
-
-                                logDebug("Removed from list - already included on chat: " + fullName);
+                                logDebug("Removed from list - already included on chat: ");
                             }
                         }
                     }
@@ -2461,19 +2448,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     for (int i=0;i<contactsMEGA.size();i++){
                         logDebug("Contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
                         if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-
-                            MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
-                            String fullName = "";
-                            if(contactDB!=null){
-                                ContactController cC = new ContactController(this);
-                                fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
-                            }
-                            else{
-                                //No name, ask for it and later refresh!!
-                                fullName = contactsMEGA.get(i).getEmail();
-                            }
-
-                            MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
+                            MegaContactAdapter megaContactAdapter = createMegaContact(contactsMEGA.get(i));
                             visibleContactsMEGA.add(megaContactAdapter);
                         }
                     }
@@ -2493,20 +2468,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 found = false;
                 logDebug("Contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
                 if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-
-                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
-                    String fullName = "";
-                    if(contactDB!=null){
-                        ContactController cC = new ContactController(this);
-                        fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
-                    }
-                    else {
-                        //No name, ask for it and later refresh!!
-                        fullName = contactsMEGA.get(i).getEmail();
-                    }
-
-                    MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
-
+                    MegaContactAdapter megaContactAdapter = createMegaContact(contactsMEGA.get(i));
                     for (int j=0; j<shared.size(); j++) {
                         if (getMegaContactMail(megaContactAdapter).equals(shared.get(j).getUser())){
                             found = true;
@@ -2524,19 +2486,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             for (int i=0;i<contactsMEGA.size();i++){
                 logDebug("Contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
                 if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-
-                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
-                    String fullName = "";
-                    if(contactDB!=null){
-                        ContactController cC = new ContactController(this);
-                        fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
-                    }
-                    else{
-                        //No name, ask for it and later refresh!!
-                        fullName = contactsMEGA.get(i).getEmail();
-                    }
-
-                    MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
+                    MegaContactAdapter megaContactAdapter = createMegaContact(contactsMEGA.get(i));
                     visibleContactsMEGA.add(megaContactAdapter);
                 }
             }
@@ -3002,6 +2952,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         switch (v.getId()) {
             case R.id.layout_scan_qr: {
                 logDebug("Scan QR code pressed");
+                if (isNecessaryDisableLocalCamera() != -1) {
+                    showConfirmationOpenCamera(this, ACTION_OPEN_QR);
+                    break;
+                }
                 initScanQR();
                 break;
             }
@@ -3061,7 +3015,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    private void initScanQR() {
+    public void initScanQR() {
         Intent intent = new Intent(this, QRCodeActivity.class);
         intent.putExtra("inviteContacts", true);
         startActivityForResult(intent, SCAN_QR_FOR_ADD_CONTACTS);
