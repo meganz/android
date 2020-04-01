@@ -582,7 +582,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         } else if (mimeType.isVideoReproducible() || mimeType.isAudio()) {
             boolean opusFile = false;
 
-            if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported() || MimeTypeList.typeForName(node.getName()).isAudioNotSupported()) {
+            if (mimeType.isVideoNotSupported() || mimeType.isAudioNotSupported()) {
                 intent = new Intent(Intent.ACTION_VIEW);
                 internalIntent = false;
                 String[] s = node.getName().split("\\.");
@@ -744,19 +744,19 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), INVALID_HANDLE);
                     return;
                 }
-
-                intent.setDataAndType(Uri.parse(url), mimeTypeType);
             }
         }
 
-        if (internalIntent || isIntentAvailable(context, intent)) {
-            context.startActivity(intent);
-            managerActivity.overridePendingTransition(0, 0);
-            imageDrag = imageView;
+        if (intent != null) {
+            if (internalIntent || isIntentAvailable(context, intent)) {
+                context.startActivity(intent);
+                managerActivity.overridePendingTransition(0, 0);
+                imageDrag = imageView;
 
-            return;
-        } else {
-            Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+                return;
+            } else {
+                Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+            }
         }
 
         ArrayList<Long> handleList = new ArrayList<>();
