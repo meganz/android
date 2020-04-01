@@ -47,27 +47,28 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
-    Context context;
-    MegaOffline nodeOffline = null;
-    NodeController nC;
+    private Context context;
+    private MegaOffline nodeOffline = null;
+    private NodeController nC;
 
     private BottomSheetBehavior mBehavior;
     private LinearLayout items_layout;
 
-    LinearLayout mainLinearLayout;
-    ImageView nodeThumb;
-    TextView nodeName;
-    TextView nodeInfo;
-    LinearLayout optionDeleteOffline;
+    private LinearLayout mainLinearLayout;
+    private ImageView nodeThumb;
+    private TextView nodeName;
+    private TextView nodeInfo;
+    private LinearLayout optionShare;
+    private LinearLayout optionDeleteOffline;
     private LinearLayout optionOpenWith;
 
-    DisplayMetrics outMetrics;
+    private DisplayMetrics outMetrics;
     private int heightDisplay;
 
-    MegaApiAndroid megaApi;
-    DatabaseHandler dbH;
+    private MegaApiAndroid megaApi;
+    private DatabaseHandler dbH;
 
-    File file;
+    private File file;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,19 +109,21 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_offline_item, null);
 
-        mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.offline_bottom_sheet);
-        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
+        mainLinearLayout = contentView.findViewById(R.id.offline_bottom_sheet);
+        items_layout = contentView.findViewById(R.id.items_layout);
 
-        nodeThumb = (ImageView) contentView.findViewById(R.id.offline_thumbnail);
-        nodeName = (TextView) contentView.findViewById(R.id.offline_name_text);
-        nodeInfo  = (TextView) contentView.findViewById(R.id.offline_info_text);
-        optionDeleteOffline = (LinearLayout) contentView.findViewById(R.id.option_delete_offline_layout);
-        optionOpenWith = (LinearLayout) contentView.findViewById(R.id.option_open_with_layout);
+        nodeThumb = contentView.findViewById(R.id.offline_thumbnail);
+        nodeName = contentView.findViewById(R.id.offline_name_text);
+        nodeInfo  = contentView.findViewById(R.id.offline_info_text);
+        optionDeleteOffline = contentView.findViewById(R.id.option_delete_offline_layout);
+        optionOpenWith = contentView.findViewById(R.id.option_open_with_layout);
+        optionShare = contentView.findViewById(R.id.option_share_layout);
 
         optionDeleteOffline.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
+        optionShare.setOnClickListener(this);
 
-        LinearLayout separatorOpen = (LinearLayout) contentView.findViewById(R.id.separator_open);
+        LinearLayout separatorOpen = contentView.findViewById(R.id.separator_open);
 
         nodeName.setMaxWidth(scaleWidthPx(200, outMetrics));
         nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
@@ -203,6 +206,11 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             }
 
             optionDeleteOffline.setVisibility(View.VISIBLE);
+
+            if (nodeOffline.isFolder() && !isOnline(context)) {
+                optionShare.setVisibility(View.GONE);
+                contentView.findViewById(R.id.separator_share).setVisibility(View.GONE);
+            }
         }
 
         dialog.setContentView(contentView);
@@ -229,6 +237,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 openWith();
                 break;
             }
+            case R.id.option_share_layout:
+                shareOfflineNode(context, nodeOffline);
+                break;
         }
 
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());

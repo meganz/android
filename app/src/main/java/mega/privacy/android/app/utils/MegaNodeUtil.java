@@ -16,20 +16,27 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.ExportListener;
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.jobservices.CameraUploadsService.SECONDARY_UPLOADS;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -209,6 +216,75 @@ public class MegaNodeUtil {
     }
 
     /**
+     *
+     * Shares a node.
+     * If the node is a folder creates and/or shares the folder link.
+     * If the node is a file and exists in local storage, shares the file. If not, creates and/or shares the file link.
+     *
+     * @param context   current Context.
+     * @param node      node to share.
+     */
+    public static void shareNode(Context context, MegaNode node) {
+        if (shouldContinueWithoutError(context, "sharing node", node)) {
+            String path = getLocalFile(context, node.getName(), node.getSize());
+
+            if (!isTextEmpty(path) && !node.isFolder()) {
+                shareFile(context, new File(path));
+            } else if (node.isExported()) {
+                startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
+            } else {
+                MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND)));
+            }
+        }
+    }
+
+    /**
+     * Shares a link.
+     *
+     * @param context   current Context.
+     * @param fileLink  link to share.
+     */
+    public static void shareLink(Context context, String fileLink) {
+        startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), fileLink);
+    }
+
+    /**
+     * Ends the creation of the share intent and starts it.
+     *
+     * @param context       current Context.
+     * @param shareIntent   intent to start the share.
+     * @param link          link of the node to share.
+     */
+    public static void startShareIntent (Context context, Intent shareIntent, String link) {
+        shareIntent.setType(TYPE_TEXT_PLAIN);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, link);
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+    }
+
+    /**
+     * Checks if there is any error before continues any action.
+     *
+     * @param context   current Context.
+     * @param message   action being taken.
+     * @param node      node involved in the action.
+     * @return True if there is not any error, false otherwise.
+     */
+    private static boolean shouldContinueWithoutError(Context context, String message, MegaNode node) {
+        String error = "Error " + message + ". ";
+
+        if (node == null) {
+            logError(error + "Node == NULL");
+            return false;
+        } else if (!isOnline(context)) {
+            logError(error + "No network connection");
+            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Checks if a MegaNode is the user attribute "My chat files"
      *
      * @param node MegaNode to check
@@ -335,5 +411,26 @@ public class MegaNodeUtil {
         } else {
             return R.drawable.ic_folder_list;
         }
+    }
+
+    /**
+     * Checks if the Toolbar option "share" should be visible or not depending on the permissions of the MegaNode
+     *
+     * @param adapterType   view in which is required the check
+     * @param isFolderLink  if true, the node comes from a folder link
+     * @param handle        identifier of the MegaNode to check
+     * @return True if the option "share" should be visible, false otherwise
+     */
+    public static boolean showShareOption(int adapterType, boolean isFolderLink, long handle) {
+        if (isFolderLink) {
+            return false;
+        } else if (adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER && adapterType != FILE_LINK_ADAPTER) {
+            MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+            MegaNode node = megaApi.getNodeByHandle(handle);
+
+            return node != null && megaApi.getAccess(node) == MegaShare.ACCESS_OWNER;
+        }
+
+        return true;
     }
 }

@@ -44,7 +44,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -1294,7 +1293,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		input.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
-		showKeyboard();
+		showKeyboardDelayed(input);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
@@ -1340,7 +1339,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		});
 		builder.setPositiveButton(getString(R.string.button_set),
 				(dialog, whichButton) -> onClickAlertDialog(input, alias));
-		builder.setOnDismissListener(dialog -> hideKeyboard());
 		builder.setNegativeButton(getString(R.string.general_cancel),
 				(dialog, whichButton) -> setNicknameDialog.dismiss());
 
@@ -1523,19 +1521,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		for (long fileHandle : fileHandles) {
 			megaChatApi.attachNode(chatId, fileHandle, listener);
 		}
-	}
-
-	/*
-	 * Display keyboard
-	 */
-	private void showKeyboardDelayed(final View view) {
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
 	}
 
 	public void showConfirmationRemoveContact(final MegaUser c){
@@ -2410,7 +2395,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putBoolean(WAITING_FOR_CALL, waitingForCall);
-		hideKeyboard();
 	}
 
 	@Override

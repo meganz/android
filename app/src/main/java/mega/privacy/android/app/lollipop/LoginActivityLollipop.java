@@ -13,6 +13,8 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -42,7 +44,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -604,135 +605,24 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         setIntent(null);
     }
 
-    boolean loggerPermissionKarere = false;
-    boolean loggerPermissionSDK = false;
-
+    @Override
     public void showConfirmationEnableLogsKarere() {
-        logDebug("showConfirmationEnableLogsKarere");
-
         if (loginFragment != null) {
             loginFragment.numberOfClicksKarere = 0;
         }
 
         loginActivity = this;
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:{
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                            if (!hasStoragePermission) {
-                                loggerPermissionKarere = true;
-                                ActivityCompat.requestPermissions(loginActivity,
-                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        REQUEST_WRITE_STORAGE);
-                            } else {
-                                enableLogsKarere();
-                            }
-                        } else {
-                            enableLogsKarere();
-                        }
-                        break;
-                    }
-
-                    case DialogInterface.BUTTON_NEGATIVE: {
-                        break;
-                    }
-                }
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+        super.showConfirmationEnableLogsKarere();
     }
 
+    @Override
     public void showConfirmationEnableLogsSDK() {
-        logDebug("showConfirmationEnableLogsSDK");
-
         if (loginFragment != null) {
             loginFragment.numberOfClicksSDK = 0;
         }
 
         loginActivity = this;
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:{
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                            if (!hasStoragePermission) {
-                                loggerPermissionSDK = true;
-                                ActivityCompat.requestPermissions(loginActivity,
-                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        REQUEST_WRITE_STORAGE);
-                            } else {
-                                enableLogsSDK();
-                            }
-                        } else {
-                            enableLogsSDK();
-                        }
-                        break;
-                    }
-
-                    case DialogInterface.BUTTON_NEGATIVE: {
-                        break;
-                    }
-                }
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        logDebug("onRequestPermissionsResult");
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
-            case REQUEST_WRITE_STORAGE:{
-                if (loggerPermissionKarere){
-                    loggerPermissionKarere = false;
-                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                        enableLogsKarere();
-                    }
-                }
-                else if (loggerPermissionSDK){
-                    loggerPermissionSDK = false;
-                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                        enableLogsSDK();
-                    }
-                }
-            }
-        }
-    }
-
-    public void enableLogsSDK() {
-        logDebug("enableLogsSDK");
-
-        dbH.setFileLoggerSDK(true);
-        setFileLoggerSDK(true);
-        MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-        showSnackbar(getString(R.string.settings_enable_logs));
-        logDebug("App Version: " + getVersion(this));
-    }
-
-    public void enableLogsKarere() {
-        logDebug("enableLogsKarere");
-
-        dbH.setFileLoggerKarere(true);
-        setFileLoggerKarere(true);
-        MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-        showSnackbar(getString(R.string.settings_enable_logs));
-        logDebug("App Version: " + getVersion(this));
+        super.showConfirmationEnableLogsSDK();
     }
 
     public void setWaitingForConfirmAccount(boolean waitingForConfirmAccount) {
