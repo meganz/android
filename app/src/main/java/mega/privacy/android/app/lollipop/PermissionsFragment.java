@@ -39,15 +39,12 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     private LinearLayout setupLayout;
     private LinearLayout allowAccessLayout;
     private ImageView imgDisplay;
-    private TextView itemsText;
     private TextView titleDisplay;
     private TextView subtitleDisplay;
     // only for access contacts permission.
     private TextView explanationDisplay;
-    private LinearLayout itemsLayout;
 
     private boolean isAllowingAccessShown;
-    private int permissionsPosition = 0;
     private int numItems = 0;
     private int[] items = new int[PERMISSION_FLOW_PAGE_SIZE];
     private int currentPermission = 0;
@@ -84,12 +81,10 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         setupButton = v.findViewById(R.id.setup_button);
         setupButton.setOnClickListener(this);
         allowAccessLayout = v.findViewById(R.id.allow_access_fragment_container);
-        itemsText = v.findViewById(R.id.items_text);
         imgDisplay = v.findViewById(R.id.image_permissions);
         titleDisplay = v.findViewById(R.id.title_permissions);
         subtitleDisplay = v.findViewById(R.id.subtitle_permissions);
         explanationDisplay = v.findViewById(R.id.subtitle_explanation);
-        itemsLayout = v.findViewById(R.id.items_layout);
 
         mImages = new int[]{
                 R.drawable.photos,
@@ -126,7 +121,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
         if (savedInstanceState == null) {
             numItems = 0;
-            permissionsPosition = 0;
             readGranted = hasPermissions(this.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
             writeGranted = hasPermissions(this.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
             cameraGranted = hasPermissions(this.getActivity(), Manifest.permission.CAMERA);
@@ -155,7 +149,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             showSetupLayout();
         } else {
             isAllowingAccessShown = savedInstanceState.getBoolean("isAllowingAccessShown", false);
-            permissionsPosition = savedInstanceState.getInt("permissionsPosition", 0);
             numItems = savedInstanceState.getInt("numItems", 0);
             currentPermission = savedInstanceState.getInt("currentPermission", 0);
             items = savedInstanceState.getIntArray("items");
@@ -172,12 +165,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
         if (isAllowingAccessShown) {
             ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
-        }
-
-        if (numItems == 1) {
-            itemsLayout.setVisibility(View.GONE);
-        } else {
-            itemsText.setText(getString(R.string.wizard_steps_indicator, permissionsPosition + 1, numItems));
         }
     }
 
@@ -209,10 +196,8 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             for (int i = 0; i < numItems; i++) {
                 if (items[i] == currentPermission) {
                     if (i + 1 < numItems) {
-                        permissionsPosition++;
                         currentPermission = items[i + 1];
                         setContent(currentPermission);
-                        itemsText.setText(getString(R.string.wizard_steps_indicator, permissionsPosition + 1, numItems));
                         break;
                     } else {
                         ((ManagerActivityLollipop) context).destroyPermissionsFragment();
@@ -328,7 +313,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("isAllowingAccessShown", isAllowingAccessShown);
-        outState.putInt("permissionsPosition", permissionsPosition);
         outState.putInt("numItems", numItems);
         outState.putInt("currentPermission", currentPermission);
         outState.putIntArray("items", items);

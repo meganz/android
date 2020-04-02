@@ -590,7 +590,6 @@ public class ChatUtil {
      * @return Image file to be uploaded.
      */
     public static File checkImageBeforeUpload(File file) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
         int orientation = AndroidGfxProcessor.getExifOrientation(file.getAbsolutePath());
         Rect fileRect = AndroidGfxProcessor.getImageDimensions(file.getAbsolutePath(), orientation);
         Bitmap fileBitmap = AndroidGfxProcessor.getBitmap(file.getAbsolutePath(), fileRect, orientation, fileRect.right, fileRect.bottom);
@@ -600,8 +599,8 @@ public class ChatUtil {
         }
 
         File outFile = null;
-        float width = options.outWidth;
-        float height = options.outHeight;
+        float width = fileBitmap.getWidth();
+        float height = fileBitmap.getHeight();
         float totalPixels = width * height;
         float division = DOWNSCALE_IMAGES_PX / totalPixels;
         float factor = (float) Math.min(Math.sqrt(division), 1);

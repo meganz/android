@@ -683,7 +683,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         individualSubtitleToobar.setText("");
         individualSubtitleToobar.setVisibility(View.GONE);
         groupalSubtitleToolbar.setText("");
-        groupalSubtitleToolbar.setVisibility(View.GONE);
+        setGroupalSubtitleToolbarVisibility(false);
         subtitleCall.setVisibility(View.GONE);
         subtitleChronoCall.setVisibility(View.GONE);
         participantsLayout.setVisibility(View.GONE);
@@ -1449,27 +1449,48 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         logDebug("END:numberToLoad: " + numberToLoad);
     }
 
+    /**
+     * Sets the visibility of the groupalSubtitleToolbar view.
+     * If it is visible some attributes of the layout should be updated due to the marquee behaviour.
+     *
+     * This method should be used always the visibility of groupalSubtitleToolbar
+     * changes instead of change the visibility directly.
+     *
+     * @param visible   true if visible, false otherwise
+     */
+    private void setGroupalSubtitleToolbarVisibility(boolean visible) {
+        groupalSubtitleToolbar.setVisibility(visible ? View.VISIBLE : View.GONE);
+
+        if (visible) {
+            groupalSubtitleToolbar.setSelected(true);
+            groupalSubtitleToolbar.setHorizontallyScrolling(true);
+            groupalSubtitleToolbar.setFocusable(true);
+            groupalSubtitleToolbar.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+            groupalSubtitleToolbar.setMarqueeRepeatLimit(-1);
+            groupalSubtitleToolbar.setSingleLine(true);
+            groupalSubtitleToolbar.setHorizontallyScrolling(true);
+        }
+    }
+
     private void setSubtitleVisibility() {
+        boolean isGroup = chatRoom.isGroup();
+
+        individualSubtitleToobar.setVisibility(isGroup ? View.GONE : View.VISIBLE);
+        setGroupalSubtitleToolbarVisibility(isGroup);
+
         if (chatRoom.isGroup()) {
-            individualSubtitleToobar.setVisibility(View.GONE);
-            groupalSubtitleToolbar.setVisibility(View.VISIBLE);
             iconStateToolbar.setVisibility(View.GONE);
         }
-        else {
-            individualSubtitleToobar.setVisibility(View.VISIBLE);
-            groupalSubtitleToolbar.setVisibility(View.GONE);
-        }
+
         subtitleCall.setVisibility(View.GONE);
     }
 
-    private void setPreviewGroupalSubtitle () {
+    private void setPreviewGroupalSubtitle() {
         long participants = chatRoom.getPeerCount();
+
+        setGroupalSubtitleToolbarVisibility(participants > 0);
         if (participants > 0) {
-            groupalSubtitleToolbar.setVisibility(View.VISIBLE);
             groupalSubtitleToolbar.setText(adjustForLargeFont(getString(R.string.number_of_participants, participants)));
-        }
-        else {
-            groupalSubtitleToolbar.setVisibility(View.GONE);
         }
     }
 
@@ -1565,7 +1586,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         }
                         else {
                             groupalSubtitleToolbar.setText(null);
-                            groupalSubtitleToolbar.setVisibility(View.GONE);
+                            setGroupalSubtitleToolbarVisibility(false);
                         }
                     }
                     else{
@@ -1733,7 +1754,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
         if (customSubtitle.toString().trim().isEmpty()){
             groupalSubtitleToolbar.setText(null);
-            groupalSubtitleToolbar.setVisibility(View.GONE);
+            setGroupalSubtitleToolbarVisibility(false);
         }
         else {
             groupalSubtitleToolbar.setText(adjustForLargeFont(customSubtitle.toString()));
@@ -2215,7 +2236,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void hideRecordingLayout(){
-        if(recordingLayout.getVisibility() == View.GONE) return;
+        if(recordingLayout == null || recordingLayout.getVisibility() == View.GONE) return;
         recordingChrono.setText("00:00");
         recordingLayout.setVisibility(View.GONE);
     }
@@ -2519,7 +2540,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                 logDebug("The call in this chat is In progress, but I do not participate");
                 MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
-                checkCamera();
                 megaChatApi.startChatCall(idChat, startVideo, this);
             }
             return;
@@ -2530,14 +2550,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logDebug("There is not a call in this chat and I am not in another call");
             MegaApplication.setCallLayoutStatus(idChat, false);
             MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
-            checkCamera();
             megaChatApi.startChatCall(idChat, startVideo, this);
         }
 
-    }
-
-    private void checkCamera() {
-        if (startVideo) app.manuallyActivatedLocalCamera();
     }
 
     private boolean checkPermissions(String permission, int requestCode) {
@@ -7080,7 +7095,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
                 idChat = request.getChatHandle();
 
-                if (e.getErrorCode() == MegaChatError.ERROR_OK && idChat != MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE) {
+                if (idChat != MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE) {
                     dbH.setLastPublicHandle(idChat);
                     dbH.setLastPublicHandleTimeStamp();
                     dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CHAT);
@@ -8259,7 +8274,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (isGroup()) {
             subtitleCall.setVisibility(View.VISIBLE);
             individualSubtitleToobar.setVisibility(View.GONE);
-            groupalSubtitleToolbar.setVisibility(View.GONE);
+            setGroupalSubtitleToolbarVisibility(false);
         }
         usersWithVideo();
         activateChrono(true, subtitleChronoCall, call);
@@ -8577,7 +8592,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private void checkIfServiceCanStart(Intent intent) {
         preservedIntents.add(intent);
         if (!isAskingForMyChatFiles) {
-            isAskingForMyChatFiles = true;
             checkIfIsNeededToAskForMyChatFilesFolder();
         }
     }
@@ -8592,6 +8606,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 proceedWithAction();
             }
         } else {
+            isAskingForMyChatFiles = true;
             megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
         }
     }
@@ -8603,11 +8618,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 startService(intent);
             }
             preservedIntents.clear();
-            isAskingForMyChatFiles = false;
         }
     }
 
     public void setMyChatFilesFolder(MegaNode myChatFilesFolder) {
+        isAskingForMyChatFiles = false;
         this.myChatFilesFolder = myChatFilesFolder;
     }
 

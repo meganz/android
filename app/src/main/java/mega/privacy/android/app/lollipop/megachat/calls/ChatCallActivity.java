@@ -196,21 +196,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.call_action, menu);
         cameraSwapMenuItem = menu.findItem(R.id.cab_menu_camera_swap);
+        cameraSwapMenuItem.setEnabled(true);
+        cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.background_chat));
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if(isNecessaryToShowSwapCameraOption()){
+        if (isNecessaryToShowSwapCameraOption() && callChat.hasLocalVideo()) {
             cameraSwapMenuItem.setVisible(true);
-            if(callChat.hasLocalVideo()){
-                cameraSwapMenuItem.setEnabled(true);
-                cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.background_chat));
-            }else{
-                cameraSwapMenuItem.setEnabled(false);
-                cameraSwapMenuItem.setIcon(mutateIcon(this, R.drawable.ic_camera_swap, R.color.white_50_opacity));
-            }
-        }else{
+        } else {
             cameraSwapMenuItem.setVisible(false);
         }
 
@@ -1460,18 +1455,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 logDebug("Video FAB");
                 if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                     displayLinearFAB(false);
-                    application.manuallyActivatedLocalCamera();
                     megaChatApi.answerChatCall(chatId, true, this);
                     clearHandlers();
                     answerCallFAB.clearAnimation();
                     videoFAB.clearAnimation();
 
                 } else if (callChat.hasLocalVideo()) {
-                    logDebug("Disable Video");
                     megaChatApi.disableVideo(chatId, this);
                 } else {
                     logDebug("Enable Video");
-                    application.manuallyActivatedLocalCamera();
                     megaChatApi.enableVideo(chatId, this);
                 }
                 sendSignalPresence();
@@ -1988,19 +1980,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private void createAppRTCAudioManager(boolean isSpeakerOn){
         rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn);
-        rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
-            @Override
-            public void needToUpdate(boolean isNear) {
-                boolean realStatus = application.getVideoStatus(callChat.getChatid());
-                if(!realStatus){
-                    inTemporaryState = false;
-                }else if(isNear){
-                    inTemporaryState = true;
-                    megaChatApi.disableVideo(chatId, ChatCallActivity.this);
-                }else{
-                    inTemporaryState = false;
-                    megaChatApi.enableVideo(chatId, ChatCallActivity.this);
-                }
+        rtcAudioManager.setOnProximitySensorListener(isNear -> {
+            boolean realStatus = application.getVideoStatus(callChat.getChatid());
+            if(!realStatus){
+                inTemporaryState = false;
+            }else if(isNear){
+                inTemporaryState = true;
+                megaChatApi.disableVideo(chatId, ChatCallActivity.this);
+            }else{
+                inTemporaryState = false;
+                megaChatApi.enableVideo(chatId, ChatCallActivity.this);
             }
         });
     }
@@ -2290,7 +2279,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             megaChatApi.signalPresenceActivity();
         }
         application.setSpeakerStatus(callChat.getChatid(), isVideoCall);
-        if (isVideoCall) application.manuallyActivatedLocalCamera();
         megaChatApi.answerChatCall(chatId, isVideoCall, this);
     }
 

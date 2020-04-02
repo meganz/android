@@ -3211,10 +3211,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
     		return;
 		}
 
-		dbH.setLastPublicHandle(handle);
-		dbH.setLastPublicHandleTimeStamp();
-		dbH.setLastPublicHandleType(AFFILIATE_TYPE_CONTACT);
-
 		handleInviteContact = handle;
     	dismissOpenLinkDialog();
 		logDebug("Handle to invite a contact: " + handle);
@@ -11609,7 +11605,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			return;
 		}
 
-		if (((MegaApplication) getApplication()) == null || ((MegaApplication) getApplication()).getMyAccountInfo() == null) {
+		if (app == null || app.getMyAccountInfo() == null) {
 			return;
 		}
 
@@ -11631,6 +11627,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					businessLabel.setVisibility(View.VISIBLE);
 				}
 
+				if (getSettingsFragment() != null) {
+					sttFLol.updateCancelAccountSetting();
+				}
 			} else {
 				businessLabel.setVisibility(View.GONE);
 				upgradeAccount.setVisibility(View.VISIBLE);

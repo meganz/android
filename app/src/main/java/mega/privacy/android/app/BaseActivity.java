@@ -26,16 +26,12 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import mega.privacy.android.app.listeners.ChatLogoutListener;
-import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
@@ -44,6 +40,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -81,6 +78,9 @@ public class BaseActivity extends AppCompatActivity {
     private boolean isPaused = false;
 
     private DisplayMetrics outMetrics;
+
+    //Indicates when the activity should finish due to some error
+    private static boolean finishActivityAtError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -544,6 +544,10 @@ public class BaseActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 isExpiredBusinessAlertShown = false;
+                if (finishActivityAtError) {
+                    finishActivityAtError = false;
+                    finish();
+                }
                 dialog.dismiss();
             }
         });
@@ -615,5 +619,13 @@ public class BaseActivity extends AppCompatActivity {
 
     public DisplayMetrics getOutMetrics() {
         return outMetrics;
+    }
+
+    protected void setFinishActivityAtError(boolean finishActivityAtError) {
+        BaseActivity.finishActivityAtError = finishActivityAtError;
+    }
+
+    protected boolean isBusinessExpired() {
+        return megaApi.isBusinessAccount() && megaApi.getBusinessStatus() == BUSINESS_STATUS_EXPIRED;
     }
 }
