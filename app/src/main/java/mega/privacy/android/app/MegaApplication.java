@@ -13,7 +13,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.hardware.camera2.CameraManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -98,7 +97,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.7.4_297";
+	static final public String USER_AGENT = "MEGAAndroid/3.7.5_298";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -161,10 +160,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private static MegaApplication singleApplicationInstance;
 
 	private PowerManager.WakeLock wakeLock;
-	private Handler cameraHandler = null;
-	private CameraManager cameraManager = null;
-	private CameraManager.AvailabilityCallback cameraCallback = null;
-	private boolean localCameraEnabled = false;
 
 	private CallListener callListener = new CallListener();
 
@@ -182,60 +177,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
 		intent.putExtra("actionType", GO_OFFLINE);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-	}
-
-	private void disableLocalCamera() {
-		if (localCameraEnabled) {
-			localCameraEnabled = false;
-			return;
-		}
-		if (megaChatApi == null) return;
-
-		long chatIdCallInProgress = getChatCallInProgress();
-		MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
-		if (callInProgress != null && callInProgress.hasLocalVideo()) {
-			logDebug("Disabling local video ... the camera is using by other app");
-			megaChatApi.disableVideo(chatIdCallInProgress, null);
-		}
-	}
-
-	private void checkDeviceCamera() {
-		if (cameraManager != null) return;
-		cameraManager = (CameraManager) getApplicationContext().getSystemService(Context.CAMERA_SERVICE);
-		if (cameraHandler == null) cameraHandler = new Handler();
-
-		if (cameraCallback == null) {
-			cameraCallback = new CameraManager.AvailabilityCallback() {
-				@Override
-				public void onCameraAvailable(String cameraId) {
-					super.onCameraAvailable(cameraId);
-					disableLocalCamera();
-				}
-
-				@Override
-				public void onCameraUnavailable(String cameraId) {
-					super.onCameraUnavailable(cameraId);
-					disableLocalCamera();
-				}
-			};
-		}
-		cameraManager.registerAvailabilityCallback(cameraCallback, cameraHandler);
-	}
-
-	public void manuallyActivatedLocalCamera(){
-		localCameraEnabled = true;
-	}
-
-	private void clearCameraHandle(){
-		if (cameraHandler != null) {
-			cameraHandler.removeCallbacksAndMessages(null);
-			cameraHandler = null;
-		}
-		if(cameraManager != null && cameraCallback != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-			cameraManager.unregisterAvailabilityCallback((CameraManager.AvailabilityCallback) cameraCallback);
-			cameraManager = null;
-			cameraCallback = null;
-		}
 	}
 
 	public static void smsVerifyShowed(boolean isShowed) {
@@ -496,8 +437,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						if (listAllCalls == null || listAllCalls.size() == 0)
 							return;
 
-						checkDeviceCamera();
-
 						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
 							setAudioManagerValues(callStatus);
 						}
@@ -517,7 +456,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						break;
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
 						removeValues(chatId);
-						clearCameraHandle();
 						break;
 
 					case MegaChatCall.CALL_STATUS_DESTROYED:
@@ -548,16 +486,17 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		megaApi = getMegaApi();
-		megaApiFolder = getMegaApiFolder();
-		megaChatApi = getMegaChatApi();
-        scheduleCameraUploadJob(getApplicationContext());
-        storageState = dbH.getStorageState();
 
 		initLoggerSDK();
 		initLoggerKarere();
 
 		checkAppUpgrade();
+
+		megaApi = getMegaApi();
+		megaApiFolder = getMegaApiFolder();
+		megaChatApi = getMegaChatApi();
+        scheduleCameraUploadJob(getApplicationContext());
+        storageState = dbH.getStorageState();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -1298,13 +1237,11 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			logDebug("The call is already opened");
 			return;
 		}
-
 		MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
 		if (callToLaunch == null || callToLaunch.getStatus() > MegaChatCall.CALL_STATUS_IN_PROGRESS){
 			logWarning("Launch not in correct status");
 			return;
 		}
-
 		logDebug("Open the call");
 		if (shouldNotify(this) && !isActivityVisible()) {
 			PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
