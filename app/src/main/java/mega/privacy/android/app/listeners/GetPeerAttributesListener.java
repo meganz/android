@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.HashMap;
 
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import nz.mega.sdk.MegaChatApiJava;
@@ -22,6 +23,13 @@ public class GetPeerAttributesListener extends ChatBaseListener {
         super(context);
     }
 
+    /**
+     * Constructor used to ask for participants' attributes from GroupChatInfoActivityLollipop.
+     *
+     * @param context               current Context
+     * @param participantRequests   HashMap<Integer, MegaChatParticipant> in which the keys are the positions in adapter
+     *                              and the values the participants of the chat to check
+     */
     public GetPeerAttributesListener(Context context, HashMap<Integer, MegaChatParticipant> participantRequests) {
         super(context);
 
@@ -39,6 +47,8 @@ public class GetPeerAttributesListener extends ChatBaseListener {
             if (chatHandle != INVALID_HANDLE && handleList != null) {
                 if (context instanceof GroupChatInfoActivityLollipop) {
                     ((GroupChatInfoActivityLollipop) context).updateParticipants(chatHandle, participantRequests, handleList);
+                } else if (context instanceof ChatActivityLollipop) {
+                    ((ChatActivityLollipop) context).updateCustomSubtitle(chatHandle, handleList);
                 }
             } else {
                 logError("Error asking for user attributes. Chat handle: " + chatHandle + " handleList: " + handleList == null ? "NULL" : "not null");

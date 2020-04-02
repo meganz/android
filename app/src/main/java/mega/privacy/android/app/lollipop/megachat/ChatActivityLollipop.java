@@ -105,6 +105,7 @@ import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
+import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -179,6 +180,8 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class ChatActivityLollipop extends DownloadableActivity implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
+
+    private static final int MAX_NAMES_PARTICIPANTS = 4;
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -1705,47 +1708,111 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void setCustomSubtitle(){
+    private String getParticipantName(long handle) {
+        String participant;
+        //Check nickname
+        String nickname = getNicknameContact(handle);
+        if (nickname != null) {
+            participant = nickname;
+        } else {
+            String participantName = chatRoom.getPeerFirstnameByHandle(handle);
+            if (isTextEmpty(participantName)) {
+                //Get the lastname
+                String participantLastName = chatRoom.getPeerLastnameByHandle(handle);
+                if (isTextEmpty(participantLastName)) {
+                    //Get the email
+                    participant = chatRoom.getPeerEmailByHandle(handle);
+                } else {
+                    //Append last name to the title
+                    participant = participantLastName;
+                }
+            } else {
+                //Append first name to the title
+                participant = participantName;
+            }
+        }
+
+        return participant;
+    }
+
+    private void setCustomSubtitle() {
         logDebug("setCustomSubtitle");
 
         long participantsCount = chatRoom.getPeerCount();
-        StringBuilder customSubtitle = new StringBuilder("");
-        for(int i=0;i<participantsCount;i++) {
+        StringBuilder customSubtitle = new StringBuilder();
 
-            if(i!=0){
+        for (int i = 0; i < participantsCount; i++) {
+            if ((i == 1 || i == 2) && areMoreParticipants(i)) {
                 customSubtitle.append(", ");
             }
-            String participant;
-            //Check nickname
-            String nickname = getNicknameContact(chatRoom.getPeerHandle(i));
-            if (nickname != null) {
-                participant = nickname;
-            } else {
-                String participantName = chatRoom.getPeerFirstname(i);
-                if (isTextEmpty(participantName)) {
-                    //Get the lastname
-                    String participantLastName = chatRoom.getPeerLastname(i);
-                    if (isTextEmpty(participantLastName)) {
-                        //Get the email
-                        participant = chatRoom.getPeerEmail(i);
-                    } else {
-                        //Append last name to the title
-                        participant = participantLastName;
-                    }
-                } else {
-                    //Append first name to the title
-                    participant = participantName;
+
+            String firstNames = customSubtitle.toString();
+
+            String participantName = getParticipantName(chatRoom.getPeerHandle(i));
+            if (isTextEmpty(participantName)) {
+                sendGetPeerAttributesRequest(participantsCount);
+                return;
+            } else if (i == 0 && !areMoreParticipants(i)) {
+                groupalSubtitleToolbar.setText(adjustForLargeFont(participantName));
+            } else if (i > 0 && !areMoreParticipants(i)) {
+                if (!isTextEmpty(firstNames)) {
+                    groupalSubtitleToolbar.setText(adjustForLargeFont(getResources().getQuantityString(R.plurals.custom_subtitle_of_group_chat, 1, firstNames, participantName)));
                 }
+            } else if (areMoreParticipantsThanMaxAllowed(i)) {
+                if (!isTextEmpty(firstNames)) {
+                    groupalSubtitleToolbar.setText(adjustForLargeFont(getResources().getQuantityString(R.plurals.custom_subtitle_of_group_chat, 4, firstNames, participantsCount - 3)));
+                }
+                break;
+            } else {
+                customSubtitle.append(participantName);
             }
-            customSubtitle.append(participant);
         }
-        if (customSubtitle.toString().trim().isEmpty()){
+
+        if (isTextEmpty(groupalSubtitleToolbar.getText().toString())) {
             groupalSubtitleToolbar.setText(null);
             groupalSubtitleToolbar.setVisibility(View.GONE);
+        } else {
+            groupalSubtitleToolbar.setVisibility(View.VISIBLE);
         }
-        else {
-            groupalSubtitleToolbar.setText(adjustForLargeFont(customSubtitle.toString()));
+    }
+
+    private boolean areMoreParticipants(long position) {
+        return chatRoom.getPeerCount() > position + 1;
+    }
+
+    private boolean areSameParticipantsAsMaxAllowed(long position) {
+        return chatRoom.getPeerCount() == MAX_NAMES_PARTICIPANTS && position == 3;
+    }
+
+    private boolean areMoreParticipantsThanMaxAllowed(long position) {
+        return chatRoom.getPeerCount() >= MAX_NAMES_PARTICIPANTS && position == 3;
+    }
+
+    private void sendGetPeerAttributesRequest(long participantsCount) {
+        MegaHandleList handleList = MegaHandleList.createInstance();
+
+        for (int i = 0; i < participantsCount; i++) {
+            handleList.addMegaHandle(chatRoom.getPeerHandle(i));
+
+            if (areSameParticipantsAsMaxAllowed(i) || areMoreParticipantsThanMaxAllowed(i)){
+                break;
+            }
         }
+
+        if (handleList.size() > 0) {
+            megaChatApi.loadUserAttributes(chatRoom.getChatId(), handleList, chatRoom.getAuthorizationToken(), new GetPeerAttributesListener(this));
+        }
+    }
+
+    public void updateCustomSubtitle(long chatId, MegaHandleList handleList) {
+        if (handleList == null || handleList.size() == 0
+                || chatId != chatRoom.getChatId() || megaChatApi.getChatRoom(chatId) == null) {
+            return;
+        }
+
+        chatRoom = megaChatApi.getChatRoom(chatId);
+
+        setCustomSubtitle();
     }
 
     public void setLastGreen(String date){

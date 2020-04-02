@@ -2415,6 +2415,11 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d participants</item>
     </plurals>
 
+    <plurals name="custom_subtitle_of_group_chat">
+        <item context="Subtitle chat screen for groups with permissions, not archived and custom titles. When there are up to 4 participants in the chat. Example: user1, user2, user3 and user4" quantity="one">%1$s and %2$s</item>
+        <item context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more" quantity="other">%1$s and %2$d more</item>
+    </plurals>
+
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Before you can generate a link for this chat, you need to set a description:</string>
 
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat link copied to the clipboard</string>
