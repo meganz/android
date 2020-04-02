@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
@@ -13,6 +12,7 @@ import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.FileUtil;
+import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.download.ChatDownloadInfo;
@@ -68,7 +68,7 @@ public class DownloadableActivity extends SorterContentActivity {
                     if(fromChat) {
                         if (chatDownloadInfo != null) {
                             ChatController controller = new ChatController(this);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            if (!FileUtils.isBasedOnSAF()) {
                                 controller.requestLocalFolder(chatDownloadInfo.getSize(), chatDownloadInfo.getSerializedNodes(), sdCardOperator.getSDCardRoot());
                             } else {
                                 controller.download(extractRealPath(treeUri), chatDownloadInfo.getNodeList());
@@ -79,13 +79,13 @@ public class DownloadableActivity extends SorterContentActivity {
                     } else {
                         if (nC != null) {
                             if (downloadInfo != null) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                if (!FileUtils.isBasedOnSAF()) {
                                     nC.requestLocalFolder(downloadInfo, sdCardOperator.getSDCardRoot(), null);
                                 } else {
                                     nC.checkSizeBeforeDownload(extractRealPath(treeUri), null, downloadInfo.getSize(), downloadInfo.getHashes(), downloadInfo.isHighPriority());
                                 }
                             } else if (linkInfo != null) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                if (!FileUtils.isBasedOnSAF()) {
                                     nC.intentPickFolder(linkInfo.getNode(), linkInfo.getUrl(), sdCardOperator.getSDCardRoot());
                                 } else {
                                     nC.downloadTo(linkInfo.getNode(), extractRealPath(treeUri), linkInfo.getUrl());
@@ -95,7 +95,7 @@ public class DownloadableActivity extends SorterContentActivity {
                             NodeController controller = new NodeController(this);
                             //file link
                             if (linkInfo != null) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                if (!FileUtils.isBasedOnSAF()) {
                                     controller.intentPickFolder(linkInfo.getNode(), linkInfo.getUrl(), sdCardOperator.getSDCardRoot());
                                 } else {
                                     controller.downloadTo(linkInfo.getNode(), extractRealPath(treeUri), linkInfo.getUrl());
@@ -104,7 +104,7 @@ public class DownloadableActivity extends SorterContentActivity {
                                 //folder link
                                 if (this instanceof FolderLinkActivityLollipop) {
                                     FolderLinkActivityLollipop activity = (FolderLinkActivityLollipop) this;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    if (!FileUtils.isBasedOnSAF()) {
                                         activity.toSelectFolder(downloadInfo.getHashes(), downloadInfo.getSize(), sdCardOperator.getSDCardRoot(), null);
                                     } else {
                                         activity.downloadTo(extractRealPath(treeUri), null, downloadInfo.getSize(), downloadInfo.getHashes());

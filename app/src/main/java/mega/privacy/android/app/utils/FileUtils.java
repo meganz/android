@@ -713,5 +713,14 @@ public class FileUtils {
             }
         }
     }
+
+    /**
+     * According device's Android version to see if get file path and write permission by SAF.
+     *
+     * @return true if using SAF to get file path and write permission on the path.
+     */
+    public static boolean isBasedOnSAF() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q;
+    }
 }
 
