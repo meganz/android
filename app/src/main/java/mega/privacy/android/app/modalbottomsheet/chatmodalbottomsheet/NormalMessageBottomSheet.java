@@ -1,6 +1,5 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -19,6 +18,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiImageView;
+import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -48,8 +48,8 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
     int position;
 
     private BottomSheetBehavior mBehavior;
-
-    private LinearLayout mainLinearLayout;
+    private RelativeLayout mainLayout;
+    private LinearLayout optionsLayout;
 
     private LinearLayout reactionsLayout;
     private RelativeLayout firstReaction;
@@ -62,6 +62,7 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
     private EmojiImageView fourthEmoji;
     private RelativeLayout fifthReaction;
     private EmojiImageView fifthEmoji;
+    private EmojiKeyboard emojiKeyboard;
 
     private RelativeLayout addReaction;
 
@@ -131,9 +132,12 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
         heightDisplay = outMetrics.heightPixels;
 
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_text_msg, null);
+        mainLayout = contentView.findViewById(R.id.bottom_sheet);
 
-        mainLinearLayout = contentView.findViewById(R.id.bottom_sheet_text_msg);
+        emojiKeyboard = contentView.findViewById(R.id.emoji_keyboard);
+        emojiKeyboard.init(((ChatActivityLollipop) context), px2dp(239, outMetrics));
 
+        optionsLayout = contentView.findViewById(R.id.bottom_sheet_options_layout);
         reactionsLayout = contentView.findViewById(R.id.reaction_layout);
         firstReaction = reactionsLayout.findViewById(R.id.first_emoji_layout);
         firstEmoji = reactionsLayout.findViewById(R.id.first_emoji_image);
@@ -169,7 +173,6 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
         fifthReaction.setOnClickListener(this);
         addReaction.setOnClickListener(this);
 
-
         if (message == null || chatRoom == null || !(context instanceof ChatActivityLollipop) || ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) || message.isUploading()) {
             optionForward.setVisibility(View.GONE);
             optionEdit.setVisibility(View.GONE);
@@ -199,7 +202,7 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
         }
 
         dialog.setContentView(contentView);
-        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+        mBehavior = BottomSheetBehavior.from((View) mainLayout.getParent());
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(itemsLayout, heightDisplay, context, 48));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
@@ -216,17 +219,17 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
         switch(v.getId()){
 
             case R.id.forward_layout:
-               ((ChatActivityLollipop) context).forwardMessages(messagesSelected);
+                ((ChatActivityLollipop) context).forwardMessages(messagesSelected);
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.edit_layout:
-                ((ChatActivityLollipop) context).editMessagesOption(messagesSelected);
+                ((ChatActivityLollipop) context).editMessage(messagesSelected);
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.copy_layout:
-                ((ChatActivityLollipop) context).optionCopy(message);
+                ((ChatActivityLollipop) context).copyMessage(message);
                 dismissAllowingStateLoss();
                 break;
 
@@ -244,21 +247,14 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
                 break;
 
             case R.id.icon_more_reactions:
-                dismissAllowingStateLoss();
+                if(emojiKeyboard != null){
+                    optionsLayout.setVisibility(View.GONE);
+                    emojiKeyboard.setVisibility(View.VISIBLE);
+                }
                 break;
         }
 
-        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-        mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-    public int getPositionByMail(String email){
-        long userCount = message.getMessage().getUsersCount();
-        for(int i=0;i<userCount;i++){
-            if(message.getMessage().getUserEmail(i).equals(email)){
-                return i;
-            }
-        }
-        return -1;
+        mBehavior = BottomSheetBehavior.from((View) mainLayout.getParent());
     }
 
     @Override

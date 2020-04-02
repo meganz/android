@@ -22,7 +22,7 @@
         android:id="@+id/cab_menu_invite_chat"
         android:orderInCategory="120"
         android:title="@string/add_participants_menu_item"
-        MEGA:showAsAction="never" />
+        MEGA:showAsAction="always" />
 
     <item
         android:id="@+id/cab_menu_contact_info_chat"

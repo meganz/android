@@ -27,6 +27,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 public class EmojiKeyboard extends LinearLayout {
 
     private boolean isListenerActivated = true;
+    private boolean isReactionsKeyboard = false;
+
     private Activity activity;
     private EmojiEditTextInterface editInterface;
     private RecentEmoji recentEmoji;
@@ -46,11 +48,11 @@ public class EmojiKeyboard extends LinearLayout {
     private ImageButton emojiIcon;
     private int keyboardHeight;
 
-    //Click in EMOJI
     private final OnEmojiClickListener clickListener = new OnEmojiClickListener() {
         @Override
         public void onEmojiClick(@NonNull final EmojiImageView imageView, @NonNull final Emoji emoji) {
-            if (isListenerActivated) {
+            if(isReactionsKeyboard){
+            }else if (isListenerActivated) {
                 editInterface.input(emoji);
                 recentEmoji.addEmoji(emoji);
                 imageView.updateEmoji(emoji);
@@ -62,11 +64,6 @@ public class EmojiKeyboard extends LinearLayout {
     private OnPlaceButtonListener buttonListener;
     private boolean isLetterKeyboardShown = false;
     private boolean isEmojiKeyboardShown = false;
-
-    public EmojiKeyboard(Context context) {
-        super(context);
-        init(null, 0);
-    }
 
     public EmojiKeyboard(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -120,6 +117,13 @@ public class EmojiKeyboard extends LinearLayout {
         DisplayMetrics outMetrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
         keyboardHeight = (outMetrics.heightPixels / 2) - getActionBarHeight(activity, getResources());
+        requestLayout();
+    }
+
+    public void init(Activity context, int height) {
+        this.activity = context;
+        this.keyboardHeight = height;
+        isReactionsKeyboard = true;
         requestLayout();
     }
 
