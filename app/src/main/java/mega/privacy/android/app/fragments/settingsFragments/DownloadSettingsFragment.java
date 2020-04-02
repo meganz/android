@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.annotation.NonNull;
@@ -18,7 +17,6 @@ import java.io.File;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
-import mega.privacy.android.app.utils.FileUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
 
@@ -115,7 +113,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
             if (intent == null) {
                 logDebug("intent NULL");
                 if (resultCode != Activity.RESULT_OK) {
-                    if (!FileUtils.isBasedOnSAF()) {
+                    if (isBasedOnFileStorage()) {
                         showSnackbar(context, getString(R.string.download_requires_permission));
                     }
                 } else {
@@ -137,7 +135,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
                         logError("SDCardOperator initialize failed", e);
                     }
                     if (sdCardOperator != null) {
-                        if (!FileUtils.isBasedOnSAF()) {
+                        if (isBasedOnFileStorage()) {
                             toSelectFolder(sdCardOperator.getSDCardRoot());
                         } else {
                             downloadLocationPath = getFullPathFromTreeUri(treeUri, context);
