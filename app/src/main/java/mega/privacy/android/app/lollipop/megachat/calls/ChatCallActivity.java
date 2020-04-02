@@ -1565,9 +1565,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * @param needToBeEnable Value is true, if it has to be activated. False in the opposite case.
      */
     private void updateVideoFABStatus(boolean needToBeEnable) {
-        if (!videoFAB.isShown())
-            return;
-
         if (needToBeEnable) {
             //Enable video FAB
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
@@ -1577,6 +1574,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
         }
+
+        if(!videoFAB.isShown()) videoFAB.show();
     }
 
     /**
