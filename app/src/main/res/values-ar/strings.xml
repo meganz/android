@@ -1822,11 +1822,12 @@
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">تم إنهاء حسابك بسبب مخالفة شروط الخدمة الخاصة ب MEGA، مثل إساءة استخدام حقوق الآخرين؛ مشاركة /أو استيراد البيانات غير المشروعة؛ أو إساءة استخدام النظام.</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">لا توجد ملفات</string>
-    <string name="label_file_size_byte" context="size in byte">بايت</string>
-    <string name="label_file_size_kilo_byte" context="size in kilobyte">كيلو بايت</string>
-    <string name="label_file_size_mega_byte" context="size in megabyte">ميغابايب</string>
-    <string name="label_file_size_giga_byte" context="size in gigabyte">جيجابايت</string>
-    <string name="label_file_size_tera_byte" context="size in terabyte">تيرابايت</string>
+    <string name="label_file_size_byte" context="size in byte">%s بايت</string>
+    <string name="label_file_size_kilo_byte" context="size in kilobyte">%s كيلو بايت</string>
+    <string name="label_file_size_mega_byte" context="size in megabyte">%s ميغابايب</string>
+    <string name="label_file_size_giga_byte" context="size in gigabyte">%s جيجابايت</string>
+    <string name="label_file_size_tera_byte" context="size in terabyte">%s تيرابايت</string>
+    <string name="label_mega_byte" context="size in byte">بايت</string>
 
     <plurals name="number_of_versions" formatted="false">
         <item context="Number of versions of a file shown on the screen info of the file, version item" quantity="one">%1$d نسخة معدلة</item>

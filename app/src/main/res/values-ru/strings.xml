@@ -1822,11 +1822,12 @@
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Ваша учетная запись была прервана из-за нарушения Условий предоставления услуг MEGA, таких как злоупотребление правами других лиц; обмен и/или импорт незаконных данных; или злоупотребление системой.</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">Нет файлов</string>
-    <string name="label_file_size_byte" context="size in byte">Б</string>
-    <string name="label_file_size_kilo_byte" context="size in kilobyte">КБ</string>
-    <string name="label_file_size_mega_byte" context="size in megabyte">МБ</string>
-    <string name="label_file_size_giga_byte" context="size in gigabyte">ГБ</string>
-    <string name="label_file_size_tera_byte" context="size in terabyte">ТБ</string>
+    <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s Б</string>
+    <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s КБ</string>
+    <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s МБ</string>
+    <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s ГБ</string>
+    <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s ТБ</string>
+    <string name="label_mega_byte" context="Size in megabytes.">МБ</string>
 
     <plurals name="number_of_versions" formatted="false">
         <item context="Number of versions of a file shown on the screen info of the file, version item" quantity="one">Версия %1$d</item>
