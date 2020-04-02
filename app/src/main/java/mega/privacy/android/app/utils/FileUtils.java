@@ -742,12 +742,13 @@ public class FileUtils {
     }
 
     /**
-     * According device's Android version to see if get file path and write permission by SAF.
+     * According device's Android version to see if get file path and write permission by FileStorageActivity.
      *
-     * @return true if using SAF to get file path and write permission on the path.
+     * @return true if using FileStorageActivity to get file path and write permission on the path.
+     *         false by SAF
      */
-    public static boolean isBasedOnSAF() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT > Build.VERSION_CODES.P;
+    public static boolean isBasedOnFileStorage() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT <= Build.VERSION_CODES.P;
     }
 }
 
