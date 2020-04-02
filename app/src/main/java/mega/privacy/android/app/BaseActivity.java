@@ -46,6 +46,7 @@ import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -88,6 +89,9 @@ public class BaseActivity extends AppCompatActivity {
     private boolean isPaused = false;
 
     private DisplayMetrics outMetrics;
+
+    //Indicates when the activity should finish due to some error
+    private static boolean finishActivityAtError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -551,6 +555,10 @@ public class BaseActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 isExpiredBusinessAlertShown = false;
+                if (finishActivityAtError) {
+                    finishActivityAtError = false;
+                    finish();
+                }
                 dialog.dismiss();
             }
         });
@@ -622,6 +630,14 @@ public class BaseActivity extends AppCompatActivity {
 
     public DisplayMetrics getOutMetrics() {
         return outMetrics;
+    }
+
+    protected void setFinishActivityAtError(boolean finishActivityAtError) {
+        BaseActivity.finishActivityAtError = finishActivityAtError;
+    }
+
+    protected boolean isBusinessExpired() {
+        return megaApi.isBusinessAccount() && megaApi.getBusinessStatus() == BUSINESS_STATUS_EXPIRED;
     }
 
     /**

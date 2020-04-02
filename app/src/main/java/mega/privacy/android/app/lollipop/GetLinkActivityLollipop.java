@@ -6,17 +6,19 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
 
@@ -36,7 +38,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
 
 public class GetLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface {
 
@@ -191,6 +192,12 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		showFragment(visibleFragment);
+
+		if (isBusinessExpired()) {
+			setFinishActivityAtError(true);
+			LocalBroadcastManager.getInstance(getApplicationContext())
+					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+		}
 	}
 
     @Override
@@ -339,7 +346,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (e.getErrorCode() == MegaError.API_OK) {
 			logDebug("link: " + request.getLink());
-			
+
 			//for megaApi.encryptLinkWithPassword() case, request.getNodeHandle() returns -1 and cause selectedNode set to null
 			long handle = request.getNodeHandle();
 			if(handle == -1){
@@ -353,7 +360,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 					getLinkFragment.requestFinish(request, e);
 				}
 			}
-		} else {
+		} else if (e.getErrorCode() != MegaError.API_EBUSINESSPASTDUE){
 			logWarning("Error: " + e.getErrorString());
 			showSnackbar(getString(R.string.context_no_link));
 		}
