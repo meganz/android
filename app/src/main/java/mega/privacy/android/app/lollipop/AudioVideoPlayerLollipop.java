@@ -107,7 +107,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
@@ -129,7 +128,6 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
@@ -153,7 +151,6 @@ import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
@@ -162,9 +159,10 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class AudioVideoPlayerLollipop extends DownloadableActivity implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
-        MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener, MegaChatCallListenerInterface {
+        MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
     public static final String IS_PLAYLIST = "IS_PLAYLIST";
@@ -329,7 +327,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     private ArrayList<File> zipMediaFiles = new ArrayList<>();
     private boolean isZip = false;
     private GetMediaFilesTask getMediaFilesTask;
-
     private long [] nodeHandles;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -351,6 +348,22 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
     };
 
+    private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null)
+                return;
+
+            if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
+                int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+                if ((callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT || callStatus == MegaChatCall.CALL_STATUS_RING_IN)
+                        && player != null && player.getPlayWhenReady()) {
+                    player.setPlayWhenReady(false);
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -362,6 +375,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
         LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
+
+        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+        filter.addAction(ACTION_CALL_STATUS_UPDATE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
 
         downloadLocationDefaultPath = getDownloadLocation(this);
 
@@ -598,7 +615,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 if (megaChatApi == null) {
                     megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
                 }
-
                 if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
                     logDebug("Refresh session - karere");
                     Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
@@ -608,8 +624,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     finish();
                     return;
                 }
-
-                megaChatApi.addChatCallListener(this);
 
                 if (isFolderLink) {
                     megaApiFolder = app.getMegaApiFolder();
@@ -792,16 +806,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             if (fromChat) {
                 fromChatSavedInstance = true;
             }
-        }
-    }
-
-    @Override
-    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        logDebug("onChatCallUpdate ");
-        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)
-                && (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN || call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)
-                && player != null && player.getPlayWhenReady()) {
-            player.setPlayWhenReady(false);
         }
     }
 
@@ -1929,12 +1933,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         if (!onPlaylist){
             logDebug("NOT on Playlist mode");
             searchMenuItem.setVisible(false);
+            shareMenuItem.setVisible(showShareOption(adapterType, isFolderLink, handle));
 
             if (adapterType == OFFLINE_ADAPTER){
                 logDebug("OFFLINE_ADAPTER");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(true);
                 propertiesMenuItem.setVisible(true);
                 downloadMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
@@ -1951,12 +1955,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 logDebug("SEARCH_ADAPTER");
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
-                if (isUrl){
-                    shareMenuItem.setVisible(false);
-                }
-                else {
-                    shareMenuItem.setVisible(true);
-                }
                 if(node.isExported()){
                     removelinkMenuItem.setVisible(true);
                     getlinkMenuItem.setVisible(false);
@@ -1995,7 +1993,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 logDebug("FROM_CHAT");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
                 moveMenuItem.setVisible(false);
                 copyMenuItem.setVisible(false);
@@ -2045,7 +2042,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 logDebug("FILE_LINK_ADAPTER");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(true);
                 renameMenuItem.setVisible(false);
@@ -2061,7 +2057,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             else if (adapterType == ZIP_ADAPTER) {
                 propertiesMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
-                shareMenuItem.setVisible(true);
                 downloadMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
@@ -2085,13 +2080,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(true);
-
-                if (isUrl){
-                    shareMenuItem.setVisible(false);
-                }
-                else {
-                    shareMenuItem.setVisible(true);
-                }
 
                 MegaNode node = megaApi.getNodeByHandle(handle);
                 int accessLevel = megaApi.getAccess(node);
@@ -2121,12 +2109,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 chatRemoveMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
-                if (!isUrl) {
-                    shareMenuItem.setVisible(true);
-                }
-                else {
-                    shareMenuItem.setVisible(false);
-                }
                 removelinkMenuItem.setVisible(false);
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
@@ -2153,14 +2135,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             else {
                 logDebug("else");
                 boolean shareVisible = true;
-                shareMenuItem.setVisible(true);
 
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if (node == null){
                     getlinkMenuItem.setVisible(false);
                     removelinkMenuItem.setVisible(false);
-                    shareMenuItem.setVisible(false);
                     propertiesMenuItem.setVisible(false);
                     downloadMenuItem.setVisible(false);
                     renameMenuItem.setVisible(false);
@@ -2174,16 +2154,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     chatRemoveMenuItem.setVisible(false);
                 }
                 else {
-                    if(adapterType==CONTACT_FILE_ADAPTER){
-                        shareMenuItem.setVisible(false);
-                        shareVisible = false;
-                    }
-                    else{
-                        if(isFolderLink){
-                            shareMenuItem.setVisible(false);
-                            shareVisible = false;
-                        }
-                    }
                     copyMenuItem.setVisible(true);
 
                     if(node.isExported()){
@@ -2273,12 +2243,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
 
                     downloadMenuItem.setVisible(true);
-                    if (isUrl){
-                        shareMenuItem.setVisible(false);
-                    }
-                    else if (shareVisible){
-                        shareMenuItem.setVisible(true);
-                    }
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
                     chatRemoveMenuItem.setVisible(false);
@@ -2342,16 +2306,15 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             }
             case R.id.full_video_viewer_share: {
                 logDebug("Share option");
-                Uri newUri = uri;
-                if (uri.toString().contains(VOICE_CLIP_FOLDER)) {
-                    MegaNode file = megaApi.getNodeByHandle(handle);
-                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
-                    if (localPath == null) break;
-                    File voiceClipFile = new File(localPath);
-                    newUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", voiceClipFile);
+                if (adapterType == OFFLINE_ADAPTER) {
+                    shareFile(this, getOfflineFile(this, mediaOffList.get(currentWindowIndex)));
+                } else if (adapterType == ZIP_ADAPTER) {
+                    shareFile(this, zipMediaFiles.get(currentWindowIndex));
+                } else if (adapterType == FILE_LINK_ADAPTER) {
+                    shareLink(this, getIntent().getStringExtra(URL_FILE_LINK));
+                } else {
+                    shareNode(this, megaApi.getNodeByHandle(handle));
                 }
-
-                intentToSendFile(newUri);
                 break;
             }
             case R.id.full_video_viewer_properties: {
@@ -3117,28 +3080,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
     }
 
-    public void intentToSendFile(Uri uri){
-        logDebug("intentToSendFile");
-
-        if(uri!=null){
-            if (!isUrl) {
-                Intent share = new Intent(android.content.Intent.ACTION_SEND);
-                share.setType(MimeTypeList.typeForName(fileName).getType()+"/*");
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    logDebug("Use provider to share");
-                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
-                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                } else {
-                    share.putExtra(Intent.EXTRA_STREAM, uri);
-                }
-                startActivity(Intent.createChooser(share, getString(R.string.context_share)));
-            }
-            else{
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.not_download), -1);
-            }
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -3415,10 +3356,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             megaApi.httpServerStop();
         }
 
-        if (megaChatApi != null) {
-            megaChatApi.removeChatCallListener(this);
-        }
-
         if (megaApiFolder != null) {
             megaApiFolder.httpServerStop();
         }
@@ -3433,6 +3370,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 
         super.onDestroy();
     }
@@ -3462,7 +3400,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     setTitle(fileName);
 
                     boolean isOnMegaDownloads = false;
-                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                    String localPath = getLocalFile(this, file.getName(), file.getSize());
                     File f = new File(downloadLocationDefaultPath, file.getName());
                     if(f.exists() && (f.length() == file.getSize())){
                         isOnMegaDownloads = true;
@@ -3690,10 +3628,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 megaApi.removeTransferListener(this);
                 megaApi.removeGlobalListener(this);
                 megaApi.httpServerStop();
-            }
-
-            if (megaChatApi != null) {
-                megaChatApi.removeChatCallListener(this);
             }
 
             if (player != null){
@@ -4261,7 +4195,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                         }
                         mSource = null;
                         boolean isOnMegaDownloads = false;
-                        localPath = getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
+                        localPath = getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize());
                         File f = new File(downloadLocationDefaultPath, n.getName());
                         if (f.exists() && (f.length() == n.getSize())) {
                             isOnMegaDownloads = true;

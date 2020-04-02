@@ -37,6 +37,10 @@
 
     <string name="general_export" context="button">Exportă</string>
 
+    <string name="general_ok" context="Answer for confirmation dialog.">Ok</string>
+    <string name="general_skip" context="Skip a step of a configuration process.">Omite</string>
+    <string name="general_stop" context="Label for a button to stop some process. For example stop the Camera Uploads">Oprește</string>
+
     <string name="general_retry" context="option shown when a message could not be sent">Reîncearcă</string>
     <string name="general_open_browser" context="Button to open the default web browser">Deschide browserul</string>
     <!--
@@ -96,7 +100,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">Deconectează-te</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">Încărcare</string>
     <string name="action_create_folder" context="Menu item">Creează un folder nou</string>
-    <string name="action_open_link" context="Item menu option upon right click on one or multiple files.">Deschide linkul</string>
+    <string name="action_open_link" context="Item menu option upon right click on one or multiple files.">Deschide un link</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     -->
@@ -108,14 +112,14 @@
     <string name="action_pause" context="Search button">Pune pe pauză</string>
     <string name="action_refresh" context="Menu item">Reîmprospătează</string>
     <string name="action_sort_by" context="Menu item">Sortează după</string>
-    <string name="action_help" context="Settings category title for Help">Ajutor</string>
+    <string name="action_help" context="Menu item">Ajutor</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Upgradează contul</string>
     <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Se upgradează contul</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Selectează toate</string>
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Șterge selecția</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Vizualizare tip miniatură</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Vizualizare tip listă</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Fă backup cheii recup</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Fă backup cheii de recuperare</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Anulează abonamentul</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">Abonamentul a fost anulat</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Nu am putut anula abonamentul tău. Te rugăm să contactezi support&#64;mega.nz pentru asistență</string>
@@ -246,7 +250,7 @@
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Unitate cloud</string>
     <string name="section_recents" context="Label to reference a recents section">Recente</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Încărcări media</string>
-    <string name="section_inbox" context="title of the screen that show the inbox">Conținut media primit</string>
+    <string name="section_inbox" context="Section name for the “Messages” section.Preferably one word. There is little space for this word.">Conținut media primit</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Salvate pentru offline</string>
     <string name="section_saved_for_offline_new" context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Offline</string>
     <!--
@@ -254,14 +258,14 @@
     -->
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Foldere partajate</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Coș de gunoi</string>
-    <string name="section_contacts" context="Title of the contact list">Contacte</string>
+    <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Contacte</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Contacte [A](%1$d)[/A]</string>
     <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[B]Nicio [/B][A]cerere trimisă[/A][B].[/B]</string>
     <string name="received_requests_empty" context="the user has not received any contact request from other users">[B]Nicio [/B][A]cerere primită[/A][B].[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transferuri</string>
 
-    <string name="section_account" context="button to the settings of the user’s account">Contul meu</string>
+    <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Contul meu</string>
     <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Încărcări cameră</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
@@ -269,7 +273,7 @@
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Primite</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Efectuate</string>
 
-    <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Partajări primite</string>
+    <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">Partajări primite</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Partajări primite cu</string>
     <!--
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
@@ -294,7 +298,7 @@
     <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
     -->
     <string name="file_properties_info_size_file" context="category in sort by action">Dimensiune</string>
-    <string name="file_properties_info_last_modified" context="When the file was last modified">Ultima modificare</string>
+    <string name="file_properties_info_last_modified" context="When the file/folder was last modified">Ultima modificare</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Adăugat</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
@@ -324,7 +328,7 @@
 
     <string name="error_not_enough_free_space" context="Error message">Spațiu liber insuficient pe dispozitiv</string>
 
-    <string name="option_link_without_key" context="Alert Dialog to get link">Link fără cheie</string>
+    <string name="option_link_without_key" context="This is button text on the Get Link dialog. This lets the user get a public file/folder link without the decryption key e.g. https://mega.nz/#!Qo12lSpT.">Link fără cheie</string>
     <string name="option_decryption_key" context="Alert Dialog to get link">Cheie de decriptare</string>
 
     <!--
@@ -340,7 +344,26 @@
 	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transferring</string>
 	-->
     <string name="download_preparing_files" context="Alert shown when some content is sharing with chats and they are processing">Se pregătesc fișierele</string>
-    <string name="download_began" context="message when the download starts">Descărcarea a început</string>
+
+    <plurals name="download_began">
+        <item context="Message when a download starts. Singular 1 file" quantity="one">Descărcarea a început</item>
+        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">Au început %1$d descărcări</item>
+    </plurals>
+
+    <plurals name="download_finish">
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">Descărcarea s-a terminat</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">Au fost terminate %1$d descărcări</item>
+    </plurals>
+
+    <plurals name="upload_began">
+        <item context="Message when a upload starts. Singular 1 file" quantity="one">Încărcarea a început</item>
+        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">Au început %1$d încărcări</item>
+    </plurals>
+
+    <plurals name="upload_finish">
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">Încărcarea s-a terminat</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">Au fost terminate %1$d încărcări</item>
+    </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -361,7 +384,7 @@
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Elimină linkul</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Acest link nu va mai fi disponibil publicului.</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Redenumește</string>
-    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Deschide linkul</string>
+    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Deschide un link</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Deschide</string>
     <string name="context_renaming" context="while renaming a file or folder">Se redenumește</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Se pregătește fișierul</string>
@@ -428,7 +451,7 @@
     <!--
     <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Phone Contacts</string>
     -->
-    <string name="context_delete" context="Button in My Account section to confirm the account deletion">Șterge</string>
+    <string name="context_delete" context="menu item">Șterge</string>
     <!--
     <string name="context_more" context="menu item">More</string>
     -->
@@ -509,6 +532,11 @@
     -->
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Îți mulțumim pentru feedback! Sigur vrei să anulezi abonamentul MEGA?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Abonamentul tău nu a fost anulat. Te rugăm să furnizezi un motiv pentru anulare</string>
+    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Îți mulțumim că te-ai abonat la %1$s %2$s!</string>
+    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
+    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
+    <string name="subscription_type_monthly" context="">Lunar</string>
+    <string name="subscription_type_yearly" context="">Anual</string>
 
     <string name="context_node_private" context="success message after removing the public link of a folder">Folderul este acum privat</string>
 
@@ -556,7 +584,6 @@
     </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">Resursă temporar indisponibilă, te rugăm să reîncerci mai târziu</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Nu se poate deschide fișierul selectat</string>
-    <string name="upload_began" context="when an upload starts, a message is shown to the user">Încărcarea a început</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Se dezarhivează fișierul</string>
 
     <string name="error_io_problem" context="error message while browsing the local filesystem">Problemă cu sistemul de fișiere</string>
@@ -643,17 +670,14 @@
     -->
     <string name="menu_cancel_all_transfers" context="menu item">Șterge toate transferurile</string>
 
-    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Realizează fotografie</string>
+    <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Realizează o fotografie</string>
 
-    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Allow notifications for incoming MEGA calls</string>
-    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
-    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
+    <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Permite notificări pentru apelurile MEGA primite</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA are nevoie de autorizarea ta pentru a permite interfața de apel să apară de pe fundal.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Nu-ți fă griji, poți totuși să acorzi manual permisiunile din setările dispozitivului.</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Numai Wi-Fi</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi sau plan de date</string>
-    <string name="general_ok" context="Answer for confirmation dialog.">Ok</string>
-    <string name="general_skip" context="skip the step of camera upload">Omite</string>
-    <string name="general_stop" context="skip the step of camera upload">Oprește</string>
     <string name="cam_sync_syncing" context="The upload of the user’s photos orvideos from their specified album is in progress.">Încărcări cameră în curs</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Vrei să oprești încărcări cameră?</string>
     <!--
@@ -687,7 +711,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Afișează dispozitivele avansate (SD extern)</string>
 	<string name="add_phone_number_label" context="Label of button on account page that ask user to add their phone number">Adaugă un număr de telefon</string>
 	<string name="verify_account_title" context="enter verification code page title">Verifică-ți contul</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Contul tău a fost suspendat temporar din cauza unor posibile abuzuri. Te rugăm să verifici numărul de telefon pentru a-ți debloca contul.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Contul tău a fost blocat temporar din cauza unor posibile abuzuri. Te rugăm să verifici numărul de telefon pentru a-ți debloca contul.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Țară</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Numărul tău de telefon</string>
     <string name="general_back_button" context="Button label - go to previous page">Înapoi</string>
@@ -696,7 +720,7 @@
 	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Te rugăm să selectezi un cod al unei țări</string>
     <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Codurile țărilor nu au putut fi obținute.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Te rugăm să furnizezi un număr de telefon valid.</string>
-	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">Te rugăm să tastezi codul de verificare trimis către</string>
+	<string name="verify_account_enter_txt_label" context="Label tell user to enter received txt to below input boxes">Te rugăm să introduci codul de verificare trimis către</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Verifică-ți contul</string>
 	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Cod greșit. Te rugăm să încerci din nou sau să retrimiți.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">Nu ai primit un cod?</string>
@@ -773,7 +797,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Fișierele tale locale vor fi șterse și vei fi deconectat după 10 încercări eșuate</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Cod incorect</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Cod PIN greșit, te rugăm să încerci din nou. Ai 1 încercare rămasă</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">PIN greșit, te rugăm să încerci din nou. Ai 1 încercare rămasă</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Cod PIN greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Codurile PIN nu coincid</string>
@@ -785,7 +809,7 @@
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Despre</string>
     <string name="settings_about_privacy_policy" context="App means “Application”">Politica de confidențialitate</string>
-    <string name="settings_about_terms_of_service" context="App means “Application”">Termenii de utilizare a serviciului</string>
+    <string name="settings_about_terms_of_service" context="">Termenii de utilizare a serviciului</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">Versiunea aplicației</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">Versiune MEGA SDK</string>
@@ -939,8 +963,11 @@
 
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">Trebuie să fii autentificat pentru a efectua această acțiune.</string>
+    <string name="change_email_not_logged_in" context="Error message when a user attempts to change their email without an active login session.">Trebuie să fii autentificat pentru a finaliza modificarea e-mailului. Te rugăm să te autentifici din nou cu adresa de e-mail actuală și apoi dă clic pe linkul de confirmare din nou.</string>
+    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">Felicitări, noua adresă de e-mail pentru acest cont MEGA este: %1$s</string>
     <string name="invalid_string" context="Error when the user leaves empty the password field">Incorect</string>
 
+    <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">Intrare nevalidă</string>
     <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Adresă de e-mail nevalidă</string>
     <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Te rugăm să verifici adresa de e-mail și să încerci din nou.</string>
     <!--
@@ -992,7 +1019,7 @@
     <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Beneficiază pe deplin de contul tău MEGA upgradându-l la PRO.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Editează poza de profil</string>
-    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Realizează fotografie</string>
+    <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Realizează o fotografie</string>
     <string name="choose_photo_avatar_panel" context="Option of the sliding panel to change the avatar by choosing an existing picture">Alege poza</string>
     <string name="delete_avatar_panel" context="Option of the sliding panel to delete the existing avatar">Șterge poza</string>
 
@@ -1080,15 +1107,12 @@
     <!--
     <string name="archive_chat_empty" context="Message shown when the user has no archived chats">No archived conversations</string>
     -->
-    <string name="recent_chat_enable_chat" context="Message shown when the user has no archived chats">Chatul este dezactivat</string>
-    <string name="recent_chat_enable_chat_button" context="Message shown when the user has no archived chats">Activează chatul</string>
 
     <!--
     <string name="get_started_button" context="Button to start using the chat">Get started</string>
     -->
 
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invită-ți prietenii pentru a se alătura în chat și bucură-te de platforma noastră criptată cu intimitate și securitate.</string>
-    <!--<string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat[A]and enjoy our encrypted platform with privacy and security.</string>-->
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
@@ -1166,7 +1190,7 @@
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Adaugă participanți</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Elimină participantul</string>
 
-    <string name="mega_info_empty_screen" context="Message about MEGA when there are no message in the chat screen">Îți protejează conversațiile cu criptare (controlată de utilizator) capăt-la-capăt oferind asigurări de siguranță:</string>
+    <string name="mega_info_empty_screen" context="Message about MEGA when there are no message in the chat screen">Îți protejează conversațiile cu criptare (controlată de utilizator) capăt-la-capăt, oferind asigurări esențiale de siguranță:</string>
     <string name="mega_authenticity_empty_screen" context="Message about MEGA when there are no message in the chat screen">Sistemul se asigură că datele primite sunt într-adevăr de la expeditorul specificat, iar conținutul său nu a fost manipulat în timpul tranzitului.</string>
     <string name="mega_confidentiality_empty_screen" context="Message about MEGA when there are no message in the chat screen">Doar autorul și destinatarii vizați sunt capabili să descifreze și să citească conținutul.</string>
 
@@ -1235,8 +1259,6 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] a părăsit chatul de grup[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Mesaj netrimis. Apasă pentru opțiuni</string>
-
-    <string name="chat_status_title" context="settings of the chat to choose the status">Stare</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1349,10 +1371,9 @@
 
     <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Elimini din Salvate pentru offline?</string>
 
-    <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chatul este dezactivat și nu poate fi activat fără o conexiune.</string>
-
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Setează statusul</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Înlătură</string>
+    <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Indisponibil</string>
 
     <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">Invitație acceptată</string>
     <string name="context_invitacion_reply_declined" context="Declined request invitacion alert">Invitație respinsă</string>
@@ -1432,10 +1453,20 @@
         <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Se încarcă %1$d din %2$d fișiere</item>
     </plurals>
 
+    <plurals name="upload_service_paused_notification">
+        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">Se încarcă %1$d din %2$d fișier (pus pe pauză)</item>
+        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Se încarcă %1$d din %2$d fișiere (puse pe pauză)</item>
+    </plurals>
+
 	<plurals name="folder_upload_service_notification">
 		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Se încarcă %1$d din %2$d folder</item>
 		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Se încarcă %1$d din %2$d foldere</item>
 	</plurals>
+
+    <plurals name="folder_upload_service_paused_notification">
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Se încarcă %1$d din %2$d folder (pus pe pauză)</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Se încarcă %1$d din %2$d foldere (puse pe pauză)</item>
+    </plurals>
 
     <plurals name="upload_service_final_notification">
         <item context="Text of the notification shown when the upload service has finished, Singular" quantity="one">%1$d fișier încărcat</item>
@@ -1484,7 +1515,12 @@
         <item context="Text of the notification shown when the download service is running, Plural" quantity="other">Se descarcă %1$d din %2$d fișiere</item>
     </plurals>
 
-    <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is depleted">Cotă de transfer epuizată</string>
+    <plurals name="download_service_paused_notification">
+        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">Se descarcă %1$d din %2$d fișier (pus pe pauză)</item>
+        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Se descarcă %1$d din %2$d fișiere (puse pe pauză)</item>
+    </plurals>
+
+    <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Cotă de transfer insuficientă</string>
     <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Transferul în coadă depășește cota de transfer actuală disponibilă pentru adresa ta IP și, prin urmare, poate fi întreruptă.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Vezi planurile noastre</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continuă fără cont</string>
@@ -1555,7 +1591,7 @@
 
     <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">Anulează contul</string>
     <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">Dacă anulezi contul, nu vei putea accesa datele contului, contactele sau conversațiile MEGA.\nNu vei putea anula această acțiune.</string>
-    <string name="delete_button" context="Button in My Account section to confirm the account deletion">Șterge</string>
+    <string name="delete_button" context="menu item">Șterge</string>
 
     <string name="file_properties_info_info_file">Informații</string>
     <string name="file_properties_info_size" context="Refers to the size of a file.">Dimensiune totală</string>
@@ -1625,13 +1661,13 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">Bonusuri pentru recomandări</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">Instalează o aplicație mobilă</string>
-    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">Adaugă nr. de tel. mobil</string>
+    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">Adaugă un nr. de tel. mobil</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Bonus de înregistrare</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Instalează aplicația desktop MEGA</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Cotă de bază a contului</string>
     <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">Niciun fișier în Încărcări cameră</string>
     <string name="general_num_days_left" context="indicates the number of days left related to a achievement">%1$d z rămase</string>
-    <string name="expired_achievement" context="state to indicate the achievement has expired">Expirat</string>
+    <string name="expired_label" context="State to indicate something has expired (achivements of business status account for instance)">Expirat</string>
 
     <string name="setting_title_use_https_only" context="title of the advanced setting to choose the use of https">Nu folosi HTTP</string>
     <string name="setting_subtitle_use_https_only" context="subtitle of the advanced setting to choose the use of https">Activează această opțiune numai dacă transferurile tale nu pornesc. În circumstanțe normale, HTTP este satisfăcător deoarece toate transferurile sunt deja criptate.</string>
@@ -1666,7 +1702,7 @@
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Niciun folder partajat</string>
 
-    <string name="settings_help" context="Settings category title for Help">Ajutor</string>
+    <string name="settings_help" context="Menu item">Ajutor</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Trimite feedback</string>
     <string name="setting_feedback_subject" context="mail subject">Feedback pentru Android</string>
     <string name="setting_feedback_body" context="mail body">Te rugăm să scrii feedbackul aici:</string>
@@ -1717,7 +1753,7 @@
 
     <string name="not_permited_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">Numai contactele MEGA pot fi adăugate</string>
 
-    <string name="invalid_connection_state" context="Info label about the connectivity state of an individual chat">Chat deconectat</string>
+    <string name="invalid_connection_state" context="Info label about the connectivity state of the chat">Se reconectează la chat</string>
 
     <string name="call_error" context="Message show when a call cannot be established">Eroare: Apelul nu poate fi stabilit</string>
 
@@ -1727,7 +1763,7 @@
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Opțiuni avansate</string>
     <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">MEGA are nevoie de permisiunea ta pentru a descărca fișiere</string>
-    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Cardul SD vechi este indisponibil, te rugăm să setezi o nouă locație de descărcare.</string>
     <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Alege locația de descărcare</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">Nu au fost acordate permisiunile pentru contacte</string>
@@ -1739,7 +1775,7 @@
     <string name="save_cloud_drive" context="Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive">În unitatea cloud</string>
     <string name="save_file_system" context="Option shown in QR code bottom sheet dialog to save QR code in File System">În sistemul de fișiere</string>
     <string name="section_my_code" context="Title of QR code section">Codul meu</string>
-    <string name="section_scan_code" context="Title of QR code scan section">Scanează codul</string>
+    <string name="section_scan_code" context="Title of QR code scan section">Scanează un cod</string>
     <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">Acceptă automat</string>
     <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Utilizatorii MEGA care îți scanează codul QR vor fi adăugați automat în lista de contacte.</string>
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Codul QR anterior nu va mai fi valid</string>
@@ -1760,7 +1796,7 @@
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">Invitația nu a fost trimisă. %s este deja în lista de contacte.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">Invitația nu a fost trimisă. A apărut o eroare la procesarea acesteia.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Se generează codul QR&#8230;</string>
-    <string name="menu_item_scan_code" context="Title of QR code scan menu item">Scanează codul QR</string>
+    <string name="menu_item_scan_code" context="Title of QR code scan menu item">Scanează un cod QR</string>
     <string name="button_copy_link" context="get the contact link and copy it">Copiază linkul</string>
     <string name="button_create_qr" context="Create QR code">Creează cod QR</string>
     <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">Cod QR creat cu succes</string>
@@ -1777,7 +1813,6 @@
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Setează perioada</string>
 
     <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invită-ți prietenii să intre pe [/B][A]Chat[/A][B] și bucură-te de platforma noastră criptată cu intimitate și securitate.[/B]</string>
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">[C]Activează [/C][B]chatul[/B][A][C] și bucură-te de platforma noastră criptată cu intimitate și securitate.[/C]</string>
 
     <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Niciun conținut media în [/B][A]Încărcări cameră[/A][B].[/B]</string>
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Coș de gunoi[/A] [B]gol[/B][B].[/B]</string>
@@ -1785,7 +1820,7 @@
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Niciun fișier în [/B][A]Conținut media primit[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Niciun fișier în [/B][A]unitatea cloud[/A][B].[/B]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Niciun fișier în [/B][A]Offline[/A][B].[/B]</string>
-    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]Niciun [/B][A]contact[/A][B].[/B]</string>
+    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Niciun [/B][A]contact[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Nicio[/A] [B]conversație[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Se încarcă[/A] [B]conversațiile&#8230;[/B]</string>
@@ -1902,13 +1937,11 @@
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">Îți mai aduci aminte parola?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">Ești pe cale să te deconectezi, te rugăm să îți testezi parola pentru a te asigura că ți-o aduci aminte.\nDacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Te rugăm să îți testezi parola mai jos pentru a te asigura că ți-o aduci aminte. Dacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
-    <string name="general_do_not_show" context="‘Do you remember your password?’ dialog option that permits user do not show it again">Nu-mi afișa din nou</string>
+    <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Nu-mi afișa din nou</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Testează parola</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Testează-ți parola</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Parolă acceptată</string>
     <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Parolă greșită.\nFă un backup al cheii de recuperare cât mai curând posibil!</string>
-    <string name="recovery_key_exported_dialog_title" context="Title of the dialog ‘Recovery Key exported’">Cheie de recuperare exportată</string>
-    <string name="recovery_key_exported_dialog_text" context="Text of the dialog ‘Recovery Key exported’">Cheia de recuperare a fost exportată în secțiunea Offline ca RecoveryKey.txt.\nNotă: Aceasta va fi ștearsă dacă te deconectezi, te rugăm să o stochezi într-un loc sigur.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">Ești pe cale să te deconectezi, te rugăm să îți testezi parola pentru a te asigura că ți-o aduci aminte.\nDacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Copiază în clipboard</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Exportă cheia de recuperare</string>
@@ -1921,8 +1954,8 @@
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">Mesaje noi</string>
 
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">Apel de intrare</string>
-    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
-    <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">MEGA background pop-ups are disabled.\nTap to change the settings.</string>
+    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Mergi la apel</string>
+    <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">Popupurile în fundal MEGA sunt dezactivate.\nAtinge pentru a schimba setările.</string>
 
     <plurals name="number_unread_messages">
         <item context="Subtitle to show the number of unread messages on a chat, unread message" quantity="one">%1$s mesaj necitit</item>
@@ -2010,7 +2043,7 @@
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Autentificarea cu doi factori activată</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">Data viitoare când te autentifici în contul ți se va cere să introduci un cod din 6 cifre furnizat de aplicația de autentificare.</string>
     <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Fă backup cheii de recuperare</b></string>
-    <string name="pin_error_2fa" context="Error shown when it is scanning a QR code and it is invalid">Cod nevalid</string>
+    <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Cod nevalid</string>
     <string name="lost_your_authenticator_device" context="Title of screen Lost authenticator decive">Ți-ai pierdut dispozitivul pentru autentificare?</string>
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Verificare la autentificare</string>
     <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">Autentificare cu doi factori\nModifică parola</string>
@@ -2144,7 +2177,7 @@
 
     <string name="error_own_email_as_contact" context="Error shown if a user tries to add their own email address as a contact">Nu este nevoie să adaugi adresa de e-mail proprie</string>
 
-    <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Cod nevalid</string>
+    <string name="invalid_code" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Cod nevalid</string>
 
     <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Unitatea cloud este aproape plină. Upgradează la PRO și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Unitatea cloud este aproape plină. Upgradează acum și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
@@ -2171,7 +2204,7 @@
     <string name="contact_info_button_more" context="More button in contact info page">Mai multe</string>
 
     <plurals name="plural_select_file">
-        <item context="Section title to select a file to perform an action, one file" quantity="one">Alege un fișier</item>
+        <item context="one file" quantity="one">Alege un fișier</item>
         <item context="Section title to select a file to perform an action, more files" quantity="other">Alege fișiere</item>
     </plurals>
 
@@ -2251,7 +2284,7 @@
     <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Rotația cheii este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele din trecut.</string>
 
     <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Rotația cheii este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele din trecut.</string>
-    <string name="action_open_chat_link" context="Menu item">Deschide linkul chatului</string>
+    <string name="action_open_chat_link" context="Menu item">Deschide un link de chat</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">Invitația către contactul %s a fost trimisă înainte și poate fi consultată în fila Cereri trimise.</string>
 
@@ -2289,6 +2322,15 @@
     <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]Fișierul tău partajat public [/A][B]%s[/B][C] a fost eliminat.[/C]</string>
     <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]Folderul tău partajat public [/A][B]%s[/B][C] a fost eliminat.[/C]</string>
 
+    <string name="message_file_takedown_pop_out_notification" context="Popup notification text on mouse-over of taken down file.">Acest fișier a făcut obiectul unei notificări de eliminare.</string>
+    <string name="message_folder_takedown_pop_out_notification" context="Popup notification text on mouse-over taken down folder.">Acest folder a făcut obiectul unei notificări de eliminare.</string>
+    <string name="dispute_takendown_file" context="option to dispute taken down file or folder">Contestă eliminarea</string>
+    <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">Indisponibil din cauza încălcării ToS/AUP</string>
+    <plurals name="alert_taken_down_files">
+        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">%d fișier nu a fost descărcat din cauza încălcării ToS/AUP.</item>
+        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">%d fișiere nu au fost descărcate din cauza încălcării ToS/AUP.</item>
+    </plurals>
+
     <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Fișierul tău partajat public [/A][B]%s[/B][C] a fost restabilit.[/C]</string>
     <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]Folderul tău partajat public [/A][B]%s[/B][C] a fost restabilit.[/C]</string>
 
@@ -2311,8 +2353,10 @@
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Selectează metoda de plată</string>
 
     <string name="billing_period_title" context="title of billing period">Perioadă de facturare</string>
-    <string name="billed_monthly_text" context="option of billing period, monthly">[A]Facturare lunară[/A] %s /lună</string>
-    <string name="billed_yearly_text" context="option of billing period, yearly">[A]Facturare anuală[/A] %s /an</string>
+    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
+    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]One-off (year)[/A] %s</string>
+    <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]Lunară[/A] %s/lună</string>
+    <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Anuală[/A] %s/an</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">Anulează</string>
     <string name="button_continue" context="dialog option continue in alert dialog">Continuă</string>
 
@@ -2322,6 +2366,7 @@
     <string name="payment_method_centili" context="one of the payment methods">[A]Operator mobil[/A] (plată unică)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NOU</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Pentru a upgrada abonamentul actual, te rugăm să contactezi asistența pentru un [A]plan personalizat[/A].</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">numele fișierului</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Afișează văzut(ă) ultima dată&#8230;</string>
@@ -2373,6 +2418,7 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Linkul chatului copiat în clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]De la[/A] %s / [A]lună[/A] *</string>
+    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user / [A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Abonarea recurentă poate fi anulată în orice moment înainte de data de reînnoire.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Apel început</string>
 
@@ -2389,13 +2435,15 @@
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permite accesul la cameră pentru a scana documente, a realiza fotografii și a efectua apeluri video.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Activează apelurile</string>
     <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Activează accesul la contacte</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGA are nevoie de acces la contacte pentru a te ajuta să te conectezi cu alte persoane de pe MEGA.</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permite accesul la microfon pentru a efectua apeluri criptate.</string>
     <string name="general_enable_access" context="General enable access">Activează accesul</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Fișiere partajate</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Atașament trimis deja</string>
 
+    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]Apel de grup încheiat[/A][C]. Durata: [/C]</string>
     <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]Apel încheiat[/A][C]. Durata: [/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s oră[/B]</item>
@@ -2409,6 +2457,8 @@
         <item context="Message that shows the seconds of a call when it ends, one second" quantity="one">[B]%1$d secundă[/B]</item>
         <item context="Message that shows the seconds of a call when it ends, more seconds" quantity="other">[B]%1$d secunde[/B]</item>
     </plurals>
+    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]Apel încheiat[/A]</string>
+    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]Apel de grup încheiat[/A]</string>
 
     <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]Văzut(ă) ultima dată [/A]astăzi, %1$s</string>
     <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user">[A]Văzut(ă) ultima dată [/A]cu mult timp în urmă</string>
@@ -2443,6 +2493,9 @@
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
+    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">Încă poți acorda permisiuni MEGA în setările dispozitivului.</string>
+    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
+
     <plurals name="messages_forwarded_success_plural" formatted="false">
         <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">Mesaj redirecționat</item>
         <item context="Confirmation message after forwarding one or several messages, version items" quantity="other">Mesaje redirecționate</item>
@@ -2470,8 +2523,9 @@
         <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d contact găsit pe MEGA</item>
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacte găsite pe MEGA</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user&#039;s phone contacts have a MEGA account. In other case here would appear all the user&#039;s phone contacts that have a MEGA account.">Inviți contactul acum?</string>
+    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Inviți un contact acum?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Vezi cine este deja pe MEGA</string>
+    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Se încarcă contactele pe MEGA&#8230;</string>
 
 
@@ -2541,7 +2595,7 @@
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s a amuțit acest apel</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Amuțit</string>
 
-    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File already downloaded. Copied to the selected path.</string>
+    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">Fișier deja descărcat. Copiat în calea selectată.</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Alătură-te apelului</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">Pentru a te alătura acestui apel, trebuie să termini apelul actual.</string>
@@ -2621,6 +2675,30 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Se încarcă</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Te rugăm să astepți&#8230;</string>
 
+    <string name="account_label" context="Head label to show the business account type">Account type</string>
+    <string name="business_label" context="Label in My Account section to show user account type">Business</string>
+    <string name="admin_label" context="Business user role">Admin</string>
+    <string name="user_label" context="Business user role">Utilizator</string>
+    <string name="status_label" context="General label to show the status of something or someone">Stare</string>
+    <string name="active_label" context="State to indicate something is active (business status account for instance)">Activă</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">Grație</string>
+    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
+    <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Utilizare</string>
+    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
+    <string name="overall_usage_label" context="Title of overall usage section in Storage">Utilizare generală</string>
+    <string name="transfer_label" context="Title of transfer section in Storage">Transferuri</string>
+
+    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
+    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">A fost o problemă cu ultima plată. Te rugăm să accesezi MEGA folosind un browser desktop pentru mai multe informații.</string>
+    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Contul tău business a expirat</string>
+    <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">A apărut o problemă la procesarea plății. MEGA este limitat în modul numai vizualizare până când această problemă a fost rezolvată într-un browser web desktop.</string>
+    <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">În prezent, contul tău este [B]suspendat[/B]. Poți răsfoi numai prin datele tale.</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Deși MEGA nu are acces la datele tale, administratorii organizației tale pot controla și vedea încărcările cameră din contul tău de utilizator</string>
+    <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Ceva a mers prost</string>
+    <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contactează administratorul contului business pentru a rezolva problema și pentru a-ți activa contul.</string>
+    <string name="business_account_clarification" context="">** For genuine business purposes.</string>
+    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep the placeholder is to indicate if the space is refered to storage or transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]%1$s[/A] **</string>
+
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe dispozitiv.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Când te deconectezi, transferurile în curs vor fi anulate.</string>
     <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe dispozitiv și transferurile în curs vor fi anulate.</string>
@@ -2636,14 +2714,24 @@
     <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Eroare. Folderul %1$s s nu a fost creat</string>
 
     <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Verifică adresa de e-mail</string>
-    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Contul tău a fost temporar suspendat pentru siguranța ta.</string>
-    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]Please verify your email address[/A] and follow the steps in MEGA’s email to unlock your account.</string>
+    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Contul tău a fost blocat temporar pentru siguranța ta.</string>
+    <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]Te rugăm să-ți verifici adresa de e-mail[/A] și urmează pașii din e-mailul MEGA pentru a-ți debloca contul.</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">De ce văd asta?</string>
-    <string name="resend_email_label" cotext="Label of a button which action is resend an email">Resend email</string>
+    <string name="resend_email_label" cotext="Label of a button which action is resend an email">Retrimite e-mailul</string>
+    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">E-mail trimis deja. Te rugăm să aștepți câteva minute înainte de a încerca din nou.</string>
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Conturi blocate</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Este posibil să folosești aceeași parolă pentru contul tău MEGA ca și pentru alte servicii și că cel puțin unul dintre aceste alte servicii a suferit o încălcare a securității datelor.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Parola ta s-a scurs și acum este folosită de persoane rău-intenționate pentru a se autentifica în conturile tale, inclusiv, dar nu numai, în contul tău MEGA.</string>
 
-    <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
+    <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Se reconectează</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Te-ai întors.</string>
+
+    <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">Se înregistrează&#8230;</string>
+    <string name="create_new_file_action" context="Text shown for the action create new file">Creează un fișier nou</string>
+    <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Eroare privind permisiunile</string>
+    <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">Nu ai permisiunile necesare pentru a reveni la versiunea anterioară pentru acest fișier. Pentru a continua, putem crea un nou fișier cu datele readuse la versiunea anterioară. Dorești să continui?</string>
+    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
+
+    <string name="download_location" context="Download location label">Locație de descărcare</string>
+    <string name="confirmation_download_location" context="Text asking confirmation for download location">Salvezi întotdeauna în această locație?</string>
 </resources>

@@ -873,6 +873,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void startCall() {
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if (chatRoomTo != null) {
+
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
 				Intent i = new Intent(this, ChatCallActivity.class);
 				i.putExtra(CHAT_ID, chatRoomTo.getChatId());
@@ -2489,7 +2490,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
 		MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
-		if (startVideo) app.manuallyActivatedLocalCamera();
 		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
 		waitingForCall = false;
 	}

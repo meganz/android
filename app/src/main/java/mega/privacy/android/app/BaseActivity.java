@@ -1,15 +1,20 @@
 package mega.privacy.android.app;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,24 +31,22 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import mega.privacy.android.app.listeners.ChatLogoutListener;
-import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -63,6 +66,11 @@ public class BaseActivity extends AppCompatActivity {
 
     private boolean delaySignalPresence = false;
 
+    //Indicates if app is requesting the required permissions to enable the SDK logger
+    private boolean permissionLoggerSDK = false;
+    //Indicates if app is requesting the required permissions to enable the Karere logger
+    private boolean permissionLoggerKarere = false;
+
     public BaseActivity() {
         app = MegaApplication.getInstance();
 
@@ -81,6 +89,9 @@ public class BaseActivity extends AppCompatActivity {
     private boolean isPaused = false;
 
     private DisplayMetrics outMetrics;
+
+    //Indicates when the activity should finish due to some error
+    private static boolean finishActivityAtError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -544,6 +555,10 @@ public class BaseActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 isExpiredBusinessAlertShown = false;
+                if (finishActivityAtError) {
+                    finishActivityAtError = false;
+                    finish();
+                }
                 dialog.dismiss();
             }
         });
@@ -615,5 +630,85 @@ public class BaseActivity extends AppCompatActivity {
 
     public DisplayMetrics getOutMetrics() {
         return outMetrics;
+    }
+
+    protected void setFinishActivityAtError(boolean finishActivityAtError) {
+        BaseActivity.finishActivityAtError = finishActivityAtError;
+    }
+
+    protected boolean isBusinessExpired() {
+        return megaApi.isBusinessAccount() && megaApi.getBusinessStatus() == BUSINESS_STATUS_EXPIRED;
+    }
+
+    /**
+     * Shows a dialog to confirm enable the SDK logs.
+     */
+    protected void showConfirmationEnableLogsSDK() {
+        showConfirmationEnableLogs(true, false);
+    }
+
+    /**
+     * Shows a dialog to confirm enable the Karere logs.
+     */
+    protected void showConfirmationEnableLogsKarere() {
+        showConfirmationEnableLogs(false, true);
+    }
+
+    /**
+     * Shows a dialog to confirm enable the SDK and/or Karere logs.
+     * @param sdk True to confirm enable the SDK logs or false otherwise.
+     * @param karere True to confirm enable the Karere logs or false otherwise.
+     */
+    private void showConfirmationEnableLogs(boolean sdk, boolean karere) {
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    if (!hasPermissions(baseActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        permissionLoggerSDK = sdk;
+                        permissionLoggerKarere = karere;
+                        requestPermission(baseActivity, REQUEST_WRITE_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                        break;
+                    }
+                    if (sdk) {
+                        setStatusLoggerSDK(baseActivity, true);
+                    }
+                    if (karere) {
+                        setStatusLoggerKarere(baseActivity, true);
+                    }
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+                    break;
+            }
+        };
+
+        androidx.appcompat.app.AlertDialog.Builder builder;
+        builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        logDebug("Request Code: " + requestCode);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_WRITE_STORAGE) {
+            if (permissionLoggerKarere) {
+                permissionLoggerKarere = false;
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setStatusLoggerKarere(baseActivity, true);
+                } else {
+                    Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
+                }
+            } else if (permissionLoggerSDK) {
+                permissionLoggerSDK = false;
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setStatusLoggerSDK(baseActivity, true);
+                } else {
+                    Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
+                }
+            }
+        }
     }
 }
