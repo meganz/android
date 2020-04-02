@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -738,6 +739,15 @@ public class FileUtils {
                 logWarning("Exception creating video thumbnail", e);
             }
         }
+    }
+
+    /**
+     * According device's Android version to see if get file path and write permission by SAF.
+     *
+     * @return true if using SAF to get file path and write permission on the path.
+     */
+    public static boolean isBasedOnSAF() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT > Build.VERSION_CODES.P;
     }
 }
 

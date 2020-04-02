@@ -199,7 +199,7 @@ public class SelectDownloadLocationDialog {
                                     break;
                             }
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            if (!FileUtils.isBasedOnSAF()) {
                                 try {
                                     sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                                     selectLocalFolder(sdCardRoot);

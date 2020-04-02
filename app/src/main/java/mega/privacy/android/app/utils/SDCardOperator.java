@@ -170,7 +170,7 @@ public class SDCardOperator {
 
     private static Intent getRequestPermissionIntent(Context context, String sdCardRoot) {
         Intent intent = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        if (!FileUtils.isBasedOnSAF()) {
             StorageManager sm = context.getSystemService(StorageManager.class);
             if (sm != null) {
                 StorageVolume volume = sm.getStorageVolume(new File(sdCardRoot));
