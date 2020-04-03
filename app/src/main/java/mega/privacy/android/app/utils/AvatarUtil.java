@@ -32,10 +32,10 @@ import static mega.privacy.android.app.utils.Util.*;
 public class AvatarUtil {
 
     /**
-     * Retrieve the first letter of an String.
+     * Retrieve the first letter of a String.
      *
-     * @param text used to obtain the first letter.
-     * @return the appropiated first letter to painted in the default avatar.
+     * @param text String to obtain the first letter.
+     * @return The first letter of the string to be painted in the default avatar.
      */
     public static String getFirstLetter(String text) {
         String resultUnknown = String.valueOf(UNKNOWN_USER_NAME_AVATAR.charAt(0)).toUpperCase(Locale.getDefault());
@@ -72,7 +72,7 @@ public class AvatarUtil {
     /**
      * Retrieve if a char is recognizable.
      *
-     * @param input_char the char to be examined.
+     * @param input_char The char to be examined.
      * @return True if the char is recognizable. Otherwise false.
      */
     private static boolean isRecognizableCharacter(char input_char) {
@@ -94,8 +94,8 @@ public class AvatarUtil {
     /**
      * Retrieve the color determined for an avatar.
      *
-     * @param user
-     * @return the default avatar color.
+     * @param user The user from whom the color of the avatar is to be obtained.
+     * @return The default avatar color.
      */
     public static int getColorAvatar(MegaUser user) {
         if (user == null) {
@@ -109,8 +109,8 @@ public class AvatarUtil {
     /**
      * Retrieve the color determined for an avatar.
      *
-     * @param handle
-     * @return the default avatar color.
+     * @param handle The identifier of the user from whom the color of the avatar is to be obtained.
+     * @return The default avatar color.
      */
     public static int getColorAvatar(long handle) {
         if (handle == -1) {
@@ -124,8 +124,8 @@ public class AvatarUtil {
     /**
      * Retrieve the color determined for an avatar.
      *
-     * @param handle
-     * @return the default avatar color.
+     * @param handle The identifier of the user from whom the color of the avatar is to be obtained.
+     * @return The default avatar color.
      */
     public static int getColorAvatar(String handle) {
         if (handle == null) {
@@ -144,6 +144,12 @@ public class AvatarUtil {
         return Color.parseColor(color);
     }
 
+    /**
+     * Retrieve the color of the avatar depending on the type.
+     *
+     * @param typeColor The kind of avatar that's going to be painted.
+     * @return The color of the avatar in particular.
+     */
     public static int getSpecificColor(String typeColor) {
         switch (typeColor) {
             case AVATAR_GROUP_CHAT_COLOR:
@@ -158,11 +164,11 @@ public class AvatarUtil {
     /**
      * Retrieve de default avatar.
      *
-     * @param colorAvatar
-     * @param textAvatar
-     * @param textSize
-     * @param isList
-     * @param customEmojis
+     * @param colorAvatar  The color of the avatar's background.
+     * @param textAvatar   The letter to be painted on the avatar.
+     * @param textSize     The size of the initial letter.
+     * @param isList       Grid or list indicator.
+     * @param customEmojis Indicator of whether or not to use mega emojis.
      * @return Bitmap with the default avatar built in.
      */
     public static Bitmap getDefaultAvatar(int colorAvatar, String textAvatar, int textSize, boolean isList, boolean customEmojis) {
@@ -225,10 +231,10 @@ public class AvatarUtil {
     /**
      * Retrieve the default avatar bitmap with custom emojis.
      *
-     * @param colorAvatar
-     * @param textAvatar
-     * @param textSize
-     * @param isList
+     * @param colorAvatar The color of the avatar's background.
+     * @param textAvatar  The letter to be painted on the avatar.
+     * @param textSize    The size of the initial letter.
+     * @param isList      Grid or list indicator.
      * @return Bitmap with the default avatar built in.
      */
     public static Bitmap getDefaultAvatar(int colorAvatar, String textAvatar, int textSize, boolean isList) {
@@ -238,12 +244,11 @@ public class AvatarUtil {
     /**
      * Retrieve the default avatar bitmap from Share Contact.
      *
-     * @param context
-     * @param megaApi
-     * @param contact
+     * @param context Context of the Activity.
+     * @param contact The contact from whom the avatar is to be obtained.
      * @return Bitmap with the default avatar built in.
      */
-    public static Bitmap getAvatarShareContact(Context context, MegaApiAndroid megaApi, ShareContactInfo contact) {
+    public static Bitmap getAvatarShareContact(Context context, ShareContactInfo contact) {
         String mail = ((AddContactActivityLollipop) context).getShareContactMail(contact);
         int color;
         if (contact.isPhoneContact()) {
@@ -281,6 +286,12 @@ public class AvatarUtil {
         return getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
     }
 
+    /**
+     * Retrieve the avatar image of a particular user.
+     *
+     * @param email The String containing the user's email.
+     * @return The bitmap with the avatar image.
+     */
     public static Bitmap getImageAvatar(String email) {
         File avatar = buildAvatarFile(MegaApplication.getInstance().getBaseContext(), email + ".jpg");
         if (isFileAvailable(avatar) && avatar.length() > 0) {
