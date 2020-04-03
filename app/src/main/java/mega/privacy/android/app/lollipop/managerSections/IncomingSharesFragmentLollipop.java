@@ -330,7 +330,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			} else {
 				emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
 			}
-			textToShow = String.format(context.getString(R.string.context_empty_incoming));
+			textToShow = context.getString(R.string.context_empty_incoming);
 		}
 
 		setFinalEmptyView(textToShow);

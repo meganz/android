@@ -61,12 +61,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 				menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-				int show;
-				if (onlyOneFileSelected) {
-					show = SHOW_AS_ACTION_NEVER;
-				} else {
-					show = SHOW_AS_ACTION_ALWAYS;
-				}
+				int show = onlyOneFileSelected ? SHOW_AS_ACTION_NEVER : SHOW_AS_ACTION_ALWAYS;
 				menu.findItem(R.id.cab_menu_copy).setShowAsAction(show);
 				menu.findItem(R.id.cab_menu_move).setShowAsAction(show);
 
@@ -356,7 +351,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			} else {
 				emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
 			}
-			textToShow = String.format(context.getString(R.string.context_empty_outgoing));
+			textToShow = context.getString(R.string.context_empty_outgoing);
 		}
 
 		setFinalEmptyView(textToShow);

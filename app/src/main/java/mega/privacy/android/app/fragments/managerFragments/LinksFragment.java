@@ -158,7 +158,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
         if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleOutgoing()
                 || managerActivity.getParentHandleOutgoing() == -1) {
             emptyImageView.setImageResource(R.drawable.ic_zero_data_public_links);
-            textToShow = String.format(context.getString(R.string.context_empty_links));
+            textToShow = context.getString(R.string.context_empty_links);
         }
 
         setFinalEmptyView(textToShow);
@@ -245,13 +245,11 @@ public class LinksFragment extends MegaNodeBaseFragment {
     }
 
     public static int getLinksOrderCloud(int orderCloud, boolean isFirstNavigationLevel) {
-        int order = orderCloud;
-
         if (!isFirstNavigationLevel) {
-            return order;
+            return orderCloud;
         }
 
-        switch (order) {
+        switch (orderCloud) {
             case ORDER_MODIFICATION_ASC:
                 return ORDER_LINK_CREATION_ASC;
 
@@ -259,7 +257,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 return ORDER_LINK_CREATION_DESC;
 
             default:
-                return order;
+                return orderCloud;
         }
     }
 }

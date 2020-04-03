@@ -22,18 +22,21 @@ import static nz.mega.sdk.MegaApiJava.*;
 public class SorterContentActivity extends PinActivityLollipop {
 
     private ManagerActivityLollipop managerActivityLollipop;
+    private FileExplorerActivityLollipop fileExplorerActivity;
+    private ManagerActivityLollipop.DrawerItem drawerItem;
 
     private boolean isIncomingOrOutgoingRootLevel;
 
     public void showSortOptions(final Context context, DisplayMetrics outMetrics) {
-
-        ManagerActivityLollipop.DrawerItem drawerItem = null;
         AlertDialog sortByDialog;
         LayoutInflater inflater = getLayoutInflater();
 
         if (context instanceof ManagerActivityLollipop) {
             managerActivityLollipop = (ManagerActivityLollipop) context;
             drawerItem = managerActivityLollipop.getDrawerItem();
+        } else if (context instanceof FileExplorerActivityLollipop) {
+            fileExplorerActivity = (FileExplorerActivityLollipop) context;
+            drawerItem = fileExplorerActivity.getCurrentItem();
         }
 
         View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
@@ -168,9 +171,7 @@ public class SorterContentActivity extends PinActivityLollipop {
                     order = managerActivityLollipop.orderCloud;
             }
         } else if (context instanceof FileExplorerActivityLollipop) {
-
             MegaPreferences prefs = DatabaseHandler.getDbHandler(context).getPreferences();
-            drawerItem = ((FileExplorerActivityLollipop) context).getCurrentItem();
 
             if (drawerItem == null) {
                 return;
@@ -185,13 +186,13 @@ public class SorterContentActivity extends PinActivityLollipop {
                     break;
 
                 case SHARED_ITEMS:
-                    if (((FileExplorerActivityLollipop) context).getParentHandleIncoming() == -1 && prefs != null && prefs.getPreferredSortOthers() != null) {
+                    if (fileExplorerActivity.getParentHandleIncoming() == -1 && prefs != null && prefs.getPreferredSortOthers() != null) {
                         order = Integer.parseInt(prefs.getPreferredSortOthers());
                     } else if (prefs != null && prefs.getPreferredSortCloud() != null) {
                         order = Integer.parseInt(prefs.getPreferredSortCloud());
                     }
 
-                    if (((FileExplorerActivityLollipop) context).getParentHandleIncoming() == -1) {
+                    if (fileExplorerActivity.getParentHandleIncoming() == -1) {
                         sortByNameTV.setText(context.getString(R.string.sortby_owner_mail));
 
                         sortByDateTV.setVisibility(View.GONE);
@@ -253,126 +254,122 @@ public class SorterContentActivity extends PinActivityLollipop {
         photoCheck.setChecked(photoFirst);
         videoCheck.setChecked(videoFirst);
 
-        final ManagerActivityLollipop.DrawerItem finalDrawerItem = drawerItem;
-        View.OnClickListener clickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean ascending = false;
-                boolean descending = false;
-                boolean newest = false;
-                boolean oldest = false;
-                boolean largest = false;
-                boolean smallest = false;
-                boolean photoFirst = false;
-                boolean videoFirst = false;
-                int order;
+        View.OnClickListener clickListener = v -> {
+            boolean ascending1 = false;
+            boolean descending1 = false;
+            boolean newest1 = false;
+            boolean oldest1 = false;
+            boolean largest1 = false;
+            boolean smallest1 = false;
+            boolean photoFirst1 = false;
+            boolean videoFirst1 = false;
+            int order1;
 
-                switch (v.getId()) {
-                    case R.id.sortby_dialog_ascending_check:
-                        ascending = true;
-                        order = ORDER_DEFAULT_ASC;
-                        break;
+            switch (v.getId()) {
+                case R.id.sortby_dialog_ascending_check:
+                    ascending1 = true;
+                    order1 = ORDER_DEFAULT_ASC;
+                    break;
 
-                    case R.id.sortby_dialog_descending_check:
-                        descending = true;
-                        order = ORDER_DEFAULT_DESC;
-                        break;
+                case R.id.sortby_dialog_descending_check:
+                    descending1 = true;
+                    order1 = ORDER_DEFAULT_DESC;
+                    break;
 
-                    case R.id.sortby_dialog_newest_check:
-                        newest = true;
+                case R.id.sortby_dialog_newest_check:
+                    newest1 = true;
 
-                        if (finalDrawerItem == ManagerActivityLollipop.DrawerItem.CONTACTS) {
-                            order = ORDER_CREATION_ASC;
-                        } else {
-                            order = ORDER_MODIFICATION_DESC;
-                        }
-                        break;
-
-                    case R.id.sortby_dialog_oldest_check:
-                        oldest = true;
-                        if (finalDrawerItem == ManagerActivityLollipop.DrawerItem.CONTACTS) {
-                            order = ORDER_CREATION_DESC;
-                        } else {
-                            order = ORDER_MODIFICATION_ASC;
-                        }
-                        break;
-
-                    case R.id.sortby_dialog_largest_first_check:
-                        largest = true;
-                        order = ORDER_SIZE_DESC;
-                        break;
-
-                    case R.id.sortby_dialog_smallest_first_check:
-                        smallest = true;
-                        order = ORDER_SIZE_ASC;
-                        break;
-
-                    case R.id.sortby_dialog_photo_check:
-                        photoFirst = true;
-                        order = ORDER_PHOTO_DESC;
-                        break;
-
-                    case R.id.sortby_dialog_video_check:
-                        videoFirst = true;
-                        order = ORDER_VIDEO_DESC;
-                        break;
-
-                    default:
-                        order = ORDER_DEFAULT_ASC;
-                }
-
-                ascendingCheck.setChecked(ascending);
-                descendingCheck.setChecked(descending);
-                newestCheck.setChecked(newest);
-                oldestCheck.setChecked(oldest);
-                largestCheck.setChecked(largest);
-                smallestCheck.setChecked(smallest);
-                photoCheck.setChecked(photoFirst);
-                videoCheck.setChecked(videoFirst);
-
-                switch (finalDrawerItem) {
-                    case CONTACTS:
-                        ((ManagerActivityLollipop) context).selectSortByContacts(order);
-                        break;
-
-                    case SHARED_ITEMS:
-                        if (context instanceof ManagerActivityLollipop) {
-                            if (((ManagerActivityLollipop) context).isFirstNavigationLevel()
-                                    && isIncomingOrOutgoingRootLevel) {
-                                ((ManagerActivityLollipop) context).refreshOthersOrder(order);
-                            } else {
-                                ((ManagerActivityLollipop) context).refreshCloudOrder(order);
-                            }
-                        } else if (context instanceof FileExplorerActivityLollipop) {
-                            setFileExplorerOrder(finalDrawerItem, context, order);
-                            if (((FileExplorerActivityLollipop) context).getParentHandleIncoming() == -1) {
-                                updateManagerOrder(false, order);
-                            } else {
-                                updateManagerOrder(true, order);
-                            }
-                        }
-                        break;
-
-                    case CAMERA_UPLOADS:
-                    case MEDIA_UPLOADS:
-                        ((ManagerActivityLollipop) context).selectSortUploads(order);
-                        break;
-
-                    default:
-                        if (context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).refreshCloudOrder(order);
-                        } else if (context instanceof FileExplorerActivityLollipop) {
-                            setFileExplorerOrder(finalDrawerItem, context, order);
-                            updateManagerOrder(true, order);
-                        }
-                }
-
-                if (dialog != null) {
-                    try {
-                        dialog.dismiss();
-                    } catch (Exception e) {
-                        logWarning("Exception dismissing dialog");
+                    if (drawerItem == ManagerActivityLollipop.DrawerItem.CONTACTS) {
+                        order1 = ORDER_CREATION_ASC;
+                    } else {
+                        order1 = ORDER_MODIFICATION_DESC;
                     }
+                    break;
+
+                case R.id.sortby_dialog_oldest_check:
+                    oldest1 = true;
+                    if (drawerItem == ManagerActivityLollipop.DrawerItem.CONTACTS) {
+                        order1 = ORDER_CREATION_DESC;
+                    } else {
+                        order1 = ORDER_MODIFICATION_ASC;
+                    }
+                    break;
+
+                case R.id.sortby_dialog_largest_first_check:
+                    largest1 = true;
+                    order1 = ORDER_SIZE_DESC;
+                    break;
+
+                case R.id.sortby_dialog_smallest_first_check:
+                    smallest1 = true;
+                    order1 = ORDER_SIZE_ASC;
+                    break;
+
+                case R.id.sortby_dialog_photo_check:
+                    photoFirst1 = true;
+                    order1 = ORDER_PHOTO_DESC;
+                    break;
+
+                case R.id.sortby_dialog_video_check:
+                    videoFirst1 = true;
+                    order1 = ORDER_VIDEO_DESC;
+                    break;
+
+                default:
+                    order1 = ORDER_DEFAULT_ASC;
+            }
+
+            ascendingCheck.setChecked(ascending1);
+            descendingCheck.setChecked(descending1);
+            newestCheck.setChecked(newest1);
+            oldestCheck.setChecked(oldest1);
+            largestCheck.setChecked(largest1);
+            smallestCheck.setChecked(smallest1);
+            photoCheck.setChecked(photoFirst1);
+            videoCheck.setChecked(videoFirst1);
+
+            switch (drawerItem) {
+                case CONTACTS:
+                    managerActivityLollipop.selectSortByContacts(order1);
+                    break;
+
+                case SHARED_ITEMS:
+                    if (context instanceof ManagerActivityLollipop) {
+                        if (managerActivityLollipop.isFirstNavigationLevel()
+                                && isIncomingOrOutgoingRootLevel) {
+                            managerActivityLollipop.refreshOthersOrder(order1);
+                        } else {
+                            managerActivityLollipop.refreshCloudOrder(order1);
+                        }
+                    } else if (context instanceof FileExplorerActivityLollipop) {
+                        setFileExplorerOrder(drawerItem, context, order1);
+                        if (fileExplorerActivity.getParentHandleIncoming() == -1) {
+                            updateManagerOrder(false, order1);
+                        } else {
+                            updateManagerOrder(true, order1);
+                        }
+                    }
+                    break;
+
+                case CAMERA_UPLOADS:
+                case MEDIA_UPLOADS:
+                    managerActivityLollipop.selectSortUploads(order1);
+                    break;
+
+                default:
+                    if (context instanceof ManagerActivityLollipop) {
+                        managerActivityLollipop.refreshCloudOrder(order1);
+                    } else if (context instanceof FileExplorerActivityLollipop) {
+                        setFileExplorerOrder(drawerItem, context, order1);
+                        updateManagerOrder(true, order1);
+                    }
+            }
+
+            if (dialog != null) {
+                try {
+                    dialog.dismiss();
+                } catch (Exception e) {
+                    logWarning("Exception dismissing dialog");
                 }
             }
         };
@@ -395,10 +392,10 @@ public class SorterContentActivity extends PinActivityLollipop {
     }
 
     private void setFileExplorerOrder(ManagerActivityLollipop.DrawerItem drawerItem, Context context, int order) {
-        ((FileExplorerActivityLollipop) context).refreshOrderNodes(order);
+        fileExplorerActivity.refreshOrderNodes(order);
         MegaPreferences prefs = DatabaseHandler.getDbHandler(context).getPreferences();
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-        if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS && ((FileExplorerActivityLollipop) context).getParentHandleIncoming() == -1) {
+        if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS && fileExplorerActivity.getParentHandleIncoming() == -1) {
             if (prefs != null) {
                 prefs.setPreferredSortOthers(String.valueOf(order));
             }

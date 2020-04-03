@@ -617,11 +617,8 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 							pdfIntent.putExtra("chatId", chatId);
 
 							pdfIntent.putExtra("FILENAME", node.getName());
-							MegaPreferences prefs = dbH.getPreferences();
-							String downloadLocationDefaultPath = getDownloadLocation(this);
 
 							String localPath = getLocalFile(this, node.getName(), node.getSize());
-
 							if (localPath != null){
 								File mediaFile = new File(localPath);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {

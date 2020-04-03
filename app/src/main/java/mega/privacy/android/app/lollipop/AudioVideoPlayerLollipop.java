@@ -382,7 +382,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         filter.addAction(ACTION_CALL_STATUS_UPDATE);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
 
-        downloadLocationDefaultPath = getDownloadLocation(this);
+        downloadLocationDefaultPath = getDownloadLocation();
 
         draggableView.setViewAnimator(new ExitViewAnimator<>());
 
@@ -4156,7 +4156,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 else {
                     mediaSourcePlaylist.clear();
                 }
-                downloadLocationDefaultPath = getDownloadLocation(getApplicationContext());
+                downloadLocationDefaultPath = getDownloadLocation();
                 if (isOffline) {
                     for (int i = 0; i < mediaOffList.size(); i++) {
                         MegaOffline currentNode = mediaOffList.get(i);

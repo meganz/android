@@ -359,7 +359,7 @@ public class NodeController {
         }
 
         boolean askMe = askMe(context);
-        String downloadLocationDefaultPath = getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation();
 
         if (askMe) {
             logDebug("askMe");
@@ -1568,7 +1568,7 @@ public class NodeController {
         if (askMe) {
             pickFolder(document, url);
         } else {
-            String downloadLocationDefaultPath = getDownloadLocation(context);
+            String downloadLocationDefaultPath = getDownloadLocation();
             downloadTo(document, downloadLocationDefaultPath, url);
         }
     }

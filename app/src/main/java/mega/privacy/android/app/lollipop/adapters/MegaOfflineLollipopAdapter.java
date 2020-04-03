@@ -669,7 +669,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.textViewFileSize.setText(getFolderInfo(currentFile));
 		} else {
 			long nodeSize = currentFile.length();
-			holder.textViewFileSize.setText(getSizeString(nodeSize) + " . " + formatLongDateTime(currentFile.lastModified() / 1000));
+			holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(currentFile.lastModified() / 1000)));
 		}
 
 		if (multipleSelect && isItemChecked(position)) {

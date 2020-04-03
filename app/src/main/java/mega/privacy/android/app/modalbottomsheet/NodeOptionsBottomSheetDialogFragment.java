@@ -265,7 +265,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionSendChat.setVisibility(View.GONE);
             } else {
                 long nodeSize = node.getSize();
-                nodeInfo.setText(getSizeString(nodeSize) + " . " + formatLongDateTime(node.getModificationTime()));
+                nodeInfo.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
 
                 if (megaApi.hasVersions(node)) {
                     nodeVersionsIcon.setVisibility(View.VISIBLE);

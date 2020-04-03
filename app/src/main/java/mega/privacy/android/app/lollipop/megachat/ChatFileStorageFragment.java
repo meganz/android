@@ -81,7 +81,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
         prefs = dbH.getPreferences();
 
-        downloadLocationDefaultPath = getDownloadLocation(context);
+        downloadLocationDefaultPath = getDownloadLocation();
 
         super.onCreate(savedInstanceState);
         logDebug("After onCreate called super");

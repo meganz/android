@@ -147,7 +147,6 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
@@ -260,8 +259,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -288,17 +285,17 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private static final String INDEX_CLOUD = "INDEX_CLOUD";
     public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
 
-	private static final int ERROR_TAB = -1;
-	private static final int CLOUD_TAB = 0;
-	private static final int RECENTS_TAB = 1;
-	private static final int INCOMING_TAB = 0;
-	private static final int OUTGOING_TAB = 1;
-	private static final int LINKS_TAB = 2;
-	private static final int CONTACTS_TAB = 0;
-	private static final int SENT_REQUESTS_TAB = 1;
-	private static final int RECEIVED_REQUESTS_TAB = 2;
-	private static final int GENERAL_TAB = 0;
-	private static final int STORAGE_TAB = 1;
+	public static final int ERROR_TAB = -1;
+	public static final int CLOUD_TAB = 0;
+	public static final int RECENTS_TAB = 1;
+	public static final int INCOMING_TAB = 0;
+	public static final int OUTGOING_TAB = 1;
+	public static final int LINKS_TAB = 2;
+	public static final int CONTACTS_TAB = 0;
+	public static final int SENT_REQUESTS_TAB = 1;
+	public static final int RECEIVED_REQUESTS_TAB = 2;
+	public static final int GENERAL_TAB = 0;
+	public static final int STORAGE_TAB = 1;
 	public static final int PENDING_TAB = 0;
 	public static final int COMPLETED_TAB = 1;
 
@@ -2355,23 +2352,23 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				setSharesTabIcons(position);
 				switch (position) {
 					case INCOMING_TAB:
-						if (isOutgoingAdded() && outSFLol.isMultipleselect()) {
+						if (isOutgoingAdded() && outSFLol.isMultipleSelect()) {
 							outSFLol.getActionMode().finish();
-						} else if (isLinksAdded() && lF.isMultipleselect()) {
+						} else if (isLinksAdded() && lF.isMultipleSelect()) {
 							lF.getActionMode().finish();
 						}
 						break;
 					case OUTGOING_TAB:
-						if (isIncomingAdded() && inSFLol.isMultipleselect()) {
+						if (isIncomingAdded() && inSFLol.isMultipleSelect()) {
 							inSFLol.getActionMode().finish();
-						}  else if (isLinksAdded() && lF.isMultipleselect()) {
+						}  else if (isLinksAdded() && lF.isMultipleSelect()) {
 							lF.getActionMode().finish();
 						}
 						break;
 					case LINKS_TAB:
-						if (isIncomingAdded() && inSFLol.isMultipleselect()) {
+						if (isIncomingAdded() && inSFLol.isMultipleSelect()) {
 							inSFLol.getActionMode().finish();
-						} else if (isOutgoingAdded() && outSFLol.isMultipleselect()) {
+						} else if (isOutgoingAdded() && outSFLol.isMultipleSelect()) {
 							outSFLol.getActionMode().finish();
 						}
 						break;
@@ -5226,7 +5223,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			setSharesTabIcons(indexShares);
 
 			//Force on CreateView, addTab do not execute onCreateView
-			if (indexShares != -ERROR_TAB) {
+			if (indexShares != ERROR_TAB) {
 				logDebug("The index of the TAB Shares is: " + indexShares);
 				if (viewPagerShares != null){
 					switch (indexShares) {

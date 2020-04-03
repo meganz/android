@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -102,7 +101,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     public MegaNodeBaseFragment() {
         prefs = dbH.getPreferences();
-        downloadLocationDefaultPath = getDownloadLocation(getContext());
+        downloadLocationDefaultPath = getDownloadLocation();
     }
 
     protected class BaseActionBarCallBack implements ActionMode.Callback {
@@ -113,7 +112,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         protected boolean showShare;
         protected boolean allFiles;
         protected boolean showRename;
-        protected boolean showCopy;
         protected boolean showMove;
         protected boolean showRemoveLink;
         protected boolean showLink;
@@ -256,7 +254,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             showShare = true;
             allFiles = true;
             showRename = false;
-            showCopy = true;
             showMove = true;
             showRemoveLink = false;
             showLink = false;
@@ -305,12 +302,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
         protected void checkSelectOptions(Menu menu, boolean fromTrash) {
             selected = adapter.getSelectedNodes();
+            showSelectAll = selected.size() == adapter.getItemCount();
 
-            if (selected.size() == adapter.getItemCount()) {
-                showSelectAll = false;
-            } else {
-                showSelectAll = true;
-            }
             menu.findItem(R.id.cab_menu_select_all).setVisible(showSelectAll);
             if (!fromTrash) {
                 menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(false);
@@ -402,7 +395,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         return actionMode;
     }
 
-    public boolean isMultipleselect() {
+    public boolean isMultipleSelect() {
         return adapter != null && adapter.isMultipleSelect();
     }
 
@@ -586,9 +579,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 intent = new Intent(Intent.ACTION_VIEW);
                 internalIntent = false;
                 String[] s = node.getName().split("\\.");
-                if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) {
-                    opusFile = true;
-                }
+                opusFile = s.length > 1 && s[s.length - 1].equals("opus");
             } else {
                 intent = new Intent(context, AudioVideoPlayerLollipop.class);
                 internalIntent = true;
@@ -660,30 +651,29 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 try {
                     // open the file for reading
                     instream = new FileInputStream(f.getAbsolutePath());
-                    // if file the available for reading
-                    if (instream != null) {
-                        // prepare the file for reading
-                        InputStreamReader inputreader = new InputStreamReader(instream);
-                        BufferedReader buffreader = new BufferedReader(inputreader);
+                    // prepare the file for reading
+                    InputStreamReader inputreader = new InputStreamReader(instream);
+                    BufferedReader buffreader = new BufferedReader(inputreader);
 
-                        String line1 = buffreader.readLine();
-                        if (line1 != null) {
-                            String line2 = buffreader.readLine();
+                    String line1 = buffreader.readLine();
+                    if (line1 != null) {
+                        String line2 = buffreader.readLine();
 
-                            String url = line2.replace("URL=", "");
+                        String url = line2.replace("URL=", "");
 
-                            logDebug("Is URL - launch browser intent");
-                            Intent i = new Intent(Intent.ACTION_VIEW);
-                            i.setData(Uri.parse(url));
-                            startActivity(i);
-                            return;
-                        }
+                        logDebug("Is URL - launch browser intent");
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(url));
+                        startActivity(i);
+                        return;
                     }
                 } catch (Exception ex) {
                     logError("EXCEPTION reading file", ex);
                 } finally {
                     try {
-                        instream.close();
+                        if (instream != null) {
+                            instream.close();
+                        }
                     } catch (IOException e) {
                         logError("EXCEPTION closing InputStream", e);
                     }
@@ -835,14 +825,14 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         fastScroller.setRecyclerView(recyclerView);
     }
 
-    protected String getGeneralEmptyView() {
+    private String getGeneralEmptyView() {
         if (isScreenInPortrait(context)) {
             emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
         } else {
             emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
         }
 
-        return String.format(context.getString(R.string.file_browser_empty_folder_new));
+        return context.getString(R.string.file_browser_empty_folder_new);
     }
 
     protected void setFinalEmptyView(String text) {

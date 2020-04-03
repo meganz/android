@@ -939,7 +939,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         } else {
             logDebug("Node is file");
             long nodeSize = node.getSize();
-            holder.textViewFileSize.setText(getSizeString(nodeSize) + " . " + formatLongDateTime(node.getModificationTime()));
+            holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
 
             if(megaApi.hasVersions(node)){
                 holder.versionsIcon.setVisibility(View.VISIBLE);
