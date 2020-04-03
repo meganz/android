@@ -36,13 +36,6 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
     private MegaApiAndroid megaApi;
     private Context context;
 
-    private RelativeLayout exportMKLayout;
-    private TextView titleExportMK;
-    private TextView subTitleExportMK;
-    private TextView firstParExportMK;
-    private TextView secondParExportMK;
-    private TextView thirdParExportMK;
-    private TextView actionExportMK;
     private Button printMK;
     private Button copyMK;
     private Button saveMK;
@@ -76,41 +69,6 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-
-        exportMKLayout = v.findViewById(R.id.export_mk_full_layout);
-        LinearLayout.LayoutParams exportMKButtonsParams = (LinearLayout.LayoutParams)exportMKLayout.getLayoutParams();
-        exportMKButtonsParams.setMargins(0, 0, 0, scaleHeightPx(10, outMetrics));
-        exportMKLayout.setLayoutParams(exportMKButtonsParams);
-
-        titleExportMK = v.findViewById(R.id.title_export_MK_layout);
-        RelativeLayout.LayoutParams titleExportMKParams = (RelativeLayout.LayoutParams)titleExportMK.getLayoutParams();
-        titleExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(17, outMetrics), px2dp(24, outMetrics), 0);
-        titleExportMK.setLayoutParams(titleExportMKParams);
-
-        subTitleExportMK = v.findViewById(R.id.subtitle_export_MK_layout);
-        RelativeLayout.LayoutParams subTitleExportMKParams = (RelativeLayout.LayoutParams)subTitleExportMK.getLayoutParams();
-        subTitleExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(33, outMetrics), px2dp(24, outMetrics), 0);
-        subTitleExportMK.setLayoutParams(subTitleExportMKParams);
-
-        firstParExportMK = v.findViewById(R.id.first_par_export_MK_layout);
-        RelativeLayout.LayoutParams firstParExportMKParams = (RelativeLayout.LayoutParams)firstParExportMK.getLayoutParams();
-        firstParExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(20, outMetrics), px2dp(24, outMetrics), 0);
-        firstParExportMK.setLayoutParams(firstParExportMKParams);
-
-        secondParExportMK = v.findViewById(R.id.second_par_export_MK_layout);
-        RelativeLayout.LayoutParams secondParExportMKParams = (RelativeLayout.LayoutParams)secondParExportMK.getLayoutParams();
-        secondParExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(16, outMetrics), px2dp(24, outMetrics), 0);
-        secondParExportMK.setLayoutParams(secondParExportMKParams);
-
-        thirdParExportMK = v.findViewById(R.id.third_par_export_MK_layout);
-        RelativeLayout.LayoutParams thirdParExportMKParams = (RelativeLayout.LayoutParams)thirdParExportMK.getLayoutParams();
-        thirdParExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(20, outMetrics), px2dp(24, outMetrics), 0);
-        thirdParExportMK.setLayoutParams(thirdParExportMKParams);
-
-        actionExportMK = v.findViewById(R.id.action_export_MK_layout);
-        RelativeLayout.LayoutParams actionExportMKParams = (RelativeLayout.LayoutParams)actionExportMK.getLayoutParams();
-        actionExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(24, outMetrics), px2dp(24, outMetrics), 0);
-        actionExportMK.setLayoutParams(actionExportMKParams);
 
         printMK = v.findViewById(R.id.print_MK_button);
         printMK.setOnClickListener(this);
