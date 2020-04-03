@@ -18,9 +18,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiImageView;
-import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
+import mega.privacy.android.app.components.twemoji.ReactionsKeyboard;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
@@ -30,23 +29,22 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class NormalMessageBottomSheet extends BottomSheetDialogFragment implements View.OnClickListener {
 
-    Context context;
-    MegaHandleList handleList;
-    AndroidMegaChatMessage message = null;
-    long chatId;
-    long messageId;
-    String email=null;
+    private final static int HEIGHT_REACTIONS_KEYBOARD = 300;
 
-    int position;
+    private Context context;
+    private AndroidMegaChatMessage message = null;
+    private long chatId;
+    private long messageId;
 
+    private View contentView;
     private BottomSheetBehavior mBehavior;
     private RelativeLayout mainLayout;
     private LinearLayout optionsLayout;
@@ -62,7 +60,7 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
     private EmojiImageView fourthEmoji;
     private RelativeLayout fifthReaction;
     private EmojiImageView fifthEmoji;
-    private EmojiKeyboard emojiKeyboard;
+    private ReactionsKeyboard emojiKeyboard;
 
     private RelativeLayout addReaction;
 
@@ -73,12 +71,9 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
     private LinearLayout optionDelete;
 
     private DisplayMetrics outMetrics;
-    static ManagerActivityLollipop.DrawerItem drawerItem = null;
     private int heightDisplay;
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
-    private DatabaseHandler dbH;
-    private NodeController nC;
     private ChatController chatC;
     private MegaChatRoom chatRoom;
 
@@ -94,6 +89,9 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
+        if(!(context instanceof ChatActivityLollipop))
+            return;
+
         if (savedInstanceState != null) {
             logDebug("Bundle is NOT NULL");
             chatId = savedInstanceState.getLong(CHAT_ID, -1);
@@ -105,10 +103,8 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
             }
         } else {
 
-            if (context instanceof ChatActivityLollipop) {
-                chatId = ((ChatActivityLollipop) context).idChat;
-                messageId = ((ChatActivityLollipop) context).selectedMessageId;
-            }
+            chatId = ((ChatActivityLollipop) context).idChat;
+            messageId = ((ChatActivityLollipop) context).selectedMessageId;
 
             MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
             if (messageMega != null) {
@@ -117,9 +113,7 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
         }
 
         chatRoom = megaChatApi.getChatRoom(chatId);
-        nC = new NodeController(context);
         chatC = new ChatController(context);
-        dbH = MegaApplication.getInstance().getDbH();
     }
 
     @Override
@@ -131,11 +125,14 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
         display.getMetrics(outMetrics);
         heightDisplay = outMetrics.heightPixels;
 
-        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_text_msg, null);
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_text_msg, null);
         mainLayout = contentView.findViewById(R.id.bottom_sheet);
 
         emojiKeyboard = contentView.findViewById(R.id.emoji_keyboard);
-        emojiKeyboard.init(((ChatActivityLollipop) context), px2dp(239, outMetrics));
+        emojiKeyboard.init(((ChatActivityLollipop) context), px2dp(HEIGHT_REACTIONS_KEYBOARD, outMetrics));
+        emojiKeyboard.setOnEmojiSelectedListener(emoji -> {
+            addEmojiReaction(emoji);
+        });
 
         optionsLayout = contentView.findViewById(R.id.bottom_sheet_options_layout);
         reactionsLayout = contentView.findViewById(R.id.reaction_layout);
@@ -167,25 +164,34 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
         optionCopy.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
         firstReaction.setOnClickListener(this);
+        firstEmoji.setOnClickListener(this);
         secondReaction.setOnClickListener(this);
+        secondEmoji.setOnClickListener(this);
         thirdReaction.setOnClickListener(this);
+        thirdEmoji.setOnClickListener(this);
         fourthReaction.setOnClickListener(this);
+        fourthEmoji.setOnClickListener(this);
         fifthReaction.setOnClickListener(this);
+        fifthEmoji.setOnClickListener(this);
         addReaction.setOnClickListener(this);
 
-        if (message == null || chatRoom == null || !(context instanceof ChatActivityLollipop) || ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) || message.isUploading()) {
+        if (message == null || chatRoom == null || ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) || message.isUploading()) {
             optionForward.setVisibility(View.GONE);
             optionEdit.setVisibility(View.GONE);
             optionCopy.setVisibility(View.GONE);
             optionDelete.setVisibility(View.GONE);
+            reactionsLayout.setVisibility(View.GONE);
         } else {
             optionCopy.setVisibility(View.VISIBLE);
             if (((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview())) {
                 optionForward.setVisibility(View.GONE);
                 optionEdit.setVisibility(View.GONE);
                 optionDelete.setVisibility(View.GONE);
+                reactionsLayout.setVisibility(View.GONE);
 
             } else {
+                reactionsLayout.setVisibility(View.VISIBLE);
+
                 if (!isOnline(context) || chatC.isInAnonymousMode()) {
                     optionForward.setVisibility(View.GONE);
                 } else {
@@ -209,15 +215,14 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View view) {
         if (message == null) {
             logWarning("The message is NULL");
             return;
         }
         ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
         messagesSelected.add(message);
-        switch(v.getId()){
-
+        switch(view.getId()){
             case R.id.forward_layout:
                 ((ChatActivityLollipop) context).forwardMessages(messagesSelected);
                 dismissAllowingStateLoss();
@@ -239,11 +244,24 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
                 break;
 
             case R.id.first_emoji_layout:
+            case R.id.first_emoji_image:
+                addReaction(contentView.findViewById(R.id.first_emoji_image));
+                break;
             case R.id.second_emoji_layout:
+            case R.id.second_emoji_image:
+                addReaction(contentView.findViewById(R.id.second_emoji_image));
+                break;
             case R.id.third_emoji_layout:
+            case R.id.third_emoji_image:
+                addReaction(contentView.findViewById(R.id.third_emoji_image));
+                break;
             case R.id.fourth_emoji_layout:
+            case R.id.fourth_emoji_image:
+                addReaction(contentView.findViewById(R.id.fourth_emoji_image));
+                break;
             case R.id.fifth_emoji_layout:
-                dismissAllowingStateLoss();
+            case R.id.fifth_emoji_image:
+                addReaction(contentView.findViewById(R.id.fifth_emoji_image));
                 break;
 
             case R.id.icon_more_reactions:
@@ -269,5 +287,14 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
 
         outState.putLong(CHAT_ID, chatId);
         outState.putLong(MESSAGE_ID, messageId);
+    }
+
+    private void addReaction(EmojiImageView imageEmoji){
+        addEmojiReaction(imageEmoji.getEmoji());
+    }
+
+    private void addEmojiReaction(Emoji emoji){
+        addReactionInMsg(context, chatId, message.getMessage(), emoji);
+        dismissAllowingStateLoss();
     }
 }

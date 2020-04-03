@@ -95,7 +95,7 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.components.twemoji.OnPlaceButtonListener;
+import mega.privacy.android.app.components.twemoji.listeners.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
@@ -482,6 +482,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         }
         return false;
+    }
+
+    @Override
+    public void onReactionUpdate(MegaChatApiJava api, long msgid, String reaction, int count) {
+        logDebug("MessageId: "+ msgid);
     }
 
     private class UserTyping {

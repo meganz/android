@@ -87,6 +87,10 @@ public final class EmojiImageView extends AppCompatImageView {
     }
   }
 
+  public Emoji getEmoji() {
+    return currentEmoji;
+  }
+
   public void setEmoji(@NonNull final Emoji emoji) {
     if (!emoji.equals(currentEmoji)) {
       setImageDrawable(null);
@@ -98,11 +102,9 @@ public final class EmojiImageView extends AppCompatImageView {
         imageLoadingTask.cancel(true);
       }
 
-      setOnClickListener(new OnClickListener() {
-        @Override public void onClick(final View view) {
-          if (clickListener != null) {
-            clickListener.onEmojiClick(EmojiImageView.this, currentEmoji);
-          }
+      setOnClickListener(view -> {
+        if (clickListener != null) {
+          clickListener.onEmojiClick(EmojiImageView.this, currentEmoji);
         }
       });
 

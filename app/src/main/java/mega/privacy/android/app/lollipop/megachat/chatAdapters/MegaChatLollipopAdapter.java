@@ -84,6 +84,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -573,6 +574,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         //        TextView meText;
         TextView timeOwnText;
         RelativeLayout contentOwnMessageLayout;
+        private RelativeLayout ownMessageReactionsLayout;
+
         private EmojiTextView contentOwnMessageText;
 
         //Own rich links
@@ -838,6 +841,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             } else {
                 holder.titleOwnMessage.setPadding(0, 0, scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics), 0);
             }
+
+            holder.ownMessageReactionsLayout = v.findViewById(R.id.own_message_reactions_layout);
+            holder.ownMessageReactionsLayout.setVisibility(View.GONE);
 
             holder.previewFramePort = v.findViewById(R.id.preview_frame_portrait);
             holder.previewFrameLand = v.findViewById(R.id.preview_frame_landscape);
@@ -1279,6 +1285,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         ((ViewHolderMessageChat) holder).itemLayout.setLayoutParams(params);
 
+        ((ViewHolderMessageChat) holder).ownMessageReactionsLayout.setVisibility(View.GONE);
+
         ((ViewHolderMessageChat) holder).forwardOwnRichLinks.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).forwardOwnPortrait.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).forwardOwnLandscape.setVisibility(View.GONE);
@@ -1499,6 +1507,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).itemLayout.setLayoutParams(paramsDefault);
         ((ViewHolderMessageChat) holder).currentPosition = position;
 
+        ((ViewHolderMessageChat) holder).ownMessageReactionsLayout.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).errorUploadingContact.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).errorUploadingFile.setVisibility(View.GONE);
@@ -3898,7 +3907,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
 
     public void bindNormalMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
-        logDebug("position: " + position);
+        logDebug("bindNormalMessage position: " + position);
 
         MegaChatMessage message = androidMessage.getMessage();
         if (message.getUserHandle() == myUserHandle) {
@@ -4223,6 +4232,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
             }
+
         } else {
             long userHandle = message.getUserHandle();
             logDebug("Contact message!!: " + userHandle);
@@ -4445,6 +4455,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
+
+        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), message.getMsgId());
+
     }
 
     private void checkEmojiSize(String message, EmojiTextView textView) {
@@ -8356,6 +8369,32 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    private void checkReactionsInMessage(int position, final ViewHolderMessageChat holder, boolean ownMessage, long chatId, long messageId) {
+        if (isHolderNull(position, holder)) {
+            return;
+        }
+
+        MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, messageId);
+        if (listReactions == null || listReactions.size() <= 0) {
+            logDebug("No reactions in this message");
+            if(ownMessage) {
+                holder.ownMessageReactionsLayout.setVisibility(View.GONE);
+            }
+            return;
+        }
+
+        if(ownMessage) {
+            holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
+        }
+
+        for (int i = 0; i < listReactions.size(); i++) {
+            String reaction = listReactions.get(i);
+            logDebug("reaction = "+reaction);
+
+        }
+
+
+    }
 
     private int getAdapterItemPosition(long id) {
         for (int position = 0; position < messages.size(); position++) {

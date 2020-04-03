@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.emoji.EmojiCategory;
 
-import static mega.privacy.android.app.components.twemoji.Utils.checkNotNull;
+import static mega.privacy.android.app.components.twemoji.Utils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 /* EmojiManager where an EmojiProvider can be installed for further usage.*/
@@ -222,10 +222,12 @@ public final class EmojiManager {
     verifyInstalled();
     emojiReplacer.replaceWithImages(context, text, emojiSize, defaultEmojiSize, DEFAULT_EMOJI_REPLACER);
   }
+
   EmojiCategory[] getCategories() {
     verifyInstalled();
     return categories;
   }
+
   Pattern getEmojiRepetitivePattern() {
     return emojiRepetitivePattern;
   }

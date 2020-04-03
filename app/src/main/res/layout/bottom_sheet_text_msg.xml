@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@color/white">
 
-    <mega.privacy.android.app.components.twemoji.EmojiKeyboard
+    <mega.privacy.android.app.components.twemoji.ReactionsKeyboard
         android:id="@+id/emoji_keyboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

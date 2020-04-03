@@ -26,16 +26,20 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -383,5 +387,49 @@ public class ChatUtil {
         fileBitmap.recycle();
 
         return outFile;
+    }
+
+    public static void addReactionInMsg(Context context, long chatId, MegaChatMessage message, Emoji emoji) {
+        EmojiEditText editText = new EmojiEditText(context);
+        editText.input(emoji);
+        String reaction = editText.getText().toString();
+        MegaChatError error = MegaApplication.getInstance().getMegaChatApi().addReaction(chatId, message.getMsgId(), reaction);
+        checkErrorReaction(ADD_REACTION, error);
+    }
+
+    public static void delReactionInMsg(long chatId, MegaChatMessage message, String reaction) {
+        MegaChatError error = MegaApplication.getInstance().getMegaChatApi().delReaction(chatId, message.getMsgId(), reaction);
+        checkErrorReaction(DELETE_REACTION, error);
+    }
+
+    private static void checkErrorReaction(String type, MegaChatError error) {
+        switch (error.getErrorCode()) {
+            case MegaChatError.ERROR_OK:
+                if (type.equals(ADD_REACTION)) {
+                    logDebug("The reaction has been added correctly");
+                } else if (type.equals(DELETE_REACTION)) {
+                    logDebug("The reaction has been deleted correctly");
+                }
+                break;
+            case MegaChatError.ERROR_ARGS:
+                logDebug("The reaction is null");
+                break;
+            case MegaChatError.ERROR_NOENT:
+                if (type.equals(ADD_REACTION)) {
+                    logDebug("the chat or message doesn't exists");
+                } else if (type.equals(DELETE_REACTION)) {
+                    logDebug("the chat or message doesn't exists or that reaction is not in that message");
+                }
+                break;
+            case MegaChatError.ERROR_ACCESS:
+                logDebug("The privilege is no standar or moderator");
+                break;
+            case MegaError.API_EEXIST:
+                if (type.equals(ADD_REACTION)) {
+                    logDebug("The reaction has already been added to that message");
+                }
+                break;
+
+        }
     }
 }

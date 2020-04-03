@@ -32,24 +32,28 @@ public final class EmojiPagerAdapter extends PagerAdapter {
   }
 
   @Override public Object instantiateItem(final ViewGroup pager, final int position) {
-    final View newView;
+    View newView = null;
+    if(recentEmoji != null){
+      if(position == RECENT_POSITION){
+        newView = new RecentEmojiGridView(pager.getContext()).init(listener, longListener, recentEmoji);
+        recentEmojiGridView = (RecentEmojiGridView) newView;
+      }else{
+        newView = new EmojiGridView(pager.getContext()).init(listener, longListener, EmojiManager.getInstance().getCategories()[position - 1], variantManager);
+      }
+      pager.addView(newView);
 
-    if (position == RECENT_POSITION) {
-      newView = new RecentEmojiGridView(pager.getContext()).init(listener, longListener, recentEmoji);
-      recentEmojiGridView = (RecentEmojiGridView) newView;
-    } else {
-      newView = new EmojiGridView(pager.getContext()).init(listener, longListener,
-              EmojiManager.getInstance().getCategories()[position - 1], variantManager);
+    }else if(position != RECENT_POSITION){
+        newView = new EmojiGridView(pager.getContext()).init(listener, longListener, EmojiManager.getInstance().getCategories()[position - 1], variantManager);
+        pager.addView(newView);
     }
 
-    pager.addView(newView);
     return newView;
   }
 
   @Override public void destroyItem(final ViewGroup pager, final int position, final Object view) {
     pager.removeView((View) view);
 
-    if (position == RECENT_POSITION) {
+    if (recentEmoji != null && position == RECENT_POSITION) {
       recentEmojiGridView = null;
     }
   }
@@ -63,7 +67,7 @@ public final class EmojiPagerAdapter extends PagerAdapter {
   }
 
   void invalidateRecentEmojis() {
-    if (recentEmojiGridView != null) {
+    if (recentEmoji != null && recentEmojiGridView != null) {
       recentEmojiGridView.invalidateEmojis();
     }
   }

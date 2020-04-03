@@ -20,6 +20,7 @@ import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiBackspaceClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickListener;
+import mega.privacy.android.app.components.twemoji.listeners.OnPlaceButtonListener;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -27,8 +28,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 public class EmojiKeyboard extends LinearLayout {
 
     private boolean isListenerActivated = true;
-    private boolean isReactionsKeyboard = false;
-
     private Activity activity;
     private EmojiEditTextInterface editInterface;
     private RecentEmoji recentEmoji;
@@ -51,8 +50,7 @@ public class EmojiKeyboard extends LinearLayout {
     private final OnEmojiClickListener clickListener = new OnEmojiClickListener() {
         @Override
         public void onEmojiClick(@NonNull final EmojiImageView imageView, @NonNull final Emoji emoji) {
-            if(isReactionsKeyboard){
-            }else if (isListenerActivated) {
+            if (isListenerActivated) {
                 editInterface.input(emoji);
                 recentEmoji.addEmoji(emoji);
                 imageView.updateEmoji(emoji);
@@ -117,13 +115,6 @@ public class EmojiKeyboard extends LinearLayout {
         DisplayMetrics outMetrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
         keyboardHeight = (outMetrics.heightPixels / 2) - getActionBarHeight(activity, getResources());
-        requestLayout();
-    }
-
-    public void init(Activity context, int height) {
-        this.activity = context;
-        this.keyboardHeight = height;
-        isReactionsKeyboard = true;
         requestLayout();
     }
 
