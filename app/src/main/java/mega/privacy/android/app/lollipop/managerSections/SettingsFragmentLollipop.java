@@ -351,8 +351,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		helpSendFeedback = findPreference(KEY_HELP_SEND_FEEDBACK);
 		helpSendFeedback.setOnPreferenceClickListener(this);
 
-		cancelAccount = findPreference("settings_advanced_features_cancel_account");
+		cancelAccount = findPreference(KEY_CANCEL_ACCOUNT);
 		cancelAccount.setOnPreferenceClickListener(this);
+		updateCancelAccountSetting();
 
 		aboutPrivacy = findPreference(KEY_ABOUT_PRIVACY_POLICY);
 		aboutPrivacy.setOnPreferenceClickListener(this);
@@ -841,6 +842,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
                 queueSizeInput.setSelection(input.length());
             }
         }
+	}
+
+	public void updateCancelAccountSetting() {
+		if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
+			advancedFeaturesCategory.removePreference(cancelAccount);
+		}
 	}
 
 	public void setVersionsInfo(){
@@ -1601,7 +1608,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			viewIntent.setData(Uri.parse("https://github.com/meganz/android"));
 			startActivity(viewIntent);
 		}
-		else if (preference.getKey().compareTo("settings_advanced_features_cancel_account") == 0){
+		else if (preference.getKey().compareTo(KEY_CANCEL_ACCOUNT) == 0){
 			logDebug("Cancel account preference");
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}

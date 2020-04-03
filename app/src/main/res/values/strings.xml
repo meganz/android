@@ -112,7 +112,7 @@
     <string name="action_pause" context="Search button">Pause</string>
     <string name="action_refresh" context="Menu item">Refresh</string>
     <string name="action_sort_by" context="Menu item">Sort by</string>
-    <string name="action_help" context="Settings category title for Help">Help</string>
+    <string name="action_help" context="Menu item">Help</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Upgrade account</string>
     <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Upgrading account</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Select all</string>
@@ -451,7 +451,7 @@
     <!--
     <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Phone Contacts</string>
     -->
-    <string name="context_delete" context="Button in My Account section to confirm the account deletion">Delete</string>
+    <string name="context_delete" context="menu item">Delete</string>
     <!--
     <string name="context_more" context="menu item">More</string>
     -->
@@ -533,8 +533,8 @@
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Thank you for your feedback! Are you sure you want to cancel your MEGA subscription?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Your subscription has not been cancelled. Please provide a reason for your cancellation</string>
     <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Thank you for subscribing to %1$s %2$s!</string>
-    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
-    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
+    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">Your new subscription will take effect once the current one expires, the new price will be charged at that time.</string>
+    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Your subscription will take effect once the payment is processed by Google.</string>
     <string name="subscription_type_monthly" context="">Monthly</string>
     <string name="subscription_type_yearly" context="">Yearly</string>
 
@@ -674,7 +674,7 @@
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Allow notifications for incoming MEGA calls</string>
     <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
-    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually set up on your device’s settings.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually grant permissions from your device’s settings.</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or mobile data</string>
@@ -797,7 +797,7 @@
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Incorrect code</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN, please try again. You have 1 attempt left</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Wrong PIN code, please try again. You have %2d attempts left</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN Codes don’t match</string>
@@ -1521,7 +1521,7 @@
         <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Downloading %1$d of %2$d files (paused)</item>
     </plurals>
 
-    <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is depleted">Depleted transfer quota</string>
+    <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Insufficient transfer quota</string>
     <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Your queued transfer exceeds the current transfer quota available for your IP address and may therefore be interrupted.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">See our plans</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continue without account</string>
@@ -1662,7 +1662,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">Referral Bonuses</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">Install a mobile app</string>
-    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">Add mobile phone</string>
+    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">Add a mobile phone</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Registration bonus</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Install MEGA desktop app</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Account Base Quota</string>
@@ -1754,7 +1754,7 @@
 
     <string name="not_permited_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">Only MEGA contacts can be added</string>
 
-    <string name="invalid_connection_state" context="Info label about the connectivity state of an individual chat">Chat disconnected</string>
+    <string name="invalid_connection_state" context="Info label about the connectivity state of the chat">Reconnecting to chat</string>
 
     <string name="call_error" context="Message show when a call cannot be established">Error. The call cannot be established</string>
 
@@ -1764,7 +1764,7 @@
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Advanced options</string>
     <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">MEGA needs your permission to download files</string>
-    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">The old SD card is not available, please set a new download location.</string>
     <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Choose download location</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">No contact permissions granted</string>
@@ -1821,7 +1821,7 @@
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]No files in your [/B][A]Inbox[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]No files in your [/B][A]Cloud Drive[/A][B].[/B]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]Offline[/A][B].[/B]</string>
-    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]No [/B][A]Contacts[/A]</string>
+    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]No [/B][A]Contacts[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]No[/A] [B]Conversations[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Loading[/A] [B]Conversations&#8230;[/B]</string>
@@ -2356,8 +2356,8 @@
     <string name="billing_period_title" context="title of billing period">Billing period</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
     <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]One-off (year)[/A] %s</string>
-    <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]Monthly[/A] %s /month</string>
-    <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Yearly[/A] %s /year</string>
+    <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]Monthly[/A] %s/month</string>
+    <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Yearly[/A] %s/year</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">Cancel</string>
     <string name="button_continue" context="dialog option continue in alert dialog">Continue</string>
 
@@ -2367,7 +2367,7 @@
     <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
-    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">To upgrade from you current subscription, please contact support for a [A]custom plan[/A].</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">To upgrade your current subscription, please contact support for a [A]custom plan[/A].</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">file name</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show Last seen&#8230;</string>
@@ -2437,9 +2437,9 @@
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
     <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Grant access to your address book</string>
     <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
-    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explan that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Allow access to your microphone to make encrypted calls.</string>
-    <string name="general_enable_access" context="General enable access">Enable access</string>
+    <string name="general_enable_access" context="General enable access">Allow Access</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
@@ -2494,7 +2494,7 @@
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
-    <string name="on_permanently_denied" context="After the user ticketed \'Don\'t ask again' on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions on your device\’s settings</string>
+    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions in your device’s settings</string>
     <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your address book, you will be able to discover your contacts more easily. MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
@@ -2524,8 +2524,8 @@
         <item context="How many local contacts have been on MEGA, Singular of local contact. 1 contact" quantity="one">%d contact found on MEGA</item>
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">%d contacts found on MEGA</item>
     </plurals>
-    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user&#039;s phone contacts have a MEGA account. In other case here would appear all the user&#039;s phone contacts that have a MEGA account.">Invite contact now?</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Discover your contacts on MEGA</string>
+    <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Invite contact now?</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Loading contacts on MEGA&#8230;</string>
 
@@ -2682,23 +2682,24 @@
     <string name="user_label" context="Business user role">User</string>
     <string name="status_label" context="General label to show the status of something or someone">Status</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">Active</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">Grace</string>
-    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">Grace period</string>
+    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available from a desktop web browser.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Usage</string>
     <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
     <string name="overall_usage_label" context="Title of overall usage section in Storage">Overall usage</string>
     <string name="transfer_label" context="Title of transfer section in Storage">Transfer</string>
 
-    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
-    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA in a desktop browser for more information.</string>
+    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact because they are part of your Business account.</string>
+    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA using a desktop browser for more information.</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Your business account is expired</string>
-    <string name="expired_admin_business_text" context="Details shown when a Business account is expired. Details for the administrator of the Business account">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
+    <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Your account is currently [B]suspended[/B]. You can only browse your data.</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view your Camera Uploads in your user account</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view the Camera Uploads in your user account</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Something went wrong</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contact your business account administrator to resolve the issue and activate your account.</string>
-    <string name="business_account_clarification" context="">** For genuine business purposes.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep the placeholder is to indicate if the space is refered to storage or transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]%1$s[/A] **</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** For genuine business purposes.</string>
+    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]Storage[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]Transfer quota[/A] **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">When you logout, files from your Offline section will be deleted from your device.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">When you logout, ongoing transfers will be cancelled.</string>
@@ -2738,7 +2739,7 @@
     <string name="create_new_file_action" context="Text shown for the action create new file">Create new file</string>
     <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Permissions error</string>
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">You do not have the permissions required to revert this file. In order to continue, we can create a new file with the reverted data. Would you like to proceed?</string>
-    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
+    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version was created as a new file successfully.</string>
 
     <string name="download_location" context="Download location label">Download location</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
