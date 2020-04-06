@@ -73,10 +73,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
 
 public class InviteContactActivity extends PinActivityLollipop implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
 
@@ -505,7 +505,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         }
     }
 
-    private void initScanQR() {
+    public void initScanQR() {
         logDebug("initScanQR");
         Intent intent = new Intent(this, QRCodeActivity.class);
         intent.putExtra(INVITE_CONTACT_SCAN_QR, true);
@@ -665,6 +665,10 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         switch (v.getId()) {
             case R.id.layout_scan_qr: {
                 logDebug("Scan QR code pressed");
+                if (isNecessaryDisableLocalCamera() != -1) {
+                    showConfirmationOpenCamera(this, ACTION_OPEN_QR);
+                    break;
+                }
                 initScanQR();
                 break;
             }

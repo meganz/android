@@ -1476,7 +1476,7 @@ public class ChatController {
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        String downloadLocationDefaultPath = getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation();
 
         if(!nodeList.isEmpty() && isVoiceClip(nodeList.get(0).getName())){
             File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());
@@ -1661,7 +1661,7 @@ public class ChatController {
             }
             if ((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE) {
                 logDebug("ISFILE");
-                String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+                String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize());
 
                 //Check if the file is already downloaded
                 MegaApplication app = MegaApplication.getInstance();

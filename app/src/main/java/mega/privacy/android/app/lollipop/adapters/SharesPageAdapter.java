@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
@@ -14,7 +15,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SharesPageAdapter extends FragmentStatePagerAdapter {
 
-    final int PAGE_COUNT = 2;
+    final int PAGE_COUNT = 3;
     private Context context;
 
     public SharesPageAdapter(FragmentManager fm, Context context) {
@@ -25,26 +26,32 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         logDebug("Position: " + position);
-        switch (position){
-            case 0: {
+        switch (position) {
+            case 0:
                 IncomingSharesFragmentLollipop isF = (IncomingSharesFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.INCOMING_SHARES.getTag());
                 if (isF != null) {
                     return isF;
                 }
-                else {
-                    return IncomingSharesFragmentLollipop.newInstance();
-                }
-            }
-            case 1:{
+
+                return IncomingSharesFragmentLollipop.newInstance();
+
+            case 1:
                 OutgoingSharesFragmentLollipop osF = (OutgoingSharesFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.OUTGOING_SHARES.getTag());
-                if (osF != null)  {
+                if (osF != null) {
                     return osF;
                 }
-                else {
-                    return OutgoingSharesFragmentLollipop.newInstance();
+
+                return OutgoingSharesFragmentLollipop.newInstance();
+
+            case 2:
+                LinksFragment lF = (LinksFragment) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.LINKS.getTag());
+                if (lF != null) {
+                    return lF;
                 }
-            }
+
+                return LinksFragment.newInstance();
         }
+
         return null;
     }
 
@@ -56,14 +63,18 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         // Generate title based on item position
-        switch (position){
-            case 0: {
+        switch (position) {
+            case 0:
                 return context.getString(R.string.tab_incoming_shares);
-            }
-            case 1:{
+
+            case 1:
                 return context.getString(R.string.tab_outgoing_shares);
-            }
+
+            case 2:
+                return context.getString(R.string.tab_links_shares);
+
         }
+
         return null;
     }
 

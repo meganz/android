@@ -461,10 +461,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		logDebug("onQueueComplete: total of files before reset " + total);
 		if(total <= 0){
 			logDebug("onQueueComplete: reset total downloads");
-			Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED);
-			intent.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER);
-			intent.putExtra(NUMBER_FILES, megaApi.getTotalDownloads());
-			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+			if (megaApi.getTotalDownloads() > 0) {
+				Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED);
+				intent.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER);
+				intent.putExtra(NUMBER_FILES, megaApi.getTotalDownloads());
+				LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+			}
+
 			megaApi.resetTotalDownloads();
 			errorEBloqued = 0;
 			errorCount = 0;

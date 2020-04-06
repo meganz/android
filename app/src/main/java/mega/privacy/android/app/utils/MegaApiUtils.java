@@ -118,7 +118,7 @@ public class MegaApiUtils {
                     R.plurals.general_num_folders, numFolders);
             if (numFiles > 0) {
                 info = info
-                        + ", "
+                        + " . "
                         + numFiles
                         + " "
                         + context.getResources().getQuantityString(

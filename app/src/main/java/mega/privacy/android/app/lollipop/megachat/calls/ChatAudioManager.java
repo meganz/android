@@ -16,7 +16,7 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaHandleList;
 
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ChatAudioManager {
@@ -41,15 +41,15 @@ public class ChatAudioManager {
         audioManager = (AudioManager) myContext.getSystemService(Context.AUDIO_SERVICE);
     }
 
-    public void setAudioManagerValues(MegaChatCall call, MegaHandleList listCallsRequest, MegaHandleList listCallsRing) {
-
-        int callStatus = call.getStatus();
+    public void setAudioManagerValues(int callStatus, MegaHandleList listCallsRequest, MegaHandleList listCallsRing) {
         logDebug("Call status: " + callStatusToString(callStatus));
+
         if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
             if (listCallsRing != null && listCallsRing.size() > 0) {
                 logDebug("There was also an incoming call (stop incoming call sound)");
                 stopAudioSignals();
             }
+
             outgoingCallSound();
         } else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
             if (listCallsRequest == null || listCallsRequest.size() < 1) {
@@ -58,8 +58,10 @@ public class ChatAudioManager {
                     logDebug("There is another incoming call (stop the sound of the previous incoming call)");
                     stopAudioSignals();
                 }
+
                 incomingCallSound();
             }
+
             checkVibration();
         }
     }

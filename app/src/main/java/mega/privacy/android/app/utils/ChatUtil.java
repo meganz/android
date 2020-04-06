@@ -13,21 +13,15 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.Nullable;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
-import android.os.SystemClock;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Chronometer;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -35,139 +29,22 @@ import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class ChatUtil {
 
     private static final float DOWNSCALE_IMAGES_PX = 2000000f;
-
-    /*Method to know if i'm participating in any A/V call*/
-    public static boolean participatingInACall(MegaChatApiAndroid megaChatApi) {
-        if (megaChatApi == null) return false;
-        MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
-        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
-        MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
-        MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
-        MegaHandleList listCalls = megaChatApi.getChatCalls();
-
-        if ((listCalls.size() - listCallsDestroy.size()) == 0) {
-            logDebug("No calls in progress");
-            return false;
-        }
-
-        logDebug("There is some call in progress");
-        if ((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsRingIn.size())) {
-            logDebug("I'm not participating in any of the calls there");
-            return false;
-        }
-        if (listCallsRequestSent.size() > 0) {
-            logDebug("I'm doing a outgoing call");
-            return true;
-        }
-        logDebug("I'm in a call in progress");
-        return true;
-    }
-
-    /*Method to know the chat id which A / V call I am participating in*/
-    public static long getChatCallInProgress(MegaChatApiAndroid megaChatApi) {
-        if (megaChatApi != null) {
-            MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
-            if (listCallsRequestSent != null && listCallsRequestSent.size() > 0) {
-                return listCallsRequestSent.get(0);
-            }
-
-            MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-            if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
-                return listCallsInProgress.get(0);
-            }
-
-            MegaHandleList listCallsInReconnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RECONNECTING);
-            if (listCallsInReconnecting != null && listCallsInReconnecting.size() > 0) {
-                return listCallsInReconnecting.get(0);
-            }
-        }
-        return -1;
-    }
-
-    /*Method to return to the call which I am participating*/
-    public static void returnCall(Context context, MegaChatApiAndroid megaChatApi) {
-        if ((megaChatApi == null) || (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)) == null))
-            return;
-        long chatId = getChatCallInProgress(megaChatApi);
-        MegaChatCall call = megaChatApi.getChatCall(chatId);
-        MegaApplication.setShowPinScreen(false);
-        Intent intent = new Intent(context, ChatCallActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(CHAT_ID, chatId);
-        intent.putExtra(CALL_ID, call.getId());
-        context.startActivity(intent);
-
-    }
-
-    /*Method to show or hide the "Tap to return to call" banner*/
-    public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
-        if (megaChatApi == null || callInProgressLayout == null) return;
-        if (!participatingInACall(megaChatApi)) {
-            callInProgressLayout.setVisibility(View.GONE);
-            activateChrono(false, callInProgressChrono, null);
-            return;
-        }
-
-        long chatId = getChatCallInProgress(megaChatApi);
-        if (chatId == -1) return;
-
-        MegaChatCall call = megaChatApi.getChatCall(chatId);
-        if (call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
-            logDebug("Displayed the Reconnecting call layout");
-            activateChrono(false, callInProgressChrono, null);
-            callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.reconnecting_bar));
-            callInProgressText.setText(context.getString(R.string.reconnecting_message));
-
-        } else {
-            logDebug("Displayed the layout to return to the call");
-            callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
-            callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
-
-            if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                activateChrono(true, callInProgressChrono, call);
-            } else {
-                activateChrono(false, callInProgressChrono, null);
-            }
-        }
-        callInProgressLayout.setVisibility(View.VISIBLE);
-    }
-
-    /*Method to know if I come from a call reconnection to show the layout of returning to the call*/
-    public static boolean isAfterReconnecting(Context context, RelativeLayout layout, final TextView reconnectingText) {
-        return layout != null && layout.getVisibility() == View.VISIBLE && reconnectingText.getText().toString().equals(context.getString(R.string.reconnecting_message));
-    }
-
-    /*Method to know if a call is established*/
-    public static boolean isEstablishedCall(MegaChatApiAndroid megaChatApi, long chatId) {
-
-        if ((megaChatApi == null) || (megaChatApi.getChatCall(chatId) == null)) return false;
-        MegaChatCall call = megaChatApi.getChatCall(chatId);
-        if ((call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS))
-            return true;
-        return false;
-    }
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -343,21 +220,6 @@ public class ChatUtil {
 
     }
 
-    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall callChat) {
-        if (chronometer == null) return;
-        if(!activateChrono){
-            chronometer.stop();
-            chronometer.setVisibility(View.GONE);
-            return;
-        }
-        if (callChat != null) {
-            chronometer.setVisibility(View.VISIBLE);
-            chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration() * 1000));
-            chronometer.start();
-            chronometer.setFormat(" %s");
-        }
-    }
-
     /**
      * Locks the device window in landscape mode.
      */
@@ -391,110 +253,6 @@ public class ChatUtil {
      */
     public static void unlockOrientation(Activity activity) {
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-    }
-
-    public static String milliSecondsToTimer(long milliseconds) {
-        String minutesString;
-        String secondsString;
-        String finalTime = "";
-        int hours = (int) (milliseconds / (1000 * 60 * 60));
-        int minutes = (int) (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
-        int seconds = (int) ((milliseconds % (1000 * 60 * 60)) % (1000 * 60) / 1000);
-
-        if (minutes < 10) {
-            minutesString = "0" + minutes;
-        } else {
-            minutesString = "" + minutes;
-        }
-        if (seconds < 10) {
-            secondsString = "0" + seconds;
-        } else {
-            secondsString = "" + seconds;
-        }
-
-        if (hours > 0) {
-            if (hours < 10) {
-                finalTime = "0" + hours + ":";
-            } else {
-                finalTime = "" + hours + ":";
-            }
-        }
-
-        finalTime = finalTime + minutesString + ":" + secondsString;
-        return finalTime;
-    }
-
-    public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity){
-        if(activity == null){
-            return;
-        }
-
-        try{
-            android.app.AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
-            dialogBuilder.setPositiveButton(
-                    activity.getString(android.R.string.ok),
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            if (finish) {
-                                activity.finishAndRemoveTask();
-                            }
-                        }
-                    });
-            dialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    if (finish) {
-                        activity.finishAndRemoveTask();
-                    }
-                }
-            });
-
-
-            android.app.AlertDialog dialog = dialogBuilder.create();
-            dialog.show();
-            brandAlertDialog(dialog);
-        }catch(Exception ex){
-            showToast(activity, message);
-        }
-    }
-
-    public static String callStatusToString(int status){
-        switch (status) {
-            case MegaChatCall.CALL_STATUS_INITIAL: {
-                return "CALL_STATUS_INITIAL";
-            }
-            case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM: {
-                return "CALL_STATUS_HAS_LOCAL_STREAM";
-            }
-            case MegaChatCall.CALL_STATUS_REQUEST_SENT: {
-                return "CALL_STATUS_REQUEST_SENT";
-            }
-            case MegaChatCall.CALL_STATUS_RING_IN: {
-                return "CALL_STATUS_RING_IN";
-            }
-            case MegaChatCall.CALL_STATUS_JOINING: {
-                return "CALL_STATUS_JOINING";
-            }
-            case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
-                return "CALL_STATUS_IN_PROGRESS";
-            }
-            case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION: {
-                return "CALL_STATUS_TERMINATING_USER_PARTICIPATION";
-            }
-            case MegaChatCall.CALL_STATUS_DESTROYED: {
-                return "CALL_STATUS_DESTROYED";
-            }
-            case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
-                return "CALL_STATUS_USER_NO_PRESENT";
-            }
-            case MegaChatCall.CALL_STATUS_RECONNECTING: {
-                return "CALL_STATUS_RECONNECTING";
-            }
-            default:
-                return  String.valueOf(status);
-        }
     }
 
     public static String converterShortCodes(String text) {
@@ -544,20 +302,6 @@ public class ChatUtil {
         return result;
     }
 
-    public static boolean isStatusConnected(Context context, MegaChatApiAndroid megaChatApi, long chatId) {
-        return checkConnection(context) && megaChatApi != null && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED && megaChatApi.getChatConnectionState(chatId) == MegaChatApi.CHAT_CONNECTION_ONLINE;
-    }
-
-    public static boolean checkConnection(Context context) {
-        if (!isOnline(context)) {
-            if (context instanceof ContactInfoActivityLollipop) {
-                ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-            }
-            return false;
-        }
-        return true;
-    }
-
     /**
      * Gets the image compress format depending on the file extension.
      * @param name Name of the image file including the extension.
@@ -590,7 +334,6 @@ public class ChatUtil {
      * @return Image file to be uploaded.
      */
     public static File checkImageBeforeUpload(File file) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
         int orientation = AndroidGfxProcessor.getExifOrientation(file.getAbsolutePath());
         Rect fileRect = AndroidGfxProcessor.getImageDimensions(file.getAbsolutePath(), orientation);
         Bitmap fileBitmap = AndroidGfxProcessor.getBitmap(file.getAbsolutePath(), fileRect, orientation, fileRect.right, fileRect.bottom);
@@ -600,8 +343,8 @@ public class ChatUtil {
         }
 
         File outFile = null;
-        float width = options.outWidth;
-        float height = options.outHeight;
+        float width = fileBitmap.getWidth();
+        float height = fileBitmap.getHeight();
         float totalPixels = width * height;
         float division = DOWNSCALE_IMAGES_PX / totalPixels;
         float factor = (float) Math.min(Math.sqrt(division), 1);

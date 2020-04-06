@@ -1563,72 +1563,41 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 showParkAccountLayout();
                 break;
             }
-            case R.id.login_text_view:{
+
+            case R.id.login_text_view:
                 numberOfClicksKarere++;
                 if (numberOfClicksKarere == 5){
                     MegaAttributes attrs = dbH.getAttributes();
-                    if(attrs!=null){
-                        if (attrs.getFileLoggerKarere() != null){
-                            try {
-                                if (Boolean.parseBoolean(attrs.getFileLoggerKarere()) == false) {
-                                    ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
-                                }
-                                else{
-                                    dbH.setFileLoggerKarere(false);
-                                    setFileLoggerKarere(false);
-                                    numberOfClicksKarere = 0;
-                                    MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
-                                    ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
-                                }
-                            }
-                            catch(Exception e){
-                                ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
-                            }
+                    if (attrs != null && attrs.getFileLoggerKarere() != null) {
+                        if (Boolean.parseBoolean(attrs.getFileLoggerKarere())) {
+                            numberOfClicksKarere = 0;
+                            setStatusLoggerKarere(context, false);
+                            break;
                         }
-                        else{
-                            ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
-                        }
+                    } else {
+                        logWarning("Karere file logger attribute is NULL");
                     }
-                    else{
-                        logWarning("attrs is NULL");
-                        ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
-                    }
+                    ((LoginActivityLollipop) context).showConfirmationEnableLogsKarere();
                 }
                 break;
-            }
-            case R.id.text_newToMega:{
+
+            case R.id.text_newToMega:
                 numberOfClicksSDK++;
-                if (numberOfClicksSDK == 5){
+                if (numberOfClicksSDK == 5) {
                     MegaAttributes attrs = dbH.getAttributes();
-                    if(attrs!=null){
-                        if (attrs.getFileLoggerSDK() != null){
-                            try {
-                                if (Boolean.parseBoolean(attrs.getFileLoggerSDK()) == false) {
-                                    ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
-                                }
-                                else{
-                                    dbH.setFileLoggerSDK(false);
-                                    setFileLoggerSDK(false);
-                                    numberOfClicksSDK = 0;
-                                    MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-                                    ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
-                                }
-                            }
-                            catch(Exception e){
-                                ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
-                            }
+                    if (attrs != null && attrs.getFileLoggerSDK() != null) {
+                        if (Boolean.parseBoolean(attrs.getFileLoggerSDK())) {
+                            numberOfClicksSDK = 0;
+                            setStatusLoggerSDK(context, false);
+                            break;
                         }
-                        else{
-                            ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
-                        }
+                    } else {
+                        logWarning("SDK file logger attribute is NULL");
                     }
-                    else{
-                        logWarning("attrs is NULL");
-                        ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
-                    }
+                    ((LoginActivityLollipop) context).showConfirmationEnableLogsSDK();
                 }
                 break;
-            }
+
             case R.id.lost_authentication_device: {
                 try {
                     String url = "https://mega.nz/recovery";

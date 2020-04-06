@@ -518,13 +518,10 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 						mediaIntent.putExtra("HANDLE", file.getHandle());
 						mediaIntent.putExtra("FILENAME", file.getName());
-						boolean isOnMegaDownloads = false;
-						String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-						File f = new File(downloadLocationDefaultPath, file.getName());
-						if(f.exists() && (f.length() == file.getSize())){
-							isOnMegaDownloads = true;
-						}
-						if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+
+						String localPath = getLocalFile(context, file.getName(), file.getSize());
+
+						if (localPath != null){
 							File mediaFile = new File(localPath);
 							//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1004,7 +1001,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
-		downloadLocationDefaultPath = getDownloadLocation(context);
+		downloadLocationDefaultPath = getDownloadLocation();
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();

@@ -31,6 +31,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -662,5 +663,23 @@ public class OfflineUtils {
 
     public static String removeInitialOfflinePath(String path) {
         return path.replace(MegaApplication.getInstance().getString(R.string.section_saved_for_offline_new), "");
+    }
+
+    /**
+     * Shares a offline node.
+     * If the node is a folder and the app has network connection, shares a folder link.
+     * If the node is a file, shares the file.
+     *
+     * @param context
+     * @param offline
+     */
+    public static void shareOfflineNode(Context context, MegaOffline offline) {
+        if (offline.isFolder()) {
+            if (isOnline(context)) {
+                shareNode(context, MegaApplication.getInstance().getMegaApi().getNodeByHandle(Long.parseLong(offline.getHandle())));
+            }
+        } else {
+            shareFile(context, getOfflineFile(context, offline));
+        }
     }
 }

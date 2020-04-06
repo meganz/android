@@ -55,6 +55,9 @@ public class Constants {
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
     public static final String ACTION_FORWARD_MESSAGES = "ACTION_FORWARD_MESSAGES";
+    public static final String ACTION_OPEN_QR = "ACTION_OPEN_QR";
+    public static final String ACTION_TAKE_PICTURE = "ACTION_TAKE_PICTURE";
+    public static final String ACTION_TAKE_PROFILE_PICTURE = "ACTION_TAKE_PROFILE_PICTURE";
 
     public static final String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
@@ -275,6 +278,7 @@ public class Constants {
     public static final int FILE_INFO_SHARED_CONTACT_ADAPTER = 2022;
     public static final int GENERAL_OTHERS_ADAPTER = 2023;
     public static final int RECENTS_ADAPTER = 2024;
+    public static final int LINKS_ADAPTER = 2025;
 
     public static final int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
     public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -345,6 +349,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
     public static final String CHAT_FOLDER = "My chat files";
     public static final String AUTHORITY_STRING_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider";
+    public static final String TYPE_TEXT_PLAIN = "text/plain";
 
     public static final int RICH_WARNING_TRUE = 1;
     public static final int RICH_WARNING_FALSE = 0;
@@ -430,6 +435,7 @@ public class Constants {
     public static final String SELECTED_USERS = "SELECTED_USERS";
     public static final String ID_MESSAGES = "ID_MESSAGES";
     public static final String USER_HANDLES = "USER_HANDLES";
+    public static final String URL_FILE_LINK = "URL_FILE_LINK";
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";

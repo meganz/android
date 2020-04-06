@@ -516,16 +516,10 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 							mediaIntent.putExtra("chatId", chatId);
 
 							mediaIntent.putExtra("FILENAME", node.getName());
-							MegaPreferences prefs = dbH.getPreferences();
-							String downloadLocationDefaultPath = getDownloadLocation(this);
-							String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
-							File f = new File(downloadLocationDefaultPath, node.getName());
-							boolean isOnMegaDownloads = false;
-							if(f.exists() && (f.length() == node.getSize())){
-								isOnMegaDownloads = true;
-							}
-							logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
-							if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+
+							String localPath = getLocalFile(this, node.getName(), node.getSize());
+
+							if (localPath != null){
 								File mediaFile = new File(localPath);
 								//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -623,17 +617,9 @@ public class NodeAttachmentHistoryActivity extends DownloadableActivity implemen
 							pdfIntent.putExtra("chatId", chatId);
 
 							pdfIntent.putExtra("FILENAME", node.getName());
-							MegaPreferences prefs = dbH.getPreferences();
-							String downloadLocationDefaultPath = getDownloadLocation(this);
 
-							String localPath = getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
-							File f = new File(downloadLocationDefaultPath, node.getName());
-							boolean isOnMegaDownloads = false;
-							if(f.exists() && (f.length() == node.getSize())){
-								isOnMegaDownloads = true;
-							}
-							logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
-							if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+							String localPath = getLocalFile(this, node.getName(), node.getSize());
+							if (localPath != null){
 								File mediaFile = new File(localPath);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 									logDebug("File Provider Option");
