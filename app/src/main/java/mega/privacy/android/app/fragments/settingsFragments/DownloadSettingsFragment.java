@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
 
 import java.io.File;
 
@@ -30,6 +31,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DownloadSettingsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
+    private PreferenceCategory category;
     private Preference downloadLocation;
     private TwoLineCheckPreference storageAskMeAlways;
 
@@ -41,6 +43,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences_download);
 
+        category = findPreference(KEY_STORAGE_DOWNLOAD_CATEGORY);
         downloadLocation = findPreference(KEY_STORAGE_DOWNLOAD_LOCATION);
         downloadLocation.setOnPreferenceClickListener(this);
 
@@ -58,17 +61,23 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
         }
 
         storageAskMeAlways.setChecked(askMe);
+        if(askMe) {
+            category.removePreference(downloadLocation);
+        }
 
         if (isTextEmpty(prefs.getStorageDownloadLocation())) {
-            File defaultDownloadLocation = buildDefaultDownloadDir(context);
-            defaultDownloadLocation.mkdirs();
-
-            downloadLocationPath = defaultDownloadLocation.getAbsolutePath();
+            resetDefaultDownloadLocation();
         } else {
             downloadLocationPath = prefs.getStorageDownloadLocation();
         }
 
         setDownloadLocation();
+    }
+
+    private void resetDefaultDownloadLocation() {
+        File defaultDownloadLocation = buildDefaultDownloadDir(context);
+        defaultDownloadLocation.mkdirs();
+        downloadLocationPath = defaultDownloadLocation.getAbsolutePath();
     }
 
     @Override
@@ -77,6 +86,12 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
         switch (preference.getKey()) {
             case KEY_STORAGE_ASK_ME_ALWAYS:
                 dbH.setStorageAskAlways(askMe = storageAskMeAlways.isChecked());
+                if(askMe) {
+                    category.removePreference(downloadLocation);
+                } else {
+                    resetDefaultDownloadLocation();
+                    category.addPreference(downloadLocation);
+                }
                 setDownloadLocation();
                 break;
 
