@@ -4810,11 +4810,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     int count = 0;
                     for (int i = 0; i < nodeList.size(); i++) {
                         MegaNode temp = nodeList.get(i);
-                        if (!(megaChatApi.isRevoked(chatRoom.getChatId(), temp.getHandle()))) {
-                            count++;
-                            logDebug("Node Handle: " + temp.getHandle());
-                            totalSize = totalSize + temp.getSize();
-                        }
+                        count++;
+                        logDebug("Node Handle: " + temp.getHandle());
+                        totalSize = totalSize + temp.getSize();
                     }
 
                     holder.contentOwnMessageFileSize.setText(getSizeString(totalSize));
@@ -5115,10 +5113,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     int count = 0;
                     for (int i = 0; i < nodeList.size(); i++) {
                         MegaNode temp = nodeList.get(i);
-                        if (!(megaChatApi.isRevoked(chatRoom.getChatId(), temp.getHandle()))) {
-                            count++;
-                            totalSize = totalSize + temp.getSize();
-                        }
+                        count++;
+                        totalSize = totalSize + temp.getSize();
                     }
                     ((ViewHolderMessageChat) holder).contentContactMessageFileSize.setText(getSizeString(totalSize));
                     MegaNode node = nodeList.get(0);

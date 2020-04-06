@@ -1831,7 +1831,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private boolean areMoreParticipantsThanMaxAllowed(long position) {
-        return chatRoom.getPeerCount() >= MAX_NAMES_PARTICIPANTS && position == 2;
+        return chatRoom.getPeerCount() > MAX_NAMES_PARTICIPANTS && position == 2;
     }
 
     private void sendGetPeerAttributesRequest(long participantsCount) {
@@ -5303,25 +5303,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                 logDebug("TYPE_NODE_ATTACHMENT MESSAGE!!!!");
-                MegaNodeList nodeList = msg.getMegaNodeList();
-                int revokedCount = 0;
-
-                for(int i=0; i<nodeList.size(); i++){
-                    MegaNode node = nodeList.get(i);
-                    boolean revoked = megaChatApi.isRevoked(idChat, node.getHandle());
-                    if(revoked){
-                        logDebug("The node is revoked: " + node.getHandle());
-                        revokedCount++;
-                    }
-                    else{
-                        logDebug("Node NOT revoked: " + node.getHandle());
-                    }
-                }
-
-                if(revokedCount==nodeList.size()){
-                    logDebug("RETURN");
-                    return;
-                }
             }
 
             if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
@@ -5690,54 +5671,30 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_ACCESS)){
             logDebug("Change access of the message");
-            MegaNodeList nodeList = msg.getMegaNodeList();
-            int revokedCount = 0;
+            logDebug("One attachment revoked, modify message");
+            resultModify = modifyMessageReceived(androidMsg, false);
+            if (resultModify == -1) {
+                logDebug("Modify result is -1");
+                int firstIndexShown = messages.get(0).getMessage().getMsgIndex();
+                logDebug("The first index is: " + firstIndexShown + " the index of the updated message: " + msg.getMsgIndex());
+                if (firstIndexShown <= msg.getMsgIndex()) {
+                    logDebug("The message should be in the list");
+                    if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
 
-            for(int i=0; i<nodeList.size(); i++){
-                MegaNode node = nodeList.get(i);
-                boolean revoked = megaChatApi.isRevoked(idChat, node.getHandle());
-                if(revoked){
-                    logDebug("The node is revoked: " + node.getHandle());
-                    revokedCount++;
-                }
-                else{
-                    logDebug("Node not revoked: " + node.getHandle());
-                }
-            }
-
-            if(revokedCount==nodeList.size()){
-                logDebug("All the attachments have been revoked");
-                deleteMessage(msg, false);
-            }
-            else{
-                logDebug("One attachment revoked, modify message");
-                resultModify = modifyMessageReceived(androidMsg, false);
-
-                if(resultModify==-1) {
-                    logDebug("Modify result is -1");
-                    int firstIndexShown = messages.get(0).getMessage().getMsgIndex();
-                    logDebug("The first index is: " + firstIndexShown + " the index of the updated message: " + msg.getMsgIndex());
-                    if(firstIndexShown<=msg.getMsgIndex()){
-                        logDebug("The message should be in the list");
-                        if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                        logDebug("Node attachment message not in list -> append");
+                        AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
+                        reinsertNodeAttachmentNoRevoked(msgToAppend);
+                    }
+                } else {
+                    if (messages.size() < NUMBER_MESSAGES_BEFORE_LOAD) {
+                        logDebug("Show more message - add to the list");
+                        if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
 
                             logDebug("Node attachment message not in list -> append");
                             AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
                             reinsertNodeAttachmentNoRevoked(msgToAppend);
                         }
                     }
-                    else{
-                        if(messages.size()<NUMBER_MESSAGES_BEFORE_LOAD){
-                            logDebug("Show more message - add to the list");
-                            if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-
-                                logDebug("Node attachment message not in list -> append");
-                                AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
-                                reinsertNodeAttachmentNoRevoked(msgToAppend);
-                            }
-                        }
-                    }
-
                 }
             }
         }
