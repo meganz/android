@@ -83,7 +83,7 @@ public class FileUtils {
     }
 
     public static boolean isOnMegaDownloads(Context context, MegaNode node) {
-        File f = new File(getDownloadLocation(context), node.getName());
+        File f = new File(getDownloadLocation(), node.getName());
 
         if (isFileAvailable(f) && f.length() == node.getSize()) {
             return true;
@@ -425,8 +425,8 @@ public class FileUtils {
         return false;
     }
 
-    public static String getDownloadLocation (Context context) {
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+    public static String getDownloadLocation () {
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(MegaApplication.getInstance());
         MegaPreferences prefs = dbH.getPreferences();
 
         if (prefs != null

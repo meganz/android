@@ -505,7 +505,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
-		downloadLocationDefaultPath = getDownloadLocation(context);
+		downloadLocationDefaultPath = getDownloadLocation();
 		lastPositionStack = new Stack<>();
 
 		if (megaChatApi == null) {

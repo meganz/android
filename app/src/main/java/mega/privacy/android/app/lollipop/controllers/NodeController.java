@@ -17,6 +17,7 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -26,6 +27,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -357,7 +359,7 @@ public class NodeController {
         }
 
         boolean askMe = askMe(context);
-        String downloadLocationDefaultPath = getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation();
 
         if (askMe) {
             logDebug("askMe");
@@ -1057,13 +1059,21 @@ public class NodeController {
         }
     }
 
-    public void removeLink(MegaNode document){
-        logDebug("removeLink");
+    public void removeLink(MegaNode document, ExportListener exportListener){
+        megaApi.disableExport(document, exportListener);
+    }
+
+    public void removeLinks(ArrayList<MegaNode> nodes){
         if (!isOnline(context)){
             ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
-        megaApi.disableExport(document, ((ManagerActivityLollipop) context));
+
+        ExportListener exportListener = new ExportListener(context, true, nodes.size());
+
+        for (MegaNode node : nodes) {
+            removeLink(node, exportListener);
+        }
     }
 
 
@@ -1337,9 +1347,30 @@ public class NodeController {
 
         ShareListener shareListener = new ShareListener(context, REMOVE_SHARE_LISTENER, listShares.size());
 
-        for (int i = 0; i < listShares.size(); i++) {
-            String email = listShares.get(i).getUser();
+        for (MegaShare share : listShares) {
+            String email = share.getUser();
             if (email != null) {
+                removeShare(shareListener, node, email);
+            }
+        }
+    }
+
+    public void removeSeveralFolderShares(List<MegaNode> nodes) {
+        ArrayList<MegaShare> totalShares = new ArrayList<>();
+
+        for (MegaNode node : nodes) {
+            ArrayList<MegaShare> shares = megaApi.getOutShares(node);
+            if (shares != null && !shares.isEmpty()) {
+                totalShares.addAll(shares);
+            }
+        }
+
+        ShareListener shareListener = new ShareListener(context, REMOVE_SHARE_LISTENER, totalShares.size());
+
+        for (MegaShare megaShare : totalShares) {
+            MegaNode node = megaApi.getNodeByHandle(megaShare.getNodeHandle());
+            String email = megaShare.getUser();
+            if (node != null && email != null) {
                 removeShare(shareListener, node, email);
             }
         }
@@ -1537,7 +1568,7 @@ public class NodeController {
         if (askMe) {
             pickFolder(document, url);
         } else {
-            String downloadLocationDefaultPath = getDownloadLocation(context);
+            String downloadLocationDefaultPath = getDownloadLocation();
             downloadTo(document, downloadLocationDefaultPath, url);
         }
     }

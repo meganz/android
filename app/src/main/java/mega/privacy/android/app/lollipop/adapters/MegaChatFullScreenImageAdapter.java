@@ -244,7 +244,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 
 		prefs = dbH.getPreferences();
 
-		downloadLocationDefaultPath = getDownloadLocation(context);
+		downloadLocationDefaultPath = getDownloadLocation();
 	}
 
 	@Override

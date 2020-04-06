@@ -352,7 +352,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 
 		prefs = dbH.getPreferences();
 
-		downloadLocationDefaultPath = getDownloadLocation(context);
+		downloadLocationDefaultPath = getDownloadLocation();
 	}
 
 	@Override

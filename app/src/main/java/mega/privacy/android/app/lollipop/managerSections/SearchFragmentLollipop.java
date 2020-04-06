@@ -472,7 +472,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		downloadLocationDefaultPath = getDownloadLocation(context);
+		downloadLocationDefaultPath = getDownloadLocation();
 
 		lastPositionStack = new Stack<>();
 		super.onCreate(savedInstanceState);

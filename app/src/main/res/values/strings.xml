@@ -256,6 +256,7 @@
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">Shared items</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Shared folders</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish Bin</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Contacts</string>
@@ -272,6 +273,7 @@
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Incoming</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Outgoing</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">Links</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">Incoming Shares</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Incoming shares with</string>
@@ -383,6 +385,10 @@
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Remove share</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">This link will not be publicly available anymore.</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">This link will not be publicly available anymore.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Open link</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Open</string>
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">Date</string>
     <string name="sortby_creation_date" context="category in sort by action">Creation Date</string>
     <string name="sortby_modification_date" context="category in sort by action">Modification Date</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Link creation date</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Newest</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Oldest</string>
 
@@ -1556,7 +1563,14 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Show info</string>
 
-    <string name="context_link_removal_error" context="error message">Link removal failed. Please try again later.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">Link removal failed. Please try again later.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Some links removal failed. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">Link action failed. Please try again later.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Write the user’s email</string>
@@ -1828,6 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]No [/B][A]Incoming Shared folders[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]No [/B][A]Outgoing Shared folders[/A][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Sent requests</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Received requests</string>
@@ -2741,6 +2756,10 @@
     <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Permissions error</string>
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">You do not have the permissions required to revert this file. In order to continue, we can create a new file with the reverted data. Would you like to proceed?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version was created as a new file successfully.</string>
+
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
 
     <string name="download_location" context="Download location label">Download location</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>

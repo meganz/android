@@ -84,6 +84,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -652,6 +653,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         }
         else if (type == ZIP_ADAPTER) {
             ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
+        } else if (type == LINKS_ADAPTER) {
+            LinksFragment.imageDrag.getLocationOnScreen(location);
         }
     }
 

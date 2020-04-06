@@ -111,6 +111,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -160,6 +161,7 @@ import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+
 
 public class AudioVideoPlayerLollipop extends DownloadableActivity implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
@@ -380,7 +382,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         filter.addAction(ACTION_CALL_STATUS_UPDATE);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
 
-        downloadLocationDefaultPath = getDownloadLocation(this);
+        downloadLocationDefaultPath = getDownloadLocation();
 
         draggableView.setViewAnimator(new ExitViewAnimator<>());
 
@@ -929,8 +931,9 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     if (parentNode != null) {
                         nodes = megaApiFolder.getChildren(parentNode, orderGetChildren);
                     }
-                }
-                else {
+                } else if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
+                    nodes = megaApi.getPublicLinks(orderGetChildren);
+                } else {
                     if (parentNodeHandle == -1) {
                         switch (adapterType) {
                             case FILE_BROWSER_ADAPTER: {
@@ -1412,14 +1415,19 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             getImageView(0, handle);
         }
         else {
-            MegaNode parentNode;
-            if (isFolderLink) {
-                parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(handle));
+            ArrayList<MegaNode> listNodes;
+            if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
+                listNodes = megaApi.getPublicLinks(orderGetChildren);
+            } else {
+                MegaNode parentNode;
+                if (isFolderLink) {
+                    parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(handle));
+                } else {
+                    parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+                }
+                listNodes = megaApi.getChildren(parentNode, orderGetChildren);
             }
-            else {
-                parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-            }
-            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
+
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
                     getImageView(i, -1);
@@ -1463,17 +1471,21 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             scrollToPosition(0, handle);
         }
         else {
-            MegaNode parentNode;
-            if (isFolderLink) {
-                parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(handle));
+            ArrayList<MegaNode> listNodes;
+            if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
+                listNodes = megaApi.getPublicLinks(orderGetChildren);
+            } else {
+                MegaNode parentNode;
+                if (isFolderLink) {
+                    parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(handle));
+                } else {
+                    parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+                }
+                listNodes = megaApi.getChildren(parentNode, orderGetChildren);
             }
-            else {
-                parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-            }
-            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
 
-            for (int i=0; i<listNodes.size(); i++){
-                if (listNodes.get(i).getHandle() == handle){
+            for (int i = 0; i < listNodes.size(); i++) {
+                if (listNodes.get(i).getHandle() == handle) {
                     scrollToPosition(i, -1);
                     break;
                 }
@@ -1547,6 +1559,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             if (ZipBrowserActivityLollipop.imageDrag != null){
                 ZipBrowserActivityLollipop.imageDrag.setVisibility(visibility);
             }
+        } else if (adapterType == LINKS_ADAPTER) {
+            if (LinksFragment.imageDrag != null){
+                LinksFragment.imageDrag.setVisibility(visibility);
+            }
         }
     }
 
@@ -1604,6 +1620,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         else if (adapterType == ZIP_ADAPTER){
             if (ZipBrowserActivityLollipop.imageDrag != null){
                 ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
+            }
+        } else if (adapterType == LINKS_ADAPTER){
+            if (LinksFragment.imageDrag != null){
+                LinksFragment.imageDrag.getLocationOnScreen(location);
             }
         }
     }
@@ -4136,7 +4156,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 else {
                     mediaSourcePlaylist.clear();
                 }
-                downloadLocationDefaultPath = getDownloadLocation(getApplicationContext());
+                downloadLocationDefaultPath = getDownloadLocation();
                 if (isOffline) {
                     for (int i = 0; i < mediaOffList.size(); i++) {
                         MegaOffline currentNode = mediaOffList.get(i);
