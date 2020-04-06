@@ -438,7 +438,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		}
 
 		prefs = dbH.getPreferences();
-		downloadLocationDefaultPath = getDownloadLocation(this);
+		downloadLocationDefaultPath = getDownloadLocation();
 
 		lastPositionStack = new Stack<>();
 		
@@ -832,7 +832,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 
         boolean askMe = askMe(this);
         prefs = dbH.getPreferences();
-        downloadLocationDefaultPath = getDownloadLocation(this);
+        downloadLocationDefaultPath = getDownloadLocation();
 
         if (askMe) {
             File[] fs = getExternalFilesDirs(null);

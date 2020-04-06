@@ -351,8 +351,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		helpSendFeedback = findPreference(KEY_HELP_SEND_FEEDBACK);
 		helpSendFeedback.setOnPreferenceClickListener(this);
 
-		cancelAccount = findPreference("settings_advanced_features_cancel_account");
+		cancelAccount = findPreference(KEY_CANCEL_ACCOUNT);
 		cancelAccount.setOnPreferenceClickListener(this);
+		updateCancelAccountSetting();
 
 		aboutPrivacy = findPreference(KEY_ABOUT_PRIVACY_POLICY);
 		aboutPrivacy.setOnPreferenceClickListener(this);
@@ -829,7 +830,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
         }else{
             size = String.valueOf(Integer.parseInt(sizeInDB));
         }
-        String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label, size + getResources().getString(R.string.label_file_size_mega_byte));
+        String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label,
+				getResources().getString(R.string.label_file_size_mega_byte, size));
         cameraUploadCharging.setSummary(chargingHelper);
 
         if(savedInstanceState != null){
@@ -841,6 +843,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
                 queueSizeInput.setSelection(input.length());
             }
         }
+	}
+
+	public void updateCancelAccountSetting() {
+		if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
+			advancedFeaturesCategory.removePreference(cancelAccount);
+		}
 	}
 
 	public void setVersionsInfo(){
@@ -879,7 +887,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 	public void resetRubbishInfo() {
 		logInfo("Updating size after clean the Rubbish Bin");
-		String emptyString = "0 " + getString(R.string.label_file_size_byte);
+		String emptyString = getString(R.string.label_file_size_byte, "0");
 		rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, emptyString));
 		MegaApplication.getInstance().getMyAccountInfo().setFormattedUsedRubbish(emptyString);
 	}
@@ -1601,7 +1609,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			viewIntent.setData(Uri.parse("https://github.com/meganz/android"));
 			startActivity(viewIntent);
 		}
-		else if (preference.getKey().compareTo("settings_advanced_features_cancel_account") == 0){
+		else if (preference.getKey().compareTo(KEY_CANCEL_ACCOUNT) == 0){
 			logDebug("Cancel account preference");
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
@@ -2476,7 +2484,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
         queueSizeInput.setSingleLine();
         queueSizeInput.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-        queueSizeInput.setHint(getString(R.string.label_file_size_mega_byte));
+        queueSizeInput.setHint(getString(R.string.label_mega_byte));
         queueSizeInput.setImeOptions(EditorInfo.IME_ACTION_DONE);
         queueSizeInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -2505,8 +2513,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
         params.setMargins(px2dp(margin+5, outMetrics), px2dp(0, outMetrics), px2dp(margin, outMetrics), 0);
         final TextView text = new TextView(context);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
-        String MB = getString(R.string.label_file_size_mega_byte);
-        text.setText(getString(R.string.settings_compression_queue_subtitle, COMPRESSION_QUEUE_SIZE_MIN + MB, COMPRESSION_QUEUE_SIZE_MAX + MB));
+        text.setText(getString(R.string.settings_compression_queue_subtitle,
+				getString(R.string.label_file_size_mega_byte, String.valueOf(COMPRESSION_QUEUE_SIZE_MIN)),
+				getString(R.string.label_file_size_mega_byte, String.valueOf(COMPRESSION_QUEUE_SIZE_MAX))));
         layout.addView(text,params);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -2539,8 +2548,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
             int size = Integer.parseInt(value);
             if(isQueueSizeValid(size)){
                 compressionQueueSizeDialog.dismiss();
-                cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.label_file_size_mega_byte));
-                String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label, size + getResources().getString(R.string.label_file_size_mega_byte));
+                cameraUploadVideoQueueSize.setSummary(getResources().getString(R.string.label_file_size_mega_byte, String.valueOf(size)));
+                String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label,
+						getResources().getString(R.string.label_file_size_mega_byte, String.valueOf(size)));
                 cameraUploadCharging.setSummary(chargingHelper);
                 dbH.setChargingOnSize(size);
                 prefs.setChargingOnSize(size + "");
@@ -2596,7 +2606,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
 		dbH.setConversionOnCharging(true);
 		dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
-		String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label, DEFAULT_CONVENTION_QUEUE_SIZE + getResources().getString(R.string.label_file_size_mega_byte));
+		String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label,
+				getResources().getString(R.string.label_file_size_mega_byte, String.valueOf(DEFAULT_CONVENTION_QUEUE_SIZE)));
 		cameraUploadCharging.setSummary(chargingHelper);
 	}
 
@@ -2647,7 +2658,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		} else {
 			size = Integer.parseInt(sizeInDB);
 		}
-		cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.label_file_size_mega_byte));
+		cameraUploadVideoQueueSize.setSummary(getResources().getString(R.string.label_file_size_mega_byte, String.valueOf(size)));
 	}
 
     private void enableVideoCompressionSizeSettingsAndRestartUpload(){

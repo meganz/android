@@ -414,6 +414,17 @@ public class MegaNodeUtil {
     }
 
     /**
+     * Checks if it is on Links section and in root level.
+     *
+     * @param adapterType   current section
+     * @param parentHandle  current parent handle
+     * @return true if it is on Links section and it is in root level, false otherwise
+     */
+    public static boolean isInRootLinksLevel(int adapterType, long parentHandle) {
+        return adapterType == LINKS_ADAPTER && parentHandle == INVALID_HANDLE;
+    }
+
+    /*
      * Checks if the Toolbar option "share" should be visible or not depending on the permissions of the MegaNode
      *
      * @param adapterType   view in which is required the check

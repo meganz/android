@@ -507,19 +507,19 @@ public class Util {
 
 		Context context = MegaApplication.getInstance().getApplicationContext();
 		if (size < KB){
-			sizeString = size + " " + context.getString(R.string.label_file_size_byte);
+			sizeString = context.getString(R.string.label_file_size_byte, Long.toString(size));
 		}
 		else if (size < MB){
-			sizeString = decf.format(size/KB) + " " + context.getString(R.string.label_file_size_kilo_byte);
+			sizeString = context.getString(R.string.label_file_size_kilo_byte, decf.format(size/KB));
 		}
 		else if (size < GB){
-			sizeString = decf.format(size/MB) + " " + context.getString(R.string.label_file_size_mega_byte);
+			sizeString = context.getString(R.string.label_file_size_mega_byte, decf.format(size/MB));
 		}
 		else if (size < TB){
-			sizeString = decf.format(size/GB) + " " + context.getString(R.string.label_file_size_giga_byte);
+			sizeString = context.getString(R.string.label_file_size_giga_byte, decf.format(size/GB));
 		}
 		else{
-			sizeString = decf.format(size/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
+			sizeString = context.getString(R.string.label_file_size_tera_byte, decf.format(size/TB));
 		}
 		
 		return sizeString;
@@ -533,10 +533,10 @@ public class Util {
 
 		Context context = MegaApplication.getInstance().getApplicationContext();
         if (gbSize < TB){
-            sizeString = decf.format(gbSize) + " " + context.getString(R.string.label_file_size_giga_byte);
+            sizeString = context.getString(R.string.label_file_size_giga_byte, decf.format(gbSize));
         }
         else{
-            sizeString = decf.format(gbSize/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
+            sizeString = context.getString(R.string.label_file_size_tera_byte, decf.format(gbSize/TB));
         }
 
         return sizeString;

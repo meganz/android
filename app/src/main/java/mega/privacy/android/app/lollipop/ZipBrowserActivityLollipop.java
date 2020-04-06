@@ -275,7 +275,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		}
 		
 		currentPath = pathZip;
-		downloadLocationDefaultPath = getDownloadLocation(this);
+		downloadLocationDefaultPath = getDownloadLocation();
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		
@@ -421,7 +421,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
-		String downloadLocationDefaultPath = getDownloadLocation(this);
+		String downloadLocationDefaultPath = getDownloadLocation();
 		
 		String absolutePath= downloadLocationDefaultPath+"/"+currentPath;
 		if(!folderzipped){

@@ -380,7 +380,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         dbH = DatabaseHandler.getDbHandler(context);
         prefs = dbH.getPreferences();
-        downloadLocationDefaultPath = getDownloadLocation(context);
+        downloadLocationDefaultPath = getDownloadLocation();
 
         handler = new Handler();
 

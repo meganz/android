@@ -1,10 +1,10 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
@@ -12,7 +12,7 @@ import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
-public abstract class RotatableFragment extends Fragment {
+public abstract class RotatableFragment extends BaseFragment {
 
     private final static String UNHANDLED_ITEM = "unHandledItem";
     private final static String SELECTED_ITEMS = "selectedItems";
@@ -115,7 +115,6 @@ public abstract class RotatableFragment extends Fragment {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
