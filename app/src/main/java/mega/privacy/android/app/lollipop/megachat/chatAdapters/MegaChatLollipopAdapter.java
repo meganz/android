@@ -8359,4 +8359,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
         return -1;
     }
+
+    public void setChatRoom(MegaChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
+    }
  }

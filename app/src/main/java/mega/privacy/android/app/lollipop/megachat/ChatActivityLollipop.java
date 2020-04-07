@@ -191,7 +191,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private static final String MESSAGE_HANDLE_PLAYING = "messageHandleVoicePlaying";
     private static final String USER_HANDLE_PLAYING = "userHandleVoicePlaying";
 
-    private final static int NUMBER_MESSAGES_TO_LOAD = 20;
+    private final static int NUMBER_MESSAGES_TO_LOAD = 32;
+    private final static int MAX_NUMBER_MESSAGES_TO_LOAD_NOT_SEEN = 256;
     private final static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
     public static final int REPEAT_INTERVAL = 40;
 
@@ -245,17 +246,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private final static int TYPE_MESSAGE_JUMP_TO_LEAST = 0;
     private final static int TYPE_MESSAGE_NEW_MESSAGE = 1;
 
-    private int currentRecordButtonState = 0;
+    private int currentRecordButtonState;
     private String mOutputFilePath;
     private int keyboardHeight;
     private int marginBottomDeactivated;
     private int marginBottomActivated;
-    boolean newVisibility = false;
-    boolean getMoreHistory=false;
-    int minutesLastGreen = -1;
-    boolean isLoadingHistory = false;
+    boolean newVisibility;
+    boolean getMoreHistory;
+    int minutesLastGreen = INVALID_VALUE;
+    boolean isLoadingHistory;
     private AlertDialog errorOpenChatDialog;
-    long numberToLoad = -1;
+    long numberToLoad;
 
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private AlertDialog chatAlertDialog;
@@ -1093,23 +1094,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
 
                 if (stateHistory != MegaChatApi.SOURCE_NONE) {
-                    if (dy > 0) {
-                        // Scrolling up
-                        scrollingUp = true;
-                    } else {
-                        // Scrolling down
-                        scrollingUp = false;
-                    }
+                    scrollingUp = dy > 0 ? true : false;
 
-                    if (!scrollingUp) {
-                        int pos = mLayoutManager.findFirstVisibleItemPosition();
-                        if (pos <= NUMBER_MESSAGES_BEFORE_LOAD && getMoreHistory) {
-                            logDebug("DE->loadMessages:scrolling up");
-                            isLoadingHistory = true;
-                            stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                            positionToScroll = -1;
-                            getMoreHistory = false;
-                        }
+                    if (!scrollingUp && mLayoutManager.findFirstVisibleItemPosition() <= NUMBER_MESSAGES_BEFORE_LOAD && getMoreHistory) {
+                        logDebug("DE->loadMessages:scrolling up");
+                        askForMoreMessages();
+                        positionToScroll = INVALID_VALUE;
                     }
                 }
             }
@@ -1413,7 +1403,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                 isOpeningChat = true;
 
-                String textToShowB = String.format(getString(R.string.chat_loading_messages));
+                String textToShowB = getString(R.string.chat_loading_messages);
 
                 try {
                     textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
@@ -1422,14 +1412,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     textToShowB = textToShowB.replace("[/B]", "</font>");
                 } catch (Exception e) {
                 }
-                Spanned resultB = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultB = Html.fromHtml(textToShowB, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    resultB = Html.fromHtml(textToShowB);
-                }
 
-                emptyScreen(resultB.toString());
+                emptyScreen(getSpannedHtmlText(textToShowB).toString());
 
                 if(textSnackbar!=null){
                     String chatLink = getIntent().getStringExtra("CHAT_LINK");
@@ -1475,10 +1459,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     public void loadHistory() {
-        logDebug("loadHistory");
-
-        isLoadingHistory = true;
-
         long unreadCount = chatRoom.getUnreadCount();
         lastSeenReceived = unreadCount == 0;
 
@@ -1488,9 +1468,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if (!isTurn) {
                 lastIdMsgSeen = INVALID_HANDLE;
                 generalUnreadCount = 0;
-                numberToLoad = NUMBER_MESSAGES_TO_LOAD;
-                stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                return;
             }
         } else {
             if (!isTurn) {
@@ -1507,9 +1484,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         }
 
-        numberToLoad = Math.abs(generalUnreadCount) + NUMBER_MESSAGES_TO_LOAD;
-        stateHistory = megaChatApi.loadMessages(idChat, (int) numberToLoad);
-        logDebug("END:numberToLoad: " + numberToLoad);
+        askForMoreMessages();
     }
 
     /**
@@ -4814,6 +4789,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
         logDebug("onChatRoomUpdate!");
         this.chatRoom = chat;
+        if (adapter != null) {
+            adapter.setChatRoom(chatRoom);
+        }
+
         if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_CLOSED)){
             logDebug("CHANGE_TYPE_CLOSED for the chat: " + chat.getChatId());
             int permission = chat.getOwnPrivilege();
@@ -4893,7 +4872,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
 
                 if(usersTyping==null){
-                    usersTyping = new ArrayList<UserTyping>();
+                    usersTyping = new ArrayList<>();
                     usersTypingSync = Collections.synchronizedList(usersTyping);
                 }
 
@@ -4907,17 +4886,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                     logDebug("userHandleTyping: " + userHandleTyping);
 
-
-                    if(nameTyping==null){
-                        logWarning("NULL name");
+                    if (isTextEmpty(nameTyping)) {
                         nameTyping = getString(R.string.transfer_unknown);
                     }
-                    else{
-                        if(nameTyping.trim().isEmpty()){
-                            logWarning("EMPTY name");
-                            nameTyping = getString(R.string.transfer_unknown);
-                        }
-                    }
+
                     participantTyping.setFirstName(nameTyping);
 
                     userTypingTimeStamp = System.currentTimeMillis()/1000;
@@ -4926,18 +4898,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     usersTypingSync.add(currentUserTyping);
 
                     String userTyping =  getResources().getQuantityString(R.plurals.user_typing, 1, toCDATA(usersTypingSync.get(0).getParticipantTyping().getFirstName()));
-
                     userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                     userTyping = userTyping.replace("[/A]", "</font>");
-
-                    Spanned result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(userTyping,Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(userTyping);
-                    }
-
-                    userTypingText.setText(result);
+                    userTypingText.setText(getSpannedHtmlText(userTyping));
 
                     userTypingLayout.setVisibility(View.VISIBLE);
                 }
@@ -4962,16 +4925,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         UserTyping currentUserTyping = new UserTyping(participantTyping);
 
                         String nameTyping = chatC.getFirstName(userHandleTyping, chatRoom);
-                        if(nameTyping==null){
-                            logWarning("NULL name");
+                        if (isTextEmpty(nameTyping)) {
                             nameTyping = getString(R.string.transfer_unknown);
                         }
-                        else{
-                            if(nameTyping.trim().isEmpty()){
-                                logWarning("EMPTY name");
-                                nameTyping = getString(R.string.transfer_unknown);
-                            }
-                        }
+
                         participantTyping.setFirstName(nameTyping);
 
                         userTypingTimeStamp = System.currentTimeMillis()/1000;
@@ -4980,58 +4937,29 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         usersTypingSync.add(currentUserTyping);
 
                         //Show the notification
+                        String userTyping;
                         int size = usersTypingSync.size();
-                        switch (size){
-                            case 1:{
-                                String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1, usersTypingSync.get(0).getParticipantTyping().getFirstName());
+                        switch (size) {
+                            case 1:
+                                userTyping = getResources().getQuantityString(R.plurals.user_typing, 1, usersTypingSync.get(0).getParticipantTyping().getFirstName());
                                 userTyping = toCDATA(userTyping);
-                                userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
-                                userTyping = userTyping.replace("[/A]", "</font>");
-
-                                Spanned result = null;
-                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                                    result = Html.fromHtml(userTyping,Html.FROM_HTML_MODE_LEGACY);
-                                } else {
-                                    result = Html.fromHtml(userTyping);
-                                }
-
-                                userTypingText.setText(result);
                                 break;
-                            }
-                            case 2:{
-                                String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2, usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName());
+
+                            case 2:
+                                userTyping = getResources().getQuantityString(R.plurals.user_typing, 2, usersTypingSync.get(0).getParticipantTyping().getFirstName() + ", " + usersTypingSync.get(1).getParticipantTyping().getFirstName());
                                 userTyping = toCDATA(userTyping);
-                                userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
-                                userTyping = userTyping.replace("[/A]", "</font>");
-
-                                Spanned result = null;
-                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                                    result = Html.fromHtml(userTyping,Html.FROM_HTML_MODE_LEGACY);
-                                } else {
-                                    result = Html.fromHtml(userTyping);
-                                }
-
-                                userTypingText.setText(result);
                                 break;
-                            }
-                            default:{
-                                String names = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName();
-                                String userTyping = String.format(getString(R.string.more_users_typing),toCDATA(names));
 
-                                userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
-                                userTyping = userTyping.replace("[/A]", "</font>");
-
-                                Spanned result = null;
-                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                                    result = Html.fromHtml(userTyping,Html.FROM_HTML_MODE_LEGACY);
-                                } else {
-                                    result = Html.fromHtml(userTyping);
-                                }
-
-                                userTypingText.setText(result);
+                            default:
+                                String names = usersTypingSync.get(0).getParticipantTyping().getFirstName() + ", " + usersTypingSync.get(1).getParticipantTyping().getFirstName();
+                                userTyping = String.format(getString(R.string.more_users_typing), toCDATA(names));
                                 break;
-                            }
                         }
+
+                        userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
+                        userTyping = userTyping.replace("[/A]", "</font>");
+
+                        userTypingText.setText(getSpannedHtmlText(userTyping));
                         userTypingLayout.setVisibility(View.VISIBLE);
                     }
                 }
@@ -5422,108 +5350,100 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
         else{
             logDebug("NULLmsg:REACH FINAL HISTORY:stateHistory " + stateHistory);
-            if(!bufferSending.isEmpty()){
+            if (!bufferSending.isEmpty()) {
                 bufferMessages.addAll(bufferSending);
                 bufferSending.clear();
             }
 
-            logDebug("numberToLoad: " + numberToLoad + " bufferSize: " + bufferMessages.size() + " messagesSize: " + messages.size());
-            if((bufferMessages.size()+messages.size())>=numberToLoad){
-                logDebug("Full history received");
-                fullHistoryReceivedOnLoad();
-                isLoadingHistory = false;
-            }
-            else if(((bufferMessages.size()+messages.size())<numberToLoad) && (stateHistory==MegaChatApi.SOURCE_ERROR)){
-                logDebug("noMessagesLoaded&SOURCE_ERROR: wait to CHAT ONLINE connection");
+            if (stateHistory == MegaChatApi.SOURCE_ERROR) {
+                logDebug("SOURCE_ERROR: wait to CHAT ONLINE connection");
                 retryHistory = true;
-            }
-            else{
-                logDebug("lessNumberReceived");
-                if((stateHistory!=MegaChatApi.SOURCE_NONE)&&(stateHistory!=MegaChatApi.SOURCE_ERROR)){
-                    logDebug("But more history exists --> loadMessages");
-                    isLoadingHistory = true;
-                    stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                    logDebug("New state of history: " + stateHistory);
-                    getMoreHistory = false;
-                    if(stateHistory==MegaChatApi.SOURCE_NONE || stateHistory==MegaChatApi.SOURCE_ERROR){
-                        fullHistoryReceivedOnLoad();
-                        isLoadingHistory = false;
-                    }
+            } else if (stateHistory == MegaChatApi.SOURCE_NONE) {
+                logDebug("SOURCE_NONE: there are no more messages");
+                fullHistoryReceivedOnLoad();
+            } else if (bufferMessages.size() == NUMBER_MESSAGES_TO_LOAD) {
+                logDebug("All the messages asked are loaded");
+                long messagesLoadedCount = bufferMessages.size() + messages.size();
+                fullHistoryReceivedOnLoad();
+
+                if (messagesLoadedCount < Math.abs(generalUnreadCount) && messagesLoadedCount < MAX_NUMBER_MESSAGES_TO_LOAD_NOT_SEEN) {
+                    askForMoreMessages();
                 }
-                else{
-                    fullHistoryReceivedOnLoad();
-                    isLoadingHistory = false;
+            } else {
+                long pendingMessagesCount = numberToLoad - bufferMessages.size();
+                if (pendingMessagesCount > 0) {
+                    logDebug("Fewer messages received (" + bufferMessages.size() + ") than asked (" + NUMBER_MESSAGES_TO_LOAD + "): ask for the rest of messages (" + pendingMessagesCount + ")");
+                    askForMoreMessages(pendingMessagesCount);
+
+                    if (stateHistory == MegaChatApi.SOURCE_NONE) {
+                        logDebug("SOURCE_NONE: there are no more messages");
+                        fullHistoryReceivedOnLoad();
+                    }
                 }
             }
         }
         logDebug("END onMessageLoaded - messages.size=" + messages.size());
     }
 
-    public void fullHistoryReceivedOnLoad(){
+    /**
+     * Initiates fetching 32 messages more of the current ChatRoom.
+     */
+    private void askForMoreMessages() {
+        askForMoreMessages(NUMBER_MESSAGES_TO_LOAD);
+    }
+
+    /**
+     * Initiates fetching some messages more of the current ChatRoom.
+     *
+     * @param messagesCount number of messages to be fetched
+     */
+    private void askForMoreMessages(long messagesCount) {
+        isLoadingHistory = true;
+        numberToLoad = messagesCount;
+        stateHistory = megaChatApi.loadMessages(idChat, (int) numberToLoad);
+        getMoreHistory = false;
+    }
+
+    public void fullHistoryReceivedOnLoad() {
         logDebug("fullHistoryReceivedOnLoad");
 
+        isLoadingHistory = false;
         isOpeningChat = false;
 
-        if(!bufferMessages.isEmpty()){
+        if (!bufferMessages.isEmpty()) {
             logDebug("Buffer size: " + bufferMessages.size());
             loadBufferMessages();
 
-            if(lastSeenReceived==false){
-                logDebug("Last message seen NOT received");
-                if(stateHistory!=MegaChatApi.SOURCE_NONE){
-                    logDebug("F->loadMessages");
-                    isLoadingHistory = true;
-                    stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                }
-            }
-            else{
+            if (lastSeenReceived && positionToScroll > 0 && positionToScroll < messages.size()) {
                 logDebug("Last message seen received");
-                if(positionToScroll>0){
-                    logDebug("Scroll to position: " + positionToScroll);
-                    if(positionToScroll<messages.size()){
-                        //Find last message
-                        int positionLastMessage = -1;
-                        for(int i=messages.size()-1; i>=0;i--) {
-                            AndroidMegaChatMessage androidMessage = messages.get(i);
+                //Find last message
+                int positionLastMessage = -1;
+                for (int i = messages.size() - 1; i >= 0; i--) {
+                    AndroidMegaChatMessage androidMessage = messages.get(i);
 
-                            if (!androidMessage.isUploading()) {
-
-                                MegaChatMessage msg = androidMessage.getMessage();
-                                if (msg.getMsgId() == lastIdMsgSeen) {
-                                    positionLastMessage = i;
-                                    break;
-                                }
-                            }
+                    if (!androidMessage.isUploading()) {
+                        MegaChatMessage msg = androidMessage.getMessage();
+                        if (msg.getMsgId() == lastIdMsgSeen) {
+                            positionLastMessage = i;
+                            break;
                         }
-
-                        //Check if it has no my messages after
-                        positionLastMessage = positionLastMessage + 1;
-                        AndroidMegaChatMessage message = messages.get(positionLastMessage);
-
-                        while(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()){
-                            lastIdMsgSeen = message.getMessage().getMsgId();
-                            positionLastMessage = positionLastMessage + 1;
-                            message = messages.get(positionLastMessage);
-                        }
-
-                        if(isTurn){
-                            scrollToMessage(-1);
-
-                        }else{
-                            scrollToMessage(lastIdMsgSeen);
-                        }
-
-                    }
-                    else{
-                        logError("Error, the position to scroll is more than size of messages");
                     }
                 }
+
+                //Check if it has no my messages after
+                positionLastMessage = positionLastMessage + 1;
+                AndroidMegaChatMessage message = messages.get(positionLastMessage);
+
+                while (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
+                    lastIdMsgSeen = message.getMessage().getMsgId();
+                    positionLastMessage = positionLastMessage + 1;
+                    message = messages.get(positionLastMessage);
+                }
+
+                scrollToMessage(isTurn ? -1 : lastIdMsgSeen);
             }
 
             setLastMessageSeen();
-        }
-        else{
-            logWarning("Buffer empty");
         }
 
         logDebug("getMoreHistoryTRUE");

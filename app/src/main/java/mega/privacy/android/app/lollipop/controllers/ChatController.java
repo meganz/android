@@ -1074,22 +1074,14 @@ public class ChatController {
             logDebug("Not participant any more!");
             String handleString = megaApi.handleToBase64(userHandle);
             MegaUser contact = megaApi.getContact(handleString);
-            if(contact!=null){
-                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-                    logDebug("Is contact!");
-                    return getFirstNameDB(userHandle);
-                }
-                else{
-                    logDebug("Old contact");
-                    return getNonContactFirstName(userHandle);
-                }
-            }
-            else{
-                logDebug("Non contact");
+            if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+                logDebug("Is contact!");
+                return getFirstNameDB(userHandle);
+            } else {
+                logDebug("Non contact or Old contact");
                 return getNonContactFirstName(userHandle);
             }
-        }
-        else{
+        } else {
             logDebug("Is participant");
             return getParticipantFirstName(userHandle, chatRoom);
         }
@@ -1205,8 +1197,7 @@ public class ChatController {
         if (isTextEmpty(firstName)) {
             String lastName = chatRoom.getPeerLastnameByHandle(userHandle);
             if (isTextEmpty(lastName)) {
-                logWarning("Full name empty");
-                logDebug("Put email as fullname");
+                logWarning("Full name empty. Put email as fullname");
                 String mail = chatRoom.getPeerEmailByHandle(userHandle);
                 if (isTextEmpty(mail)) {
                     return "";
