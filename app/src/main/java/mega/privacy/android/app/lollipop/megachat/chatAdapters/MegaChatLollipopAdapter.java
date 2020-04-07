@@ -780,6 +780,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         public ViewHolderHeaderChat(View view) {
             super(view);
         }
+
+        RelativeLayout firstMessage;
+        ImageView loadingMessages;
     }
 
     ViewHolderMessageChat holder;
@@ -789,7 +792,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (viewType == TYPE_HEADER) {
             logDebug("Create header");
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.header_item_chat, parent, false);
-            return new ViewHolderHeaderChat(v);
+            ViewHolderHeaderChat holder = new ViewHolderHeaderChat(v);
+
+            holder.firstMessage = v.findViewById(R.id.first_message_chat);
+            holder.loadingMessages = v.findViewById(R.id.loading_messages_image);
+
+            return holder;
         } else {
             logDebug("Create item message");
             Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
@@ -1256,7 +1264,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ViewHolderHeaderChat) {
-            logDebug("ViewHolderHeaderChat: " + position);
+            ViewHolderHeaderChat holderHeaderChat = (ViewHolderHeaderChat) holder;
+
+            if (megaChatApi.isFullHistoryLoaded(chatRoom.getChatId())) {
+                holderHeaderChat.firstMessage.setVisibility(View.VISIBLE);
+                holderHeaderChat.loadingMessages.setVisibility(View.GONE);
+            } else {
+                holderHeaderChat.firstMessage.setVisibility(View.GONE);
+                holderHeaderChat.loadingMessages.setVisibility(View.VISIBLE);
+            }
         } else {
             logDebug("ViewHolderMessageChat: " + position);
             AndroidMegaChatMessage androidMessage = messages.get(position - 1);

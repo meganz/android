@@ -9,136 +9,158 @@
     android:layout_marginBottom="20dp"
     android:background="@color/background_chat">
 
-    <LinearLayout
-        android:id="@+id/mega_info_layout"
+    <RelativeLayout
+        android:id="@+id/first_message_chat"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
-        <RelativeLayout
-            android:id="@+id/mega_icon_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/mega_icon_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_confidentiality"
-                android:visibility="invisible"/>
-        </RelativeLayout>
-
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/mega_info_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="24dp">
-            <TextView
-                android:id="@+id/mega_title"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:id="@+id/mega_icon_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/mega_icon_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_confidentiality"
+                    android:visibility="invisible"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/title_mega_info_empty_screen"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
+                android:layout_marginLeft="24dp">
 
-            <TextView
-                android:id="@+id/mega_info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/mega_info_empty_screen"
-                android:textColor="@color/mail_my_account"
-                android:textSize="14sp"
-                android:layout_below="@+id/mega_title"/>
+                <TextView
+                    android:id="@+id/mega_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_mega_info_empty_screen"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/mega_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mega_info_empty_screen"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="14sp"
+                    android:layout_below="@+id/mega_title"/>
 
-    </LinearLayout>
+            </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/confidentiality_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@+id/mega_info_layout"
-        android:layout_marginBottom="20dp">
+        </LinearLayout>
 
-        <RelativeLayout
-            android:id="@+id/confidentiality_icon_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/confidentiality_icon_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:src="@drawable/ic_confidentiality"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="24dp">
-            <TextView
-                android:id="@+id/confidentiality_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_mega_confidentiality_empty_screen"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
-
-            <TextView
-                android:id="@+id/confidentiality_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/mega_confidentiality_empty_screen"
-                android:textColor="@color/mail_my_account"
-                android:textSize="14sp"
-                android:layout_below="@+id/confidentiality_title"/>
-
-        </RelativeLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/authenticity_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@+id/confidentiality_info">
-
-        <RelativeLayout
-            android:id="@+id/authenticity_icon_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/authenticity_icon_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:src="@drawable/ic_authenticity"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/confidentiality_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="24dp">
-            <TextView
-                android:id="@+id/authenticity_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/title_mega_authenticity_empty_screen"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
+            android:orientation="horizontal"
+            android:layout_below="@+id/mega_info_layout"
+            android:layout_marginBottom="20dp">
 
-            <TextView
-                android:id="@+id/authenticity_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/mega_authenticity_empty_screen"
-                android:textColor="@color/mail_my_account"
-                android:textSize="14sp"
-                android:layout_below="@+id/authenticity_title"/>
+            <RelativeLayout
+                android:id="@+id/confidentiality_icon_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
 
-        </RelativeLayout>
-    </LinearLayout>
+                <ImageView
+                    android:id="@+id/confidentiality_icon_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_confidentiality"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp">
+
+                <TextView
+                    android:id="@+id/confidentiality_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_mega_confidentiality_empty_screen"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/confidentiality_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mega_confidentiality_empty_screen"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="14sp"
+                    android:layout_below="@+id/confidentiality_title"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/authenticity_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@+id/confidentiality_info">
+
+            <RelativeLayout
+                android:id="@+id/authenticity_icon_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/authenticity_icon_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_authenticity"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp">
+
+                <TextView
+                    android:id="@+id/authenticity_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_mega_authenticity_empty_screen"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/authenticity_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mega_authenticity_empty_screen"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="14sp"
+                    android:layout_below="@+id/authenticity_title"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/loading_messages_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>
