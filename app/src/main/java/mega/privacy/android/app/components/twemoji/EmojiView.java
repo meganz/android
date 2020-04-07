@@ -25,6 +25,8 @@ import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListene
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.RepeatListener;
 
+import static mega.privacy.android.app.utils.Constants.*;
+
 public final class EmojiView extends LinearLayout implements ViewPager.OnPageChangeListener {
   private static final long INITIAL_INTERVAL = TimeUnit.SECONDS.toMillis(1) / 2;
   private static final int NORMAL_INTERVAL = 50;
@@ -32,21 +34,26 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
   @ColorInt private final int themeAccentColor;
   @ColorInt private final int themeIconColor;
 
-  private final ImageButton[] emojiTabs;
+  private ImageButton[] emojiTabs = null;
   private final EmojiPagerAdapter emojiPagerAdapter;
-
+  private String type;
   @Nullable OnEmojiBackspaceClickListener onEmojiBackspaceClickListener;
 
   private int emojiTabLastSelectedIndex = -1;
 
-  public EmojiView(final Context context, final OnEmojiClickListener onEmojiClickListener, final OnEmojiLongClickListener onEmojiLongClickListener, @NonNull final RecentEmoji recentEmoji, @NonNull final VariantEmoji variantManager) {
+  public EmojiView(final Context context, final OnEmojiClickListener onEmojiClickListener, final OnEmojiLongClickListener onEmojiLongClickListener, @NonNull final RecentEmoji recentEmoji, @NonNull final VariantEmoji variantManager, final String typeView) {
     super(context);
+    this.type = typeView;
 
-    View.inflate(context, R.layout.emoji_view, this);
+    if (type.equals(TYPE_EMOJI)) {
+      View.inflate(context, R.layout.emoji_view, this);
+      setBackgroundColor(ContextCompat.getColor(context, R.color.emoji_background));
+    } else if (type.equals(TYPE_REACTION)) {
+      View.inflate(context, R.layout.reactions_view, this);
+      setBackgroundColor(ContextCompat.getColor(context, R.color.background_chat));
+    }
 
     setOrientation(VERTICAL);
-    setBackgroundColor(ContextCompat.getColor(context, R.color.emoji_background));
-
     themeIconColor = ContextCompat.getColor(context, R.color.emoji_icons);
     final TypedValue value = new TypedValue();
     context.getTheme().resolveAttribute(R.attr.colorAccent, value, true);
@@ -62,12 +69,20 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
 
     final EmojiCategory[] categories = EmojiManager.getInstance().getCategories();
 
-    emojiTabs = new ImageButton[categories.length + 2];
-    emojiTabs[0] = inflateButton(context, R.drawable.emoji_recent, emojisTab);
-    for (int i = 0; i < categories.length; i++) {
-      emojiTabs[i + 1] = inflateButton(context, categories[i].getIcon(), emojisTab);
+    if (type.equals(TYPE_EMOJI)) {
+      emojiTabs = new ImageButton[categories.length + 2];
+      emojiTabs[0] = inflateButton(context, R.drawable.emoji_recent, emojisTab);
+      for (int i = 0; i < categories.length; i++) {
+        emojiTabs[i + 1] = inflateButton(context, categories[i].getIcon(), emojisTab);
+      }
+      emojiTabs[emojiTabs.length - 1] = inflateButton(context, R.drawable.emoji_backspace, emojisTab);
+    } else if (type.equals(TYPE_REACTION)) {
+      emojiTabs = new ImageButton[categories.length + 1];
+      emojiTabs[0] = inflateButton(context, R.drawable.emoji_recent, emojisTab);
+      for (int i = 0; i < categories.length; i++) {
+        emojiTabs[i + 1] = inflateButton(context, categories[i].getIcon(), emojisTab);
+      }
     }
-    emojiTabs[emojiTabs.length - 1] = inflateButton(context, R.drawable.emoji_backspace, emojisTab);
 
     handleOnClicks(emojisPager);
 
@@ -80,17 +95,25 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
   }
 
   private void handleOnClicks(final ViewPager emojisPager) {
-    for (int i = 0; i < emojiTabs.length - 1; i++) {
+    int totalLength = 0;
+
+    if (type.equals(TYPE_REACTION)) {
+      totalLength = emojiTabs.length;
+    } else if (type.equals(TYPE_EMOJI)) {
+      totalLength = emojiTabs.length - 1;
+    }
+
+    for (int i = 0; i < totalLength; i++) {
       emojiTabs[i].setOnClickListener(new EmojiTabsClickListener(emojisPager, i));
     }
 
-    emojiTabs[emojiTabs.length - 1].setOnTouchListener(new RepeatListener(INITIAL_INTERVAL, NORMAL_INTERVAL, new OnClickListener() {
-      @Override public void onClick(final View view) {
+    if (type.equals(TYPE_EMOJI)) {
+      emojiTabs[emojiTabs.length - 1].setOnTouchListener(new RepeatListener(INITIAL_INTERVAL, NORMAL_INTERVAL, view -> {
         if (onEmojiBackspaceClickListener != null) {
           onEmojiBackspaceClickListener.onEmojiBackspaceClick(view);
         }
-      }
-    }));
+      }));
+    }
   }
 
   public void setOnEmojiBackspaceClickListener(@Nullable final OnEmojiBackspaceClickListener onEmojiBackspaceClickListener) {

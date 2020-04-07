@@ -9,12 +9,10 @@ import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickLis
 
 public final class EmojiPagerAdapter extends PagerAdapter {
   private static final int RECENT_POSITION = 0;
-
   private final OnEmojiClickListener listener;
   private final OnEmojiLongClickListener longListener;
   private final RecentEmoji recentEmoji;
   private final VariantEmoji variantManager;
-
   private RecentEmojiGridView recentEmojiGridView;
 
   EmojiPagerAdapter(final OnEmojiClickListener listener,
@@ -32,20 +30,15 @@ public final class EmojiPagerAdapter extends PagerAdapter {
   }
 
   @Override public Object instantiateItem(final ViewGroup pager, final int position) {
-    View newView = null;
-    if(recentEmoji != null){
-      if(position == RECENT_POSITION){
-        newView = new RecentEmojiGridView(pager.getContext()).init(listener, longListener, recentEmoji);
-        recentEmojiGridView = (RecentEmojiGridView) newView;
-      }else{
-        newView = new EmojiGridView(pager.getContext()).init(listener, longListener, EmojiManager.getInstance().getCategories()[position - 1], variantManager);
-      }
-      pager.addView(newView);
-
-    }else if(position != RECENT_POSITION){
-        newView = new EmojiGridView(pager.getContext()).init(listener, longListener, EmojiManager.getInstance().getCategories()[position - 1], variantManager);
-        pager.addView(newView);
+    View newView;
+    if(position == RECENT_POSITION){
+      newView = new RecentEmojiGridView(pager.getContext()).init(listener, longListener, recentEmoji);
+      recentEmojiGridView = (RecentEmojiGridView) newView;
+    }else{
+      newView = new EmojiGridView(pager.getContext()).init(listener, longListener, EmojiManager.getInstance().getCategories()[position - 1], variantManager);
     }
+
+    pager.addView(newView);
 
     return newView;
   }

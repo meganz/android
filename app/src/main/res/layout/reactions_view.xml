@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <LinearLayout
-        android:id="@+id/reactions_tab"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:orientation="horizontal"
-        android:background="@color/background_chat"
-        android:layout_alignParentBottom="true"/>
-    <View
-        android:id="@+id/reactions_divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider_upgrade_account"/>
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/reactions_pager"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/background_chat"/>
-
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/emojis_pager"
+            android:layout_width="match_parent"
+            android:layout_height="213dp"
+            android:paddingTop="10dp"
+            android:layout_gravity="bottom"
+            android:layout_above="@id/emoji_divider"/>
+        <View
+            android:id="@+id/emoji_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_above="@id/emojis_tab"
+            android:layout_gravity="bottom"
+            android:background="@color/divider_upgrade_account"/>
+        <LinearLayout
+            android:id="@+id/emojis_tab"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:layout_alignParentBottom="true"/>
 </merge>

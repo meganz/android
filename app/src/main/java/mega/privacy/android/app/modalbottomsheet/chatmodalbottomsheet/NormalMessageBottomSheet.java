@@ -37,7 +37,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 
 public class NormalMessageBottomSheet extends BottomSheetDialogFragment implements View.OnClickListener {
 
-    private final static int HEIGHT_REACTIONS_KEYBOARD = 300;
+    private final static int HEIGHT_REACTIONS_KEYBOARD = 250;
 
     private Context context;
     private AndroidMegaChatMessage message = null;
@@ -129,7 +129,7 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
         mainLayout = contentView.findViewById(R.id.bottom_sheet);
 
         emojiKeyboard = contentView.findViewById(R.id.emoji_keyboard);
-        emojiKeyboard.init(((ChatActivityLollipop) context), px2dp(HEIGHT_REACTIONS_KEYBOARD, outMetrics));
+        emojiKeyboard.init(px2dp(HEIGHT_REACTIONS_KEYBOARD, outMetrics));
         emojiKeyboard.setOnEmojiSelectedListener(emoji -> {
             addEmojiReaction(emoji);
         });
@@ -225,22 +225,22 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
         switch(view.getId()){
             case R.id.forward_layout:
                 ((ChatActivityLollipop) context).forwardMessages(messagesSelected);
-                dismissAllowingStateLoss();
+                closeDialog();
                 break;
 
             case R.id.edit_layout:
                 ((ChatActivityLollipop) context).editMessage(messagesSelected);
-                dismissAllowingStateLoss();
+                closeDialog();
                 break;
 
             case R.id.copy_layout:
                 ((ChatActivityLollipop) context).copyMessage(message);
-                dismissAllowingStateLoss();
+                closeDialog();
                 break;
 
             case R.id.delete_layout:
                 ((ChatActivityLollipop) context).showConfirmationDeleteMessages(messagesSelected, chatRoom);
-                dismissAllowingStateLoss();
+                closeDialog();
                 break;
 
             case R.id.first_emoji_layout:
@@ -293,8 +293,20 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
         addEmojiReaction(imageEmoji.getEmoji());
     }
 
+    private void closeDialog(){
+        if(emojiKeyboard != null){
+            emojiKeyboard.persistReactionList();
+        }
+
+        dismissAllowingStateLoss();
+    }
+
     private void addEmojiReaction(Emoji emoji){
         addReactionInMsg(context, chatId, message.getMessage(), emoji);
-        dismissAllowingStateLoss();
+        if(emojiKeyboard != null){
+            emojiKeyboard.persistReactionList();
+        }
+
+        closeDialog();
     }
 }

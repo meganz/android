@@ -2,6 +2,7 @@ package mega.privacy.android.app.components.twemoji;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -10,93 +11,124 @@ import java.util.StringTokenizer;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 
-@SuppressWarnings("PMD.ForLoopCanBeForeach") public final class VariantEmojiManager implements VariantEmoji {
-  private static final String PREFERENCE_NAME = "variant-emoji-manager";
-  private static final String EMOJI_DELIMITER = "~";
-  private static final String VARIANT_EMOJIS = "variant-emojis";
-  static final int EMOJI_GUESS_SIZE = 5;
+import static mega.privacy.android.app.utils.Constants.TYPE_EMOJI;
+import static mega.privacy.android.app.utils.Constants.TYPE_REACTION;
 
-  @NonNull private final Context context;
-  @NonNull private List<Emoji> variantsList = new ArrayList<>(0);
+@SuppressWarnings("PMD.ForLoopCanBeForeach")
+public final class VariantEmojiManager implements VariantEmoji {
+    static final int EMOJI_GUESS_SIZE = 5;
+    private static final String PREFERENCE_EMOJI = "variant-emoji-manager";
+    private static final String PREFERENCE_REACTION = "variant-reaction-manager";
+    private static final String EMOJI_DELIMITER = "~";
+    private static final String VARIANT_EMOJIS = "variant-emojis";
+    private static final String VARIANT_REACTIONS = "variant-reactions";
+    @NonNull
+    private final Context context;
+    private String type;
+    @NonNull
+    private List<Emoji> variantsEmojiList = new ArrayList<>(0);
 
-  public VariantEmojiManager(@NonNull final Context context) {
-    this.context = context.getApplicationContext();
-  }
-
-  @NonNull @Override public Emoji getVariant(final Emoji desiredEmoji) {
-    if (variantsList.isEmpty()) {
-      initFromSharedPreferences();
+    public VariantEmojiManager(@NonNull final Context context, final String typeView) {
+        this.context = context.getApplicationContext();
+        this.type = typeView;
     }
 
-    final Emoji baseEmoji = desiredEmoji.getBase();
+    @NonNull
+    @Override
+    public Emoji getVariant(final Emoji desiredEmoji) {
+        if (variantsEmojiList.isEmpty()) {
+            initFromSharedPreferences();
+        }
 
-    for (int i = 0; i < variantsList.size(); i++) {
-      final Emoji emoji = variantsList.get(i);
+        final Emoji baseEmoji = desiredEmoji.getBase();
 
-      if (baseEmoji.equals(emoji.getBase())) {
-        return emoji;
-      }
+        for (int i = 0; i < variantsEmojiList.size(); i++) {
+            final Emoji emoji = variantsEmojiList.get(i);
+
+            if (baseEmoji.equals(emoji.getBase())) {
+                return emoji;
+            }
+        }
+
+        return desiredEmoji;
     }
 
-    return desiredEmoji;
-  }
+    @Override
+    public void addVariant(@NonNull final Emoji newVariant) {
+        final Emoji newVariantBase = newVariant.getBase();
 
-  @Override public void addVariant(@NonNull final Emoji newVariant) {
-    final Emoji newVariantBase = newVariant.getBase();
+        if (variantsEmojiList.size() == 0) {
+            variantsEmojiList.add(newVariant);
+        }
 
-    for (int i = 0; i < variantsList.size(); i++) {
-      final Emoji variant = variantsList.get(i);
+        for (int i = 0; i < variantsEmojiList.size(); i++) {
+            final Emoji variant = variantsEmojiList.get(i);
 
-      if (variant.getBase().equals(newVariantBase)) {
-        if (variant.equals(newVariant)) {
-          return; // Same skin-tone was used.
+            if (variant.getBase().equals(newVariantBase)) {
+                if (variant.equals(newVariant)) {
+                    return;
+                }
+                variantsEmojiList.remove(i);
+                variantsEmojiList.add(newVariant);
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void persist() {
+        if (variantsEmojiList.size() > 0) {
+            final StringBuilder stringBuilder = new StringBuilder(variantsEmojiList.size() * EMOJI_GUESS_SIZE);
+
+            for (int i = 0; i < variantsEmojiList.size(); i++) {
+                stringBuilder.append(variantsEmojiList.get(i).getUnicode()).append(EMOJI_DELIMITER);
+            }
+
+            stringBuilder.setLength(stringBuilder.length() - EMOJI_DELIMITER.length());
+            if (type.equals(TYPE_EMOJI)) {
+                getPreferences().edit().putString(VARIANT_EMOJIS, stringBuilder.toString()).apply();
+            } else if (type.equals(TYPE_REACTION)) {
+                getPreferences().edit().putString(VARIANT_REACTIONS, stringBuilder.toString()).apply();
+            }
+
         } else {
-          variantsList.remove(i);
-          variantsList.add(newVariant);
-
-          return;
+            if (type.equals(TYPE_EMOJI)) {
+                getPreferences().edit().remove(VARIANT_EMOJIS).apply();
+            } else if (type.equals(TYPE_REACTION)) {
+                getPreferences().edit().remove(VARIANT_REACTIONS).apply();
+            }
         }
-      }
     }
 
-    variantsList.add(newVariant);
-  }
-
-  @Override public void persist() {
-    if (variantsList.size() > 0) {
-      final StringBuilder stringBuilder = new StringBuilder(variantsList.size() * EMOJI_GUESS_SIZE);
-
-      for (int i = 0; i < variantsList.size(); i++) {
-        stringBuilder.append(variantsList.get(i).getUnicode()).append(EMOJI_DELIMITER);
-      }
-
-      stringBuilder.setLength(stringBuilder.length() - EMOJI_DELIMITER.length());
-
-      getPreferences().edit().putString(VARIANT_EMOJIS, stringBuilder.toString()).apply();
-    } else {
-      getPreferences().edit().remove(VARIANT_EMOJIS).apply();
-    }
-  }
-
-  private void initFromSharedPreferences() {
-    final String savedRecentVariants = getPreferences().getString(VARIANT_EMOJIS, "");
-
-    if (savedRecentVariants.length() > 0) {
-      final StringTokenizer stringTokenizer = new StringTokenizer(savedRecentVariants, EMOJI_DELIMITER);
-      variantsList = new ArrayList<>(stringTokenizer.countTokens());
-
-      while (stringTokenizer.hasMoreTokens()) {
-        final String token = stringTokenizer.nextToken();
-        final Emoji emoji = EmojiManager.getInstance().findEmoji(token);
-
-        if (emoji != null && emoji.getLength() == token.length()) {
-          variantsList.add(emoji);
+    private void initFromSharedPreferences() {
+        String savedRecentVariants = null;
+        if (type.equals(TYPE_EMOJI)) {
+            savedRecentVariants = getPreferences().getString(VARIANT_EMOJIS, "");
+        } else if (type.equals(TYPE_REACTION)) {
+            savedRecentVariants = getPreferences().getString(VARIANT_REACTIONS, "");
         }
-      }
-    }
-  }
 
-  private SharedPreferences getPreferences() {
-    return context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
-  }
+        if (savedRecentVariants.length() > 0) {
+            final StringTokenizer stringTokenizer = new StringTokenizer(savedRecentVariants, EMOJI_DELIMITER);
+            variantsEmojiList = new ArrayList<>(stringTokenizer.countTokens());
+
+            while (stringTokenizer.hasMoreTokens()) {
+                final String token = stringTokenizer.nextToken();
+                final Emoji emoji = EmojiManager.getInstance().findEmoji(token);
+
+                if (emoji != null && emoji.getLength() == token.length()) {
+                    variantsEmojiList.add(emoji);
+
+                }
+            }
+        }
+    }
+
+    private SharedPreferences getPreferences() {
+        if (type.equals(TYPE_REACTION)) {
+            return context.getSharedPreferences(PREFERENCE_REACTION, Context.MODE_PRIVATE);
+        }
+
+        return context.getSharedPreferences(PREFERENCE_EMOJI, Context.MODE_PRIVATE);
+    }
 }

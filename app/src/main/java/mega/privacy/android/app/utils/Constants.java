@@ -227,6 +227,8 @@ public class Constants {
 
     public static final String ADD_REACTION = "ADD_REACTION";
     public static final String DELETE_REACTION = "DELETE_REACTION";
+    public static final String TYPE_EMOJI = "TYPE_EMOJI";
+    public static final String TYPE_REACTION = "TYPE_REACTION";
 
     public static final String ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD = "ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD";
 

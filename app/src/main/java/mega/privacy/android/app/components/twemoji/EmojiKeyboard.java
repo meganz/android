@@ -23,6 +23,7 @@ import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickLis
 import mega.privacy.android.app.components.twemoji.listeners.OnPlaceButtonListener;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class EmojiKeyboard extends LinearLayout {
@@ -53,6 +54,7 @@ public class EmojiKeyboard extends LinearLayout {
             if (isListenerActivated) {
                 editInterface.input(emoji);
                 recentEmoji.addEmoji(emoji);
+                variantEmoji.addVariant(emoji);
                 imageView.updateEmoji(emoji);
                 variantPopup.dismiss();
             }
@@ -88,17 +90,12 @@ public class EmojiKeyboard extends LinearLayout {
         final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EmojiKeyboard, defStyle, 0);
         a.recycle();
         this.rootView = getRootView();
-        this.variantEmoji = new VariantEmojiManager(getContext());
-        this.recentEmoji = new RecentEmojiManager(getContext());
+        this.variantEmoji = new VariantEmojiManager(getContext(), TYPE_EMOJI);
+        this.recentEmoji = new RecentEmojiManager(getContext(), TYPE_EMOJI);
         this.variantPopup = new EmojiVariantPopup(rootView, clickListener);
 
-        final EmojiView emojiView = new EmojiView(getContext(), clickListener, longClickListener, recentEmoji, variantEmoji);
-        emojiView.setOnEmojiBackspaceClickListener(new OnEmojiBackspaceClickListener() {
-            @Override
-            public void onEmojiBackspaceClick(final View v) {
-                editInterface.backspace();
-            }
-        });
+        final EmojiView emojiView = new EmojiView(getContext(), clickListener, longClickListener, recentEmoji, variantEmoji, TYPE_EMOJI);
+        emojiView.setOnEmojiBackspaceClickListener(v -> editInterface.backspace());
         addView(emojiView);
     }
 
