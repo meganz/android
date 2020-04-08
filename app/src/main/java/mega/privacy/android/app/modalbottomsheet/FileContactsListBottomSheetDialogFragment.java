@@ -199,8 +199,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
     public void addAvatarContactPanel(MegaUser contact){
 
         /*Default Avatar*/
-        int color = getColorAvatar(context, megaApi, contact);
-        contactImageView.setImageBitmap(getDefaultAvatar(context, color, fullName, AVATAR_SIZE, false));
+        contactImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(contact), fullName, AVATAR_SIZE, false));
 
         /*Avatar*/
         if(contact!=null){

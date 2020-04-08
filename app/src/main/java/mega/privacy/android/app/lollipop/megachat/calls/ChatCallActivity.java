@@ -96,7 +96,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     final private static int REMOTE_VIDEO_NOT_INIT = -1;
     final private static int REMOTE_VIDEO_ENABLED = 1;
     final private static int REMOTE_VIDEO_DISABLED = 0;
-    final private static int BIG_LETTER_SIZE = 60;
+    final private static int BIG_LETTER_SIZE = 120;
     final private static int MIN_PEERS_LIST = 7;
     final private static int MAX_PEERS_GRID = 6;
     final private static int ARROW_ANIMATION = 250;
@@ -861,7 +861,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         }
         /*Default Avatar*/
-        Bitmap defaultBitmapAvatar = getDefaultAvatar(this, getColorAvatar(this, megaApi, peerId), name, AVATAR_SIZE, true);
+        Bitmap defaultBitmapAvatar = getDefaultAvatar(getColorAvatar(peerId), name, AVATAR_SIZE, true);
         setBitmap(defaultBitmapAvatar, peerId);
 
         /*Avatar*/
@@ -892,7 +892,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         /*Default Avatar*/
-        avatarBigCameraGroupCallImage.setImageBitmap(getDefaultAvatar(this, getColorAvatar(this, megaApi, peerId), avatarLetter, BIG_LETTER_SIZE, true));
+        avatarBigCameraGroupCallImage.setImageBitmap(getDefaultAvatar(getColorAvatar(peerId), avatarLetter, BIG_LETTER_SIZE, true));
         /*Avatar*/
         Bitmap bitmap = profileAvatar(peerId, peerEmail);
         if (bitmap == null) return;
@@ -2306,21 +2306,19 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private String getName(long peerid) {
         String name = " ";
-        if (megaChatApi == null || chat == null) return name;
+        if (megaChatApi == null) return name;
 
         if (peerid == megaChatApi.getMyUserHandle()) {
             name = megaChatApi.getMyFullname();
             if (name == null) name = megaChatApi.getMyEmail();
 
         } else {
-            name = chat.getPeerFullnameByHandle(peerid);
+            name = getFirstNameDB(peerid);
             if (name == null) {
-                name = megaChatApi.getContactEmail(peerid);
-                if (name == null) {
-                    CallNonContactNameListener listener = new CallNonContactNameListener(this, peerid, false, name);
-                    megaChatApi.getUserEmail(peerid, listener);
-                }
+                CallNonContactNameListener listener = new CallNonContactNameListener(this, peerid, false, name);
+                megaChatApi.getUserEmail(peerid, listener);
             }
+
         }
         return name;
     }

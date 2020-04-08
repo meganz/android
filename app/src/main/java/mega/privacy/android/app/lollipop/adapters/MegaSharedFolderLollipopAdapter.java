@@ -313,14 +313,14 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				/*Default Avatar*/
-				int color = getColorAvatar(context, megaApi, contact);
+				int color = getColorAvatar(contact);
 				String name = " ";
 				if(holder.textViewContactName!=null){
 					name = holder.textViewContactName.getText().toString();
 				}else if(holder.contactMail != null && holder.contactMail.length() > 0){
 					name = holder.contactMail;
 				}
-				holder.imageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, true));
+				holder.imageView.setImageBitmap(getDefaultAvatar(color, name, AVATAR_SIZE, true));
 
 				/*Avatar*/
 				if(contact!=null){

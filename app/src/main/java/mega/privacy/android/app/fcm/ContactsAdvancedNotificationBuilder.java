@@ -443,36 +443,18 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     }
 
     private Bitmap createDefaultAvatar(String email){
-        MegaUser contact = megaApi.getContact(email);
-        int color = getColorAvatar(context, megaApi, contact);
-        return getDefaultAvatar(context, color, email, AVATAR_SIZE, true, false);
+        return getDefaultAvatar(getColorAvatar(megaApi.getContact(email)), email, AVATAR_SIZE, true, false);
     }
 
     public Bitmap setUserAvatar(String contactMail){
         logDebug("setUserAvatar");
 
-        File avatar = buildAvatarFile(context, contactMail + ".jpg");
-        Bitmap bitmap = null;
-        if (isFileAvailable(avatar)){
-            if (avatar.length() > 0){
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    return createDefaultAvatar(contactMail);
-                }
-                else{
-                    return getCircleBitmap(bitmap);
-                }
-            }
-            else{
-                return createDefaultAvatar(contactMail);
-            }
-        }
-        else{
+        Bitmap bitmap = getImageAvatar(contactMail);
+        if(bitmap == null){
             return createDefaultAvatar(contactMail);
         }
+
+        return bitmap;
     }
 
     public Notification buildSummaryIPC(String groupKey) {
