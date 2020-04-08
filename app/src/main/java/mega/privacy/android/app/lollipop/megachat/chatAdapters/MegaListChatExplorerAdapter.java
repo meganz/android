@@ -275,7 +275,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     public void createGroupChatAvatar(ViewHolderChatExplorerList holder){
         logDebug("createGroupChatAvatar()");
         String title = holder.titleText.getText().toString();
-        holder.avatarImage.setImageBitmap(getDefaultAvatar(getSpecificColor(AVATAR_GROUP_CHAT_COLOR), title, AVATAR_SIZE, true));
+        holder.avatarImage.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), title, AVATAR_SIZE, true));
     }
 
     public void setUserAvatar(ViewHolderChatExplorerList holder, String userHandle){

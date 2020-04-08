@@ -267,10 +267,10 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 		int color;
 		if (isMegaContact){
-			color = getSpecificColor(AVATAR_PRIMARY_COLOR);
+			color = getSpecificAvatarColor(AVATAR_PRIMARY_COLOR);
 		}
 		else{
-			color = getSpecificColor(AVATAR_PHONE_COLOR);
+			color = getSpecificAvatarColor(AVATAR_PHONE_COLOR);
 		}
 
 		String name = null;

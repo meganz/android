@@ -5650,7 +5650,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageContactEmail.setText(name);
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 holder.contentOwnMessageContactName.setText(email);
-                Bitmap bitmapDefaultAvatar = getDefaultAvatar(getSpecificColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
+                Bitmap bitmapDefaultAvatar = getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
                 holder.contentOwnMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
             }
 
@@ -5766,7 +5766,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentContactMessageContactEmail.setText(name);
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 holder.contentContactMessageContactName.setText(email);
-                Bitmap bitmap = getDefaultAvatar(getSpecificColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
+                Bitmap bitmap = getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
                 holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
             }
 

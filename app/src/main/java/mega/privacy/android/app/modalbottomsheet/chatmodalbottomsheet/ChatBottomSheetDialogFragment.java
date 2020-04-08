@@ -355,7 +355,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         }
 
         if(chat.isGroup()){
-            color = getSpecificColor(AVATAR_GROUP_CHAT_COLOR);
+            color = getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR);
         }else{
             color = getColorAvatar(megaApi.getContact(contactMail));
         }

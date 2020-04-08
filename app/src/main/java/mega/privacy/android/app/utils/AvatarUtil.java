@@ -28,6 +28,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class AvatarUtil {
 
@@ -113,7 +114,7 @@ public class AvatarUtil {
      * @return The default avatar color.
      */
     public static int getColorAvatar(long handle) {
-        if (handle == -1) {
+        if (handle == INVALID_HANDLE) {
             return getColor(null);
         }
 
@@ -138,7 +139,7 @@ public class AvatarUtil {
 
     private static int getColor(String color) {
         if (color == null) {
-            return getSpecificColor(AVATAR_PRIMARY_COLOR);
+            return getSpecificAvatarColor(AVATAR_PRIMARY_COLOR);
         }
 
         return Color.parseColor(color);
@@ -150,7 +151,7 @@ public class AvatarUtil {
      * @param typeColor The kind of avatar that's going to be painted.
      * @return The color of the avatar in particular.
      */
-    public static int getSpecificColor(String typeColor) {
+    public static int getSpecificAvatarColor(String typeColor) {
         switch (typeColor) {
             case AVATAR_GROUP_CHAT_COLOR:
                 return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.divider_upgrade_account);

@@ -202,7 +202,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         logDebug("setUserAvatar");
 
         if (item.getChat() != null && item.getChat().isGroup()) {
-            holder.avatar.setImageBitmap(getDefaultAvatar(getSpecificColor(AVATAR_GROUP_CHAT_COLOR), item.getTitle(), AVATAR_SIZE, true));
+            holder.avatar.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), item.getTitle(), AVATAR_SIZE, true));
         }
         else {
             MegaUser user = null;

@@ -855,7 +855,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void createGroupChatAvatar(){
         logDebug("createGroupChatAvatar()");
-        avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificColor(AVATAR_GROUP_CHAT_COLOR), chat.getTitle(), AVATAR_SIZE, true));
+        avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), chat.getTitle(), AVATAR_SIZE, true));
     }
 
     public void showParticipantsPanel(MegaChatParticipant participant){

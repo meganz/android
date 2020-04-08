@@ -109,7 +109,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
                 holder.textViewName.setText(contact.getEmail());
             }
         }
-        holder.avatar.setImageBitmap(getDefaultAvatar(getSpecificColor(AVATAR_PHONE_COLOR), holder.textViewName.getText().toString(), AVATAR_SIZE, true));
+        holder.avatar.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_PHONE_COLOR), holder.textViewName.getText().toString(), AVATAR_SIZE, true));
     }
 
     @Override

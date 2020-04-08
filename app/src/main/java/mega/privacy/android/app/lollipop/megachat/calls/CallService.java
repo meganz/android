@@ -329,7 +329,7 @@ public class CallService extends Service{
         if (userHandle != -1) {
             color = getColorAvatar(userHandle);
         } else {
-            color = getSpecificColor(AVATAR_GROUP_CHAT_COLOR);
+            color = getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR);
         }
 
         return getDefaultAvatar(color, fullName, AVATAR_SIZE, true);

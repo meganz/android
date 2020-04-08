@@ -608,7 +608,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	}
 
 	public void createGroupChatAvatar(ViewHolderChatList holder, String chatTitle){
-		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(getDefaultAvatar(getSpecificColor(AVATAR_GROUP_CHAT_COLOR), chatTitle, AVATAR_SIZE, true));
+		((ViewHolderNormalChatList)holder).imageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), chatTitle, AVATAR_SIZE, true));
 	}
 
 	@Override
