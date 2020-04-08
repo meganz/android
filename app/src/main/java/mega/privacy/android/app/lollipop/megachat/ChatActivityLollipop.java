@@ -25,18 +25,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -66,6 +54,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
@@ -101,9 +102,10 @@ import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
-import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
+import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -117,20 +119,20 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
-import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
+import mega.privacy.android.app.modalbottomsheet.ReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NormalMessageBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NormalMessageBottomSheet;
 import mega.privacy.android.app.utils.TimeUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -159,24 +161,23 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
-
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 public class ChatActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
@@ -287,7 +288,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     boolean isOpeningChat = true;
 
-    int selectedPosition;
+    public int selectedPosition = -1;
     public long selectedMessageId = -1;
     MegaChatRoom chatRoom;
 
@@ -482,11 +483,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             }
         }
         return false;
-    }
-
-    @Override
-    public void onReactionUpdate(MegaChatApiJava api, long msgid, String reaction, int count) {
-        logDebug("MessageId: "+ msgid);
     }
 
     private class UserTyping {
@@ -4369,6 +4365,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
+    public void openReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage){
+        if(chatRoom.getChatId() != chatId)
+            return;
+
+        int positionInMessages = messages.indexOf(megaMessage);
+        showReactionBottomSheet(megaMessage, positionInMessages);
+    }
+
     public void itemClick(int positionInAdapter, int [] screenPosition) {
         int positionInMessages = positionInAdapter-1;
 
@@ -5668,6 +5672,21 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     @Override
+    public void onReactionUpdate(MegaChatApiJava api, long msgid, String reaction, int count) {
+        logDebug("Reaction update in msg "+ msgid);
+        MegaChatMessage message = megaChatApi.getMessage(idChat, msgid);
+        if(message == null)
+            return;
+
+        for (AndroidMegaChatMessage msg : messages) {
+            if (msg.getMessage().getMsgId() == msgid) {
+                adapter.notifyItemChanged(messages.indexOf(msg) + 1);
+                break;
+            }
+        }
+    }
+
+    @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         logDebug("msgID "+ msg.getMsgId());
         logDebug("onMessageUpdate ");
@@ -6893,6 +6912,17 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         selectedMessageId = message.getMessage().getMsgId();
         bottomSheetDialogFragment = new NormalMessageBottomSheet();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+    }
+
+    public void showReactionBottomSheet(AndroidMegaChatMessage message, int position){
+        selectedPosition = position;
+
+        if (message == null)
+            return;
+
+        selectedMessageId = message.getMessage().getMsgId();
+        bottomSheetDialogFragment = new ReactionsBottomSheet();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 

@@ -1191,30 +1191,21 @@
             android:id="@+id/own_message_reactions_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxWidth="254dp"
             android:layout_below="@id/content_own_message_layout"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="6dp"
+            android:layout_marginTop="4dp"
             android:layout_alignRight="@id/content_own_message_layout"
             android:gravity="right"
+            android:background="@null"
             android:visibility="gone">
 
-            <RelativeLayout
-                android:id="@+id/icon_more_reactions"
-                android:layout_width="40dp"
-                android:layout_height="28dp"
-                android:layout_gravity="center"
-                android:background="@drawable/rounded_add_reaction">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_centerInParent="true"
-                    android:adjustViewBounds="true"
-                    android:background="@null"
-                    android:src="@drawable/ic_emoji_add" />
-            </RelativeLayout>
-
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/own_message_reactions_recycler"
+                android:layoutDirection="rtl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"/>
         </RelativeLayout>
     </RelativeLayout>
 
@@ -1308,6 +1299,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
+                android:layout_marginBottom="6dp"
                 android:layout_below="@+id/title_contact_message_layout">
 
                 <!--contact mini avatar-->
@@ -2063,6 +2055,27 @@
                 <!--End RelativeLayout contact-->
 
             </RelativeLayout>
+
+            <!--chat reactions layout-->
+            <RelativeLayout
+                android:id="@+id/contact_message_reactions_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/content_contact_message_layout"
+                android:layout_marginLeft="48dp"
+                android:layout_marginBottom="6dp"
+                android:layout_alignLeft="@id/content_contact_message_layout"
+                android:gravity="left"
+                android:background="@null"
+                android:visibility="gone">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/contact_message_reactions_recycler"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"/>
+            </RelativeLayout>
+
         </RelativeLayout>
 
     </RelativeLayout>

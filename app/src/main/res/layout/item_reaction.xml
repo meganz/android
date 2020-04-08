@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/item_reaction_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:background="@drawable/contact_reaction_added">
+
+        <mega.privacy.android.app.components.twemoji.ReactionImageView
+            android:id="@+id/item_emoji_reaction"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="6dp"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:background="@null" />
+
+        <TextView
+            android:id="@+id/item_number_users_reaction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:layout_toRightOf="@id/item_emoji_reaction"
+            android:textColor="@color/number_reactions_added"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/more_reactions_layout"
+        android:layout_width="40dp"
+        android:layout_height="28dp"
+        android:layout_gravity="center"
+        android:background="@drawable/rounded_add_reaction"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerInParent="true"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            android:src="@drawable/ic_emoji_add" />
+    </RelativeLayout>
+
+</RelativeLayout>

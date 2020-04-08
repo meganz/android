@@ -225,10 +225,9 @@ public class Constants {
     public static final String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
     public static final String ACTION_OPEN_CONTACTS_SECTION = "ACTION_OPEN_CONTACTS_SECTION";
 
-    public static final String ADD_REACTION = "ADD_REACTION";
-    public static final String DELETE_REACTION = "DELETE_REACTION";
     public static final String TYPE_EMOJI = "TYPE_EMOJI";
     public static final String TYPE_REACTION = "TYPE_REACTION";
+    public static final String INVALID_REACTION = "INVALID_REACTION";
 
     public static final String ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD = "ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD";
 
@@ -441,6 +440,7 @@ public class Constants {
     public static final String USER_HANDLES = "USER_HANDLES";
     public static final String MESSAGE_ID = "MESSAGE_ID";
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
+    public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";

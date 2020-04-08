@@ -14,9 +14,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import androidx.core.content.ContextCompat;
-import androidx.exifinterface.media.ExifInterface;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -42,6 +39,11 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+import androidx.exifinterface.media.ExifInterface;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
@@ -57,11 +59,13 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.EqualSpacingItemDecoration;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.ReactionAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatAttachmentAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -70,7 +74,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MessageVoiceClip;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.megachat.RemovedMessage;
-
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -87,19 +90,19 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
 
@@ -574,9 +577,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         //        TextView meText;
         TextView timeOwnText;
         RelativeLayout contentOwnMessageLayout;
-        private RelativeLayout ownMessageReactionsLayout;
-
         private EmojiTextView contentOwnMessageText;
+        private RelativeLayout ownMessageReactionsLayout;
+        private RecyclerView ownMessageReactionsRecycler;
 
         //Own rich links
         RelativeLayout urlOwnMessageLayout;
@@ -702,6 +705,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         RoundedImageView contactImageView;
         RelativeLayout contentContactMessageLayout;
+        private RelativeLayout contactMessageReactionsLayout;
+        private RecyclerView contactMessageReactionsRecycler;
         private EmojiTextView contentContactMessageText;
 
         RoundedImageView contentContactMessageThumbLand;
@@ -843,6 +848,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             holder.ownMessageReactionsLayout = v.findViewById(R.id.own_message_reactions_layout);
+            holder.ownMessageReactionsRecycler = v.findViewById(R.id.own_message_reactions_recycler);
             holder.ownMessageReactionsLayout.setVisibility(View.GONE);
 
             holder.previewFramePort = v.findViewById(R.id.preview_frame_portrait);
@@ -1039,8 +1045,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageLayout = v.findViewById(R.id.content_contact_message_layout);
             holder.contentContactMessageText = v.findViewById(R.id.content_contact_message_text);
             holder.contentContactMessageText.setNeccessaryShortCode(false);
-            holder.contentContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape);
 
+            holder.contactMessageReactionsLayout = v.findViewById(R.id.contact_message_reactions_layout);
+            holder.contactMessageReactionsRecycler = v.findViewById(R.id.contact_message_reactions_recycler);
+            holder.contactMessageReactionsLayout.setVisibility(View.GONE);
+
+            holder.contentContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
             holder.contentContactMessageThumbLand.setBorderWidth(1);
             holder.contentContactMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
@@ -1508,6 +1518,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).currentPosition = position;
 
         ((ViewHolderMessageChat) holder).ownMessageReactionsLayout.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).contactMessageReactionsLayout.setVisibility(View.GONE);
+
         ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).errorUploadingContact.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).errorUploadingFile.setVisibility(View.GONE);
@@ -4456,7 +4468,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
-        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), message.getMsgId());
+        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
 
     }
 
@@ -7820,7 +7832,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 this.notifyItemChanged(currentPositionInAdapter);
                 break;
             }
-
         }
     }
 
@@ -8369,32 +8380,47 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private void checkReactionsInMessage(int position, final ViewHolderMessageChat holder, boolean ownMessage, long chatId, long messageId) {
+    private void checkReactionsInMessage(int position, final ViewHolderMessageChat holder, boolean ownMessage, long chatId, AndroidMegaChatMessage megaMessage) {
         if (isHolderNull(position, holder)) {
             return;
         }
-
-        MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, messageId);
+        MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, megaMessage.getMessage().getMsgId());
         if (listReactions == null || listReactions.size() <= 0) {
             logDebug("No reactions in this message");
-            if(ownMessage) {
+            if (ownMessage) {
                 holder.ownMessageReactionsLayout.setVisibility(View.GONE);
+            } else {
+                holder.contactMessageReactionsLayout.setVisibility(View.GONE);
             }
             return;
         }
 
-        if(ownMessage) {
-            holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
-        }
-
+        ArrayList<String> list = new ArrayList<>();
         for (int i = 0; i < listReactions.size(); i++) {
-            String reaction = listReactions.get(i);
-            logDebug("reaction = "+reaction);
-
+            list.add(i, listReactions.get(i));
         }
+        list.add(INVALID_REACTION);
 
+        EqualSpacingItemDecoration itemDecoration = new EqualSpacingItemDecoration(8, EqualSpacingItemDecoration.GRID);
+        ReactionAdapter adapter = new ReactionAdapter(context, chatId, megaMessage, list);
+        if (ownMessage) {
+            holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
+            GridLayoutManager grid = new GridLayoutManager(context, 4);
+            grid.setReverseLayout(true);
+            holder.ownMessageReactionsRecycler.setHasFixedSize(false);
+            holder.ownMessageReactionsRecycler.setLayoutManager(grid);
+            holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
+            holder.ownMessageReactionsRecycler.setAdapter(adapter);
+        } else {
+            holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
+            holder.contactMessageReactionsRecycler.setHasFixedSize(false);
 
+            holder.contactMessageReactionsRecycler.setLayoutManager(new GridLayoutManager(context, 4, RecyclerView.VERTICAL, false));
+            holder.contactMessageReactionsRecycler.addItemDecoration(itemDecoration);
+            holder.contactMessageReactionsRecycler.setAdapter(adapter);
+        }
     }
+
 
     private int getAdapterItemPosition(long id) {
         for (int position = 0; position < messages.size(); position++) {

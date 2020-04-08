@@ -19,6 +19,7 @@ import java.util.Locale;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
+import mega.privacy.android.app.components.twemoji.EmojiUtils;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
@@ -46,7 +47,7 @@ public class AvatarUtil {
         }
 
         String resultTitle = EmojiUtilsShortcodes.emojify(text);
-        List<EmojiRange> emojis = EmojiManager.getInstance().findAllEmojis(resultTitle);
+        List<EmojiRange> emojis = EmojiUtils.emojis(resultTitle);
 
         if (emojis != null && emojis.size() > 0 && emojis.get(0).start == 0) {
             String megaEmoji = resultTitle.substring(emojis.get(0).start, emojis.get(0).end);

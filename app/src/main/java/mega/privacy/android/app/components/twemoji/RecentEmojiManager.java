@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import static mega.privacy.android.app.utils.Constants.*;
 
@@ -34,45 +35,45 @@ public final class RecentEmojiManager implements RecentEmoji {
     public RecentEmojiManager(@NonNull final Context context, final String typeView) {
         this.context = context.getApplicationContext();
         this.type = typeView;
+        getRecentEmojis();
     }
 
     @SuppressWarnings({"PMD.AvoidDeeplyNestedIfStmts", "checkstyle:nestedifdepth"})
     @NonNull
     @Override
     public Collection<Emoji> getRecentEmojis() {
-        if (emojiList.size() == 0) {
-            String savedRecentEmojis = null;
-
-            if (type.equals(TYPE_EMOJI)) {
-                savedRecentEmojis = getPreferences().getString(RECENT_EMOJIS, "");
-            } else if (type.equals(TYPE_REACTION)) {
-                savedRecentEmojis = getPreferences().getString(RECENT_REACTIONS, "");
-            }
-
-            if (savedRecentEmojis.length() > 0) {
-                final StringTokenizer stringTokenizer = new StringTokenizer(savedRecentEmojis, EMOJI_DELIMITER);
-                emojiList = new EmojiList(stringTokenizer.countTokens());
-
-                while (stringTokenizer.hasMoreTokens()) {
-                    final String token = stringTokenizer.nextToken();
-
-                    final String[] parts = token.split(TIME_DELIMITER);
-
-                    if (parts.length == 2) {
-                        final Emoji emoji = EmojiManager.getInstance().findEmoji(parts[0]);
-
-                        if (emoji != null && emoji.getLength() == parts[0].length()) {
-                            final long timestamp = Long.parseLong(parts[1]);
-
-                            emojiList.add(emoji, timestamp);
-                        }
-                    }
-                }
-            } else {
-                emojiList = new EmojiList(0);
-            }
+        if (emojiList.size() > 0) {
+            return emojiList.getEmojis();
         }
 
+        String savedRecentEmojis = null;
+        if (type.equals(TYPE_EMOJI)) {
+            savedRecentEmojis = getPreferences().getString(RECENT_EMOJIS, "");
+        } else if (type.equals(TYPE_REACTION)) {
+            savedRecentEmojis = getPreferences().getString(RECENT_REACTIONS, "");
+        }
+
+        if (savedRecentEmojis == null || savedRecentEmojis.length() == 0) {
+            emojiList = new EmojiList(0);
+            return emojiList.getEmojis();
+        }
+
+        final StringTokenizer stringTokenizer = new StringTokenizer(savedRecentEmojis, EMOJI_DELIMITER);
+        emojiList = new EmojiList(stringTokenizer.countTokens());
+
+        while (stringTokenizer.hasMoreTokens()) {
+            final String token = stringTokenizer.nextToken();
+            final String[] parts = token.split(TIME_DELIMITER);
+
+            if (parts.length == 2) {
+                final Emoji emoji = EmojiManager.getInstance().findEmoji(parts[0]);
+
+                if (emoji != null && emoji.getLength() == parts[0].length()) {
+                    final long timestamp = Long.parseLong(parts[1]);
+                    emojiList.add(emoji, timestamp);
+                }
+            }
+        }
         return emojiList.getEmojis();
     }
 
@@ -84,24 +85,25 @@ public final class RecentEmojiManager implements RecentEmoji {
 
     @Override
     public void persist() {
-        if (emojiList.size() > 0) {
-            final StringBuilder stringBuilder = new StringBuilder(emojiList.size() * EMOJI_GUESS_SIZE);
+        if (emojiList.size() == 0)
+            return;
 
-            for (int i = 0; i < emojiList.size(); i++) {
-                final Data data = emojiList.get(i);
-                stringBuilder.append(data.emoji.getUnicode())
-                        .append(TIME_DELIMITER)
-                        .append(data.timestamp)
-                        .append(EMOJI_DELIMITER);
-            }
+        final StringBuilder stringBuilder = new StringBuilder(emojiList.size() * EMOJI_GUESS_SIZE);
 
-            stringBuilder.setLength(stringBuilder.length() - EMOJI_DELIMITER.length());
+        for (int i = 0; i < emojiList.size(); i++) {
+            final Data data = emojiList.get(i);
+            stringBuilder.append(data.emoji.getUnicode())
+                    .append(TIME_DELIMITER)
+                    .append(data.timestamp)
+                    .append(EMOJI_DELIMITER);
+        }
 
-            if (type.equals(TYPE_EMOJI)) {
-                getPreferences().edit().putString(RECENT_EMOJIS, stringBuilder.toString()).apply();
-            } else if (type.equals(TYPE_REACTION)) {
-                getPreferences().edit().putString(RECENT_REACTIONS, stringBuilder.toString()).apply();
-            }
+        stringBuilder.setLength(stringBuilder.length() - EMOJI_DELIMITER.length());
+
+        if (type.equals(TYPE_EMOJI)) {
+            getPreferences().edit().putString(RECENT_EMOJIS, stringBuilder.toString()).apply();
+        } else if (type.equals(TYPE_REACTION)) {
+            getPreferences().edit().putString(RECENT_REACTIONS, stringBuilder.toString()).apply();
         }
     }
 

@@ -6,13 +6,6 @@
     android:layout_height="wrap_content"
     android:background="@color/white">
 
-    <mega.privacy.android.app.components.twemoji.ReactionsKeyboard
-        android:id="@+id/emoji_keyboard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
-        android:visibility="gone" />
-
     <LinearLayout
         android:id="@+id/bottom_sheet_options_layout"
         android:layout_width="match_parent"
@@ -20,6 +13,7 @@
         android:background="@color/white"
         android:orientation="vertical"
         android:visibility="visible">
+
         <LinearLayout
             android:id="@+id/reactions_layout"
             android:layout_width="match_parent"
@@ -60,8 +54,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:gravity="center_vertical"
-                    android:visibility="gone"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <ImageView
                         android:id="@+id/forward_image"
@@ -99,8 +93,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:gravity="center_vertical"
-                    android:visibility="gone"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <ImageView
                         android:id="@+id/edit_image"
@@ -129,8 +123,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:gravity="center_vertical"
-                    android:visibility="gone"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <ImageView
                         android:id="@+id/copy_image"
@@ -167,8 +161,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:gravity="center_vertical"
-                    android:visibility="gone"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <ImageView
                         android:id="@+id/delete_image"
@@ -196,7 +190,6 @@
 
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>
-
 
 
 </RelativeLayout>

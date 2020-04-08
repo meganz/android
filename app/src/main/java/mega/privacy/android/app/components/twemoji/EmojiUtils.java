@@ -33,7 +33,10 @@ public final class EmojiUtils {
   }
 
   /** returns the emojis that were found in the given text */
-  @NonNull public static List<EmojiRange> emojis(@Nullable final String text) {
+  @NonNull public static List<EmojiRange> emojis(final String text) {
+    if(text == null || text.isEmpty())
+      return null;
+
     return EmojiManager.getInstance().findAllEmojis(text);
   }
 

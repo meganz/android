@@ -214,6 +214,8 @@
     <color name="background_recording">#78252525</color>
     <color name="background_reactions">#03000000</color>
     <color name="stroke_add_reaction">#12000000</color>
-
+    <color name="stroke_own_reaction_added">#FF00BFA5</color>
+    <color name="background_own_reaction_added">#6000BFA5</color>
+    <color name="number_reactions_added">#54000000</color>
 
 </resources>
