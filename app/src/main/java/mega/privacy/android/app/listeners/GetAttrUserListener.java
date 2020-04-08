@@ -184,9 +184,11 @@ public class GetAttrUserListener extends BaseListener {
      * @param request   result of the request
      */
     private void updateAvatar(MegaRequest request) {
+        boolean isEmail = EMAIL_ADDRESS.matcher(request.getEmail()).matches();
+
         if (adapter == null || holder == null
-                || !holder.getUserHandle().equals(request.getEmail())
-                || holder.getContactMail() == null || !holder.getContactMail().equals(request.getEmail())) {
+                || (!isEmail && !holder.getUserHandle().equals(request.getEmail()))
+                || (isEmail && (holder.getContactMail() == null || !holder.getContactMail().equals(request.getEmail())))) {
             logWarning("Error getting user's avatar");
             return;
         }

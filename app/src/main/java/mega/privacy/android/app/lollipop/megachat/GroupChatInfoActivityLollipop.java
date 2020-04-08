@@ -65,6 +65,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -80,6 +82,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     private static final int MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100;
     private static final int MAX_LENGTH_CHAT_TITLE = 60;
+    private static final int PARTICIPANTS_EXTRA = 10;
 
     private ChatController chatC;
     private long chatHandle;
@@ -182,6 +185,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
                     changeViewElevation(aB, recyclerView.canScrollVertically(-1), getOutMetrics());
+                    if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
+                        checkIfShouldAskForUsersAttributes();
+                    }
                 }
 
                 @Override
@@ -299,8 +305,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         } else {
             adapter.setParticipants(participants);
         }
-
-        checkIfShouldAskForUsersAttributes();
     }
 
     private void updateAdapter(long contactHandle) {
@@ -1223,12 +1227,21 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         MegaHandleList handleList = MegaHandleList.createInstance();
         HashMap<Integer, MegaChatParticipant> participantRequests = new HashMap<>();
-        participantRequests.putAll(pendingParticipantRequests);
-        pendingParticipantRequests.clear();
+        int firstPosition = linearLayoutManager.findFirstVisibleItemPosition();
+        int lastPosition = linearLayoutManager.findLastVisibleItemPosition();
+        int extraPosition;
 
-        for (Integer position : participantRequests.keySet()) {
-            MegaChatParticipant participant = participantRequests.get(position);
+        extraPosition = firstPosition - PARTICIPANTS_EXTRA;
+        firstPosition = max(extraPosition, 1);
+
+        extraPosition = lastPosition + PARTICIPANTS_EXTRA;
+        lastPosition = min(extraPosition, participants.size());
+
+        for (int i = firstPosition; i <= lastPosition; i++) {
+            MegaChatParticipant participant = pendingParticipantRequests.get(i);
             if (participant != null) {
+                participantRequests.put(i, participant);
+                pendingParticipantRequests.remove(i);
                 handleList.addMegaHandle(participant.getHandle());
             }
         }

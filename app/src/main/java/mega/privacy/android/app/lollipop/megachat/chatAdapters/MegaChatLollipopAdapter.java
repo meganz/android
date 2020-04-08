@@ -61,6 +61,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatAttachmentAvatarListener;
@@ -80,6 +81,7 @@ import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
@@ -8275,10 +8277,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (!holder.nameRequestedAction) {
             logDebug("Call for nonContactName: " + handle);
             holder.nameRequestedAction = true;
-            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, handle, chatRoom.isPreview(), pos);
-            megaChatApi.getUserFirstname(handle, chatRoom.getAuthorizationToken(), listener);
-            megaChatApi.getUserLastname(handle, chatRoom.getAuthorizationToken(), listener);
-            megaChatApi.getUserEmail(handle, listener);
+            int privilege = chatRoom.getPeerPrivilegeByHandle(handle);
+            if (privilege == MegaChatRoom.PRIV_UNKNOWN || privilege == MegaChatRoom.PRIV_RM) {
+                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, handle, chatRoom.isPreview(), pos);
+                megaChatApi.getUserFirstname(handle, chatRoom.getAuthorizationToken(), listener);
+                megaChatApi.getUserLastname(handle, chatRoom.getAuthorizationToken(), listener);
+                megaChatApi.getUserEmail(handle, listener);
+            } else {
+                MegaHandleList handleList = MegaHandleList.createInstance();
+                handleList.addMegaHandle(handle);
+                megaChatApi.loadUserAttributes(chatRoom.getChatId(), handleList, chatRoom.getAuthorizationToken(),
+                        new GetPeerAttributesListener(context, holder, this));
+            }
         } else {
             logWarning("Name already asked and no name received: " + handle);
         }
@@ -8379,4 +8389,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void setChatRoom(MegaChatRoom chatRoom) {
         this.chatRoom = chatRoom;
     }
- }
+
+    public MegaChatRoom getChatRoom() {
+        return chatRoom;
+    }
+}
