@@ -1155,8 +1155,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		p.setColor(Color.TRANSPARENT);
 		c.drawPaint(p);
 
-		int color = getColorAvatar(this, megaApi, user);
-		imageLayout.setBackgroundColor(color);
+		imageLayout.setBackgroundColor(getColorAvatar(user));
 		contactPropertiesImage.setImageBitmap(defaultAvatar);
 	}
 

@@ -2007,28 +2007,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 contactInfoMenuItem.setVisible(false);
                 archiveMenuItem.setVisible(false);
             }else {
-                if(megaChatApi.getNumCalls() <= 0){
-                    callMenuItem.setEnabled(true);
-                    callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
+
+                if (megaChatApi != null && (megaChatApi.getNumCalls() <= 0 || (!participatingInACall() && !megaChatApi.hasCallInChatRoom(chatRoom.getChatId())))) {
+                    if (!chatRoom.isGroup() || chatRoom.getPeerCount() > 0) {
+                        callMenuItem.setEnabled(true);
+                        callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
+                    }
 
                     if (chatRoom.isGroup()) {
                         videoMenuItem.setVisible(false);
-                    }else{
+                    } else {
                         videoMenuItem.setEnabled(true);
                         videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.background_chat));
-                    }
-
-                }else{
-                    if( megaChatApi!=null && !participatingInACall() && !megaChatApi.hasCallInChatRoom(chatRoom.getChatId())){
-                        callMenuItem.setEnabled(true);
-                        callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
-
-                        if (chatRoom.isGroup()) {
-                            videoMenuItem.setVisible(false);
-                        }else{
-                            videoMenuItem.setEnabled(true);
-                            videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.background_chat));
-                        }
                     }
                 }
 

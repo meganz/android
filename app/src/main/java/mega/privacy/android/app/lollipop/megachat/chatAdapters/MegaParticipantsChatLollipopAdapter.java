@@ -292,7 +292,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 int color = ContextCompat.getColor(groupChatInfoActivity, R.color.divider_upgrade_account);
                 String title = getChat().getTitle();
-                holderHeader.avatarImageView.setImageBitmap(getDefaultAvatar(groupChatInfoActivity, color, title, AVATAR_SIZE, true));
+                holderHeader.avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), title, AVATAR_SIZE, true));
 
                 holderHeader.infoTitleChatText.setText(getChat().getTitle());
 
@@ -445,8 +445,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderParticipantsList.imageButtonThreeDots.setColorFilter(null);
 
                 /*Default Avatar*/
-                int avatarColor = getColorAvatar(groupChatInfoActivity, megaApi, holderParticipantsList.userHandle);
-                holderParticipantsList.imageView.setImageBitmap(getDefaultAvatar(groupChatInfoActivity, avatarColor, holderParticipantsList.fullName, AVATAR_SIZE, true));
+                int avatarColor = getColorAvatar(holderParticipantsList.userHandle);
+                holderParticipantsList.imageView.setImageBitmap(getDefaultAvatar(avatarColor, holderParticipantsList.fullName, AVATAR_SIZE, true));
 
                 /*Avatar*/
                 String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());

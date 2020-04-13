@@ -68,6 +68,7 @@ import nz.mega.sdk.MegaUser;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;

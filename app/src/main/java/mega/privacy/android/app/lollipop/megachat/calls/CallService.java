@@ -327,11 +327,12 @@ public class CallService extends Service{
     private Bitmap createDefaultAvatar(long userHandle, String fullName) {
         int color;
         if (userHandle != -1) {
-            color = getColorAvatar(this, megaApi, userHandle);
+            color = getColorAvatar(userHandle);
         } else {
-            color = ContextCompat.getColor(this, R.color.divider_upgrade_account);
+            color = getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR);
         }
-        return getDefaultAvatar(this, color, fullName, AVATAR_SIZE, true);
+
+        return getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
     }
 
     @Override

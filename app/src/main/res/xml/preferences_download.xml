@@ -3,19 +3,23 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
+    <androidx.preference.PreferenceCategory
+        android:key="download_setting"
+        app:allowDividerAbove="false"
+        app:allowDividerBelow="false">
+        <mega.privacy.android.app.components.TwoLineCheckPreference
+            android:key="settings_storage_ask_me_always"
+            android:title="@string/settings_storage_ask_me_always"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
 
-    <mega.privacy.android.app.components.TwoLineCheckPreference
-        android:key="settings_storage_ask_me_always"
-        android:title="@string/settings_storage_ask_me_always"
-        app:allowDividerAbove="true"
-        app:allowDividerBelow="true"
-        app:iconSpaceReserved="false" />
-
-    <androidx.preference.Preference
-        android:key="settings_storage_download_location"
-        android:title="@string/settings_storage_download_location"
-        app:allowDividerAbove="true"
-        app:allowDividerBelow="true"
-        app:iconSpaceReserved="false" />
+        <androidx.preference.Preference
+            android:key="settings_storage_download_location"
+            android:title="@string/settings_storage_download_location"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            app:iconSpaceReserved="false" />
+    </androidx.preference.PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>
