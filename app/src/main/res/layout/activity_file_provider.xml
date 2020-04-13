@@ -13,10 +13,10 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:minHeight="?attr/actionBarSize"
-        app:titleTextAppearance="@style/ToolbarTitle.Secondary"
         android:background="?attr/colorPrimary"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/Theme.Megaactionbar"
+        app:titleTextAppearance="@style/ToolbarTitle"
+        app:theme="@style/Theme.Megaactionbar"
         tools:context=".FileProviderActivityLollipop" />
 
     <LinearLayout
@@ -70,7 +70,7 @@
                 android:id="@+id/sliding_tabs_provider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/MyCustomTabLayout.Secondary"/>
+                style="@style/MyCustomTabLayout"/>
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/provider_tabs_pager"
