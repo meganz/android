@@ -8,7 +8,6 @@ import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -16,16 +15,14 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.twemoji.EmojiImageView;
-import mega.privacy.android.app.components.twemoji.RecentEmoji;
-import mega.privacy.android.app.components.twemoji.RecentEmojiManager;
-import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatReactionsFragment;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
@@ -45,23 +42,12 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
     private View contentView;
     private BottomSheetBehavior mBehavior;
     private RelativeLayout mainLayout;
-    private LinearLayout reactionsLayout;
-    private RelativeLayout firstReaction;
-    private EmojiImageView firstEmoji;
-    private RelativeLayout secondReaction;
-    private EmojiImageView secondEmoji;
-    private RelativeLayout thirdReaction;
-    private EmojiImageView thirdEmoji;
-    private RelativeLayout fourthReaction;
-    private EmojiImageView fourthEmoji;
-    private RelativeLayout fifthReaction;
-    private EmojiImageView fifthEmoji;
-    private RelativeLayout addReaction;
     private LinearLayout itemsLayout;
     private LinearLayout optionForward;
     private LinearLayout optionEdit;
     private LinearLayout optionCopy;
     private LinearLayout optionDelete;
+    private LinearLayout optionSelect;
 
     private DisplayMetrics outMetrics;
     private int heightDisplay;
@@ -69,12 +55,13 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
     private MegaChatApiAndroid megaChatApi;
     private ChatController chatC;
     private MegaChatRoom chatRoom;
-    private RecentEmoji recentEmoji;
+
+    private LinearLayout reactionsLayout;
+    private ChatReactionsFragment reactionsFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logDebug("onCreate");
 
         if (megaApi == null) {
             megaApi = MegaApplication.getInstance().getMegaApi();
@@ -91,21 +78,15 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
             chatId = savedInstanceState.getLong(CHAT_ID, -1);
             messageId = savedInstanceState.getLong(MESSAGE_ID, -1);
             positionMessage = savedInstanceState.getInt(POSITION_SELECTED_MESSAGE, -1);
-
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
-            if (messageMega != null) {
-                message = new AndroidMegaChatMessage(messageMega);
-            }
         } else {
-
             chatId = ((ChatActivityLollipop) context).idChat;
             messageId = ((ChatActivityLollipop) context).selectedMessageId;
             positionMessage = ((ChatActivityLollipop) context).selectedPosition;
+        }
 
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
-            if (messageMega != null) {
-                message = new AndroidMegaChatMessage(messageMega);
-            }
+        MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+        if (messageMega != null) {
+            message = new AndroidMegaChatMessage(messageMega);
         }
 
         chatRoom = megaChatApi.getChatRoom(chatId);
@@ -123,65 +104,48 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_text_msg, null);
         mainLayout = contentView.findViewById(R.id.bottom_sheet);
-        reactionsLayout = contentView.findViewById(R.id.reaction_layout);
-        firstReaction = reactionsLayout.findViewById(R.id.first_emoji_layout);
-        firstEmoji = reactionsLayout.findViewById(R.id.first_emoji_image);
-        secondReaction = reactionsLayout.findViewById(R.id.second_emoji_layout);
-        secondEmoji = reactionsLayout.findViewById(R.id.second_emoji_image);
-        thirdReaction = reactionsLayout.findViewById(R.id.third_emoji_layout);
-        thirdEmoji = reactionsLayout.findViewById(R.id.third_emoji_image);
-        fourthReaction = reactionsLayout.findViewById(R.id.fourth_emoji_layout);
-        fourthEmoji = reactionsLayout.findViewById(R.id.fourth_emoji_image);
-        fifthReaction = reactionsLayout.findViewById(R.id.fifth_emoji_layout);
-        fifthEmoji = reactionsLayout.findViewById(R.id.fifth_emoji_image);
-        addReaction = reactionsLayout.findViewById(R.id.icon_more_reactions);
+        reactionsLayout = contentView.findViewById(R.id.reactions_layout);
+        reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
         itemsLayout = contentView.findViewById(R.id.items_layout);
         optionForward = contentView.findViewById(R.id.forward_layout);
         optionEdit = contentView.findViewById(R.id.edit_layout);
         optionCopy = contentView.findViewById(R.id.copy_layout);
         optionDelete = contentView.findViewById(R.id.delete_layout);
+        optionSelect = contentView.findViewById(R.id.option_select_layout);
 
-        firstEmoji.setEmoji(new Emoji(0x1f642, R.drawable.emoji_twitter_1f642));
-        secondEmoji.setEmoji(new Emoji(0x2639, R.drawable.emoji_twitter_2639));
-        thirdEmoji.setEmoji(new Emoji(0x1f923, R.drawable.emoji_twitter_1f923));
-        fourthEmoji.setEmoji(new Emoji(0x1f44d, R.drawable.emoji_twitter_1f44d));
-        fifthEmoji.setEmoji(new Emoji(0x1f44f, R.drawable.emoji_twitter_1f44f));
+        reactionsFragment.init(context, chatId, messageId, positionMessage);
 
         optionForward.setOnClickListener(this);
         optionEdit.setOnClickListener(this);
         optionCopy.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
-        firstReaction.setOnClickListener(this);
-        firstEmoji.setOnClickListener(this);
-        secondReaction.setOnClickListener(this);
-        secondEmoji.setOnClickListener(this);
-        thirdReaction.setOnClickListener(this);
-        thirdEmoji.setOnClickListener(this);
-        fourthReaction.setOnClickListener(this);
-        fourthEmoji.setOnClickListener(this);
-        fifthReaction.setOnClickListener(this);
-        fifthEmoji.setOnClickListener(this);
-        addReaction.setOnClickListener(this);
-        recentEmoji = new RecentEmojiManager(getContext(), TYPE_REACTION);
+        optionSelect.setOnClickListener(this);
 
         if (message == null || chatRoom == null || ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) || message.isUploading()) {
             optionForward.setVisibility(View.GONE);
             optionEdit.setVisibility(View.GONE);
             optionCopy.setVisibility(View.GONE);
             optionDelete.setVisibility(View.GONE);
-            reactionsLayout.setVisibility(View.GONE);
+            optionSelect.setVisibility(View.GONE);
 
         } else {
-            optionCopy.setVisibility(View.VISIBLE);
+            int typeMessage = message.getMessage().getType();
+
+            optionSelect.setVisibility(View.VISIBLE);
+            if(typeMessage == MegaChatMessage.TYPE_NORMAL ||
+                    (typeMessage == MegaChatMessage.TYPE_CONTAINS_META &&
+                            message.getMessage().getContainsMeta() != null &&
+                            message.getMessage().getContainsMeta().getType() != MegaChatContainsMeta.CONTAINS_META_INVALID &&
+                            message.getMessage().getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW )){
+                optionCopy.setVisibility(View.VISIBLE);
+            }else{
+                optionCopy.setVisibility(View.GONE);
+            }
             if (((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview())) {
                 optionForward.setVisibility(View.GONE);
                 optionEdit.setVisibility(View.GONE);
                 optionDelete.setVisibility(View.GONE);
-                reactionsLayout.setVisibility(View.GONE);
-
             } else {
-                reactionsLayout.setVisibility(View.VISIBLE);
-
                 if (!isOnline(context) || chatC.isInAnonymousMode()) {
                     optionForward.setVisibility(View.GONE);
                 } else {
@@ -192,10 +156,20 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
                     optionEdit.setVisibility(View.GONE);
                     optionDelete.setVisibility(View.GONE);
                 } else {
-                    optionEdit.setVisibility(View.VISIBLE);
+                    if(typeMessage == MegaChatMessage.TYPE_NORMAL || typeMessage == MegaChatMessage.TYPE_CONTAINS_META) {
+                        optionEdit.setVisibility(View.VISIBLE);
+                    }else{
+                        optionEdit.setVisibility(View.GONE);
+                    }
                     optionDelete.setVisibility(View.VISIBLE);
                 }
             }
+        }
+
+        if (shouldReactionOptionsBeVisible(context, chatRoom, message)) {
+            reactionsLayout.setVisibility(View.VISIBLE);
+        } else {
+            reactionsLayout.setVisibility(View.GONE);
         }
 
         dialog.setContentView(contentView);
@@ -219,6 +193,10 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
                 dismissAllowingStateLoss();
                 break;
 
+            case R.id.option_select_layout:
+                ((ChatActivityLollipop)context).activateActionMode();
+                break;
+
             case R.id.edit_layout:
                 ((ChatActivityLollipop) context).editMessage(messagesSelected);
                 dismissAllowingStateLoss();
@@ -231,36 +209,6 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
 
             case R.id.delete_layout:
                 ((ChatActivityLollipop) context).showConfirmationDeleteMessages(messagesSelected, chatRoom);
-                dismissAllowingStateLoss();
-                break;
-
-            case R.id.first_emoji_layout:
-            case R.id.first_emoji_image:
-                addReaction(contentView.findViewById(R.id.first_emoji_image));
-                break;
-
-            case R.id.second_emoji_layout:
-            case R.id.second_emoji_image:
-                addReaction(contentView.findViewById(R.id.second_emoji_image));
-                break;
-
-            case R.id.third_emoji_layout:
-            case R.id.third_emoji_image:
-                addReaction(contentView.findViewById(R.id.third_emoji_image));
-                break;
-
-            case R.id.fourth_emoji_layout:
-            case R.id.fourth_emoji_image:
-                addReaction(contentView.findViewById(R.id.fourth_emoji_image));
-                break;
-
-            case R.id.fifth_emoji_layout:
-            case R.id.fifth_emoji_image:
-                addReaction(contentView.findViewById(R.id.fifth_emoji_image));
-                break;
-
-            case R.id.icon_more_reactions:
-                ((ChatActivityLollipop) context).showReactionBottomSheet(messagesSelected.get(0), positionMessage);
                 dismissAllowingStateLoss();
                 break;
         }
@@ -281,17 +229,4 @@ public class NormalMessageBottomSheet extends BottomSheetDialogFragment implemen
         outState.putLong(MESSAGE_ID, messageId);
         outState.putLong(POSITION_SELECTED_MESSAGE, positionMessage);
     }
-
-    private void addReaction(EmojiImageView imageEmoji){
-        recentEmoji.addEmoji(imageEmoji.getEmoji());
-        addReactionInMsg(context, chatId, message.getMessage(),imageEmoji.getEmoji());
-        closeDialog();
-    }
-
-    private void closeDialog(){
-        recentEmoji.persist();
-        dismissAllowingStateLoss();
-
-    }
-
 }

@@ -30,6 +30,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatReactionsFragment;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import nz.mega.sdk.MegaApiAndroid;
@@ -41,6 +42,7 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.shouldReactionOptionsBeVisible;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -65,6 +67,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     private LinearLayout items_layout;
 
     public LinearLayout mainLinearLayout;
+    private LinearLayout titleContact;
+    private LinearLayout separatorTitleContact;
     public EmojiTextView titleNameContactChatPanel;
     public ImageView stateIcon;
     public EmojiTextView titleMailContactChatPanel;
@@ -74,6 +78,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     LinearLayout optionStartConversation;
     LinearLayout optionInvite;
     LinearLayout optionRemove;
+    private LinearLayout optionSelect;
 
     DisplayMetrics outMetrics;
 
@@ -83,8 +88,13 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH;
+    private MegaChatRoom chatRoom;
 
     private int heightDisplay;
+    private int positionMessage;
+
+    private LinearLayout reactionsLayout;
+    private ChatReactionsFragment reactionsFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -101,14 +111,11 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
         if(savedInstanceState!=null) {
             logDebug("Bundle is NOT NULL");
-            chatId = savedInstanceState.getLong("chatId", -1);
-            messageId = savedInstanceState.getLong("messageId", -1);
-            logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
-            email = savedInstanceState.getString("email");
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
-            if(messageMega!=null){
-                message = new AndroidMegaChatMessage(messageMega);
-            }
+            chatId = savedInstanceState.getLong(CHAT_ID, -1);
+            messageId = savedInstanceState.getLong(MESSAGE_ID, -1);
+            positionMessage = savedInstanceState.getInt(POSITION_SELECTED_MESSAGE, -1);
+            email = savedInstanceState.getString("email", null);
+
         }
         else{
             logWarning("Bundle NULL");
@@ -116,23 +123,23 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             if(context instanceof ChatActivityLollipop){
                 chatId = ((ChatActivityLollipop) context).idChat;
                 messageId = ((ChatActivityLollipop) context).selectedMessageId;
+                positionMessage = ((ChatActivityLollipop) context).selectedPosition;
             }
             else{
                 chatId = ((ContactAttachmentActivityLollipop) context).chatId;
                 messageId = ((ContactAttachmentActivityLollipop) context).messageId;
                 email = ((ContactAttachmentActivityLollipop) context).selectedEmail;
             }
+        }
 
-            logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
-            if(messageMega!=null){
-                message = new AndroidMegaChatMessage(messageMega);
-            }
+        MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+        if (messageMega != null) {
+            message = new AndroidMegaChatMessage(messageMega);
         }
 
         nC = new NodeController(context);
         chatC = new ChatController(context);
-
+        chatRoom = megaChatApi.getChatRoom(chatId);
         dbH = DatabaseHandler.getDbHandler(getActivity());
     }
 
@@ -150,6 +157,10 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.contact_attachment_bottom_sheet);
+        titleContact = contentView.findViewById(R.id.contact_attachment_chat_title_layout);
+        separatorTitleContact = contentView.findViewById(R.id.contact_title_separator);
+        reactionsLayout = contentView.findViewById(R.id.reactions_layout);
+        reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
         items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
         titleNameContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_name_text);
@@ -168,13 +179,26 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         optionStartConversation = (LinearLayout) contentView.findViewById(R.id.option_start_conversation_layout);
         optionInvite = (LinearLayout) contentView.findViewById(R.id.option_invite_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
+        optionSelect = contentView.findViewById(R.id.option_select_layout);
 
         optionView.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
         optionStartConversation.setOnClickListener(this);
         optionInvite.setOnClickListener(this);
+        optionSelect.setOnClickListener(this);
 
         LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
+
+        if(context instanceof ChatActivityLollipop) {
+            reactionsFragment.init(context, chatId, messageId, positionMessage);
+            optionSelect.setVisibility(View.VISIBLE);
+            titleContact.setVisibility(View.GONE);
+            separatorTitleContact.setVisibility(View.GONE);
+        }else{
+            titleContact.setVisibility(View.VISIBLE);
+            separatorTitleContact.setVisibility(View.VISIBLE);
+            optionSelect.setVisibility(View.GONE);
+        }
 
         optionRemove.setVisibility(View.GONE);
 
@@ -414,18 +438,15 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 separatorInfo.setVisibility(View.VISIBLE);
             }
 
+            if (shouldReactionOptionsBeVisible(context, chatRoom, message)) {
+                reactionsLayout.setVisibility(View.VISIBLE);
+            } else {
+                reactionsLayout.setVisibility(View.GONE);
+            }
+
             dialog.setContentView(contentView);
 
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-//            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//
-//
-//            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-//            }
-//            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//            }
             mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
@@ -503,6 +524,11 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 dismissAllowingStateLoss();
                 break;
             }
+            case R.id.option_select_layout:
+                if(context instanceof ChatActivityLollipop){
+                    ((ChatActivityLollipop)context).activateActionMode();
+                }
+                break;
             case R.id.option_invite_layout:{
                 logDebug("Invite option");
 
@@ -602,10 +628,11 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
-
-        outState.putLong("chatId", chatId);
-        outState.putLong("messageId", messageId);
+        outState.putLong(CHAT_ID, chatId);
+        outState.putLong(MESSAGE_ID, messageId);
+        if (context instanceof ChatActivityLollipop) {
+            outState.putLong(POSITION_SELECTED_MESSAGE, positionMessage);
+        }
     }
 }

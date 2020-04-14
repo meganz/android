@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -24,15 +24,16 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatReactionsFragment;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 
@@ -41,24 +42,23 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
-    Context context;
-    MegaNode node = null;
-    MegaNodeList nodeList;
-    MegaChatMessage messageMega;
-    AndroidMegaChatMessage message = null;
-    long chatId;
-    long messageId;
-    long handle=-1;
-    ChatController chatC;
+    private Context context;
+    private MegaNode node = null;
+    private MegaNodeList nodeList;
+    private MegaChatMessage messageMega;
+    private AndroidMegaChatMessage message = null;
+    private long chatId;
+    private long messageId;
+    private long handle = INVALID_HANDLE;
+    private int positionMessage;
 
     private BottomSheetBehavior mBehavior;
     private LinearLayout items_layout;
-
     LinearLayout mainLinearLayout;
-    CoordinatorLayout coordinatorLayout;
 
     ImageView nodeThumb;
     TextView nodeName;
@@ -72,17 +72,23 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     LinearLayout optionSaveOffline;
     LinearLayout optionRemove;
     LinearLayout optionForwardLayout;
+    private LinearLayout optionSelect;
 
-    DisplayMetrics outMetrics;
+    private DisplayMetrics outMetrics;
+    private int heightDisplay;
 
-    static ManagerActivityLollipop.DrawerItem drawerItem = null;
     Bitmap thumb = null;
 
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
-    DatabaseHandler dbH;
+    private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
+    private DatabaseHandler dbH;
+    private ChatController chatC;
+    private MegaChatRoom chatRoom;
 
-    private int heightDisplay;
+    private RelativeLayout titleLayout;
+    private LinearLayout titleSeparator;
+    private LinearLayout reactionsLayout;
+    private ChatReactionsFragment reactionsFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,19 +96,22 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
         logDebug("onCreate");
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            megaApi = MegaApplication.getInstance().getMegaApi();
         }
 
         if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
         if(savedInstanceState!=null) {
             logDebug("Bundle is NOT NULL");
-            chatId = savedInstanceState.getLong("chatId", -1);
-            messageId = savedInstanceState.getLong("messageId", -1);
+            chatId = savedInstanceState.getLong(CHAT_ID, -1);
+            messageId = savedInstanceState.getLong(MESSAGE_ID, -1);
             logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
             handle = savedInstanceState.getLong("handle", -1);
+            if(context instanceof ChatActivityLollipop) {
+                positionMessage = savedInstanceState.getInt(POSITION_SELECTED_MESSAGE, -1);
+            }
         }
         else{
             logWarning("Bundle NULL");
@@ -110,6 +119,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             if(context instanceof ChatActivityLollipop){
                 chatId = ((ChatActivityLollipop) context).idChat;
                 messageId = ((ChatActivityLollipop) context).selectedMessageId;
+                positionMessage = ((ChatActivityLollipop) context).selectedPosition;
             }
             else if(context instanceof NodeAttachmentHistoryActivity){
                 chatId = ((NodeAttachmentHistoryActivity) context).chatId;
@@ -124,8 +134,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             message = new AndroidMegaChatMessage(messageMega);
         }
 
+        chatRoom = megaChatApi.getChatRoom(chatId);
         chatC = new ChatController(context);
-
         dbH = DatabaseHandler.getDbHandler(getActivity());
     }
 
@@ -142,9 +152,14 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_attachment_item, null);
 
-        mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.node_attachment_bottom_sheet);
-        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
+        mainLinearLayout = contentView.findViewById(R.id.node_attachment_bottom_sheet);
+        titleLayout = contentView.findViewById(R.id.node_attachment_title_layout);
+        titleSeparator = contentView.findViewById(R.id.title_separator);
 
+        reactionsLayout = contentView.findViewById(R.id.reactions_layout);
+        reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
+
+        items_layout = contentView.findViewById(R.id.items_layout);
         nodeThumb = (ImageView) contentView.findViewById(R.id.node_attachment_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.node_attachment_name_text);
         nodeInfo  = (TextView) contentView.findViewById(R.id.node_attachment_info_text);
@@ -156,12 +171,24 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionSaveOffline = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
         optionForwardLayout = (LinearLayout) contentView.findViewById(R.id.option_forward_layout);
+        optionSelect = contentView.findViewById(R.id.option_select_layout);
 
         LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
         LinearLayout separatorRemove = (LinearLayout) contentView.findViewById(R.id.separator_remove);
 
         if (message == null || message.getMessage() == null) {
             return;
+        }
+
+        if(context instanceof ChatActivityLollipop) {
+            reactionsFragment.init(context, chatId, messageId, positionMessage);
+            optionSelect.setVisibility(View.VISIBLE);
+            titleLayout.setVisibility(View.GONE);
+            titleSeparator.setVisibility(View.GONE);
+        }else{
+            titleLayout.setVisibility(View.VISIBLE);
+            titleSeparator.setVisibility(View.VISIBLE);
+            optionSelect.setVisibility(View.GONE);
         }
 
         if(message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle() && messageMega.isDeletable()){
@@ -181,6 +208,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionRemove.setOnClickListener(this);
         optionImport.setOnClickListener(this);
         optionForwardLayout.setOnClickListener(this);
+        optionSelect.setOnClickListener(this);
 
         if (chatC.isInAnonymousMode()) {
             optionSaveOffline.setVisibility(View.GONE);
@@ -272,18 +300,15 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             separatorRemove.setVisibility(View.VISIBLE);
         }
 
+        if (shouldReactionOptionsBeVisible(context, chatRoom, message)) {
+            reactionsLayout.setVisibility(View.VISIBLE);
+        } else {
+            reactionsLayout.setVisibility(View.GONE);
+        }
+
         dialog.setContentView(contentView);
 
         mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//
-//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-//        }
-//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//        }
-
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
@@ -347,6 +372,11 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     chatC.prepareMessageToForward(messageId, chatId);
                     break;
                 }
+                case R.id.option_select_layout:
+                    if(context instanceof ChatActivityLollipop){
+                        ((ChatActivityLollipop)context).activateActionMode();
+                    }
+                    break;
                 case R.id.option_download_layout:{
                     logDebug("Download option");
                     if(node==null){
@@ -425,11 +455,13 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
-
-        outState.putLong("chatId", chatId);
-        outState.putLong("messageId", messageId);
         outState.putLong("handle", handle);
+        outState.putLong(CHAT_ID, chatId);
+        outState.putLong(MESSAGE_ID, messageId);
+
+        if(context instanceof ChatActivityLollipop) {
+            outState.putLong(POSITION_SELECTED_MESSAGE, positionMessage);
+        }
     }
 }

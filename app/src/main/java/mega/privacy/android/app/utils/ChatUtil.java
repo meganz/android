@@ -30,6 +30,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -410,5 +411,14 @@ public class ChatUtil {
             logDebug("The reaction has been deleted correctly");
         }
 
+    }
+
+    public static boolean shouldReactionOptionsBeVisible(Context context, MegaChatRoom chatRoom, AndroidMegaChatMessage message) {
+        return chatRoom != null && message != null &&
+                context instanceof ChatActivityLollipop &&
+                !((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) &&
+                !message.isUploading() &&
+                ((chatRoom.getOwnPrivilege() != MegaChatRoom.PRIV_RM && chatRoom.getOwnPrivilege() != MegaChatRoom.PRIV_RO)
+                        || chatRoom.isPreview());
     }
 }
