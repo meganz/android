@@ -51,6 +51,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -230,62 +231,12 @@ public final class ChatAdvancedNotificationBuilder {
                     logDebug("Get message id: " + handleListUnread.get(j) + " from chatId: " + chats.get(i).getChatId());
                     MegaChatMessage message = megaChatApi.getMessage(chats.get(i).getChatId(), handleListUnread.get(j));
                     if (message != null) {
+                        String messageContent = converterShortCodes(getMessageContent(message));
+                        CharSequence cs;
+                        String title = converterShortCodes(chats.get(i).getTitle());
 
-                        String messageContent = "";
-
-                        if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
-                            logDebug("TYPE_NODE_ATTACHMENT || TYPE_VOICE_CLIP");
-                            messageContent = checkMessageContentAttachmentOrVoiceClip(message);
-                        } else if (message.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                            logDebug("TYPE_CONTACT_ATTACHMENT");
-
-                            long userCount = message.getUsersCount();
-
-                            if (userCount == 1) {
-                                String name = "";
-                                name = message.getUserName(0);
-                                if (name.trim().isEmpty()) {
-                                    name = message.getUserName(0);
-                                }
-                                String email = message.getUserName(0);
-                                messageContent = email;
-                            } else {
-                                StringBuilder name = new StringBuilder("");
-                                name.append(message.getUserName(0));
-                                for (int k = 1; k < userCount; k++) {
-                                    name.append(", " + message.getUserName(k));
-                                }
-                                messageContent = name.toString();
-                            }
-                        } else if (message.getType() == MegaChatMessage.TYPE_TRUNCATE) {
-                            logDebug("TYPE_TRUNCATE");
-
-                            messageContent = context.getString(R.string.history_cleared_message);
-
-                        } else if (message.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
-                            logDebug("TYPE_CONTAINS_META");
-                            messageContent = checkMessageContentMeta(message);
-                        } else {
-                            logDebug("OTHER");
-                            messageContent = message.getContent();
-                        }
-
-                        CharSequence cs = " ";
-                        String title = chats.get(i).getTitle();
                         if (chats.get(i).isGroup()) {
-                            long lastMsgSender = message.getUserHandle();
-
-                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chats.get(i).getChatId());
-                            String nameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
-                            if (nameAction == null) {
-                                nameAction = "";
-                            }
-
-                            if (nameAction.trim().length() <= 0) {
-                                ChatController cC = new ChatController(context);
-                                nameAction = cC.getFirstName(lastMsgSender, chatRoom);
-                            }
-
+                            String nameAction = converterShortCodes(getSender(message, megaChatApi.getChatRoom(chats.get(i).getChatId())));
                             cs = nameAction + " @ " + title + ": " + messageContent;
                         } else {
                             cs = title + ": " + messageContent;
@@ -314,6 +265,59 @@ public final class ChatAdvancedNotificationBuilder {
             notificationManager.notify(NOTIFICATION_SUMMARY_CHAT, notif);
         } else {
             notificationManager.cancel(NOTIFICATION_SUMMARY_CHAT);
+        }
+    }
+
+    private String getSender(MegaChatMessage msg, MegaChatRoom chatRoom) {
+        if (chatRoom == null) return null;
+
+        long lastMsgSender = msg.getUserHandle();
+        String nameAction = getNicknameContact(lastMsgSender);
+
+        if (isTextEmpty(nameAction)) {
+            nameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+        }
+
+        if (isTextEmpty(nameAction)) {
+            nameAction = new ChatController(context).getFirstName(lastMsgSender, chatRoom);
+        }
+
+        return nameAction;
+    }
+
+    private String getMessageContent(MegaChatMessage msg) {
+        if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
+            return checkMessageContentAttachmentOrVoiceClip(msg);
+        } else if (msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
+            logDebug("TYPE_CONTACT_ATTACHMENT");
+            long userCount = msg.getUsersCount();
+            String messageContent;
+
+            if (userCount == 1) {
+                messageContent = msg.getUserName(0);
+                if (isTextEmpty(messageContent)) {
+                    messageContent = msg.getUserEmail(0);
+                }
+            } else {
+                StringBuilder name = new StringBuilder("");
+                name.append(msg.getUserName(0));
+                for (int j = 1; j < userCount; j++) {
+                    name.append(", " + msg.getUserName(j));
+                }
+                messageContent = name.toString();
+            }
+
+            return messageContent;
+        } else if (msg.getType() == MegaChatMessage.TYPE_TRUNCATE) {
+            logDebug("TYPE_TRUNCATE");
+            return context.getString(R.string.history_cleared_message);
+        } else if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
+            logDebug("TYPE_CONTAINS_META");
+            return checkMessageContentMeta(msg);
+
+        } else {
+            logDebug("OTHER");
+            return msg.getContent();
         }
     }
 
@@ -408,47 +412,9 @@ public final class ChatAdvancedNotificationBuilder {
         for (int i = sizeFor; i >= 0; i--) {
             MegaChatMessage msg = unreadMessageList.get(i);
             logDebug("getMessage: chatID: " + chat.getChatId() + " " + unreadMessageList.get(i));
-            String messageContent = "";
-
             if (msg != null) {
-                if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
-                    messageContent = checkMessageContentAttachmentOrVoiceClip(msg);
-                } else if (msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                    logDebug("TYPE_CONTACT_ATTACHMENT");
-
-                    long userCount = msg.getUsersCount();
-
-                    if (userCount == 1) {
-                        String name = "";
-                        name = msg.getUserName(0);
-                        if (name.trim().isEmpty()) {
-                            name = msg.getUserName(0);
-                        }
-                        String email = msg.getUserName(0);
-                        messageContent = email;
-                    } else {
-                        StringBuilder name = new StringBuilder("");
-                        name.append(msg.getUserName(0));
-                        for (int j = 1; j < userCount; j++) {
-                            name.append(", " + msg.getUserName(j));
-                        }
-                        messageContent = name.toString();
-                    }
-                } else if (msg.getType() == MegaChatMessage.TYPE_TRUNCATE) {
-                    logDebug("TYPE_TRUNCATE");
-                    messageContent = context.getString(R.string.history_cleared_message);
-                } else if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
-                    logDebug("TYPE_CONTAINS_META");
-                    messageContent = checkMessageContentMeta(msg);
-
-                } else {
-                    logDebug("OTHER");
-                    messageContent = msg.getContent();
-                }
-
-                messageContent = converterShortCodes(messageContent);
-                String sender = chat.getPeerFirstnameByHandle(msg.getUserHandle());
-                sender = converterShortCodes(sender);
+                String messageContent = converterShortCodes(getMessageContent(msg));
+                String sender = converterShortCodes(getSender(msg, chat));
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     messagingStyleContentO.addMessage(messageContent, msg.getTimestamp(), sender);
@@ -1147,17 +1113,11 @@ public final class ChatAdvancedNotificationBuilder {
             });
             //Check if the last chat notification is enabled
 
-            long lastChatId = -1;
-            if (chats != null) {
-                if (!(chats.isEmpty())) {
-                    lastChatId = chats.get(0).getChatId();
-                } else {
-                    logError("ERROR:chatsEMPTY:removeAllChatNotifications");
-                    removeAllChatNotifications();
-                    return;
-                }
+            long lastChatId;
+            if (!(chats.isEmpty())) {
+                lastChatId = chats.get(0).getChatId();
             } else {
-                logError("ERROR:chatsNULL:removeAllChatNotifications");
+                logError("ERROR:chatsEMPTY:removeAllChatNotifications");
                 removeAllChatNotifications();
                 return;
             }
