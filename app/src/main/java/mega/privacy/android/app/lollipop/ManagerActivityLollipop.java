@@ -13090,12 +13090,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
 			logDebug("Truncate history request finish.");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				if(drawerItem == DrawerItem.CHAT){
-					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-					if (rChatFL != null && rChatFL.isVisible()) {
-						rChatFL.refreshNode(megaChatApi.getChatListItem(request.getChatHandle()));
-					}
-				}
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_success), -1);
 			}
 			else{
