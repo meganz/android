@@ -99,7 +99,6 @@ public class ChatAudioManager {
     private void incomingCallSound() {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) return;
         initializeAudioManager();
-        stopSound();
         if (audioManager == null) return;
         Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         if (ringtoneUri == null) return;
