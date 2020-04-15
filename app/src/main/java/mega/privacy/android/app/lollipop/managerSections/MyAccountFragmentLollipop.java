@@ -450,7 +450,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if (!myAccountInfo.isBusinessStatusReceived()) {
 			businessAccountManagementAlert.setVisibility(View.GONE);
 			typeAccount.setText(getString(R.string.recovering_info));
-			typeAccount.setAllCaps(false);
 			upgradeButton.setVisibility(View.GONE);
 			achievementsLayout.setVisibility(View.GONE);
 			achievementsSeparator.setVisibility(View.GONE);
@@ -538,7 +537,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		if (myAccountInfo.getAccountType() < 0 || myAccountInfo.getAccountType() > 4) {
 			typeAccount.setText(getString(R.string.recovering_info));
-			typeAccount.setAllCaps(false);
 		} else {
 			switch (myAccountInfo.getAccountType()) {
 				case 0:
@@ -561,7 +559,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					typeAccount.setText(getString(R.string.prolite_account));
 					break;
 			}
-			typeAccount.setAllCaps(true);
 		}
 
 		if (myAccountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
