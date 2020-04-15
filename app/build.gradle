@@ -128,11 +128,6 @@ dependencies {
     hmsImplementation 'com.huawei.hms:iap:4.0.2.300'
     hmsImplementation 'com.huawei.hms:maps:4.0.0.302'
     hmsImplementation 'com.huawei.hms:location:4.0.2.300'
-
-//    apply plugin: 'com.google.gms.google-services'
-
-
-
 }
-apply plugin: 'com.huawei.agconnect'
-//apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.huawei.agconnect'
+apply plugin: 'com.google.gms.google-services'
