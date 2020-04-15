@@ -7319,7 +7319,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void checkBeforeOpeningQR(boolean openScanQR){
 		if (isNecessaryDisableLocalCamera() != -1) {
-			showConfirmationOpenCamera(this, ACTION_OPEN_QR);
+			showConfirmationOpenCamera(this, ACTION_OPEN_QR, openScanQR);
 			return;
 		}
 		openQR(openScanQR);
@@ -7329,7 +7329,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		ScanCodeFragment fragment = new ScanCodeFragment();
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
 		Intent intent = new Intent(this, QRCodeActivity.class);
-		intent.putExtra("contacts", openScanQr);
+		intent.putExtra(OPEN_SCAN_QR, openScanQr);
 		startActivity(intent);
 	}
 

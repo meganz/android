@@ -333,7 +333,18 @@ public class CallUtil {
         return chatIdCallInProgress;
     }
 
-    public static void showConfirmationOpenCamera(Activity activity, String action) {
+    /**
+     * When there is a video call in progress with the video enabled of the current account logged-in,
+     * alerts the user if they are sure they want to perform the action in which the camera is involved,
+     * since their camera will be disabled in the call.
+     *
+     * @param activity      current Activity involved
+     * @param action        the action to perform. These are the possibilities:
+     *                      ACTION_TAKE_PICTURE, TAKE_PICTURE_PROFILE_CODE, ACTION_OPEN_QR
+     * @param openScanQR    if the action is ACTION_OPEN_QR, it specifies whether to open the "Scan QR" section.
+     *                      True if it should open the "Scan QR" section, false otherwise.
+     */
+    public static void showConfirmationOpenCamera(Activity activity, String action, boolean openScanQR) {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
@@ -344,7 +355,7 @@ public class CallUtil {
                     }
                     if (activity instanceof ManagerActivityLollipop) {
                         if (action.equals(ACTION_OPEN_QR)) {
-                            ((ManagerActivityLollipop) activity).openQR(true);
+                            ((ManagerActivityLollipop) activity).openQR(openScanQR);
                         } else if (action.equals(ACTION_TAKE_PICTURE)) {
                             takePicture(activity, TAKE_PHOTO_CODE);
                         } else if (action.equals(ACTION_TAKE_PROFILE_PICTURE)) {
