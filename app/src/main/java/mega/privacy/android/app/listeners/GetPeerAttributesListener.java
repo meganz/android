@@ -40,7 +40,7 @@ public class GetPeerAttributesListener extends ChatBaseListener {
     public GetPeerAttributesListener(Context context, HashMap<Integer, MegaChatParticipant> participantRequests) {
         super(context);
 
-        this.participantRequests = participantRequests;
+        this.participantRequests = new HashMap<>(participantRequests);
     }
 
     /**

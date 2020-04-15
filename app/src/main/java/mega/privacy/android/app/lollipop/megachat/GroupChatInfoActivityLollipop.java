@@ -68,7 +68,6 @@ import nz.mega.sdk.MegaUser;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -1221,32 +1220,75 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     /**
-     * If there are participants without attributes, it launches a request to ask for them.
+     * If there are participants visibles in the UI without attributes,
+     * it launches a request to ask for them.
      */
     private void checkIfShouldAskForUsersAttributes() {
         if (pendingParticipantRequests.isEmpty()) return;
+
+        HashMap<Integer, MegaChatParticipant> copyOfpendingParticipantRequests = new HashMap<>(pendingParticipantRequests);
+        pendingParticipantRequests.clear();
 
         MegaHandleList handleList = MegaHandleList.createInstance();
         HashMap<Integer, MegaChatParticipant> participantRequests = new HashMap<>();
         int firstPosition = linearLayoutManager.findFirstVisibleItemPosition();
         int lastPosition = linearLayoutManager.findLastVisibleItemPosition();
-        int extraPosition;
-
-        extraPosition = firstPosition - PARTICIPANTS_EXTRA;
-        firstPosition = max(extraPosition, 1);
-
-        extraPosition = lastPosition + PARTICIPANTS_EXTRA;
-        lastPosition = min(extraPosition, participants.size());
 
         for (int i = firstPosition; i <= lastPosition; i++) {
-            MegaChatParticipant participant = pendingParticipantRequests.get(i);
+            MegaChatParticipant participant = copyOfpendingParticipantRequests.get(i);
             if (participant != null) {
                 participantRequests.put(i, participant);
-                pendingParticipantRequests.remove(i);
                 handleList.addMegaHandle(participant.getHandle());
             }
+
+            copyOfpendingParticipantRequests.remove(i);
         }
 
+        requestUserAttributes(handleList, participantRequests);
+
+        checkIfShouldAskForMoreUsersAttributes(copyOfpendingParticipantRequests);
+    }
+
+    /**
+     *  If there are participants not visibles in the UI but already scrolled without attributes,
+     *  it launches a request to ask for them.
+     *
+     * @param pendingParticipantRequests HashMap in which the pending participants to check, and their positions in the adapter are stored
+     */
+    private void checkIfShouldAskForMoreUsersAttributes(HashMap<Integer, MegaChatParticipant> pendingParticipantRequests) {
+        MegaHandleList handleList = MegaHandleList.createInstance();
+        HashMap<Integer, MegaChatParticipant> participantRequests = new HashMap<>();
+        int i = 0;
+
+        for (Integer position : pendingParticipantRequests.keySet()) {
+            MegaChatParticipant participant = pendingParticipantRequests.get(position);
+            if (participant != null) {
+                participantRequests.put(position, participant);
+                handleList.addMegaHandle(participant.getHandle());
+            }
+
+            i++;
+
+            boolean maxRequestReached = i % PARTICIPANTS_EXTRA == 0;
+            if (i == pendingParticipantRequests.size() || maxRequestReached) {
+                requestUserAttributes(handleList, participantRequests);
+
+                if (maxRequestReached) {
+                    handleList = MegaHandleList.createInstance();
+                    participantRequests = new HashMap<>();
+                }
+            }
+        }
+    }
+
+    /**
+     * Requests the attributes of some MegaChatParticipants
+     *
+     * @param handleList            MegaHandleList in which the participant's handles are stored to ask for their attributes
+     * @param participantRequests   HashMap in which the participants and their positions in the adapter are stored
+     */
+    private void requestUserAttributes(MegaHandleList handleList, HashMap<Integer, MegaChatParticipant> participantRequests) {
+        long size = handleList.size();
         if (handleList.size() > 0) {
             megaChatApi.loadUserAttributes(chatHandle, handleList, chat.getAuthorizationToken(), new GetPeerAttributesListener(this, participantRequests));
         }
@@ -1267,6 +1309,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         for (int i = 0; i < handleList.size(); i++) {
             long handle = handleList.get(i);
+            chatC.setNonContactAttributesInDB(chat, handle);
 
             for (Integer positionInAdapter : participantUpdates.keySet()) {
                 if (participantUpdates.get(positionInAdapter).getHandle() == handle) {

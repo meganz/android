@@ -1834,6 +1834,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         chatRoom = megaChatApi.getChatRoom(chatId);
 
         setCustomSubtitle();
+
+        for (int i = 0; i < handleList.size(); i++) {
+            chatC.setNonContactAttributesInDB(chatRoom, handleList.get(i));
+        }
     }
 
     public void setLastGreen(String date){
