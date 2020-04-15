@@ -36,9 +36,14 @@ public class ChatAudioManager {
     }
 
     public void initializeAudioManager() {
-        if (audioManager != null) return;
+        if (audioManager != null) {
+            audioManager.setMode(AudioManager.MODE_NORMAL);
+            return;
+        }
+
         logDebug("Initializing audio manager...");
         audioManager = (AudioManager) myContext.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(AudioManager.MODE_NORMAL);
     }
 
     public void setAudioManagerValues(int callStatus, MegaHandleList listCallsRequest, MegaHandleList listCallsRing) {
@@ -51,6 +56,7 @@ public class ChatAudioManager {
             }
 
             outgoingCallSound();
+
         } else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
             if (listCallsRequest == null || listCallsRequest.size() < 1) {
                 logDebug("I'm not calling");
@@ -93,6 +99,7 @@ public class ChatAudioManager {
     private void incomingCallSound() {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) return;
         initializeAudioManager();
+        stopSound();
         if (audioManager == null) return;
         Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         if (ringtoneUri == null) return;
@@ -143,7 +150,12 @@ public class ChatAudioManager {
     }
 
     public void stopAudioSignals() {
-        if(audioManager != null) audioManager = null;
+        if(audioManager != null){
+            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            audioManager = null;
+        }
+        logDebug("stop sound and vibration");
+
         stopSound();
         stopVibration();
     }
