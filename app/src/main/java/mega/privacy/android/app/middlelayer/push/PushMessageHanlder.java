@@ -2,6 +2,7 @@ package mega.privacy.android.app.middlelayer.push;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.PowerManager;
 
@@ -14,6 +15,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.fcm.KeepAliveService;
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -37,6 +39,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
     private static final String TYPE_ACCEPTANCE = "5";
     private static final String TYPE_CALL = "4";
     private static final String TYPE_CHAT = "2";
+    public static final String PUSH_TOKEN = "PUSH_TOKEN";
 
     private MegaApplication app;
 
@@ -164,13 +167,20 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
         }
     }
 
-    public void sendRegistrationToServer(String token) {
-        if (megaApi == null) {
-            megaApi = app.getMegaApi();
+    public void sendRegistrationToServer(String newToken) {
+        if(TextUtil.isTextEmpty(newToken)) return;
+
+        SharedPreferences sp = app.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE);
+        String token = sp.getString("token", "");
+        if (!token.equals(newToken)) {
+            sp.edit().putString("token", newToken).apply();
+            if (megaApi == null) {
+                megaApi = app.getMegaApi();
+            }
+            logDebug("Push service's new token: " + newToken);
+            TOKEN = token;
+            megaApi.registerPushNotifications(DEVICE_ANDROID, newToken, this);
         }
-        logDebug("Push service's token: " + token);
-        TOKEN = token;
-        megaApi.registerPushNotifications(DEVICE_ANDROID, token);
     }
 
     public static String getToken() {
@@ -253,6 +263,13 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
                 megaChatApi.connectInBackground(this);
             } else {
                 logError("ERROR: " + e.getErrorString());
+            }
+        } else if (request.getType() == MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                logDebug("Register push token successfully.");
+            } else {
+                logError("Register push token failed, retry. error code is: " + e.getErrorCode());
+                // may need retry when error code isn't -15
             }
         }
     }

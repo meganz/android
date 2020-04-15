@@ -23,7 +23,8 @@
             android:value="@string/google_maps_key" />
 
         <service
-            android:name=".service.push.MegaMessageService">
+            android:name=".service.push.MegaMessageService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>

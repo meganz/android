@@ -204,6 +204,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.service.push.MegaMessageService;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
@@ -2525,7 +2526,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			dbH.setInvalidateSdkCache(false);
-
+            MegaMessageService.getToken(this);
 			nVEmail.setVisibility(View.VISIBLE);
 			nVEmail.setText(megaApi.getMyEmail());
 //				megaApi.getUserData(this);
