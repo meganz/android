@@ -173,13 +173,14 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
         SharedPreferences sp = app.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE);
         String token = sp.getString("token", "");
         if (!token.equals(newToken)) {
-            sp.edit().putString("token", newToken).apply();
             if (megaApi == null) {
                 megaApi = app.getMegaApi();
             }
             logDebug("Push service's new token: " + newToken);
             TOKEN = token;
             megaApi.registerPushNotifications(DEVICE_ANDROID, newToken, this);
+        } else {
+            logDebug("No need to register new token.");
         }
     }
 
@@ -266,7 +267,11 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
             }
         } else if (request.getType() == MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION) {
             if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("Register push token successfully.");
+                String token = request.getText();
+                logDebug("Register push token successfully. Token is: " + token);
+                // record the token locally when register successful.
+                SharedPreferences sp = app.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE);
+                sp.edit().putString("token", token).apply();
             } else {
                 logError("Register push token failed, retry. error code is: " + e.getErrorCode());
                 // may need retry when error code isn't -15

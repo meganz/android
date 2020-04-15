@@ -16,18 +16,13 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MegaMessageService extends HmsMessageService {
 
-    private static PushMessageHanlder messageHanlder;
+    private PushMessageHanlder messageHanlder;
 
     @Override
     public void onCreate() {
         super.onCreate();
         logDebug("HMS message created");
-        synchronized (new Object()) {
-            if (messageHanlder == null) {
-                logDebug("Create new push message handler.");
-                messageHanlder = new PushMessageHanlder();
-            }
-        }
+        messageHanlder = new PushMessageHanlder();
     }
 
     private PushMessageHanlder.Message convert(RemoteMessage remoteMessage) {
@@ -55,7 +50,7 @@ public class MegaMessageService extends HmsMessageService {
             try {
                 // wait for the callback
                 String token = HmsInstanceId.getInstance(context).getToken(appId, "HCM");
-                messageHanlder.sendRegistrationToServer(token);
+                new PushMessageHanlder().sendRegistrationToServer(token);
             } catch (ApiException e) {
                 logError(e.getMessage(), e);
                 e.printStackTrace();

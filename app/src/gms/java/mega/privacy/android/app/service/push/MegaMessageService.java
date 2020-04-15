@@ -14,22 +14,18 @@ import java.util.concurrent.Executors;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
 
 public class MegaMessageService extends FirebaseMessagingService {
 
-    private static PushMessageHanlder messageHanlder;
+    private PushMessageHanlder messageHanlder;
 
     @Override
     public void onCreate() {
         super.onCreate();
         logDebug("onCreateFCM");
-        synchronized (new Object()) {
-            if (messageHanlder == null) {
-                logDebug("Create new push message handler.");
-                messageHanlder = new PushMessageHanlder();
-            }
-        }
+        messageHanlder = new PushMessageHanlder();
     }
 
     @Override
@@ -64,7 +60,7 @@ public class MegaMessageService extends FirebaseMessagingService {
             FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance();
             try {
                 String token = instanceId.getToken(id, "FCM");
-                messageHanlder.sendRegistrationToServer(token);
+                new PushMessageHanlder().sendRegistrationToServer(token);
             } catch (IOException e) {
                 e.printStackTrace();
                 logError(e.getMessage(), e);
