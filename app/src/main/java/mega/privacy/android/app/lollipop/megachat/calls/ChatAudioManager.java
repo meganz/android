@@ -149,12 +149,12 @@ public class ChatAudioManager {
     }
 
     public void stopAudioSignals() {
-        if(audioManager != null){
+        if (audioManager != null) {
             audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             audioManager = null;
         }
-        logDebug("stop sound and vibration");
 
+        logDebug("Stop sound and vibration");
         stopSound();
         stopVibration();
     }

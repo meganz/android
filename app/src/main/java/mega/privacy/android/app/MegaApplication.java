@@ -1282,7 +1282,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 	}
 
-	public void removeValues(long chatId) {
+	private void removeValues(long chatId) {
 		removeStatusVideoAndSpeaker(chatId);
 		removeChatAudioManager();
 	}
@@ -1329,15 +1329,17 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	}
 
 	public void createChatAudioManager() {
-		if (chatAudioManager != null)
+		if (chatAudioManager != null) {
 			return;
+		}
 
 		chatAudioManager = ChatAudioManager.create(getApplicationContext());
 	}
 
 	public void removeChatAudioManager() {
-		if (chatAudioManager == null)
+		if (chatAudioManager == null) {
 			return;
+		}
 
 		chatAudioManager.stopAudioSignals();
 		chatAudioManager = null;
