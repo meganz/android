@@ -89,7 +89,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 
-public class ContactFileListActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight, UploadBottomSheetDialogActionListener {
+public class ContactFileListActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface, UploadBottomSheetDialogActionListener {
 
 	FrameLayout fragmentContainer;
 
@@ -1572,18 +1572,6 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 			cflF.clearSelections();
 			cflF.hideMultipleSelect();
 		}
-	}
-
-	@Override
-	public int getHeightToPanel(BottomSheetDialogFragment dialog) {
-		if (dialog instanceof ContactFileListBottomSheetDialogFragment) {
-			if (fragmentContainer != null && aB != null) {
-				final Rect r = new Rect();
-				fragmentContainer.getWindowVisibleDisplayFrame(r);
-				return (r.height() - aB.getHeight());
-			}
-		}
-		return -1;
 	}
 
 	public void openAdvancedDevices(long handleToDownload, boolean highPriority) {

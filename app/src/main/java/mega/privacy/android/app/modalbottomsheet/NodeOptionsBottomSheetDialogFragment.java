@@ -37,6 +37,7 @@ import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -390,7 +391,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 }
 
                 long restoreHandle = node.getRestoreHandle();
-                if (restoreHandle != -1) {
+                if (restoreHandle != INVALID_HANDLE) {
                     MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
                     if ((!megaApi.isInRubbish(node)) || restoreNode == null || megaApi.isInRubbish(restoreNode)) {
                         counterModify--;
@@ -548,7 +549,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             case MegaShare.ACCESS_READWRITE:
                                 logDebug("LEVEL 0 - readwrite");
                                 permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
-
+                                break;
                         }
                     }
 
@@ -608,7 +609,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             counterRemove--;
                             optionRubbishBin.setVisibility(View.GONE);
                             break;
-
                     }
                 } else if (tabSelected == 1) {
                     logDebug("showOptionsPanelOutgoing");
@@ -806,7 +806,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                                 logDebug("LEVEL 0 - readwrite");
                                 nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
                                 break;
-
                         }
                     }
 
@@ -942,7 +941,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(true);
+        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
     }
 
     private void showOwnerSharedFolder() {

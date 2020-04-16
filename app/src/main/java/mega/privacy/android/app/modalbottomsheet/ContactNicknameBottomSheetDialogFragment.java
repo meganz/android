@@ -1,33 +1,16 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 
 import static mega.privacy.android.app.utils.Constants.*;
 
-public class ContactNicknameBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
-
-    private final static int MAX_HEIGHT = 48;
-    public LinearLayout mainLinearLayout;
-    public TextView titleText;
-    public LinearLayout optionEditNickname;
-    public LinearLayout optionRemoveNickname;
-    protected Context context;
-    private DisplayMetrics outMetrics;
-    private BottomSheetBehavior mBehavior;
-    private LinearLayout items_layout;
-    private int heightDisplay;
+public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
     private String nickname;
     private ContactInfoActivityLollipop contactInfoActivityLollipop = null;
 
@@ -45,49 +28,34 @@ public class ContactNicknameBottomSheetDialogFragment extends BottomSheetDialogF
 
     @Override
     public void onClick(View v) {
-        if(contactInfoActivityLollipop == null) return;
+        if (contactInfoActivityLollipop == null) return;
         switch (v.getId()) {
-            case R.id.edit_nickname_layout: {
+            case R.id.edit_nickname_layout:
                 contactInfoActivityLollipop.showConfirmationSetNickname(nickname);
                 break;
-            }
-            case R.id.remove_nickname_layout: {
+
+            case R.id.remove_nickname_layout:
                 contactInfoActivityLollipop.addNickname(null, null);
                 break;
-            }
         }
-        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-        mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+        setStateBottomSheetBehaviorHidden();
     }
 
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(final Dialog dialog, int style) {
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-        heightDisplay = outMetrics.heightPixels;
-
         super.setupDialog(dialog, style);
 
-        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_nickname, null);
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_nickname, null);
         mainLinearLayout = contentView.findViewById(R.id.nickname_bottom_sheet);
         items_layout = contentView.findViewById(R.id.items_layout);
-        titleText = contentView.findViewById(R.id.nickname_title_text);
-        optionEditNickname = contentView.findViewById(R.id.edit_nickname_layout);
-        optionRemoveNickname = contentView.findViewById(R.id.remove_nickname_layout);
-        optionEditNickname.setOnClickListener(this);
-        optionRemoveNickname.setOnClickListener(this);
+        contentView.findViewById(R.id.edit_nickname_layout).setOnClickListener(this);
+        contentView.findViewById(R.id.remove_nickname_layout).setOnClickListener(this);
         dialog.setContentView(contentView);
-        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, getContext(), MAX_HEIGHT));
-        mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-    }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false);
     }
 
     @Override

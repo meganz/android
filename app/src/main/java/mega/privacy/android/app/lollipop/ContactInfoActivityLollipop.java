@@ -83,7 +83,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
-import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import nz.mega.sdk.MegaApiAndroid;
@@ -231,7 +231,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     long parentHandle;
 	private String nickname;
 
-	private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
+	private ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment;
 	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
 
 	private AskForDisplayOverDialog askForDisplayOverDialog;
@@ -1905,7 +1905,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
 		selectedNode = node;
-		bottomSheetDialogFragment = new ContactInfoBottomSheetDialogFragment();
+		bottomSheetDialogFragment = new ContactFileListBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
     

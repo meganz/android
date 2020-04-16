@@ -1,7 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -24,9 +23,12 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
-    private static final int HEIGHT_HEADER = 81;
+    private static final int HEIGHT_CHILD = 50;
+    static final int HEIGHT_HEADER_LARGE = 81;
+    static final int HEIGHT_HEADER_LOW = 48;
 
     protected Context context;
     protected MegaApiAndroid megaApi;
@@ -34,7 +36,8 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     protected DatabaseHandler dbH;
 
     protected DisplayMetrics outMetrics;
-    protected int heightDisplay;
+    private int halfHeightDisplay;
+    private int heightHeader;
     protected BottomSheetBehavior mBehavior;
 
     protected View contentView;
@@ -59,7 +62,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        heightDisplay = outMetrics.heightPixels;
+        halfHeightDisplay = outMetrics.heightPixels / 2;
     }
 
     @Override
@@ -68,17 +71,24 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
         this.context = context;
     }
 
-    protected void setBottomSheetBehavior(boolean addBottomSheetCallBack) {
+    void setBottomSheetBehavior(int heightHeader, boolean addBottomSheetCallBack) {
+        this.heightHeader = heightHeader;
         mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, HEIGHT_HEADER));
-        mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+        int peekHeight = getPeekHeight();
+        if (peekHeight < halfHeightDisplay) {
+            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        } else {
+            mBehavior.setPeekHeight(peekHeight);
+            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
 
         if (addBottomSheetCallBack) {
             addBottomSheetCallBack();
         }
     }
 
-    protected void setStateBottomSheetBehaviorHidden() {
+    void setStateBottomSheetBehaviorHidden() {
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
@@ -93,7 +103,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                if (isScreenInPortrait(context)) {
                     ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
                     if (getActivity() != null && getActivity().findViewById(R.id.toolbar) != null) {
                         int tBHeight = getActivity().findViewById(R.id.toolbar).getHeight();
@@ -103,7 +113,6 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
                         int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, context.getResources().getDisplayMetrics());
                         int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
 
-                        logDebug("bottomSheet.height: " + mainLinearLayout.getHeight() + " maxHeight: " + maxHeight);
                         if (mainLinearLayout.getHeight() > maxHeight) {
                             params.height = maxHeight;
                             bottomSheet.setLayoutParams(params);
@@ -114,7 +123,48 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
         });
     }
 
-    public interface CustomHeight{
-        int getHeightToPanel(BottomSheetDialogFragment dialog);
+    private int getPeekHeight() {
+        int numOptions = items_layout.getChildCount();
+        int numOptionsVisibles = 0;
+        int heightChild = px2dp(HEIGHT_CHILD, outMetrics);
+        int peekHeight = px2dp(heightHeader, outMetrics);
+
+        for (int i = 0; i < numOptions; i++) {
+            if (items_layout.getChildAt(i).getVisibility() == View.VISIBLE) {
+                numOptionsVisibles++;
+            }
+        }
+
+        if ((numOptionsVisibles <= 3 && heightHeader == HEIGHT_HEADER_LARGE) || (numOptionsVisibles <= 4 && heightHeader == HEIGHT_HEADER_LOW)) {
+            return peekHeight + (heightChild * numOptions);
+        } else {
+            for (int i = 0; i < numOptions; i++) {
+                if (items_layout.getChildAt(i).getVisibility() == View.VISIBLE && peekHeight < halfHeightDisplay) {
+                    peekHeight += heightChild;
+
+                    if (peekHeight >= halfHeightDisplay) {
+                        if (items_layout.getChildAt(i + 2) != null) {
+                            for (int j = i + 2; j < numOptions; j++) {
+                                if (items_layout.getChildAt(j).getVisibility() == View.VISIBLE) {
+                                    return peekHeight + (heightChild / 2);
+                                }
+                            }
+
+                            return peekHeight + heightChild;
+                        } else if (items_layout.getChildAt(i + 1) != null) {
+                            if (items_layout.getChildAt(i + 1).getVisibility() == View.VISIBLE) {
+                                return peekHeight + (heightChild / 2);
+                            } else {
+                                return peekHeight + heightChild;
+                            }
+                        } else {
+                            return peekHeight + heightChild;
+                        }
+                    }
+                }
+            }
+        }
+
+        return peekHeight;
     }
 }
