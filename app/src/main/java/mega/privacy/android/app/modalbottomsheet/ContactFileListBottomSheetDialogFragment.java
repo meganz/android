@@ -285,10 +285,8 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
 
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-//            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
             mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
-            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
             final ContactFileListBottomSheetDialogFragment thisclass = this;
 

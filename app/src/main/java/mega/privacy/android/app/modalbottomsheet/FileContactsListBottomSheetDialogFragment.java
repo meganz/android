@@ -183,17 +183,8 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//
-//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-//        }
-//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//        }
-
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     public void addAvatarContactPanel(MegaUser contact){

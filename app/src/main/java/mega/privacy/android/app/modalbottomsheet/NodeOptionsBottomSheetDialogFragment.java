@@ -1010,7 +1010,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
             mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
-            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
             mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                 @Override

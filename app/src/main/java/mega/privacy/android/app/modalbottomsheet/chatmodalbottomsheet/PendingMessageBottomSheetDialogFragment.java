@@ -169,16 +169,8 @@ public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFr
         dialog.setContentView(contentView);
 
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//
-//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-//        }
-//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//        }
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 48));
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     @Override

@@ -64,7 +64,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
 
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 48));
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     @Override

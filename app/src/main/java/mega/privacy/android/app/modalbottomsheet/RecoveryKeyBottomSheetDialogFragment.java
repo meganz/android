@@ -99,6 +99,6 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, getContext(), 48));
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 }

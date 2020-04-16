@@ -77,9 +77,8 @@ public class ManageChatLinkBottomSheetDialogFragment extends BottomSheetDialogFr
         dialog.setContentView(contentView);
 
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(itemsLayout, heightDisplay, context, 48));
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     @Override
