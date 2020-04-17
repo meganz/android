@@ -734,11 +734,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void setAvatarLayout() {
-        if (chat.isGroup()) return;
+        if (chat.isGroup())
+            return;
+
         setProfileAvatar(megaChatApi.getMyUserHandle());
         setProfileAvatar(chat.getPeerHandle(0));
-        myAvatarLayout.setVisibility(View.VISIBLE);
-        contactAvatarLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
