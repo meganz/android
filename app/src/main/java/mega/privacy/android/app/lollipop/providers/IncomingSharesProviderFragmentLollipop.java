@@ -266,7 +266,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				setNodes(nodes);
 				parentHandle = -1;
 				adapter.setParentHandle(-1);
-				changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
+				changeActionBarTitle(getString(R.string.file_provider_title).toUpperCase());
 				if (context instanceof FileProviderActivity){
 					((FileProviderActivity)context).setParentHandle(parentHandle);
 					logDebug("PArentHandle change to: " + parentHandle);
@@ -298,7 +298,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			}			
 		}
 
-		changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
+		changeActionBarTitle(getString(R.string.file_provider_title).toUpperCase());
 	}
 
 	@Override
@@ -400,7 +400,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				((FileProviderActivity)context).setIncParentHandle(parentHandle);
 				logDebug("The parent handle change to: " + parentHandle);
 			}
-			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
+			changeActionBarTitle(getString(R.string.file_provider_title).toUpperCase());
 			findNodes();
 			
 			setNodes(nodes);
