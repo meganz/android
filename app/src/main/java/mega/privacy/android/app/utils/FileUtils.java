@@ -59,7 +59,6 @@ public class FileUtils {
     private static final String VOLUME_EXTERNAL = "external";
     private static final String VOLUME_INTERNAL = "internal";
 
-
     public static String getRecoveryKeyFileName() {
         return MegaApplication.getInstance().getApplicationContext().getString(R.string.general_rk) + ".txt";
     }

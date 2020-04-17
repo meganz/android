@@ -1458,6 +1458,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         megaChatApi.removeChatLink(idChat, this);
     }
 
+    /**
+     * Requests to load for first time chat messages.
+     * It controls if it is the real first time, or the device was rotated with the "isTurn" flag.
+     */
     public void loadHistory() {
         long unreadCount = chatRoom.getUnreadCount();
         lastSeenReceived = unreadCount == 0;
@@ -1731,33 +1735,48 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
+    /**
+     * Gets a participant's name to show.
+     * It depends on the availability of the participant's attributes.
+     * It would be set following this order: nickname -> first name -> last name -> email
+     *
+     * @param handle    participant's identifier
+     * @return The participant's name to show.
+     */
     private String getParticipantName(long handle) {
-        String participant;
+        String participant = "";
+
         //Check nickname
         String nickname = getNicknameContact(handle);
         if (nickname != null) {
             participant = nickname;
-        } else {
-            String participantName = chatRoom.getPeerFirstnameByHandle(handle);
-            if (isTextEmpty(participantName)) {
-                //Get the lastname
-                String participantLastName = chatRoom.getPeerLastnameByHandle(handle);
-                if (isTextEmpty(participantLastName)) {
-                    //Get the email
-                    participant = chatRoom.getPeerEmailByHandle(handle);
-                } else {
-                    //Append last name to the title
-                    participant = participantLastName;
-                }
-            } else {
-                //Append first name to the title
-                participant = participantName;
-            }
+        }
+
+        if (isTextEmpty(participant)) {
+            //Get the firstname
+            participant = chatRoom.getPeerFirstnameByHandle(handle);
+        }
+
+        if (isTextEmpty(participant)) {
+            //Get the lastname
+            participant = chatRoom.getPeerLastnameByHandle(handle);
+        }
+
+        if (isTextEmpty(participant)) {
+            //Get the email
+            participant = chatRoom.getPeerEmailByHandle(handle);
         }
 
         return participant;
     }
 
+    /**
+     * When the group chat has a custom title, the subtitle has to contain the participants' names.
+     * It sets the custom subtitle. The subtitle would contain the participant's names following these rules:
+     * - If the group has four or less participants: all their names.
+     * - If the group has more than four participants: the names of the three first participants and X more,
+     *      which "X" is the number of the rest of participants
+     */
     private void setCustomSubtitle() {
         logDebug("setCustomSubtitle");
 
@@ -1797,18 +1816,41 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
+    /**
+     * Checks if there are more participants in the group chat after the current position.
+     *
+     * @param position  position to check
+     * @return  True if there are more participants after the current position, false otherwise.
+     */
     private boolean areMoreParticipants(long position) {
         return chatRoom.getPeerCount() > position + 1;
     }
 
+    /**
+     * Checks if there only four participants in the group chat.
+     *
+     * @param position  position to check
+     * @return  True if there are four participants, false otherwise.
+     */
     private boolean areSameParticipantsAsMaxAllowed(long position) {
         return chatRoom.getPeerCount() == MAX_NAMES_PARTICIPANTS && position == 3;
     }
 
+    /**
+     * Checks if there are more than four participants in the group chat.
+     *
+     * @param position  position to check
+     * @return True if there are more than four participants, false otherwise.
+     */
     private boolean areMoreParticipantsThanMaxAllowed(long position) {
         return chatRoom.getPeerCount() > MAX_NAMES_PARTICIPANTS && position == 2;
     }
 
+    /**
+     * Requests the attributes of the participants when they unavailable.
+     *
+     * @param participantsCount number of participants in the group chat.
+     */
     private void sendGetPeerAttributesRequest(long participantsCount) {
         MegaHandleList handleList = MegaHandleList.createInstance();
 
@@ -1825,6 +1867,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
+    /**
+     * Updates the custom subtitle when the request for load the participants' attributes finishes.
+     *
+     * @param chatId        identifier of the chat received in the request
+     * @param handleList    list of the participants' handles
+     */
     public void updateCustomSubtitle(long chatId, MegaHandleList handleList) {
         if (handleList == null || handleList.size() == 0
                 || chatId != chatRoom.getChatId() || megaChatApi.getChatRoom(chatId) == null) {
@@ -5398,6 +5446,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         getMoreHistory = false;
     }
 
+    /**
+     * Updates the loaded messages in the adapter when all the messages have been received.
+     */
     public void fullHistoryReceivedOnLoad() {
         logDebug("fullHistoryReceivedOnLoad");
 
