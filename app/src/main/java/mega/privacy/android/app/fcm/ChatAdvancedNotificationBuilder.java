@@ -29,6 +29,7 @@ import java.util.Set;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
@@ -82,6 +83,9 @@ public final class ChatAdvancedNotificationBuilder {
     private String notificationChannelNameInProgressMissedCall = NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
     private String notificationChannelIdIncomingCall = NOTIFICATION_CHANNEL_INCOMING_CALLS_ID;
     private String notificationChannelNameIncomingCall = NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME;
+
+    private MegaChatRequest request;
+    private boolean isUpdatingUserName;
 
     public static ChatAdvancedNotificationBuilder newInstance(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
         Context appContext = context.getApplicationContext();
@@ -204,6 +208,8 @@ public final class ChatAdvancedNotificationBuilder {
 
         notificationBuilder.setShowWhen(true);
 
+        setSilentNotificationIfUpdatingUserName(uriParameter, vibration);
+
         if (uriParameter != null) {
             notificationBuilder.setSound(uriParameter);
         }
@@ -236,7 +242,9 @@ public final class ChatAdvancedNotificationBuilder {
                         String title = converterShortCodes(chats.get(i).getTitle());
 
                         if (chats.get(i).isGroup()) {
-                            String nameAction = converterShortCodes(getSender(message, megaChatApi.getChatRoom(chats.get(i).getChatId())));
+                            MegaChatRoom chat = megaChatApi.getChatRoom(chats.get(i).getChatId());
+                            String nameAction = converterShortCodes(getSender(message, chat));
+
                             cs = nameAction + " @ " + title + ": " + messageContent;
                         } else {
                             cs = title + ": " + messageContent;
@@ -282,7 +290,31 @@ public final class ChatAdvancedNotificationBuilder {
             nameAction = new ChatController(context).getFirstName(lastMsgSender, chatRoom);
         }
 
+        if (isTextEmpty(nameAction)) {
+            nameAction = context.getString(R.string.unknown_name_label);
+
+            if (request != null) {
+                MegaHandleList handleList = MegaHandleList.createInstance();
+                handleList.addMegaHandle(msg.getUserHandle());
+                megaChatApi.loadUserAttributes(chatRoom.getChatId(), handleList, chatRoom.getAuthorizationToken(), new GetPeerAttributesListener(context, request));
+            }
+        }
+
         return nameAction;
+    }
+
+    /**
+     * Checks if it is updating the name of the chat notification message.
+     * If so, it silentiates the notification.
+     *
+     * @param uriParameter  Uri which contains the sound of the notification
+     * @param vibration     String which indicates if the notification should vibrate
+     */
+    private void setSilentNotificationIfUpdatingUserName(Uri uriParameter, String vibration) {
+        if (isUpdatingUserName) {
+            uriParameter = null;
+            vibration = STRING_FALSE;
+        }
     }
 
     private String getMessageContent(MegaChatMessage msg) {
@@ -451,6 +483,8 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationBuilder.setWhen(lastMsg.getTimestamp() * 1000);
             }
         }
+
+        setSilentNotificationIfUpdatingUserName(uriParameter, vibration);
 
         if (uriParameter != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1064,6 +1098,7 @@ public final class ChatAdvancedNotificationBuilder {
 
     public void generateChatNotification(MegaChatRequest request){
         logDebug("generateChatNotification");
+        this.request = request;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             newGenerateChatNotification(request);
@@ -1485,5 +1520,9 @@ public final class ChatAdvancedNotificationBuilder {
             logDebug("Notifications OFF for this chat");
             return false;
         }
+    }
+
+    public void setIsUpdatingUserName() {
+        isUpdatingUserName = true;
     }
 }

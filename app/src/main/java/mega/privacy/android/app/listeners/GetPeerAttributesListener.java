@@ -4,6 +4,8 @@ import android.content.Context;
 
 import java.util.HashMap;
 
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -25,6 +27,8 @@ public class GetPeerAttributesListener extends ChatBaseListener {
     private boolean isChatMessageRequest;
     private MegaChatLollipopAdapter.ViewHolderMessageChat holder;
     private MegaChatLollipopAdapter adapter;
+
+    private MegaChatRequest request;
 
     public GetPeerAttributesListener(Context context) {
         super(context);
@@ -58,6 +62,18 @@ public class GetPeerAttributesListener extends ChatBaseListener {
         isChatMessageRequest = true;
     }
 
+    /**
+     * Constructor used to request for participant's attributes from a chat message notification.
+     *
+     * @param context   current Context
+     * @param request   MegaChatRequest which contains the push notification to update
+     */
+    public GetPeerAttributesListener(Context context, MegaChatRequest request) {
+        super(context);
+
+        this.request = request;
+    }
+
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         if (request.getType() != MegaChatRequest.TYPE_GET_PEER_ATTRIBUTES) return;
@@ -67,7 +83,9 @@ public class GetPeerAttributesListener extends ChatBaseListener {
             long chatHandle = request.getChatHandle();
 
             if (chatHandle != INVALID_HANDLE && handleList != null) {
-                if (context instanceof GroupChatInfoActivityLollipop) {
+                if (this.request != null) {
+                   updateNotificationName();
+                } else if (context instanceof GroupChatInfoActivityLollipop) {
                     ((GroupChatInfoActivityLollipop) context).updateParticipants(chatHandle, participantRequests, handleList);
                 } else if (context instanceof ChatActivityLollipop) {
                     if (isChatMessageRequest) {
@@ -101,5 +119,14 @@ public class GetPeerAttributesListener extends ChatBaseListener {
         adapter.setChatRoom(chat);
         new ChatController(context).setNonContactAttributesInDB(chat, peerHandle);
         adapter.notifyItemChanged(holder.getAdapterPosition());
+    }
+
+    /**
+     * Updates a notification with the user's attributes reveived in the request.
+     */
+    private void updateNotificationName() {
+        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(context, MegaApplication.getInstance().getMegaApi(), MegaApplication.getInstance().getMegaChatApi());
+        notificationBuilder.setIsUpdatingUserName();
+        notificationBuilder.generateChatNotification(request);
     }
 }
