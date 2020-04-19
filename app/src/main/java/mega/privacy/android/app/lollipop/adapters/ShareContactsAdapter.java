@@ -141,7 +141,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
             }
         }
 
-        holder.avatar.setImageBitmap(getAvatarShareContact(context, megaApi, contact));
+        holder.avatar.setImageBitmap(getAvatarShareContact(context, contact));
     }
 
     @Override

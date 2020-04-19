@@ -23,6 +23,7 @@ import java.util.Map;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.FileUtils.isBasedOnFileStorage;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SDCardOperator {
@@ -170,7 +171,7 @@ public class SDCardOperator {
 
     private static Intent getRequestPermissionIntent(Context context, String sdCardRoot) {
         Intent intent = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        if (isBasedOnFileStorage()) {
             StorageManager sm = context.getSystemService(StorageManager.class);
             if (sm != null) {
                 StorageVolume volume = sm.getStorageVolume(new File(sdCardRoot));
@@ -179,7 +180,7 @@ public class SDCardOperator {
                 }
             }
         }
-        //for below N, open SAF
+        //for below N or above P, open SAF
         if (intent == null) {
             intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         }

@@ -84,6 +84,46 @@
             <!-- Options -->
 
             <LinearLayout
+                android:id="@+id/option_share_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/option_share_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:tint="@color/black"
+                    android:src="@drawable/ic_social_share_white"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/option_share_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="@string/general_share"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator_share"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/divider_upgrade_account"/>
+
+            <LinearLayout
                 android:id="@+id/option_open_with_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

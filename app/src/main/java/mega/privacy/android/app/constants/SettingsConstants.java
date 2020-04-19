@@ -46,6 +46,7 @@ public class SettingsConstants {
 
     public static final String KEY_CHAT_NESTED_NOTIFICATIONS = "settings_nested_notifications_chat";
 
+    public static final String KEY_STORAGE_DOWNLOAD_CATEGORY = "download_setting";
     public static final String KEY_STORAGE_DOWNLOAD = "settings_nested_download_location";
     public static final String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
     public static final String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";
@@ -66,6 +67,7 @@ public class SettingsConstants {
     public static final String KEY_MEGA_SECONDARY_MEDIA_FOLDER = "settings_mega_secondary_media_folder";
 
     public static final String KEY_CACHE = "settings_advanced_features_cache";
+    public static final String KEY_CANCEL_ACCOUNT = "settings_advanced_features_cancel_account";
     public static final String KEY_OFFLINE = "settings_file_management_offline";
     public static final String KEY_RUBBISH = "settings_file_management_rubbish";
     public static final String KEY_FILE_VERSIONS = "settings_file_management_file_version";

@@ -351,8 +351,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		helpSendFeedback = findPreference(KEY_HELP_SEND_FEEDBACK);
 		helpSendFeedback.setOnPreferenceClickListener(this);
 
-		cancelAccount = findPreference("settings_advanced_features_cancel_account");
+		cancelAccount = findPreference(KEY_CANCEL_ACCOUNT);
 		cancelAccount.setOnPreferenceClickListener(this);
+		updateCancelAccountSetting();
 
 		aboutPrivacy = findPreference(KEY_ABOUT_PRIVACY_POLICY);
 		aboutPrivacy.setOnPreferenceClickListener(this);
@@ -829,7 +830,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
         }else{
             size = String.valueOf(Integer.parseInt(sizeInDB));
         }
-        String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label, size + getResources().getString(R.string.label_file_size_mega_byte));
+        String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label,
+				getResources().getString(R.string.label_file_size_mega_byte, size));
         cameraUploadCharging.setSummary(chargingHelper);
 
         if(savedInstanceState != null){
@@ -841,6 +843,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
                 queueSizeInput.setSelection(input.length());
             }
         }
+	}
+
+	public void updateCancelAccountSetting() {
+		if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
+			advancedFeaturesCategory.removePreference(cancelAccount);
+		}
 	}
 
 	public void setVersionsInfo(){
@@ -879,7 +887,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 	public void resetRubbishInfo() {
 		logInfo("Updating size after clean the Rubbish Bin");
-		String emptyString = "0 " + getString(R.string.label_file_size_byte);
+		String emptyString = getString(R.string.label_file_size_byte, "0");
 		rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, emptyString));
 		MegaApplication.getInstance().getMyAccountInfo().setFormattedUsedRubbish(emptyString);
 	}
@@ -1144,90 +1152,64 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
     @Override
 	public boolean onPreferenceClick(Preference preference) {
-		logDebug("onPreferenceClick");
-
 		prefs = dbH.getPreferences();
-		logDebug("KEY = " + preference.getKey());
-		if (preference.getKey().compareTo(KEY_ABOUT_SDK_VERSION) == 0){
-			logDebug("KEY_ABOUT_SDK_VERSION pressed");
+		logDebug("KEY pressed: " + preference.getKey());
+		if (preference.getKey().compareTo(KEY_ABOUT_SDK_VERSION) == 0) {
 			numberOfClicksSDK++;
-			if (numberOfClicksSDK == 5){
+			if (numberOfClicksSDK == 5) {
 				MegaAttributes attrs = dbH.getAttributes();
-				if (attrs.getFileLoggerSDK() != null){
-					try {
-						if (Boolean.parseBoolean(attrs.getFileLoggerSDK()) == false) {
-							((ManagerActivityLollipop)context).showConfirmationEnableLogsSDK();
-						}
-						else{
-							dbH.setFileLoggerSDK(false);
-							setFileLoggerSDK(false);
-							numberOfClicksSDK = 0;
-							MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-                            ((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
-						}
+				if (attrs != null && attrs.getFileLoggerSDK() != null) {
+					if (Boolean.parseBoolean(attrs.getFileLoggerSDK())) {
+						numberOfClicksSDK = 0;
+						setStatusLoggerSDK(context, false);
+					} else {
+						((ManagerActivityLollipop) context).showConfirmationEnableLogsSDK();
 					}
-					catch(Exception e){
-						((ManagerActivityLollipop)context).showConfirmationEnableLogsSDK();
-					}
-				}
-				else{
-					((ManagerActivityLollipop)context).showConfirmationEnableLogsSDK();
+				} else {
+					logWarning("SDK file logger attribute is NULL");
+					((ManagerActivityLollipop) context).showConfirmationEnableLogsSDK();
 				}
 			}
-		}
-		else{
+		} else {
 			numberOfClicksSDK = 0;
 		}
 
-		if (preference.getKey().compareTo(KEY_ABOUT_KARERE_VERSION) == 0){
-			logDebug("KEY_ABOUT_KARERE_VERSION pressed");
+		if (preference.getKey().compareTo(KEY_ABOUT_KARERE_VERSION) == 0) {
 			numberOfClicksKarere++;
-			if (numberOfClicksKarere == 5){
+			if (numberOfClicksKarere == 5) {
 				MegaAttributes attrs = dbH.getAttributes();
-				if (attrs.getFileLoggerKarere() != null){
-					try {
-						if (Boolean.parseBoolean(attrs.getFileLoggerKarere()) == false) {
-							((ManagerActivityLollipop)context).showConfirmationEnableLogsKarere();
-						}
-						else{
-							dbH.setFileLoggerKarere(false);
-							setFileLoggerKarere(false);
-							numberOfClicksKarere = 0;
-							MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
-							((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
-						}
+				if (attrs != null && attrs.getFileLoggerKarere() != null) {
+					if (Boolean.parseBoolean(attrs.getFileLoggerKarere())) {
+						numberOfClicksKarere = 0;
+						setStatusLoggerKarere(context, false);
+					} else {
+						((ManagerActivityLollipop) context).showConfirmationEnableLogsKarere();
 					}
-					catch(Exception e){
-						((ManagerActivityLollipop)context).showConfirmationEnableLogsKarere();
-					}
-				}
-				else{
-					((ManagerActivityLollipop)context).showConfirmationEnableLogsKarere();
+				} else {
+					logWarning("Karere file logger attribute is NULL");
+					((ManagerActivityLollipop) context).showConfirmationEnableLogsKarere();
 				}
 			}
-		}
-		else{
+		} else {
 			numberOfClicksKarere = 0;
 		}
 
-		if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) == 0){
+		if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) == 0) {
 			logDebug("KEY_ABOUT_APP_VERSION pressed");
 			numberOfClicksAppVersion++;
-			if (numberOfClicksAppVersion == 5){
+			if (numberOfClicksAppVersion == 5) {
 
-				if (MegaApplication.isShowInfoChatMessages() == false) {
+				if (!MegaApplication.isShowInfoChatMessages()) {
 					MegaApplication.setShowInfoChatMessages(true);
 					numberOfClicksAppVersion = 0;
-					((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is enabled", -1);
-				}
-				else{
+					((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is enabled", -1);
+				} else {
 					MegaApplication.setShowInfoChatMessages(false);
 					numberOfClicksAppVersion = 0;
-					((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is disabled", -1);
+					((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is disabled", -1);
 				}
 			}
-		}
-		else{
+		} else {
 			numberOfClicksAppVersion = 0;
 		}
 
@@ -1627,7 +1609,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			viewIntent.setData(Uri.parse("https://github.com/meganz/android"));
 			startActivity(viewIntent);
 		}
-		else if (preference.getKey().compareTo("settings_advanced_features_cancel_account") == 0){
+		else if (preference.getKey().compareTo(KEY_CANCEL_ACCOUNT) == 0){
 			logDebug("Cancel account preference");
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
@@ -2502,7 +2484,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
         queueSizeInput.setSingleLine();
         queueSizeInput.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-        queueSizeInput.setHint(getString(R.string.label_file_size_mega_byte));
+        queueSizeInput.setHint(getString(R.string.label_mega_byte));
         queueSizeInput.setImeOptions(EditorInfo.IME_ACTION_DONE);
         queueSizeInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -2531,8 +2513,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
         params.setMargins(px2dp(margin+5, outMetrics), px2dp(0, outMetrics), px2dp(margin, outMetrics), 0);
         final TextView text = new TextView(context);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
-        String MB = getString(R.string.label_file_size_mega_byte);
-        text.setText(getString(R.string.settings_compression_queue_subtitle, COMPRESSION_QUEUE_SIZE_MIN + MB, COMPRESSION_QUEUE_SIZE_MAX + MB));
+        text.setText(getString(R.string.settings_compression_queue_subtitle,
+				getString(R.string.label_file_size_mega_byte, String.valueOf(COMPRESSION_QUEUE_SIZE_MIN)),
+				getString(R.string.label_file_size_mega_byte, String.valueOf(COMPRESSION_QUEUE_SIZE_MAX))));
         layout.addView(text,params);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -2565,8 +2548,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
             int size = Integer.parseInt(value);
             if(isQueueSizeValid(size)){
                 compressionQueueSizeDialog.dismiss();
-                cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.label_file_size_mega_byte));
-                String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label, size + getResources().getString(R.string.label_file_size_mega_byte));
+                cameraUploadVideoQueueSize.setSummary(getResources().getString(R.string.label_file_size_mega_byte, String.valueOf(size)));
+                String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label,
+						getResources().getString(R.string.label_file_size_mega_byte, String.valueOf(size)));
                 cameraUploadCharging.setSummary(chargingHelper);
                 dbH.setChargingOnSize(size);
                 prefs.setChargingOnSize(size + "");
@@ -2622,7 +2606,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
 		dbH.setConversionOnCharging(true);
 		dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
-		String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label, DEFAULT_CONVENTION_QUEUE_SIZE + getResources().getString(R.string.label_file_size_mega_byte));
+		String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label,
+				getResources().getString(R.string.label_file_size_mega_byte, String.valueOf(DEFAULT_CONVENTION_QUEUE_SIZE)));
 		cameraUploadCharging.setSummary(chargingHelper);
 	}
 
@@ -2673,7 +2658,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		} else {
 			size = Integer.parseInt(sizeInDB);
 		}
-		cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.label_file_size_mega_byte));
+		cameraUploadVideoQueueSize.setSummary(getResources().getString(R.string.label_file_size_mega_byte, String.valueOf(size)));
 	}
 
     private void enableVideoCompressionSizeSettingsAndRestartUpload(){

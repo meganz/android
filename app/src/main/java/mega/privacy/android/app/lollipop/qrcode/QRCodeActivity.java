@@ -42,13 +42,12 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-
-import static mega.privacy.android.app.lollipop.InviteContactActivity.INVITE_CONTACT_SCAN_QR;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class QRCodeActivity extends PinActivityLollipop implements MegaRequestListenerInterface{
 
@@ -78,7 +77,6 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     MegaApiAndroid megaApi;
 
-    private boolean contacts = false;
     private boolean inviteContacts = false;
     private boolean showScanQrView = false;
 
@@ -92,14 +90,12 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         logDebug("onCreate");
 
         if (savedInstanceState != null) {
-            contacts = savedInstanceState.getBoolean("contacts", false);
+            showScanQrView = savedInstanceState.getBoolean(OPEN_SCAN_QR, false);
             inviteContacts = savedInstanceState.getBoolean("inviteContacts", false);
-            showScanQrView = savedInstanceState.getBoolean(INVITE_CONTACT_SCAN_QR, false);
         }
         else {
-            contacts = getIntent().getBooleanExtra("contacts", false);
+            showScanQrView = getIntent().getBooleanExtra(OPEN_SCAN_QR, false);
             inviteContacts = getIntent().getBooleanExtra("inviteContacts", false);
-            showScanQrView = getIntent().getBooleanExtra(INVITE_CONTACT_SCAN_QR, false);
         }
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -123,7 +119,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         aB = getSupportActionBar();
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
-        tB.setTitle(getString(R.string.section_qr_code));
+        tB.setTitle(getString(R.string.section_qr_code).toUpperCase());
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -137,6 +133,8 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         }else {
             initActivity();
         }
+
+        changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
     }
 
     @Override
@@ -184,7 +182,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
         viewPagerQRCode.setAdapter(qrCodePageAdapter);
         tabLayoutQRCode.setupWithViewPager(viewPagerQRCode);
-        if (contacts || inviteContacts || showScanQrView){
+        if (showScanQrView || inviteContacts){
             viewPagerQRCode.setCurrentItem(1);
         }
         else {
@@ -195,9 +193,8 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("contacts", contacts);
+        outState.putBoolean(OPEN_SCAN_QR, showScanQrView);
         outState.putBoolean("inviteContacts", inviteContacts);
-        outState.putBoolean(INVITE_CONTACT_SCAN_QR, showScanQrView);
     }
 
     @Override
@@ -208,6 +205,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         inflater.inflate(R.menu.activity_qr_code, menu);
 
         shareMenuItem = menu.findItem(R.id.qr_code_share);
+        shareMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_social_share_white, R.color.black));
         saveMenuItem = menu.findItem(R.id.qr_code_save);
         settingsMenuItem = menu.findItem(R.id.qr_code_settings);
         resetQRMenuItem = menu.findItem(R.id.qr_code_reset);

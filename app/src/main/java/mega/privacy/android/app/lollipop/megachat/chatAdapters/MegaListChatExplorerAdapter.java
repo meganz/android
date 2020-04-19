@@ -274,19 +274,17 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
     public void createGroupChatAvatar(ViewHolderChatExplorerList holder){
         logDebug("createGroupChatAvatar()");
-        int color = ContextCompat.getColor(context, R.color.divider_upgrade_account);
         String title = holder.titleText.getText().toString();
-        holder.avatarImage.setImageBitmap(getDefaultAvatar(context, color, title, AVATAR_SIZE, true));
+        holder.avatarImage.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), title, AVATAR_SIZE, true));
     }
 
     public void setUserAvatar(ViewHolderChatExplorerList holder, String userHandle){
 		/*Default Avatar*/
-        int color= getColorAvatar(context, megaApi, userHandle);
         String fullName = holder.titleText.getText().toString();
         if ((fullName == null || fullName.trim().length() <= 0) && holder.email != null && holder.email.length() > 0){
             fullName = holder.email;
         }
-        holder.avatarImage.setImageBitmap(getDefaultAvatar(context, color, fullName, AVATAR_SIZE, true));
+        holder.avatarImage.setImageBitmap(getDefaultAvatar(getColorAvatar(userHandle), fullName, AVATAR_SIZE, true));
 
         /*Avatar*/
 		ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);

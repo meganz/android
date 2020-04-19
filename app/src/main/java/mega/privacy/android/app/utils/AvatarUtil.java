@@ -11,11 +11,10 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import androidx.core.content.ContextCompat;
 import com.vdurmont.emoji.EmojiParser;
-
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
-
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
@@ -24,16 +23,21 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
-
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class AvatarUtil {
 
-    /*Method to get the letter or emoji, which will be painted in the default avatar*/
+    /**
+     * Retrieve the first letter of a String.
+     *
+     * @param text String to obtain the first letter.
+     * @return The first letter of the string to be painted in the default avatar.
+     */
     public static String getFirstLetter(String text) {
         String resultUnknown = String.valueOf(UNKNOWN_USER_NAME_AVATAR.charAt(0)).toUpperCase(Locale.getDefault());
         if (text.isEmpty()) {
@@ -66,6 +70,12 @@ public class AvatarUtil {
         return resultChar;
     }
 
+    /**
+     * Retrieve if a char is recognizable.
+     *
+     * @param input_char The char to be examined.
+     * @return True if the char is recognizable. Otherwise false.
+     */
     private static boolean isRecognizableCharacter(char input_char) {
         return (input_char >= 48 && input_char <= 57) || (input_char >= 65 && input_char <= 90) || (input_char >= 97 && input_char <= 122);
     }
@@ -82,32 +92,87 @@ public class AvatarUtil {
         return null;
     }
 
-    /*Methods to obtain the color of the avatar*/
-    public static int getColorAvatar(Context context, MegaApiAndroid megaApi, MegaUser user) {
-        if(user == null)return getColorAvatar(context, null);
+    /**
+     * Retrieve the color determined for an avatar.
+     *
+     * @param user The user from whom the color of the avatar is to be obtained.
+     * @return The default avatar color.
+     */
+    public static int getColorAvatar(MegaUser user) {
+        if (user == null) {
+            return getColor(null);
+        }
 
-        return getColorAvatar(context, megaApi.getUserAvatarColor(user));
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        return getColor(megaApi.getUserAvatarColor(user));
     }
 
-    public static int getColorAvatar(Context context, MegaApiAndroid megaApi, long handle) {
-        if(handle == -1 ) return getColorAvatar(context, null);
+    /**
+     * Retrieve the color determined for an avatar.
+     *
+     * @param handle The identifier of the user from whom the color of the avatar is to be obtained.
+     * @return The default avatar color.
+     */
+    public static int getColorAvatar(long handle) {
+        if (handle == INVALID_HANDLE) {
+            return getColor(null);
+        }
 
-        return getColorAvatar(context, megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(handle)));
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        return getColor(megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(handle)));
     }
 
-    public static int getColorAvatar(Context context, MegaApiAndroid megaApi, String handle) {
-        if(handle == null ) return getColorAvatar(context, null);
+    /**
+     * Retrieve the color determined for an avatar.
+     *
+     * @param handle The identifier of the user from whom the color of the avatar is to be obtained.
+     * @return The default avatar color.
+     */
+    public static int getColorAvatar(String handle) {
+        if (handle == null) {
+            return getColor(null);
+        }
 
-        return getColorAvatar(context, megaApi.getUserAvatarColor(handle));
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        return getColor(megaApi.getUserAvatarColor(handle));
     }
 
-    private static int getColorAvatar(Context context, String color){
-        if(color == null) return ContextCompat.getColor(context, R.color.lollipop_primary_color);
+    private static int getColor(String color) {
+        if (color == null) {
+            return getSpecificAvatarColor(AVATAR_PRIMARY_COLOR);
+        }
+
         return Color.parseColor(color);
     }
 
-    /*Method to get the default avatar bitmap*/
-    public static Bitmap getDefaultAvatar(Context context, int colorAvatar, String textAvatar, int textSize, boolean isList, boolean customEmojis) {
+    /**
+     * Retrieve the color of the avatar depending on the type.
+     *
+     * @param typeColor The kind of avatar that's going to be painted.
+     * @return The color of the avatar in particular.
+     */
+    public static int getSpecificAvatarColor(String typeColor) {
+        switch (typeColor) {
+            case AVATAR_GROUP_CHAT_COLOR:
+                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.divider_upgrade_account);
+            case AVATAR_PHONE_COLOR:
+                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.color_default_avatar_phone);
+            default:
+                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.lollipop_primary_color);
+        }
+    }
+
+    /**
+     * Retrieve de default avatar.
+     *
+     * @param colorAvatar  The color of the avatar's background.
+     * @param textAvatar   The letter to be painted on the avatar.
+     * @param textSize     The size of the initial letter.
+     * @param isList       Grid or list indicator.
+     * @param customEmojis Indicator of whether or not to use mega emojis.
+     * @return Bitmap with the default avatar built in.
+     */
+    public static Bitmap getDefaultAvatar(int colorAvatar, String textAvatar, int textSize, boolean isList, boolean customEmojis) {
         Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
 
@@ -116,18 +181,18 @@ public class AvatarUtil {
         paintCircle.setColor(colorAvatar);
         paintCircle.setAntiAlias(true);
 
-        if(isList){
+        if (isList) {
             /*Shape list*/
             int radius;
             if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
                 radius = defaultAvatar.getWidth() / 2;
-            }else {
+            } else {
                 radius = defaultAvatar.getHeight() / 2;
             }
             c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, paintCircle);
-        }else{
+        } else {
             /*Shape grid*/
-            Path path = getRoundedRect(0, 0, DEFAULT_AVATAR_WIDTH_HEIGHT , DEFAULT_AVATAR_WIDTH_HEIGHT, 10, 10,true, true, false, false);
+            Path path = getRoundedRect(0, 0, DEFAULT_AVATAR_WIDTH_HEIGHT, DEFAULT_AVATAR_WIDTH_HEIGHT, 10, 10, true, true, false, false);
             c.drawPath(path, paintCircle);
         }
 
@@ -150,7 +215,7 @@ public class AvatarUtil {
 
         String firstLetter = getFirstLetter(textAvatar);
         if (customEmojis && EmojiManager.getInstance().getFirstEmoji(firstLetter) != null) {
-            Bitmap emojiBitmap = Bitmap.createScaledBitmap(EmojiManager.getInstance().getFirstEmoji(firstLetter).getBitmap(context), textSize, textSize, false);
+            Bitmap emojiBitmap = Bitmap.createScaledBitmap(EmojiManager.getInstance().getFirstEmoji(firstLetter).getBitmap(), textSize, textSize, false);
             int xPos = (c.getWidth() - emojiBitmap.getWidth()) / 2;
             int yPos = (c.getHeight() - emojiBitmap.getHeight()) / 2;
             c.drawBitmap(emojiBitmap, xPos, yPos, paintText);
@@ -164,25 +229,39 @@ public class AvatarUtil {
         return defaultAvatar;
     }
 
-    /*Method to get the default avatar bitmap with custom emojis*/
-    public static Bitmap getDefaultAvatar(Context context, int colorAvatar, String textAvatar, int textSize, boolean isList) {
-        return getDefaultAvatar(context, colorAvatar, textAvatar, textSize, isList, true);
+    /**
+     * Retrieve the default avatar bitmap with custom emojis.
+     *
+     * @param colorAvatar The color of the avatar's background.
+     * @param textAvatar  The letter to be painted on the avatar.
+     * @param textSize    The size of the initial letter.
+     * @param isList      Grid or list indicator.
+     * @return Bitmap with the default avatar built in.
+     */
+    public static Bitmap getDefaultAvatar(int colorAvatar, String textAvatar, int textSize, boolean isList) {
+        return getDefaultAvatar(colorAvatar, textAvatar, textSize, isList, true);
     }
 
-    /*Methods to get the default avatar bitmap from a Share Contact*/
-    public static Bitmap getAvatarShareContact(Context context, MegaApiAndroid megaApi, ShareContactInfo contact){
+    /**
+     * Retrieve the default avatar bitmap from Share Contact.
+     *
+     * @param context Context of the Activity.
+     * @param contact The contact from whom the avatar is to be obtained.
+     * @return Bitmap with the default avatar built in.
+     */
+    public static Bitmap getAvatarShareContact(Context context, ShareContactInfo contact) {
         String mail = ((AddContactActivityLollipop) context).getShareContactMail(contact);
         int color;
         if (contact.isPhoneContact()) {
             color = ContextCompat.getColor(context, R.color.color_default_avatar_phone);
         } else if (contact.isMegaContact()) {
-            color = getColorAvatar(context, megaApi, contact.getMegaContactAdapter().getMegaUser());
+            color = getColorAvatar(contact.getMegaContactAdapter().getMegaUser());
         } else {
-            color = getColorAvatar(context, null);
+            color = getColor(null);
         }
 
         String fullName = null;
-        if(contact.isPhoneContact()){
+        if (contact.isPhoneContact()) {
             fullName = contact.getPhoneContactInfo().getName();
         } else if (contact.isMegaContact()) {
             fullName = contact.getMegaContactAdapter().getFullName();
@@ -191,7 +270,7 @@ public class AvatarUtil {
             fullName = mail;
         }
 
-        if(contact.isPhoneContact() || contact.isMegaContact()) {
+        if (contact.isPhoneContact() || contact.isMegaContact()) {
             /*Avatar*/
             File avatar = buildAvatarFile(context, mail + ".jpg");
             Bitmap bitmap;
@@ -205,7 +284,27 @@ public class AvatarUtil {
         }
 
         /*Default Avatar*/
-        return getDefaultAvatar(context, color, fullName, AVATAR_SIZE, true);
+        return getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
     }
 
+    /**
+     * Retrieve the avatar image of a particular user.
+     *
+     * @param email The String containing the user's email.
+     * @return The bitmap with the avatar image.
+     */
+    public static Bitmap getImageAvatar(String email) {
+        File avatar = buildAvatarFile(MegaApplication.getInstance().getBaseContext(), email + ".jpg");
+        if (isFileAvailable(avatar) && avatar.length() > 0) {
+            BitmapFactory.Options bOpts = new BitmapFactory.Options();
+            Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+            if (bitmap != null) {
+                return getCircleBitmap(bitmap);
+            }
+
+            avatar.delete();
+        }
+
+        return null;
+    }
 }

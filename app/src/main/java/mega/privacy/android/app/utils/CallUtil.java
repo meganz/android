@@ -22,6 +22,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.Constants.*;
@@ -116,7 +117,9 @@ public class CallUtil {
      */
     public static void showCallLayout(Context context, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono, final TextView callInProgressText) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (callInProgressLayout == null) return;
+        if (callInProgressLayout == null){
+            return;
+        }
 
         if (!participatingInACall()) {
             callInProgressLayout.setVisibility(View.GONE);
@@ -125,7 +128,9 @@ public class CallUtil {
         }
 
         long chatId = getChatCallInProgress();
-        if (chatId == -1) return;
+        if (chatId == -1){
+            return;
+        }
 
         MegaChatCall call = megaChatApi.getChatCall(chatId);
         if (call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
@@ -133,6 +138,7 @@ public class CallUtil {
             activateChrono(false, callInProgressChrono, null);
             callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.reconnecting_bar));
             callInProgressText.setText(context.getString(R.string.reconnecting_message));
+
         } else {
             logDebug("Displayed the layout to return to the call");
             callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
@@ -144,6 +150,7 @@ public class CallUtil {
                 activateChrono(false, callInProgressChrono, null);
             }
         }
+
         callInProgressLayout.setVisibility(View.VISIBLE);
     }
 
@@ -173,16 +180,19 @@ public class CallUtil {
         return (call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS);
     }
 
-    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall callChat) {
-        if (chronometer == null) return;
+    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall call) {
+        if (chronometer == null)
+            return;
+
         if (!activateChrono) {
             chronometer.stop();
             chronometer.setVisibility(View.GONE);
             return;
         }
-        if (callChat != null) {
+
+        if (call != null) {
             chronometer.setVisibility(View.VISIBLE);
-            chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration() * 1000));
+            chronometer.setBase(SystemClock.elapsedRealtime() - (call.getDuration()* 1000));
             chronometer.start();
             chronometer.setFormat(" %s");
         }
@@ -272,6 +282,21 @@ public class CallUtil {
         }
     }
 
+    public static String sessionStatusToString(int status) {
+        switch (status) {
+            case MegaChatSession.SESSION_STATUS_INVALID:
+                return "SESSION_STATUS_INVALID";
+            case MegaChatSession.SESSION_STATUS_INITIAL:
+                return "SESSION_STATUS_INITIAL";
+            case MegaChatSession.SESSION_STATUS_IN_PROGRESS:
+                return "SESSION_STATUS_IN_PROGRESS";
+            case MegaChatSession.SESSION_STATUS_DESTROYED:
+                return "SESSION_STATUS_DESTROYED";
+            default:
+                return String.valueOf(status);
+        }
+    }
+
     public static boolean isStatusConnected(Context context, long chatId) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         return checkConnection(context) && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED && megaChatApi.getChatConnectionState(chatId) == MegaChatApi.CHAT_CONNECTION_ONLINE;
@@ -308,7 +333,18 @@ public class CallUtil {
         return chatIdCallInProgress;
     }
 
-    public static void showConfirmationOpenCamera(Activity activity, String action) {
+    /**
+     * When there is a video call in progress with the video enabled of the current account logged-in,
+     * alerts the user if they are sure they want to perform the action in which the camera is involved,
+     * since their camera will be disabled in the call.
+     *
+     * @param activity      current Activity involved
+     * @param action        the action to perform. These are the possibilities:
+     *                      ACTION_TAKE_PICTURE, TAKE_PICTURE_PROFILE_CODE, ACTION_OPEN_QR
+     * @param openScanQR    if the action is ACTION_OPEN_QR, it specifies whether to open the "Scan QR" section.
+     *                      True if it should open the "Scan QR" section, false otherwise.
+     */
+    public static void showConfirmationOpenCamera(Activity activity, String action, boolean openScanQR) {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
@@ -319,7 +355,7 @@ public class CallUtil {
                     }
                     if (activity instanceof ManagerActivityLollipop) {
                         if (action.equals(ACTION_OPEN_QR)) {
-                            ((ManagerActivityLollipop) activity).openQR();
+                            ((ManagerActivityLollipop) activity).openQR(openScanQR);
                         } else if (action.equals(ACTION_TAKE_PICTURE)) {
                             takePicture(activity, TAKE_PHOTO_CODE);
                         } else if (action.equals(ACTION_TAKE_PROFILE_PICTURE)) {

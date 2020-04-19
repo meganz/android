@@ -711,16 +711,16 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	}
 	
 	private void createDefaultAvatar(ViewHolderContacts holder, MegaContactAdapter contact){
-		int color = getColorAvatar(context, megaApi, contact.getMegaUser());
+		int color = getColorAvatar(contact.getMegaUser());
 		String fullName = contact.getFullName();
 
 		if (holder instanceof ViewHolderContactsList){
-			Bitmap bit = getDefaultAvatar(context, color, fullName, AVATAR_SIZE, true);
+			Bitmap bit = getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
 			((ViewHolderContactsList)holder).imageView.setImageBitmap(bit);
 
 		}
 		else if (holder instanceof ViewHolderContactsGrid){
-			Bitmap bit = getDefaultAvatar(context, color, fullName, AVATAR_SIZE_GRID, false);
+			Bitmap bit = getDefaultAvatar(color, fullName, AVATAR_SIZE_GRID, false);
 			((ViewHolderContactsGrid)holder).imageView.setImageBitmap(bit);
 		}
 
