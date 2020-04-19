@@ -158,7 +158,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
                 .camera(CameraPosition.fromLatLngZoom(location, DEFAULT_ZOOM))
                 .liteMode(true);
 
-        mapView = new MapView(getContext(), options);
+        mapView = new MapView(activity, options);
         mapView.onCreate(null);
         mapView.getMapAsync(googleMap -> {
             googleMap.addMarker(new MarkerOptions().position(location));
@@ -262,7 +262,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
         LatLng latLng = mMap.getCameraPosition().target;
         if (latLng == null) return;
 
-        List<Address> addresses = getAddresses(getContext(), latLng.latitude, latLng.longitude);
+        List<Address> addresses = getAddresses(activity, latLng.latitude, latLng.longitude);
         String title = getInfoTitle();
 
         if (addresses != null && addresses.size() > 0) {

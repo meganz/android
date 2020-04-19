@@ -1,6 +1,5 @@
 package mega.privacy.android.app.middlelayer.map;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 
 import mega.privacy.android.app.R;
@@ -9,7 +8,7 @@ import mega.privacy.android.app.lollipop.megachat.MapsActivity;
 
 public abstract class AbstractMapHandler implements MapHandler {
 
-    private MapsActivity activity;
+    protected MapsActivity activity;
 
     protected Bitmap fullscreenIconMarker;
 
@@ -46,10 +45,6 @@ public abstract class AbstractMapHandler implements MapHandler {
         activity.setCurrentLocationVisibility();
     }
 
-    protected Context getContext() {
-        return activity.getApplicationContext();
-    }
-
     protected void sendSnapshot(byte[] byteArray, double latitude, double longitude) {
         activity.onSnapshotReady(byteArray, latitude, longitude);
     }
@@ -80,6 +75,10 @@ public abstract class AbstractMapHandler implements MapHandler {
 
     protected void showIconShadow() {
         activity.showMarkerIconShadow();
+    }
+
+    public void hideCustomMarker() {
+        activity.hideCustomMarker();
     }
 
     protected void showMarker() {

@@ -513,6 +513,11 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
         fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
     }
 
+    public void hideCustomMarker() {
+        fullscreenMarkerIcon.setVisibility(View.INVISIBLE);
+        fullscreenMarkerIconShadow.setVisibility(View.GONE);
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         logDebug("LocationListener onLocationChanged");
