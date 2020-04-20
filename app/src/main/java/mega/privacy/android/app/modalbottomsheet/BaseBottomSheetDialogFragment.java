@@ -28,8 +28,8 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     private static final int HEIGHT_CHILD = 50;
-    static final int HEIGHT_HEADER_LARGE = 81;
-    static final int HEIGHT_HEADER_LOW = 48;
+    protected static final int HEIGHT_HEADER_LARGE = 81;
+    protected static final int HEIGHT_HEADER_LOW = 48;
 
     protected Context context;
     protected MegaApiAndroid megaApi;
@@ -78,7 +78,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
      * @param heightHeader
      * @param addBottomSheetCallBack
      */
-    void setBottomSheetBehavior(int heightHeader, boolean addBottomSheetCallBack) {
+    protected void setBottomSheetBehavior(int heightHeader, boolean addBottomSheetCallBack) {
         this.heightHeader = heightHeader;
         mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
 
@@ -98,7 +98,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     /**
      * Hides the BottomSheet.
      */
-    void setStateBottomSheetBehaviorHidden() {
+    protected void setStateBottomSheetBehaviorHidden() {
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 

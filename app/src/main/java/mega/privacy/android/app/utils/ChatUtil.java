@@ -14,10 +14,13 @@ import androidx.annotation.Nullable;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,6 +36,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -383,5 +387,42 @@ public class ChatUtil {
         fileBitmap.recycle();
 
         return outFile;
+    }
+
+    /**
+     * Sets the contact status icon
+     *
+     * @param contactId         contact's identifier
+     * @param contactStateIcon  view in which the status has to be set
+     */
+    public static void setContactStatus(long contactId, ImageView contactStateIcon) {
+        if (contactStateIcon == null) {
+            return;
+        }
+
+        int userStatus = MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(contactId);
+        contactStateIcon.setVisibility(View.VISIBLE);
+
+        switch (userStatus) {
+            case MegaChatApi.STATUS_ONLINE:
+                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_online));
+                break;
+
+            case MegaChatApi.STATUS_AWAY:
+                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_away));
+                break;
+
+            case MegaChatApi.STATUS_BUSY:
+                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_busy));
+                break;
+
+            case MegaChatApi.STATUS_OFFLINE:
+                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_offline));
+                break;
+
+            case MegaChatApi.STATUS_INVALID:
+            default:
+                contactStateIcon.setVisibility(View.GONE);
+        }
     }
 }

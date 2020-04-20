@@ -301,8 +301,6 @@ public class AvatarUtil {
             if (bitmap != null) {
                 return getCircleBitmap(bitmap);
             }
-
-            avatar.delete();
         }
 
         return null;

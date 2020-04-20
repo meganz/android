@@ -1,12 +1,8 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -15,29 +11,18 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
+public class UploadBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
-
-    private Context context;
     private UploadBottomSheetDialogActionListener listener;
-    private BottomSheetBehavior mBehavior;
-    private LinearLayout mainLinearLayout;
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(final Dialog dialog, int style) {
-
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        int heightDisplay = outMetrics.heightPixels;
-
         super.setupDialog(dialog, style);
-        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_upload, null);
 
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_upload, null);
         mainLinearLayout = contentView.findViewById(R.id.upload_bottom_sheet);
-        LinearLayout items_layout = contentView.findViewById(R.id.items_layout);
+        items_layout = contentView.findViewById(R.id.items_layout);
 
         LinearLayout optionFromDevice = contentView.findViewById(R.id.upload_from_device_layout);
         LinearLayout optionFromSystem = contentView.findViewById(R.id.upload_from_system_layout);
@@ -61,59 +46,35 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         optionCreateFolder.setOnClickListener(this);
 
         dialog.setContentView(contentView);
-        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-
-        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 48));
-        mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false);
     }
 
     @Override
     public void onClick(View v) {
-
         switch (v.getId()) {
-
-            case R.id.upload_from_device_layout: {
-                logDebug("click upload from device");
+            case R.id.upload_from_device_layout:
                 listener.uploadFromDevice();
-                dismissAllowingStateLoss();
                 break;
-            }
-            case R.id.upload_from_system_layout: {
-                logDebug("click upload from_system");
+
+            case R.id.upload_from_system_layout:
                 listener.uploadFromSystem();
                 break;
-            }
-            case R.id.scan_document_layout:{
-                break;
-            }
 
-            case R.id.take_picture_layout: {
-                logDebug("Click take picture");
+            case R.id.take_picture_layout:
                 listener.takePictureAndUpload();
                 break;
-            }
-            case R.id.new_folder_layout: {
-                logDebug("Click create new folder");
+
+            case R.id.new_folder_layout:
                 listener.showNewFolderDialog();
                 break;
-            }
         }
 
-        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-        mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.context = activity;
-        listener = (UploadBottomSheetDialogActionListener) activity;
+        setStateBottomSheetBehaviorHidden();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        this.context = context;
         listener = (UploadBottomSheetDialogActionListener) context;
     }
 }
