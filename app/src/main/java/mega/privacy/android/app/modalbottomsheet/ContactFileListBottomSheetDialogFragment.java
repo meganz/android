@@ -67,7 +67,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         }
 
         if (savedInstanceState != null) {
-            long handle = savedInstanceState.getLong("handle", -1);
+            long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
         } else if (context instanceof ContactFileListActivityLollipop) {
             node = contactFileListActivity.getSelectedNode();
@@ -139,7 +139,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             optionInfoText.setText(R.string.general_folder_info);
             nodeInfo.setText(getInfoFolder(node, context, megaApi));
 
-            if (firstLevel || parentHandle == -1) {
+            if (firstLevel || parentHandle == INVALID_HANDLE) {
                 optionLeave.setVisibility(View.VISIBLE);
 
                 switch (accessLevel) {
@@ -197,7 +197,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 optionMove.setVisibility(View.GONE);
                 optionRename.setVisibility(View.VISIBLE);
 
-                if (firstLevel || parentHandle == -1) {
+                if (firstLevel || parentHandle == INVALID_HANDLE) {
                     optionRubbish.setVisibility(View.GONE);
                 } else {
                     optionRubbish.setVisibility(View.VISIBLE);
@@ -274,7 +274,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
             case R.id.option_properties_layout:
                 Intent i = new Intent(context, FileInfoActivityLollipop.class);
-                i.putExtra("handle", node.getHandle());
+                i.putExtra(HANDLE, node.getHandle());
                 i.putExtra("from", FROM_INCOMING_SHARES);
                 boolean firstLevel = getFirstLevel();
                 i.putExtra("firstLevel", firstLevel);
@@ -330,6 +330,6 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
-        outState.putLong("handle", handle);
+        outState.putLong(HANDLE, handle);
     }
 }

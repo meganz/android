@@ -16,10 +16,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -30,7 +32,7 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            long handle = savedInstanceState.getLong("handle", -1);
+            long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
         } else if (context instanceof FolderLinkActivityLollipop) {
             node = ((FolderLinkActivityLollipop) context).getSelectedNode();
@@ -131,6 +133,6 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
-        outState.putLong("handle", handle);
+        outState.putLong(HANDLE, handle);
     }
 }

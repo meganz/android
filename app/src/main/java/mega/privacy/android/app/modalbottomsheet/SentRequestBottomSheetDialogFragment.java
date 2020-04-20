@@ -26,6 +26,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
 public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -60,7 +61,7 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         if(savedInstanceState!=null) {
             logDebug("Bundle is NOT NULL");
-            long handle = savedInstanceState.getLong("handle", -1);
+            long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             logDebug("Handle of the request: " + handle);
             request = megaApi.getContactRequestByHandle(handle);
         }
@@ -172,7 +173,6 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
         logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         long handle = request.getHandle();
-        logDebug("Handle of the request: " + handle);
-        outState.putLong("handle", handle);
+        outState.putLong(HANDLE, handle);
     }
 }

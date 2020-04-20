@@ -25,7 +25,6 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
 import android.os.Build;

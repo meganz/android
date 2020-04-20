@@ -104,7 +104,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             chatId = savedInstanceState.getLong("chatId", -1);
             messageId = savedInstanceState.getLong("messageId", -1);
             logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
-            email = savedInstanceState.getString("email");
+            email = savedInstanceState.getString(EMAIL);
             MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
             if(messageMega!=null){
                 message = new AndroidMegaChatMessage(messageMega);

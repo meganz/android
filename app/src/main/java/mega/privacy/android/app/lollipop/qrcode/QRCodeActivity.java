@@ -52,7 +52,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class QRCodeActivity extends PinActivityLollipop implements MegaRequestListenerInterface{
 
-    private static int REQUEST_DOWNLOAD_FOLDER = 1000;
     private final int MY_PERMISSIONS_REQUEST_CAMERA = 1010;
 
     private Toolbar tB;

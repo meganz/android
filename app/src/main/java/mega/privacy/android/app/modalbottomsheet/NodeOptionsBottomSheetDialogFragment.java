@@ -86,7 +86,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            long handle = savedInstanceState.getLong("handle", -1);
+            long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
             if (context instanceof ManagerActivityLollipop) {
                 drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
@@ -919,26 +919,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
         }
 
-        if (counterSave <= 0) {
-            separatorDownload.setVisibility(View.GONE);
-        } else {
-            separatorDownload.setVisibility(View.VISIBLE);
-        }
-        if (counterShares <= 0) {
-            separatorShares.setVisibility(View.GONE);
-        } else {
-            separatorShares.setVisibility(View.VISIBLE);
-        }
-        if (counterModify <= 0) {
-            separatorModify.setVisibility(View.GONE);
-        } else {
-            separatorModify.setVisibility(View.VISIBLE);
-        }
-        if (counterOpen <= 0 || counterRemove <= 0) {
-            separatorOpen.setVisibility(View.GONE);
-        } else {
-            separatorOpen.setVisibility(View.VISIBLE);
-        }
+        separatorDownload.setVisibility(counterSave <= 0 ? View.GONE : View.VISIBLE);
+        separatorShares.setVisibility(counterShares <= 0 ? View.GONE : View.VISIBLE);
+        separatorModify.setVisibility(counterModify <= 0 ? View.GONE : View.VISIBLE);
+        separatorOpen.setVisibility(counterOpen <= 0 || counterRemove <= 0 ? View.GONE : View.VISIBLE);
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
@@ -987,19 +971,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.option_properties_layout:
                 i = new Intent(context, FileInfoActivityLollipop.class);
-                i.putExtra("handle", node.getHandle());
+                i.putExtra(HANDLE, node.getHandle());
 
                 if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS) {
                     if (((ManagerActivityLollipop) context).getTabItemShares() == 0) {
                         i.putExtra("from", FROM_INCOMING_SHARES);
-                        int dBT = ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming();
-                        if (dBT <= 0) {
-                            logDebug("First LEVEL is true: " + dBT);
-                            i.putExtra("firstLevel", true);
-                        } else {
-                            logDebug("First LEVEL is false: " + dBT);
-                            i.putExtra("firstLevel", false);
-                        }
+                        i.putExtra("firstLevel", ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming() <= 0);
                     } else if (((ManagerActivityLollipop) context).getTabItemShares() == 1) {
                         i.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
                     }
@@ -1169,6 +1146,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
-        outState.putLong("handle", handle);
+        outState.putLong(HANDLE, handle);
     }
 }

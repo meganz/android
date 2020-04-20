@@ -1,24 +1,13 @@
 package mega.privacy.android.app.modalbottomsheet;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import androidx.core.content.ContextCompat;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Display;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,10 +16,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -38,9 +24,7 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
@@ -78,7 +62,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         cC = new ContactController(context);
 
         if (savedInstanceState != null) {
-            String email = savedInstanceState.getString("email");
+            String email = savedInstanceState.getString(EMAIL);
             if (email != null) {
                 MegaUser megaUser = megaApi.getContact(email);
                 String fullName = getMegaUserNameDB(megaUser);
@@ -151,28 +135,28 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         contactStateIcon.setVisibility(View.VISIBLE);
         if (megaChatApi != null) {
             int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
-            if (userStatus == MegaChatApi.STATUS_ONLINE) {
-                logDebug("This user is connected");
-                contactStateIcon.setVisibility(View.VISIBLE);
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-            } else if (userStatus == MegaChatApi.STATUS_AWAY) {
-                logDebug("This user is away");
-                contactStateIcon.setVisibility(View.VISIBLE);
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
-            } else if (userStatus == MegaChatApi.STATUS_BUSY) {
-                logDebug("This user is busy");
-                contactStateIcon.setVisibility(View.VISIBLE);
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
-            } else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
-                logDebug("This user is offline");
-                contactStateIcon.setVisibility(View.VISIBLE);
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-            } else if (userStatus == MegaChatApi.STATUS_INVALID) {
-                logWarning("INVALID status: " + userStatus);
-                contactStateIcon.setVisibility(View.GONE);
-            } else {
-                logDebug("This user status is: " + userStatus);
-                contactStateIcon.setVisibility(View.GONE);
+            contactStateIcon.setVisibility(View.VISIBLE);
+
+            switch (userStatus) {
+                case MegaChatApi.STATUS_ONLINE:
+                    contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+                    break;
+
+                case MegaChatApi.STATUS_AWAY:
+                    contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+                    break;
+
+                case MegaChatApi.STATUS_BUSY:
+                    contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+                    break;
+
+                case MegaChatApi.STATUS_OFFLINE:
+                    contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+                    break;
+
+                case MegaChatApi.STATUS_INVALID:
+                default:
+                    contactStateIcon.setVisibility(View.GONE);
             }
         }
 
@@ -246,6 +230,6 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         String email = contact.getMegaUser().getEmail();
-        outState.putString("email", email);
+        outState.putString(EMAIL, email);
     }
 }

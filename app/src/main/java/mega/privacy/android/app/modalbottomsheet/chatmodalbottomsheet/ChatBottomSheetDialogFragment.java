@@ -375,14 +375,14 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     Intent i = new Intent(context, GroupChatInfoActivityLollipop.class);
 //                i.putExtra("userEmail", selectedChatItem.getContacts().get(0).getMail());
 //                i.putExtra("userFullName", ((ManagerActivityLollipop) context).getFullNameChat());
-                    i.putExtra("handle", chat.getChatId());
+                    i.putExtra(HANDLE, chat.getChatId());
                     context.startActivity(i);
                 }
                 else{
                     Intent i = new Intent(context, ContactInfoActivityLollipop.class);
 //                i.putExtra("userEmail", selectedChatItem.getContacts().get(0).getMail());
 //                i.putExtra("userFullName", ((ManagerActivityLollipop) context).getFullNameChat());
-                    i.putExtra("handle", chat.getChatId());
+                    i.putExtra(HANDLE, chat.getChatId());
                     context.startActivity(i);
                 }
 

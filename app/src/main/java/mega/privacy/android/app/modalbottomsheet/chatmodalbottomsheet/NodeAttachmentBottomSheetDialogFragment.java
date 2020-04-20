@@ -41,6 +41,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -102,7 +103,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             chatId = savedInstanceState.getLong("chatId", -1);
             messageId = savedInstanceState.getLong("messageId", -1);
             logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
-            handle = savedInstanceState.getLong("handle", -1);
+            handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
         }
         else{
             logWarning("Bundle NULL");
@@ -421,6 +422,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
         outState.putLong("chatId", chatId);
         outState.putLong("messageId", messageId);
-        outState.putLong("handle", handle);
+        outState.putLong(HANDLE, handle);
     }
 }

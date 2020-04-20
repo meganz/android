@@ -22,6 +22,7 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
+import static android.view.View.VISIBLE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -71,6 +72,12 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
         this.context = context;
     }
 
+    /**
+     * Sets the initial state of a BottomSheet and its state.
+     *
+     * @param heightHeader
+     * @param addBottomSheetCallBack
+     */
     void setBottomSheetBehavior(int heightHeader, boolean addBottomSheetCallBack) {
         this.heightHeader = heightHeader;
         mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
@@ -88,10 +95,16 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
         }
     }
 
+    /**
+     * Hides the BottomSheet.
+     */
     void setStateBottomSheetBehaviorHidden() {
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
+    /**
+     * Sets the behaviour of a BottomSheet when its state changes.
+     */
     private void addBottomSheetCallBack() {
         mBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -123,6 +136,14 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
         });
     }
 
+    /**
+     * Gets the initial height of a BottomSheet.
+     * It depends on the number of options visibles on it
+     * and on the display height and current orientation of the used device.
+     * The maximum height will be a bit more than half of the screen.
+     *
+     * @return  The initial height of a BottomSheet
+     */
     private int getPeekHeight() {
         int numOptions = items_layout.getChildCount();
         int numOptionsVisibles = 0;
@@ -130,7 +151,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
         int peekHeight = px2dp(heightHeader, outMetrics);
 
         for (int i = 0; i < numOptions; i++) {
-            if (items_layout.getChildAt(i).getVisibility() == View.VISIBLE) {
+            if (getItemsLayoutChildAt(i).getVisibility() == VISIBLE) {
                 numOptionsVisibles++;
             }
         }
@@ -139,32 +160,46 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
             return peekHeight + (heightChild * numOptions);
         } else {
             for (int i = 0; i < numOptions; i++) {
-                if (items_layout.getChildAt(i).getVisibility() == View.VISIBLE && peekHeight < halfHeightDisplay) {
+                if (isChildVisibleAt(i) && peekHeight < halfHeightDisplay) {
                     peekHeight += heightChild;
 
                     if (peekHeight >= halfHeightDisplay) {
-                        if (items_layout.getChildAt(i + 2) != null) {
+                        if (getItemsLayoutChildAt(i + 2) != null) {
                             for (int j = i + 2; j < numOptions; j++) {
-                                if (items_layout.getChildAt(j).getVisibility() == View.VISIBLE) {
+                                if (isChildVisibleAt(j)) {
                                     return peekHeight + (heightChild / 2);
                                 }
                             }
-
-                            return peekHeight + heightChild;
-                        } else if (items_layout.getChildAt(i + 1) != null) {
-                            if (items_layout.getChildAt(i + 1).getVisibility() == View.VISIBLE) {
-                                return peekHeight + (heightChild / 2);
-                            } else {
-                                return peekHeight + heightChild;
-                            }
-                        } else {
-                            return peekHeight + heightChild;
+                        } else if (isChildVisibleAt(i + 1)) {
+                            return peekHeight + (heightChild / 2);
                         }
+
+                        return peekHeight + heightChild;
                     }
                 }
             }
         }
 
         return peekHeight;
+    }
+
+    /**
+     * Gets a child view from "items_layout".
+     *
+     * @param index the index of the child to get
+     * @return The child view
+     */
+    private View getItemsLayoutChildAt(int index) {
+        return items_layout.getChildAt(index);
+    }
+
+    /**
+     * Checks if a child view from "items_layout" exists and if it is visible.
+     *
+     * @param index the index of the child to check
+     * @return True if the child view exists and if it is visible, false otherwise
+     */
+    private boolean isChildVisibleAt(int index) {
+        return getItemsLayoutChildAt(index) != null && getItemsLayoutChildAt(index).getVisibility() == VISIBLE;
     }
 }

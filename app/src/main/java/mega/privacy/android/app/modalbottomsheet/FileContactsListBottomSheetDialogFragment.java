@@ -1,24 +1,15 @@
 package mega.privacy.android.app.modalbottomsheet;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.io.File;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -26,7 +17,6 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
@@ -61,7 +51,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            String email = savedInstanceState.getString("email");
+            String email = savedInstanceState.getString(EMAIL);
             if (email != null) {
                 contact = megaApi.getContact(email);
                 if (contact == null) {
@@ -185,7 +175,6 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         }
 
         switch (v.getId()) {
-
             case R.id.file_contact_list_option_permissions_layout:
                 if (context instanceof FileContactListActivityLollipop) {
                     ((FileContactListActivityLollipop) context).changePermissions();
@@ -216,6 +205,6 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         String email = contact.getEmail();
-        outState.putString("email", email);
+        outState.putString(EMAIL, email);
     }
 }

@@ -32,11 +32,7 @@ public class MyAccountBottomSheetDialogFragment extends BaseBottomSheetDialogFra
         optionRemovePicture.setOnClickListener(this);
         optionQRcode.setOnClickListener(this);
 
-        if (new AccountController(context).existsAvatar()) {
-            optionRemovePicture.setVisibility(View.VISIBLE);
-        } else {
-            optionRemovePicture.setVisibility(View.GONE);
-        }
+        optionRemovePicture.setVisibility(new AccountController(context).existsAvatar() ? View.VISIBLE : View.GONE);
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LOW, false);

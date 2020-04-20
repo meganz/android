@@ -21,6 +21,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -40,7 +41,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            String handle = savedInstanceState.getString("handle");
+            String handle = savedInstanceState.getString(HANDLE);
             nodeOffline = dbH.findByHandle(handle);
         } else if (context instanceof ManagerActivityLollipop) {
             nodeOffline = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
@@ -91,7 +92,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             int folders = 0;
             int files = 0;
             if (file.isDirectory()) {
-
                 File[] fList = file.listFiles();
                 if (fList != null) {
                     for (File f : fList) {
@@ -162,6 +162,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
                     ((ManagerActivityLollipop) context).showConfirmationRemoveFromOffline();
                 }
                 break;
+
             case R.id.option_open_with_layout:
                 openWith();
                 break;
@@ -176,11 +177,10 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
 
     private void openWith() {
         String type = MimeTypeList.typeForName(nodeOffline.getName()).getType();
-
         Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", file), type);
+            mediaIntent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, file), type);
         } else {
             mediaIntent.setDataAndType(Uri.fromFile(file), type);
         }
@@ -197,6 +197,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         String handle = nodeOffline.getHandle();
-        outState.putString("handle", handle);
+        outState.putString(HANDLE, handle);
     }
 }

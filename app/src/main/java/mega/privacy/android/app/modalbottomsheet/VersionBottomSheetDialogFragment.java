@@ -29,9 +29,11 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.*;
 
 public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -71,7 +73,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
         if(savedInstanceState!=null) {
             logDebug("Bundle is NOT NULL");
-            long handle = savedInstanceState.getLong("handle", -1);
+            long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             logDebug("Handle of the node: " + handle);
             node = megaApi.getNodeByHandle(handle);
         }
@@ -261,10 +263,8 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
-        logDebug("Handle of the node: " + handle);
-        outState.putLong("handle", handle);
+        outState.putLong(HANDLE, handle);
     }
 }

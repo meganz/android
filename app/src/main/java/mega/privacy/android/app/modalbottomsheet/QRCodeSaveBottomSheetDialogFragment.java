@@ -3,46 +3,32 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
-import android.os.Bundle;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.io.File;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    private static int REQUEST_DOWNLOAD_FOLDER = 1000;
-
     @Override
     public void onClick(View v) {
-        logDebug("onClick");
         switch (v.getId()) {
             case R.id.qr_code_saveTo_cloud_layout:
-                logDebug("Option save to Cloud Drive");
                 saveToCloudDrive();
                 break;
 
             case R.id.qr_code_saveTo_fileSystem_layout:
-                logDebug("Option save to File System");
                 saveToFileSystem();
                 break;
         }
