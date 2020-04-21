@@ -818,7 +818,6 @@ public final class ChatAdvancedNotificationBuilder {
             NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(R.drawable.ic_call_filled, context.getString(R.string.answer_call_incoming).toUpperCase(), pendingIntentAnswer).build();
             NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(R.drawable.ic_remove_not, context.getString(R.string.ignore_call_incoming).toUpperCase(), pendingIntentIgnore).build();
 
-
             long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
 
 
@@ -846,6 +845,7 @@ public final class ChatAdvancedNotificationBuilder {
                         .setVibrate(pattern)
                         .addAction(actionAnswer)
                         .addAction(actionIgnore)
+                        .setDeleteIntent(pendingIntentIgnore)
                         .setColor(ContextCompat.getColor(context, R.color.mega))
                         .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
@@ -875,7 +875,8 @@ public final class ChatAdvancedNotificationBuilder {
                         .setAutoCancel(false)
                         .setContentIntent(null)
                         .addAction(actionAnswer)
-                        .addAction(actionIgnore);
+                        .addAction(actionIgnore)
+                        .setDeleteIntent(pendingIntentIgnore);
 
                 if(chatToAnswer.isGroup()){
                     notificationBuilder.setContentTitle(chatToAnswer.getTitle());
