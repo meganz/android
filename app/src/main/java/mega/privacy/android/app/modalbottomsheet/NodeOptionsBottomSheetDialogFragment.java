@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
@@ -27,6 +26,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -89,12 +89,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
             if (context instanceof ManagerActivityLollipop) {
-                drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                drawerItem = ManagerActivityLollipop.getDrawerItem();
             }
         } else {
             if (context instanceof ManagerActivityLollipop) {
                 node = ((ManagerActivityLollipop) context).getSelectedNode();
-                drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                drawerItem = ManagerActivityLollipop.getDrawerItem();
             }
         }
 
@@ -1062,7 +1062,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_open_with_layout:
-                UtilsModalBottomSheet.openWith(megaApi, context, node);
+                openWith(node);
                 break;
 
             case R.id.option_restore_layout:
