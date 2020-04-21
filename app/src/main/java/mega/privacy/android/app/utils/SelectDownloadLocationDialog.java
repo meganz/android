@@ -3,7 +3,6 @@ package mega.privacy.android.app.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.support.v7.app.AlertDialog;
 
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ import mega.privacy.android.app.utils.download.DownloadInfo;
 import mega.privacy.android.app.utils.download.DownloadLinkInfo;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.FileUtils.isBasedOnFileStorage;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SelectDownloadLocationDialog {
@@ -199,7 +199,7 @@ public class SelectDownloadLocationDialog {
                                     break;
                             }
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            if (isBasedOnFileStorage()) {
                                 try {
                                     sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                                     selectLocalFolder(sdCardRoot);
