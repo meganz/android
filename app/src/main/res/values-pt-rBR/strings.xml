@@ -347,22 +347,22 @@
 
     <plurals name="download_began">
         <item context="Message when a download starts. Singular 1 file" quantity="one">Download iniciado</item>
-        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have started</item>
+        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads foram iniciados</item>
     </plurals>
 
     <plurals name="download_finish">
-        <item context="Message when a download finishes. Singular 1 file" quantity="one">Download has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have finished</item>
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">O download foi concluído</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads foram concluídos</item>
     </plurals>
 
     <plurals name="upload_began">
         <item context="Message when a upload starts. Singular 1 file" quantity="one">Envio iniciado</item>
-        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have started</item>
+        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads foram iniciados</item>
     </plurals>
 
     <plurals name="upload_finish">
-        <item context="Message when a download finishes. Singular 1 file" quantity="one">Upload has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have finished</item>
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">O upload foi concluído</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads foram concluídos</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -532,9 +532,9 @@
     -->
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Obrigado pelo seu comentário! Tem a certeza de que deseja cancelar a sua assinatura MEGA?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">A sua assinatura não foi cancelada. Por favor, indique um motivo para o cancelamento.</string>
-    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Thank you for subscribing to %1$s %2$s!</string>
-    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
-    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
+    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Obrigado por assinar o plano %1$s %2$s!</string>
+    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">A sua nova assinatura entrará em vigor assim que o seu plano atual expirar, quando também será cobrado o pagamento correspondente ao novo plano.</string>
+    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">A sua assinatura entrará em vigor assim que o pagamento for processado pelo Google.</string>
     <string name="subscription_type_monthly" context="">Mensal</string>
     <string name="subscription_type_yearly" context="">Anual</string>
 
@@ -673,8 +673,8 @@
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Tirar foto</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Permitir notificações de chamadas entrantes no MEGA</string>
-    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
-    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually grant permissions from your device’s settings.</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">O MEGA precisa de sua autorização para permitir que a interface de chamada apareça em segundo plano.</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Não se preocupe, você ainda pode conceder manualmente as permissões nas configurações do seu dispositivo.</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Somente Wi-Fi</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi ou dados móveis</string>
@@ -790,7 +790,7 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Não definido</string>
-    <string name="settings_reset_lock_code" context="settings of the pin lock">Resetar o código PIN</string>
+    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">Alterar o PIN</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">Bloqueio com PIN</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Enviar</string>
@@ -964,10 +964,10 @@
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">Você precisa estar logado para realizar esta ação.</string>
     <string name="change_email_not_logged_in" context="Error message when a user attempts to change their email without an active login session.">Você precisa estar logado para completar a sua mudança de email. Por favor, faça login novamente com o seu endereço de email atual e, em seguida, clique novamente no link de confirmação.</string>
-    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">Congratulations, your new email address for this MEGA account is: %1$s</string>
+    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">Parabéns, o novo email desta conta no MEGA é %1$s</string>
     <string name="invalid_string" context="Error when the user leaves empty the password field">Incorreto</string>
 
-    <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">Invalid input</string>
+    <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">Entrada inválida</string>
     <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Endereço de email inválido</string>
     <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Por favor, confirme o endereço de email e tente novamente.</string>
     <!--
@@ -1074,7 +1074,7 @@
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Esta conta ainda não foi confirmada. Por favor, verifique o seu email.</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn’t exist">O link da pasta não está disponível</string>
-    <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">O link desta pasta foi eliminado por uma infração dos nossos Termos de serviço.</string>
+    <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">O link desta pasta foi eliminado por infringir os nossos Termos de serviço.</string>
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn’t exist">Link de arquivo indisponível</string>
     <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">Este link foi removido por infringir os nossos Termos de serviço.</string>
@@ -1369,7 +1369,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]de %2$s[/A]</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Você quer eliminar da seção Offline?</string>
+    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Você quer eliminar da seção Offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Definir status</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Fechar</string>
@@ -1454,8 +1454,8 @@
     </plurals>
 
     <plurals name="upload_service_paused_notification">
-        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">Uploading %1$d of %2$d file (paused)</item>
-        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Uploading %1$d of %2$d files (paused)</item>
+        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">Fazendo o upload de %1$d de %2$d arquivo (pausado)</item>
+        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Fazendo o upload de %1$d de %2$d arquivos (pausado)</item>
     </plurals>
 
 	<plurals name="folder_upload_service_notification">
@@ -1464,8 +1464,8 @@
 	</plurals>
 
     <plurals name="folder_upload_service_paused_notification">
-        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder (paused)</item>
-        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders (paused)</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Fazendo o upload de %1$d de %2$d pasta (pausado)</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Fazendo o upload de %1$d de %2$d pastas (pausado)</item>
     </plurals>
 
     <plurals name="upload_service_final_notification">
@@ -1516,8 +1516,8 @@
     </plurals>
 
     <plurals name="download_service_paused_notification">
-        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">Downloading %1$d of %2$d file (paused)</item>
-        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Downloading %1$d of %2$d files (paused)</item>
+        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">Fazendo o download de %1$d de %2$d arquivo (pausado)</item>
+        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Fazendo o download de %1$d de %2$d arquivos (pausado)</item>
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Cota de transferência insuficiente</string>
@@ -1763,7 +1763,7 @@
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Opções avançadas</string>
     <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">O MEGA precisa de sua permissão para fazer o download de arquivos</string>
-    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">O cartão SD já não está disponível. Por favor, escolha um novo destino de download.</string>
     <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Escolher o destino do download</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">Sem permissão para acessar os contatos</string>
@@ -1954,7 +1954,7 @@
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">Novas mensagens</string>
 
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">Chamada recebida</string>
-    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Acessar a chamada</string>
     <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">Os pop-ups do MEGA em segundo plano estão desativados.\nToque para alterar as configurações.</string>
 
     <plurals name="number_unread_messages">
@@ -2252,7 +2252,7 @@
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">A rotação de chaves é um pouco mais segura, mas não permite criar um link do chat, e os novos participantes não verão as mensagens anteriores.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] criou um link para o chat.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] deletou o link do chat.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] eliminou o link do chat.[/B]</string>
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">Deletar o link do chat</string>
 
@@ -2327,8 +2327,8 @@
     <string name="dispute_takendown_file" context="option to dispute taken down file or folder">Disputar remoção</string>
     <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">Não acessível por infringir os termos de serviço</string>
     <plurals name="alert_taken_down_files">
-        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">%d file was not downloaded due to ToS/AUP violation.</item>
-        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">%d files were not downloaded due to ToS/AUP violation.</item>
+        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">Não foi feito o download de %d arquivo por infringir os nossos Termos de serviço.</item>
+        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">Não foi feito o download de %d arquivos por infringirem os nossos Termos de serviço.</item>
     </plurals>
 
     <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]O seu arquivo compartilhado publicamente [/A] [B]%s[/B][C] foi restaurado.[/C]</string>
@@ -2353,8 +2353,8 @@
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Escolha um método de pagamento</string>
 
     <string name="billing_period_title" context="title of billing period">Ciclo de faturamento</string>
-    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
-    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]One-off (year)[/A] %s</string>
+    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Pagamento único (mensal)[/A] %s</string>
+    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]Pagamento único (anual)[/A] %s</string>
     <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]Mensal[/A] %s/mês</string>
     <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Anual[/A] %s/ano</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">Cancelar</string>
@@ -2366,7 +2366,7 @@
     <string name="payment_method_centili" context="one of the payment methods">[A]Operadora móvel[/A] (pagamento único)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NOVAS</string>
-    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">To upgrade from you current subscription, please contact support for a [A]custom plan[/A].</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Para fazer o upgrade do seu plano atual, entre em contato com a nossa equipe de suporte e solicite um [A]plano personalizado[/A].</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">nome do arquivo</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Mostrar o último acesso&#8230;</string>
@@ -2418,7 +2418,7 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Link do chat copiado para a área de transferência</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]A partir de[/A] %s [A]por mês[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user / [A]month[/A] *</string>
+    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]A partir de[/A] %s por usuário/[A]mês[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* A assinatura pode ser cancelada em qualquer momento antes da data de renovação.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Chamada iniciada</string>
 
@@ -2434,16 +2434,16 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Ativar câmera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permita o acesso à sua câmera para escanear documentos, tirar fotos e fazer videochamadas.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Ativar chamadas</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Permitir acesso aos seus contatos</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
-    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Permitir o acesso ao seu catálogo de endereços</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Descubra facilmente quais são os contatos do seu catálogo de endereços que já estão no MEGA.</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">O MEGA não utilizará esses dados com nenhum outro propósito, e nunca irá interagir com os seus contatos sem o seu consentimento.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permitir acesso ao seu microfone para fazer chamadas criptografadas.</string>
     <string name="general_enable_access" context="General enable access">Permitir acesso</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Arquivos compartilhados</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Anexo já enviado</string>
 
-    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]Group call ended[/A][C]. Duration: [/C]</string>
+    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]Chamada em grupo finalizada[/A][C]. Duração: [/C]</string>
     <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]Chamada finalizada[/A][C]. Duração:[/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s hora[/B]</item>
@@ -2457,8 +2457,8 @@
         <item context="Message that shows the seconds of a call when it ends, one second" quantity="one">[B]%1$d segundo[/B]</item>
         <item context="Message that shows the seconds of a call when it ends, more seconds" quantity="other">[B]%1$d segundos[/B]</item>
     </plurals>
-    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]Call ended[/A]</string>
-    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]Group call ended[/A]</string>
+    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]Chamada finalizada[/A]</string>
+    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]Chamada em grupo finalizada[/A]</string>
 
     <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]Último acesso [/A]hoje às %1$s</string>
     <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user">[A]Último acesso [/A]há muito tempo atrás</string>
@@ -2493,8 +2493,8 @@
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
-    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions in your device’s settings</string>
-    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
+    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">Você ainda pode conceder as permissões ao MEGA nas configurações do seu dispositivo.</string>
+    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">Se você permitir que o MEGA acesse o seu catálogo de endereços, poderá descobrir os seus contatos mais facilmente. O MEGA não utilizará esses dados para nenhum outro propósito e nunca irá interagir com os seus contatos sem o seu consentimento.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
         <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">Mensagem encaminhada</item>
@@ -2525,7 +2525,7 @@
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Convidar um contato?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Veja quem já está no MEGA</string>
-    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
+    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Permita que o MEGA acesse o seu catálogo de endereços para descobrir quais dos seus contatos já estão no MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Carregando contatos no MEGA&#8230;</string>
 
 
@@ -2675,29 +2675,30 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Carregando</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Por favor, aguarde&#8230;</string>
 
-    <string name="account_label" context="Head label to show the business account type">Account type</string>
+    <string name="account_label" context="Head label to show the business account type">Tipo de conta</string>
     <string name="business_label" context="Label in My Account section to show user account type">Business</string>
-    <string name="admin_label" context="Business user role">Admin</string>
-    <string name="user_label" context="Business user role">User</string>
+    <string name="admin_label" context="Business user role">Administrador</string>
+    <string name="user_label" context="Business user role">Usuário</string>
     <string name="status_label" context="General label to show the status of something or someone">Status</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">Ativa</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">Grace</string>
-    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">Período de carência</string>
+    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">O gerenciamento de usuários somente está disponível no navegador de um computador.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Utilização</string>
-    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
+    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Informações sobre o uso do armazenamento</string>
     <string name="overall_usage_label" context="Title of overall usage section in Storage">Uso geral</string>
     <string name="transfer_label" context="Title of transfer section in Storage">Transferência</string>
 
-    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
-    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA using a desktop browser for more information.</string>
+    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">Você não pode remover a %1$s dos seus contatos, por fazer parte da sua conta Business.</string>
+    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">Não foi possível processar o seu último pagamento. Por favor, acesse o MEGA usando um navegador em um computador para obter mais informações.</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">A sua conta business expirou</string>
-    <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
+    <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">Não foi possível processar o seu pagamento. O seu acesso será somente leitura até que o problema seja corrigido usando um navegador em um computador.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">A sua conta [B]expirou[/B]. Somente é possível visualizar os seus dados.</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view the Camera Uploads in your user account</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Embora o MEGA não tenha acesso a seus dados, os administradores de sua organização podem controlar e visualizar os Uploads da câmera na sua conta de usuário.</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Algo deu errado</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Entre em contato com o administrador de sua conta comercial para solucionar o problema e ativar a sua conta.</string>
-    <string name="business_account_clarification" context="">** For genuine business purposes.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep the placeholder is to indicate if the space is refered to storage or transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]%1$s[/A] **</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Para uso corporativo legítimo.</string>
+    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Armazenamento[/A] ILIMITADO **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Cota de transferência[/A] ILIMITADA **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Quando você fizer logout, os arquivos da seção Offline serão deletados do seu dispositivo.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Quando você fizer logout, as transferências em andamento serão canceladas.</string>
@@ -2718,7 +2719,7 @@
     <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">Para desbloquear a sua conta, [A]confirme o seu email[/A] seguindo os passos indicados no email enviado pelo MEGA.</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Por que estou vendo isso?</string>
     <string name="resend_email_label" cotext="Label of a button which action is resend an email">Reenviar email</string>
-    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">Email already sent. Please wait a few minutes before trying again.</string>
+    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">O email já foi enviado. Espere alguns minutos antes de tentar novamente.</string>
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Contas bloqueadas</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">É possível que você esteja usando no MEGA a mesma senha que usa em outros serviços, e que pelo menos um desses outros serviços tenha sofrido uma filtração de dados.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">A sua senha foi comprometida, e agora está sendo usada por pessoas mal intencionadas para fazer login nas suas contas, incluindo a sua conta no MEGA (mas não se limitando a ela).</string>
@@ -2730,8 +2731,8 @@
     <string name="create_new_file_action" context="Text shown for the action create new file">Criar um novo arquivo</string>
     <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Erro de permissões</string>
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">Você não tem a permissão necessária para reverter este arquivo. Caso decida continuar, estará criando um novo arquivo com os dados revertidos. Você quer continuar?</string>
-    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
+    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">A versão foi criada como um novo arquivo.</string>
 
     <string name="download_location" context="Download location label">Local do download</string>
-    <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
+    <string name="confirmation_download_location" context="Text asking confirmation for download location">Salvar sempre nesta pasta?</string>
 </resources>

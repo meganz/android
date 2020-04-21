@@ -347,22 +347,22 @@
 
     <plurals name="download_began">
         <item context="Message when a download starts. Singular 1 file" quantity="one">已开始下载</item>
-        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have started</item>
+        <item context="Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d个下载已开始</item>
     </plurals>
 
     <plurals name="download_finish">
-        <item context="Message when a download finishes. Singular 1 file" quantity="one">Download has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d downloads have finished</item>
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">下载已完成</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">%1$d个下载已完成</item>
     </plurals>
 
     <plurals name="upload_began">
         <item context="Message when a upload starts. Singular 1 file" quantity="one">已开始上传</item>
-        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have started</item>
+        <item context="Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d个上传已开始</item>
     </plurals>
 
     <plurals name="upload_finish">
-        <item context="Message when a download finishes. Singular 1 file" quantity="one">Upload has finished</item>
-        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d uploads have finished</item>
+        <item context="Message when a download finishes. Singular 1 file" quantity="one">上传已完成</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d个上传已完成</item>
     </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -374,7 +374,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">图片分享自</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">分享链接</string>
-    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">获得链接</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">获取链接</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
 
@@ -383,7 +383,7 @@
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">删除分享</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">删除链接</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">该共享链接即将失效。</string>
-    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">重新命名</string>
+    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">重命名</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">打开链接</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">打开</string>
     <string name="context_renaming" context="while renaming a file or folder">重新命名中</string>
@@ -532,9 +532,9 @@
     -->
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">感谢您的建议！您确定要取消MEGA订阅吗？</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">您的签约未取消。请告诉我们您要取消签约的原因。</string>
-    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Thank you for subscribing to %1$s %2$s!</string>
-    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
-    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
+    <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">感谢您订阅%1$s %2$s!</string>
+    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">Your new subscription will take effect once the current one expires, the new price will be charged at that time.</string>
+    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Your subscription will take effect once the payment is processed by Google.</string>
     <string name="subscription_type_monthly" context="">每月</string>
     <string name="subscription_type_yearly" context="">每年</string>
 
@@ -673,8 +673,8 @@
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">拍照</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">允许接收MEGA来电通知</string>
-    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
-    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Don’t worry, you can still manually grant permissions from your device’s settings.</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA需要您的授权才能允许呼叫界面从后台弹出。</string>
+    <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">别担心，您仍然可以从设备的设置中手动授予权限。</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">仅限Wi-Fi</string>
     <string name="cam_sync_data" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi或移动数据</string>
@@ -790,14 +790,14 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未设定</string>
-    <string name="settings_reset_lock_code" context="settings of the pin lock">重设PIN码</string>
+    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">重设PIN码</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN 锁定</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">输入</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">您的本地文件将被删除，您将在10次尝试失败后注销</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">代码错误</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">PIN码错误，请再试一次。您还有1次尝试机会。</item>
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">PIN码错误，请再试一次，您还有1次尝试机会。</item>
         <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">密码错误，请重试。您剩下％2d的尝试</item>
     </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN码不正确</string>
@@ -964,10 +964,10 @@
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">您必须登录才能执行此操作。</string>
     <string name="change_email_not_logged_in" context="Error message when a user attempts to change their email without an active login session.">您必须登入以完成您的电子邮件地址变更作业。请您使用目前的电子邮件地址重新登入，然后再次点击您的确认链接。</string>
-    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">Congratulations, your new email address for this MEGA account is: %1$s</string>
+    <string name="email_changed" context="Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address.">更改已完成，您当前MEGA帐户的新电子邮件地址为：%1$s</string>
     <string name="invalid_string" context="Error when the user leaves empty the password field">不正确</string>
 
-    <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">Invalid input</string>
+    <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">无效的输入</string>
     <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">无效的邮箱地址</string>
     <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">请核对您的邮箱地址然后再试一次。</string>
     <!--
@@ -1369,7 +1369,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">[A]%2$s[/A]中的%1$s</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">从离线存储中删除</string>
+    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">从离线存储中删除</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">设定状态</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">解除</string>
@@ -1454,8 +1454,8 @@
     </plurals>
 
     <plurals name="upload_service_paused_notification">
-        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">Uploading %1$d of %2$d file (paused)</item>
-        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Uploading %1$d of %2$d files (paused)</item>
+        <item context="Text of the notification shown when the upload service is paused, Singular" quantity="one">正在上传%2$d个文件中的%1$d（已暂停）</item>
+        <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">正在上传%2$d个文件中的%1$d（已暂停）</item>
     </plurals>
 
 	<plurals name="folder_upload_service_notification">
@@ -1464,8 +1464,8 @@
 	</plurals>
 
     <plurals name="folder_upload_service_paused_notification">
-        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder (paused)</item>
-        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders (paused)</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">正在上传%2$d文件夹中的%1$d（已暂停）</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">正在上传%2$d文件夹中的%1$d（已暂停）</item>
     </plurals>
 
     <plurals name="upload_service_final_notification">
@@ -1516,8 +1516,8 @@
     </plurals>
 
     <plurals name="download_service_paused_notification">
-        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">Downloading %1$d of %2$d file (paused)</item>
-        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">Downloading %1$d of %2$d files (paused)</item>
+        <item context="Text of the notification shown when the download service is paused, Singular" quantity="one">正在下载%2$d个文件中的%1$d（已暂停）</item>
+        <item context="Text of the notification shown when the download service is paused, Plural" quantity="other">正在下载%2$d个文件中的%1$d（已暂停）</item>
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">传输流量不足</string>
@@ -1763,7 +1763,7 @@
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">高级选项</string>
     <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">MEGA需要允许下载文件</string>
-    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Old SD Card is unavailable, please set a new download location.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">无法使用旧的SD卡，请设置新的下载位置。</string>
     <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">选择下载位置</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">未通过联系人的允许</string>
@@ -1820,7 +1820,7 @@
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]无文件在您的 [/B][A]收件箱[/A][B]。[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]无文件在您的 [/B][A]云盘[/A][B]。[/B]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]无文件 [/B][A]离线[/A][B]。[/B]</string>
-    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]无 [/B][A]联系人[/A][B]。[/B]</string>
+    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]无[/B][A]联系人[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]无[/A] [B]对话[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]加载[/A] [B]对话&#8230; [/B]</string>
@@ -1954,7 +1954,7 @@
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">新消息</string>
 
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">来电</string>
-    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">Go to the call</string>
+    <string name="notification_incoming_action" context="Text for the notification action to launch the incoming call page">接听电话</string>
     <string name="notification_enable_display" context="Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10)">MEGA后台弹出窗口已禁用。\n点击更改设置。</string>
 
     <plurals name="number_unread_messages">
@@ -2236,7 +2236,7 @@
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">最短期限为7天，最长期限为30天。</string>
 	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">最小为%1$s，最大为%2$s。</string>
 
-    <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">删除较旧的文件，早于</string>
+    <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">删除垃圾桶中的文件，时间早于</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d 天</string>
 	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">当大小超过以下MB时通知我</string>
 
@@ -2327,8 +2327,8 @@
     <string name="dispute_takendown_file" context="option to dispute taken down file or folder">解除争议</string>
     <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">由于违反ToS服务条款或AUP可接受的使用政策而无法访问</string>
     <plurals name="alert_taken_down_files">
-        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">%d file was not downloaded due to ToS/AUP violation.</item>
-        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">%d files were not downloaded due to ToS/AUP violation.</item>
+        <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">由于违反ToS/AUP，%d个文件未下载。</item>
+        <item context="Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files" quantity="other">由于违反ToS/AUP，%d个文件未下载。</item>
     </plurals>
 
     <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]您的公开共享文件[/A][B]%s[/B][C]已恢复。[/C]</string>
@@ -2355,8 +2355,8 @@
     <string name="billing_period_title" context="title of billing period">结算周期</string>
     <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
     <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]One-off (year)[/A] %s</string>
-    <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]每月[/A] %s /月</string>
-    <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Yearly[/A] %s/year</string>
+    <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]每月[/A] %s/月</string>
+    <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]每年[/A] %s/年</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">取消</string>
     <string name="button_continue" context="dialog option continue in alert dialog">继续</string>
 
@@ -2366,7 +2366,7 @@
     <string name="payment_method_centili" context="one of the payment methods">[A]手机运营商[/A] （一次性）</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">新</string>
-    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">To upgrade from you current subscription, please contact support for a [A]custom plan[/A].</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">如需升级当前订阅，请联系客服团队了解[A]自定义计划[/A]</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">文件名</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">显示上一次活动</string>
@@ -2418,7 +2418,7 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">聊天链接已复制到剪贴板</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]从[/A] %s / [A]月[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user / [A]month[/A] *</string>
+    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user/[A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">*续订日期到期前随时可取消续订服务。</string>
     <string name="call_started_messages" context="Message shown when a call starts.">通话已开始</string>
 
@@ -2443,7 +2443,7 @@
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">附件已发送</string>
 
-    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]Group call ended[/A][C]. Duration: [/C]</string>
+    <string name="group_call_ended_message" context="Message shown when a group call ends.">[A]群组通话结束[/A][C]。时长：[/C]</string>
     <string name="call_ended_message" context="Message to indicate a call has ended and indicate the call duration.">[A]通话结束[/A][C]. 时长:[/C]</string>
     <plurals name="plural_call_ended_messages_hours">
         <item context="Message that shows the hours of a call when it ends, one hour" quantity="one">[B]%1$s 小时[/B]</item>
@@ -2457,8 +2457,8 @@
         <item context="Message that shows the seconds of a call when it ends, one second" quantity="one">[B]%1$d 秒[/B]</item>
         <item context="Message that shows the seconds of a call when it ends, more seconds" quantity="other">[B]%1$d 秒[/B]</item>
     </plurals>
-    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]Call ended[/A]</string>
-    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]Group call ended[/A]</string>
+    <string name="call_ended_no_duration_message" context="Message to indicate a call has ended without indicate the call duration.">[A]通话结束[/A]</string>
+    <string name="group_call_ended_no_duration_message" context="Message to indicate a group call has ended without indicate the call duration.">[A]群组通话结束[/A]</string>
 
     <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]上次在线[/A]于今天 %1$s</string>
     <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user">[A]上次在线[/A]很久之前</string>
@@ -2493,8 +2493,8 @@
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
-    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">You still can grant MEGA permissions in your device’s settings</string>
-    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
+    <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">您仍然可以在设备的设置中授予MEGA权限</string>
+    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your address book, you will be able to discover your contacts more easily. MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
         <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">消息已转发</item>
@@ -2524,7 +2524,7 @@
         <item context="How many local contacts have been on MEGA, Plural of local contact. 2 contacts" quantity="other">已找到%d个联系人</item>
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">立即邀请联系人？</string>
-    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">看看谁在用MEGA</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who is already on MEGA</string>
     <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">正在加载MEGA联系人&#8230;&#8230;</string>
 
@@ -2677,27 +2677,28 @@
 
     <string name="account_label" context="Head label to show the business account type">Account type</string>
     <string name="business_label" context="Label in My Account section to show user account type">企业</string>
-    <string name="admin_label" context="Business user role">Admin</string>
-    <string name="user_label" context="Business user role">User</string>
+    <string name="admin_label" context="Business user role">管理员</string>
+    <string name="user_label" context="Business user role">用户</string>
     <string name="status_label" context="General label to show the status of something or someone">状态</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">已登录</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">Grace</string>
-    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">宽限等待</string>
+    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available from a desktop web browser.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">用量</string>
-    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
+    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Storage usage details</string>
     <string name="overall_usage_label" context="Title of overall usage section in Storage">使用情况总览</string>
     <string name="transfer_label" context="Title of transfer section in Storage">传输</string>
 
-    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
-    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">There has been a problem with your last payment. Please access MEGA using a desktop browser for more information.</string>
+    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact because they are part of your Business account.</string>
+    <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">您的上一次付款有问题。请使用桌面浏览器访问MEGA获取更多信息。</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">您的企业帐户已到期</string>
-    <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">There has been a problem processing your payment. MEGA is limited to view only until this issue has been fixed in a desktop web browser.</string>
+    <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">处理您的付款时出现问题。在桌面浏览器中修复此问题前，MEGA仅限于查看。</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">当前您的帐户已被[B]禁用[/B]。您只能浏览数据。</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view the Camera Uploads in your user account</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">尽管MEGA无法访问您的数据，但您的企业管理员可以控制并查看用户的帐户中的“相机上传”文件。</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">出错了</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">请联系您的企业帐户管理员解决此问题并激活帐户。</string>
-    <string name="business_account_clarification" context="">** For genuine business purposes.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep the placeholder is to indicate if the space is refered to storage or transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]%1$s[/A] **</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** For genuine business purposes.</string>
+    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Storage[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Transfer quota[/A] **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">登出帐户后，“离线”中的文件将从您的设备中删除。</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">登出帐户后，正在进行的传输将被取消。</string>
@@ -2718,7 +2719,7 @@
     <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]请验证您的电子邮箱[/A]并按照MEGA邮件中的步骤解锁您的帐户。</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">为什么我的帐户被停用？</string>
     <string name="resend_email_label" cotext="Label of a button which action is resend an email">重新发送邮件</string>
-    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">Email already sent. Please wait a few minutes before trying again.</string>
+    <string name="resend_email_error" cotext="Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again">邮件已发送。请等待几分钟后再试。</string>
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">帐户已锁</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">您的MEGA帐户使用的密码可能与其他服务使用的密码相同，并且这些其他服务中至少有一项服务的数据已遭泄露。</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">您的密码遭到泄露（包括且不限于MEGA帐户），您的帐户正在被他人登录和使用。</string>
@@ -2730,8 +2731,8 @@
     <string name="create_new_file_action" context="Text shown for the action create new file">创建新文档</string>
     <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">未获得授权</string>
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">您没有还原文件所需的权限，您想使用已还原的数据创建一个新文件吗？</string>
-    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
+    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version was created as a new file successfully.</string>
 
     <string name="download_location" context="Download location label">下载地址</string>
-    <string name="confirmation_download_location" context="Text asking confirmation for download location">Always save to this location?</string>
+    <string name="confirmation_download_location" context="Text asking confirmation for download location">总是保存到此位置？</string>
 </resources>

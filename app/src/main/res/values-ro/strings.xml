@@ -533,8 +533,8 @@
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Îți mulțumim pentru feedback! Sigur vrei să anulezi abonamentul MEGA?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Abonamentul tău nu a fost anulat. Te rugăm să furnizezi un motiv pentru anulare</string>
     <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Îți mulțumim că te-ai abonat la %1$s %2$s!</string>
-    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
-    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
+    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">Noul tău abonament se va aplica odată ce cel actual expiră, noul preț va fi perceput la acel moment.</string>
+    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Abonamentul tău se va aplica după ce plata va fi procesată de Google.</string>
     <string name="subscription_type_monthly" context="">Lunar</string>
     <string name="subscription_type_yearly" context="">Anual</string>
 
@@ -790,7 +790,7 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nesetat</string>
-    <string name="settings_reset_lock_code" context="settings of the pin lock">Resetează codul PIN</string>
+    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">Resetează codul PIN</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">Blocare prin PIN</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Introdu</string>
@@ -1369,7 +1369,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]din %2$s[/A]</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Elimini din Salvate pentru offline?</string>
+    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Elimini din Salvate pentru offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Setează statusul</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Înlătură</string>
@@ -2012,7 +2012,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Te rugăm să introduci o parolă mai puternică</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">Contact nou</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Utilizarea stocării</string>
+    <string name="title_storage_usage" context="title of usage storage section in Storage">Utilizarea spațiului de stocare</string>
 
     <plurals name="plural_number_contact_request_notification">
         <item context="Notification title to show the number of incoming contact request, contact request" quantity="one">%1$d cerere de contact în așteptare</item>
@@ -2353,8 +2353,8 @@
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Selectează metoda de plată</string>
 
     <string name="billing_period_title" context="title of billing period">Perioadă de facturare</string>
-    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
-    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]One-off (year)[/A] %s</string>
+    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Unică (o lună)[/A] %s</string>
+    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]Unică (un an)[/A] %s</string>
     <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]Lunară[/A] %s/lună</string>
     <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Anuală[/A] %s/an</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">Anulează</string>
@@ -2418,7 +2418,7 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Linkul chatului copiat în clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]De la[/A] %s / [A]lună[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user / [A]month[/A] *</string>
+    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]De la[/A] %s per utilizator/[A]lună[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Abonarea recurentă poate fi anulată în orice moment înainte de data de reînnoire.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Apel început</string>
 
@@ -2434,9 +2434,9 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Activează camera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permite accesul la cameră pentru a scana documente, a realiza fotografii și a efectua apeluri video.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Activează apelurile</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Activează accesul la contacte</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
-    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Acordă acces la agenda de adrese</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Descoperă cu ușurință contactele din agenda de adrese pe MEGA.</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA nu va folosi aceste date în alt scop și nu va interacționa niciodată cu contactele tale fără consimțământul tău.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permite accesul la microfon pentru a efectua apeluri criptate.</string>
     <string name="general_enable_access" context="General enable access">Activează accesul</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Fișiere partajate</string>
@@ -2494,7 +2494,7 @@
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
     <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">Încă poți acorda permisiuni MEGA în setările dispozitivului.</string>
-    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
+    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your address book, you will be able to discover your contacts more easily. MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
         <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">Mesaj redirecționat</item>
@@ -2525,7 +2525,7 @@
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Inviți un contact acum?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Vezi cine este deja pe MEGA</string>
-    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
+    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Acordă-i acces lui MEGA la agenda de adrese pentru a-ți descoperi contactele pe MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Se încarcă contactele pe MEGA&#8230;</string>
 
 
@@ -2675,20 +2675,20 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Se încarcă</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Te rugăm să astepți&#8230;</string>
 
-    <string name="account_label" context="Head label to show the business account type">Account type</string>
+    <string name="account_label" context="Head label to show the business account type">Tipul contului</string>
     <string name="business_label" context="Label in My Account section to show user account type">Business</string>
     <string name="admin_label" context="Business user role">Admin</string>
     <string name="user_label" context="Business user role">Utilizator</string>
     <string name="status_label" context="General label to show the status of something or someone">Stare</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">Activă</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">Grație</string>
-    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">Perioadă de grație</string>
+    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">Gestionarea utilizatorilor este disponibilă doar de pe un browser web de desktop.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Utilizare</string>
-    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
+    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Detalii privind utilizarea spațiului de stocare</string>
     <string name="overall_usage_label" context="Title of overall usage section in Storage">Utilizare generală</string>
     <string name="transfer_label" context="Title of transfer section in Storage">Transferuri</string>
 
-    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
+    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">Nu poți elimina pe %1$s ca contact, deoarece face parte din contul tău business.</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">A fost o problemă cu ultima plată. Te rugăm să accesezi MEGA folosind un browser desktop pentru mai multe informații.</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Contul tău business a expirat</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">A apărut o problemă la procesarea plății. MEGA este limitat în modul numai vizualizare până când această problemă a fost rezolvată într-un browser web desktop.</string>
@@ -2696,8 +2696,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Deși MEGA nu are acces la datele tale, administratorii organizației tale pot controla și vedea încărcările cameră din contul tău de utilizator</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Ceva a mers prost</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contactează administratorul contului business pentru a rezolva problema și pentru a-ți activa contul.</string>
-    <string name="business_account_clarification" context="">** For genuine business purposes.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep the placeholder is to indicate if the space is refered to storage or transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]%1$s[/A] **</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Pentru scopurile de afaceri autentice</string>
+    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Spațiu de stocare[/A] NELIMITAT**</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Cotă de transferuri[/A] NELIMITATĂ **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe dispozitiv.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Când te deconectezi, transferurile în curs vor fi anulate.</string>
@@ -2730,7 +2731,7 @@
     <string name="create_new_file_action" context="Text shown for the action create new file">Creează un fișier nou</string>
     <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Eroare privind permisiunile</string>
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">Nu ai permisiunile necesare pentru a reveni la versiunea anterioară pentru acest fișier. Pentru a continua, putem crea un nou fișier cu datele readuse la versiunea anterioară. Dorești să continui?</string>
-    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
+    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Versiunea a fost creată cu succes ca un fișier nou.</string>
 
     <string name="download_location" context="Download location label">Locație de descărcare</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Salvezi întotdeauna în această locație?</string>
