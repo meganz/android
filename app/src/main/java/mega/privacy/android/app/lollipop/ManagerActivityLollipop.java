@@ -2184,6 +2184,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         upgradeAccount.setOnClickListener(this);
 
         navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) navigationDrawerAddPhoneContainer.getLayoutParams();
+        if (isScreenInPortrait(this)) {
+        	params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        	params.removeRule(RelativeLayout.BELOW);
+		} else {
+        	params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+			params.addRule(RelativeLayout.BELOW, R.id.sections_layout);
+		}
+        navigationDrawerAddPhoneContainer.setLayoutParams(params);
 
         addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
         addPhoneNumberButton.setOnClickListener(this);

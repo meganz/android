@@ -312,6 +312,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		handler = new Handler();
 		cC = new ContactController(this);
+		nC = new NodeController(this);
         megaApi.addGlobalListener(this);
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
@@ -1922,12 +1923,11 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	}
 
 	public void onFileClick(ArrayList<Long> handleList) {
-        
-        if(nC==null){
-            nC = new NodeController(this);
-        }
-        nC.prepareForDownload(handleList, true);
-    }
+		if (nC == null) {
+			nC = new NodeController(this);
+		}
+		nC.prepareForDownload(handleList, true);
+	}
     
     public void showConfirmationLeaveIncomingShare (final MegaNode n){
 		logDebug("Node handle: " + n.getHandle());
@@ -2326,9 +2326,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
                         if(dontShowAgain.isChecked()){
                             dbH.setAttrAskSizeDownload("false");
                         }
-                        if(nC==null){
-                            nC = new NodeController(ContactInfoActivityLollipop.this);
-                        }
                         nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
                 });
@@ -2372,9 +2369,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
                     public void onClick(DialogInterface dialog, int whichButton) {
                         if(dontShowAgain.isChecked()){
                             dbH.setAttrAskNoAppDownload("false");
-                        }
-                        if(nC==null){
-                            nC = new NodeController(ContactInfoActivityLollipop.this);
                         }
                         nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
