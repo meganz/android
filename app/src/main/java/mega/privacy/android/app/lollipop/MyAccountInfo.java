@@ -416,20 +416,17 @@ public class MyAccountInfo {
         firstLetter = firstLetter.toUpperCase(Locale.getDefault());
     }
 
-    public void setProductAccounts(MegaPricing p){
-        logDebug("setProductAccounts");
-
-        if(productAccounts==null){
-            productAccounts = new ArrayList<Product>();
-        }
-        else{
+    public void setProductAccounts(MegaPricing p) {
+        if (productAccounts == null) {
+            productAccounts = new ArrayList<>();
+        } else {
             productAccounts.clear();
         }
 
         for (int i = 0; i < p.getNumProducts(); i++) {
             logDebug("p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
 
-            Product account = new Product(p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i), p.isBusinessType(i));
+            Product account = new Product(p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getGBTransfer(i), p.getAmount(i), p.getCurrency(i), p.isBusinessType(i));
 
             productAccounts.add(account);
         }
@@ -611,6 +608,10 @@ public class MyAccountInfo {
             logDebug(sku + " already subscribed.");
         }
         return result;
+    }
+
+    public List<SkuDetails> getAvailableSkus() {
+        return this.availableSkus;
     }
 
     public void setAvailableSkus(List<SkuDetails> skuDetailsList) {

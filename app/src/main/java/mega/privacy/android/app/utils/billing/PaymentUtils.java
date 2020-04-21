@@ -2,8 +2,15 @@ package mega.privacy.android.app.utils.billing;
 
 import android.content.Context;
 
+import com.android.billingclient.api.SkuDetails;
+
+import java.util.List;
+
+import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.TextUtil;
+
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 public class PaymentUtils {
 
@@ -38,7 +45,7 @@ public class PaymentUtils {
      * @return The level of the sku.
      */
     static int getProductLevel(String sku) {
-        if (TextUtil.isTextEmpty(sku)) {
+        if (isTextEmpty(sku)) {
             return -1;
         }
         switch (sku) {
@@ -108,5 +115,37 @@ public class PaymentUtils {
             default:
                 return "";
         }
+    }
+
+    public static String getSku(Product product) {
+        if (product == null) {
+            return "";
+        }
+
+        switch (product.getLevel()) {
+            case PRO_LITE:
+                return product.getMonths() == 1 ? SKU_PRO_LITE_MONTH : SKU_PRO_LITE_YEAR;
+            case PRO_I:
+                return product.getMonths() == 1 ? SKU_PRO_I_MONTH : SKU_PRO_I_YEAR;
+            case PRO_II:
+                return product.getMonths() == 1 ? SKU_PRO_II_MONTH : SKU_PRO_II_YEAR;
+            case PRO_III:
+                return product.getMonths() == 1 ? SKU_PRO_III_MONTH : SKU_PRO_III_YEAR;
+            default:
+                return "";
+        }
+    }
+
+    public static SkuDetails getSkuDetails(List<SkuDetails> list, String key) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+
+        for (SkuDetails details : list) {
+            if (details.getSku().equals(key)) {
+                return details;
+            }
+        }
+        return null;
     }
 }

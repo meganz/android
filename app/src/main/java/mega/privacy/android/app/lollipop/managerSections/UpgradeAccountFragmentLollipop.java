@@ -2,8 +2,6 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.fragment.app.Fragment;
@@ -23,8 +21,12 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.android.billingclient.api.SkuDetails;
+
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Currency;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
@@ -286,8 +288,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	public void setPricing() {
 		logDebug("setPricing");
 
-		DecimalFormat df = new DecimalFormat("0.00");
-
 		if (myAccountInfo == null) {
 			myAccountInfo = ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo();
 		}
@@ -305,7 +305,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				Product account = productAccounts.get(i);
 
 				if (account.getMonths() == 1) {
-					String textToShow = getPriceString(df, account, false);
+					String textToShow = getPriceString(account, true);
 
 					switch (account.getLevel()) {
 						case PRO_I: {
@@ -371,7 +371,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							break;
 						}
 						case BUSINESS: {
-							textToShow = getPriceString(df, account, true);
 							String unlimitedSpace = getString(R.string.unlimited_space);
 							String unlimitedTransfer = getString(R.string.unlimited_transfer_quota);
 
@@ -425,28 +424,33 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		}
 	}
 
-	private String getPriceString(DecimalFormat df, Product account, boolean isBusiness){
-		double price = account.getAmount() / 100.00;
-		String priceString = df.format(price);
-		String[] s = priceString.split("\\.");
+	private String getPriceString(Product product, boolean monthlyBasePrice) {
+		double price = product.getAmount() / 100.00;
+		String currency = product.getCurrency();
 
-		String monthPrice = "";
-		if (s.length == 1) {
-			String[] s1 = priceString.split(",");
-			if (s1.length == 1) {
-				monthPrice = s1[0]+" €";
-			} else if (s1.length == 2) {
-				monthPrice = s1[0]+","+s1[1]+" €";
-			}
-		}else if (s.length == 2) {
-			monthPrice = s[0]+","+s[1]+" €";
+		// Try get the local pricing details from the store
+		SkuDetails details = getSkuDetails(myAccountInfo.getAvailableSkus(), getSku(product));
+		if (details != null) {
+			price = details.getPriceAmountMicros() / 1000000.00;
+			currency = details.getPriceCurrencyCode();
 		}
 
-		if (isBusiness) {
-			return getString(R.string.type_business_month, monthPrice);
+		NumberFormat format = NumberFormat.getCurrencyInstance();
+		format.setCurrency(Currency.getInstance(currency));
+
+		String stringPrice = format.format(price);
+
+		if (!monthlyBasePrice) {
+			return stringPrice;
+		} else if (product.getMonths() != 1) {
+			return "";
 		}
 
-		return getString(R.string.type_month, monthPrice);
+		if (product.getLevel() == BUSINESS) {
+			return getString(R.string.type_business_month, stringPrice);
+		}
+
+		return getString(R.string.type_month, stringPrice);
 	}
 	
 	public void showAvailableAccount(){
@@ -1300,27 +1304,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					Product account = accounts.get(i);
 
 					if(account.getLevel()==1 && account.getMonths()==1){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "";
-							}
-							else if (s1.length == 2){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "." + s1[1] + " €";
-							}
-						}
-						else if (s.length == 2){
-							priceMonthlyInteger = s[0];
-							priceMonthlyDecimal = "." + s[1] + " €";
-						}
-						String priceMonthly = priceMonthlyInteger+priceMonthlyDecimal;
-
-						String textToShowMonthly = getString(R.string.billed_monthly_text, priceMonthly);
+						String textToShowMonthly = getString(R.string.billed_monthly_text, getPriceString(account, false));
 						try{
 							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
 							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
@@ -1330,28 +1314,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						billedMonthly.setText(getSpannedHtmlText(textToShowMonthly));
 					}
 					if (account.getLevel()==1 && account.getMonths()==12){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "";
-							}
-							else if (s1.length == 2){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "." + s1[1] + " €";
-							}
-						}
-						else if (s.length == 2){
-							priceYearlyInteger = s[0];
-							priceYearlyDecimal = "." + s[1] + " €";
-						}
-
-						String priceYearly = priceYearlyInteger+priceYearlyDecimal;
-
-						String textToShowYearly = getString(R.string.billed_yearly_text, priceYearly);
+						String textToShowYearly = getString(R.string.billed_yearly_text, getPriceString(account, false));
 						try{
 							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
 							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
@@ -1441,28 +1404,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					Product account = accounts.get(i);
 
 					if(account.getLevel()==2 && account.getMonths()==1){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "";
-							}
-							else if (s1.length == 2){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "." + s1[1] + " €";
-							}
-						}
-						else if (s.length == 2){
-							priceMonthlyInteger = s[0];
-							priceMonthlyDecimal = "." + s[1] + " €";
-						}
-
-						String priceMonthly = priceMonthlyInteger+priceMonthlyDecimal;
-
-						String textToShowMonthly = getString(R.string.billed_monthly_text, priceMonthly);
+						String textToShowMonthly = getString(R.string.billed_monthly_text, getPriceString(account, false));
 						try{
 							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
 							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
@@ -1472,27 +1414,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						billedMonthly.setText(getSpannedHtmlText(textToShowMonthly));
 					}
 					if (account.getLevel()==2 && account.getMonths()==12){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "";
-							}
-							else if (s1.length == 2){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "." + s1[1] + " €";
-							}
-						}
-						else if (s.length == 2){
-							priceYearlyInteger = s[0];
-							priceYearlyDecimal = "." + s[1] + " €";
-						}
-						String priceYearly = priceYearlyInteger+priceYearlyDecimal;
-
-						String textToShowYearly = getString(R.string.billed_yearly_text, priceYearly);
+						String textToShowYearly = getString(R.string.billed_yearly_text, getPriceString(account, false));
 						try{
 							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
 							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
@@ -1583,28 +1505,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					Product account = accounts.get(i);
 
 					if(account.getLevel()==3 && account.getMonths()==1){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "";
-							}
-							else if (s1.length == 2){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "." + s1[1] + " €";
-							}
-						}
-						else if (s.length == 2){
-							priceMonthlyInteger = s[0];
-							priceMonthlyDecimal = "." + s[1] + " €";
-						}
-
-						String priceMonthly = priceMonthlyInteger+priceMonthlyDecimal;
-
-						String textToShowMonthly = getString(R.string.billed_monthly_text, priceMonthly);
+						String textToShowMonthly = getString(R.string.billed_monthly_text, getPriceString(account, false));
 						try{
 							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
 							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
@@ -1614,28 +1515,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						billedMonthly.setText(getSpannedHtmlText(textToShowMonthly));
 					}
 					if (account.getLevel()==3 && account.getMonths()==12){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "";
-							}
-							else if (s1.length == 2){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "." + s1[1] + " €";
-							}
-						}
-						else if (s.length == 2){
-							priceYearlyInteger = s[0];
-							priceYearlyDecimal = "." + s[1] + " €";
-						}
-
-						String priceYearly = priceYearlyInteger+priceYearlyDecimal;
-
-						String textToShowYearly = getString(R.string.billed_yearly_text, priceYearly);
+						String textToShowYearly = getString(R.string.billed_yearly_text, getPriceString(account, false));
 						try{
 							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
 							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
@@ -1724,24 +1604,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					Product account = accounts.get(i);
 
 					if(account.getLevel()==4 && account.getMonths()==1){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "";
-							}else if (s1.length == 2){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "," + s1[1] + " €";
-							}
-						}else if (s.length == 2){
-							priceMonthlyInteger = s[0];
-							priceMonthlyDecimal = "," + s[1] + " €";
-						}
-
-						String priceMonthly = priceMonthlyInteger+priceMonthlyDecimal;
+						String priceMonthly = getPriceString(account, false);
 
 						String textToShowMonthly = paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET ?
 								getString(R.string.billed_monthly_text, priceMonthly) : getString(R.string.billed_one_off_month, priceMonthly);
@@ -1755,26 +1618,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 					}
 					if (account.getLevel()==4 && account.getMonths()==12){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "";
-							}
-							else if (s1.length == 2){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "," + s1[1] + " €";
-							}
-						}
-						else if (s.length == 2){
-							priceYearlyInteger = s[0];
-							priceYearlyDecimal = "," + s[1] + " €";
-						}
-
-						String priceYearly = priceYearlyInteger+priceYearlyDecimal;
+						String priceYearly = getPriceString(account, false);
 
 						String textToShowYearly = paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET ?
 								getString(R.string.billed_yearly_text, priceYearly) : getString(R.string.billed_one_off_year, priceYearly);

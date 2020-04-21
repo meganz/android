@@ -382,7 +382,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         for (int i=0;i<p.getNumProducts();i++){
             logDebug("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
 
-            Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i), p.isBusinessType(i));
+            Product account = new Product(p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getGBTransfer(i), p.getAmount(i), p.getCurrency(i), p.isBusinessType(i));
 
             if(account.getLevel()==1&&account.getMonths()==1){
                 logDebug("PRO1: " + account.getStorage());

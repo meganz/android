@@ -1287,19 +1287,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         }
     }
 
-	private SkuDetails getSkuDetails(List<SkuDetails> list, String key) {
-		if (list == null || list.isEmpty()) {
-			return null;
-		}
-
-		for (SkuDetails details : list) {
-			if (details.getSku().equals(key)) {
-				return details;
-			}
-		}
-		return null;
-	}
-
 	private void getInventory() {
 		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
 			@Override
