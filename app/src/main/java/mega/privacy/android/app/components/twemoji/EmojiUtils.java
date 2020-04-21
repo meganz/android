@@ -1,7 +1,7 @@
 package mega.privacy.android.app.components.twemoji;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.util.List;

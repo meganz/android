@@ -1,9 +1,9 @@
 package mega.privacy.android.app.components.twemoji;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.text.emoji.EmojiCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.emoji.text.EmojiCompat;
 import android.text.Spannable;
 import android.text.TextUtils;
 

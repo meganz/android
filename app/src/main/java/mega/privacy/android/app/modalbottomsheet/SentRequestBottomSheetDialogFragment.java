@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialogFragment;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -129,7 +129,7 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     public void addAvatarRequestPanel(MegaContactRequest request){
         /*Default Avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(context, getColorAvatar(context, megaApi, -1), request.getTargetEmail(), AVATAR_SIZE, true));
+        contactImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), request.getTargetEmail(), AVATAR_SIZE, true));
     }
 
     @Override

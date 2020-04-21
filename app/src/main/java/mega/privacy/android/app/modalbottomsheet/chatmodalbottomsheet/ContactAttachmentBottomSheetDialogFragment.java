@@ -7,9 +7,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.content.ContextCompat;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -434,7 +434,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     public void addAvatarParticipantPanel(long handle, String email, String name){
         logDebug("handle: " + handle);
         /*Default Avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(context, getColorAvatar(context, megaApi, handle), name, AVATAR_SIZE, true));
+        contactImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(handle), name, AVATAR_SIZE, true));
 
         if (handle != -1) {
             /*Avatar*/

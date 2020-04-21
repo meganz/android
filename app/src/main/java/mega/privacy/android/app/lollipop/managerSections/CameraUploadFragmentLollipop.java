@@ -16,17 +16,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SwitchCompat;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -1826,7 +1826,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 	}
 
-	public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
+	public String getPath(String fileName, long fileSize, String destDir, MegaNode file) {
 		logDebug("getPath");
 		String path = null;
 		if (destDir != null) {
@@ -1837,25 +1837,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				for (int i = 0; i < listFiles.length; i++) {
 					if (listFiles[i].isDirectory()) {
 						path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath(), file);
-						if (path != null) {
-							return path;
-						}
 					} else {
-						boolean isOnMegaDownloads = false;
-						path = getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
-						File f = new File(downloadLocationDefaultPath, file.getName());
-						if (f.exists() && (f.length() == file.getSize())) {
-							isOnMegaDownloads = true;
-						}
-						if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))) {
-							return path;
-						}
+						path = getLocalFile(context, fileName, fileSize);
 					}
 				}
 			}
 		}
 
-		return null;
+		return path;
 	}
 
 	private void clearSelections() {

@@ -4,11 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -46,7 +46,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -56,6 +55,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -326,17 +326,14 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     public void setVisibleContacts() {
         visibleContacts.clear();
         ArrayList<MegaUser> contacts = megaApi.getContacts();
-
         for (int i = 0; i < contacts.size(); i++) {
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-
-                MegaContactDB contactDB = dbH.findContactByHandle(contacts.get(i).getHandle() + "");
-                String fullName = "";
-                if (contactDB != null) {
-                    ContactController cC = new ContactController(context);
-                    fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contacts.get(i).getEmail());
+                long contactHandle = contacts.get(i).getHandle();
+                MegaContactDB contactDB = getContactDB(contactHandle);
+                String fullName = getContactNameDB(contactDB);
+                if (fullName == null) {
+                    fullName = contacts.get(i).getEmail();
                 }
-
                 MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
                 visibleContacts.add(megaContactAdapter);
             }
@@ -395,7 +392,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             return;
         }
 
-        String localPath = getLocalFile(context, node.getName(), node.getSize(), getDownloadLocation(context));
+        String localPath = getLocalFile(context, node.getName(), node.getSize());
         boolean paramsSetSuccessfully = false;
 
         if (isAudioOrVideo(node)) {

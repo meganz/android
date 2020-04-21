@@ -8,9 +8,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.content.ContextCompat;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -36,9 +36,11 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -244,12 +246,13 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             addAvatarParticipantPanel(participantHandle, megaChatApi.getMyEmail(), myFullName);
         }
         else{
-
-            String fullName = selectedChat.getPeerFullnameByHandle(participantHandle);
-            if (fullName == null || fullName.isEmpty() || fullName.equals("")) {
-                fullName = selectedChat.getPeerEmailByHandle(participantHandle);
+            String fullName = getNicknameContact(participantHandle);
+            if (fullName == null) {
+                fullName = selectedChat.getPeerFullnameByHandle(participantHandle);
+                if (isTextEmpty(fullName)) {
+                    fullName = selectedChat.getPeerEmailByHandle(participantHandle);
+                }
             }
-
             titleNameContactChatPanel.setText(fullName);
             titleMailContactChatPanel.setText(selectedChat.getPeerEmailByHandle(participantHandle));
 
@@ -344,7 +347,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         File avatar = null;
         /*Default avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(context, getColorAvatar(context, megaApi, handle), name, AVATAR_SIZE, true));
+        contactImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(handle), name, AVATAR_SIZE, true));
 
         /*Avatar*/
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);

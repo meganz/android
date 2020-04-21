@@ -17,10 +17,10 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -355,7 +355,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         else{
             fullName = myEmail;
         }
-        return getDefaultAvatar(context, getColorAvatar(context, megaApi, myUser), fullName, AVATAR_SIZE, true);
+        return getDefaultAvatar(getColorAvatar(myUser), fullName, AVATAR_SIZE, true);
     }
 
     @Override

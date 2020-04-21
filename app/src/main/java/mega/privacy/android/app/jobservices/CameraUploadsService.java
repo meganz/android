@@ -20,10 +20,10 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.StatFs;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.media.ExifInterface;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.Nullable;
+import androidx.exifinterface.media.ExifInterface;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.io.IOException;
@@ -1745,7 +1745,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
             String title = getString(R.string.title_compression_size_over_limit);
             String size = prefs.getChargingOnSize();
-            String message = getString(R.string.message_compression_size_over_limit, size + getString(R.string.label_file_size_mega_byte));
+            String message = getString(R.string.message_compression_size_over_limit,
+                    getString(R.string.label_file_size_mega_byte, String.valueOf(size)));
             showNotification(title,message,pendingIntent,true);
         }
         

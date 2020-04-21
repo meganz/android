@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -22,9 +21,10 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import androidx.exifinterface.media.ExifInterface;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
@@ -133,7 +133,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		megaChatApi = app.getMegaChatApi();
-		mapProgressFileTransfers = new HashMap();
+		mapProgressFileTransfers = new HashMap<>();
         mapProgressFolderTransfers = new HashMap<>();
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		isForeground = false;
@@ -763,12 +763,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						if (node != null) {
 							try {
 								final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
-								float[] latLong = new float[2];
-								if (exifInterface.getLatLong(latLong)) {
-									logDebug("Latitude: " + latLong[0] + " Longitude: " + latLong[1]);
-									megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
-								}
-
+								double[] latLong = exifInterface.getLatLong();
+								megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
 							} catch (Exception e) {
 								logWarning("Couldn't read exif info: " + transfer.getPath(), e);
 							}

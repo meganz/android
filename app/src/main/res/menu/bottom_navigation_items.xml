@@ -19,7 +19,7 @@
 	<item
 		android:id="@+id/bottom_navigation_item_shared_items"
 		android:icon="@drawable/ic_shared"
-		android:title="@string/section_shared_items"/>
+		android:title="@string/title_shared_items"/>
 
 	<item
 		android:id="@+id/bottom_navigation_item_offline"

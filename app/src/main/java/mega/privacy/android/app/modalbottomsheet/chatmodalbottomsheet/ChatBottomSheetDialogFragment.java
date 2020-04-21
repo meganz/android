@@ -8,13 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.content.ContextCompat;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -23,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -359,27 +355,16 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         }
 
         if(chat.isGroup()){
-            color = ContextCompat.getColor(context, R.color.divider_upgrade_account);
+            color = getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR);
         }else{
-            MegaUser contact = megaApi.getContact(contactMail);
-            color = getColorAvatar(context, megaApi, contact);
+            color = getColorAvatar(megaApi.getContact(contactMail));
         }
 
-        chatImageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, false));
+        chatImageView.setImageBitmap(getDefaultAvatar(color, name, AVATAR_SIZE, false));
 
-        /*Avatar*/
-        File avatar = buildAvatarFile(getActivity(), contactMail + ".jpg");
-        Bitmap bitmap = null;
-        if (isFileAvailable(avatar) && avatar.length() > 0){
-            BitmapFactory.Options bOpts = new BitmapFactory.Options();
-            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-            if (bitmap == null) {
-                avatar.delete();
-            }
-            else{
-                chatImageView.setImageBitmap(bitmap);
-                return;
-            }
+        Bitmap bitmap = getImageAvatar(contactMail);
+        if(bitmap != null){
+            chatImageView.setImageBitmap(bitmap);
         }
     }
 

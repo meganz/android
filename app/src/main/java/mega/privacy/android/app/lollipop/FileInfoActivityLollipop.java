@@ -20,18 +20,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.ActionBar;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.widget.NestedScrollView;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
@@ -121,6 +121,7 @@ import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 @SuppressLint("NewApi")
 public class FileInfoActivityLollipop extends DownloadableActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
@@ -140,7 +141,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
     FileInfoActivityLollipop fileInfoActivityLollipop = this;
 	boolean firstIncomingLevel=true;
 
-    private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
 
     // The flag to indicate whether select chat is processing
     private static boolean isSelectingChat = false;
@@ -191,6 +192,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 	RelativeLayout publicLinkLayout;
 	RelativeLayout publicLinkCopyLayout;
 	TextView publicLinkText;
+	private TextView publicLinkDate;
 	RelativeLayout sharedLayout;
 	Button usersSharedWithTextButton;
 	View dividerSharedLayout;
@@ -338,6 +340,15 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             if (permissionsDialog != null) {
                 permissionsDialog.dismiss();
             }
+        }
+    };
+
+    private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) return;
+            long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+            updateAdapter(userHandle);
         }
     };
 
@@ -662,6 +673,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         publicLinkCopyLayout = (RelativeLayout) findViewById(R.id.file_properties_copy_layout);
 
         publicLinkText = (TextView) findViewById(R.id.file_properties_link_text);
+        publicLinkDate = findViewById(R.id.file_properties_link_date);
         publicLinkButton = (Button) findViewById(R.id.file_properties_link_button);
         publicLinkButton.setText(getString(R.string.context_copy));
         publicLinkButton.setOnClickListener(this);
@@ -780,10 +792,10 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 if (from == FROM_INCOMING_SHARES){
                     fragmentHandle = -1;
                     if (megaApi.getParentNode(node) != null){
-                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.tab_incoming_shares) +")");
                     }
                     else {
-                        locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer));
+                        locationTextView.setText(getResources().getString(R.string.tab_incoming_shares));
                     }
                 }
                 else{
@@ -798,7 +810,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                     }
 
                     if (megaApi.getParentNode(node) == null){ // It is because of the parent node is Incoming Shares
-                        locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer));
+                        locationTextView.setText(getResources().getString(R.string.tab_incoming_shares));
                     }
                     else if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
                             parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
@@ -811,7 +823,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                         }
                     }
                     else {
-                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.tab_incoming_shares) +")");
                     }
                 }
 
@@ -889,6 +901,9 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
         LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
 	}
 	
 	private String getTranslatedNameForParentNodes(long parentHandle){
@@ -1410,6 +1425,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 			publicLinkLayout.setVisibility(View.VISIBLE);
 			publicLinkCopyLayout.setVisibility(View.VISIBLE);
 			publicLinkText.setText(node.getPublicLink());
+			publicLinkDate.setText(getString(R.string.general_date_label, formatLongDateTime(node.getPublicLinkCreationTime())));
 		}
 		else{
 			publicLink=false;
@@ -1518,29 +1534,14 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 						MegaUser user= megaApi.getContact(mS.getUser());
 						contactMail=user.getEmail();
 						if(user!=null){
-							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-
-							if(contactDB!=null){
-								if(!contactDB.getName().equals("")){
-									ownerLabel.setText(contactDB.getName()+" "+contactDB.getLastName());
-									ownerInfo.setText(user.getEmail());
-									setOwnerState(user.getHandle());
-									createDefaultAvatar(ownerRoundeImage, user, contactDB.getName());
-								}
-								else{
-									ownerLabel.setText(user.getEmail());
-									ownerInfo.setText(user.getEmail());
-                                    setOwnerState(user.getHandle());
-									createDefaultAvatar(ownerRoundeImage, user, user.getEmail());
-								}
-							}
-							else{
-                                logWarning("The contactDB is null: ");
-								ownerLabel.setText(user.getEmail());
-								ownerInfo.setText(user.getEmail());
-                                setOwnerState(user.getHandle());
-								createDefaultAvatar(ownerRoundeImage, user, user.getEmail());
-							}
+                            String name = getMegaUserNameDB(user);
+                            if (name == null) {
+                                name = user.getEmail();
+                            }
+                            ownerLabel.setText(name);
+                            ownerInfo.setText(user.getEmail());
+                            setOwnerState(user.getHandle());
+                            createDefaultAvatar(ownerRoundeImage, user, name);
 						}
 						else{
 							ownerLabel.setText(mS.getUser());
@@ -1665,8 +1666,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 	}
 
 	private void createDefaultAvatar(ImageView ownerRoundeImage, MegaUser user, String name){
-        int color = getColorAvatar(this, megaApi, user);
-		ownerRoundeImage.setImageBitmap(getDefaultAvatar(this, color, name, AVATAR_SIZE, true));
+		ownerRoundeImage.setImageBitmap(getDefaultAvatar(getColorAvatar(user), name, AVATAR_SIZE, true));
 	}
 
 
@@ -2864,7 +2864,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         if (drawableLeave != null) drawableLeave.setColorFilter(null);
         if (drawableCopy != null) drawableCopy.setColorFilter(null);
         if (drawableChat != null) drawableChat.setColorFilter(null);
-
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
     }
 
@@ -2966,7 +2966,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3013,7 +3013,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3120,7 +3120,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
     }
 
     public void showConfirmationRemoveContactFromShare(final String email) {
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         String message = getResources().getString(R.string.remove_contact_shared_folder, email);
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> removeShare(email))
@@ -3147,7 +3147,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         listContacts = new ArrayList<>();
         if (node != null) {
             fullListContacts = megaApi.getOutShares(node);
-
             if (fullListContacts.size() > MAX_NUMBER_OF_CONTACTS_IN_LIST) {
                 listContacts = new ArrayList<>(fullListContacts.subList(0,MAX_NUMBER_OF_CONTACTS_IN_LIST));
             } else {
@@ -3201,6 +3200,20 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 actionMode = startSupportActionMode(new ActionBarCallBack());
             }
             updateActionModeTitle();
+        }
+    }
+
+    private void updateAdapter(long handleReceived) {
+        if (listContacts != null && !listContacts.isEmpty()) {
+            for (int i = 0; i < listContacts.size(); i++) {
+                String email = listContacts.get(i).getUser();
+                MegaUser contact = megaApi.getContact(email);
+                long handleUser = contact.getHandle();
+                if (handleUser == handleReceived) {
+                    adapter.notifyItemChanged(i);
+                    break;
+                }
+            }
         }
     }
     

@@ -6,12 +6,12 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -262,7 +262,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		{
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(megaApi.getRootNode());
-			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+			changeActionBarTitle(context.getString(R.string.file_provider_title).toUpperCase());
 		}
 		else
 		{
@@ -273,7 +273,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			}
 			else
 			{
-				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+				changeActionBarTitle(context.getString(R.string.file_provider_title).toUpperCase());
 			}
 		}
 		
@@ -391,7 +391,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				parentHandle=-1;
-				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+				changeActionBarTitle(context.getString(R.string.file_provider_title).toUpperCase());
 			}
 			else{
 				String path=parentNode.getName();	

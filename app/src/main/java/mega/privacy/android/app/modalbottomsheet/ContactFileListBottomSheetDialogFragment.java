@@ -8,9 +8,9 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialogFragment;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -147,7 +147,6 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
 
         LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
         LinearLayout separatorDownload = (LinearLayout) contentView.findViewById(R.id.separator_download);
-        LinearLayout separatorLeave = (LinearLayout) contentView.findViewById(R.id.separator_leave);
         LinearLayout separatorModify = (LinearLayout) contentView.findViewById(R.id.separator_modify);
 
         nodeName.setMaxWidth(scaleWidthPx(200, outMetrics));
@@ -259,33 +258,25 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                 }
             }
 
-            if (optionInfo.getVisibility() == View.GONE || (optionDownload.getVisibility() == View.GONE && optionLeave.getVisibility() == View.GONE
-                    && optionCopy.getVisibility() == View.GONE &&  optionMove.getVisibility() == View.GONE && optionRename.getVisibility() == View.GONE
-                    && optionRubbish.getVisibility() == View.GONE)){
+            if (optionInfo.getVisibility() == View.GONE || (optionDownload.getVisibility() == View.GONE && optionCopy.getVisibility() == View.GONE
+                    &&  optionMove.getVisibility() == View.GONE && optionLeave.getVisibility() == View.GONE
+                    && optionRename.getVisibility() == View.GONE && optionRubbish.getVisibility() == View.GONE)){
                 separatorInfo.setVisibility(View.GONE);
             }
             else {
                 separatorInfo.setVisibility(View.VISIBLE);
             }
 
-            if (optionDownload.getVisibility() == View.GONE || (optionLeave.getVisibility() == View.GONE && optionCopy.getVisibility() == View.GONE
-                    && optionMove.getVisibility() == View.GONE && optionRename.getVisibility() == View.GONE && optionRubbish.getVisibility() == View.GONE)){
+            if (optionDownload.getVisibility() == View.GONE || (optionCopy.getVisibility() == View.GONE && optionMove.getVisibility() == View.GONE
+                    && optionRename.getVisibility() == View.GONE && optionLeave.getVisibility() == View.GONE && optionRubbish.getVisibility() == View.GONE)){
                 separatorDownload.setVisibility(View.GONE);
             }
             else {
                 separatorDownload.setVisibility(View.VISIBLE);
             }
 
-            if (optionLeave.getVisibility() == View.GONE || (optionCopy.getVisibility() == View.GONE
-                    && optionMove.getVisibility() == View.GONE && optionRename.getVisibility() == View.GONE && optionRubbish.getVisibility() == View.GONE)) {
-                separatorLeave.setVisibility(View.GONE);
-            }
-            else {
-                separatorLeave.setVisibility(View.VISIBLE);
-            }
-
             if ((optionCopy.getVisibility() == View.GONE
-                    && optionMove.getVisibility() == View.GONE && optionRename.getVisibility() == View.GONE) || optionRubbish.getVisibility() == View.GONE) {
+                    && optionMove.getVisibility() == View.GONE && optionRename.getVisibility() == View.GONE) || (optionLeave.getVisibility() == View.GONE && optionRubbish.getVisibility() == View.GONE)) {
                 separatorModify.setVisibility(View.GONE);
             }
             else {

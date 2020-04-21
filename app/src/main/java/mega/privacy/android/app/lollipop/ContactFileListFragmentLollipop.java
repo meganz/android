@@ -10,14 +10,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.TypedValue;
@@ -285,10 +285,11 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		if (savedInstanceState != null) {
-			parentHandleStack = (Stack<Long>)(savedInstanceState.getSerializable(PARENT_HANDLE_STACK));
+			parentHandleStack = (Stack<Long>) savedInstanceState.getSerializable(PARENT_HANDLE_STACK);
 		}
 	}
 	@Override
@@ -607,13 +608,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", CONTACT_FILE_ADAPTER);
 					imageDrag = imageView;
-					boolean isOnMegaDownloads = false;
-					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if(f.exists() && (f.length() == file.getSize())){
-						isOnMegaDownloads = true;
-					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+
+					String localPath = getLocalFile(context, file.getName(), file.getSize());
+					if (localPath != null){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -673,13 +670,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", CONTACT_FILE_ADAPTER);
-					boolean isOnMegaDownloads = false;
-					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if(f.exists() && (f.length() == file.getSize())){
-						isOnMegaDownloads = true;
-					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+
+					String localPath = getLocalFile(context, file.getName(), file.getSize());
+					if (localPath != null){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N	&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -730,20 +723,14 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					logDebug("Is URL file");
 					MegaNode file = contactNodes.get(position);
 
-					boolean isOnMegaDownloads = false;
-					String localPath = getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if(f.exists() && (f.length() == file.getSize())){
-						isOnMegaDownloads = true;
-					}
-					logDebug("isOnMegaDownloads: " + isOnMegaDownloads);
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+					String localPath = getLocalFile(context, file.getName(), file.getSize());
+					if (localPath != null){
 						File mediaFile = new File(localPath);
 						InputStream instream = null;
 
 						try {
 							// open the file for reading
-							instream = new FileInputStream(f.getAbsolutePath());
+							instream = new FileInputStream(mediaFile.getAbsolutePath());
 
 							// if file the available for reading
 							if (instream != null) {
@@ -766,9 +753,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 									logWarning("Not expected format: Exception on processing url file");
 									Intent intent = new Intent(Intent.ACTION_VIEW);
 									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), "text/plain");
 									} else {
-										intent.setDataAndType(Uri.fromFile(f), "text/plain");
+										intent.setDataAndType(Uri.fromFile(mediaFile), "text/plain");
 									}
 									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
@@ -787,9 +774,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 							Intent intent = new Intent(Intent.ACTION_VIEW);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+								intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), "text/plain");
 							} else {
-								intent.setDataAndType(Uri.fromFile(f), "text/plain");
+								intent.setDataAndType(Uri.fromFile(mediaFile), "text/plain");
 							}
 							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 

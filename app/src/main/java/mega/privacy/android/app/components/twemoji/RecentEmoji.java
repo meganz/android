@@ -1,6 +1,6 @@
 package mega.privacy.android.app.components.twemoji;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.util.Collection;
 

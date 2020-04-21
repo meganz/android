@@ -16,17 +16,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
-import android.support.design.widget.TabLayout;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.AppCompatEditText;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.view.MenuItemCompat;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -370,7 +370,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 							if (cDriveProviderLol != null) {
 								if (cDriveProviderLol.getParentHandle() == INVALID_HANDLE || cDriveProviderLol.getParentHandle() == megaApi.getRootNode().getHandle()) {
-									aB.setTitle(getString(R.string.section_cloud_drive));
+									aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
 								} else {
 									aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
 								}
@@ -381,7 +381,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 							if (iSharesProviderLol != null) {
 								if (iSharesProviderLol.getDeepBrowserTree() == 0) {
-									aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+									aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
 								} else {
 									aB.setTitle(megaApi.getNodeByHandle(iSharesProviderLol.getParentHandle()).getName());
 
@@ -394,7 +394,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
-				changeStatusBarColor(this, this.getWindow(), R.color.lollipop_dark_primary_color);
+				changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
 			}
 		}
 	}
@@ -987,8 +987,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (hashes != null && hashes.length > 0) {
 			for (long hash : hashes) {
 				MegaNode tempNode = megaApi.getNodeByHandle(hash);
-				String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize(), pathToDownload);
-				if (localPath != null) {
+				String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize());
+				if(localPath != null){
 					try {
 						logDebug("COPY_FILE");
 						File fileToShare = new File(pathToDownload, tempNode.getName());
@@ -1622,7 +1622,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 					if (cDriveProviderLol != null) {
 						if (cDriveProviderLol.getParentHandle() == INVALID_HANDLE || cDriveProviderLol.getParentHandle() == megaApi.getRootNode().getHandle()) {
-							aB.setTitle(getString(R.string.section_cloud_drive));
+							aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
 						} else {
 							aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
 						}
@@ -1633,7 +1633,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 					if (iSharesProviderLol != null) {
 						if (iSharesProviderLol.getDeepBrowserTree() == 0) {
-							aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+							aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
 						} else {
 							aB.setTitle(iSharesProviderLol.name);
 						}

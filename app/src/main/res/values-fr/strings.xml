@@ -1857,11 +1857,12 @@
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Votre compte a été résilié à la suite d\'un non-respect des Conditions générales d\'utilisation de MEGA, tel qu\'une violation des droits d\'autrui ; un partage ou une importation de données illégales ; ou un abus du système.</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device’s images but there aren’t available images">Aucun fichier</string>
-    <string name="label_file_size_byte" context="size in byte">o</string>
-    <string name="label_file_size_kilo_byte" context="size in kilobyte">Ko</string>
-    <string name="label_file_size_mega_byte" context="size in megabyte">Mo</string>
-    <string name="label_file_size_giga_byte" context="size in gigabyte">Go</string>
-    <string name="label_file_size_tera_byte" context="size in terabyte">To</string>
+    <string name="label_file_size_byte" context="Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics">%s o</string>
+    <string name="label_file_size_kilo_byte" context="Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics">%s Ko</string>
+    <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s Mo</string>
+    <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s Go</string>
+    <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s To</string>
+    <string name="label_mega_byte" context="Size in megabytes.">Mo</string>
 
     <plurals name="number_of_versions" formatted="false">
         <item context="Number of versions of a file shown on the screen info of the file, version item" quantity="one">%1$d version</item>
