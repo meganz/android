@@ -100,6 +100,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
 
@@ -7117,7 +7118,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (holder != null) {
             MegaChatMessage holderMessage = getMessageAt(holder.getCurrentPosition()).getMessage();
 
-            if(msgId != -1 && holderMessage.getMsgId() != msgId)
+            if(msgId != INVALID_HANDLE && holderMessage.getMsgId() != msgId)
                 return;
 
             File previewDir = getPreviewFolder(context);
@@ -7635,7 +7636,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if (e.getErrorCode() == MegaError.API_OK) {
 
                     long handle = request.getNodeHandle();
-                    long msgId = -1;
+                    long msgId = INVALID_HANDLE;
                     if(pendingPreviews.containsKey(handle)){
                         msgId = pendingPreviews.get(handle);
                         pendingPreviews.remove(handle);
