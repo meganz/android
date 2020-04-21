@@ -310,6 +310,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
             displayLinearFAB(true);
             checkIncomingCall();
+
             return;
         }
 
@@ -1135,7 +1136,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (reconnectingLayout.isShown() && !reconnectingText.getText().equals(getString(R.string.connected_message)))
             return;
 
-        logDebug("Showing Reconnecting bar");
         reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
         reconnectingText.setText(getString(R.string.reconnecting_message));
         reconnectingLayout.setVisibility(View.VISIBLE);
@@ -2432,6 +2432,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     private void checkIncomingCall() {
         setAvatarLayout();
+        myAvatarLayout.setVisibility(View.VISIBLE);
+        contactAvatarLayout.setVisibility(View.VISIBLE);
         updateSubtitleNumberOfVideos();
 
         if(chat.isGroup()){
