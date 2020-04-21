@@ -3418,7 +3418,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (recordView.isRecordingNow()) break;
                 hideKeyboard();
                 if(isNecessaryDisableLocalCamera() != -1){
-                    showConfirmationOpenCamera(this, ACTION_TAKE_PICTURE);
+                    showConfirmationOpenCamera(this, ACTION_TAKE_PICTURE, false);
                     break;
                 }
                 controlCamera();

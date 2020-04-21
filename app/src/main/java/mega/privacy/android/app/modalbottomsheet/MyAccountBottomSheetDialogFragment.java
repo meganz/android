@@ -60,7 +60,7 @@ public class MyAccountBottomSheetDialogFragment extends BaseBottomSheetDialogFra
                 break;
 
             case R.id.my_account_my_QR_code:
-                ((ManagerActivityLollipop) context).checkBeforeOpeningQR();
+                ((ManagerActivityLollipop) context).checkBeforeOpeningQR(false);
                 break;
         }
 

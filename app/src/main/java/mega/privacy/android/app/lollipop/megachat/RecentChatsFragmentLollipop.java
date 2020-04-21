@@ -1042,6 +1042,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     logDebug("Index to replace: " + indexToReplace);
                     chats.set(indexToReplace, item);
                     onLastMessageChange(indexToReplace);
+                    onUnreadCountChange(indexToReplace, item.getUnreadCount() == 0);
                 }
             }
 
