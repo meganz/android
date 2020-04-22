@@ -6660,7 +6660,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
         notifyItemChanged(pos);
         if (selectedItems.size() == 0){
-            ((ChatActivityLollipop) context).hideMultipleSelect();
+            ((ChatActivityLollipop) context).updateActionModeTitle();
         }
     }
 
@@ -8156,54 +8156,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ViewHolderMessageChat holder = (ViewHolderMessageChat) view.getTag();
         int currentPosition = holder.getAdapterPosition();
 
-        if (!isMultipleSelect()){
-            if(currentPosition<1){
-                logWarning("Position not valid: " + currentPosition);
-            }
-            else{
-                logDebug("Position valid: " + currentPosition);
+        if (isMultipleSelect() || currentPosition < 1 || messages.get(currentPosition-1).isUploading())
+            return true;
 
-                if(!messages.get(currentPosition-1).isUploading()){
-                    if(MegaApplication.isShowInfoChatMessages()){
-                        ((ChatActivityLollipop) context).showMessageInfo(currentPosition);
-                    }
-                    else{
-                        AndroidMegaChatMessage messageR = messages.get(currentPosition-1);
-                        if(messageR.getMessage().getType() == MegaChatMessage.TYPE_CONTAINS_META){
-                            logDebug("TYPE_CONTAINS_META");
-                            MegaChatContainsMeta meta = messageR.getMessage().getContainsMeta();
-                            if(meta!=null && (meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW || meta.getType()==MegaChatContainsMeta.CONTAINS_META_GEOLOCATION)){
-//                                setMultipleSelect(true);
-                                ((ChatActivityLollipop) context).activateActionMode();
-                                ((ChatActivityLollipop) context).itemClick(currentPosition, null);
-                            }
-                            else{
-                                logWarning("Meta is Null or Invalid");
-                            }
-                        }
-                        else{
-
-                            logDebug("OTHER TYPE");
-
- //                           setMultipleSelect(true);
-                            ((ChatActivityLollipop) context).activateActionMode();
-                            ((ChatActivityLollipop) context).itemClick(currentPosition, null);
-
-//
-//                            if(currentPosition<1){
-//                                log("Position not valid");
-//                            }else{
-//                                ((ChatActivityLollipop) context).itemClick(currentPosition);
-//                            }
-                        }
-                    }
-                }
-                else{
-                    logWarning("Message uploading ");
-
-                }
-            }
+        if(MegaApplication.isShowInfoChatMessages()){
+            ((ChatActivityLollipop) context).showMessageInfo(currentPosition);
         }
+        else{
+            ((ChatActivityLollipop) context).itemLongClick(currentPosition);
+        }
+
         return true;
     }
 

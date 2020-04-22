@@ -72,6 +72,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     LinearLayout optionSaveOffline;
     LinearLayout optionRemove;
     LinearLayout optionForwardLayout;
+    private LinearLayout optionSelect;
 
     DisplayMetrics outMetrics;
 
@@ -83,6 +84,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     DatabaseHandler dbH;
 
     private int heightDisplay;
+    private int positionMessage;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -103,6 +105,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             messageId = savedInstanceState.getLong("messageId", -1);
             logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
             handle = savedInstanceState.getLong("handle", -1);
+            positionMessage = savedInstanceState.getInt(POSITION_SELECTED_MESSAGE, INVALID_POSITION);
+
         }
         else{
             logWarning("Bundle NULL");
@@ -110,6 +114,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             if(context instanceof ChatActivityLollipop){
                 chatId = ((ChatActivityLollipop) context).idChat;
                 messageId = ((ChatActivityLollipop) context).selectedMessageId;
+                positionMessage = ((ChatActivityLollipop) context).selectedPosition;
             }
             else if(context instanceof NodeAttachmentHistoryActivity){
                 chatId = ((NodeAttachmentHistoryActivity) context).chatId;
@@ -156,6 +161,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionSaveOffline = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
         optionForwardLayout = (LinearLayout) contentView.findViewById(R.id.option_forward_layout);
+        optionSelect = contentView.findViewById(R.id.option_select_layout);
 
         LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
         LinearLayout separatorRemove = (LinearLayout) contentView.findViewById(R.id.separator_remove);
@@ -181,6 +187,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionRemove.setOnClickListener(this);
         optionImport.setOnClickListener(this);
         optionForwardLayout.setOnClickListener(this);
+        optionSelect.setOnClickListener(this);
 
         if (chatC.isInAnonymousMode()) {
             optionSaveOffline.setVisibility(View.GONE);
@@ -272,18 +279,15 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             separatorRemove.setVisibility(View.VISIBLE);
         }
 
+        if(context instanceof ChatActivityLollipop) {
+            optionSelect.setVisibility(View.VISIBLE);
+        }else{
+            optionSelect.setVisibility(View.GONE);
+        }
+
         dialog.setContentView(contentView);
 
         mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//
-//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-//        }
-//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//        }
-
         mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
@@ -347,6 +351,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     chatC.prepareMessageToForward(messageId, chatId);
                     break;
                 }
+                case R.id.option_select_layout:
+                    if(context instanceof ChatActivityLollipop){
+                        ((ChatActivityLollipop)context).activateActionModeWithItem(positionMessage);
+                    }
+                    dismissAllowingStateLoss();
+                    break;
                 case R.id.option_download_layout:{
                     logDebug("Download option");
                     if(node==null){
@@ -431,5 +441,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         outState.putLong("chatId", chatId);
         outState.putLong("messageId", messageId);
         outState.putLong("handle", handle);
+
+        if (context instanceof ChatActivityLollipop) {
+            outState.putLong(POSITION_SELECTED_MESSAGE, positionMessage);
+        }
     }
 }
