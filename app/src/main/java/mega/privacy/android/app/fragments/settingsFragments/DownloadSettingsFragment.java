@@ -31,27 +31,21 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DownloadSettingsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
 
-    private PreferenceCategory category;
     private Preference downloadLocation;
     private TwoLineCheckPreference storageAskMeAlways;
 
     private boolean askMe;
     private String downloadLocationPath = "";
-    private boolean hasSDCard;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences_download);
 
-        category = findPreference(KEY_STORAGE_DOWNLOAD_CATEGORY);
         downloadLocation = findPreference(KEY_STORAGE_DOWNLOAD_LOCATION);
         downloadLocation.setOnPreferenceClickListener(this);
 
         storageAskMeAlways = (TwoLineCheckPreference) findPreference(KEY_STORAGE_ASK_ME_ALWAYS);
         storageAskMeAlways.setOnPreferenceClickListener(this);
-
-        File[] fs = context.getExternalFilesDirs(null);
-        hasSDCard = fs.length > 1 && fs[1] != null;
 
         if (prefs.getStorageAskAlways() == null) {
             askMe = true;
@@ -62,7 +56,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
 
         storageAskMeAlways.setChecked(askMe);
         if(askMe) {
-            category.removePreference(downloadLocation);
+            getPreferenceScreen().removePreference(downloadLocation);
         }
 
         if (isTextEmpty(prefs.getStorageDownloadLocation())) {
@@ -87,21 +81,17 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
             case KEY_STORAGE_ASK_ME_ALWAYS:
                 dbH.setStorageAskAlways(askMe = storageAskMeAlways.isChecked());
                 if(askMe) {
-                    category.removePreference(downloadLocation);
+                    getPreferenceScreen().removePreference(downloadLocation);
                 } else {
                     resetDefaultDownloadLocation();
-                    category.addPreference(downloadLocation);
+                    getPreferenceScreen().addPreference(downloadLocation);
                 }
                 setDownloadLocation();
                 break;
 
             case KEY_STORAGE_DOWNLOAD_LOCATION:
                 if (hasStoragePermission()) {
-                    if (hasSDCard) {
-                        showSelectDownloadLocationDialog();
-                    } else {
                         toSelectFolder(null);
-                    }
                 } else {
                     requestPermissions(new String[]{
                             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -139,7 +129,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
             Uri treeUri = intent.getData();
             if (treeUri != null) {
                 DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
-                if (pickedDir.canWrite()) {
+                if (pickedDir != null && pickedDir.canWrite()) {
                     logDebug("sd card uri is " + treeUri);
                     dbH.setSDCardUri(treeUri.toString());
                     SDCardOperator sdCardOperator = null;
@@ -190,9 +180,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment implements Pr
         Intent intent = new Intent(context, FileStorageActivityLollipop.class);
         intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
-        if (sdRoot != null) {
-            intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT, sdRoot);
-        }
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT, sdRoot);
         startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
     }
 

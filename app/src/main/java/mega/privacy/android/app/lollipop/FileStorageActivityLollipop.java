@@ -87,7 +87,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
 	public static final String EXTRA_CAMERA_FOLDER = "camera_folder";
 	public static final String EXTRA_BUTTON_PREFIX = "button_prefix";
-	public static final String EXTRA_SD_ROOT = "sd_root";
+    public static final String EXTRA_SD_ROOT = "sd_root";
 	public static final String EXTRA_PATH = "filepath";
 	public static final String EXTRA_FILES = "fileslist";
     public static final String EXTRA_PROMPT = "prompt";
@@ -159,8 +159,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private FileStorageLollipopAdapter adapter;
 	private Toolbar tB;
 	private ActionBar aB;
-
-	private DisplayMetrics outMetrics;
 	
 	private ActionMode actionMode;
 	
@@ -336,10 +334,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
-		
-		Display display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
 
 	    handler = new Handler();
 
@@ -361,8 +355,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
 		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
 		cameraFolderSettings = intent.getBooleanExtra(EXTRA_CAMERA_FOLDER, false);
-		sdRoot = intent.getStringExtra(EXTRA_SD_ROOT);
-		hasSDCard = (sdRoot != null);
+		File[] fs = getExternalFilesDirs(null);
+		hasSDCard = fs.length > 1 && fs[1] != null;
 		
 		mode = Mode.getFromIntent(intent);
 		if (mode == Mode.PICK_FOLDER) {
@@ -449,7 +443,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		emptyTextView.setText(getSpannedHtmlText(textToShow));
 
 		listView = findViewById(R.id.file_storage_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this, getOutMetrics()));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
@@ -914,13 +908,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
+		params.setMargins(scaleWidthPx(20, getOutMetrics()), scaleWidthPx(20, getOutMetrics()), scaleWidthPx(17, getOutMetrics()), 0);
 
 		final EditText input = new EditText(this);
 		layout.addView(input, params);
 
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
+		params1.setMargins(scaleWidthPx(20, getOutMetrics()), 0, scaleWidthPx(17, getOutMetrics()), 0);
 
 		final RelativeLayout error_layout = new RelativeLayout(FileStorageActivityLollipop.this);
 		layout.addView(error_layout, params1);
@@ -943,7 +937,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
+		params_text_error.setMargins(scaleWidthPx(3, getOutMetrics()), 0,0,0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(FileStorageActivityLollipop.this, R.color.login_warning));
