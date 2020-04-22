@@ -295,6 +295,7 @@ public class Constants {
     public static final int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE + 1;
 
     public static final int DEVICE_ANDROID = 1;
+    public static final int DEVICE_HUAWEI = 4;
     public static final int DEVICE_IOS = 2;
 
     public static final int NOTIFICATION_SUMMARY_CHAT = 0;

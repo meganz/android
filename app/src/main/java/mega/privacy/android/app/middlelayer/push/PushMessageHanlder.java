@@ -28,7 +28,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.Constants.DEVICE_ANDROID;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class PushMessageHanlder implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
@@ -167,7 +166,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
         }
     }
 
-    public void sendRegistrationToServer(String newToken) {
+    public void sendRegistrationToServer(String newToken, int deviceType) {
         if(TextUtil.isTextEmpty(newToken)) return;
 
         SharedPreferences sp = app.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE);
@@ -178,7 +177,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
             }
             logDebug("Push service's new token: " + newToken);
             TOKEN = token;
-            megaApi.registerPushNotifications(DEVICE_ANDROID, newToken, this);
+            megaApi.registerPushNotifications(deviceType, newToken, this);
         } else {
             logDebug("No need to register new token.");
         }

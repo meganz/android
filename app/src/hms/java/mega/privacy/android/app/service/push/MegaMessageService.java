@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 
+import static mega.privacy.android.app.utils.Constants.DEVICE_HUAWEI;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MegaMessageService extends HmsMessageService {
@@ -41,7 +42,7 @@ public class MegaMessageService extends HmsMessageService {
     @Override
     public void onNewToken(String s) {
         logDebug("New token is: " + s);
-        messageHanlder.sendRegistrationToServer(s);
+        messageHanlder.sendRegistrationToServer(s, DEVICE_HUAWEI);
     }
 
     public static void getToken(Context context) {
@@ -50,7 +51,7 @@ public class MegaMessageService extends HmsMessageService {
             try {
                 // wait for the callback
                 String token = HmsInstanceId.getInstance(context).getToken(appId, "HCM");
-                new PushMessageHanlder().sendRegistrationToServer(token);
+                new PushMessageHanlder().sendRegistrationToServer(token, DEVICE_HUAWEI);
             } catch (ApiException e) {
                 logError(e.getMessage(), e);
                 e.printStackTrace();

@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 
+import static mega.privacy.android.app.utils.Constants.DEVICE_ANDROID;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 
@@ -50,7 +51,7 @@ public class MegaMessageService extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String s) {
         logDebug("New token is: " + s);
-        messageHanlder.sendRegistrationToServer(s);
+        messageHanlder.sendRegistrationToServer(s, DEVICE_ANDROID);
     }
 
     public static void getToken(Context context) {
@@ -60,7 +61,7 @@ public class MegaMessageService extends FirebaseMessagingService {
             FirebaseInstanceId instanceId = FirebaseInstanceId.getInstance();
             try {
                 String token = instanceId.getToken(id, "FCM");
-                new PushMessageHanlder().sendRegistrationToServer(token);
+                new PushMessageHanlder().sendRegistrationToServer(token, DEVICE_ANDROID);
             } catch (IOException e) {
                 e.printStackTrace();
                 logError(e.getMessage(), e);
