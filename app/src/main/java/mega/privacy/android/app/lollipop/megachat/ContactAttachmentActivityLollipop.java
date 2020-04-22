@@ -348,7 +348,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			if(contact!=null) {
 				if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
 					Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-					i.putExtra("name", c.getMail());
+					i.putExtra(NAME, c.getMail());
 					this.startActivity(i);
 				}
 				else{

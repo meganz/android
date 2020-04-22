@@ -186,7 +186,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 }
 
                 optionLeaveChat.setVisibility(View.GONE);
-                setContactStatus(userHandle, iconStateChatPanel);
+                setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), iconStateChatPanel);
             }
 
             chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));

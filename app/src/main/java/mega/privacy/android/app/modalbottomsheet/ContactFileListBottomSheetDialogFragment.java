@@ -206,11 +206,6 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 break;
 
             case MegaShare.ACCESS_READ:
-                optionRename.setVisibility(View.GONE);
-                optionRubbish.setVisibility(View.GONE);
-                optionMove.setVisibility(View.GONE);
-                break;
-
             case MegaShare.ACCESS_READWRITE:
                 optionMove.setVisibility(View.GONE);
                 optionRename.setVisibility(View.GONE);
@@ -246,11 +241,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
     }
 
     private boolean getFirstLevel() {
-        if (context instanceof ContactFileListActivityLollipop) {
-            contactFileListActivity.isEmptyParentHandleStack();
-        }
-
-        return true;
+        return !(context instanceof ContactFileListActivityLollipop) || contactFileListActivity.isEmptyParentHandleStack();
     }
 
     @Override
@@ -278,7 +269,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 i.putExtra("from", FROM_INCOMING_SHARES);
                 boolean firstLevel = getFirstLevel();
                 i.putExtra("firstLevel", firstLevel);
-                i.putExtra("name", node.getName());
+                i.putExtra(NAME, node.getName());
                 context.startActivity(i);
                 break;
 

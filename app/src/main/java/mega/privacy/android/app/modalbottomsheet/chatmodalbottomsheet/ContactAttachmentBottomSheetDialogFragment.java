@@ -128,7 +128,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             optionInfo.setVisibility(View.VISIBLE);
 
             long userHandle = message.getMessage().getUserHandle(0);
-            setContactStatus(userHandle, stateIcon);
+            setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), stateIcon);
 
             if (userHandle != megaChatApi.getMyUserHandle()) {
 
@@ -232,13 +232,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     optionInfo.setVisibility(View.VISIBLE);
                     //Check if the contact is the same that the one is chatting
                     MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-                    if (!chatRoom.isGroup()) {
-                        long messageContactHandle = chatRoom.getPeerHandle(0);
-                        if (contact.getHandle() == messageContactHandle) {
-                            optionStartConversation.setVisibility(View.GONE);
-                        } else {
-                            optionStartConversation.setVisibility(View.VISIBLE);
-                        }
+                    if (!chatRoom.isGroup() && chatRoom.getPeerHandle(0) == contact.getHandle()) {
+                        optionStartConversation.setVisibility(View.GONE);
                     } else {
                         optionStartConversation.setVisibility(View.VISIBLE);
                     }
@@ -292,9 +287,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
                 i = new Intent(context, ContactInfoActivityLollipop.class);
                 if (context instanceof ChatActivityLollipop) {
-                    i.putExtra("name", message.getMessage().getUserEmail(0));
+                    i.putExtra(NAME, message.getMessage().getUserEmail(0));
                 } else if (position != -1) {
-                    i.putExtra("name", message.getMessage().getUserEmail(position));
+                    i.putExtra(NAME, message.getMessage().getUserEmail(position));
                 } else {
                     logWarning("Error - position -1");
                 }
@@ -333,10 +328,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                         }
                         cC.inviteMultipleContacts(contactEmails);
                     }
-                } else {
-                    if (email != null) {
-                        cC.inviteContact(email);
-                    }
+                } else if (email != null) {
+                    cC.inviteContact(email);
                 }
 
 
@@ -386,5 +379,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
         outState.putLong(CHAT_ID, chatId);
         outState.putLong(MESSAGE_ID, messageId);
+        outState.putString(EMAIL, email);
     }
 }

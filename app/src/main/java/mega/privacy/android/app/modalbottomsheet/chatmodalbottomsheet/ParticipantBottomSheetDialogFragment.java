@@ -111,7 +111,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
-        setContactStatus(participantHandle, stateIcon);
+        setContactStatus(megaChatApi.getUserOnlineStatus(participantHandle), stateIcon);
 
         if (participantHandle == megaApi.getMyUser().getHandle()) {
             ChatController chatC = new ChatController(context);
@@ -234,7 +234,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         switch (v.getId()) {
             case R.id.contact_info_group_participants_chat_layout:
                 Intent i = new Intent(context, ContactInfoActivityLollipop.class);
-                i.putExtra("name", selectedChat.getPeerEmailByHandle(participantHandle));
+                i.putExtra(NAME, selectedChat.getPeerEmailByHandle(participantHandle));
                 context.startActivity(i);
                 dismissAllowingStateLoss();
                 break;

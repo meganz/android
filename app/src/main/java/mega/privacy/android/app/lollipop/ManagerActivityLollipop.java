@@ -2936,7 +2936,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 								Intent i = new Intent(this, FileInfoActivityLollipop.class);
 								i.putExtra("handle", nodeLink.getHandle());
-								i.putExtra("name", nodeLink.getName());
+								i.putExtra(NAME, nodeLink.getName());
 								startActivity(i);
 							}
 						}

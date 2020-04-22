@@ -131,7 +131,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         optionStartConversation.setVisibility(View.VISIBLE);
         optionStartConversation.setOnClickListener(this);
 
-        setContactStatus(contact.getMegaUser().getHandle(), contactStateIcon);
+        setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle()), contactStateIcon);
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
@@ -171,7 +171,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         switch (v.getId()) {
             case R.id.contact_list_info_contact_layout:
                 Intent i = new Intent(context, ContactInfoActivityLollipop.class);
-                i.putExtra("name", contact.getMegaUser().getEmail());
+                i.putExtra(NAME, contact.getMegaUser().getEmail());
                 context.startActivity(i);
                 break;
 

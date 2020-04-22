@@ -558,7 +558,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			userEmail = extras.getString("name");
+			userEmail = extras.getString(NAME);
 			int currNodePosition = extras.getInt("node_position", -1);
 
 			setContentView(R.layout.activity_main_contact_properties);

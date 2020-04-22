@@ -28,6 +28,7 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
@@ -45,6 +46,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class ChatUtil {
 
@@ -392,15 +394,14 @@ public class ChatUtil {
     /**
      * Sets the contact status icon
      *
-     * @param contactId         contact's identifier
-     * @param contactStateIcon  view in which the status has to be set
+     * @param userStatus         contact's status
+     * @param contactStateIcon  view in which the status icon has to be set
      */
-    public static void setContactStatus(long contactId, ImageView contactStateIcon) {
+    public static void setContactStatus(int userStatus, ImageView contactStateIcon) {
         if (contactStateIcon == null) {
             return;
         }
 
-        int userStatus = MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(contactId);
         contactStateIcon.setVisibility(View.VISIBLE);
 
         switch (userStatus) {
@@ -423,6 +424,65 @@ public class ChatUtil {
             case MegaChatApi.STATUS_INVALID:
             default:
                 contactStateIcon.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Sets the contact status icon and status text
+     *
+     * @param userStatus         contact's status
+     * @param contactStateIcon  view in which the status icon has to be set
+     * @param contactStateText  view in which the status text has to be set
+     */
+    public static void setContactStatus(int userStatus, ImageView contactStateIcon, TextView contactStateText) {
+        MegaApplication app = MegaApplication.getInstance();
+        setContactStatus(userStatus, contactStateIcon);
+
+        if (contactStateText == null) {
+            return;
+        }
+
+        contactStateText.setVisibility(View.VISIBLE);
+
+        switch (userStatus) {
+            case MegaChatApi.STATUS_ONLINE:
+                contactStateText.setText(app.getString(R.string.online_status));
+                break;
+
+            case MegaChatApi.STATUS_AWAY:
+                contactStateText.setText(app.getString(R.string.away_status));
+                break;
+
+            case MegaChatApi.STATUS_BUSY:
+                contactStateText.setText(app.getString(R.string.busy_status));
+                break;
+
+            case MegaChatApi.STATUS_OFFLINE:
+                contactStateText.setText(app.getString(R.string.offline_status));
+                break;
+
+            case MegaChatApi.STATUS_INVALID:
+            default:
+                contactStateText.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * If the contact has last green, sets is as status text
+     *
+     * @param context           current Context
+     * @param userStatus        contact's status
+     * @param lastGreen         contact's last green
+     * @param contactStateText  view in which the last green has to be set
+     */
+    public static void setContactLastGreen(Context context, int userStatus, String lastGreen, MarqueeTextView contactStateText) {
+        if (contactStateText == null || isTextEmpty(lastGreen)) {
+            return;
+        }
+
+        if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
+            contactStateText.setText(lastGreen);
+            contactStateText.isMarqueeIsNecessary(context);
         }
     }
 }

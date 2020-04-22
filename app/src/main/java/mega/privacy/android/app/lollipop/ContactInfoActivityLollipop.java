@@ -440,7 +440,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			removeContactChatLayout.setOnClickListener(this);
 
 			chatHandle = extras.getLong("handle",-1);
-			userEmailExtra = extras.getString("name");
+			userEmailExtra = extras.getString(NAME);
 			if (chatHandle != -1) {
 
 				logDebug("From chat!!");

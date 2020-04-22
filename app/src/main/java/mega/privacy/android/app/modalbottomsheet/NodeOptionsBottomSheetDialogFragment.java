@@ -996,7 +996,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         }
                     }
                 }
-                i.putExtra("name", node.getName());
+                i.putExtra(NAME, node.getName());
 
                 ((ManagerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_FILE_INFO);
                 dismissAllowingStateLoss();
@@ -1013,7 +1013,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case R.id.option_share_folder_layout:
                 if (isOutShare(node)) {
                     i = new Intent(context, FileContactListActivityLollipop.class);
-                    i.putExtra("name", node.getHandle());
+                    i.putExtra(NAME, node.getHandle());
                     context.startActivity(i);
                     dismissAllowingStateLoss();
                 } else {
