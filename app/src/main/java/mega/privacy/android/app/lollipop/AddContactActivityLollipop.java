@@ -2953,7 +2953,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             case R.id.layout_scan_qr: {
                 logDebug("Scan QR code pressed");
                 if (isNecessaryDisableLocalCamera() != -1) {
-                    showConfirmationOpenCamera(this, ACTION_OPEN_QR);
+                    showConfirmationOpenCamera(this, ACTION_OPEN_QR, true);
                     break;
                 }
                 initScanQR();

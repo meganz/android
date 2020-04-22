@@ -1666,8 +1666,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 	}
 
 	private void createDefaultAvatar(ImageView ownerRoundeImage, MegaUser user, String name){
-        int color = getColorAvatar(this, megaApi, user);
-		ownerRoundeImage.setImageBitmap(getDefaultAvatar(this, color, name, AVATAR_SIZE, true));
+		ownerRoundeImage.setImageBitmap(getDefaultAvatar(getColorAvatar(user), name, AVATAR_SIZE, true));
 	}
 
 

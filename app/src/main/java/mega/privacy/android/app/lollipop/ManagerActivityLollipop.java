@@ -2191,6 +2191,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
         upgradeAccount.setOnClickListener(this);
 
         navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) navigationDrawerAddPhoneContainer.getLayoutParams();
+        if (isScreenInPortrait(this)) {
+        	params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        	params.removeRule(RelativeLayout.BELOW);
+		} else {
+        	params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+			params.addRule(RelativeLayout.BELOW, R.id.sections_layout);
+		}
+        navigationDrawerAddPhoneContainer.setLayoutParams(params);
 
         addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
         addPhoneNumberButton.setOnClickListener(this);
@@ -4099,7 +4108,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	public void setDefaultAvatar(){
 		logDebug("setDefaultAvatar");
-		nVPictureProfile.setImageBitmap(getDefaultAvatar(this, getColorAvatar(this, megaApi, megaApi.getMyUser()), MegaApplication.getInstance().getMyAccountInfo().getFullName(), AVATAR_SIZE, true));
+		nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(megaApi.getMyUser()), MegaApplication.getInstance().getMyAccountInfo().getFullName(), AVATAR_SIZE, true));
 	}
 
 	public void setOfflineAvatar(String email, long myHandle, String name){
@@ -4144,7 +4153,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 
 		if (nVPictureProfile != null){
-			nVPictureProfile.setImageBitmap(getDefaultAvatar(this, getColorAvatar(this, megaApi, myHandle), name, AVATAR_SIZE, true));
+			nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(myHandle), name, AVATAR_SIZE, true));
 		}
 	}
 
@@ -7308,7 +7317,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.action_scan_qr: {
 				logDebug("Action menu scan QR code pressed");
                 //Check if there is a in progress call:
-				checkBeforeOpeningQR();
+				checkBeforeOpeningQR(true);
 				return true;
 			}
 			case R.id.action_return_call:{
@@ -7324,19 +7333,19 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
 	}
 
-	public void checkBeforeOpeningQR(){
+	public void checkBeforeOpeningQR(boolean openScanQR){
 		if (isNecessaryDisableLocalCamera() != -1) {
-			showConfirmationOpenCamera(this, ACTION_OPEN_QR);
+			showConfirmationOpenCamera(this, ACTION_OPEN_QR, openScanQR);
 			return;
 		}
-		openQR();
+		openQR(openScanQR);
 	}
 
-	public void openQR(){
+	public void openQR(boolean openScanQr){
 		ScanCodeFragment fragment = new ScanCodeFragment();
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
 		Intent intent = new Intent(this, QRCodeActivity.class);
-		intent.putExtra("contacts", true);
+		intent.putExtra(OPEN_SCAN_QR, openScanQr);
 		startActivity(intent);
 	}
 

@@ -115,6 +115,7 @@ public abstract class RotatableFragment extends BaseFragment {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {

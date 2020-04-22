@@ -267,10 +267,10 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 		int color;
 		if (isMegaContact){
-			color = ContextCompat.getColor(mContext, R.color.lollipop_primary_color);
+			color = getSpecificAvatarColor(AVATAR_PRIMARY_COLOR);
 		}
 		else{
-			color = ContextCompat.getColor(mContext, R.color.color_default_avatar_phone);
+			color = getSpecificAvatarColor(AVATAR_PHONE_COLOR);
 		}
 
 		String name = null;
@@ -280,7 +280,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 			name = holder.contactName;
 		}
 
-		Bitmap bitmap = getDefaultAvatar(mContext, color, name, AVATAR_SIZE, true);
+		Bitmap bitmap = getDefaultAvatar(color, name, AVATAR_SIZE, true);
 		holder.imageView.setImageBitmap(bitmap);
 	}
 	

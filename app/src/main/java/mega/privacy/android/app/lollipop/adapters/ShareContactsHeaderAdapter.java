@@ -233,7 +233,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                     }
                 }
 
-                holder.avatar.setImageBitmap(getAvatarShareContact(mContext, megaApi, contact));
+                holder.avatar.setImageBitmap(getAvatarShareContact(mContext, contact));
                 UserAvatarListenerShare listener = new UserAvatarListenerShare(mContext, holder);
 
                 File avatar = buildAvatarFile(mContext,mail + ".jpg");
@@ -274,7 +274,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
                 holder.contactNameTextView.setText(contact.getPhoneContactInfo().getName());
                 holder.emailTextView.setText(contact.getPhoneContactInfo().getEmail());
-                holder.avatar.setImageBitmap(getAvatarShareContact(mContext, megaApi, contact));
+                holder.avatar.setImageBitmap(getAvatarShareContact(mContext, contact));
             }
         } else if (contact.isProgress()) {
             holder.itemLayout.setVisibility(View.GONE);

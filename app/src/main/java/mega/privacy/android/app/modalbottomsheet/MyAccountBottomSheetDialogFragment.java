@@ -142,7 +142,7 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
             }
             case R.id.my_account_my_QR_code:
                 logDebug("Option QR code");
-                ((ManagerActivityLollipop) context).checkBeforeOpeningQR();
+                ((ManagerActivityLollipop) context).checkBeforeOpeningQR(false);
                 break;
         }
 

@@ -159,13 +159,6 @@
         <item name="tabTextAppearance">@style/MyCustomTabTextAppearance</item>
     </style>
 
-    <style name="MyCustomTabLayout.Secondary" parent="MyCustomTabLayout">
-        <item name="tabIndicatorColor">@color/white</item>
-        <item name="tabBackground">@color/dark_primary_color</item>
-        <item name="tabSelectedTextColor">@color/white</item>
-        <item name="tabTextAppearance">@style/MyCustomTabTextAppearance.Secondary</item>
-    </style>
-
     <style name="MyCustomTabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/mail_my_account</item>

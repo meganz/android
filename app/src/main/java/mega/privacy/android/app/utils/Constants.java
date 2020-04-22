@@ -380,6 +380,10 @@ public class Constants {
 
     public static final String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
 
+    public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
+    public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
+    public static final String AVATAR_PHONE_COLOR = "AVATAR_PHONE_COLOR";
+
     /**
      * A phone number pattern, which length should be in 5-22, and the beginning can have a '+'.
      */
@@ -436,6 +440,7 @@ public class Constants {
     public static final String ID_MESSAGES = "ID_MESSAGES";
     public static final String USER_HANDLES = "USER_HANDLES";
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
+    public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";

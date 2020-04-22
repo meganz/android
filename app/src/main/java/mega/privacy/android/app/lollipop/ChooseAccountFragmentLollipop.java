@@ -161,7 +161,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         freeLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_layout);
         freeLayout.setOnClickListener(this);
         titleFree = (TextView) v.findViewById(R.id.choose_account_free_title_text);
-        titleFree.setText(getString(R.string.free_account).toUpperCase());
+        titleFree.setText(getString(R.string.free_account));
         storageSectionFree = (TextView) v.findViewById(R.id.storage_free);
         bandwidthSectionFree = (TextView) v.findViewById(R.id.bandwidth_free);
         achievementsSectionFree = (TextView) v.findViewById(R.id.achievements_free);

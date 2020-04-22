@@ -2769,4 +2769,6 @@
 
     <string name="view_in_folder_label" context="Action to show any file in its location">View in folder</string>
     <string name="browse_files_label" context="Title of a screen to browse files">Browse files</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
 </resources>

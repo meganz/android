@@ -1,41 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navigation_drawer_account_view"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:foreground="?selectableItemBackground"
-    tools:layout_height="wrap_content"
-    android:background="#ffffff">
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:background="#ffffff"
+    android:foreground="?selectableItemBackground">
 
     <LinearLayout
-        android:layout_height="wrap_content"
+        android:id="@+id/sections_layout"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingStart="24dp"
         android:paddingTop="44dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:paddingBottom="44dp">
+        android:paddingEnd="24dp">
 
         <RelativeLayout
             android:id="@+id/navigation_drawer_account_section"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:id="@+id/navigation_drawer_user_account_relative_layout_profile_avatar"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true">
 
                 <mega.privacy.android.app.components.RoundedImageView
                     android:id="@+id/navigation_drawer_user_account_picture_profile"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="fitCenter"
                     android:layout_centerInParent="true"
+                    android:scaleType="fitCenter"
                     rounded:border_width="0dp"
                     rounded:corner_radius="30dp" />
 
@@ -44,7 +43,7 @@
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:layout_alignTop="@id/navigation_drawer_user_account_picture_profile"
-                    android:layout_alignRight="@id/navigation_drawer_user_account_picture_profile"
+                    android:layout_alignEnd="@id/navigation_drawer_user_account_picture_profile"
                     android:background="@null"
                     android:src="@drawable/ic_offline" />
 
@@ -55,44 +54,43 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/navigation_drawer_user_account_relative_layout_profile_avatar"
-                android:gravity="center_vertical"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="20dp"
+                android:gravity="center_vertical"
                 android:orientation="vertical">
 
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/navigation_drawer_account_information_display_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    rounded:emojiSize="14sp"
-                    android:textColor="@color/name_my_account"
-                    android:text="User Name"
-                    android:singleLine="true"
                     android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"/>
+                    android:singleLine="true"
+                    android:text="User Name"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    rounded:emojiSize="14sp" />
 
                 <TextView
                     android:id="@+id/navigation_drawer_account_information_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="@color/name_my_account"
-                    android:text="email@domain.com"
-                    android:singleLine="true"
                     android:ellipsize="end"
-                    android:fontFamily="roboto"/>
+                    android:fontFamily="roboto"
+                    android:singleLine="true"
+                    android:text="email@domain.com"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="14sp" />
 
-				<TextView
-					android:id="@+id/business_label"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="12sp"
-					android:textAllCaps="true"
-					android:text="@string/business_label"
-					android:textColor="@color/business_color"
-					android:layout_below="@id/navigation_drawer_account_information"
-					android:layout_marginTop="7dp"/>
+                <TextView
+                    android:id="@+id/business_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:text="@string/business_label"
+                    android:textAllCaps="true"
+                    android:textColor="@color/business_color"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -100,15 +98,15 @@
                 android:id="@+id/nv_used_space_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#ffffff"
                 android:layout_below="@+id/navigation_drawer_account_information"
+                android:background="#ffffff"
                 android:visibility="gone">
 
                 <ProgressBar
                     android:id="@+id/manager_used_space_bar"
                     style="@style/UsedSpaceProgressBar"
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"/>
+                    android:layout_height="2dp" />
 
                 <TextView
                     android:id="@+id/navigation_drawer_space"
@@ -117,12 +115,12 @@
                     android:layout_below="@id/manager_used_space_bar"
                     android:layout_marginTop="12dp"
                     android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:textSize="13sp"/>
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
             </RelativeLayout>
 
         </RelativeLayout>
-        
+
         <RelativeLayout
             android:id="@+id/my_account_section"
             android:layout_width="match_parent"
@@ -132,20 +130,20 @@
                 android:id="@+id/my_account_section_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left|center_vertical"
                 android:layout_centerVertical="true"
-                android:textSize="14sp"
                 android:fontFamily="sans-serif-light"
-                android:textStyle="bold"
+                android:gravity="start|center_vertical"
+                android:text="@string/section_account"
                 android:textColor="@color/name_my_account"
-                android:text="@string/section_account"/>
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account"
-                android:layout_alignParentBottom="true"/>
+                android:background="@color/divider_upgrade_account" />
 
         </RelativeLayout>
 
@@ -158,21 +156,21 @@
                 android:id="@+id/contacts_section_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left|center_vertical"
                 android:layout_centerVertical="true"
-                android:textSize="14sp"
                 android:fontFamily="sans-serif-light"
-                android:textStyle="bold"
+                android:gravity="start|center_vertical"
+                android:text="@string/section_contacts"
                 android:textColor="@color/name_my_account"
-                android:text="@string/section_contacts"/>
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account"
-                android:layout_alignParentBottom="true"/>
+                android:background="@color/divider_upgrade_account" />
 
         </RelativeLayout>
 
@@ -185,21 +183,21 @@
                 android:id="@+id/inbox_section_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left|center_vertical"
                 android:layout_centerVertical="true"
-                android:textSize="14sp"
                 android:fontFamily="sans-serif-light"
-                android:textStyle="bold"
+                android:gravity="start|center_vertical"
+                android:text="@string/section_inbox"
                 android:textColor="@color/name_my_account"
-                android:text="@string/section_inbox"/>
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account"
-                android:layout_alignParentBottom="true"/>
+                android:background="@color/divider_upgrade_account" />
 
         </RelativeLayout>
 
@@ -212,20 +210,20 @@
                 android:id="@+id/notification_section_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left|center_vertical"
                 android:layout_centerVertical="true"
-                android:textSize="14sp"
                 android:fontFamily="sans-serif-light"
-                android:textStyle="bold"
+                android:gravity="start|center_vertical"
+                android:text="@string/title_properties_chat_contact_notifications"
                 android:textColor="@color/name_my_account"
-                android:text="@string/title_properties_chat_contact_notifications"/>
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account"
-                android:layout_alignParentBottom="true"/>
+                android:background="@color/divider_upgrade_account" />
 
         </RelativeLayout>
 
@@ -264,22 +262,22 @@
                 android:id="@+id/settings_section_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left|center_vertical"
                 android:layout_centerVertical="true"
-                android:textSize="14sp"
                 android:fontFamily="sans-serif-light"
-                android:textStyle="bold"
+                android:gravity="start|center_vertical"
+                android:text="@string/action_settings"
                 android:textColor="@color/name_my_account"
-                android:text="@string/action_settings"/>
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
 
             <View
                 android:id="@+id/settings_separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
-                android:background="@color/divider_upgrade_account"
-                android:layout_alignParentBottom="true"/>
+                android:background="@color/divider_upgrade_account" />
 
         </RelativeLayout>
 
@@ -287,64 +285,72 @@
             android:id="@+id/upgrade_navigation_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:elevation="6dp"
-            android:textColor="@color/accentColor"
-            android:fontFamily="sans-serif-light"
-            android:textStyle="bold"
-            android:layout_marginBottom="100dp"
-            android:layout_marginLeft="1dp"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
+            android:layout_gravity="start"
+            android:layout_marginStart="1dp"
             android:layout_marginTop="14dp"
+            android:layout_marginBottom="14dp"
+            android:elevation="6dp"
+            android:fontFamily="sans-serif-light"
+            android:paddingLeft="16dp"
+            android:paddingTop="10dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="10dp"
+            android:text="@string/my_account_upgrade_pro"
+            android:textColor="@color/accentColor"
             android:textSize="14sp"
-            android:text="@string/my_account_upgrade_pro"/>
+            android:textStyle="bold" />
 
     </LinearLayout>
 
-	<LinearLayout android:id="@+id/navigation_drawer_add_phone_number_container"
-	              android:layout_width="match_parent"
-	              android:layout_height="wrap_content"
-	              android:paddingBottom="16dp"
-	              android:layout_marginTop="20dp"
-	              android:paddingRight="16dp"
-	              android:background="#FFF9F9F9"
-	              android:layout_gravity="bottom"
-	              android:layout_alignParentBottom="true"
-	              android:visibility="gone"
-	              android:orientation="vertical">
-		<LinearLayout android:layout_width="match_parent"
-		              android:layout_height="wrap_content"
-		              android:paddingLeft="16dp"
-		              android:paddingTop="10dp"
-		              android:paddingBottom="5dp">
-			<ImageView android:id="@+id/navigation_drawer_add_phone_number_icon"
-			           android:layout_width="40dp"
-			           android:layout_height="40dp"
-			           android:src="@drawable/il_verify_phone_drawer"/>
-			<TextView android:id="@+id/navigation_drawer_add_phone_number_button"
-			          android:layout_width="wrap_content"
-			          android:layout_height="wrap_content"
-			          android:layout_marginLeft="16dp"
-			          android:background="@drawable/background_button_border_accent"
-			          android:gravity="center"
-			          android:paddingLeft="16dp"
-			          android:paddingTop="10dp"
-			          android:paddingRight="16dp"
-			          android:paddingBottom="10dp"
-			          android:text="@string/add_phone_number_label"
-			          android:textAllCaps="true"
-			          android:textColor="@color/accentColor"
-			          android:textSize="14sp"
-			          android:textStyle="bold"/>
-		</LinearLayout>
-		<TextView android:id="@+id/navigation_drawer_add_phone_number_label"
-		          android:layout_width="wrap_content"
-		          android:layout_height="wrap_content"
-		          android:layout_marginLeft="72dp"
-		          android:textSize="11sp"/>
-	</LinearLayout>
+    <LinearLayout
+        android:id="@+id/navigation_drawer_add_phone_number_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="#FFF9F9F9"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="5dp">
+
+            <ImageView
+                android:id="@+id/navigation_drawer_add_phone_number_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/il_verify_phone_drawer" />
+
+            <TextView
+                android:id="@+id/navigation_drawer_add_phone_number_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/background_button_border_accent"
+                android:gravity="center"
+                android:paddingLeft="16dp"
+                android:paddingTop="10dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="10dp"
+                android:text="@string/add_phone_number_label"
+                android:textAllCaps="true"
+                android:textColor="@color/accentColor"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/navigation_drawer_add_phone_number_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
+            android:textSize="11sp" />
+
+    </LinearLayout>
 
 </RelativeLayout>

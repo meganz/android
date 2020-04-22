@@ -46,6 +46,7 @@ public class SettingsConstants {
 
     public static final String KEY_CHAT_NESTED_NOTIFICATIONS = "settings_nested_notifications_chat";
 
+    public static final String KEY_STORAGE_DOWNLOAD_CATEGORY = "download_setting";
     public static final String KEY_STORAGE_DOWNLOAD = "settings_nested_download_location";
     public static final String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
     public static final String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";
