@@ -23,7 +23,6 @@ import android.widget.TextView;
 
 import com.android.billingclient.api.SkuDetails;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Currency;
@@ -424,11 +423,19 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		}
 	}
 
+	/**
+	 * Gets a String with the price of the product. If available return the localized price price
+	 * provided by Google Play or the provided by MEGA as default otherwise.
+	 * @param product Product to get the corresponding price.
+	 * @param monthlyBasePrice True to get a monthly base price string (i.e. "4,99 €/month") or false to get a single price (i.e. "4,99 €").
+	 * @return The price of the product provided as parameter.
+	 */
 	private String getPriceString(Product product, boolean monthlyBasePrice) {
+		// First get the "default" pricing details from the MEGA server
 		double price = product.getAmount() / 100.00;
 		String currency = product.getCurrency();
 
-		// Try get the local pricing details from the store
+		// Try get the local pricing details from the store if available
 		SkuDetails details = getSkuDetails(myAccountInfo.getAvailableSkus(), getSku(product));
 		if (details != null) {
 			price = details.getPriceAmountMicros() / 1000000.00;
@@ -437,20 +444,19 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		NumberFormat format = NumberFormat.getCurrencyInstance();
 		format.setCurrency(Currency.getInstance(currency));
-
 		String stringPrice = format.format(price);
 
-		if (!monthlyBasePrice) {
-			return stringPrice;
-		} else if (product.getMonths() != 1) {
-			return "";
+		if (monthlyBasePrice) {
+			if (product.getMonths() != 1) {
+				return "";
+			}
+
+			return getString(product.getLevel() == BUSINESS ?
+					R.string.type_business_month : R.string.type_month, stringPrice);
 		}
 
-		if (product.getLevel() == BUSINESS) {
-			return getString(R.string.type_business_month, stringPrice);
-		}
-
-		return getString(R.string.type_month, stringPrice);
+		return getString(product.getMonths() == 12 ?
+				R.string.billed_yearly_text : R.string.billed_monthly_text, stringPrice);
 	}
 	
 	public void showAvailableAccount(){
@@ -772,8 +778,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		((ManagerActivityLollipop)context).setSelectedAccountType(parameterType);
 		((ManagerActivityLollipop)context).setSelectedPaymentMethod(paymentMethod);
 		showmyF(paymentM, parameterType);
-
-//		((ManagerActivityLollipop)context).showmyF(paymentMethod, parameterType);
 	}
 
 	private void contactForCustomPlan() {
@@ -1269,15 +1273,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	}
 
-	public void showmyF(int paymentMethod, int parameterType){
+	private void showmyF(int paymentMethod, int parameterType){
 		logDebug("paymentMethod " + paymentMethod + ", type " + parameterType);
-
-		String priceMonthlyInteger = "";
-		String priceMonthlyDecimal = "";
-		String priceYearlyInteger = "";
-		String priceYearlyDecimal = "";
-
-		DecimalFormat df = new DecimalFormat("0.00");
 
 		if(myAccountInfo==null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
@@ -1295,35 +1292,30 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			return;
 		}
 
-		switch(parameterType){
-			case 1:{
-				logDebug("case PRO I");
+		for (int i = 0; i < accounts.size(); i++) {
 
-				for (int i=0;i<accounts.size();i++){
+			Product account = accounts.get(i);
 
-					Product account = accounts.get(i);
-
-					if(account.getLevel()==1 && account.getMonths()==1){
-						String textToShowMonthly = getString(R.string.billed_monthly_text, getPriceString(account, false));
-						try{
-							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-
-						billedMonthly.setText(getSpannedHtmlText(textToShowMonthly));
-					}
-					if (account.getLevel()==1 && account.getMonths()==12){
-						String textToShowYearly = getString(R.string.billed_yearly_text, getPriceString(account, false));
-						try{
-							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-
-						billedYearly.setText(getSpannedHtmlText(textToShowYearly));
-					}
+			if (account.getLevel() == parameterType) {
+				String textToShow = getPriceString(account, false);
+				try {
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+				} catch (Exception e) {
+					logWarning("Error formatting string.", e);
 				}
+
+				if (account.getMonths() == 1) {
+					billedMonthly.setText(getSpannedHtmlText(textToShow));
+				} else if (account.getMonths() == 12) {
+					billedYearly.setText(getSpannedHtmlText(textToShow));
+				}
+			}
+		}
+
+		switch (parameterType) {
+			case PRO_I:
+				logDebug("case PRO I");
 
 				switch (paymentMethod){
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
@@ -1395,36 +1387,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				break;
-			}
-			case 2:{
+
+			case PRO_II:
 				logDebug(" case PRO II");
-
-				for (int i=0;i<accounts.size();i++){
-
-					Product account = accounts.get(i);
-
-					if(account.getLevel()==2 && account.getMonths()==1){
-						String textToShowMonthly = getString(R.string.billed_monthly_text, getPriceString(account, false));
-						try{
-							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-
-						billedMonthly.setText(getSpannedHtmlText(textToShowMonthly));
-					}
-					if (account.getLevel()==2 && account.getMonths()==12){
-						String textToShowYearly = getString(R.string.billed_yearly_text, getPriceString(account, false));
-						try{
-							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-
-						billedYearly.setText(getSpannedHtmlText(textToShowYearly));
-
-					}
-				}
 
 				switch (paymentMethod){
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
@@ -1496,36 +1461,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				break;
-			}
-			case 3:{
+
+			case PRO_III:
 				logDebug("case PRO III");
-
-				for (int i=0;i<accounts.size();i++){
-
-					Product account = accounts.get(i);
-
-					if(account.getLevel()==3 && account.getMonths()==1){
-						String textToShowMonthly = getString(R.string.billed_monthly_text, getPriceString(account, false));
-						try{
-							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-
-						billedMonthly.setText(getSpannedHtmlText(textToShowMonthly));
-					}
-					if (account.getLevel()==3 && account.getMonths()==12){
-						String textToShowYearly = getString(R.string.billed_yearly_text, getPriceString(account, false));
-						try{
-							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-
-						billedYearly.setText(getSpannedHtmlText(textToShowYearly));
-
-					}
-				}
 
 				switch (paymentMethod){
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
@@ -1596,42 +1534,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				break;
-			}
-			case 4:{
+
+			case PRO_LITE:
 				logDebug("case LITE");
-				for (int i=0;i<accounts.size();i++){
-
-					Product account = accounts.get(i);
-
-					if(account.getLevel()==4 && account.getMonths()==1){
-						String priceMonthly = getPriceString(account, false);
-
-						String textToShowMonthly = paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET ?
-								getString(R.string.billed_monthly_text, priceMonthly) : getString(R.string.billed_one_off_month, priceMonthly);
-						try{
-							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-
-						billedMonthly.setText(getSpannedHtmlText(textToShowMonthly));
-
-					}
-					if (account.getLevel()==4 && account.getMonths()==12){
-						String priceYearly = getPriceString(account, false);
-
-						String textToShowYearly = paymentMethod == MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET ?
-								getString(R.string.billed_yearly_text, priceYearly) : getString(R.string.billed_one_off_year, priceYearly);
-						try{
-							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-
-						billedYearly.setText(getSpannedHtmlText(textToShowYearly));
-					}
-				}
-
 				switch (paymentMethod){
 					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
 						logDebug("Lite - PAYMENT_METHOD_FORTUMO");
@@ -1703,7 +1608,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 				}
 				break;
-			}
 		}
 	}
 }

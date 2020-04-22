@@ -117,6 +117,11 @@ public class PaymentUtils {
         }
     }
 
+    /**
+     * Gets the Google Play SKU associated to a product.
+     * @param product Product to get the SKU.
+     * @return SKU of the product
+     */
     public static String getSku(Product product) {
         if (product == null) {
             return "";
@@ -136,6 +141,12 @@ public class PaymentUtils {
         }
     }
 
+    /**
+     * Gets the details of a SKU from Google Play.
+     * @param list List of available products in Google Play.
+     * @param key Key of the product to get the details.
+     * @return Details of the product corresponding to the provided key.
+     */
     public static SkuDetails getSkuDetails(List<SkuDetails> list, String key) {
         if (list == null || list.isEmpty()) {
             return null;
