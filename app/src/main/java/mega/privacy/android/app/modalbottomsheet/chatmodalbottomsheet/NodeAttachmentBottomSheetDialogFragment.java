@@ -82,8 +82,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
 
-        if (message == null || message.getMessage() == null || node == null) {
-            logWarning("Message or node is null");
+        if (message == null || message.getMessage() == null) {
+            logWarning("Message is null");
             return;
         }
 
@@ -141,6 +141,11 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             node = nodeList.get(0);
         } else {
             node = getNodeByHandle(handle);
+        }
+
+        if (node == null) {
+            logWarning("Node is NULL");
+            return;
         }
 
         if (handle == INVALID_HANDLE) {
