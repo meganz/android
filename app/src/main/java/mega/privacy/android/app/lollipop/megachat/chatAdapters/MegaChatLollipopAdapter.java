@@ -2658,7 +2658,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             formatTime(message));
                 }
 
-                if (messages.get(position - 1).isShowAvatar()) {
+                if (messages.get(position - 1).isShowAvatar() && !isMultipleSelect()) {
                     holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
                     setContactAvatar(holder, userHandle, holder.fullNameTitle);
 
@@ -2866,7 +2866,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
 
 
-                if (messages.get(position - 1).isShowAvatar()) {
+                if (messages.get(position - 1).isShowAvatar() && !isMultipleSelect()) {
                     ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
                     setContactAvatar(((ViewHolderMessageChat) holder), userHandle, ((ViewHolderMessageChat) holder).fullNameTitle);
                 } else {
@@ -3112,7 +3112,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-            if (messages.get(position - 1).isShowAvatar()) {
+            if (messages.get(position - 1).isShowAvatar() && !isMultipleSelect()) {
                 holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
                 setContactAvatar(holder, userHandle, holder.fullNameTitle);
             } else {
@@ -3446,7 +3446,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         formatTime(message));
             }
 
-            if (messages.get(position - 1).isShowAvatar()) {
+            if (messages.get(position - 1).isShowAvatar() && !isMultipleSelect()) {
                 ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
                 setContactAvatar(((ViewHolderMessageChat) holder), userHandle, ((ViewHolderMessageChat) holder).fullNameTitle);
             } else {
@@ -3950,7 +3950,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
 
-            if (messages.get(position - 1).isShowAvatar()) {
+            if (messages.get(position - 1).isShowAvatar() && !isMultipleSelect()) {
                 ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
                 setContactAvatar(((ViewHolderMessageChat) holder), userHandle, ((ViewHolderMessageChat) holder).fullNameTitle);
             } else {
@@ -4471,7 +4471,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactManagementMessageLayout.setVisibility(View.GONE);
 
             holder.contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
-            if (messages.get(position - 1).isShowAvatar()) {
+            if (messages.get(position - 1).isShowAvatar() && !isMultipleSelect()) {
                 holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
                 setContactAvatar(holder, userHandle, ((ViewHolderMessageChat) holder).fullNameTitle);
             } else {
@@ -4970,7 +4970,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
             holder.contactManagementMessageLayout.setVisibility(View.GONE);
 
-            if (messages.get(positionInAdapter - 1).isShowAvatar()) {
+            if (messages.get(positionInAdapter - 1).isShowAvatar() && !isMultipleSelect()) {
                 holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
                 setContactAvatar(holder, userHandle, holder.fullNameTitle);
             } else {
@@ -5246,7 +5246,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
 
-            if (messages.get(position - 1).isShowAvatar()) {
+            if (messages.get(position - 1).isShowAvatar() && !isMultipleSelect()) {
                 holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
                 setContactAvatar(holder, userHandle, holder.fullNameTitle);
             } else {
@@ -5726,7 +5726,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.VISIBLE);
 
-            if (messages.get(position - 1).isShowAvatar()) {
+            if (messages.get(position - 1).isShowAvatar() && !isMultipleSelect()) {
                 ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
                 setContactAvatar(((ViewHolderMessageChat) holder), userHandle, ((ViewHolderMessageChat) holder).fullNameTitle);
             } else {

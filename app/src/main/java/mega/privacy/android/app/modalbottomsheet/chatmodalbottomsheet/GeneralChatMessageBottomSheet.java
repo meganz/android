@@ -144,16 +144,19 @@ public class GeneralChatMessageBottomSheet extends BottomSheetDialogFragment imp
                 } else {
                     optionForward.setVisibility(View.VISIBLE);
                 }
-
                 if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isEditable()) {
                     optionEdit.setVisibility(View.GONE);
-                    optionDelete.setVisibility(View.GONE);
                 } else {
                     if (typeMessage == MegaChatMessage.TYPE_NORMAL || typeMessage == MegaChatMessage.TYPE_CONTAINS_META) {
                         optionEdit.setVisibility(View.VISIBLE);
                     } else {
                         optionEdit.setVisibility(View.GONE);
                     }
+                }
+
+                if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle()) {
+                    optionDelete.setVisibility(View.GONE);
+                } else {
                     optionDelete.setVisibility(View.VISIBLE);
                 }
             }

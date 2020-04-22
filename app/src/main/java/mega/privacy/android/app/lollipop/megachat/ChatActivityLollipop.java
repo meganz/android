@@ -4405,6 +4405,27 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
+    private boolean isSelectableMessage(AndroidMegaChatMessage message){
+        if (message.getMessage().getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED || message.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL)
+            return false;
+
+        int type = message.getMessage().getType();
+        switch (type) {
+            case MegaChatMessage.TYPE_NODE_ATTACHMENT:
+            case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:
+            case MegaChatMessage.TYPE_VOICE_CLIP:
+            case MegaChatMessage.TYPE_NORMAL:
+            case MegaChatMessage.TYPE_CONTAINS_META:
+            case MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE:
+            case MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE:
+            case MegaChatMessage.TYPE_SET_PRIVATE_MODE:
+                return true;
+            default:
+                return false;
+        }
+
+    }
+
     public void itemClick(int positionInAdapter, int [] screenPosition) {
         int positionInMessages = positionInAdapter-1;
 
@@ -4421,11 +4442,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         }else{
                             logDebug("Message id: " + m.getMessage().getMsgId());
                             logDebug("Timestamp: " + m.getMessage().getTimestamp());
-
-                            adapter.toggleSelection(positionInAdapter);
-                            List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
-                            if (!messages.isEmpty()) {
-                                updateActionModeTitle();
+                            if(isSelectableMessage(m)) {
+                                adapter.toggleSelection(positionInAdapter);
+                                List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
+                                if (!messages.isEmpty()) {
+                                    updateActionModeTitle();
+                                }
                             }
                         }
                     }
