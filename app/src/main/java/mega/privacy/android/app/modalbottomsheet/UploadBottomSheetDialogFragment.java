@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 
+import androidx.annotation.NonNull;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -73,7 +75,7 @@ public class UploadBottomSheetDialogFragment extends BaseBottomSheetDialogFragme
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         listener = (UploadBottomSheetDialogActionListener) context;
     }

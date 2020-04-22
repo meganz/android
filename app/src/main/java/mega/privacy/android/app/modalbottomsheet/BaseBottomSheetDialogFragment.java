@@ -39,7 +39,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     protected DisplayMetrics outMetrics;
     private int halfHeightDisplay;
     private int heightHeader;
-    protected BottomSheetBehavior mBehavior;
+    private BottomSheetBehavior mBehavior;
 
     protected View contentView;
     protected LinearLayout mainLinearLayout;
@@ -75,8 +75,8 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     /**
      * Sets the initial state of a BottomSheet and its state.
      *
-     * @param heightHeader
-     * @param addBottomSheetCallBack
+     * @param heightHeader              height of the header
+     * @param addBottomSheetCallBack    true if it should add a BottomsheetCallback, false otherwise
      */
     protected void setBottomSheetBehavior(int heightHeader, boolean addBottomSheetCallBack) {
         this.heightHeader = heightHeader;
