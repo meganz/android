@@ -4373,7 +4373,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void itemLongClick(int positionInAdapter){
+    public void itemLongClick(int positionInAdapter) {
         int positionInMessages = positionInAdapter - 1;
         if (positionInMessages >= messages.size())
             return;
@@ -4405,7 +4405,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    private boolean isSelectableMessage(AndroidMegaChatMessage message){
+    private boolean isSelectableMessage(AndroidMegaChatMessage message) {
         if (message.getMessage().getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED || message.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL)
             return false;
 
@@ -4423,7 +4423,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             default:
                 return false;
         }
-
     }
 
     public void itemClick(int positionInAdapter, int [] screenPosition) {
@@ -4442,7 +4441,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         }else{
                             logDebug("Message id: " + m.getMessage().getMsgId());
                             logDebug("Timestamp: " + m.getMessage().getTimestamp());
-                            if(isSelectableMessage(m)) {
+                            if (isSelectableMessage(m)) {
                                 adapter.toggleSelection(positionInAdapter);
                                 List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
                                 if (!messages.isEmpty()) {

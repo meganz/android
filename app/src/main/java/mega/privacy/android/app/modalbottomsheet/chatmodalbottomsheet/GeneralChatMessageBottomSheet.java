@@ -26,7 +26,6 @@ import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
-import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -103,10 +102,14 @@ public class GeneralChatMessageBottomSheet extends BottomSheetDialogFragment imp
         mainLayout = contentView.findViewById(R.id.bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.items_layout);
         optionForward = contentView.findViewById(R.id.forward_layout);
+        LinearLayout editSeparator = contentView.findViewById(R.id.edit_separator);
         optionEdit = contentView.findViewById(R.id.edit_layout);
+        LinearLayout copySeparator = contentView.findViewById(R.id.copy_separator);
         optionCopy = contentView.findViewById(R.id.copy_layout);
+        LinearLayout selectSeparator = contentView.findViewById(R.id.select_separator);
+        optionSelect = contentView.findViewById(R.id.select_layout);
+        LinearLayout deleteSeparator = contentView.findViewById(R.id.delete_separator);
         optionDelete = contentView.findViewById(R.id.delete_layout);
-        optionSelect = contentView.findViewById(R.id.option_select_layout);
 
         optionForward.setOnClickListener(this);
         optionEdit.setOnClickListener(this);
@@ -116,15 +119,20 @@ public class GeneralChatMessageBottomSheet extends BottomSheetDialogFragment imp
 
         if (message == null || chatRoom == null || ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) || message.isUploading()) {
             optionForward.setVisibility(View.GONE);
+            editSeparator.setVisibility(View.GONE);
             optionEdit.setVisibility(View.GONE);
+            copySeparator.setVisibility(View.GONE);
             optionCopy.setVisibility(View.GONE);
-            optionDelete.setVisibility(View.GONE);
+            selectSeparator.setVisibility(View.GONE);
             optionSelect.setVisibility(View.GONE);
+            deleteSeparator.setVisibility(View.GONE);
+            optionDelete.setVisibility(View.GONE);
 
         } else {
             int typeMessage = message.getMessage().getType();
 
             optionSelect.setVisibility(View.VISIBLE);
+
             if (typeMessage == MegaChatMessage.TYPE_NORMAL ||
                     (typeMessage == MegaChatMessage.TYPE_CONTAINS_META &&
                             message.getMessage().getContainsMeta() != null &&
@@ -154,11 +162,20 @@ public class GeneralChatMessageBottomSheet extends BottomSheetDialogFragment imp
                     }
                 }
 
-                if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle()) {
+                if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isDeletable()) {
                     optionDelete.setVisibility(View.GONE);
                 } else {
                     optionDelete.setVisibility(View.VISIBLE);
                 }
+            }
+
+            deleteSeparator.setVisibility(optionDelete.getVisibility());
+            selectSeparator.setVisibility(optionSelect.getVisibility());
+            editSeparator.setVisibility(optionEdit.getVisibility());
+            if(optionEdit.getVisibility() == View.VISIBLE){
+                copySeparator.setVisibility(View.GONE);
+            }else{
+                copySeparator.setVisibility(optionCopy.getVisibility());
             }
         }
 
@@ -183,7 +200,7 @@ public class GeneralChatMessageBottomSheet extends BottomSheetDialogFragment imp
                 dismissAllowingStateLoss();
                 break;
 
-            case R.id.option_select_layout:
+            case R.id.select_layout:
                 ((ChatActivityLollipop) context).activateActionModeWithItem(positionMessage);
                 dismissAllowingStateLoss();
                 break;

@@ -74,7 +74,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     LinearLayout optionStartConversation;
     LinearLayout optionInvite;
     LinearLayout optionRemove;
+    private LinearLayout optionForward;
     private LinearLayout optionSelect;
+    private LinearLayout optionDeleteMessage;
 
     DisplayMetrics outMetrics;
 
@@ -87,6 +89,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
     private int heightDisplay;
     private int positionMessage;
+    private MegaChatRoom chatRoom;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -136,7 +139,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
         nC = new NodeController(context);
         chatC = new ChatController(context);
-
+        chatRoom = megaChatApi.getChatRoom(chatId);
         dbH = DatabaseHandler.getDbHandler(getActivity());
     }
 
@@ -167,21 +170,26 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         titleMailContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_mail_text);
         contactImageView = (RoundedImageView) contentView.findViewById(R.id.contact_attachment_thumbnail);
 
-        optionView = (LinearLayout) contentView.findViewById(R.id.option_view_layout);
-        optionInfo = (LinearLayout) contentView.findViewById(R.id.option_info_layout);
-        optionStartConversation = (LinearLayout) contentView.findViewById(R.id.option_start_conversation_layout);
-        optionInvite = (LinearLayout) contentView.findViewById(R.id.option_invite_layout);
-        optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
-        optionSelect = contentView.findViewById(R.id.option_select_layout);
+        optionForward = contentView.findViewById(R.id.forward_layout);
+        LinearLayout selectSeparator = contentView.findViewById(R.id.select_separator);
+        optionSelect = contentView.findViewById(R.id.select_layout);
+        LinearLayout viewSeparator = contentView.findViewById(R.id.view_separator);
+        optionView = contentView.findViewById(R.id.option_view_layout);
+        optionInfo = contentView.findViewById(R.id.option_info_layout);
+        LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
+        optionStartConversation = contentView.findViewById(R.id.option_start_conversation_layout);
+        optionInvite = contentView.findViewById(R.id.option_invite_layout);
+        LinearLayout deleteMessageSeparator = contentView.findViewById(R.id.delete_separator);
+        optionDeleteMessage = contentView.findViewById(R.id.delete_layout);
+        optionRemove = contentView.findViewById(R.id.option_remove_layout);
 
         optionView.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
         optionStartConversation.setOnClickListener(this);
         optionInvite.setOnClickListener(this);
         optionSelect.setOnClickListener(this);
-
-        LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
-
+        optionForward.setOnClickListener(this);
+        optionDeleteMessage.setOnClickListener(this);
         optionRemove.setVisibility(View.GONE);
 
         if(isScreenInPortrait(context)){
@@ -193,10 +201,27 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         }
 
         if (message != null) {
-            if(context instanceof ChatActivityLollipop) {
+            if (context instanceof ChatActivityLollipop && chatRoom != null) {
                 optionSelect.setVisibility(View.VISIBLE);
-            }else{
+                if (chatC.isInAnonymousMode() || ((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview())) {
+                    optionForward.setVisibility(View.GONE);
+                    optionDeleteMessage.setVisibility(View.GONE);
+                } else {
+                    if (!isOnline(context)) {
+                        optionForward.setVisibility(View.GONE);
+                    } else {
+                        optionForward.setVisibility(View.VISIBLE);
+                    }
+                    if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isDeletable()) {
+                        optionDeleteMessage.setVisibility(View.GONE);
+                    } else {
+                        optionDeleteMessage.setVisibility(View.VISIBLE);
+                    }
+                }
+            } else {
                 optionSelect.setVisibility(View.GONE);
+                optionForward.setVisibility(View.GONE);
+                optionDeleteMessage.setVisibility(View.GONE);
             }
 
             long userCount  = message.getMessage().getUsersCount();
@@ -252,7 +277,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                             optionInfo.setVisibility(View.VISIBLE);
 
                             //Check if the contact is the same that the one is chatting
-                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
                             if(!chatRoom.isGroup()){
                                 long contactHandle = message.getMessage().getUserHandle(0);
                                 long messageContactHandle = chatRoom.getPeerHandle(0);
@@ -426,6 +450,15 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 separatorInfo.setVisibility(View.VISIBLE);
             }
 
+            if (optionSelect.getVisibility() == View.VISIBLE && optionForward.getVisibility() == View.VISIBLE) {
+                selectSeparator.setVisibility(optionSelect.getVisibility());
+            }
+            if (optionSelect.getVisibility() == View.VISIBLE && (optionView.getVisibility() == View.VISIBLE || optionInfo.getVisibility() == View.VISIBLE)) {
+                viewSeparator.setVisibility(optionSelect.getVisibility());
+            }
+
+            deleteMessageSeparator.setVisibility(optionDeleteMessage.getVisibility());
+
             dialog.setContentView(contentView);
 
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
@@ -469,10 +502,10 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             logWarning("Error. The message is NULL");
             return;
         }
-
+        ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
+        messagesSelected.add(message);
         switch(v.getId()){
-
-            case R.id.option_info_layout:{
+            case R.id.option_info_layout:
                 logDebug("Info option");
 
                 if (!isOnline(context)){
@@ -480,39 +513,53 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     return;
                 }
 
-                Intent i = new Intent(context, ContactInfoActivityLollipop.class);
+                Intent infoIntent = new Intent(context, ContactInfoActivityLollipop.class);
                 if(context instanceof ChatActivityLollipop){
-                    i.putExtra("name", message.getMessage().getUserEmail(0));
+                    infoIntent.putExtra("name", message.getMessage().getUserEmail(0));
                 }
                 else{
                     if(position!=-1){
-                        i.putExtra("name", message.getMessage().getUserEmail(position));
+                        infoIntent.putExtra("name", message.getMessage().getUserEmail(position));
                     }
                     else{
                         logWarning("Error - position -1");
                     }
                 }
 
-                context.startActivity(i);
+                context.startActivity(infoIntent);
                 dismissAllowingStateLoss();
                 break;
-            }
-            case R.id.option_view_layout:{
+
+            case R.id.option_view_layout:
                 logDebug("View option");
-                Intent i = new Intent(context, ContactAttachmentActivityLollipop.class);
-                i.putExtra("chatId", chatId);
-                i.putExtra("messageId", messageId);
-                context.startActivity(i);
+                Intent viewIntent = new Intent(context, ContactAttachmentActivityLollipop.class);
+                viewIntent.putExtra("chatId", chatId);
+                viewIntent.putExtra("messageId", messageId);
+                context.startActivity(viewIntent);
                 dismissAllowingStateLoss();
                 break;
-            }
-            case R.id.option_select_layout:
-                if(context instanceof ChatActivityLollipop){
-                    ((ChatActivityLollipop)context).activateActionModeWithItem(positionMessage);
+
+            case R.id.select_layout:
+                if (context instanceof ChatActivityLollipop) {
+                    ((ChatActivityLollipop) context).activateActionModeWithItem(positionMessage);
                 }
                 dismissAllowingStateLoss();
                 break;
-            case R.id.option_invite_layout:{
+            case R.id.forward_layout:
+                if(context instanceof ChatActivityLollipop) {
+                    ((ChatActivityLollipop) context).forwardMessages(messagesSelected);
+                }
+                dismissAllowingStateLoss();
+                break;
+            case R.id.delete_layout:
+                if (context instanceof ChatActivityLollipop) {
+                    logDebug("*************  DELETE MESSAGE");
+
+                    ((ChatActivityLollipop) context).showConfirmationDeleteMessages(messagesSelected, chatRoom);
+                }
+                dismissAllowingStateLoss();
+                break;
+            case R.id.option_invite_layout:
                 logDebug("Invite option");
 
                 if (!isOnline(context)){
@@ -546,8 +593,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 }
 
                 break;
-            }
-            case R.id.option_start_conversation_layout:{
+
+            case R.id.option_start_conversation_layout:
                 logDebug("Start conversation option");
 
                 long numUsers = message.getMessage().getUsersCount();
@@ -576,10 +623,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 }
 
                 break;
-            }
+
         }
 
-//        dismiss();
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }

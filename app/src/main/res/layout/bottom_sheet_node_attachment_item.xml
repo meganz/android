@@ -42,7 +42,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:maxLines="1"
                 android:ellipsize="middle"
                 android:textColor="@color/name_my_account"
                 android:textSize="16sp"/>
@@ -55,7 +54,6 @@
                 android:layout_below="@+id/node_attachment_name_text"
                 android:textSize="14sp"
                 android:singleLine="true"
-                android:maxLines="1"
                 android:ellipsize="middle"/>
 
         </RelativeLayout>
@@ -97,8 +95,120 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
+            <LinearLayout
+                android:id="@+id/open_with_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-            <!-- Options -->
+                <ImageView
+                    android:id="@+id/open_with_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_open_with"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/open_with_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/external_play"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/forward_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/divider_upgrade_account"/>
+
+            <LinearLayout
+                android:id="@+id/forward_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/option_forward_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_forward_grey"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/option_forward_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/forward_menu_item"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/select_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/chat_sliding_panel_separator"/>
+
+            <LinearLayout
+                android:id="@+id/select_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/option_select_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_select_modal"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/option_select_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/general_select"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator_info"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/divider_upgrade_account"/>
+
             <LinearLayout
                 android:id="@+id/option_view_layout"
                 android:layout_width="match_parent"
@@ -131,76 +241,31 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/separator_info"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
-
-            <LinearLayout
-                android:id="@+id/option_select_layout"
+                android:id="@+id/option_import_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/option_select_image"
+                    android:id="@+id/option_import_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_select_modal"
+                    android:src="@drawable/ic_import_to_cloud_grey"
                     android:visibility="visible" />
 
                 <TextView
-                    android:id="@+id/option_select_text"
+                    android:id="@+id/option_import_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:text="@string/general_select"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/select_separator_info"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:orientation="vertical"
-                android:background="@color/chat_sliding_panel_separator"/>
-
-            <LinearLayout
-                android:id="@+id/option_forward_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_forward_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_forward_grey"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/option_forward_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/forward_menu_item"
-                    android:layout_marginLeft="18dp"
+                    android:text="@string/add_to_cloud"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
@@ -232,36 +297,6 @@
                     android:paddingTop="2dp"
                     android:text="@string/general_save_to_device"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_import_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_import_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_import_to_cloud_grey"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/option_import_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
-                    android:text="@string/add_to_cloud"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
@@ -335,7 +370,6 @@
                     android:textColor="@color/dark_primary_color"
                     android:textSize="16sp"/>
             </LinearLayout>
-
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
