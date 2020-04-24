@@ -7327,7 +7327,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
         megaChatApi.closeChatRoom(idChat, this);
         MegaApplication.setClosedChat(true);
-        megaChatApi.removeChatListener(this);
+        if(shouldLogout) {
+            megaChatApi.removeChatListener(this);
+        }
     }
 
     @Override
