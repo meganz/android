@@ -44,42 +44,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private MegaNode node = null;
     private NodeController nC;
 
-    private ImageView nodeThumb;
-    private TextView nodeName;
     private TextView nodeInfo;
-    private ImageView nodeVersionsIcon;
-    private RelativeLayout nodeIconLayout;
-    private ImageView nodeIcon;
-    private ImageView permissionsIcon;
-    private LinearLayout optionDownload;
-    private LinearLayout optionOffline;
-    private TextView optionOfflineText;
-    private LinearLayout optionInfo;
-    private TextView optionInfoText;
-    private ImageView optionInfoImage;
-    private LinearLayout optionLink;
-    private TextView optionLinkText;
-    private ImageView optionLinkImage;
-    private LinearLayout optionRemoveLink;
-    private LinearLayout optionShare;
-    private LinearLayout optionShareFolder;
-    private TextView optionShareFolderText;
-    private LinearLayout optionClearShares;
-    private LinearLayout optionLeaveShares;
-    private LinearLayout optionSendChat;
-    private LinearLayout optionRename;
-    private LinearLayout optionMove;
-    private LinearLayout optionCopy;
-    private LinearLayout optionRubbishBin;
-    private LinearLayout optionRemove;
-    private LinearLayout optionRestoreFromRubbish;
-    private LinearLayout optionOpenFolder;
-    private LinearLayout optionOpenWith;
-
-    private RelativeLayout node_head;
 
     private ManagerActivityLollipop.DrawerItem drawerItem;
-    private Bitmap thumb = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -107,49 +74,44 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.setupDialog(dialog, style);
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
-
         mainLinearLayout = contentView.findViewById(R.id.node_bottom_sheet);
-
         items_layout = contentView.findViewById(R.id.items_layout_bottom_sheet_node);
-        node_head = contentView.findViewById(R.id.node_title_layout);
 
-        nodeThumb = contentView.findViewById(R.id.node_thumbnail);
-        nodeName = contentView.findViewById(R.id.node_name_text);
+        ImageView nodeThumb = contentView.findViewById(R.id.node_thumbnail);
+        TextView nodeName = contentView.findViewById(R.id.node_name_text);
         nodeInfo = contentView.findViewById(R.id.node_info_text);
-        nodeVersionsIcon = contentView.findViewById(R.id.node_info_versions_icon);
-        nodeIconLayout = contentView.findViewById(R.id.node_relative_layout_icon);
-        nodeIcon = contentView.findViewById(R.id.node_icon);
-        permissionsIcon = contentView.findViewById(R.id.permissions_icon);
+        ImageView nodeVersionsIcon = contentView.findViewById(R.id.node_info_versions_icon);
+        RelativeLayout nodeIconLayout = contentView.findViewById(R.id.node_relative_layout_icon);
+        ImageView nodeIcon = contentView.findViewById(R.id.node_icon);
+        ImageView permissionsIcon = contentView.findViewById(R.id.permissions_icon);
 
-        optionInfo = contentView.findViewById(R.id.option_properties_layout);
-        optionInfoText = contentView.findViewById(R.id.option_properties_text);
-        optionInfoImage = contentView.findViewById(R.id.option_properties_image);
+        LinearLayout optionInfo = contentView.findViewById(R.id.option_properties_layout);
+        TextView optionInfoText = contentView.findViewById(R.id.option_properties_text);
 //      counterSave
-        optionDownload = contentView.findViewById(R.id.option_download_layout);
-        optionOffline = contentView.findViewById(R.id.option_offline_layout);
-        optionOfflineText = contentView.findViewById(R.id.option_offline_text);
+        LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
+        LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
+        TextView optionOfflineText = contentView.findViewById(R.id.option_offline_text);
 //      counterShares
-        optionLink = contentView.findViewById(R.id.option_link_layout);
-        optionLinkText = contentView.findViewById(R.id.option_link_text);
-        optionLinkImage = contentView.findViewById(R.id.option_link_image);
-        optionRemoveLink = contentView.findViewById(R.id.option_remove_link_layout);
-        optionShare = contentView.findViewById(R.id.option_share_layout);
-        optionShareFolder = contentView.findViewById(R.id.option_share_folder_layout);
-        optionShareFolderText = contentView.findViewById(R.id.option_share_folder_text);
-        optionClearShares = contentView.findViewById(R.id.option_clear_share_layout);
-        optionSendChat = contentView.findViewById(R.id.option_send_chat_layout);
+        LinearLayout optionLink = contentView.findViewById(R.id.option_link_layout);
+        TextView optionLinkText = contentView.findViewById(R.id.option_link_text);
+        LinearLayout optionRemoveLink = contentView.findViewById(R.id.option_remove_link_layout);
+        LinearLayout optionShare = contentView.findViewById(R.id.option_share_layout);
+        LinearLayout optionShareFolder = contentView.findViewById(R.id.option_share_folder_layout);
+        TextView optionShareFolderText = contentView.findViewById(R.id.option_share_folder_text);
+        LinearLayout optionClearShares = contentView.findViewById(R.id.option_clear_share_layout);
+        LinearLayout optionSendChat = contentView.findViewById(R.id.option_send_chat_layout);
 //      counterModify
-        optionRename = contentView.findViewById(R.id.option_rename_layout);
-        optionMove = contentView.findViewById(R.id.option_move_layout);
-        optionCopy = contentView.findViewById(R.id.option_copy_layout);
-        optionRestoreFromRubbish = contentView.findViewById(R.id.option_restore_layout);
+        LinearLayout optionRename = contentView.findViewById(R.id.option_rename_layout);
+        LinearLayout optionMove = contentView.findViewById(R.id.option_move_layout);
+        LinearLayout optionCopy = contentView.findViewById(R.id.option_copy_layout);
+        LinearLayout optionRestoreFromRubbish = contentView.findViewById(R.id.option_restore_layout);
 //      counterOpen
-        optionOpenFolder = contentView.findViewById(R.id.option_open_folder_layout);
-        optionOpenWith = contentView.findViewById(R.id.option_open_with_layout);
+        LinearLayout optionOpenFolder = contentView.findViewById(R.id.option_open_folder_layout);
+        LinearLayout optionOpenWith = contentView.findViewById(R.id.option_open_with_layout);
 //      counterRemove
-        optionLeaveShares = contentView.findViewById(R.id.option_leave_share_layout);
-        optionRubbishBin = contentView.findViewById(R.id.option_rubbish_bin_layout);
-        optionRemove = contentView.findViewById(R.id.option_remove_layout);
+        LinearLayout optionLeaveShares = contentView.findViewById(R.id.option_leave_share_layout);
+        LinearLayout optionRubbishBin = contentView.findViewById(R.id.option_rubbish_bin_layout);
+        LinearLayout optionRemove = contentView.findViewById(R.id.option_remove_layout);
 
         optionDownload.setOnClickListener(this);
         optionOffline.setOnClickListener(this);
@@ -231,7 +193,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     params1.setMargins(20, 0, 12, 0);
                     nodeThumb.setLayoutParams(params1);
 
-                    thumb = getThumbnailFromCache(node);
+                    Bitmap thumb = getThumbnailFromCache(node);
                     if (thumb != null) {
                         nodeThumb.setImageBitmap(thumb);
                     } else {

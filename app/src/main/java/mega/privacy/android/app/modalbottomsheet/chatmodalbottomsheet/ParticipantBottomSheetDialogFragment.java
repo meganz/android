@@ -1,10 +1,8 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -37,8 +35,6 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private MegaChatRoom selectedChat;
     private long chatId = INVALID_HANDLE;
     private long participantHandle = INVALID_HANDLE;
-
-    private RoundedImageView contactImageView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,7 +77,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         ImageView permissionsIcon = contentView.findViewById(R.id.group_participant_list_permissions);
 
         TextView titleMailContactChatPanel = contentView.findViewById(R.id.group_participants_chat_mail_text);
-        contactImageView = contentView.findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
+        RoundedImageView contactImageView = contentView.findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
 
         LinearLayout optionContactInfoChat = contentView.findViewById(R.id.contact_info_group_participants_chat_layout);
         LinearLayout optionStartConversationChat = contentView.findViewById(R.id.start_chat_group_participants_chat_layout);
@@ -148,7 +144,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             optionInvite.setVisibility(View.GONE);
 
-            addAvatarParticipantPanel(participantHandle, megaChatApi.getMyEmail(), myFullName);
+            setImageAvatar(megaChatApi.getMyEmail(), myFullName, contactImageView);
         } else {
             String fullName = getNicknameContact(participantHandle);
             if (fullName == null) {
@@ -193,7 +189,8 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionRemoveParticipantChat.setVisibility(View.GONE);
             }
 
-            addAvatarParticipantPanel(participantHandle, selectedChat.getPeerEmailByHandle(participantHandle), fullName);
+            String email = selectedChat.getPeerEmailByHandle(participantHandle);
+            setImageAvatar(!isTextEmpty(email) ? email : MegaApiAndroid.userHandleToBase64(participantHandle), fullName, contactImageView);
         }
 
         if ((optionContactInfoChat.getVisibility() == View.GONE && optionEditProfileChat.getVisibility() == View.GONE)
@@ -217,16 +214,6 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
-    }
-
-    private void addAvatarParticipantPanel(long handle, String email, String name) {
-        Bitmap avatar = getImageAvatar(handle == megaChatApi.getMyUserHandle() || email != null ? email : MegaApiAndroid.userHandleToBase64(handle));
-
-        if (avatar == null) {
-            avatar = getDefaultAvatar(getColorAvatar(handle), name, AVATAR_SIZE, true);
-        }
-
-        contactImageView.setImageBitmap(avatar);
     }
 
     @Override

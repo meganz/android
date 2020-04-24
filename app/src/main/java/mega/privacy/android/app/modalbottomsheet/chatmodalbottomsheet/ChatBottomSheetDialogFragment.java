@@ -31,6 +31,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -226,25 +227,27 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
     }
 
     private void addAvatarChatPanel(String contactMail, MegaChatListItem chat) {
-        int color;
-        String name = null;
-        if (chat.getTitle() != null && chat.getTitle().trim().length() > 0) {
-            name = chat.getTitle();
-        } else if (contactMail != null && contactMail.length() > 0) {
-            name = contactMail;
-        }
-
-        if (chat.isGroup()) {
-            color = getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR);
-        } else {
-            color = getColorAvatar(megaApi.getContact(contactMail));
-        }
-
-        chatImageView.setImageBitmap(getDefaultAvatar(color, name, AVATAR_SIZE, false));
-
         Bitmap bitmap = getImageAvatar(contactMail);
+
         if (bitmap != null) {
             chatImageView.setImageBitmap(bitmap);
+        } else {
+            int color;
+            String name = null;
+
+            if (!isTextEmpty(chat.getTitle())) {
+                name = chat.getTitle();
+            } else if (!isTextEmpty(contactMail)) {
+                name = contactMail;
+            }
+
+            if (chat.isGroup()) {
+                color = getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR);
+            } else {
+                color = getColorAvatar(megaApi.getContact(contactMail));
+            }
+
+            chatImageView.setImageBitmap(getDefaultAvatar(color, name, AVATAR_SIZE, false));
         }
     }
 

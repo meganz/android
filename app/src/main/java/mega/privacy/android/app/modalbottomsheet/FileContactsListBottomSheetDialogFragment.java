@@ -32,19 +32,8 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaUser contact = null;
-    private MegaNode node = null;
     private MegaShare share = null;
-    private ContactController cC;
     private String nonContactEmail;
-
-    private EmojiTextView titleNameContactPanel;
-    private TextView titleMailContactPanel;
-    private RoundedImageView contactImageView;
-    private LinearLayout optionChangePermissions;
-    private LinearLayout optionDelete;
-    private LinearLayout optionInfo;
-
-    private String fullName = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,29 +72,24 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         mainLinearLayout = contentView.findViewById(R.id.file_contact_list_bottom_sheet);
         items_layout = contentView.findViewById(R.id.items_layout);
 
-        titleNameContactPanel = contentView.findViewById(R.id.file_contact_list_contact_name_text);
-        titleMailContactPanel = contentView.findViewById(R.id.file_contact_list_contact_mail_text);
-        contactImageView = contentView.findViewById(R.id.sliding_file_contact_list_thumbnail);
+        EmojiTextView titleNameContactPanel = contentView.findViewById(R.id.file_contact_list_contact_name_text);
+        TextView titleMailContactPanel = contentView.findViewById(R.id.file_contact_list_contact_mail_text);
+        RoundedImageView contactImageView = contentView.findViewById(R.id.sliding_file_contact_list_thumbnail);
 
-        optionChangePermissions = contentView.findViewById(R.id.file_contact_list_option_permissions_layout);
-        optionDelete = contentView.findViewById(R.id.file_contact_list_option_delete_layout);
+        LinearLayout optionChangePermissions = contentView.findViewById(R.id.file_contact_list_option_permissions_layout);
+        LinearLayout optionDelete = contentView.findViewById(R.id.file_contact_list_option_delete_layout);
+        LinearLayout optionInfo = contentView.findViewById(R.id.file_contact_list_option_info_layout);
 
-        optionInfo = contentView.findViewById(R.id.file_contact_list_option_info_layout);
+        optionChangePermissions.setOnClickListener(this);
+        optionDelete.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
 
         titleNameContactPanel.setMaxWidthEmojis(scaleWidthPx(200, outMetrics));
         titleMailContactPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
 
-        optionChangePermissions.setOnClickListener(this);
-        optionDelete.setOnClickListener(this);
-
         LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
 
-        if (contact != null) {
-            fullName = getMegaUserNameDB(contact);
-        } else {
-            fullName = nonContactEmail;
-        }
+        String fullName = contact != null ? getMegaUserNameDB(contact) : nonContactEmail;
 
         if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
             optionInfo.setVisibility(View.VISIBLE);
@@ -116,7 +100,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         }
 
         titleNameContactPanel.setText(fullName);
-        addAvatarContactPanel(contact);
+        setImageAvatar(contact, contact != null ? contact.getEmail() : nonContactEmail, fullName, contactImageView);
 
         if (share != null) {
             int accessLevel = share.getAccess();
@@ -144,27 +128,6 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
-    }
-
-    private void addAvatarContactPanel(MegaUser contact) {
-        /*Default Avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(contact), fullName, AVATAR_SIZE, false));
-
-        /*Avatar*/
-        if (contact != null) {
-            String contactMail = contact.getEmail();
-            File avatar = buildAvatarFile(getActivity(), contactMail + ".jpg");
-            Bitmap bitmap;
-            if (isFileAvailable(avatar) && avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    avatar.delete();
-                } else {
-                    contactImageView.setImageBitmap(bitmap);
-                }
-            }
-        }
     }
 
     @Override

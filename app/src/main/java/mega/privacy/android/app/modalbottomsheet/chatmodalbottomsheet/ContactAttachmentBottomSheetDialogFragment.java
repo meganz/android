@@ -3,7 +3,6 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -41,8 +40,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
     private ChatController chatC;
 
     private int position;
-
-    private RoundedImageView contactImageView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,7 +94,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         stateIcon.setMaxHeight(scaleHeightPx(6, outMetrics));
 
         EmojiTextView titleMailContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_mail_text);
-        contactImageView = contentView.findViewById(R.id.contact_attachment_thumbnail);
+        RoundedImageView contactImageView = contentView.findViewById(R.id.contact_attachment_thumbnail);
 
         LinearLayout optionView = contentView.findViewById(R.id.option_view_layout);
         LinearLayout optionInfo = contentView.findViewById(R.id.option_info_layout);
@@ -163,7 +160,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     optionInvite.setVisibility(View.VISIBLE);
                 }
 
-                addAvatarParticipantPanel(userHandle, userEmail, userName);
+                setImageAvatar(userEmail, userName, contactImageView);
             }
         } else {
             MegaUser contact;
@@ -197,7 +194,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 titleNameContactChatPanel.setText(email);
 
-                addAvatarParticipantPanel(INVALID_HANDLE, null, userCount + "");
+                setImageAvatar(null, userCount + "", contactImageView);
             } else {
                 optionView.setVisibility(View.GONE);
 
@@ -245,7 +242,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     optionInvite.setVisibility(View.VISIBLE);
                 }
 
-                addAvatarParticipantPanel(userHandle, email, name);
+                setImageAvatar(email, name, contactImageView);
             }
         }
 
@@ -257,15 +254,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
-    }
-
-    private void addAvatarParticipantPanel(long handle, String email, String name) {
-        Bitmap avatar = getImageAvatar(email);
-        if (avatar == null) {
-            avatar = getDefaultAvatar(getColorAvatar(handle), name, AVATAR_SIZE, true);
-        }
-
-        contactImageView.setImageBitmap(avatar);
     }
 
     @Override

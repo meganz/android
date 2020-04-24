@@ -33,25 +33,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    protected MegaNode node = null;
-    protected NodeController nC;
-    protected BottomSheetBehavior mBehavior;
-    protected LinearLayout mainLinearLayout;
-    protected ImageView nodeThumb;
-    protected TextView nodeName;
-    protected TextView nodeInfo;
-    protected RelativeLayout nodeIconLayout;
-    protected ImageView nodeIcon;
-    protected LinearLayout optionDownload;
-    protected LinearLayout optionInfo;
-    protected TextView optionInfoText;
-    protected ImageView optionInfoImage;
-    protected LinearLayout optionLeave;
-    protected LinearLayout optionCopy;
-    protected LinearLayout optionMove;
-    protected LinearLayout optionRename;
-    protected LinearLayout optionRubbish;
-    protected Bitmap thumb = null;
+    private MegaNode node = null;
 
     private ContactFileListActivityLollipop contactFileListActivity;
     private ContactInfoActivityLollipop contactInfoActivity;
@@ -74,8 +56,6 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         } else if (context instanceof ContactInfoActivityLollipop) {
             node = contactInfoActivity.getSelectedNode();
         }
-
-        nC = new NodeController(context);
     }
 
     @SuppressLint("RestrictedApi")
@@ -89,25 +69,22 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         }
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_file_list, null);
-
         mainLinearLayout = contentView.findViewById(R.id.contact_file_list_bottom_sheet);
-
-        nodeThumb = contentView.findViewById(R.id.contact_file_list_thumbnail);
-        nodeName = contentView.findViewById(R.id.contact_file_list_name_text);
-        nodeInfo = contentView.findViewById(R.id.contact_file_list_info_text);
-        nodeIconLayout = contentView.findViewById(R.id.contact_file_list_relative_layout_icon);
-        nodeIcon = contentView.findViewById(R.id.contact_file_list_icon);
-        optionDownload = contentView.findViewById(R.id.option_download_layout);
-        optionInfo = contentView.findViewById(R.id.option_properties_layout);
-        optionInfoText = contentView.findViewById(R.id.option_properties_text);
-        optionInfoImage = contentView.findViewById(R.id.option_properties_image);
-        optionLeave = contentView.findViewById(R.id.option_leave_layout);
-        optionCopy = contentView.findViewById(R.id.option_copy_layout);
-        optionMove = contentView.findViewById(R.id.option_move_layout);
-        optionRename = contentView.findViewById(R.id.option_rename_layout);
-        optionRubbish = contentView.findViewById(R.id.option_rubbish_bin_layout);
-
         items_layout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
+
+        ImageView nodeThumb = contentView.findViewById(R.id.contact_file_list_thumbnail);
+        TextView nodeName = contentView.findViewById(R.id.contact_file_list_name_text);
+        TextView nodeInfo = contentView.findViewById(R.id.contact_file_list_info_text);
+        RelativeLayout nodeIconLayout = contentView.findViewById(R.id.contact_file_list_relative_layout_icon);
+        ImageView nodeIcon = contentView.findViewById(R.id.contact_file_list_icon);
+        LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
+        LinearLayout optionInfo = contentView.findViewById(R.id.option_properties_layout);
+        TextView optionInfoText = contentView.findViewById(R.id.option_properties_text);
+        LinearLayout optionLeave = contentView.findViewById(R.id.option_leave_layout);
+        LinearLayout optionCopy = contentView.findViewById(R.id.option_copy_layout);
+        LinearLayout optionMove = contentView.findViewById(R.id.option_move_layout);
+        LinearLayout  optionRename = contentView.findViewById(R.id.option_rename_layout);
+        LinearLayout optionRubbish = contentView.findViewById(R.id.option_rubbish_bin_layout);
 
         optionDownload.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
@@ -174,7 +151,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 params1.setMargins(20, 0, 12, 0);
                 nodeThumb.setLayoutParams(params1);
 
-                thumb = getThumbnailFromCache(node);
+                Bitmap thumb = getThumbnailFromCache(node);
                 if (thumb != null) {
                     nodeThumb.setImageBitmap(thumb);
                 } else {

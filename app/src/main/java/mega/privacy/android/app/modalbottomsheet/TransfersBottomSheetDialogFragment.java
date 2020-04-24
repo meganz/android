@@ -2,7 +2,6 @@ package mega.privacy.android.app.modalbottomsheet;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,19 +9,10 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
 import nz.mega.sdk.MegaTransfer;
 
 public class TransfersBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    AccountController aC;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        aC = new AccountController(context);
-    }
     @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(final Dialog dialog, int style) {

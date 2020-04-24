@@ -41,19 +41,6 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
     private MegaContactAdapter contact = null;
     private ContactController cC;
 
-    private EmojiTextView titleNameContactPanel;
-    private TextView titleMailContactPanel;
-    private RoundedImageView contactImageView;
-    private LinearLayout optionInfoContact;
-    private LinearLayout optionStartConversation;
-    private LinearLayout optionSendFile;
-    private LinearLayout optionSendContact;
-    private LinearLayout optionShareFolder;
-    private LinearLayout optionRemove;
-    private ImageView contactStateIcon;
-
-    private String fullName = "";
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,21 +72,20 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         super.setupDialog(dialog, style);
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_item, null);
-
         mainLinearLayout = contentView.findViewById(R.id.contact_item_bottom_sheet);
-
         items_layout = contentView.findViewById(R.id.items_layout_bottom_sheet_contact);
 
-        titleNameContactPanel = contentView.findViewById(R.id.contact_list_contact_name_text);
-        titleMailContactPanel = contentView.findViewById(R.id.contact_list_contact_mail_text);
-        contactImageView = contentView.findViewById(R.id.sliding_contact_list_thumbnail);
-        optionInfoContact = contentView.findViewById(R.id.contact_list_info_contact_layout);
-        optionStartConversation = contentView.findViewById(R.id.contact_list_option_start_conversation_layout);
-        optionSendFile = contentView.findViewById(R.id.contact_list_option_send_file_layout);
-        optionSendContact = contentView.findViewById(R.id.contact_list_option_send_contact_layout);
-        optionShareFolder = contentView.findViewById(R.id.contact_list_option_share_layout);
-        optionRemove = contentView.findViewById(R.id.contact_list_option_remove_layout);
-        contactStateIcon = contentView.findViewById(R.id.contact_list_drawable_state);
+        EmojiTextView titleNameContactPanel = contentView.findViewById(R.id.contact_list_contact_name_text);
+        TextView titleMailContactPanel = contentView.findViewById(R.id.contact_list_contact_mail_text);
+        RoundedImageView contactImageView = contentView.findViewById(R.id.sliding_contact_list_thumbnail);
+
+        LinearLayout optionInfoContact = contentView.findViewById(R.id.contact_list_info_contact_layout);
+        LinearLayout optionStartConversation = contentView.findViewById(R.id.contact_list_option_start_conversation_layout);
+        LinearLayout optionSendFile = contentView.findViewById(R.id.contact_list_option_send_file_layout);
+        LinearLayout optionSendContact = contentView.findViewById(R.id.contact_list_option_send_contact_layout);
+        LinearLayout optionShareFolder = contentView.findViewById(R.id.contact_list_option_share_layout);
+        LinearLayout optionRemove = contentView.findViewById(R.id.contact_list_option_remove_layout);
+        ImageView contactStateIcon = contentView.findViewById(R.id.contact_list_drawable_state);
 
         if (isScreenInPortrait(context)) {
             titleNameContactPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
@@ -119,14 +105,13 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
         optionStartConversation.setVisibility(View.VISIBLE);
         optionSendContact.setVisibility(View.VISIBLE);
 
-        fullName = contact.getFullName();
-        titleNameContactPanel.setText(fullName);
+        titleNameContactPanel.setText(contact.getFullName());
 
         ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact.getMegaUser());
         String sharedNodesDescription = getSubtitleDescription(sharedNodes);
         titleMailContactPanel.setText(sharedNodesDescription);
 
-        addAvatarContactPanel(contact);
+        setImageAvatar(contact.getMegaUser(), contact.getMegaUser().getEmail(), contact.getFullName(), contactImageView);
 
         optionStartConversation.setVisibility(View.VISIBLE);
         optionStartConversation.setOnClickListener(this);
@@ -135,27 +120,6 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
-    }
-
-    public void addAvatarContactPanel(MegaContactAdapter contact) {
-        /*Default Avatar*/
-        contactImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(contact.getMegaUser()), contact.getFullName(), AVATAR_SIZE, true));
-
-        /*Avatar*/
-        String contactMail = contact.getMegaUser().getEmail();
-        File avatar = buildAvatarFile(getActivity(), contactMail + ".jpg");
-        Bitmap bitmap;
-
-        if (isFileAvailable(avatar) && avatar.length() > 0) {
-            BitmapFactory.Options bOpts = new BitmapFactory.Options();
-            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-            if (bitmap == null) {
-                avatar.delete();
-            } else {
-                contactImageView.setImageBitmap(bitmap);
-                return;
-            }
-        }
     }
 
     @Override

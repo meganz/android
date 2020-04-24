@@ -52,15 +52,14 @@ public class ModalBottomSheetUtil {
             ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
             ActivityManager activityManager = (ActivityManager) app.getSystemService(Context.ACTIVITY_SERVICE);
             if (activityManager == null) {
-                logWarning("ActivityManager is null");
-                return;
-            }
-
-            activityManager.getMemoryInfo(mi);
-            if (mi.totalMem > BUFFER_COMP) {
-                megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-            } else {
                 megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
+            } else {
+                activityManager.getMemoryInfo(mi);
+                if (mi.totalMem > BUFFER_COMP) {
+                    megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
+                } else {
+                    megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
+                }
             }
 
             String url = megaApi.httpServerGetLocalLink(node);
