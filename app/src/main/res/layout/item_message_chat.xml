@@ -1202,9 +1202,9 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/own_message_reactions_recycler"
-                android:layoutDirection="rtl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:orientation="horizontal"/>
         </RelativeLayout>
     </RelativeLayout>

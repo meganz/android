@@ -161,6 +161,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     MegaChatRoom chatRoom;
 
     private ArrayList<Long> pendingPreviews = new ArrayList<>();
+    EqualSpacingItemDecoration itemDecoration = new EqualSpacingItemDecoration(8, EqualSpacingItemDecoration.HORIZONTAL);
 
     private class ChatVoiceClipAsyncTask extends AsyncTask<MegaNodeList, Void, Integer> {
         MegaChatLollipopAdapter.ViewHolderMessageChat holder;
@@ -577,16 +578,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         //        TextView meText;
         TextView timeOwnText;
         RelativeLayout contentOwnMessageLayout;
-        private EmojiTextView contentOwnMessageText;
-        private RelativeLayout ownMessageReactionsLayout;
-        private RecyclerView ownMessageReactionsRecycler;
+        EmojiTextView contentOwnMessageText;
+        RelativeLayout ownMessageReactionsLayout;
+        RecyclerView ownMessageReactionsRecycler;
+        ReactionAdapter ownReactionsAdapter = null;
 
         //Own rich links
         RelativeLayout urlOwnMessageLayout;
         RelativeLayout urlOwnMessageTextrl;
         RelativeLayout forwardOwnRichLinks;
 
-        private EmojiTextView urlOwnMessageText;
+        EmojiTextView urlOwnMessageText;
         LinearLayout urlOwnMessageWarningButtonsLayout;
         Button neverRichLinkButton;
         Button alwaysAllowRichLinkButton;
@@ -615,7 +617,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         //Contact's rich links
         RelativeLayout urlContactMessageLayout;
-        private EmojiTextView urlContactMessageText;
+        EmojiTextView urlContactMessageText;
         RelativeLayout urlContactMessageTitleLayout;
         TextView urlContactMessageTitle;
         TextView urlContactMessageDescription;
@@ -658,7 +660,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout contentOwnMessageContactLayout;
         RelativeLayout contentOwnMessageContactLayoutAvatar;
         RoundedImageView contentOwnMessageContactThumb;
-        private EmojiTextView contentOwnMessageContactName;
+        EmojiTextView contentOwnMessageContactName;
         public EmojiTextView contentOwnMessageContactEmail;
         RelativeLayout forwardOwnContact;
 
@@ -701,13 +703,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout titleContactMessage;
 
         TextView timeContactText;
-        private EmojiTextView nameContactText;
+        EmojiTextView nameContactText;
 
         RoundedImageView contactImageView;
         RelativeLayout contentContactMessageLayout;
-        private RelativeLayout contactMessageReactionsLayout;
-        private RecyclerView contactMessageReactionsRecycler;
-        private EmojiTextView contentContactMessageText;
+        RelativeLayout contactMessageReactionsLayout;
+        RecyclerView contactMessageReactionsRecycler;
+        ReactionAdapter contactReactionsAdapter = null;
+        EmojiTextView contentContactMessageText;
 
         RoundedImageView contentContactMessageThumbLand;
         RelativeLayout gradientContactMessageThumbLand;
@@ -2956,6 +2959,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
             }
+
+            checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
+
         } else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
             if (message.getUserHandle() == myUserHandle) {
                 holder.layoutAvatarMessages.setVisibility(View.GONE);
@@ -3090,6 +3096,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_meta_message_invalid));
             }
+
+            checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
+
         }
         else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
             bindGeoLocationMessage(holder, androidMessage, position);
@@ -3408,6 +3417,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
+        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
+
     }
 
     public void bindMegaLinkMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -3915,6 +3926,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
+        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
     }
 
 
@@ -4469,7 +4481,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
-
     }
 
     private void checkEmojiSize(String message, EmojiTextView textView) {
@@ -5178,6 +5189,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).contentContactMessageFileThumb.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
             }
         }
+
+        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
     }
 
 
@@ -5569,6 +5582,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
+
+        checkReactionsInMessage(positionInAdapter, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
     }
 
     public void bindContactAttachmentMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -5829,6 +5844,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
+
+        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
     }
 
     public void bindChangeTitleMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -6094,6 +6111,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             result = Html.fromHtml(textToShow);
         }
         ((ViewHolderMessageChat) holder).contactManagementMessageText.setText(result);
+
+        checkReactionsInMessage(position, holder,false, chatRoom.getChatId(), androidMessage);
     }
 
     public void bindTruncateMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -8381,17 +8400,35 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private void checkReactionsInMessage(int position, final ViewHolderMessageChat holder, boolean ownMessage, long chatId, AndroidMegaChatMessage megaMessage) {
-        if (isHolderNull(position, holder)) {
+    public void updateReaction(int positionInAdapter, long chatId, AndroidMegaChatMessage msg){
+        if(chatRoom.getChatId() != chatId || msg.getMessage().getMsgId() == -1)
             return;
+
+
+
+        checkReactionsInMessage(positionInAdapter, null,msg.getMessage().getUserHandle() == myUserHandle ,chatId,msg);
+    }
+
+    private void checkReactionsInMessage(int positionInAdapter, ViewHolderMessageChat holder, boolean ownMessage, long chatId, AndroidMegaChatMessage megaMessage) {
+        if(holder == null){
+            holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
+            if (holder == null) {
+                notifyItemChanged(positionInAdapter);
+                return;
+            }
         }
+
         MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, megaMessage.getMessage().getMsgId());
         if (listReactions == null || listReactions.size() <= 0) {
             logDebug("No reactions in this message");
             if (ownMessage) {
                 holder.ownMessageReactionsLayout.setVisibility(View.GONE);
+                holder.contactMessageReactionsRecycler.setAdapter(null);
+                holder.ownReactionsAdapter = null;
             } else {
                 holder.contactMessageReactionsLayout.setVisibility(View.GONE);
+                holder.contactMessageReactionsRecycler.setAdapter(null);
+                holder.contactReactionsAdapter = null;
             }
             return;
         }
@@ -8400,25 +8437,40 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         for (int i = 0; i < listReactions.size(); i++) {
             list.add(i, listReactions.get(i));
         }
+
         list.add(INVALID_REACTION);
-
-        EqualSpacingItemDecoration itemDecoration = new EqualSpacingItemDecoration(8, EqualSpacingItemDecoration.GRID);
-        ReactionAdapter adapter = new ReactionAdapter(context, chatId, megaMessage, list);
-        if (ownMessage) {
-            holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
-            GridLayoutManager grid = new GridLayoutManager(context, 4);
-            grid.setReverseLayout(true);
-            holder.ownMessageReactionsRecycler.setHasFixedSize(false);
-            holder.ownMessageReactionsRecycler.setLayoutManager(grid);
-            holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
-            holder.ownMessageReactionsRecycler.setAdapter(adapter);
+        int spanCount;
+        if (list.size() < 4) {
+            spanCount = list.size();
         } else {
-            holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
-            holder.contactMessageReactionsRecycler.setHasFixedSize(false);
+            spanCount = 4;
+        }
+        if (ownMessage) {
+            logDebug("It a own message");
+            holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
+            holder.ownMessageReactionsRecycler.setLayoutManager(new GridLayoutManager(context, spanCount, RecyclerView.VERTICAL, false));
 
-            holder.contactMessageReactionsRecycler.setLayoutManager(new GridLayoutManager(context, 4, RecyclerView.VERTICAL, false));
-            holder.contactMessageReactionsRecycler.addItemDecoration(itemDecoration);
-            holder.contactMessageReactionsRecycler.setAdapter(adapter);
+            if (holder.ownReactionsAdapter == null) {
+                holder.ownMessageReactionsRecycler.setHasFixedSize(true);
+                holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
+                holder.ownReactionsAdapter = new ReactionAdapter(context, chatId, megaMessage, list);
+                holder.ownMessageReactionsRecycler.setAdapter(holder.ownReactionsAdapter);
+            } else {
+                holder.ownReactionsAdapter.setReactions(list);
+            }
+        } else {
+            logDebug("It a contact message");
+            holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
+            holder.contactMessageReactionsRecycler.setLayoutManager(new GridLayoutManager(context, spanCount, RecyclerView.VERTICAL, false));
+
+            if (holder.contactReactionsAdapter == null) {
+                holder.contactMessageReactionsRecycler.setHasFixedSize(true);
+                holder.contactMessageReactionsRecycler.addItemDecoration(itemDecoration);
+                holder.contactReactionsAdapter = new ReactionAdapter(context, chatId, megaMessage, list);
+                holder.contactMessageReactionsRecycler.setAdapter(holder.contactReactionsAdapter);
+            } else {
+                holder.contactReactionsAdapter.setReactions(list);
+            }
         }
     }
 

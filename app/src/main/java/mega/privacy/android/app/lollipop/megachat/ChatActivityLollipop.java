@@ -5707,14 +5707,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     @Override
     public void onReactionUpdate(MegaChatApiJava api, long msgid, String reaction, int count) {
-        logDebug("Reaction update in msg "+ msgid);
-        MegaChatMessage message = megaChatApi.getMessage(idChat, msgid);
+        MegaChatMessage message = api.getMessage(idChat, msgid);
         if(message == null)
             return;
-
+        logDebug("Upadted:: msgid = "+msgid+",reaction = "+reaction+", count = "+count);
         for (AndroidMegaChatMessage msg : messages) {
             if (msg.getMessage().getMsgId() == msgid) {
-                adapter.notifyItemChanged(messages.indexOf(msg) + 1);
+                adapter.updateReaction(messages.indexOf(msg) + 1, idChat, msg);
                 break;
             }
         }

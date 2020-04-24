@@ -389,7 +389,7 @@ public class ChatUtil {
         return outFile;
     }
 
-    public static void addReactionInMsg(Context context, long chatId, MegaChatMessage message, Emoji emoji) {
+    public static void addReactionInMsg(Context context, long chatId, MegaChatMessage message, Emoji emoji, boolean isFromKeyboard) {
         EmojiEditText editText = new EmojiEditText(context);
         editText.input(emoji);
         String reaction = editText.getText().toString();
@@ -399,8 +399,10 @@ public class ChatUtil {
                 logDebug("The reaction has been added correctly");
                 break;
             case MegaError.API_EEXIST:
-                logDebug("This reaction is already added in this message, so it should be removed");
-                delReactionInMsg(chatId, message, reaction);
+                if (!isFromKeyboard) {
+                    logDebug("This reaction is already added in this message, so it should be removed");
+                    delReactionInMsg(chatId, message, reaction);
+                }
                 break;
         }
     }
@@ -410,7 +412,6 @@ public class ChatUtil {
         if (error.getErrorCode() == MegaChatError.ERROR_OK) {
             logDebug("The reaction has been deleted correctly");
         }
-
     }
 
     public static boolean shouldReactionOptionsBeVisible(Context context, MegaChatRoom chatRoom, AndroidMegaChatMessage message) {

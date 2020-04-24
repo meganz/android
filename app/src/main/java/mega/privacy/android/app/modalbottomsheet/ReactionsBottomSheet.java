@@ -89,7 +89,7 @@ public class ReactionsBottomSheet extends BottomSheetDialogFragment{
         reactionsKeyboard = contentView.findViewById(R.id.reaction_keyboard);
         reactionsKeyboard.init(px2dp(HEIGHT_REACTIONS_KEYBOARD, outMetrics));
         reactionsKeyboard.setOnEmojiSelectedListener(emoji -> {
-            addReactionInMsg(context, chatId, message.getMessage(), emoji);
+            addReactionInMsg(context, chatId, message.getMessage(), emoji, true);
             closeDialog();
         });
 

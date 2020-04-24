@@ -28,7 +28,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHolderReaction> implements View.OnClickListener, View.OnLongClickListener{
+public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHolderReaction> implements View.OnClickListener, View.OnLongClickListener {
 
     private MegaChatApiAndroid megaChatApi;
     private Context context;
@@ -44,19 +44,6 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         this.megaMessage = megaMessage;
         this.messageId = megaMessage.getMessage().getMsgId();
         megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-    }
-
-    public class ViewHolderReaction extends RecyclerView.ViewHolder {
-
-        private RelativeLayout moreReactionsLayout;
-        private RelativeLayout itemReactionLayout;
-        private ReactionImageView itemEmojiReaction;
-        private TextView itemNumUsersReaction;
-        private Emoji emojiReaction;
-
-        public ViewHolderReaction(View itemView) {
-            super(itemView);
-        }
     }
 
     @Override
@@ -77,12 +64,10 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ReactionAdapter.ViewHolderReaction holder, int position) {
-
         String reaction = getItemAtPosition(position);
         if (reaction == null) {
             return;
         }
-
         if (reaction.equals(INVALID_REACTION)) {
             /* Add more reactions icon visible*/
             holder.moreReactionsLayout.setVisibility(View.VISIBLE);
@@ -91,6 +76,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         }
 
         /* Specific reaction*/
+        holder.itemReactionLayout.setVisibility(View.VISIBLE);
         holder.moreReactionsLayout.setVisibility(View.GONE);
 
         List<EmojiRange> emojis = EmojiUtils.emojis(reaction);
@@ -98,14 +84,14 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         /*Number users*/
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
-        String text = numUsers+"";
+        String text = numUsers + "";
         holder.itemNumUsersReaction.setText(text);
 
         /*Color background*/
         boolean ownReaction = false;
         MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, messageId, reaction);
         for (int i = 0; i < handleList.size(); i++) {
-            if (handleList.get(0) == megaChatApi.getMyUserHandle()) {
+            if (handleList.get(i) == megaChatApi.getMyUserHandle()) {
                 ownReaction = true;
                 break;
             }
@@ -128,6 +114,16 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             return null;
 
         return listReactions.get(pos);
+    }
+
+    public void modifyReactions(ArrayList<String> listReactions, int position) {
+        this.listReactions = listReactions;
+        notifyItemChanged(position);
+    }
+
+    public void setReactions(ArrayList<String> listReactions) {
+        this.listReactions = listReactions;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -156,7 +152,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
                 break;
 
             case R.id.item_reaction_layout:
-                addReactionInMsg(context, chatId, megaMessage.getMessage(), holder.emojiReaction);
+                addReactionInMsg(context, chatId, megaMessage.getMessage(), holder.emojiReaction, false);
                 break;
         }
     }
@@ -164,5 +160,18 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     @Override
     public boolean onLongClick(View view) {
         return false;
+    }
+
+    public class ViewHolderReaction extends RecyclerView.ViewHolder {
+
+        private RelativeLayout moreReactionsLayout;
+        private RelativeLayout itemReactionLayout;
+        private ReactionImageView itemEmojiReaction;
+        private TextView itemNumUsersReaction;
+        private Emoji emojiReaction;
+
+        public ViewHolderReaction(View itemView) {
+            super(itemView);
+        }
     }
 }
