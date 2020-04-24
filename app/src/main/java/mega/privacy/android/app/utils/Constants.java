@@ -552,6 +552,11 @@ public class Constants {
             "^https://mega\\.nz/#emailverify.+$"
     };
 
+    public static final String[] WEB_SESSION_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/#sitetransfer!.+$",
+            "^https://mega\\.nz/#sitetransfer!.+$"
+    };
+
     //Types of blocked accounts
     public static final String ACCOUNT_NOT_BLOCKED = "0";
     public static final String COPYRIGHT_ACCOUNT_BLOCK = "200";

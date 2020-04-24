@@ -72,7 +72,14 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		// Email verification link
 		if (matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
 			logDebug("Open email verification link");
-			app.setIsWebOpenDueToEmailVerification(true);
+			MegaApplication.setIsWebOpenDueToEmailVerification(true);
+			openWebLink(url);
+			return;
+		}
+
+		// Web session link
+		if (matchRegexs(url, WEB_SESSION_LINK_REGEXS)) {
+			logDebug("Open web session link");
 			openWebLink(url);
 			return;
 		}
