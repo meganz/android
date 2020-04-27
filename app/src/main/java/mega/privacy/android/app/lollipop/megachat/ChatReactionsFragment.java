@@ -165,7 +165,7 @@ public class ChatReactionsFragment extends RelativeLayout implements View.OnClic
             recentEmoji.addEmoji(imageEmoji.getEmoji());
         }
 
-        addReactionInMsg(context, chatId, message.getMessage(),imageEmoji.getEmoji(),false);
+        addReactionInMsg(context, chatId, message.getMessage(),imageEmoji.getEmoji(),true);
         closeDialog();
     }
 

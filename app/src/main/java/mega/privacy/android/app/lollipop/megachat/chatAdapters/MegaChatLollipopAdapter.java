@@ -43,6 +43,7 @@ import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
@@ -53,6 +54,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -135,6 +137,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private final static int TYPE_ITEM = 1;
 
     private final static int LAYOUT_WIDTH = 330;
+    private static int MAX_COLUMNS = 4;
+    private static int REACTION_SPACE = 8;
 
     Context context;
     private int positionClicked;
@@ -161,7 +165,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     MegaChatRoom chatRoom;
 
     private ArrayList<Long> pendingPreviews = new ArrayList<>();
-    EqualSpacingItemDecoration itemDecoration = new EqualSpacingItemDecoration(8, EqualSpacingItemDecoration.HORIZONTAL);
+    private EqualSpacingItemDecoration itemDecoration = new EqualSpacingItemDecoration(REACTION_SPACE, EqualSpacingItemDecoration.HORIZONTAL);
 
     private class ChatVoiceClipAsyncTask extends AsyncTask<MegaNodeList, Void, Integer> {
         MegaChatLollipopAdapter.ViewHolderMessageChat holder;
@@ -852,6 +856,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.ownMessageReactionsLayout = v.findViewById(R.id.own_message_reactions_layout);
             holder.ownMessageReactionsRecycler = v.findViewById(R.id.own_message_reactions_recycler);
+            ((SimpleItemAnimator) holder.ownMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
             holder.ownMessageReactionsLayout.setVisibility(View.GONE);
 
             holder.previewFramePort = v.findViewById(R.id.preview_frame_portrait);
@@ -1051,6 +1056,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contactMessageReactionsLayout = v.findViewById(R.id.contact_message_reactions_layout);
             holder.contactMessageReactionsRecycler = v.findViewById(R.id.contact_message_reactions_recycler);
+            ((SimpleItemAnimator) holder.contactMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
             holder.contactMessageReactionsLayout.setVisibility(View.GONE);
 
             holder.contentContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape);
@@ -2960,7 +2966,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-            checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
+            checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
 
         } else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
             if (message.getUserHandle() == myUserHandle) {
@@ -3097,7 +3103,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_meta_message_invalid));
             }
 
-            checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
+            checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
 
         }
         else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
@@ -3417,8 +3423,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
-        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
 
+        checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
 
     public void bindMegaLinkMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -3926,7 +3932,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
-        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
+        checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
 
 
@@ -4480,7 +4486,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
-        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
+        checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
 
     private void checkEmojiSize(String message, EmojiTextView textView) {
@@ -5190,7 +5196,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
-        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
+        checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
 
 
@@ -5583,7 +5589,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
-        checkReactionsInMessage(positionInAdapter, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
+        checkReactionsInMessage(positionInAdapter, holder, chatRoom.getChatId(), androidMessage);
     }
 
     public void bindContactAttachmentMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -5845,7 +5851,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
 
-        checkReactionsInMessage(position, holder, message.getUserHandle() == myUserHandle, chatRoom.getChatId(), androidMessage);
+        checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
 
     public void bindChangeTitleMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -6015,7 +6021,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         long userHandle = message.getUserHandle();
         logDebug("Contact message!!: " + userHandle);
 
-        if(userHandle==megaChatApi.getMyUserHandle()){
+        if (userHandle == myUserHandle) {
             ((ViewHolderMessageChat) holder).fullNameTitle = megaChatApi.getMyFullname();
         }
         else{
@@ -6112,7 +6118,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
         ((ViewHolderMessageChat) holder).contactManagementMessageText.setText(result);
 
-        checkReactionsInMessage(position, holder,false, chatRoom.getChatId(), androidMessage);
+        checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
 
     public void bindTruncateMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -8400,17 +8406,146 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    public void updateReaction(int positionInAdapter, long chatId, AndroidMegaChatMessage msg){
-        if(chatRoom.getChatId() != chatId || msg.getMessage().getMsgId() == -1)
-            return;
-
-
-
-        checkReactionsInMessage(positionInAdapter, null,msg.getMessage().getUserHandle() == myUserHandle ,chatId,msg);
+    private boolean checkIfIsMyMessage(MegaChatMessage message) {
+        return message.getUserHandle() == myUserHandle && message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE && message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE && message.getType() != MegaChatMessage.TYPE_SET_PRIVATE_MODE;
     }
 
-    private void checkReactionsInMessage(int positionInAdapter, ViewHolderMessageChat holder, boolean ownMessage, long chatId, AndroidMegaChatMessage megaMessage) {
-        if(holder == null){
+    private GridLayoutManager getGridLayoutManager() {
+        return new GridLayoutManager(context, MAX_COLUMNS, RecyclerView.VERTICAL, false);
+    }
+
+    private ArrayList<String> getReactionsList(MegaStringList listReactions) {
+        ArrayList<String> list = new ArrayList<>();
+        for (int i = 0; i < listReactions.size(); i++) {
+            list.add(i, listReactions.get(i));
+        }
+        list.add(INVALID_REACTION);
+        return list;
+    }
+
+    public void checkReactionUpdated(long chatId, MegaChatMessage message, String reaction, int count) {
+        if (chatRoom.getChatId() != chatId) {
+            logDebug("Different chat ");
+            return;
+        }
+
+        int positionInAdapter = INVALID_POSITION;
+        AndroidMegaChatMessage megaMessage = null;
+        for (AndroidMegaChatMessage msg : messages) {
+            if (msg.getMessage().getMsgId() == message.getMsgId()) {
+                positionInAdapter = messages.indexOf(msg) + 1;
+                megaMessage = msg;
+                break;
+            }
+        }
+
+        if (positionInAdapter == INVALID_POSITION) {
+            logDebug("Message doesn't exist ");
+            return;
+        }
+
+        ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
+        if (holder == null) {
+            logDebug("Holder not found ");
+            notifyItemChanged(positionInAdapter);
+            return;
+        }
+
+        checkReactionsLayout(chatId, megaMessage, holder, reaction, count);
+    }
+
+    private void checkReactionsLayout(long chatId, AndroidMegaChatMessage megaMessage, final ViewHolderMessageChat holder, String reaction, int count) {
+        MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, megaMessage.getMessage().getMsgId());
+        if (noReactions(listReactions, megaMessage.getMessage(), holder)) {
+            return;
+        }
+
+        if (checkIfIsMyMessage(megaMessage.getMessage())) {
+
+            if (holder.ownReactionsAdapter == null) {
+                createReactionsAdapter(listReactions, true, chatId, megaMessage, holder);
+
+            } else {
+                if (count == 0) {
+                    holder.ownReactionsAdapter.removeItem(reaction);
+                } else {
+                    holder.ownReactionsAdapter.updateItem(reaction);
+                }
+
+                if (holder.ownReactionsAdapter.getItemCount() > 0) {
+                    holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
+                } else {
+                    holder.ownMessageReactionsLayout.setVisibility(View.GONE);
+                    holder.ownMessageReactionsRecycler.setAdapter(null);
+                    holder.ownReactionsAdapter = null;
+                }
+            }
+
+        } else {
+
+            if (holder.contactReactionsAdapter == null) {
+                createReactionsAdapter(listReactions, false, chatId, megaMessage, holder);
+
+            } else {
+                if (count == 0) {
+                    holder.contactReactionsAdapter.removeItem(reaction);
+                } else {
+                    holder.contactReactionsAdapter.updateItem(reaction);
+
+                }
+
+                if (holder.contactReactionsAdapter.getItemCount() > 0) {
+                    holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
+                } else {
+                    holder.contactMessageReactionsLayout.setVisibility(View.GONE);
+                    holder.contactMessageReactionsRecycler.setAdapter(null);
+                    holder.contactReactionsAdapter = null;
+                }
+            }
+        }
+    }
+
+    private void createReactionsAdapter(MegaStringList listReactions, boolean ownMessage, long chatId, AndroidMegaChatMessage megaMessage, final ViewHolderMessageChat holder) {
+        ArrayList<String> list = getReactionsList(listReactions);
+
+        if (ownMessage) {
+            holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
+            holder.ownMessageReactionsRecycler.setLayoutManager(getGridLayoutManager());
+            holder.ownMessageReactionsRecycler.setHasFixedSize(true);
+            holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
+            holder.ownReactionsAdapter = new ReactionAdapter(context, chatId, megaMessage, list);
+            holder.ownMessageReactionsRecycler.setAdapter(holder.ownReactionsAdapter);
+        } else {
+            holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
+            holder.contactMessageReactionsRecycler.setLayoutManager(getGridLayoutManager());
+            holder.contactMessageReactionsRecycler.setHasFixedSize(true);
+            holder.contactMessageReactionsRecycler.addItemDecoration(itemDecoration);
+            holder.contactReactionsAdapter = new ReactionAdapter(context, chatId, megaMessage, list);
+            holder.contactMessageReactionsRecycler.setAdapter(holder.contactReactionsAdapter);
+        }
+    }
+
+    private boolean noReactions(MegaStringList listReactions, MegaChatMessage message, final ViewHolderMessageChat holder) {
+        if (listReactions == null || listReactions.size() <= 0) {
+            logDebug("No reactions in this message");
+            if (checkIfIsMyMessage(message)) {
+                holder.ownMessageReactionsLayout.setVisibility(View.GONE);
+                holder.ownMessageReactionsRecycler.setAdapter(null);
+                holder.ownReactionsAdapter = null;
+
+            } else {
+                holder.contactMessageReactionsLayout.setVisibility(View.GONE);
+                holder.contactMessageReactionsRecycler.setAdapter(null);
+                holder.contactReactionsAdapter = null;
+
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void checkReactionsInMessage(int positionInAdapter, ViewHolderMessageChat holder, long chatId, AndroidMegaChatMessage megaMessage) {
+        if (holder == null) {
             holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
             if (holder == null) {
                 notifyItemChanged(positionInAdapter);
@@ -8419,61 +8554,28 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, megaMessage.getMessage().getMsgId());
-        if (listReactions == null || listReactions.size() <= 0) {
-            logDebug("No reactions in this message");
-            if (ownMessage) {
-                holder.ownMessageReactionsLayout.setVisibility(View.GONE);
-                holder.contactMessageReactionsRecycler.setAdapter(null);
-                holder.ownReactionsAdapter = null;
-            } else {
-                holder.contactMessageReactionsLayout.setVisibility(View.GONE);
-                holder.contactMessageReactionsRecycler.setAdapter(null);
-                holder.contactReactionsAdapter = null;
-            }
+        if (noReactions(listReactions, megaMessage.getMessage(), holder)) {
             return;
         }
 
-        ArrayList<String> list = new ArrayList<>();
-        for (int i = 0; i < listReactions.size(); i++) {
-            list.add(i, listReactions.get(i));
-        }
-
-        list.add(INVALID_REACTION);
-        int spanCount;
-        if (list.size() < 4) {
-            spanCount = list.size();
-        } else {
-            spanCount = 4;
-        }
-        if (ownMessage) {
-            logDebug("It a own message");
-            holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
-            holder.ownMessageReactionsRecycler.setLayoutManager(new GridLayoutManager(context, spanCount, RecyclerView.VERTICAL, false));
-
+        if (checkIfIsMyMessage(megaMessage.getMessage())) {
             if (holder.ownReactionsAdapter == null) {
-                holder.ownMessageReactionsRecycler.setHasFixedSize(true);
-                holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
-                holder.ownReactionsAdapter = new ReactionAdapter(context, chatId, megaMessage, list);
-                holder.ownMessageReactionsRecycler.setAdapter(holder.ownReactionsAdapter);
+                createReactionsAdapter(listReactions, true, chatId, megaMessage, holder);
             } else {
+                ArrayList<String> list = getReactionsList(listReactions);
                 holder.ownReactionsAdapter.setReactions(list);
+                holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
             }
         } else {
-            logDebug("It a contact message");
-            holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
-            holder.contactMessageReactionsRecycler.setLayoutManager(new GridLayoutManager(context, spanCount, RecyclerView.VERTICAL, false));
-
             if (holder.contactReactionsAdapter == null) {
-                holder.contactMessageReactionsRecycler.setHasFixedSize(true);
-                holder.contactMessageReactionsRecycler.addItemDecoration(itemDecoration);
-                holder.contactReactionsAdapter = new ReactionAdapter(context, chatId, megaMessage, list);
-                holder.contactMessageReactionsRecycler.setAdapter(holder.contactReactionsAdapter);
+                createReactionsAdapter(listReactions, false, chatId, megaMessage, holder);
             } else {
+                ArrayList<String> list = getReactionsList(listReactions);
                 holder.contactReactionsAdapter.setReactions(list);
+                holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
             }
         }
     }
-
 
     private int getAdapterItemPosition(long id) {
         for (int position = 0; position < messages.size(); position++) {
@@ -8481,6 +8583,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return position + 1;
             }
         }
-        return -1;
+        return INVALID_POSITION;
     }
  }

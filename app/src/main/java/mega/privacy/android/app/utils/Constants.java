@@ -461,6 +461,7 @@ public class Constants {
     public static final int MAX_WIDTH_ADD_CONTACTS = 60;
     public static final int AVATAR_SIZE = 150;
     public static final int AVATAR_SIZE_GRID = 75;
+    public static final int INVALID_POSITION = -1;
 
     public static final String SEPARATOR = File.separator;
 

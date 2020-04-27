@@ -116,9 +116,46 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         return listReactions.get(pos);
     }
 
-    public void modifyReactions(ArrayList<String> listReactions, int position) {
-        this.listReactions = listReactions;
-        notifyItemChanged(position);
+    public void removeItem(String reaction) {
+        if (listReactions == null || listReactions.size() == 0)
+            return;
+
+        for (String item : listReactions) {
+            if (item.equals(reaction)) {
+                int position = listReactions.indexOf(item);
+                listReactions.remove(position);
+                if (listReactions.size() == 1 && listReactions.get(0).equals(INVALID_REACTION)) {
+                    listReactions.clear();
+                } else {
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, listReactions.size());
+                }
+                break;
+            }
+        }
+    }
+
+    public void updateItem(String reaction) {
+        if (listReactions == null || listReactions.size() == 0)
+            return;
+
+        int position = INVALID_POSITION;
+
+        for (String item : listReactions) {
+            if (item.equals(reaction)) {
+                position = listReactions.indexOf(item);
+                break;
+            }
+        }
+
+        if (position == INVALID_POSITION) {
+            int positionToAdd = listReactions.size() - 1;
+            listReactions.add(positionToAdd, reaction);
+            notifyItemInserted(positionToAdd);
+            notifyItemRangeChanged(positionToAdd, listReactions.size());
+        } else {
+            notifyItemChanged(position);
+        }
     }
 
     public void setReactions(ArrayList<String> listReactions) {
@@ -152,7 +189,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
                 break;
 
             case R.id.item_reaction_layout:
-                addReactionInMsg(context, chatId, megaMessage.getMessage(), holder.emojiReaction, true);
+                addReactionInMsg(context, chatId, megaMessage.getMessage(), holder.emojiReaction, false);
                 break;
         }
     }

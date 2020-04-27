@@ -5708,15 +5708,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     @Override
     public void onReactionUpdate(MegaChatApiJava api, long msgid, String reaction, int count) {
         MegaChatMessage message = api.getMessage(idChat, msgid);
-        if(message == null)
+        if(adapter == null || message == null) {
+            logDebug("Message not found");
             return;
-        logDebug("Upadted:: msgid = "+msgid+",reaction = "+reaction+", count = "+count);
-        for (AndroidMegaChatMessage msg : messages) {
-            if (msg.getMessage().getMsgId() == msgid) {
-                adapter.updateReaction(messages.indexOf(msg) + 1, idChat, msg);
-                break;
-            }
         }
+
+        logDebug("Reaction update");
+        adapter.checkReactionUpdated(idChat, message, reaction, count);
     }
 
     @Override
@@ -6948,11 +6946,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     public void showReactionBottomSheet(AndroidMegaChatMessage message, int position){
-        selectedPosition = position;
 
-        if (message == null)
+        if (message == null || message.getMessage() == null)
             return;
 
+        selectedPosition = position;
         hideBottomSheet();
 
         selectedMessageId = message.getMessage().getMsgId();
