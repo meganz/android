@@ -677,7 +677,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
         }
 
-        megaChatApi.addChatListener(this);
+
         dbH = DatabaseHandler.getDbHandler(this);
 
         handler = new Handler();
@@ -1198,6 +1198,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         megaChatApi.closeChatRoom(idChat, this);
                         idChat = newIdChat;
                     }
+                    megaChatApi.addChatListener(this);
                     myUserHandle = megaChatApi.getMyUserHandle();
 
                     if(savedInstanceState!=null) {
@@ -7106,7 +7107,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     megaChatApi.closeChatRoom(idChat, this);
                 }
                 idChat = request.getChatHandle();
-
+                megaChatApi.addChatListener(this);
                 if (idChat != MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE) {
                     dbH.setLastPublicHandle(idChat);
                     dbH.setLastPublicHandleTimeStamp();
@@ -7327,9 +7328,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
         megaChatApi.closeChatRoom(idChat, this);
         MegaApplication.setClosedChat(true);
-        if(shouldLogout) {
-            megaChatApi.removeChatListener(this);
-        }
+        megaChatApi.removeChatListener(this);
     }
 
     @Override
