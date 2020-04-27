@@ -9,6 +9,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.widget.ImageView;
+
 import androidx.core.content.ContextCompat;
 import com.vdurmont.emoji.EmojiParser;
 import java.io.File;
@@ -301,10 +303,41 @@ public class AvatarUtil {
             if (bitmap != null) {
                 return getCircleBitmap(bitmap);
             }
-
-            avatar.delete();
         }
 
         return null;
+    }
+
+    /**
+     * Sets the user's avatar
+     *
+     * @param user              MegaUser object which contains all the user's data
+     * @param email             user's email
+     * @param fullName          user's full name
+     * @param avatarImageView   view in which the avatar has to be ser
+     */
+    public static void setImageAvatar(MegaUser user, String email, String fullName, ImageView avatarImageView) {
+        if (avatarImageView == null) {
+            return;
+        }
+
+        Bitmap bitmap = getImageAvatar(email);
+        if (bitmap != null) {
+            avatarImageView.setImageBitmap(bitmap);
+            return;
+        }
+
+        avatarImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(user), fullName, AVATAR_SIZE, true));
+    }
+
+    /**
+     * Sets the user's avatar
+     *
+     * @param email             user's email
+     * @param fullName          user's full name
+     * @param avatarImageView   view in which the avatar has to be ser
+     */
+    public static void setImageAvatar(String email, String fullName, ImageView avatarImageView) {
+        setImageAvatar(MegaApplication.getInstance().getMegaApi().getContact(email), email, fullName, avatarImageView);
     }
 }
