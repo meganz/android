@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -8,14 +7,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -54,7 +50,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
-
 
 public class LoginActivityLollipop extends BaseActivity implements MegaRequestListenerInterface {
 
@@ -241,7 +236,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                     }
                     case CHOOSE_ACCOUNT_FRAGMENT: {
                         if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                            chooseAccountFragment.onFreeClick(null);
+                            chooseAccountFragment.onFreeClick();
                         }
                         break;
                     }
@@ -549,7 +544,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
             case CHOOSE_ACCOUNT_FRAGMENT: {
                 if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                    chooseAccountFragment.onFreeClick(null);
+                    chooseAccountFragment.onFreeClick();
                 }
                 break;
             }

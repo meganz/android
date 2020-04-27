@@ -1,15 +1,12 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.fragment.app.Fragment;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import android.text.Html;
 import android.text.Spanned;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,6 +28,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -42,176 +40,143 @@ import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickListener{
+public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnClickListener{
 
-	private MegaApiAndroid megaApi;
-	public MyAccountInfo myAccountInfo;
+	protected MyAccountInfo myAccountInfo;
 
-	DisplayMetrics outMetrics;
-
-	private ScrollView scrollView;
+	protected ScrollView scrollView;
 	private RelativeLayout semitransparentLayer;
 	private TextView textMyAccount;
 
-	private LinearLayout linearLayoutMain;
+	private int parameterType = -1;
+	private int paymentMethod = -1;
 
-	int parameterType=-1;
-	int paymentMethod = -1;
-
-	private RelativeLayout proLiteLayout;
-	private RelativeLayout pro1Layout;
-	private RelativeLayout pro2Layout;
-	private RelativeLayout pro3Layout;
-	private RelativeLayout businessLayout;
-
+	//PRO LITE elements:
+	protected RelativeLayout proLiteLayout;
+	protected TextView monthSectionLite;
+	protected TextView storageSectionLite;
+	protected TextView bandwidthSectionLite;
 	private RelativeLayout proLiteTransparentLayout;
+
+	//PRO I elements:
+	protected RelativeLayout pro1Layout;
+	protected TextView monthSectionPro1;
+	protected TextView storageSectionPro1;
+	protected TextView bandwidthSectionPro1;
 	private RelativeLayout pro1TransparentLayout;
-	private RelativeLayout pro3TransparentLayout;
+
+	//PRO II elements:
+	protected RelativeLayout pro2Layout;
+	protected TextView monthSectionPro2;
+	protected TextView storageSectionPro2;
+	protected TextView bandwidthSectionPro2;
 	private RelativeLayout pro2TransparentLayout;
 
-	private TextView monthSectionLite;
-	private TextView storageSectionLite;
-	private TextView bandwidthSectionLite;
-	private TextView monthSectionPro1;
-	private TextView storageSectionPro1;
-	private TextView bandwidthSectionPro1;
-	private TextView monthSectionPro2;
-	private TextView storageSectionPro2;
-	private TextView bandwidthSectionPro2;
-	private TextView monthSectionPro3;
-	private TextView storageSectionPro3;
-	private TextView bandwidthSectionPro3;
-	private TextView monthSectionBusiness;
-	private TextView storageSectionBusiness;
-	private TextView bandwidthSectionBusiness;
+	//PRO III elements:
+	protected RelativeLayout pro3Layout;
+	protected TextView monthSectionPro3;
+	protected TextView storageSectionPro3;
+	protected TextView bandwidthSectionPro3;
+	private RelativeLayout pro3TransparentLayout;
+
+	//Business elements
+	protected RelativeLayout businessLayout;
+	protected TextView monthSectionBusiness;
+	protected TextView storageSectionBusiness;
+	protected TextView bandwidthSectionBusiness;
+
 	private TextView labelCustomPlan;
 
 	//Payment layout
-	View selectPaymentMethodLayoutLite;
-	View selectPaymentMethodLayoutPro1;
-	View selectPaymentMethodLayoutPro2;
-	View selectPaymentMethodLayoutPro3;
+	private View selectPaymentMethodLayoutLite;
+	private View selectPaymentMethodLayoutPro1;
+	private View selectPaymentMethodLayoutPro2;
+	private View selectPaymentMethodLayoutPro3;
 	private TextView selectPaymentMethod;
-	private TextView paymentTitle;
 
-	RelativeLayout googlePlayLayout;
-	RelativeLayout creditCardLayout;
-	RelativeLayout fortumoLayout;
-	RelativeLayout centiliLayout;
+	private RelativeLayout googlePlayLayout;
+	private RelativeLayout creditCardLayout;
+	private RelativeLayout fortumoLayout;
+	private RelativeLayout centiliLayout;
 
-	RelativeLayout googlePlayLayer;
-	RelativeLayout creditCardLayer;
-	RelativeLayout fortumoLayer;
-	RelativeLayout centiliLayer;
+	private RelativeLayout googlePlayLayer;
+	private RelativeLayout creditCardLayer;
+	private RelativeLayout fortumoLayer;
+	private RelativeLayout centiliLayer;
 
-	LinearLayout optionsBilling;
-	RadioGroup billingPeriod;
-	RadioButton billedMonthly;
-	RadioButton billedYearly;
-	LinearLayout layoutButtons;
-	TextView buttonCancel;
-    TextView buttonContinue;
-
-	TextView fortumoText;
-	TextView centiliText;
-	TextView creditCardText;
-	TextView googleWalletText;
-
-	Context context;
+	private LinearLayout optionsBilling;
+	private RadioGroup billingPeriod;
+	private RadioButton billedMonthly;
+	private RadioButton billedYearly;
+	private LinearLayout layoutButtons;
+	private TextView buttonContinue;
 
 	private final static int TYPE_STORAGE_LABEL = 0;
 	private final static int TYPE_TRANSFER_LABEL = 1;
 
 	@Override
-	public void onDestroy(){
-		super.onDestroy();
-	}
-	
-	@Override
-	public void onCreate (Bundle savedInstanceState){
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-
-		super.onCreate(savedInstanceState);
-		logDebug("onCreate");
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
 
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-
-		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics();
-		display.getMetrics(outMetrics);
+		myAccountInfo = app.getMyAccountInfo();
 
 		View v = inflater.inflate(R.layout.fragment_upgrade_account, container, false);
-		scrollView = (ScrollView) v.findViewById(R.id.scroll_view_upgrade);
+		scrollView = v.findViewById(R.id.scroll_view_upgrade);
 
-		new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
-			@Override
-			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-				if (scrollView.canScrollVertically(-1)){
-					((ManagerActivityLollipop) context).changeActionBarElevation(true);
-				}
-				else {
-					((ManagerActivityLollipop) context).changeActionBarElevation(false);
-				}
+		new ListenScrollChangesHelper().addViewToListen(scrollView, (v1, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+			if (scrollView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			} else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
 			}
 		});
-		linearLayoutMain = (LinearLayout) v.findViewById(R.id.linear_layout_upgrade);
 
-		textMyAccount = (TextView) v.findViewById(R.id.text_of_my_account);
-		semitransparentLayer = (RelativeLayout) v.findViewById(R.id.semitransparent_layer);
+		textMyAccount = v.findViewById(R.id.text_of_my_account);
+		semitransparentLayer = v.findViewById(R.id.semitransparent_layer);
 		semitransparentLayer.setOnClickListener(this);
 		setAccountDetails();
 
-
 		//PRO LITE ACCOUNT
-		proLiteLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout);
+		proLiteLayout = v.findViewById(R.id.upgrade_prolite_layout);
 		proLiteLayout.setOnClickListener(this);
-		monthSectionLite = (TextView) v.findViewById(R.id.month_lite);
-		storageSectionLite = (TextView) v.findViewById(R.id.storage_lite);
-		bandwidthSectionLite = (TextView) v.findViewById(R.id.bandwidth_lite);
+		monthSectionLite = v.findViewById(R.id.month_lite);
+		storageSectionLite = v.findViewById(R.id.storage_lite);
+		bandwidthSectionLite = v.findViewById(R.id.bandwidth_lite);
 		selectPaymentMethodLayoutLite = v.findViewById(R.id.available_payment_methods_prolite);
-		proLiteTransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout_transparent);
+		proLiteTransparentLayout = v.findViewById(R.id.upgrade_prolite_layout_transparent);
 		proLiteTransparentLayout.setVisibility(View.GONE);
 		//END -- PRO LITE ACCOUNT
 
 		//PRO I ACCOUNT
-		pro1Layout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_i_layout);
+		pro1Layout = v.findViewById(R.id.upgrade_pro_i_layout);
 		pro1Layout.setOnClickListener(this);
-		monthSectionPro1 = (TextView) v.findViewById(R.id.month_pro_i);
-		storageSectionPro1 = (TextView) v.findViewById(R.id.storage_pro_i);
-		bandwidthSectionPro1 = (TextView) v.findViewById(R.id.bandwidth_pro_i);
+		monthSectionPro1 = v.findViewById(R.id.month_pro_i);
+		storageSectionPro1 = v.findViewById(R.id.storage_pro_i);
+		bandwidthSectionPro1 = v.findViewById(R.id.bandwidth_pro_i);
 		selectPaymentMethodLayoutPro1 = v.findViewById(R.id.available_payment_methods_pro_i);
-		pro1TransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_i_layout_transparent);
+		pro1TransparentLayout = v.findViewById(R.id.upgrade_pro_i_layout_transparent);
 		pro1TransparentLayout.setVisibility(View.GONE);
 		//END -- PRO I ACCOUNT
 
 		//PRO II ACCOUNT
-		pro2Layout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_ii_layout);
+		pro2Layout = v.findViewById(R.id.upgrade_pro_ii_layout);
 		pro2Layout.setOnClickListener(this);
-		monthSectionPro2 = (TextView) v.findViewById(R.id.month_pro_ii);
-		storageSectionPro2 = (TextView) v.findViewById(R.id.storage_pro_ii);
-		bandwidthSectionPro2 = (TextView) v.findViewById(R.id.bandwidth_pro_ii);
+		monthSectionPro2 = v.findViewById(R.id.month_pro_ii);
+		storageSectionPro2 = v.findViewById(R.id.storage_pro_ii);
+		bandwidthSectionPro2 = v.findViewById(R.id.bandwidth_pro_ii);
 		selectPaymentMethodLayoutPro2 = v.findViewById(R.id.available_payment_methods_pro_ii);
-		pro2TransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_ii_layout_transparent);
+		pro2TransparentLayout = v.findViewById(R.id.upgrade_pro_ii_layout_transparent);
 		pro2TransparentLayout.setVisibility(View.GONE);
 		//END -- PRO II ACCOUNT
 
 		//PRO III ACCOUNT
-		pro3Layout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_iii_layout);
+		pro3Layout = v.findViewById(R.id.upgrade_pro_iii_layout);
 		pro3Layout.setOnClickListener(this);
-		monthSectionPro3 = (TextView) v.findViewById(R.id.month_pro_iii);
-		storageSectionPro3 = (TextView) v.findViewById(R.id.storage_pro_iii);
-		bandwidthSectionPro3 = (TextView) v.findViewById(R.id.bandwidth_pro_iii);
+		monthSectionPro3 = v.findViewById(R.id.month_pro_iii);
+		storageSectionPro3 = v.findViewById(R.id.storage_pro_iii);
+		bandwidthSectionPro3 = v.findViewById(R.id.bandwidth_pro_iii);
 		selectPaymentMethodLayoutPro3 = v.findViewById(R.id.available_payment_methods_pro_iii);
-		pro3TransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_iii_layout_transparent);
+		pro3TransparentLayout = v.findViewById(R.id.upgrade_pro_iii_layout_transparent);
 		pro3TransparentLayout.setVisibility(View.GONE);
 		labelCustomPlan = v.findViewById(R.id.lbl_custom_plan);
 		labelCustomPlan.setVisibility(View.GONE);
@@ -220,12 +185,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		String textToShowB = getString(R.string.label_custom_plan);
 		textToShowB = textToShowB.replace("[A]", "<font color=\'" + strColor + "\'>");
 		textToShowB = textToShowB.replace("[/A]", "</font>");
-		Spanned resultB;
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			resultB = Html.fromHtml(textToShowB, Html.FROM_HTML_MODE_LEGACY);
-		} else {
-			resultB = Html.fromHtml(textToShowB);
-		}
+		Spanned resultB = getSpannedHtmlText(textToShowB);
 		labelCustomPlan.setText(resultB);
 		//END -- PRO III ACCOUNT
 
@@ -242,35 +202,28 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		refreshAccountInfo();
 
-		int displayedAccountType = ((ManagerActivityLollipop)context).getDisplayedAccountType();
-		if(displayedAccountType!=-1){
-			switch(displayedAccountType){
-				case PRO_LITE:{
+		int displayedAccountType = ((ManagerActivityLollipop) context).getDisplayedAccountType();
+		if (displayedAccountType != -1) {
+			switch (displayedAccountType) {
+				case PRO_LITE:
 					onUpgradeClick(PRO_LITE);
 					break;
-				}
-				case PRO_I:{
+				case PRO_I:
 					onUpgradeClick(PRO_I);
 					break;
-				}
-				case PRO_II:{
+				case PRO_II:
 					onUpgradeClick(PRO_II);
 					break;
-				}
-				case PRO_III:{
+				case PRO_III:
 					onUpgradeClick(PRO_III);
 					break;
-				}
 			}
 		}
 
-		logDebug("END onCreateView");
 		return v;
 	}
 
 	public void refreshAccountInfo(){
-		logDebug("refreshAccountInfo");
-
 		logDebug("Check the last call to callToPricing");
 		if(callToPricing()){
 			logDebug("megaApi.getPricing SEND");
@@ -285,141 +238,98 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	}
 
 	public void setPricing() {
-		logDebug("setPricing");
 
+		setProPricingInfo();
+
+		int displayedAccountType = ((ManagerActivityLollipop) context).getDisplayedAccountType();
+		logDebug("displayedAccountType: " + displayedAccountType);
+		if (displayedAccountType != -1) {
+			switch (displayedAccountType) {
+				case PRO_LITE:
+					onUpgradeClick(PRO_LITE);
+					break;
+				case PRO_I:
+					onUpgradeClick(PRO_I);
+					break;
+				case PRO_II:
+					onUpgradeClick(PRO_II);
+					break;
+				case PRO_III:
+					onUpgradeClick(PRO_III);
+					break;
+			}
+		}
+	}
+
+	/**
+	 * Sets pricing info of PRO and Business plans.
+	 */
+	protected void setProPricingInfo() {
 		if (myAccountInfo == null) {
-			myAccountInfo = ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo();
+			logWarning("MyAccountInfo is Null");
+			return;
 		}
 
-		if (myAccountInfo != null) {
-			ArrayList<Product> productAccounts = myAccountInfo.getProductAccounts();
+		ArrayList<Product> productAccounts = myAccountInfo.getProductAccounts();
 
-			if (productAccounts == null) {
-				logDebug("productAccounts == null");
-				((MegaApplication) ((Activity) context).getApplication()).askForPricing();
-				return;
-			}
+		if (productAccounts == null) {
+			logDebug("productAccounts == null");
+			app.askForPricing();
+			return;
+		}
 
-			for (int i = 0; i < productAccounts.size(); i++) {
-				Product account = productAccounts.get(i);
+		for (int i = 0; i < productAccounts.size(); i++) {
+			Product account = productAccounts.get(i);
 
-				if (account.getMonths() == 1) {
-					String textToShow = getPriceString(account, true);
+			if (account.getMonths() == 1) {
+				Spanned textToShow = getPriceString(account, true);
+				Spanned textStorage = generateByteString(account.getStorage(), TYPE_STORAGE_LABEL);
+				Spanned textTransfer = generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL);
 
-					switch (account.getLevel()) {
-						case PRO_I: {
-							try{
-								textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
-								textToShow = textToShow.replace("[/A]", "</font>");
-							}catch (Exception e){
-								logError("NullPointerException happens when getting the storage string", e);
-							}
+				switch (account.getLevel()) {
+					case PRO_I:
+						monthSectionPro1.setText(textToShow);
+						storageSectionPro1.setText(textStorage);
+						bandwidthSectionPro1.setText(textTransfer);
+						break;
 
-							monthSectionPro1.setText(getSpannedHtmlText(textToShow));
-							storageSectionPro1.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
-							bandwidthSectionPro1.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
+					case PRO_II:
+						monthSectionPro2.setText(textToShow);
+						storageSectionPro2.setText(textStorage);
+						bandwidthSectionPro2.setText(textTransfer);
+						break;
 
-							break;
+					case PRO_III:
+						monthSectionPro3.setText(textToShow);
+						storageSectionPro3.setText(textStorage);
+						bandwidthSectionPro3.setText(textTransfer);
+						break;
+
+					case PRO_LITE:
+						monthSectionLite.setText(textToShow);
+						storageSectionLite.setText(textStorage);
+						bandwidthSectionLite.setText(textTransfer);
+						break;
+
+					case BUSINESS:
+						String unlimitedSpace = getString(R.string.unlimited_space);
+						String unlimitedTransfer = getString(R.string.unlimited_transfer_quota);
+
+						try {
+							unlimitedSpace = unlimitedSpace.replace("[A]", "<font color=\'#7a7a7a\'>");
+							unlimitedSpace = unlimitedSpace.replace("[/A]", "</font>");
+							unlimitedTransfer = unlimitedTransfer.replace("[A]", "<font color=\'#7a7a7a\'>");
+							unlimitedTransfer = unlimitedTransfer.replace("[/A]", "</font>");
+						} catch (Exception e) {
+							logError("Exception formatting string", e);
 						}
-						case PRO_II: {
-							try{
-								textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
-								textToShow = textToShow.replace("[/A]", "</font>");
-								textToShow = textToShow.replace("[B]", "<font color=\'#ff333a\'>");
-								textToShow = textToShow.replace("[/B]", "</font>");
-							}catch (Exception e){
-								logError("NullPointerException happens when getting the storage string", e);
-							}
 
-							monthSectionPro2.setText(getSpannedHtmlText(textToShow));
-							storageSectionPro2.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
-							bandwidthSectionPro2.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
-
-							break;
-						}
-						case PRO_III: {
-							try{
-								textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
-								textToShow = textToShow.replace("[/A]", "</font>");
-								textToShow = textToShow.replace("[B]", "<font color=\'#ff333a\'>");
-								textToShow = textToShow.replace("[/B]", "</font>");
-							}catch (Exception e){
-								logError("NullPointerException happens when getting the storage string", e);
-							}
-
-							monthSectionPro3.setText(getSpannedHtmlText(textToShow));
-							storageSectionPro3.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
-							bandwidthSectionPro3.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
-
-							break;
-						}
-						case PRO_LITE: {
-							try{
-								textToShow = textToShow.replace("[A]", "<font color=\'#ffa500\'>");
-								textToShow = textToShow.replace("[/A]", "</font>");
-								textToShow = textToShow.replace("[B]", "<font color=\'#ff333a\'>");
-								textToShow = textToShow.replace("[/B]", "</font>");
-							}catch (Exception e){
-								logError("NullPointerException happens when getting the storage string", e);
-							}
-
-							monthSectionLite.setText(getSpannedHtmlText(textToShow));
-							storageSectionLite.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
-							bandwidthSectionLite.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
-
-							break;
-						}
-						case BUSINESS: {
-							String unlimitedSpace = getString(R.string.unlimited_space);
-							String unlimitedTransfer = getString(R.string.unlimited_transfer_quota);
-
-							try{
-								textToShow = textToShow.replace("[A]", "<font color=\'#2ba6de\'>");
-								textToShow = textToShow.replace("[/A]", "</font>");
-								textToShow = textToShow.replace("[B]", "<font color=\'#2ba6de\'>");
-								textToShow = textToShow.replace("[/B]", "</font>");
-								unlimitedSpace = unlimitedSpace.replace("[A]", "<font color=\'#7a7a7a\'>");
-								unlimitedSpace = unlimitedSpace.replace("[/A]", "</font>");
-								unlimitedTransfer = unlimitedTransfer.replace("[A]", "<font color=\'#7a7a7a\'>");
-								unlimitedTransfer = unlimitedTransfer.replace("[/A]", "</font>");
-							}catch (Exception e){
-								logError("NullPointerException happens when getting the storage string", e);
-							}
-
-							monthSectionBusiness.setText(getSpannedHtmlText(textToShow));
-							storageSectionBusiness.setText(getSpannedHtmlText(unlimitedSpace));
-							bandwidthSectionBusiness.setText(getSpannedHtmlText(unlimitedTransfer));
-
-							break;
-						}
-					}
+						monthSectionBusiness.setText(textToShow);
+						storageSectionBusiness.setText(getSpannedHtmlText(unlimitedSpace));
+						bandwidthSectionBusiness.setText(getSpannedHtmlText(unlimitedTransfer));
+						break;
 				}
 			}
-
-			int displayedAccountType = ((ManagerActivityLollipop) context).getDisplayedAccountType();
-			logDebug("displayedAccountType: " + displayedAccountType);
-			if (displayedAccountType != -1) {
-				switch (displayedAccountType) {
-					case PRO_LITE: {
-						onUpgradeClick(PRO_LITE);
-						break;
-					}
-					case PRO_I: {
-						onUpgradeClick(PRO_I);
-						break;
-					}
-					case PRO_II: {
-						onUpgradeClick(PRO_II);
-						break;
-					}
-					case PRO_III: {
-						onUpgradeClick(PRO_III);
-						break;
-					}
-				}
-			}
-		} else {
-			logWarning("MyAccountInfo is Null");
 		}
 	}
 
@@ -430,7 +340,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	 * @param monthlyBasePrice True to get a monthly base price string (i.e. "4,99 €/month") or false to get a single price (i.e. "4,99 €").
 	 * @return The price of the product provided as parameter.
 	 */
-	private String getPriceString(Product product, boolean monthlyBasePrice) {
+	private Spanned getPriceString(Product product, boolean monthlyBasePrice) {
 		// First get the "default" pricing details from the MEGA server
 		double price = product.getAmount() / 100.00;
 		String currency = product.getCurrency();
@@ -446,51 +356,62 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		format.setCurrency(Currency.getInstance(currency));
 		String stringPrice = format.format(price);
 
+		String color = String.valueOf(ContextCompat.getColor(context,R.color.black));
 		if (monthlyBasePrice) {
 			if (product.getMonths() != 1) {
-				return "";
+				return getSpannedHtmlText("");
 			}
 
-			return getString(product.getLevel() == BUSINESS ?
+			switch (product.getLevel()) {
+				case PRO_I:
+				case PRO_II:
+				case PRO_III:
+					color = String.valueOf(ContextCompat.getColor(context,R.color.pro_account));
+					break;
+				case PRO_LITE:
+					color = String.valueOf(ContextCompat.getColor(context,R.color.lite_account));
+					break;
+				case BUSINESS:
+					color = String.valueOf(ContextCompat.getColor(context,R.color.business_account));
+					break;
+			}
+
+			stringPrice = getString(product.getLevel() == BUSINESS ?
 					R.string.type_business_month : R.string.type_month, stringPrice);
+		} else {
+			stringPrice = getString(product.getMonths() == 12 ?
+					R.string.billed_yearly_text : R.string.billed_monthly_text, stringPrice);
 		}
 
-		return getString(product.getMonths() == 12 ?
-				R.string.billed_yearly_text : R.string.billed_monthly_text, stringPrice);
+		try {
+			stringPrice = stringPrice.replace("[A]", "<font color=\'" + color + "\'>");
+			stringPrice = stringPrice.replace("[/A]", "</font>");
+		} catch (Exception e) {
+			logError("Exception formatting string", e);
+		}
+
+		return getSpannedHtmlText(stringPrice);
 	}
-	
-	public void showAvailableAccount(){
-		logDebug("showAvailableAccount()");
 
-		if(myAccountInfo==null){
-			logWarning("MyAccountInfo is NULL");
-			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
-		}
-
-		logDebug("showAvailableAccount: " + myAccountInfo.getAccountType());
-
-		switch(myAccountInfo.getAccountType()){
-
-			case PRO_I:{
+	public void showAvailableAccount() {
+		logDebug("Account type: " + myAccountInfo.getAccountType());
+		switch (myAccountInfo.getAccountType()) {
+			case PRO_I:
 				hideProI();
 				break;
-			}
-			case PRO_II:{
+			case PRO_II:
 				hideProII();
 				break;
-			}
-			case PRO_III:{
+			case PRO_III:
 				hideProIII();
 				break;
-			}
-			case PRO_LITE:{
+			case PRO_LITE:
 				hideProLite();
 				break;
-			}
 		}
 	}
 
-	public void onUpgradeClick(int account){
+	private void onUpgradeClick(int account){
 		logDebug("account: " + account);
 		RelativeLayout selectPaymentMethodClicked;
 
@@ -521,120 +442,114 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		if (myAccountInfo.getPaymentBitSet() != null){
 			logDebug("myAccountInfo.getPaymentBitSet() != null");
 
-			selectPaymentMethod = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_text_payment_method);
-			paymentTitle = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_text_payment_title);
-
-
-//			RelativeLayout.LayoutParams titleParams = (RelativeLayout.LayoutParams) selectPaymentMethod.getLayoutParams();
-//			titleParams.setMargins(0,scaleHeightPx(18, outMetrics),0,scaleHeightPx(14, outMetrics));
-//			selectPaymentMethod.setLayoutParams(titleParams);
+			selectPaymentMethod = selectPaymentMethodClicked.findViewById(R.id.payment_text_payment_method);
+			TextView paymentTitle = selectPaymentMethodClicked.findViewById(R.id.payment_text_payment_title);
 
 			switch (account){
-				case PRO_LITE:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.upgrade_orange));
+				case PRO_LITE:
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.lite_account));
 					paymentTitle.setText(getString(R.string.prolite_account));
 					break;
-				}
-				case PRO_I:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+				case PRO_I:
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.pro_account));
 					paymentTitle.setText(getString(R.string.pro1_account));
 					break;
-				}
-				case PRO_II:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+				case PRO_II:
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.pro_account));
 					paymentTitle.setText(getString(R.string.pro2_account));
 					break;
-				}
-				case PRO_III:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+				case PRO_III:
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.pro_account));
 					paymentTitle.setText(getString(R.string.pro3_account));
 					break;
-				}
-				default:{
+				default:
 					break;
-				}
 			}
 
-			googlePlayLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet);
+			googlePlayLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet);
 			googlePlayLayout.setOnClickListener(this);
 
-			googlePlayLayer = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet_layer);
+			googlePlayLayer = selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet_layer);
 			googlePlayLayer.setVisibility(View.GONE);
 
-			googleWalletText = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet_text);
+			TextView googleWalletText = selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet_text);
 
             String textGoogleWallet = getString(R.string.payment_method_google_wallet);
             try{
                 textGoogleWallet = textGoogleWallet.replace("[A]", "<font color=\'#000000\'>");
                 textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>");
-            }
-            catch (Exception e){}
+			} catch (Exception e) {
+				logError("Exception formatting string", e);
+			}
 
             googleWalletText.setText(getSpannedHtmlText(textGoogleWallet));
 
 
-			creditCardLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card);
+			creditCardLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card);
 			creditCardLayout.setOnClickListener(this);
 
-			creditCardLayer = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_layer);
+			creditCardLayer = selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_layer);
 			creditCardLayer.setVisibility(View.GONE);
 
-			creditCardText = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_text);
+			TextView creditCardText = selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_text);
 			String textCreditCardText = getString(R.string.payment_method_credit_card);
 			try{
 				textCreditCardText = textCreditCardText.replace("[A]", "<font color=\'#000000\'>");
 				textCreditCardText = textCreditCardText.replace("[/A]", "</font>");
+			} catch (Exception e) {
+				logError("Exception formatting string", e);
 			}
-			catch (Exception e){}
 
 			creditCardText.setText(getSpannedHtmlText(textCreditCardText));
 
-			fortumoLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo);
+			fortumoLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo);
 			fortumoLayout.setOnClickListener(this);
 
-			fortumoLayer = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo_layer);
+			fortumoLayer = selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo_layer);
 			fortumoLayer.setVisibility(View.GONE);
 
-			fortumoText = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo_text);
+			TextView fortumoText = selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo_text);
 
 			String textFortumoText = getString(R.string.payment_method_fortumo);
 			try{
 				textFortumoText = textFortumoText.replace("[A]", "<font color=\'#000000\'>");
 				textFortumoText = textFortumoText.replace("[/A]", "</font>");
+			} catch (Exception e) {
+				logError("Exception formatting string", e);
 			}
-			catch (Exception e){}
 
 			fortumoText.setText(getSpannedHtmlText(textFortumoText));
 
-			centiliLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_centili);
+			centiliLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_centili);
 			centiliLayout.setOnClickListener(this);
 
-			centiliLayer = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_centili_layer);
+			centiliLayer = selectPaymentMethodClicked.findViewById(R.id.payment_method_centili_layer);
 			centiliLayer.setVisibility(View.GONE);
 
-			centiliText = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_method_centili_text);
+			TextView centiliText = selectPaymentMethodClicked.findViewById(R.id.payment_method_centili_text);
 
 			String textCentiliText = getString(R.string.payment_method_centili);
 			try{
 				textCentiliText = textCentiliText.replace("[A]", "<font color=\'#000000\'>");
 				textCentiliText = textCentiliText.replace("[/A]", "</font>");
+			} catch (Exception e) {
+				logError("Exception formatting string", e);
 			}
-			catch (Exception e){}
 
 			centiliText.setText(getSpannedHtmlText(textCentiliText));
 
-			optionsBilling = (LinearLayout) selectPaymentMethodClicked.findViewById(R.id.options);
+			optionsBilling = selectPaymentMethodClicked.findViewById(R.id.options);
 
-			billingPeriod = (RadioGroup) selectPaymentMethodClicked.findViewById(R.id.billing_period);
-			billedMonthly = (RadioButton) selectPaymentMethodClicked.findViewById(R.id.billed_monthly);
+			billingPeriod = selectPaymentMethodClicked.findViewById(R.id.billing_period);
+			billedMonthly = selectPaymentMethodClicked.findViewById(R.id.billed_monthly);
 			billedMonthly.setOnClickListener(this);
-			billedYearly = (RadioButton) selectPaymentMethodClicked.findViewById(R.id.billed_yearly);
+			billedYearly = selectPaymentMethodClicked.findViewById(R.id.billed_yearly);
 			billedYearly.setOnClickListener(this);
 
-			layoutButtons = (LinearLayout) selectPaymentMethodClicked.findViewById(R.id.layout_buttons);
-			buttonCancel = (TextView) selectPaymentMethodClicked.findViewById(R.id.button_cancel);
+			layoutButtons = selectPaymentMethodClicked.findViewById(R.id.layout_buttons);
+			TextView buttonCancel = selectPaymentMethodClicked.findViewById(R.id.button_cancel);
 			buttonCancel.setOnClickListener(this);
-            buttonContinue = (TextView) selectPaymentMethodClicked.findViewById(R.id.button_continue);
+            buttonContinue = selectPaymentMethodClicked.findViewById(R.id.button_continue);
             buttonContinue.setOnClickListener(this);
 
             buttonContinue.setEnabled(false);
@@ -651,7 +566,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 			refreshAccountInfo();
 			logDebug("END refreshAccountInfo");
-			if (!myAccountInfo.isInventoryFinished()){
+			if (!myAccountInfo.isInventoryFinished()) {
 				logDebug("if (!myAccountInfo.isInventoryFinished())");
 				googlePlayLayout.setVisibility(View.GONE);
 			}
@@ -660,41 +575,18 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			selectPaymentMethodClicked.setVisibility(View.VISIBLE);
 			semitransparentLayer.setVisibility(View.VISIBLE);
 
-			switch (account){
-				case PRO_I:{
-
-					new Handler().post(new Runnable() {
-						@Override
-						public void run() {
-							logDebug("smeasure: " + pro2Layout.getTop());
-							logDebug("scroll to: " + pro2Layout.getBottom());
-							scrollView.smoothScrollTo(0, pro1Layout.getTop());
-
-						}
-					});
+			switch (account) {
+				case PRO_I:
+					new Handler().post(() -> scrollView.smoothScrollTo(0, pro1Layout.getTop()));
 					break;
-				}
-				case PRO_II:{
-					new Handler().post(new Runnable() {
-						@Override
-						public void run() {
-							scrollView.smoothScrollTo(0, pro3Layout.getBottom());
-						}
-					});
+				case PRO_II:
+					new Handler().post(() -> scrollView.smoothScrollTo(0, pro2Layout.getTop()));
 					break;
-				}
-				case PRO_III:{
-					new Handler().post(new Runnable() {
-						@Override
-						public void run() {
-							scrollView.smoothScrollTo(0, pro3Layout.getBottom());
-						}
-					});
+				case PRO_III:
+					new Handler().post(() -> scrollView.smoothScrollTo(0, pro3Layout.getBottom()));
 					break;
-				}
 			}
-		}
-		else{
+		} else {
 			logWarning("PaymentBitSet Null");
 		}
 	}
@@ -721,17 +613,13 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	}
 
 	private Spanned generateByteString(long gb, int labelType) {
-		String textToShow = new StringBuilder().append("[A] ")
-											   .append(getSizeStringGBBased(gb))
-											   .append(" [/A] ")
-											   .append(storageOrTransferLabel(labelType))
-											   .toString();
+		String textToShow = "[A] " + getSizeStringGBBased(gb) + " [/A] " + storageOrTransferLabel(labelType);
 
 		try {
 			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
-		} catch (NullPointerException ex) {
-			logError("NullPointerException happens when getting the storage string", ex);
+		} catch (Exception e) {
+			logError("Exception formatting string", e);
 		}
 
 		return getSpannedHtmlText(textToShow);
@@ -748,35 +636,25 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		}
 	}
 
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		context = activity;
-	}
-	
-	public void showNextPaymentFragment(int paymentM){
+	private void showNextPaymentFragment(int paymentM) {
 		logDebug("paymentM: " + paymentM);
 
-		if(selectPaymentMethodLayoutLite.getVisibility()==View.VISIBLE){
-			parameterType=PRO_LITE;
-		}
-		else if(selectPaymentMethodLayoutPro1.getVisibility()==View.VISIBLE){
-			parameterType=PRO_I;
-		}
-		else if(selectPaymentMethodLayoutPro2.getVisibility()==View.VISIBLE){
-			parameterType=PRO_II;
-		}
-		else if(selectPaymentMethodLayoutPro3.getVisibility()==View.VISIBLE){
-			parameterType=PRO_III;
-		}
-		else{
-			parameterType=0;
+		if (selectPaymentMethodLayoutLite.getVisibility() == View.VISIBLE) {
+			parameterType = PRO_LITE;
+		} else if (selectPaymentMethodLayoutPro1.getVisibility() == View.VISIBLE) {
+			parameterType = PRO_I;
+		} else if (selectPaymentMethodLayoutPro2.getVisibility() == View.VISIBLE) {
+			parameterType = PRO_II;
+		} else if (selectPaymentMethodLayoutPro3.getVisibility() == View.VISIBLE) {
+			parameterType = PRO_III;
+		} else {
+			parameterType = 0;
 		}
 		paymentMethod = paymentM;
 		logDebug("parameterType: " + parameterType);
 
-		((ManagerActivityLollipop)context).setSelectedAccountType(parameterType);
-		((ManagerActivityLollipop)context).setSelectedPaymentMethod(paymentMethod);
+		((ManagerActivityLollipop) context).setSelectedAccountType(parameterType);
+		((ManagerActivityLollipop) context).setSelectedPaymentMethod(paymentMethod);
 		showmyF(paymentM, parameterType);
 	}
 
@@ -800,7 +678,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
 					//MONTHLY SUBSCRIPTION
 					switch (parameterType) {
-						case 1: {
+						case PRO_I: {
 							//PRO I
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
@@ -814,7 +692,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							}
 							break;
 						}
-						case 2: {
+						case PRO_II: {
 							//PRO II
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
@@ -828,7 +706,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							}
 							break;
 						}
-						case 3: {
+						case PRO_III: {
 							//PRO III
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
@@ -842,7 +720,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							}
 							break;
 						}
-						case 4: {
+						case PRO_LITE: {
 							//LITE
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
@@ -868,7 +746,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				} else {
 					//YEARLY SUBSCRIPTION
 					switch (parameterType) {
-						case 1: {
+						case PRO_I: {
 							//PRO I
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
@@ -882,7 +760,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							}
 							break;
 						}
-						case 2: {
+						case PRO_II: {
 							//PRO II
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
@@ -896,7 +774,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							}
 							break;
 						}
-						case 3: {
+						case PRO_III: {
 							//PRO III
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
@@ -910,7 +788,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							}
 							break;
 						}
-						case 4: {
+						case PRO_LITE: {
 							//LITE
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
@@ -1012,22 +890,14 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.upgrade_business_layout:{
-				megaApi.getSessionTransferURL("registerb", new SessionTransferURLListener(context));
+				megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
 				break;
 			}
 		}
 	}
 
-	public void showPaymentMethods(int parameterType){
+	private void showPaymentMethods(int parameterType){
 		logDebug("parameterType: " + parameterType);
-
-		if(myAccountInfo==null){
-			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
-		}
-
-		if(myAccountInfo==null){
-			return;
-		}
 
 		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
@@ -1185,8 +1055,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		}
 	}
 
-
-	public void setAccountDetails() {
+	private void setAccountDetails() {
 		logDebug("setAccountDetails");
 
 		if ((getActivity() == null) || (!isAdded())) {
@@ -1194,95 +1063,50 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			return;
 		}
 
-		if (myAccountInfo == null) {
-			myAccountInfo = ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo();
-		}
-
-		if (myAccountInfo == null) {
-			return;
-		}
 		//Set account details
-		if (myAccountInfo.getAccountType() < 0 || myAccountInfo.getAccountType() > 4) {
+		if (myAccountInfo.getAccountType() < FREE || myAccountInfo.getAccountType() > PRO_LITE) {
 			textMyAccount.setText(getString(R.string.recovering_info));
 			textMyAccount.setTextColor(ContextCompat.getColor(context,R.color.mail_my_account));
 		} else {
+			String textToShow;
+			String color;
 			switch (myAccountInfo.getAccountType()) {
-
-				case 0: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.free_account).toUpperCase());
-					try{
-						textToShowB = textToShowB.replace("[A]", "<font color=\'#2bb200\'>");
-						textToShowB = textToShowB.replace("[/A]", "</font>");
-					}
-					catch (Exception e){}
-
-					textMyAccount.setText(getSpannedHtmlText(textToShowB));
+				case FREE:
+				default:
+					textToShow = getString(R.string.type_of_my_account, getString(R.string.free_account).toUpperCase());
+					color = String.valueOf(ContextCompat.getColor(context, R.color.free_account));
 					break;
-				}
-
-				case 1: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro1_account).toUpperCase());
-					try{
-						textToShowB = textToShowB.replace("[A]", "<font color=\'#ff333a\'>");
-						textToShowB = textToShowB.replace("[/A]", "</font>");
-					}
-					catch (Exception e){}
-
-					textMyAccount.setText(getSpannedHtmlText(textToShowB));
+				case PRO_I:
+					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro1_account).toUpperCase());
+					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
 					break;
-				}
-
-				case 2: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro2_account).toUpperCase());
-					try{
-						textToShowB = textToShowB.replace("[A]", "<font color=\'#ff333a\'>");
-						textToShowB = textToShowB.replace("[/A]", "</font>");
-					}
-					catch (Exception e){}
-
-					textMyAccount.setText(getSpannedHtmlText(textToShowB));
+				case PRO_II:
+					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro2_account).toUpperCase());
+					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
 					break;
-				}
-
-				case 3: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro3_account).toUpperCase());
-					try{
-						textToShowB = textToShowB.replace("[A]", "<font color=\'#ff333a\'>");
-						textToShowB = textToShowB.replace("[/A]", "</font>");
-					}
-					catch (Exception e){}
-
-					textMyAccount.setText(getSpannedHtmlText(textToShowB));
+				case PRO_III:
+					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro3_account).toUpperCase());
+					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
 					break;
-				}
-
-				case 4: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.prolite_account).toUpperCase());
-					try{
-						textToShowB = textToShowB.replace("[A]", "<font color=\'#ffa500\'>");
-						textToShowB = textToShowB.replace("[/A]", "</font>");
-					}
-					catch (Exception e){}
-
-					textMyAccount.setText(getSpannedHtmlText(textToShowB));
+				case PRO_LITE:
+					textToShow = getString(R.string.type_of_my_account, getString(R.string.prolite_account).toUpperCase());
+					color = String.valueOf(ContextCompat.getColor(context, R.color.lite_account));
 					break;
-				}
-
 			}
-		}
 
+			try {
+				textToShow = textToShow.replace("[A]", "<font color=\'" + color + "\'>");
+				textToShow = textToShow.replace("[/A]", "</font>");
+			} catch (Exception e) {
+				logWarning("Exception formatting string", e);
+			}
+
+			textMyAccount.setText(getSpannedHtmlText(textToShow));
+		}
 	}
 
 	private void showmyF(int paymentMethod, int parameterType){
 		logDebug("paymentMethod " + paymentMethod + ", type " + parameterType);
-
-		if(myAccountInfo==null){
-			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
-		}
-
-		if(myAccountInfo == null){
-			return;
-		}
 
 		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
@@ -1297,18 +1121,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			Product account = accounts.get(i);
 
 			if (account.getLevel() == parameterType) {
-				String textToShow = getPriceString(account, false);
-				try {
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-				} catch (Exception e) {
-					logWarning("Error formatting string.", e);
-				}
-
+				Spanned textToShow = getPriceString(account, false);
 				if (account.getMonths() == 1) {
-					billedMonthly.setText(getSpannedHtmlText(textToShow));
+					billedMonthly.setText(textToShow);
 				} else if (account.getMonths() == 12) {
-					billedYearly.setText(getSpannedHtmlText(textToShow));
+					billedYearly.setText(textToShow);
 				}
 			}
 		}

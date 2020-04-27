@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="free_account">#2BB200</color>
+    <color name="lite_account">#FFA500</color>
+    <color name="pro_account">#F0373A</color>
+    <color name="business_account">#2BA6DE</color>
+
 	<color name="pressed_mega">#CCcc0000</color>
     <color name="text_tab_alpha">#99ffffff</color>
     <color name="text_secondary">#7a7a7a</color>
@@ -47,8 +52,6 @@
     
  <!--    <color name="dark_grey_cloud_drive">#6d6f70</color>--> 
     
-    <color name="green_free_account">#31B404</color>
-
     <color name="divider_upgrade_account">#1F000000</color>
 
     <color name="transparent_white">#CCFFFFFF</color>
@@ -56,7 +59,6 @@
     <color name="black">#000000</color>
     <color name="orange">#FFFFBB33</color>
     <color name="blue">#FF33B5E5</color>
-    <color name="upgrade_orange">#ffa500</color>
     <color name="upgrade_grey">#8d8d8d</color>
     <color name="filter_icon">#8d8d94</color>
     <color name="upgrade_white">#b9ffffff</color>
@@ -181,8 +183,6 @@
 
     <color name="yellow_notif_shares">#FFFFA500</color>
     <color name="green_notif_contacts">#FF00897B</color>
-
-    <color name="free_account">#2bb200</color>
 
     <!-- DIALOGS -->
     <color name="dialog_title">#FF333333</color>

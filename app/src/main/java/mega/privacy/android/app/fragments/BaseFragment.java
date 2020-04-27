@@ -1,9 +1,13 @@
 package mega.privacy.android.app.fragments;
 
 import android.content.Context;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.Display;
+
+import java.util.Objects;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -35,12 +39,12 @@ public class BaseFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
         this.context = context;
 
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        Display display = Objects.requireNonNull(getActivity()).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
     }

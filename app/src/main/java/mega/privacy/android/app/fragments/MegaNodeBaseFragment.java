@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -312,7 +314,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
         if (context instanceof ManagerActivityLollipop) {
