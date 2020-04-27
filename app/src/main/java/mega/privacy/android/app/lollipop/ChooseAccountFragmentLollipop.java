@@ -20,9 +20,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
-import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
-import nz.mega.sdk.MegaPricing;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -49,9 +47,6 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
 
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         if (dbH.getCredentials() == null){
-//            megaApi.localLogout();
-//            AccountController aC = new AccountController(context);
-//            aC.logout(context, megaApi, megaChatApi, false);
             //Show Login Fragment
             ((LoginActivityLollipop)context).showFragment(LOGIN_FRAGMENT);
         }
@@ -136,100 +131,56 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.choose_account_free_layout:
-                onFreeClick();
-                break;
-            case R.id.choose_account_prolite_layout:
-                onUpgradeLiteClick();
-                break;
-            case R.id.choose_account_pro_i_layout:
-                onUpgrade1Click();
-                break;
-            case R.id.choose_account_pro_ii_layout:
-                onUpgrade2Click();
-                break;
-            case R.id.choose_account_pro_iii_layout:
-                onUpgrade3Click();
-                break;
-            case R.id.choose_account_business_layout:
-                megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
-                break;
-        }
-    }
-
-    void onFreeClick(){
-        logDebug("onFreeClick");
 
         Intent intent = new Intent(context,ManagerActivityLollipop.class);
         intent.putExtra("firstLogin", true);
-        intent.putExtra("upgradeAccount", false);
         intent.putExtra("newAccount", true);
         intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
-        startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
-    }
 
-    private void onUpgrade1Click() {
-//		((ManagerActivity)context).showpF(1, accounts);
-        logDebug("onUpgrade1Click");
-
-        Intent intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra("upgradeAccount", true);
-        intent.putExtra("accountType", PRO_I);
-        intent.putExtra("newAccount", true);
-        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
-        startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
-    }
-
-    private void onUpgrade2Click() {
-//		((ManagerActivity)context).showpF(2, accounts);
-        logDebug("onUpgrade2Click");
-
-        Intent intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra("upgradeAccount", true);
-        intent.putExtra("accountType", PRO_II);
-        intent.putExtra("newAccount", true);
-        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
-        startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
-    }
-
-    private void onUpgrade3Click() {
-//		((ManagerActivity)context).showpF(3, accounts);
-        logDebug("onUpgrade3Click");
-
-        Intent intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra("upgradeAccount", true);
-        intent.putExtra("accountType", PRO_III);
-        intent.putExtra("newAccount", true);
-        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
-        startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
-    }
-
-    private void onUpgradeLiteClick(){
-//		((ManagerActivity)context).showpF(4, accounts);
-        logDebug("onUpgradeLiteClick");
-
-        Intent intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra("upgradeAccount", true);
-        intent.putExtra("accountType", PRO_LITE);
-        intent.putExtra("newAccount", true);
-        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
-        startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
-    }
-
-    void setPricingInfo() {
-
-        MegaPricing p = myAccountInfo.getPricing();
-        if (p == null) {
-            logWarning("Return - getPricing NULL");
-            return;
+        switch (v.getId()){
+            case R.id.choose_account_free_layout:
+                intent.putExtra("upgradeAccount", false);
+                intent.putExtra("accountType", FREE);
+                break;
+            case R.id.choose_account_prolite_layout:
+                intent.putExtra("upgradeAccount", true);
+                intent.putExtra("accountType", PRO_LITE);
+                break;
+            case R.id.choose_account_pro_i_layout:
+                intent.putExtra("upgradeAccount", true);
+                intent.putExtra("accountType", PRO_I);
+                break;
+            case R.id.choose_account_pro_ii_layout:
+                intent.putExtra("upgradeAccount", true);
+                intent.putExtra("accountType", PRO_II);
+                break;
+            case R.id.choose_account_pro_iii_layout:
+                intent.putExtra("upgradeAccount", true);
+                intent.putExtra("accountType", PRO_III);
+                break;
+            case R.id.choose_account_business_layout:
+                intent.putExtra("upgradeAccount", true);
+                intent.putExtra("accountType", BUSINESS);
+                break;
         }
 
+        startActivity(intent);
+        ((LoginActivityLollipop)context).finish();
+    }
+
+    void onFreeClick() {
+        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        intent.putExtra("firstLogin", true);
+        intent.putExtra("upgradeAccount", false);
+        intent.putExtra("accountType", FREE);
+        intent.putExtra("newAccount", true);
+        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
+        startActivity(intent);
+        ((LoginActivityLollipop) context).finish();
+    }
+
+    @Override
+    public void setPricingInfo() {
         //Currently the API side doesn't return this value, so we have to hardcode.
         String textToShowFreeStorage = "[A] 50 GB [/A]" + getString(R.string.label_storage_upgrade_account) + " ";
         try {
@@ -248,9 +199,8 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
             logWarning("Exception formatting string", e);
         }
         bandwidthSectionFree.setText(getSpannedHtmlText(textToShowFreeBandwidth));
-
         achievementsSectionFree.setText(getSpannedHtmlText("<sup><small><font color=\'#ff333a\'>1</font></small></sup> " + getString(R.string.footnote_achievements)));
 
-        setProPricingInfo();
+        super.setPricingInfo();
     }
 }

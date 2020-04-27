@@ -810,7 +810,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					//UPGRADE_ACCOUNT_FRAGMENT
 					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 					if(upAFL!=null){
-						upAFL.setPricing();
+						upAFL.setPricingInfo();
 					}
 
 					//CENTILI_FRAGMENT
@@ -1417,7 +1417,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 		if (upAFL != null) {
-			upAFL.setPricing();
+			upAFL.setPricingInfo();
 		}
 	}
 
@@ -3095,6 +3095,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
 								selectDrawerItemPending=false;
 								displayedAccountType = PRO_LITE;
+								selectDrawerItemLollipop(drawerItem);
+								return;
+							}
+							case BUSINESS:{
+								drawerItem = DrawerItem.ACCOUNT;
+								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
+								selectDrawerItemPending=false;
+								displayedAccountType = BUSINESS;
 								selectDrawerItemLollipop(drawerItem);
 								return;
 							}

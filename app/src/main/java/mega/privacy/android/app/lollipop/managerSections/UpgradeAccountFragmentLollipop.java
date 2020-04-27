@@ -197,27 +197,14 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		bandwidthSectionBusiness = v.findViewById(R.id.bandwidth_business);
 		//END -- BUSINESS ACCOUNT
 
-		setPricing();
+		setPricingInfo();
 		showAvailableAccount();
 
 		refreshAccountInfo();
 
 		int displayedAccountType = ((ManagerActivityLollipop) context).getDisplayedAccountType();
 		if (displayedAccountType != -1) {
-			switch (displayedAccountType) {
-				case PRO_LITE:
-					onUpgradeClick(PRO_LITE);
-					break;
-				case PRO_I:
-					onUpgradeClick(PRO_I);
-					break;
-				case PRO_II:
-					onUpgradeClick(PRO_II);
-					break;
-				case PRO_III:
-					onUpgradeClick(PRO_III);
-					break;
-			}
+			onUpgradeClick(displayedAccountType);
 		}
 
 		return v;
@@ -237,34 +224,10 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		}
 	}
 
-	public void setPricing() {
-
-		setProPricingInfo();
-
-		int displayedAccountType = ((ManagerActivityLollipop) context).getDisplayedAccountType();
-		logDebug("displayedAccountType: " + displayedAccountType);
-		if (displayedAccountType != -1) {
-			switch (displayedAccountType) {
-				case PRO_LITE:
-					onUpgradeClick(PRO_LITE);
-					break;
-				case PRO_I:
-					onUpgradeClick(PRO_I);
-					break;
-				case PRO_II:
-					onUpgradeClick(PRO_II);
-					break;
-				case PRO_III:
-					onUpgradeClick(PRO_III);
-					break;
-			}
-		}
-	}
-
 	/**
 	 * Sets pricing info of PRO and Business plans.
 	 */
-	protected void setProPricingInfo() {
+	public void setPricingInfo() {
 		if (myAccountInfo == null) {
 			logWarning("MyAccountInfo is Null");
 			return;
@@ -415,28 +378,24 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		logDebug("account: " + account);
 		RelativeLayout selectPaymentMethodClicked;
 
-		switch (account){
-			case PRO_LITE:{
-				logDebug("PRO_LITE ");
+		switch (account) {
+			case PRO_LITE:
 				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutLite;
 				break;
-			}
-			case PRO_I:{
+			case PRO_I:
 				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutPro1;
 				break;
-			}
-			case PRO_II:{
+			case PRO_II:
 				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutPro2;
 				break;
-			}
-			case PRO_III:{
+			case PRO_III:
 				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutPro3;
 				break;
-			}
-			default:{
-				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutLite;
-				break;
-			}
+			case BUSINESS:
+				megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
+				return;
+			default:
+				return;
 		}
 
 		if (myAccountInfo.getPaymentBitSet() != null){
