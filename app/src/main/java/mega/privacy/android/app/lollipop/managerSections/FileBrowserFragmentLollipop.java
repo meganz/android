@@ -693,7 +693,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
     @Override
 	public void onDestroy() {
-		adapter.clearTakenDownDialog();
+		if (adapter != null) {
+			adapter.clearTakenDownDialog();
+		}
+
 		super.onDestroy();
 	}
 
