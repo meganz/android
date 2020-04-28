@@ -410,6 +410,8 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private boolean userNameChanged;
 	private boolean userEmailChanged;
 
+	private AlertDialog reconnectDialog;
+
 	private LinearLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
 
@@ -2084,7 +2086,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			orderContacts = ORDER_DEFAULT_ASC;
 			orderOthers = ORDER_DEFAULT_ASC;
 		}
-		getOverflowMenu();
 
 		handler = new Handler();
 
@@ -4515,7 +4516,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			mBillingManager.destroy();
 		}
 		cancelSearch();
-
+        if(reconnectDialog != null) {
+            reconnectDialog.cancel();
+        }
     	super.onDestroy();
 	}
 
@@ -5053,7 +5056,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		try {
 			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.general_ok, dialogClickListener)
-					.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+					.setNegativeButton(R.string.general_cancel, dialogClickListener);
+            reconnectDialog = builder.create();
+            reconnectDialog.setCanceledOnTouchOutside(false);
+            reconnectDialog.show();
 		}
 		catch (Exception e){}
 	}
@@ -6131,20 +6137,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 		}
     	drawerItem = DrawerItem.CHAT;
     	selectDrawerItemLollipop(drawerItem);
-	}
-
-	private void getOverflowMenu() {
-		logDebug("getOverflowMenu");
-	     try {
-	        ViewConfiguration config = ViewConfiguration.get(this);
-	        Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-	        if(menuKeyField != null) {
-	            menuKeyField.setAccessible(true);
-	            menuKeyField.setBoolean(config, false);
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
 	}
 
 	public void showMyAccount(){
