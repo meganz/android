@@ -2,18 +2,24 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.utils.JobUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 
+import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class GetAttrUserListener extends BaseListener {
@@ -22,6 +28,7 @@ public class GetAttrUserListener extends BaseListener {
      * If so, the rest of the actions in onRequestFinish() can be ignored.
      */
     private boolean onlyDBUpdate;
+
     public GetAttrUserListener(Context context) {
         super(context);
     }
@@ -30,8 +37,8 @@ public class GetAttrUserListener extends BaseListener {
      * Constructor to init a request for check the USER_ATTR_MY_CHAT_FILES_FOLDER user's attribute
      * and update the DB with the result.
      *
-     * @param context       current application context
-     * @param onlyDBUpdate  true if the purpose of the request is only update the DB, false otherwise
+     * @param context      current application context
+     * @param onlyDBUpdate true if the purpose of the request is only update the DB, false otherwise
      */
     public GetAttrUserListener(Context context, boolean onlyDBUpdate) {
         super(context);
@@ -70,7 +77,7 @@ public class GetAttrUserListener extends BaseListener {
                 if (myChatFolderNode != null && !api.isInRubbish(myChatFolderNode)) {
                     dBH.setMyChatFilesFolderHandle(myChatFolderNode.getHandle());
                     myChatFolderFound = true;
-                } else if (!onlyDBUpdate){
+                } else if (!onlyDBUpdate) {
                     api.createFolder(context.getString(R.string.my_chat_files_folder), api.getRootNode(), new CreateFolderListener(context, true));
                 }
 
@@ -103,16 +110,19 @@ public class GetAttrUserListener extends BaseListener {
                     }
                 }
                 break;
+
             case USER_ATTR_FIRSTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateFirstName(context, request.getText(), request.getEmail());
                 }
                 break;
+
             case USER_ATTR_LASTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateLastName(context, request.getText(), request.getEmail());
                 }
                 break;
+
             case USER_ATTR_ALIAS:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     String nickname = request.getName();
@@ -127,6 +137,82 @@ public class GetAttrUserListener extends BaseListener {
                     notifyNicknameUpdate(context, request.getNodeHandle());
                 } else {
                     logError("Error recovering the alias" + e.getErrorCode());
+                }
+                break;
+
+            case USER_ATTR_CAMERA_UPLOADS_FOLDER:
+                if (context instanceof CameraUploadsService) {
+                    if (request.getFlag()) {
+                        ((CameraUploadsService) context).onGetSecondaryFolderAttribute(request, e);
+                    } else {
+                        ((CameraUploadsService) context).onGetPrimaryFolderAttribute(request, e);
+                    }
+                } else if (e.getErrorCode() == MegaError.API_OK) {
+                    synchronized (this) {
+                        long handleInUserAttr = request.getNodeHandle();
+                        if (isNodeInRubbishOrDeleted(handleInUserAttr)) {
+                            boolean isSecondary = request.getFlag();
+                            if (isSecondary) {
+                                long secondaryHandle = findDefaultFolder(SECONDARY_UPLOADS);
+                                if (secondaryHandle == INVALID_HANDLE) {
+                                    secondaryHandle = findDefaultFolder(SECONDARY_UPLOADS_ENGLISH);
+                                }
+                                if (secondaryHandle == INVALID_HANDLE) {
+                                    if (prefs != null &&
+                                            prefs.getSecondaryMediaFolderEnabled() != null &&
+                                            Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
+                                        api.createFolder(SECONDARY_UPLOADS, api.getRootNode(), new CreateFolderListener(context));
+                                    }
+                                } else {
+                                    api.setCameraUploadsFolderSecondary(secondaryHandle, new SetAttrUserListener(context));
+                                    api.renameNode(api.getNodeByHandle(secondaryHandle), SECONDARY_UPLOADS, new RenameListener(context));
+                                }
+
+                            } else {
+                                long primaryHandle = findDefaultFolder(CAMERA_UPLOADS);
+                                if (primaryHandle == INVALID_HANDLE) {
+                                    primaryHandle = findDefaultFolder(CAMERA_UPLOADS_ENGLISH);
+                                }
+                                if (primaryHandle == INVALID_HANDLE) {
+                                    if (prefs != null &&
+                                            prefs.getCamSyncEnabled() != null &&
+                                            Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
+                                        api.createFolder(CAMERA_UPLOADS, api.getRootNode(), new CreateFolderListener(context));
+                                    }
+                                } else {
+                                    api.setCameraUploadsFolder(primaryHandle, new SetAttrUserListener(context));
+                                    api.renameNode(api.getNodeByHandle(primaryHandle), CAMERA_UPLOADS, new RenameListener(context));
+                                }
+                            }
+                        } else {
+                            long primaryHandle = getPrimaryFolderHandle();
+                            long secondaryHandle = getSecondaryFolderHandle();
+                            boolean shouldCUStop = false;
+
+                            //save changes to local DB
+                            boolean isSecondary = request.getFlag();
+                            if (isSecondary && handleInUserAttr != secondaryHandle) {
+                                dBH.setSecondaryFolderHandle(handleInUserAttr);
+                                resetSecondaryTimeline();
+                                shouldCUStop = true;
+
+                            } else if (!isSecondary && handleInUserAttr != primaryHandle) {
+                                dBH.setCamSyncHandle(handleInUserAttr);
+                                resetPrimaryTimeline();
+                                shouldCUStop = true;
+                            }
+
+                            //stop CU if destination has changed
+                            if (shouldCUStop && CameraUploadsService.isServiceRunning) {
+                                JobUtil.stopRunningCameraUploadService(context);
+                            }
+
+                            //notify manager activity to update UI
+                            if (!(context instanceof MegaApplication)) {
+                                forceUpdateCameraUploadFolderIcon(isSecondary, handleInUserAttr);
+                            }
+                        }
+                    }
                 }
                 break;
         }

@@ -39,12 +39,9 @@ public class PinActivityLollipop extends BaseActivity {
 
 		//if leave the APP then get back, should trigger camera upload.
         if(System.currentTimeMillis() - lastStart > 1000) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startCameraUploadService(PinActivityLollipop.this);
-                }
-            }, 3000);
+			if (megaApi.getRootNode() != null && !MegaApplication.isLoggingIn()){
+				startCameraUploadServiceIgnoreAttr(PinActivityLollipop.this);
+			}
         }
 	}
 }

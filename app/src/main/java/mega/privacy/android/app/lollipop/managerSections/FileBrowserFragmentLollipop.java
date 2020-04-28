@@ -66,6 +66,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1047,7 +1048,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                     return;
                 }
             } else {
-                if (n.getName().equals("Camera Uploads")) {
+                if (n.getName().equals(CAMERA_UPLOADS)) {
                     if (prefs != null) {
                         prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
                     }
@@ -1059,7 +1060,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
             }
             
         } else {
-            if (n.getName().equals("Camera Uploads")) {
+            if (n.getName().equals(CAMERA_UPLOADS)) {
                 
                 if (prefs != null) {
                     prefs.setCamSyncHandle(String.valueOf(n.getHandle()));

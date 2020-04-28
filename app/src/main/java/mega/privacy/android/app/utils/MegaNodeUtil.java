@@ -32,7 +32,6 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.jobservices.CameraUploadsService.SECONDARY_UPLOADS;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -348,12 +347,6 @@ public class MegaNodeUtil {
 
         if (cameraSyncHandle != null && !cameraSyncHandle.isEmpty() && n.getHandle() == Long.parseLong(cameraSyncHandle)) {
             return true;
-        } else if (n.getName().equals("Camera Uploads")) {
-            if (prefs != null) {
-                prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
-            }
-            dbH.setCamSyncHandle(n.getHandle());
-            return true;
         }
 
         //Check if the item is the Media Uploads folder
@@ -362,12 +355,6 @@ public class MegaNodeUtil {
         }
 
         if (secondaryMediaHandle != null && !secondaryMediaHandle.isEmpty() && n.getHandle() == Long.parseLong(secondaryMediaHandle)) {
-            return true;
-        } else if (n.getName().equals(SECONDARY_UPLOADS)) {
-            if (prefs != null) {
-                prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
-            }
-            dbH.setSecondaryFolderHandle(n.getHandle());
             return true;
         }
 
@@ -443,5 +430,25 @@ public class MegaNodeUtil {
         }
 
         return true;
+    }
+
+    /**
+     * @param handle node's handle to be detected
+     * @return whether the node is in rubbish
+     */
+    public static boolean isNodeInRubbish(long handle){
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        MegaNode node =  megaApi.getNodeByHandle(handle);
+        return node != null && megaApi.isInRubbish(node);
+    }
+
+    /**
+     * @param handle node's handle to be detected
+     * @return whether the node is in rubbish
+     */
+    public static boolean isNodeInRubbishOrDeleted(long handle){
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        MegaNode node =  megaApi.getNodeByHandle(handle);
+        return node == null || megaApi.isInRubbish(node);
     }
 }

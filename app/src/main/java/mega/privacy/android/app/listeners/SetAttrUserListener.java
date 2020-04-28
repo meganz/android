@@ -2,14 +2,17 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaStringMap;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.FragmentTag.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -61,6 +64,35 @@ public class SetAttrUserListener extends BaseListener {
                     notifyNicknameUpdate(context, request.getNodeHandle());
                 } else {
                     logError("Error adding, updating or removing the alias" + e.getErrorCode());
+                }
+                break;
+            case USER_ATTR_CAMERA_UPLOADS_FOLDER:
+                long handle = request.getNodeHandle();
+                boolean isSecondary = request.getFlag();
+                // Database and preference update
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    if (isSecondary) {
+                        resetSecondaryTimeline();
+                        dBH.setSecondaryFolderHandle(handle);
+                        prefs.setMegaHandleSecondaryFolder(String.valueOf(handle));
+                    } else {
+                        resetPrimaryTimeline();
+                        dBH.setCamSyncHandle(handle);
+                        prefs.setCamSyncHandle(String.valueOf(handle));
+                    }
+                    forceUpdateCameraUploadFolderIcon(request.getFlag(), request.getNodeHandle());
+                }
+
+                if (context instanceof CameraUploadsService) {
+                    ((CameraUploadsService) context).onSetFolderAttribute(e.getErrorCode() == MegaError.API_OK);
+                } else if (context instanceof ManagerActivityLollipop
+                        && fragmentTag == SETTINGS) {
+                    if (e.getErrorCode() == MegaError.API_OK) {
+                        ((ManagerActivityLollipop) context).getSettingsFragment().setCUDestinationFolder(isSecondary, handle);
+                        return;
+                    }
+                    showSnackbar(context, context.getString(R.string.error_unable_to_setup_cloud_folder));
+                    logError("Exception happens when set user attribute" + e.toString());
                 }
                 break;
         }

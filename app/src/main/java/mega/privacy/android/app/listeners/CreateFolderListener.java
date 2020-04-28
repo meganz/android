@@ -2,7 +2,9 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -11,6 +13,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 
+import static mega.privacy.android.app.jobservices.CameraUploadsService.CAMERA_UPLOADS;
+import static mega.privacy.android.app.jobservices.CameraUploadsService.SECONDARY_UPLOADS;
+import static mega.privacy.android.app.utils.CameraUploadUtil.deleteIfDuplicated;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -75,8 +80,20 @@ public class CreateFolderListener extends BaseListener {
                 api.setMyChatFilesFolder(handle, new SetAttrUserListener(nodeAttachmentHistoryActivity));
                 nodeAttachmentHistoryActivity.setMyChatFilesFolder(node);
                 nodeAttachmentHistoryActivity.handleStoredData();
+            } else if (context instanceof CameraUploadsService) {
+                ((CameraUploadsService) context).onCreateFolder(request, e);
             } else {
                 nodeAttachmentHistoryActivity.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error));
+            }
+        } else if (context instanceof CameraUploadsService) {
+            ((CameraUploadsService) context).onCreateFolder(request, e);
+        } else if (context instanceof MegaApplication) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                if (name.equals(CAMERA_UPLOADS) && !deleteIfDuplicated(name, handle)) {
+                    api.setCameraUploadsFolder(handle, new SetAttrUserListener(context));
+                }else if (name.equals(SECONDARY_UPLOADS) && !deleteIfDuplicated(name, handle)) {
+                    api.setCameraUploadsFolderSecondary(handle, new SetAttrUserListener(context));
+                }
             }
         }
 
