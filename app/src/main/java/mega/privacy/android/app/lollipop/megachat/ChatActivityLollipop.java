@@ -176,6 +176,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
@@ -3321,32 +3322,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
         String message= getResources().getString(R.string.confirmation_leave_group_chat);
         builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-    }
-
-    public void showConfirmationRejoinChat(final long publicHandle){
-        logDebug("showConfirmationRejoinChat");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE: {
-                        logDebug("Rejoin chat!: " + publicHandle);
-                        megaChatApi.autorejoinPublicChat(idChat, publicHandle, chatActivity);
-                        break;
-                    }
-                    case DialogInterface.BUTTON_NEGATIVE: {
-                        //No button clicked
-                        break;
-                    }
-                }
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        String message= getResources().getString(R.string.confirmation_rejoin_chat_link);
-        builder.setMessage(message).setPositiveButton(R.string.action_join, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
@@ -7107,7 +7082,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
                 idChat = request.getChatHandle();
 
-                if (idChat != MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE) {
+                if (idChat != MEGACHAT_INVALID_HANDLE) {
                     dbH.setLastPublicHandle(idChat);
                     dbH.setLastPublicHandleTimeStamp();
                     dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CHAT);
@@ -7120,7 +7095,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     if (megaChatApi.getChatRoom(idChat).isActive()) {
                         logWarning("ERROR: You are already a participant of the chat link or are trying to open it again");
                     } else {
-                        showConfirmationRejoinChat(request.getUserHandle());
+                        megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
                     }
                 }
             }
@@ -7140,19 +7115,22 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
         else if(request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-
                 if (request.getUserHandle() != -1) {
                     //Rejoin option
-                    showChat(null);
+                    initializeInputText();
+                    titleToolbar.setText(chatRoom.getTitle());
+                    isOpeningChat = true;
+                    loadHistory();
                 } else {
                     //Join
                     setChatSubtitle();
                     setPreviewersView();
-                    supportInvalidateOptionsMenu();
                 }
+
+                supportInvalidateOptionsMenu();
             } else {
                 logError("ERROR WHEN JOINING CHAT " + e.getErrorCode() + " " + e.getErrorString());
-                showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
+                showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_LAST_GREEN){
