@@ -39,6 +39,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class NotificationsFragmentLollipop extends Fragment implements View.OnClickListener {
@@ -259,7 +260,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                     logDebug("Go to contact info");
                     Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-                    intent.putExtra("name", notif.getEmail());
+                    intent.putExtra(NAME, notif.getEmail());
                     startActivity(intent);
                 }
                 else{ ArrayList<MegaContactRequest> contacts = megaApi.getIncomingContactRequests();
@@ -283,7 +284,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                     logDebug("Go to contact info");
                     Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-                    intent.putExtra("name", notif.getEmail());
+                    intent.putExtra(NAME, notif.getEmail());
                     startActivity(intent);
                 }
                 break;
