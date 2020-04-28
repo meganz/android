@@ -38,6 +38,10 @@ public final class EmojiImageView extends AppCompatImageView {
 
   private boolean hasVariants;
 
+  public EmojiImageView(final Context context){
+    super(context);
+  }
+
   public EmojiImageView(final Context context, final AttributeSet attrs) {
     super(context, attrs);
 

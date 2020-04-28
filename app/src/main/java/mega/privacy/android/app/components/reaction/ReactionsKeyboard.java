@@ -1,4 +1,4 @@
-package mega.privacy.android.app.components.twemoji;
+package mega.privacy.android.app.components.reaction;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,6 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.twemoji.EmojiImageView;
+import mega.privacy.android.app.components.twemoji.EmojiVariantPopup;
+import mega.privacy.android.app.components.twemoji.EmojiView;
+import mega.privacy.android.app.components.twemoji.RecentEmoji;
+import mega.privacy.android.app.components.twemoji.RecentEmojiManager;
+import mega.privacy.android.app.components.twemoji.VariantEmoji;
+import mega.privacy.android.app.components.twemoji.VariantEmojiManager;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickListener;

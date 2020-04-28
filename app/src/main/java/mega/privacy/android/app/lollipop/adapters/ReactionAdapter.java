@@ -22,6 +22,7 @@ import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -36,6 +37,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     private long chatId;
     private ArrayList<String> listReactions;
     private AndroidMegaChatMessage megaMessage;
+    private MegaChatRoom chatRoom;
 
     public ReactionAdapter(Context context, long chatid, AndroidMegaChatMessage megaMessage, ArrayList<String> listReactions) {
         this.context = context;
@@ -44,6 +46,9 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         this.megaMessage = megaMessage;
         this.messageId = megaMessage.getMessage().getMsgId();
         megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        chatRoom = megaChatApi.getChatRoom(chatId);
+        if(chatRoom == null)
+            return;
     }
 
     @Override
@@ -52,13 +57,19 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         ViewHolderReaction holder = new ViewHolderReaction(v);
         holder.moreReactionsLayout = v.findViewById(R.id.more_reactions_layout);
         holder.moreReactionsLayout.setTag(holder);
-        holder.moreReactionsLayout.setOnClickListener(this);
         holder.itemReactionLayout = v.findViewById(R.id.item_reaction_layout);
         holder.itemReactionLayout.setTag(holder);
-        holder.itemReactionLayout.setOnClickListener(this);
         holder.itemNumUsersReaction = v.findViewById(R.id.item_number_users_reaction);
         holder.itemEmojiReaction = v.findViewById(R.id.item_emoji_reaction);
 
+        holder.moreReactionsLayout.setOnClickListener(this);
+        holder.itemReactionLayout.setOnClickListener(this);
+
+        if (chatRoom.isGroup()) {
+            holder.itemReactionLayout.setOnLongClickListener(this);
+        } else {
+            holder.itemReactionLayout.setOnLongClickListener(null);
+        }
         return holder;
     }
 
@@ -81,6 +92,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         List<EmojiRange> emojis = EmojiUtils.emojis(reaction);
         holder.emojiReaction = emojis.get(0).emoji;
+        holder.reaction = reaction;
 
         /*Number users*/
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
@@ -195,7 +207,24 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     }
 
     @Override
-    public boolean onLongClick(View view) {
+    public boolean onLongClick(View v) {
+
+        ViewHolderReaction holder = (ViewHolderReaction) v.getTag();
+        if (holder == null)
+            return false;
+
+        int currentPosition = holder.getAdapterPosition();
+        if (currentPosition < 0) {
+            logWarning("Current position error - not valid value");
+            return false;
+        }
+
+        switch (v.getId()) {
+            case R.id.item_reaction_layout:
+                ((ChatActivityLollipop) context).openInfoReactionBottomSheet(chatId, megaMessage, holder.reaction);
+                break;
+        }
+
         return false;
     }
 
@@ -206,6 +235,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         private ReactionImageView itemEmojiReaction;
         private TextView itemNumUsersReaction;
         private Emoji emojiReaction;
+        private String reaction;
 
         public ViewHolderReaction(View itemView) {
             super(itemView);

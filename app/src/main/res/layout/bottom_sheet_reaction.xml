@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@color/white">
 
-    <mega.privacy.android.app.components.twemoji.ReactionsKeyboard
+    <mega.privacy.android.app.components.reaction.ReactionsKeyboard
         android:id="@+id/reaction_keyboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

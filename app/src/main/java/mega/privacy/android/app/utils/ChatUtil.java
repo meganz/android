@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -41,6 +42,7 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaStringList;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -421,5 +423,16 @@ public class ChatUtil {
                 !message.isUploading() &&
                 ((chatRoom.getOwnPrivilege() != MegaChatRoom.PRIV_RM && chatRoom.getOwnPrivilege() != MegaChatRoom.PRIV_RO)
                         || chatRoom.isPreview());
+    }
+
+    public static ArrayList<String> getReactionsList(MegaStringList listReactions, boolean invalidReaction) {
+        ArrayList<String> list = new ArrayList<>();
+        for (int i = 0; i < listReactions.size(); i++) {
+            list.add(i, listReactions.get(i));
+        }
+        if(invalidReaction) {
+            list.add(INVALID_REACTION);
+        }
+        return list;
     }
 }

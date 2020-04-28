@@ -125,9 +125,10 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
-import mega.privacy.android.app.modalbottomsheet.ReactionsBottomSheet;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NormalMessageBottomSheet;
@@ -4377,6 +4378,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
+    public void openInfoReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage, String reaction){
+        if(chatRoom.getChatId() != chatId)
+            return;
+
+        int positionInMessages = messages.indexOf(megaMessage);
+        showInfoReactionBottomSheet(megaMessage, positionInMessages, reaction);
+    }
+
     public void openReactionBottomSheet(long chatId, AndroidMegaChatMessage megaMessage){
         if(chatRoom.getChatId() != chatId)
             return;
@@ -6942,6 +6951,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         selectedMessageId = message.getMessage().getMsgId();
         bottomSheetDialogFragment = new NormalMessageBottomSheet();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+    }
+
+    public void showInfoReactionBottomSheet(AndroidMegaChatMessage message, int position, String reaction){
+        if (message == null || message.getMessage() == null)
+            return;
+
+        selectedPosition = position;
+        hideBottomSheet();
+
+        selectedMessageId = message.getMessage().getMsgId();
+        bottomSheetDialogFragment = new InfoReactionsBottomSheet(this, reaction);
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 

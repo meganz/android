@@ -1,4 +1,4 @@
-package mega.privacy.android.app.modalbottomsheet;
+package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -14,7 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.twemoji.ReactionsKeyboard;
+import mega.privacy.android.app.components.reaction.ReactionsKeyboard;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;

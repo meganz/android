@@ -8411,15 +8411,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         return message.getUserHandle() == myUserHandle && message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE && message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE && message.getType() != MegaChatMessage.TYPE_SET_PRIVATE_MODE;
     }
 
-    private ArrayList<String> getReactionsList(MegaStringList listReactions) {
-        ArrayList<String> list = new ArrayList<>();
-        for (int i = 0; i < listReactions.size(); i++) {
-            list.add(i, listReactions.get(i));
-        }
-        list.add(INVALID_REACTION);
-        return list;
-    }
-
     public void checkReactionUpdated(long chatId, MegaChatMessage message, String reaction, int count) {
         if (chatRoom.getChatId() != chatId) {
             logDebug("Different chat ");
@@ -8503,7 +8494,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     private void createReactionsAdapter(MegaStringList listReactions, boolean ownMessage, long chatId, AndroidMegaChatMessage megaMessage, final ViewHolderMessageChat holder) {
-        ArrayList<String> list = getReactionsList(listReactions);
+        ArrayList<String> list = getReactionsList(listReactions, true);
 
         if (ownMessage) {
             holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
@@ -8559,7 +8550,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (holder.ownReactionsAdapter == null) {
                 createReactionsAdapter(listReactions, true, chatId, megaMessage, holder);
             } else {
-                ArrayList<String> list = getReactionsList(listReactions);
+                ArrayList<String> list = getReactionsList(listReactions, true);
                 holder.ownReactionsAdapter.setReactions(list);
                 holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
             }
@@ -8567,7 +8558,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (holder.contactReactionsAdapter == null) {
                 createReactionsAdapter(listReactions, false, chatId, megaMessage, holder);
             } else {
-                ArrayList<String> list = getReactionsList(listReactions);
+                ArrayList<String> list = getReactionsList(listReactions, true);
                 holder.contactReactionsAdapter.setReactions(list);
                 holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
             }
