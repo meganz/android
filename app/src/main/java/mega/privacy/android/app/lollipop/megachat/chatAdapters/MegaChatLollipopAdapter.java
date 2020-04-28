@@ -63,6 +63,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EqualSpacingItemDecoration;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.RtlGridLayoutManager;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -8410,10 +8411,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         return message.getUserHandle() == myUserHandle && message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE && message.getType() != MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE && message.getType() != MegaChatMessage.TYPE_SET_PRIVATE_MODE;
     }
 
-    private GridLayoutManager getGridLayoutManager() {
-        return new GridLayoutManager(context, MAX_COLUMNS, RecyclerView.VERTICAL, false);
-    }
-
     private ArrayList<String> getReactionsList(MegaStringList listReactions) {
         ArrayList<String> list = new ArrayList<>();
         for (int i = 0; i < listReactions.size(); i++) {
@@ -8510,14 +8507,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (ownMessage) {
             holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
-            holder.ownMessageReactionsRecycler.setLayoutManager(getGridLayoutManager());
-            holder.ownMessageReactionsRecycler.setHasFixedSize(true);
+            holder.ownMessageReactionsRecycler.setLayoutManager(new RtlGridLayoutManager(context, MAX_COLUMNS,  RecyclerView.VERTICAL, false));
+            holder.ownMessageReactionsRecycler.setHasFixedSize(false);
             holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
             holder.ownReactionsAdapter = new ReactionAdapter(context, chatId, megaMessage, list);
             holder.ownMessageReactionsRecycler.setAdapter(holder.ownReactionsAdapter);
         } else {
             holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
-            holder.contactMessageReactionsRecycler.setLayoutManager(getGridLayoutManager());
+            holder.contactMessageReactionsRecycler.setLayoutManager(new GridLayoutManager(context, MAX_COLUMNS, RecyclerView.VERTICAL, false));
             holder.contactMessageReactionsRecycler.setHasFixedSize(true);
             holder.contactMessageReactionsRecycler.addItemDecoration(itemDecoration);
             holder.contactReactionsAdapter = new ReactionAdapter(context, chatId, megaMessage, list);
