@@ -1348,14 +1348,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             long handle = request.getNodeHandle();
             if (CAMERA_UPLOADS.equals(name)) {
                 // check if other client has created this folder already, if yes, delete it.
-                if(!deleteIfDuplicated(name, handle)) {
-                    megaApi.setCameraUploadsFolder(handle, setAttrUserListener);
-                }
+                megaApi.setCameraUploadsFolder(handle, setAttrUserListener);
             }
             if (SECONDARY_UPLOADS.equals(name)) {
-                if(!deleteIfDuplicated(name, handle)) {
-                    megaApi.setCameraUploadsFolderSecondary(handle, setAttrUserListener);
-                }
+                megaApi.setCameraUploadsFolderSecondary(handle, setAttrUserListener);
             }
         } else {
             finish();

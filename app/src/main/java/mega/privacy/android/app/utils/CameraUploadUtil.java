@@ -16,6 +16,7 @@ import mega.privacy.android.app.MegaPreferences;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -252,34 +253,13 @@ public class CameraUploadUtil {
     }
 
     /**
-     * Check if a newly created folder is duplicated, if yes delete the folder.
-     *
-     * @param name   The name of the folder.
-     * @param handle The hanlde of the folder.
-     * @return true, the folder is duplicated, and been removed. Otherwise, false.
-     */
-    public static boolean deleteIfDuplicated(String name, long handle) {
-        // only compare the folders under cloud root.
-        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
-        ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
-        for (MegaNode node : nl) {
-            // have same name, different handle, is folder and not in rubbish bin.
-            if (name.equals(node.getName()) && (handle != node.getHandle()) && node.isFolder() && !megaApi.isInRubbish(node)) {
-                megaApi.remove(megaApi.getNodeByHandle(handle));
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Force update node list's icon
      *
      * @param isSecondary whether the updated node is secondary folder
      * @param handle      the updated node handle
      */
     public static void forceUpdateCameraUploadFolderIcon(boolean isSecondary, long handle) {
-        Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE);
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE);
         intent.putExtra(EXTRA_IS_CU_SECONDARY_FOLDER, isSecondary);
         intent.putExtra(EXTRA_NODE_HANDLE, handle);
         LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intent);

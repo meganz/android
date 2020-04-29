@@ -15,7 +15,6 @@ import nz.mega.sdk.MegaRequest;
 
 import static mega.privacy.android.app.jobservices.CameraUploadsService.CAMERA_UPLOADS;
 import static mega.privacy.android.app.jobservices.CameraUploadsService.SECONDARY_UPLOADS;
-import static mega.privacy.android.app.utils.CameraUploadUtil.deleteIfDuplicated;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -89,9 +88,9 @@ public class CreateFolderListener extends BaseListener {
             ((CameraUploadsService) context).onCreateFolder(request, e);
         } else if (context instanceof MegaApplication) {
             if (e.getErrorCode() == MegaError.API_OK) {
-                if (name.equals(CAMERA_UPLOADS) && !deleteIfDuplicated(name, handle)) {
+                if (name.equals(CAMERA_UPLOADS)) {
                     api.setCameraUploadsFolder(handle, new SetAttrUserListener(context));
-                }else if (name.equals(SECONDARY_UPLOADS) && !deleteIfDuplicated(name, handle)) {
+                } else if (name.equals(SECONDARY_UPLOADS)) {
                     api.setCameraUploadsFolderSecondary(handle, new SetAttrUserListener(context));
                 }
             }
