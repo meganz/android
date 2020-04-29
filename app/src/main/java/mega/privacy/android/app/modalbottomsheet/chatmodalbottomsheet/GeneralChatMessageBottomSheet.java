@@ -19,7 +19,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
+import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatContainsMeta;
@@ -30,41 +30,19 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class GeneralChatMessageBottomSheet extends BottomSheetDialogFragment implements View.OnClickListener {
+public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    private Context context;
     private AndroidMegaChatMessage message = null;
     private long chatId;
     private long messageId;
     private int positionMessage;
 
-    private View contentView;
-    private BottomSheetBehavior mBehavior;
-    private RelativeLayout mainLayout;
-    private LinearLayout itemsLayout;
-    private LinearLayout optionForward;
-    private LinearLayout optionEdit;
-    private LinearLayout optionCopy;
-    private LinearLayout optionDelete;
-    private LinearLayout optionSelect;
-
-    private DisplayMetrics outMetrics;
-    private int heightDisplay;
-    private MegaApiAndroid megaApi;
-    private MegaChatApiAndroid megaChatApi;
     private ChatController chatC;
     private MegaChatRoom chatRoom;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (megaApi == null) {
-            megaApi = MegaApplication.getInstance().getMegaApi();
-        }
-        if (megaChatApi == null) {
-            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        }
 
         if (!(context instanceof ChatActivityLollipop))
             return;
@@ -93,23 +71,19 @@ public class GeneralChatMessageBottomSheet extends BottomSheetDialogFragment imp
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
 
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-        heightDisplay = outMetrics.heightPixels;
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_general_chat_messages, null);
-        mainLayout = contentView.findViewById(R.id.bottom_sheet);
-        itemsLayout = contentView.findViewById(R.id.items_layout);
-        optionForward = contentView.findViewById(R.id.forward_layout);
+        items_layout = contentView.findViewById(R.id.items_layout);
+
+        LinearLayout optionForward = contentView.findViewById(R.id.forward_layout);
         LinearLayout editSeparator = contentView.findViewById(R.id.edit_separator);
-        optionEdit = contentView.findViewById(R.id.edit_layout);
+        LinearLayout optionEdit = contentView.findViewById(R.id.edit_layout);
         LinearLayout copySeparator = contentView.findViewById(R.id.copy_separator);
-        optionCopy = contentView.findViewById(R.id.copy_layout);
+        LinearLayout optionCopy = contentView.findViewById(R.id.copy_layout);
         LinearLayout selectSeparator = contentView.findViewById(R.id.select_separator);
-        optionSelect = contentView.findViewById(R.id.select_layout);
+        LinearLayout optionSelect = contentView.findViewById(R.id.select_layout);
         LinearLayout deleteSeparator = contentView.findViewById(R.id.delete_separator);
-        optionDelete = contentView.findViewById(R.id.delete_layout);
+        LinearLayout optionDelete = contentView.findViewById(R.id.delete_layout);
 
         optionForward.setOnClickListener(this);
         optionEdit.setOnClickListener(this);
@@ -180,9 +154,7 @@ public class GeneralChatMessageBottomSheet extends BottomSheetDialogFragment imp
         }
 
         dialog.setContentView(contentView);
-        mBehavior = BottomSheetBehavior.from((View) mainLayout.getParent());
-        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(itemsLayout, heightDisplay, context, 48));
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
     }
 
     @Override
@@ -197,31 +169,26 @@ public class GeneralChatMessageBottomSheet extends BottomSheetDialogFragment imp
         switch (view.getId()) {
             case R.id.forward_layout:
                 ((ChatActivityLollipop) context).forwardMessages(messagesSelected);
-                dismissAllowingStateLoss();
                 break;
 
             case R.id.select_layout:
                 ((ChatActivityLollipop) context).activateActionModeWithItem(positionMessage);
-                dismissAllowingStateLoss();
                 break;
 
             case R.id.edit_layout:
                 ((ChatActivityLollipop) context).editMessage(messagesSelected);
-                dismissAllowingStateLoss();
                 break;
 
             case R.id.copy_layout:
                 ((ChatActivityLollipop) context).copyMessage(message);
-                dismissAllowingStateLoss();
                 break;
 
             case R.id.delete_layout:
                 ((ChatActivityLollipop) context).showConfirmationDeleteMessages(messagesSelected, chatRoom);
-                dismissAllowingStateLoss();
                 break;
         }
 
-        mBehavior = BottomSheetBehavior.from((View) mainLayout.getParent());
+        setStateBottomSheetBehaviorHidden();
     }
 
     @Override

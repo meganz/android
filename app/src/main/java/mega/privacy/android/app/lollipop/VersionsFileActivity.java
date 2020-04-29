@@ -51,7 +51,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -61,6 +61,7 @@ import static nz.mega.sdk.MegaShare.*;
 public class VersionsFileActivity extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, MegaGlobalListenerInterface {
 	private static final String IS_CHECKING_REVERT_VERSION = "IS_CHECKING_REVERT_VERSION";
 	private static final String SELECTED_NODE_HANDLE = "SELECTED_NODE_HANDLE";
+	private static final String SELECTED_POSITION =  "SELECTED_POSITION";
 
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
@@ -329,6 +330,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			nodeHandle = savedInstanceState.getLong(EXTRA_NODE_HANDLE, INVALID_HANDLE);
 			ischeckingRevertVersion = savedInstanceState.getBoolean(IS_CHECKING_REVERT_VERSION, false);
 			selectedNodeHandle = savedInstanceState.getLong(SELECTED_NODE_HANDLE, INVALID_HANDLE);
+			selectedPosition = savedInstanceState.getInt(SELECTED_POSITION);
 		}
 
 	    Bundle extras = getIntent().getExtras();
@@ -922,6 +924,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		outState.putLong(EXTRA_NODE_HANDLE, node.getHandle());
 		outState.putBoolean(IS_CHECKING_REVERT_VERSION, ischeckingRevertVersion);
 		outState.putLong(SELECTED_NODE_HANDLE, selectedNodeHandle);
+		outState.putInt(SELECTED_POSITION, selectedPosition);
 	}
 
 	public int getAccessLevel() {
