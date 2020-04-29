@@ -3,25 +3,14 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
 import java.util.ArrayList;
-
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -146,9 +135,9 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             deleteSeparator.setVisibility(optionDelete.getVisibility());
             selectSeparator.setVisibility(optionSelect.getVisibility());
             editSeparator.setVisibility(optionEdit.getVisibility());
-            if(optionEdit.getVisibility() == View.VISIBLE){
+            if (optionEdit.getVisibility() == View.VISIBLE) {
                 copySeparator.setVisibility(View.GONE);
-            }else{
+            } else {
                 copySeparator.setVisibility(optionCopy.getVisibility());
             }
         }

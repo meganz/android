@@ -3824,15 +3824,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-    private void activateActionMode(){
-        if (!adapter.isMultipleSelect()){
+    private void activateActionMode() {
+        if (!adapter.isMultipleSelect()) {
             adapter.setMultipleSelect(true);
             actionMode = startSupportActionMode(new ActionBarCallBack());
             updateActionModeTitle();
         }
     }
 
-    public void activateActionModeWithItem(int positionInAdapter){
+    public void activateActionModeWithItem(int positionInAdapter) {
         activateActionMode();
         if (adapter.isMultipleSelect()) {
             itemClick((positionInAdapter + 1), null);
@@ -3876,7 +3876,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                             clipboard.setPrimaryClip(clip);
                         }
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.messages_copied_clipboard), -1);
-
                     }
 
                     break;
@@ -3973,7 +3972,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                 menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
                 importIcon.setVisible(false);
-
 
             }else {
 
@@ -4328,9 +4326,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     public void updateActionModeTitle() {
         try {
             if (actionMode != null) {
-                if(adapter.getSelectedItemCount() == 0){
+                if (adapter.getSelectedItemCount() == 0) {
                     actionMode.setTitle(getString(R.string.select_message_title).toUpperCase());
-                }else{
+                } else {
                     actionMode.setTitle(adapter.getSelectedItemCount() + "");
                 }
                 actionMode.invalidate();
@@ -4351,7 +4349,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (actionMode != null) {
             actionMode.finish();
         }
-
     }
 
     public void finishMultiselectionMode() {
@@ -4763,34 +4760,19 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 }else{
                                     String url = richLinkMessage.getUrl();
 
-                                    if(richLinkMessage.isChat()){
+                                    if (richLinkMessage.isChat()) {
                                         loadChatLink(url);
-                                    }
-                                    else{
-                                        if(richLinkMessage.getNode()!=null){
-                                            if(richLinkMessage.getNode().isFile()){
-                                                openMegaLink(url, true);
-                                            }
-                                            else{
-                                                openMegaLink(url, false);
-                                            }
-                                        }
-                                        else{
-                                            if(richLinkMessage.isFile()){
-                                                openMegaLink(url, true);
-                                            }
-                                            else{
-                                                openMegaLink(url, false);
-                                            }
-                                        }
+                                    } else if (richLinkMessage.getNode() != null) {
+                                        openMegaLink(url, richLinkMessage.getNode().isFile());
+                                    } else {
+                                        openMegaLink(url, richLinkMessage.isFile());
+
                                     }
                                 }
-
                             }
                         }
                     }
                 }
-
             }
         }else{
             logDebug("DO NOTHING: Position (" + positionInMessages + ") is more than size in messages (size: " + messages.size() + ")");
@@ -6933,7 +6915,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-    public void showGeneralChatMessageBottomSheet(AndroidMegaChatMessage message, int position){
+    public void showGeneralChatMessageBottomSheet(AndroidMegaChatMessage message, int position) {
         selectedPosition = position;
 
         if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
@@ -7721,9 +7703,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     public boolean hasMessagesRemoved(MegaChatMessage messageSelected) {
-        if(removedMessages != null && !removedMessages.isEmpty()){
-            for(int i=0; i<removedMessages.size(); i++){
-                if(messageSelected.getMsgId() == removedMessages.get(i).msgId){
+        if (removedMessages != null && !removedMessages.isEmpty()) {
+            for (int i = 0; i < removedMessages.size(); i++) {
+                if (messageSelected.getMsgId() == removedMessages.get(i).msgId) {
                     return true;
                 }
             }

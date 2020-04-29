@@ -2530,8 +2530,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 //Forwards element (own messages):
                 if (cC.isInAnonymousMode() || isMultipleSelect()) {
                     holder.forwardOwnRichLinks.setVisibility(View.GONE);
-                }
-                else {
+                } else {
                     holder.forwardOwnRichLinks.setVisibility(View.VISIBLE);
                     holder.forwardOwnRichLinks.setOnClickListener(this);
                 }
@@ -3063,10 +3062,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             checkMultiselectionMode(position, holder, true);
 
-            if(!multipleSelect){
-                if(positionClicked != -1 && positionClicked == position){
+            if (!multipleSelect) {
+                if (positionClicked != -1 && positionClicked == position) {
                     holder.forwardOwnMessageLocation.setEnabled(false);
-                }else{
+                } else {
                     holder.forwardOwnMessageLocation.setEnabled(true);
                 }
             }
@@ -3421,10 +3420,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             checkMultiselectionMode(position, holder, true);
 
-            if(!multipleSelect){
-                if(positionClicked != -1 && positionClicked == position){
+            if (!multipleSelect) {
+                if (positionClicked != -1 && positionClicked == position) {
                     holder.forwardOwnRichLinks.setEnabled(false);
-                }else{
+                } else {
                     holder.forwardOwnRichLinks.setEnabled(true);
                 }
             }
@@ -3627,7 +3626,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
     }
-
 
     public void bindNormalMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         logDebug("position: " + position);
@@ -4326,8 +4324,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                     if (cC.isInAnonymousMode() || isMultipleSelect()) {
                                         holder.forwardOwnPortrait.setVisibility(View.GONE);
-                                    }
-                                    else {
+                                    } else {
                                         holder.forwardOwnPortrait.setVisibility(View.VISIBLE);
                                         holder.forwardOwnPortrait.setOnClickListener(this);
                                     }
