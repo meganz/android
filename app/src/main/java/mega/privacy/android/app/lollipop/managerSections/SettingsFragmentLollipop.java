@@ -957,8 +957,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			setOnlineOptions(false);
 		}
 
-		setAttrUserListener = new SetAttrUserListener(context);
-		setAttrUserListener.setFragmentTag(SETTINGS);
+		setAttrUserListener = new SetAttrUserListener(context, SETTINGS);
 
 		return v;
 	}
@@ -1009,12 +1008,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	public void onAttach(Context context) {
 		super.onAttach(context);
 		this.context = context;
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		setAttrUserListener = null;
 	}
 
 	@Override

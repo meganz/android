@@ -3,6 +3,7 @@ package mega.privacy.android.app.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -149,6 +150,7 @@ public class GetAttrUserListener extends BaseListener {
                     }
                 } else if (e.getErrorCode() == MegaError.API_OK) {
                     synchronized (this) {
+                        MegaPreferences prefs = dBH.getPreferences();
                         long handleInUserAttr = request.getNodeHandle();
                         if (isNodeInRubbishOrDeleted(handleInUserAttr)) {
                             boolean isSecondary = request.getFlag();

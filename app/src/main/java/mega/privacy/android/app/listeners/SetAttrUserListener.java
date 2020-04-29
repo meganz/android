@@ -3,6 +3,7 @@ package mega.privacy.android.app.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -19,11 +20,20 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 
 public class SetAttrUserListener extends BaseListener {
 
+    // FragmentTag is for storing the fragment which has the api call within Activity Context
+    private FragmentTag fragmentTag;
+
     public SetAttrUserListener(Context context) {
         super(context);
+    }
+
+    public SetAttrUserListener(Context context, FragmentTag fragmentTag) {
+        super(context);
+        this.fragmentTag = fragmentTag;
     }
 
     @Override
@@ -70,6 +80,7 @@ public class SetAttrUserListener extends BaseListener {
             case USER_ATTR_CAMERA_UPLOADS_FOLDER:
                 long handle = request.getNodeHandle();
                 boolean isSecondary = request.getFlag();
+                MegaPreferences prefs = dBH.getPreferences();
                 // Database and preference update
                 if (e.getErrorCode() == MegaError.API_OK) {
                     if (isSecondary) {

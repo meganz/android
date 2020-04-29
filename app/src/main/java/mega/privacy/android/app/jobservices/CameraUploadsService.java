@@ -984,6 +984,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             return CHECKING_USER_ATTRIBUTE;
         }
 
+        if (!ignoreAttr && !isSecondaryHandleSynced) {
+            logDebug("Try to get Camera Uploads primary target folder.");
+            megaApi.getCameraUploadsFolderSecondary(getAttrUserListener);
+            return CHECKING_USER_ATTRIBUTE;
+        }
+
         int primaryFolderResult = checkPrimaryFolder();
         int secondaryFolderResult = checkSecondaryFolder();
 
@@ -991,11 +997,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             return primaryFolderResult;
         }
 
-        if (secondaryFolderResult != 0) {
-            return secondaryFolderResult;
-        }
-
-        return 0;
+        return secondaryFolderResult;
     }
 
     private int checkPrimaryFolder() {
@@ -1305,7 +1307,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 resetPrimaryTimeline();
             }
             // start to get secondary handle.
-            megaApi.getCameraUploadsFolderSecondary(getAttrUserListener);
+            if (!isSecondaryHandleSynced) {
+                megaApi.getCameraUploadsFolderSecondary(getAttrUserListener);
+            }
         } else {
             logWarning("Get primary handle faild, finish process.");
             finish();

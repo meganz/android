@@ -914,14 +914,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			synchronized (this){
 				long handleInUserAttr = intent.getLongExtra(EXTRA_NODE_HANDLE, -1);
 				boolean isSecondary = intent.getBooleanExtra(EXTRA_IS_CU_SECONDARY_FOLDER, false);
-				if (isSecondary) {
-					if (drawerItem == DrawerItem.MEDIA_UPLOADS) {
-						secondaryMediaUploadsClicked();
-					}
-				} else {
-					if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
-						cameraUploadsClicked();
-					}
+				if (isSecondary && drawerItem == DrawerItem.MEDIA_UPLOADS) {
+					secondaryMediaUploadsClicked();
+				} else if (!isSecondary && drawerItem == DrawerItem.CAMERA_UPLOADS) {
+					cameraUploadsClicked();
 				}
 
 				//refresh settings if user is on that page
