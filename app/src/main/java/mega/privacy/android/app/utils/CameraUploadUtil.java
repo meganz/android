@@ -205,21 +205,12 @@ public class CameraUploadUtil {
     private static long getUploadFolderHandle(boolean isPrimary) {
         MegaPreferences prefs = dbH.getPreferences();
         if (prefs == null) {
-            return -1;
+            return INVALID_HANDLE;
         }
 
-        String handle;
-        if (isPrimary) {
-            handle = prefs.getCamSyncHandle();
-        } else {
-            handle = prefs.getMegaHandleSecondaryFolder();
-        }
+        String handle = isPrimary ? prefs.getCamSyncHandle() : prefs.getMegaHandleSecondaryFolder();
 
-        if (isTextEmpty(handle)) {
-            return -1;
-        } else {
-            return Long.parseLong(handle);
-        }
+        return isTextEmpty(handle) ? INVALID_HANDLE : Long.parseLong(handle);
     }
 
     public static void disableMediaUploadProcess() {
@@ -257,11 +248,7 @@ public class CameraUploadUtil {
     public static long findDefaultFolder(String folderName) {
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
         MegaNode node = megaApi.getNodeByPath(folderName, megaApi.getRootNode());
-        if (node != null && node.isFolder() && !megaApi.isInRubbish(node)) {
-            return node.getHandle();
-        } else {
-            return INVALID_HANDLE;
-        }
+        return node != null && node.isFolder() && !megaApi.isInRubbish(node) ? node.getHandle() : INVALID_HANDLE;
     }
 
     /**

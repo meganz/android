@@ -6,6 +6,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -88,7 +89,10 @@ public class SetAttrUserListener extends BaseListener {
                 } else if (context instanceof ManagerActivityLollipop
                         && fragmentTag == SETTINGS) {
                     if (e.getErrorCode() == MegaError.API_OK) {
-                        ((ManagerActivityLollipop) context).getSettingsFragment().setCUDestinationFolder(isSecondary, handle);
+                        SettingsFragmentLollipop settingsFragment = ((ManagerActivityLollipop) context).getSettingsFragment();
+                        if (settingsFragment != null) {
+                            settingsFragment.setCUDestinationFolder(isSecondary, handle);
+                        }
                         return;
                     }
                     showSnackbar(context, context.getString(R.string.error_unable_to_setup_cloud_folder));

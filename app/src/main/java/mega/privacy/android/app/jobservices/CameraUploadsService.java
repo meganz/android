@@ -80,6 +80,7 @@ import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
@@ -130,10 +131,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private String localPath = "";
     private boolean removeGPS = true;
     private ChatSettings chatSettings;
-    private long cameraUploadHandle = -1;
+    private long cameraUploadHandle = INVALID_HANDLE;
     private boolean secondaryEnabled;
     private String localPathSecondary = "";
-    private long secondaryUploadHandle = -1;
+    private long secondaryUploadHandle = INVALID_HANDLE;
     private MegaNode secondaryUploadNode = null;
     
     private boolean isLoggingIn;
@@ -1000,7 +1001,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private int checkPrimaryFolder() {
         if (isNodeInRubbishOrDeleted(cameraUploadHandle)) {
             cameraUploadHandle = findDefaultFolder(CAMERA_UPLOADS);
-            if (cameraUploadHandle == -1) {
+            if (cameraUploadHandle == INVALID_HANDLE) {
                 megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), createFolderListener);
                 return TARGET_FOLDER_NOT_EXIST;
             } else {
@@ -1031,7 +1032,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             logDebug("the secondary uploads are enabled");
             if (isNodeInRubbishOrDeleted(secondaryUploadHandle)) {
                 secondaryUploadHandle = findDefaultFolder(SECONDARY_UPLOADS);
-                if (secondaryUploadHandle == -1) {
+                if (secondaryUploadHandle == INVALID_HANDLE) {
                     logDebug("must create the folder");
                     megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), createFolderListener);
                     return TARGET_FOLDER_NOT_EXIST;
@@ -1295,7 +1296,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             isPrimaryHandleSynced = true;
             long cuPrimaryHandleInUserAttr = request.getNodeHandle();
             // when get an invalid hanle from cloud, need to upload local handle.
-            if (cuPrimaryHandleInUserAttr == -1 && cameraUploadHandle != -1) {
+            if (cuPrimaryHandleInUserAttr == INVALID_HANDLE && cameraUploadHandle != INVALID_HANDLE) {
                 megaApi.setCameraUploadsFolder(cameraUploadHandle, setAttrUserListener);
             } else if (cameraUploadHandle != cuPrimaryHandleInUserAttr) {
                 //cloud setting takes priority, update local handle.
@@ -1316,7 +1317,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
             isSecondaryHandleSynced = true;
             long cuSecondaryHandleInUserAttr = request.getNodeHandle();
-            if (cuSecondaryHandleInUserAttr == -1 && secondaryUploadHandle != -1) {
+            if (cuSecondaryHandleInUserAttr == INVALID_HANDLE && secondaryUploadHandle != INVALID_HANDLE) {
                 megaApi.setCameraUploadsFolderSecondary(secondaryUploadHandle, setAttrUserListener);
             } else if(cuSecondaryHandleInUserAttr != secondaryUploadHandle) {
                 secondaryUploadHandle = cuSecondaryHandleInUserAttr;

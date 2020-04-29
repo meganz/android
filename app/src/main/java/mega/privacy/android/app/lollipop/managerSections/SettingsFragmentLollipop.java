@@ -1814,16 +1814,18 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	};
 
 	public synchronized void setCUDestinationFolder(boolean isSecondary, long handle) {
+		MegaNode targetNode = megaApi.getNodeByHandle(handle);
+		if (targetNode == null) return;
 		if (isSecondary) {
 			//reset secondary timeline.
             handleSecondaryMediaFolder = handle;
-			megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);
+			megaNodeSecondaryMediaFolder = targetNode;
 			megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
 			megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 		} else {
             //reset primary timeline.
 			camSyncHandle = handle;
-			camSyncMegaNode = megaApi.getNodeByHandle(camSyncHandle);
+			camSyncMegaNode = targetNode;
 			camSyncMegaPath = camSyncMegaNode.getName();
 			megaCameraFolder.setSummary(camSyncMegaPath);
 		}
@@ -2464,7 +2466,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		cameraUpload = false;
 		cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
 		cameraUploadOn.setSummary("");
-		secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
 		cameraUploadCategory.removePreference(cameraUploadHow);
 		cameraUploadCategory.removePreference(cameraUploadWhat);
 		cameraUploadCategory.removePreference(localCameraUploadFolder);
@@ -2474,8 +2475,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		cameraUploadCategory.removePreference(keepFileNames);
 		cameraUploadCategory.removePreference(megaCameraFolder);
 		cameraUploadCategory.removePreference(secondaryMediaFolderOn);
-		cameraUploadCategory.removePreference(localSecondaryFolder);
-		cameraUploadCategory.removePreference(megaSecondaryFolder);
+		disableMediaUploadUIProcess();
 	}
 
     public void showResetCompressionQueueSizeDialog(){

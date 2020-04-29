@@ -165,7 +165,9 @@ public class GetAttrUserListener extends BaseListener {
                                     }
                                 } else {
                                     api.setCameraUploadsFolderSecondary(secondaryHandle, new SetAttrUserListener(context));
-                                    api.renameNode(api.getNodeByHandle(secondaryHandle), SECONDARY_UPLOADS, new RenameListener(context));
+                                    if (!SECONDARY_UPLOADS.equals(SECONDARY_UPLOADS_ENGLISH)) {
+                                        api.renameNode(api.getNodeByHandle(secondaryHandle), SECONDARY_UPLOADS, new RenameListener(context));
+                                    }
                                 }
 
                             } else {
@@ -181,7 +183,9 @@ public class GetAttrUserListener extends BaseListener {
                                     }
                                 } else {
                                     api.setCameraUploadsFolder(primaryHandle, new SetAttrUserListener(context));
-                                    api.renameNode(api.getNodeByHandle(primaryHandle), CAMERA_UPLOADS, new RenameListener(context));
+                                    if (!CAMERA_UPLOADS.equals(CAMERA_UPLOADS_ENGLISH)) {
+                                        api.renameNode(api.getNodeByHandle(primaryHandle), CAMERA_UPLOADS, new RenameListener(context));
+                                    }
                                 }
                             }
                         } else {

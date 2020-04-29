@@ -433,6 +433,7 @@ public class MegaNodeUtil {
     }
 
     /**
+     * This method is to detect whether the node exist and in rubbish bean
      * @param handle node's handle to be detected
      * @return whether the node is in rubbish
      */
@@ -443,6 +444,8 @@ public class MegaNodeUtil {
     }
 
     /**
+     * This method is to detect whether the node has been deleted completely
+     * or in rubbish bin
      * @param handle node's handle to be detected
      * @return whether the node is in rubbish
      */

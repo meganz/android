@@ -55,7 +55,6 @@ public class Constants {
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
 
-    public static final String EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER";
     public static final String ACTION_FORWARD_MESSAGES = "ACTION_FORWARD_MESSAGES";
     public static final String ACTION_OPEN_QR = "ACTION_OPEN_QR";
     public static final String ACTION_TAKE_PICTURE = "ACTION_TAKE_PICTURE";
@@ -250,7 +249,6 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ORDER = "INTENT_UPDATE_ORDER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_VIEW = "INTENT_UPDATE_VIEW";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
-    public static final String BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE = "INTENT_CU_ATTR_CHANGE";
     public static final String BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED = "INTENT_BUSINESS_EXPIRED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED = "INTENT_CHAT_ARCHIVED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP = "INTENT_CHAT_ARCHIVED_GROUP";
