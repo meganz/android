@@ -434,6 +434,8 @@ public class Constants {
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
 
+    public static final String REGISTER_BUSINESS_ACCOUNT = "registerb";
+
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
     public static final int MAX_WIDTH_CONTACT_NAME_PORT = 200;
     public static final int MAX_WIDTH_CONTACT_NAME_GRID_LAND = 150;
@@ -550,6 +552,11 @@ public class Constants {
     public static final String[] EMAIL_VERIFY_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#emailverify.+$",
             "^https://mega\\.nz/#emailverify.+$"
+    };
+
+    public static final String[] WEB_SESSION_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/#sitetransfer!.+$",
+            "^https://mega\\.nz/#sitetransfer!.+$"
     };
 
     //Types of blocked accounts

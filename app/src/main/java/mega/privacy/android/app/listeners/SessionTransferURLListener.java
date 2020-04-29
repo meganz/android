@@ -27,10 +27,7 @@ public class SessionTransferURLListener extends BaseListener {
             if (link != null) {
                 Uri uri = Uri.parse(link);
                 if (uri != null) {
-                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
-                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(uri);
-                    context.startActivity(openTermsIntent);
+                    context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
                     return;
                 }
             }
