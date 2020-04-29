@@ -71,6 +71,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
@@ -78,6 +79,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
+	private static final String PATH = "PATH";
 
 	public static final String EXTRA_URL = "fileurl";
 	public static final String EXTRA_SIZE = "filesize";
@@ -372,8 +374,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 		
 		if (savedInstanceState != null) {
-			if (savedInstanceState.containsKey("path")) {
-				path = new File(savedInstanceState.getString("path"));
+			if (savedInstanceState.containsKey(PATH)) {
+				path = new File(savedInstanceState.getString(PATH));
 			}
 
 			fromSaveRecoveryKey = savedInstanceState.getBoolean(EXTRA_SAVE_RECOVERY_KEY, false);
@@ -457,67 +459,121 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		prefs = dbH.getPreferences();
 
-
 		if (mode ==Mode.BROWSE_FILES) {
-		    root = path = new File(intent.getExtras().getString(EXTRA_PATH));
-        } else {
-            root = buildExternalStorageFile("");
-            if (root == null) {
-                root = new File(File.separator);
-            }
-
-            //pick file from SD card
-            if (hasSDCard) {
-                root = new File(sdRoot);
-            }
-
-            if (cameraFolderSettings && Environment.getExternalStorageDirectory() != null) {
-                path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-            } else if (!hasSDCard) {
-                if (prefs == null) {
-                    path = buildExternalStorageFile(DOWNLOAD_DIR);
-                } else {
-                    String lastFolder = prefs.getLastFolderUpload();
-                    if (lastFolder != null) {
-                        path = new File(prefs.getLastFolderUpload());
-                        if (!path.exists()) {
-                            path = null;
-                        }
-                    } else {
-                        path = buildExternalStorageFile(DOWNLOAD_DIR);
-                    }
-                }
-                if (path == null) {
-                    path = buildExternalStorageFile(DOWNLOAD_DIR);
-                }
-            } else {
-                //always pick from SD card root
-                path = new File(sdRoot);
-            }
-        }
-		
-		if (path == null){
-			finish();
-			return;
+			if (intent.getExtras() != null) {
+				String extraPath = intent.getExtras().getString(EXTRA_PATH);
+				if (!isTextEmpty(extraPath)) {
+					root = path = new File(extraPath);
+				}
+			}
+		    checkPath();
+		} else if (hasSDCard) {
+			showRootWithSDView(true);
+		} else {
+			openPickFromInternalStorage();
 		}
-		
-		path.mkdirs();
-		changeFolder(path);
-		logDebug("Path to show: " + path);
 
 		if (isSetDownloadLocationShown) {
 			showConfirmationSaveInSameLocation();
 		}
 	}
 
+	private void openPickFromInternalStorage() {
+		root = buildExternalStorageFile("");
+
+		if (cameraFolderSettings && Environment.getExternalStorageDirectory() != null) {
+			path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+			return;
+		}
+
+		if (prefs != null && prefs.getLastFolderUpload() != null) {
+			path = new File(prefs.getLastFolderUpload());
+		}
+
+		if (path == null) {
+			path = buildExternalStorageFile(DOWNLOAD_DIR);
+		}
+
+		checkPath();
+	}
+
+	private void openPickFromSDCard() {
+		root = buildExternalStorageFile("");
+
+		SDCardOperator sdCardOperator;
+		try {
+			sdCardOperator = new SDCardOperator(this);
+		} catch (SDCardOperator.SDCardException e) {
+			e.printStackTrace();
+			logError("Initialize SDCardOperator failed", e);
+			//sd card is not available, choose internal storage location
+			showRootWithSDView(false);
+			openPickFromInternalStorage();
+			return;
+		}
+
+		String sdCardRoot = sdCardOperator.getSDCardRoot();
+		//don't use DocumentFile
+		if (sdCardOperator.canWriteWithFile(sdCardRoot)) {
+			sdRoot = sdCardRoot;
+		} else if (isBasedOnFileStorage()) {
+			try {
+				sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+				sdRoot = sdCardRoot;
+			} catch (SDCardOperator.SDCardException e) {
+				e.printStackTrace();
+				logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
+				SDCardOperator.requestSDCardPermission(sdCardRoot, this, this);
+			}
+		} else {
+			SDCardOperator.requestSDCardPermission(sdCardRoot, this, this);
+		}
+
+		if (sdRoot != null) {
+			path = new File(sdRoot);
+		}
+	}
+
+	private void showRootWithSDView(boolean show) {
+		if (show) {
+			contentText.setText(String.format("%s%s", SEPARATOR, getString(R.string.storage_root_label)));
+			rootLevelLayout.setVisibility(View.VISIBLE);
+			buttonsContainer.setVisibility(View.GONE);
+			showEmptyState();
+		} else {
+			rootLevelLayout.setVisibility(View.GONE);
+			buttonsContainer.setVisibility(View.VISIBLE);
+		}
+	}
+
+	private void showEmptyState() {
+		if (rootLevelLayout.getVisibility() == View.VISIBLE) {
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		} else if (adapter != null && adapter.getItemCount() > 0) {
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		} else {
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+		}
+	}
+
+	private void checkPath() {
+		if (path == null){
+			finish();
+		}
+
+		changeFolder(path);
+	}
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-		if (isScreenInPortrait(this)) {
-			emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-		} else {
-			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-		}
+		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
 	}
 
 	@Override
@@ -528,8 +584,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	@Override
 	public void onSaveInstanceState(Bundle state) {
-		state.putString("path", path.getAbsolutePath());
+		if (path != null) {
+			state.putString(PATH, path.getAbsolutePath());
+		}
 		state.putBoolean(EXTRA_SAVE_RECOVERY_KEY, fromSaveRecoveryKey);
+		state.putBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, isSetDownloadLocationShown);
+		state.putBoolean(IS_CONFIRMATION_CHECKED, confirmationChecked);
+
 		super.onSaveInstanceState(state);
 	}
 	
@@ -575,19 +636,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 			Collections.sort(documents, new CustomComparator());
 		}
-		if(documents.size()==0){
-			logDebug("Documents SIZE 0");
-			listView.setVisibility(View.GONE);
-			emptyImageView.setVisibility(View.VISIBLE);
-			emptyTextView.setVisibility(View.VISIBLE);
-		}
-		else{
-			logDebug("Documents: " + documents.size());
-			adapter.setFiles(documents);
-			listView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-		}
+
+		adapter.setFiles(documents);
+		showEmptyState();
 	}
 
 	private void updateActionModeTitle() {
@@ -716,12 +767,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				break;
 
 			case R.id.internal_storage_layout:
+				showRootWithSDView(false);
+				openPickFromInternalStorage();
 				break;
 
 			case R.id.external_storage_layout:
+				openPickFromSDCard();
 				break;
 		}
-		
 	}
 
 	/**
@@ -781,14 +834,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		intent.putExtra(EXTRA_SIZE, size);
 		setResult(RESULT_OK, intent);
 		finish();
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-		outState.putBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, isSetDownloadLocationShown);
-		outState.putBoolean(IS_CONFIRMATION_CHECKED, confirmationChecked);
-
-		super.onSaveInstanceState(outState, outPersistentState);
 	}
 
 	@Override
@@ -880,21 +925,20 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	@Override
 	public void onBackPressed() {
-		logDebug("onBackPressed");
 		retryConnectionsAndSignalPresence();
 
 		// Finish activity if at the root
-		if (path.equals(root)) {
-			super.onBackPressed();
+		if ((hasSDCard && rootLevelLayout.getVisibility() == View.VISIBLE) || !hasSDCard && path.equals(root)) {
+				super.onBackPressed();
 		// Go one level higher otherwise
+		} else if (hasSDCard && path.equals(root)) {
+			showRootWithSDView(true);
 		} else {
 			changeFolder(path.getParentFile());
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
-				logDebug("Pop of the stack " + lastVisiblePosition + " position");
 			}
-			logDebug("Scroll to " + lastVisiblePosition + " position");
 
 			if(lastVisiblePosition>=0){
 				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
