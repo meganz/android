@@ -2491,6 +2491,7 @@
 
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">You are not allowed to join this call as it has reached the maximum number of participants.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">You are not allowed to enable video as this call has reached the maximum number of participants using video.</string>
+    <string name="call_error_call_on_hold" context="Message show when a user cannot put the call on hold">You are not allowed to put the call on hold.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Incoming call&#8230;</string>
@@ -2611,6 +2612,7 @@
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignore</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s muted this call</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
+    <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">Call on hold</string>
 
     <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File already downloaded. Copied to the selected path.</string>
 

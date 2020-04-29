@@ -18,11 +18,13 @@ public class BroadcastConstants {
     public static final String ACTION_CALL_STATUS_UPDATE = "ACTION_CALL_STATUS_UPDATE";
     public static final String ACTION_CHANGE_LOCAL_AVFLAGS = "ACTION_CHANGE_LOCAL_AVFLAGS";
     public static final String ACTION_CHANGE_COMPOSITION = "ACTION_CHANGE_COMPOSITION";
+    public static final String ACTION_CHANGE_CALL_ON_HOLD = "ACTION_CHANGE_CALL_ON_HOLD";
     public static final String ACTION_SESSION_STATUS_UPDATE = "ACTION_SESSION_STATUS_UPDATE";
     public static final String ACTION_CHANGE_REMOTE_AVFLAGS = "ACTION_CHANGE_REMOTE_AVFLAGS";
     public static final String ACTION_CHANGE_AUDIO_LEVEL = "ACTION_CHANGE_AUDIO_LEVEL";
     public static final String ACTION_CHANGE_NETWORK_QUALITY = "ACTION_CHANGE_NETWORK_QUALITY";
     public static final String ACTION_UPDATE_CALL = "ACTION_UPDATE_CALL";
+    public static final String ACTION_CHANGE_SESSION_ON_HOLD = "ACTION_CHANGE_SESSION_ON_HOLD";
 
 
     //    Broadcasts' extras

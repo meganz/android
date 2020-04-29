@@ -55,6 +55,15 @@ public class CallListener implements MegaChatCallListenerInterface {
             LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentLocalFlags);
         }
 
+        if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_ON_HOLD)) {
+            logDebug("Call on hold changed ");
+            Intent intentLocalFlags = new Intent(BROADCAST_ACTION_INTENT_CALL_UPDATE);
+            intentLocalFlags.setAction(ACTION_CHANGE_CALL_ON_HOLD);
+            intentLocalFlags.putExtra(UPDATE_CHAT_CALL_ID, call.getChatid());
+            intentLocalFlags.putExtra(UPDATE_CALL_ID, call.getId());
+            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentLocalFlags);
+        }
+
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION) && call.getCallCompositionChange() != 0) {
             logDebug("Call composition changed. Call status is " + callStatusToString(call.getStatus()) + ". Num of participants is " + call.getPeeridParticipants().size());
             Intent intentComposition = new Intent(BROADCAST_ACTION_INTENT_CALL_UPDATE);
@@ -105,6 +114,17 @@ public class CallListener implements MegaChatCallListenerInterface {
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_NETWORK_QUALITY)) {
             Intent intentNetwork = new Intent(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
             intentNetwork.setAction(ACTION_CHANGE_NETWORK_QUALITY);
+            intentNetwork.putExtra(UPDATE_CHAT_CALL_ID, chatid);
+            intentNetwork.putExtra(UPDATE_CALL_ID, callid);
+            intentNetwork.putExtra(UPDATE_PEER_ID, session.getPeerid());
+            intentNetwork.putExtra(UPDATE_CLIENT_ID, session.getClientid());
+            LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intentNetwork);
+        }
+
+        if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_ON_HOLD)) {
+            logDebug("Session on hold changed ");
+            Intent intentNetwork = new Intent(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
+            intentNetwork.setAction(ACTION_CHANGE_SESSION_ON_HOLD);
             intentNetwork.putExtra(UPDATE_CHAT_CALL_ID, chatid);
             intentNetwork.putExtra(UPDATE_CALL_ID, callid);
             intentNetwork.putExtra(UPDATE_PEER_ID, session.getPeerid());
