@@ -8,8 +8,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -30,7 +30,6 @@ import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -47,10 +46,12 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSharedFolderLollipopAdapter.ViewHolderShareList> implements OnClickListener, View.OnLongClickListener {
@@ -270,47 +271,10 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			MegaUser contact = megaApi.getContact(holder.contactMail);
 
 			if(contact!=null){
-				MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
-				if(contactDB!=null){
-					if(!contactDB.getName().equals("")){
-						holder.textViewContactName.setText(contactDB.getName()+" "+contactDB.getLastName());
-					}
-					else{
-						holder.textViewContactName.setText(holder.contactMail);
-					}
-				}
-				else{
-					logWarning("The contactDB is null: ");
-					holder.textViewContactName.setText(holder.contactMail);
-				}
+				holder.textViewContactName.setText(getMegaUserNameDB(contact));
 
 				holder.stateIcon.setVisibility(View.VISIBLE);
-				if (megaChatApi != null) {
-					int userStatus = megaChatApi.getUserOnlineStatus(contact.getHandle());
-					if (userStatus == MegaChatApi.STATUS_ONLINE) {
-						logDebug("This user is connected");
-						holder.stateIcon.setVisibility(View.VISIBLE);
-						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
-					} else if (userStatus == MegaChatApi.STATUS_AWAY) {
-						logDebug("This user is away");
-						holder.stateIcon.setVisibility(View.VISIBLE);
-						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
-					} else if (userStatus == MegaChatApi.STATUS_BUSY) {
-						logDebug("This user is busy");
-						holder.stateIcon.setVisibility(View.VISIBLE);
-						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
-					} else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
-						logDebug("This user is offline");
-						holder.stateIcon.setVisibility(View.VISIBLE);
-						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
-					} else if (userStatus == MegaChatApi.STATUS_INVALID) {
-						logWarning("INVALID status: " + userStatus);
-						holder.stateIcon.setVisibility(View.GONE);
-					} else {
-						logDebug("This user status is: " + userStatus);
-						holder.stateIcon.setVisibility(View.GONE);
-					}
-				}
+				setContactStatus(megaChatApi.getUserOnlineStatus(contact.getHandle()), holder.stateIcon);
 			}
 			else{
 				holder.textViewContactName.setText(holder.contactMail);
@@ -324,14 +288,14 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				/*Default Avatar*/
-				int color = getColorAvatar(context, megaApi, contact);
+				int color = getColorAvatar(contact);
 				String name = " ";
 				if(holder.textViewContactName!=null){
 					name = holder.textViewContactName.getText().toString();
 				}else if(holder.contactMail != null && holder.contactMail.length() > 0){
 					name = holder.contactMail;
 				}
-				holder.imageView.setImageBitmap(getDefaultAvatar(context, color, name, AVATAR_SIZE, true));
+				holder.imageView.setImageBitmap(getDefaultAvatar(color, name, AVATAR_SIZE, true));
 
 				/*Avatar*/
 				if(contact!=null){

@@ -2,7 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -141,7 +141,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
             }
         }
 
-        holder.avatar.setImageBitmap(getAvatarShareContact(context, megaApi, contact));
+        holder.avatar.setImageBitmap(getAvatarShareContact(context, contact));
     }
 
     @Override

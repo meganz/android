@@ -6,9 +6,9 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -36,13 +36,6 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
     private MegaApiAndroid megaApi;
     private Context context;
 
-    private RelativeLayout exportMKLayout;
-    private TextView titleExportMK;
-    private TextView subTitleExportMK;
-    private TextView firstParExportMK;
-    private TextView secondParExportMK;
-    private TextView thirdParExportMK;
-    private TextView actionExportMK;
     private Button printMK;
     private Button copyMK;
     private Button saveMK;
@@ -51,14 +44,12 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
 
     public static ExportRecoveryKeyFragment newInstance() {
         logDebug("newInstance");
-        ExportRecoveryKeyFragment fragment = new ExportRecoveryKeyFragment();
-        return fragment;
+        return new ExportRecoveryKeyFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logDebug("onCreate");
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -72,7 +63,6 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        logDebug("onCreateView");
 
         View v = inflater.inflate(R.layout.export_mk_layout, container, false);
 
@@ -80,66 +70,20 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        exportMKLayout = (RelativeLayout) v.findViewById(R.id.export_mk_full_layout);
-        LinearLayout.LayoutParams exportMKButtonsParams = (LinearLayout.LayoutParams)exportMKLayout.getLayoutParams();
-        exportMKButtonsParams.setMargins(0, 0, 0, scaleHeightPx(10, outMetrics));
-        exportMKLayout.setLayoutParams(exportMKButtonsParams);
-
-        titleExportMK = (TextView) v.findViewById(R.id.title_export_MK_layout);
-        RelativeLayout.LayoutParams titleExportMKParams = (RelativeLayout.LayoutParams)titleExportMK.getLayoutParams();
-        titleExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(50, outMetrics), px2dp(24, outMetrics), 0);
-        titleExportMK.setLayoutParams(titleExportMKParams);
-
-        subTitleExportMK = (TextView) v.findViewById(R.id.subtitle_export_MK_layout);
-        RelativeLayout.LayoutParams subTitleExportMKParams = (RelativeLayout.LayoutParams)subTitleExportMK.getLayoutParams();
-        subTitleExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(24, outMetrics), px2dp(24, outMetrics), 0);
-        subTitleExportMK.setLayoutParams(subTitleExportMKParams);
-
-        firstParExportMK = (TextView) v.findViewById(R.id.first_par_export_MK_layout);
-        RelativeLayout.LayoutParams firstParExportMKParams = (RelativeLayout.LayoutParams)firstParExportMK.getLayoutParams();
-        firstParExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(20, outMetrics), px2dp(24, outMetrics), 0);
-        firstParExportMK.setLayoutParams(firstParExportMKParams);
-
-        secondParExportMK = (TextView) v.findViewById(R.id.second_par_export_MK_layout);
-        RelativeLayout.LayoutParams secondParExportMKParams = (RelativeLayout.LayoutParams)secondParExportMK.getLayoutParams();
-        secondParExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(20, outMetrics), px2dp(24, outMetrics), 0);
-        secondParExportMK.setLayoutParams(secondParExportMKParams);
-
-        thirdParExportMK = (TextView) v.findViewById(R.id.third_par_export_MK_layout);
-        RelativeLayout.LayoutParams thirdParExportMKParams = (RelativeLayout.LayoutParams)thirdParExportMK.getLayoutParams();
-        thirdParExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(24, outMetrics), px2dp(24, outMetrics), 0);
-        thirdParExportMK.setLayoutParams(thirdParExportMKParams);
-
-        actionExportMK = (TextView) v.findViewById(R.id.action_export_MK_layout);
-        RelativeLayout.LayoutParams actionExportMKParams = (RelativeLayout.LayoutParams)actionExportMK.getLayoutParams();
-        actionExportMKParams.setMargins(px2dp(24, outMetrics), scaleHeightPx(20, outMetrics), px2dp(24, outMetrics), 0);
-        actionExportMK.setLayoutParams(actionExportMKParams);
-
         printMK = v.findViewById(R.id.print_MK_button);
-        printMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
         printMK.setOnClickListener(this);
 
-        copyMK = (Button) v.findViewById(R.id.copy_MK_button);
-        copyMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-
+        copyMK = v.findViewById(R.id.copy_MK_button);
         copyMK.setOnClickListener(this);
 
-        saveMK = (Button) v.findViewById(R.id.save_MK_button);
-        saveMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+        saveMK = v.findViewById(R.id.save_MK_button);
         saveMK.setOnClickListener(this);
 
         return v;
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        logDebug("onAttach");
-        super.onAttach(activity);
-        context = activity;
-    }
-
-    @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         logDebug("onAttach context");
         super.onAttach(context);
         this.context = context;
@@ -147,25 +91,21 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.print_MK_button:{
+        AccountController aC = new AccountController(context);
+        switch (v.getId()) {
+            case R.id.print_MK_button:
                 hideMKLayout();
-                AccountController aC = new AccountController(context);
                 aC.printRK();
                 break;
-            }
-            case R.id.copy_MK_button:{
+            case R.id.copy_MK_button:
                 hideMKLayout();
-                AccountController aC = new AccountController(context);
                 aC.copyMK(false);
                 break;
-            }
-            case R.id.save_MK_button:{
+            case R.id.save_MK_button:
                 if (checkStoragePermission()) {
                     toFileSystem();
                 }
                 break;
-            }
         }
     }
 

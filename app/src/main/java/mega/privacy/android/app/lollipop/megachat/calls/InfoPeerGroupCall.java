@@ -1,6 +1,4 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
-
-
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 
 public class InfoPeerGroupCall {
@@ -14,6 +12,17 @@ public class InfoPeerGroupCall {
     private GroupCallListener listener;
     private boolean goodQuality;
 
+    public InfoPeerGroupCall(long peerId, long clientId, String name) {
+        this.peerId = peerId;
+        this.clientId = clientId;
+        this.name = name;
+        this.videoOn = false;
+        this.audioOn = false;
+        this.greenLayer = false;
+        this.goodQuality = true;
+        this.listener = null;
+    }
+
     public InfoPeerGroupCall(long peerId, long clientId, String name, boolean videoOn, boolean audioOn, boolean greenLayer, boolean goodQuality, GroupCallListener listener) {
 
         this.peerId = peerId;
@@ -22,8 +31,8 @@ public class InfoPeerGroupCall {
         this.videoOn = videoOn;
         this.audioOn = audioOn;
         this.greenLayer = greenLayer;
-        this.listener = listener;
         this.goodQuality = goodQuality;
+        this.listener = listener;
     }
 
     public long getPeerId() {

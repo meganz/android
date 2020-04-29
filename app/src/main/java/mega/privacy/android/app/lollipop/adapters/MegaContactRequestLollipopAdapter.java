@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.ViewHolder;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -190,8 +190,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 	
 	private void createDefaultAvatar(ViewHolderContactsRequestList holder){
-		int color = ContextCompat.getColor(context, R.color.lollipop_primary_color);
-		Bitmap defaultAvatar = getDefaultAvatar(context, color, holder.contactMail , AVATAR_SIZE, true);
+		Bitmap defaultAvatar = getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), holder.contactMail , AVATAR_SIZE, true);
 		holder.imageView.setImageBitmap(defaultAvatar);
 	}
 		

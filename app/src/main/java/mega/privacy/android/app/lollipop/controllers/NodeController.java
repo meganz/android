@@ -9,14 +9,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -26,6 +27,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -45,7 +47,6 @@ import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
-import mega.privacy.android.app.utils.CopyFileThread;
 import mega.privacy.android.app.utils.DownloadChecker;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
@@ -61,7 +62,6 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class NodeController {
@@ -359,7 +359,7 @@ public class NodeController {
         }
 
         boolean askMe = askMe(context);
-        String downloadLocationDefaultPath = getDownloadLocation(context);
+        String downloadLocationDefaultPath = getDownloadLocation();
 
         if (askMe) {
             logDebug("askMe");
@@ -666,7 +666,7 @@ public class NodeController {
 
                 if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
                     logDebug("ISFILE");
-                    String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+                    String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize());
                     //Check if the file is already downloaded, and downloaded file is the latest version
                     MegaApplication app = MegaApplication.getInstance();
                     if (localPath != null
@@ -1059,13 +1059,21 @@ public class NodeController {
         }
     }
 
-    public void removeLink(MegaNode document){
-        logDebug("removeLink");
+    public void removeLink(MegaNode document, ExportListener exportListener){
+        megaApi.disableExport(document, exportListener);
+    }
+
+    public void removeLinks(ArrayList<MegaNode> nodes){
         if (!isOnline(context)){
             ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
-        megaApi.disableExport(document, ((ManagerActivityLollipop) context));
+
+        ExportListener exportListener = new ExportListener(context, true, nodes.size());
+
+        for (MegaNode node : nodes) {
+            removeLink(node, exportListener);
+        }
     }
 
 
@@ -1339,9 +1347,30 @@ public class NodeController {
 
         ShareListener shareListener = new ShareListener(context, REMOVE_SHARE_LISTENER, listShares.size());
 
-        for (int i = 0; i < listShares.size(); i++) {
-            String email = listShares.get(i).getUser();
+        for (MegaShare share : listShares) {
+            String email = share.getUser();
             if (email != null) {
+                removeShare(shareListener, node, email);
+            }
+        }
+    }
+
+    public void removeSeveralFolderShares(List<MegaNode> nodes) {
+        ArrayList<MegaShare> totalShares = new ArrayList<>();
+
+        for (MegaNode node : nodes) {
+            ArrayList<MegaShare> shares = megaApi.getOutShares(node);
+            if (shares != null && !shares.isEmpty()) {
+                totalShares.addAll(shares);
+            }
+        }
+
+        ShareListener shareListener = new ShareListener(context, REMOVE_SHARE_LISTENER, totalShares.size());
+
+        for (MegaShare megaShare : totalShares) {
+            MegaNode node = megaApi.getNodeByHandle(megaShare.getNodeHandle());
+            String email = megaShare.getUser();
+            if (node != null && email != null) {
                 removeShare(shareListener, node, email);
             }
         }
@@ -1539,7 +1568,7 @@ public class NodeController {
         if (askMe) {
             pickFolder(document, url);
         } else {
-            String downloadLocationDefaultPath = getDownloadLocation(context);
+            String downloadLocationDefaultPath = getDownloadLocation();
             downloadTo(document, downloadLocationDefaultPath, url);
         }
     }
@@ -1604,7 +1633,7 @@ public class NodeController {
         final MegaNode tempNode = currentDocument;
         if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
             logDebug("is file");
-            final String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+            final String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize());
             if(localPath != null){
                 checkDownload(context, tempNode, localPath, parentPath, false, downloadToSDCard, sdCardOperator);
             } else{

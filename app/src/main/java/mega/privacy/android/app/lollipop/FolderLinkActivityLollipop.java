@@ -21,16 +21,16 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -90,11 +90,12 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -277,15 +278,18 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
 		switch (item.getItemId()) {
-	    	// Respond to the action bar's Up/Home button
-		    case android.R.id.home:{
-		    	onBackPressed();
-		    	return true;
-		    }
+			// Respond to the action bar's Up/Home button
+			case android.R.id.home:
+				onBackPressed();
+				break;
+
+			case R.id.share_link:
+				shareLink(this, url);
+				break;
 		}
-	
+
 		return super.onOptionsItemSelected(item);
-    }
+	}
 
 	public void updateScrollPosition(int position) {
 		logDebug("Position: " + position);
@@ -434,7 +438,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		}
 
 		prefs = dbH.getPreferences();
-		downloadLocationDefaultPath = getDownloadLocation(this);
+		downloadLocationDefaultPath = getDownloadLocation();
 
 		lastPositionStack = new Stack<>();
 		
@@ -828,7 +832,7 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 
         boolean askMe = askMe(this);
         prefs = dbH.getPreferences();
-        downloadLocationDefaultPath = getDownloadLocation(this);
+        downloadLocationDefaultPath = getDownloadLocation();
 
         if (askMe) {
             File[] fs = getExternalFilesDirs(null);
@@ -1677,13 +1681,9 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 						mediaIntent.putExtra("parentNodeHandle", megaApiFolder.getParentNode(nodes.get(position)).getHandle());
 					}
 					imageDrag = imageView;
-					boolean isOnMegaDownloads = false;
-					String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if(f.exists() && (f.length() == file.getSize())){
-						isOnMegaDownloads = true;
-					}
-					if (localPath != null && (isOnMegaDownloads || (megaApiFolder.getFingerprint(file) != null && megaApiFolder.getFingerprint(file).equals(megaApiFolder.getFingerprint(localPath))))){
+
+					String localPath = getLocalFile(this, file.getName(), file.getSize());
+					if (localPath != null){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1770,13 +1770,9 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 					Intent pdfIntent = new Intent(FolderLinkActivityLollipop.this, PdfViewerActivityLollipop.class);
 					pdfIntent.putExtra("APP", true);
 					pdfIntent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
-					boolean isOnMegaDownloads = false;
-					String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if(f.exists() && (f.length() == file.getSize())){
-						isOnMegaDownloads = true;
-					}
-					if (localPath != null && (isOnMegaDownloads || (megaApiFolder.getFingerprint(file) != null && megaApiFolder.getFingerprint(file).equals(megaApiFolder.getFingerprint(localPath))))){
+
+					String localPath = getLocalFile(this, file.getName(), file.getSize());
+					if (localPath != null){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(FolderLinkActivityLollipop.this, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -2154,5 +2150,12 @@ public class FolderLinkActivityLollipop extends DownloadableActivity implements 
 		} catch(Exception ex){}
 
 		finish();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.file_folder_link_action, menu);
+
+		return super.onCreateOptionsMenu(menu);
 	}
 }

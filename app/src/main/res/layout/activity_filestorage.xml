@@ -8,7 +8,7 @@
     android:id="@+id/file_storage_container"
     tools:context=".FileStorageActivityLollipop" >
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_filestorage"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -96,7 +96,7 @@
 		android:layout_above="@id/options_file_storage_layout"
 		android:background="@color/tour_bar_grey" />
 
-   <android.support.v7.widget.RecyclerView
+   <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/file_storage_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

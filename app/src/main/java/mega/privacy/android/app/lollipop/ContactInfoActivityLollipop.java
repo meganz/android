@@ -20,19 +20,21 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.graphics.Palette;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.palette.graphics.Palette;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -42,7 +44,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -68,7 +69,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.AppBarStateChangeListener;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MarqueeTextView;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -80,7 +83,8 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
-import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -105,16 +109,20 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
+
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
 @SuppressLint("NewApi")
@@ -123,8 +131,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
 
 	ContactController cC;
-    private android.support.v7.app.AlertDialog downloadConfirmationDialog;
-    private android.support.v7.app.AlertDialog renameDialog;
+    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
+    private androidx.appcompat.app.AlertDialog renameDialog;
 
 	private final static int MAX_WIDTH_APPBAR_LAND = 400;
 	private final static int MAX_WIDTH_APPBAR_PORT = 200;
@@ -132,7 +140,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	RelativeLayout imageLayout;
 	android.app.AlertDialog permissionsDialog;
 	ProgressDialog statusDialog;
-
+	AlertDialog setNicknameDialog;
 	ContactInfoActivityLollipop contactInfoActivityLollipop;
 	CoordinatorLayout fragmentContainer;
 	CollapsingToolbarLayout collapsingToolbar;
@@ -144,6 +152,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	//Info of the user
 	private EmojiTextView nameText;
 	private TextView emailText;
+	private TextView setNicknameText;
 
 	LinearLayout chatOptionsLayout;
 	View dividerChatOptionsLayout;
@@ -220,10 +229,12 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     NodeController nC;
     boolean moveToRubbish;
     long parentHandle;
+	private String nickname;
 
-    private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
+	private ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment;
+	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
 
-    private AskForDisplayOverDialog askForDisplayOverDialog;
+	private AskForDisplayOverDialog askForDisplayOverDialog;
 
     private boolean waitingForCall;
 
@@ -240,6 +251,19 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			if (statusDialog != null) {
 				statusDialog.dismiss();
 			}
+		}
+	};
+
+	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null) return;
+			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
+			if (user != null && userHandle == user.getHandle()) {
+				checkNickname(user.getHandle());
+				updateAvatar();
+			}
+
 		}
 	};
 
@@ -315,11 +339,17 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			collapsingToolbar = findViewById(R.id.collapse_toolbar);
 			contactStateIcon = findViewById(R.id.contact_drawable_state);
 
-			/*Toolbar*/
+			/*TITLE*/
 			firstLineTextToolbar = findViewById(R.id.first_line_toolbar);
+
+			/*SUBTITLE*/
 			secondLineTextToolbar = findViewById(R.id.second_line_toolbar);
+
 			nameText = findViewById(R.id.chat_contact_properties_name_text);
 			emailText = findViewById(R.id.chat_contact_properties_email_text);
+			setNicknameText = findViewById(R.id.chat_contact_properties_nickname);
+			setNicknameText.setOnClickListener(this);
+
 			int width;
 			if(isScreenInPortrait(this)){
 				width = px2dp(MAX_WIDTH_APPBAR_PORT, outMetrics);
@@ -328,6 +358,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				width = px2dp(MAX_WIDTH_APPBAR_LAND, outMetrics);
 				secondLineTextToolbar.setPadding(0,0,0,5);
 			}
+			nameText.setMaxWidthEmojis(width);
 			firstLineTextToolbar.setMaxWidthEmojis(width);
 			secondLineTextToolbar.setMaxWidth(width);
 
@@ -410,7 +441,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 			removeContactChatLayout.setOnClickListener(this);
 
 			chatHandle = extras.getLong("handle",-1);
-			userEmailExtra = extras.getString("name");
+			userEmailExtra = extras.getString(NAME);
 			if (chatHandle != -1) {
 
 				logDebug("From chat!!");
@@ -421,61 +452,27 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 				String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
 				user = megaApi.getContact(userHandleEncoded);
-				if(user!=null){
-					logDebug("User foundd!!!");
-				}
-
 				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 
-				if (chat.getTitle() != null && !chat.getTitle().isEmpty() && !chat.getTitle().equals("")){
-					firstLineTextToolbar.setText(chat.getTitle());
-					nameText.setText(chat.getTitle());
-				}
-				else {
-					if (userEmailExtra != null) {
-						firstLineTextToolbar.setText(userEmailExtra);
-						nameText.setText(userEmailExtra);
+				if (user != null) {
+					checkNickname(user.getHandle());
+				} else {
+					String fullName = "";
+					if (!isTextEmpty(chat.getTitle())) {
+						fullName = chat.getTitle();
+					} else if (userEmailExtra != null) {
+						fullName = userEmailExtra;
 					}
+					withoutNickname(fullName);
 				}
-				String fullname = firstLineTextToolbar.getText().toString();
-				setDefaultAvatar(fullname);
-			}
-			else{
+			} else {
 				logDebug("From contacts!!");
-
 				fromContacts = true;
 				user = megaApi.getContact(userEmailExtra);
-
-				String fullName = "";
-				if(user!=null){
-					logDebug("User handle: " + user.getHandle());
-					MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-					if(contactDB!=null){
-						logDebug("Contact DB found!");
-						String firstNameText = "";
-						String lastNameText = "";
-
-						firstNameText = contactDB.getName();
-						lastNameText = contactDB.getLastName();
-
-						if (firstNameText.trim().length() <= 0){
-							fullName = lastNameText;
-						}
-						else{
-							fullName = firstNameText + " " + lastNameText;
-						}
-
-						if (fullName.trim().length() <= 0){
-							logDebug("Put email as fullname");
-							fullName= user.getEmail();
-						}
-
-						firstLineTextToolbar.setText(fullName);
-						nameText.setText(fullName);
-					}
-					else{
-						logWarning("The contactDB is null: ");
-					}
+				if (user != null) {
+					checkNickname(user.getHandle());
+				} else {
+					withoutNickname(userEmailExtra);
 				}
 
 				chat = megaChatApi.getChatRoomByUser(user.getHandle());
@@ -502,8 +499,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				if (megaChatApi == null) {
 					megaChatApi = ((MegaApplication) this.getApplication()).getMegaChatApi();
 				}
-
-				setDefaultAvatar(fullName);
 			}
 
 			if(isOnline(this)){
@@ -611,6 +606,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
+		LocalBroadcastManager.getInstance(this).registerReceiver(nicknameReceiver,
+				new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_NICKNAME));
 	}
 
 	private void visibilityStateIcon() {
@@ -627,6 +624,35 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 
 		contactStateIcon.setVisibility(View.GONE);
 		return;
+	}
+
+	private void checkNickname(long contactHandle) {
+		MegaContactDB contactDB = getContactDB(contactHandle);
+		if (contactDB == null) return;
+
+		String fullName = buildFullName(contactDB.getName(), contactDB.getLastName(), contactDB.getMail());
+		String nicknameText = contactDB.getNickname();
+
+		if (isTextEmpty(nicknameText)) {
+			withoutNickname(fullName);
+		} else {
+			withNickname(fullName, nicknameText);
+		}
+	}
+
+	private void withoutNickname(String name) {
+		firstLineTextToolbar.setText(name);
+		nameText.setVisibility(View.GONE);
+		setNicknameText.setText(getString(R.string.add_nickname));
+		setDefaultAvatar();
+	}
+
+	private void withNickname(String name, String nickname) {
+		firstLineTextToolbar.setText(nickname);
+		nameText.setText(name);
+		nameText.setVisibility(View.VISIBLE);
+		setNicknameText.setText(getString(R.string.edit_nickname));
+		setDefaultAvatar();
 	}
 
 
@@ -848,13 +874,13 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	public void startCall() {
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if (chatRoomTo != null) {
+
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
 				Intent i = new Intent(this, ChatCallActivity.class);
 				i.putExtra(CHAT_ID, chatRoomTo.getChatId());
 				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(i);
-
-			} else if (isStatusConnected(this, megaChatApi, chatRoomTo.getChatId())) {
+			} else if (isStatusConnected(this, chatRoomTo.getChatId())) {
 				startCallWithChatOnline(chatRoomTo);
 			}
 		} else {
@@ -1121,10 +1147,8 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		return dominantColor;
 	}
 
-	public void setDefaultAvatar(String title) {
+	private void setDefaultAvatar() {
 		logDebug("setDefaultAvatar");
-
-
 		Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
@@ -1132,23 +1156,15 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		p.setColor(Color.TRANSPARENT);
 		c.drawPaint(p);
 
-		String color = megaApi.getUserAvatarColor(user);
-		if (color != null) {
-			logDebug("The color to set the avatar is " + color);
-			imageLayout.setBackgroundColor(Color.parseColor(color));
-		} else {
-			logDebug("Default color to the avatar");
-			imageLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-		}
-
+		imageLayout.setBackgroundColor(getColorAvatar(user));
 		contactPropertiesImage.setImageBitmap(defaultAvatar);
-
 	}
 
 	private void startingACall(boolean withVideo) {
 		startVideo = withVideo;
 		if (checkPermissionsCall()) {
 			startCall();
+
 		}
 	}
 
@@ -1250,6 +1266,116 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 				startActivity(nodeHistoryIntent);
 				break;
 			}
+			case R.id.chat_contact_properties_nickname: {
+				if (setNicknameText.getText().toString().equals(getString(R.string.add_nickname))) {
+					showConfirmationSetNickname(null);
+				} else if (user != null && !isBottomSheetDialogShown(contactNicknameBottomSheetDialogFragment)) {
+					nickname = firstLineTextToolbar.getText().toString();
+					contactNicknameBottomSheetDialogFragment = new ContactNicknameBottomSheetDialogFragment();
+					contactNicknameBottomSheetDialogFragment.show(getSupportFragmentManager(), contactNicknameBottomSheetDialogFragment.getTag());
+				}
+				break;
+			}
+		}
+	}
+
+	public void showConfirmationSetNickname(final String alias) {
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(16, outMetrics), scaleWidthPx(17, outMetrics), 0);
+		final EmojiEditText input = new EmojiEditText(this);
+		layout.addView(input, params);
+		input.setSingleLine();
+		input.setSelectAllOnFocus(true);
+		input.requestFocus();
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+		input.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		showKeyboardDelayed(input);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+
+		input.setImeActionLabel(getString(R.string.add_nickname), EditorInfo.IME_ACTION_DONE);
+		if (alias == null) {
+			input.setHint(getString(R.string.add_nickname));
+			builder.setTitle(getString(R.string.add_nickname));
+		} else {
+			input.setHint(alias);
+			input.setText(alias);
+			input.setSelection(input.length());
+			builder.setTitle(getString(R.string.edit_nickname));
+		}
+		int colorDisableButton = ContextCompat.getColor(this, R.color.accentColorTransparent);
+		int colorEnableButton = ContextCompat.getColor(this, R.color.accentColor);
+
+		input.addTextChangedListener(new TextWatcher() {
+			private void handleText() {
+				if (setNicknameDialog != null) {
+					final Button okButton = setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+					if (input.getText().length() == 0) {
+						okButton.setEnabled(false);
+						okButton.setTextColor(colorDisableButton);
+					} else {
+						okButton.setEnabled(true);
+						okButton.setTextColor(colorEnableButton);
+					}
+				}
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				handleText();
+			}
+		});
+		builder.setPositiveButton(getString(R.string.button_set),
+				(dialog, whichButton) -> onClickAlertDialog(input, alias));
+		builder.setNegativeButton(getString(R.string.general_cancel),
+				(dialog, whichButton) -> setNicknameDialog.dismiss());
+
+		builder.setView(layout);
+		setNicknameDialog = builder.create();
+		setNicknameDialog.show();
+		setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+		setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(colorDisableButton);
+		setNicknameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> onClickAlertDialog(input, alias));
+		setNicknameDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> setNicknameDialog.dismiss());
+
+	}
+
+	private void onClickAlertDialog(EmojiEditText input, String alias) {
+		String name = input.getText().toString();
+		if (isTextEmpty(name)) {
+			logWarning("Input is empty");
+			input.setError(getString(R.string.invalid_string));
+			input.requestFocus();
+		} else {
+			addNickname(alias, name);
+			setNicknameDialog.dismiss();
+		}
+	}
+
+	public void addNickname(String oldNickname, String newNickname) {
+		if (oldNickname != null && oldNickname.equals(newNickname)) return;
+		//Update the new nickname
+		megaApi.setUserAlias(user.getHandle(), newNickname, new SetAttrUserListener(this));
+	}
+
+	private void updateAvatar(){
+		if(isOnline(this)){
+			setAvatar();
+		}else if (chat != null){
+			setOfflineAvatar(chat.getPeerEmail(0));
 		}
 	}
 
@@ -1396,19 +1522,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 		for (long fileHandle : fileHandles) {
 			megaChatApi.attachNode(chatId, fileHandle, listener);
 		}
-	}
-
-	/*
-	 * Display keyboard
-	 */
-	private void showKeyboardDelayed(final View view) {
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
 	}
 
 	public void showConfirmationRemoveContact(final MegaUser c){
@@ -1625,6 +1738,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         }
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(nicknameReceiver);
 	}
 
 	@Override
@@ -1792,7 +1906,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
 		selectedNode = node;
-		bottomSheetDialogFragment = new ContactInfoBottomSheetDialogFragment();
+		bottomSheetDialogFragment = new ContactFileListBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
     
@@ -1803,10 +1917,17 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
     public void setSelectedNode(MegaNode selectedNode) {
         this.selectedNode = selectedNode;
     }
-    
-    public void onFileClick(ArrayList<Long> handleList) {
-        nC.prepareForDownload(handleList, true);
-    }
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void onFileClick(ArrayList<Long> handleList) {
+		if (nC == null) {
+			nC = new NodeController(this);
+		}
+		nC.prepareForDownload(handleList, true);
+	}
     
     public void showConfirmationLeaveIncomingShare (final MegaNode n){
 		logDebug("Node handle: " + n.getHandle());
@@ -1826,7 +1947,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             }
         };
         
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         String message= getResources().getString(R.string.confirmation_leave_share_folder);
         builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -1850,7 +1971,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             }
         };
         
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         String message= getResources().getString(R.string.confirmation_leave_share_folder);
         builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -1909,7 +2030,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         if(handleList!=null){
             
             if (handleList.size() > 0){
-                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
                 if (handleList.size() > 1){
                     builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
@@ -2092,7 +2213,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
             }
         });
         
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
@@ -2113,7 +2234,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         builder.setView(layout);
         renameDialog = builder.create();
         renameDialog.show();
-        renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+        renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -2184,7 +2305,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         final long [] hashesC = hashes;
         final long sizeC=size;
         
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2228,7 +2349,7 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
         final long [] hashesC = hashes;
         final long sizeC=size;
         
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2267,7 +2388,6 @@ public class ContactInfoActivityLollipop extends DownloadableActivity implements
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-
 		outState.putBoolean(WAITING_FOR_CALL, waitingForCall);
 	}
 
