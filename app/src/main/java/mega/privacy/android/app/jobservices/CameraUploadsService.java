@@ -978,16 +978,18 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         //Prevent checking while app alive because it has been handled by global event
         logDebug("is primary/secondary attr synced: " + isPrimaryHandleSynced + "/" + isSecondaryHandleSynced + ", ignoreAttr: " + ignoreAttr);
-        if (!ignoreAttr && !isPrimaryHandleSynced) {
-            logDebug("Try to get Camera Uploads primary target folder.");
-            megaApi.getCameraUploadsFolder(getAttrUserListener);
-            return CHECKING_USER_ATTRIBUTE;
-        }
+        if (!ignoreAttr) {
+            if (!isPrimaryHandleSynced) {
+                megaApi.getCameraUploadsFolder(getAttrUserListener);
+            }
 
-        if (!ignoreAttr && !isSecondaryHandleSynced) {
-            logDebug("Try to get Camera Uploads primary target folder.");
-            megaApi.getCameraUploadsFolderSecondary(getAttrUserListener);
-            return CHECKING_USER_ATTRIBUTE;
+            if (!isSecondaryHandleSynced) {
+                megaApi.getCameraUploadsFolderSecondary(getAttrUserListener);
+            }
+
+            if (!isPrimaryHandleSynced || !isSecondaryHandleSynced) {
+                return CHECKING_USER_ATTRIBUTE;
+            }
         }
 
         int primaryFolderResult = checkPrimaryFolder();
@@ -1305,10 +1307,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 cameraUploadHandle = cuPrimaryHandleInUserAttr;
                 dbH.setCamSyncHandle(cameraUploadHandle);
                 resetPrimaryTimeline();
-            }
-            // start to get secondary handle.
-            if (!isSecondaryHandleSynced) {
-                megaApi.getCameraUploadsFolderSecondary(getAttrUserListener);
             }
         } else {
             logWarning("Get primary handle faild, finish process.");
