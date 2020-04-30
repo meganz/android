@@ -1698,18 +1698,22 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         //file can not be compress will be uploaded directly?
         File srcFile = new File(localPath);
         if (srcFile.exists()) {
-            StatFs stat = new StatFs(tempRoot);
-            double availableFreeSpace = stat.getAvailableBytes();
-            if (availableFreeSpace > srcFile.length()) {
-                logDebug("Can not compress but got enough disk space, so should be un-supported format issue");
-                String newPath = record.getNewPath();
-                File temp = new File(newPath);
-                dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,localPath,isSecondary);
-                if (newPath.startsWith(tempRoot) && temp.exists()) {
-                    temp.delete();
+            try {
+                StatFs stat = new StatFs(tempRoot);
+                double availableFreeSpace = stat.getAvailableBytes();
+                if (availableFreeSpace > srcFile.length()) {
+                    logDebug("Can not compress but got enough disk space, so should be un-supported format issue");
+                    String newPath = record.getNewPath();
+                    File temp = new File(newPath);
+                    dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING, localPath, isSecondary);
+                    if (newPath.startsWith(tempRoot) && temp.exists()) {
+                        temp.delete();
+                    }
+                } else {
+                    //record will remain in DB and will be re-compressed next launch
                 }
-            } else {
-                //record will remain in DB and will be re-compressed next launch
+            } catch (Exception ex) {
+                logError("Exception happens, cache folder is deleted: " + ex.toString());
             }
         } else {
             logWarning("Compressed video not exists, remove from DB");
