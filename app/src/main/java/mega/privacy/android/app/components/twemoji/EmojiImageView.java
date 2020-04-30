@@ -96,6 +96,22 @@ public final class EmojiImageView extends AppCompatImageView {
     return currentEmoji;
   }
 
+  public void setEmoji(@NonNull final Emoji emoji, boolean isInfoReaction) {
+    if (!emoji.equals(currentEmoji)) {
+      setImageDrawable(null);
+
+      currentEmoji = emoji;
+      hasVariants = !isInfoReaction;
+
+      if (imageLoadingTask != null) {
+        imageLoadingTask.cancel(true);
+      }
+
+      imageLoadingTask = new ImageLoadingTask(this);
+      imageLoadingTask.execute(emoji);
+    }
+  }
+
   public void setEmoji(@NonNull final Emoji emoji) {
     if (!emoji.equals(currentEmoji)) {
       setImageDrawable(null);

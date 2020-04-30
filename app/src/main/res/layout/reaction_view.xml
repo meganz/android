@@ -5,7 +5,7 @@
     android:layout_height="59dp"
     android:layout_marginLeft="9dp"
     android:layout_marginRight="9dp"
-    android:background="@null"
+    android:background="@color/white"
     android:descendantFocusability="blocksDescendants">
 
     <RelativeLayout

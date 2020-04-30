@@ -857,7 +857,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.ownMessageReactionsLayout = v.findViewById(R.id.own_message_reactions_layout);
             holder.ownMessageReactionsRecycler = v.findViewById(R.id.own_message_reactions_recycler);
+            holder.ownMessageReactionsRecycler.setLayoutManager(new RtlGridLayoutManager(context, MAX_COLUMNS,  RecyclerView.VERTICAL, false));
             ((SimpleItemAnimator) holder.ownMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+            holder.ownMessageReactionsRecycler.setHasFixedSize(false);
+            holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
             holder.ownMessageReactionsLayout.setVisibility(View.GONE);
 
             holder.previewFramePort = v.findViewById(R.id.preview_frame_portrait);
@@ -1058,6 +1061,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactMessageReactionsLayout = v.findViewById(R.id.contact_message_reactions_layout);
             holder.contactMessageReactionsRecycler = v.findViewById(R.id.contact_message_reactions_recycler);
             ((SimpleItemAnimator) holder.contactMessageReactionsRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+            holder.contactMessageReactionsRecycler.setLayoutManager(new GridLayoutManager(context, MAX_COLUMNS, RecyclerView.VERTICAL, false));
+            holder.contactMessageReactionsRecycler.setHasFixedSize(true);
+            holder.contactMessageReactionsRecycler.addItemDecoration(itemDecoration);
             holder.contactMessageReactionsLayout.setVisibility(View.GONE);
 
             holder.contentContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape);
@@ -8498,16 +8504,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (ownMessage) {
             holder.ownMessageReactionsLayout.setVisibility(View.VISIBLE);
-            holder.ownMessageReactionsRecycler.setLayoutManager(new RtlGridLayoutManager(context, MAX_COLUMNS,  RecyclerView.VERTICAL, false));
-            holder.ownMessageReactionsRecycler.setHasFixedSize(false);
-            holder.ownMessageReactionsRecycler.addItemDecoration(itemDecoration);
             holder.ownReactionsAdapter = new ReactionAdapter(context, chatId, megaMessage, list);
             holder.ownMessageReactionsRecycler.setAdapter(holder.ownReactionsAdapter);
         } else {
             holder.contactMessageReactionsLayout.setVisibility(View.VISIBLE);
-            holder.contactMessageReactionsRecycler.setLayoutManager(new GridLayoutManager(context, MAX_COLUMNS, RecyclerView.VERTICAL, false));
-            holder.contactMessageReactionsRecycler.setHasFixedSize(true);
-            holder.contactMessageReactionsRecycler.addItemDecoration(itemDecoration);
             holder.contactReactionsAdapter = new ReactionAdapter(context, chatId, megaMessage, list);
             holder.contactMessageReactionsRecycler.setAdapter(holder.contactReactionsAdapter);
         }
@@ -8525,7 +8525,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contactMessageReactionsLayout.setVisibility(View.GONE);
                 holder.contactMessageReactionsRecycler.setAdapter(null);
                 holder.contactReactionsAdapter = null;
-
             }
             return true;
         }

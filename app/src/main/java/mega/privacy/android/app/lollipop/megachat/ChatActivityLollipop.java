@@ -5722,8 +5722,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
         }
 
-        logDebug("Reaction update");
         adapter.checkReactionUpdated(idChat, message, reaction, count);
+        if(bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded() && bottomSheetDialogFragment instanceof InfoReactionsBottomSheet){
+            ((InfoReactionsBottomSheet) bottomSheetDialogFragment).changeInReactionReceived(msgid, idChat, reaction, count);
+        }
     }
 
     @Override
