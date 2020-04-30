@@ -89,6 +89,7 @@ public class IncomingCallNotification {
                 .addAction(R.drawable.ic_phone_white, context.getString(R.string.notification_incoming_action), pendingIntent)
                 .setFullScreenIntent(pendingIntent, true)
                 .setOngoing(true)
+                .setContentIntent(pendingIntent)
                 .setColor(ContextCompat.getColor(context, R.color.mega))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_CALL);
