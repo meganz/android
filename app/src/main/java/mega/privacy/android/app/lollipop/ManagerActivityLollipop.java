@@ -845,8 +845,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 
 						upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-						if(upAFL!=null){
-							upAFL.showAvailableAccount();
+						if (upAFL != null) {
+							if (drawerItem == DrawerItem.ACCOUNT && accountFragment == UPGRADE_ACCOUNT_FRAGMENT && megaApi.isBusinessAccount()) {
+								closeUpgradeAccountFragment();
+							} else {
+								upAFL.showAvailableAccount();
+							}
 						}
 
 						if(getSettingsFragment() != null){
@@ -854,6 +858,10 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						}
 
 						checkBusinessStatus();
+
+						if (megaApi.isBusinessAccount()) {
+							supportInvalidateOptionsMenu();
+						}
 					}
 				}
 				else if(actionType == UPDATE_CREDIT_CARD_SUBSCRIPTION){
@@ -6828,39 +6836,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						return true;
 		    		}
 					else if (drawerItem == DrawerItem.ACCOUNT){
-
-						switch(accountFragment){
-							case UPGRADE_ACCOUNT_FRAGMENT:{
-								logDebug("Back to MyAccountFragment~ -> drawerItemPreUpgradeAccount");
-
-								setFirstNavigationLevel(true);
-								displayedAccountType=-1;
-								if (drawerItemPreUpgradeAccount != null) {
-									if (drawerItemPreUpgradeAccount == DrawerItem.ACCOUNT) {
-										if (accountFragmentPreUpgradeAccount == -1) {
-											accountFragment = MY_ACCOUNT_FRAGMENT;
-										}
-										else {
-											accountFragment = accountFragmentPreUpgradeAccount;
-										}
-									}
-									drawerItem = drawerItemPreUpgradeAccount;
-								}
-								else {
-									accountFragment = MY_ACCOUNT_FRAGMENT;
-									drawerItem = DrawerItem.ACCOUNT;
-								}
-								selectDrawerItemLollipop(drawerItem);
+						switch (accountFragment) {
+							case UPGRADE_ACCOUNT_FRAGMENT:
+								closeUpgradeAccountFragment();
 								return true;
-							}
-							case CC_FRAGMENT:{
+
+							case CC_FRAGMENT:
 								ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
-								if (ccFL != null){
+								if (ccFL != null) {
 									displayedAccountType = ccFL.getParameterType();
 								}
 								showUpAF();
 								return true;
-							}
 						}
 					}
 				}
@@ -7691,23 +7678,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	    		}
 	    		case UPGRADE_ACCOUNT_FRAGMENT:{
 					logDebug("Back to MyAccountFragment -> drawerItemPreUpgradeAccount");
-					displayedAccountType=-1;
-					if (drawerItemPreUpgradeAccount != null) {
-						if (drawerItemPreUpgradeAccount == DrawerItem.ACCOUNT) {
-							if (accountFragmentPreUpgradeAccount == -1) {
-								accountFragment = MY_ACCOUNT_FRAGMENT;
-							}
-							else {
-								accountFragment = accountFragmentPreUpgradeAccount;
-							}
-						}
-						drawerItem = drawerItemPreUpgradeAccount;
-					}
-					else {
-						accountFragment = MY_ACCOUNT_FRAGMENT;
-						drawerItem = DrawerItem.ACCOUNT;
-					}
-					selectDrawerItemLollipop(drawerItem);
+					closeUpgradeAccountFragment();
 	    			return;
 	    		}
 	    		case CC_FRAGMENT:{
@@ -7755,6 +7726,28 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			super.onBackPressed();
 			return;
 		}
+	}
+
+	private void closeUpgradeAccountFragment() {
+		setFirstNavigationLevel(true);
+		displayedAccountType = -1;
+
+		if (drawerItemPreUpgradeAccount != null) {
+			if (drawerItemPreUpgradeAccount == DrawerItem.ACCOUNT) {
+				if (accountFragmentPreUpgradeAccount == -1) {
+					accountFragment = MY_ACCOUNT_FRAGMENT;
+				} else {
+					accountFragment = accountFragmentPreUpgradeAccount;
+				}
+			}
+
+			drawerItem = drawerItemPreUpgradeAccount;
+		} else {
+			accountFragment = MY_ACCOUNT_FRAGMENT;
+			drawerItem = DrawerItem.ACCOUNT;
+		}
+
+		selectDrawerItemLollipop(drawerItem);
 	}
 
 	public void backToDrawerItem(int item) {
