@@ -83,6 +83,7 @@ public class SetAttrUserListener extends BaseListener {
                 MegaPreferences prefs = dBH.getPreferences();
                 // Database and preference update
                 if (e.getErrorCode() == MegaError.API_OK) {
+                    if (prefs == null) return;
                     if (isSecondary) {
                         resetSecondaryTimeline();
                         dBH.setSecondaryFolderHandle(handle);

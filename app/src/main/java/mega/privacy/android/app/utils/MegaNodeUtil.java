@@ -345,7 +345,10 @@ public class MegaNodeUtil {
             cameraSyncHandle = prefs.getCamSyncHandle();
         }
 
-        if (cameraSyncHandle != null && !cameraSyncHandle.isEmpty() && n.getHandle() == Long.parseLong(cameraSyncHandle)) {
+        long handle = n.getHandle();
+
+        if (cameraSyncHandle != null && !cameraSyncHandle.isEmpty()
+                && handle == Long.parseLong(cameraSyncHandle) && !isNodeInRubbishOrDeleted(handle) ) {
             return true;
         }
 
@@ -354,11 +357,8 @@ public class MegaNodeUtil {
             secondaryMediaHandle = prefs.getMegaHandleSecondaryFolder();
         }
 
-        if (secondaryMediaHandle != null && !secondaryMediaHandle.isEmpty() && n.getHandle() == Long.parseLong(secondaryMediaHandle)) {
-            return true;
-        }
-
-        return false;
+        return secondaryMediaHandle != null && !secondaryMediaHandle.isEmpty()
+                && handle == Long.parseLong(secondaryMediaHandle) && !isNodeInRubbishOrDeleted(handle);
     }
 
     /**
