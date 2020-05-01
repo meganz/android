@@ -3,14 +3,14 @@
     android:id="@+id/reaction_layout"
     android:layout_width="wrap_content"
     android:layout_height="59dp"
-    android:layout_marginLeft="9dp"
-    android:layout_marginRight="9dp"
     android:background="@color/white"
     android:descendantFocusability="blocksDescendants">
 
     <RelativeLayout
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_marginRight="9dp"
+        android:layout_marginLeft="9dp"
         android:layout_centerInParent="true"
         android:background="@drawable/rounded_background">
         <mega.privacy.android.app.components.twemoji.EmojiImageView

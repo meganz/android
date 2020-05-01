@@ -109,6 +109,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         infoReactionsPager = contentView.findViewById(R.id.info_reactions_pager);
         infoReactionsPager.addOnPageChangeListener(this);
         separator = new RelativeLayout(context);
+
         separator.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
 
         final MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, messageId);
@@ -141,7 +142,10 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     private void removeReaction(int position, String reaction){
         if (reactionTabs.get(position).isSelected()) {
             reactionTabs.get(position).setSelected(false);
+            infoReactionsPager.setCurrentItem(0);
+            onPageSelected(0);
         }
+
         reactionTabs.get(position).removeAllViews();
         reactionTabs.remove(position);
     }
@@ -177,7 +181,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         if (reactionTabLastSelectedIndex != i) {
             if (reactionTabLastSelectedIndex >= 0 && reactionTabLastSelectedIndex < reactionTabs.size()) {
                 reactionTabs.get(reactionTabLastSelectedIndex).setSelected(false);
-                if (reactionTabs.get(reactionTabLastSelectedIndex).getChildCount() == 1) {
+                if (reactionTabs.get(reactionTabLastSelectedIndex).getChildCount() > 0) {
                     reactionTabs.get(reactionTabLastSelectedIndex).removeView(separator);
                 }
             }
@@ -189,10 +193,12 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
                 }
                 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(px2dp(40, outMetrics), px2dp(2, outMetrics));
                 lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                lp.leftMargin = px2dp(9,outMetrics);
+                lp.rightMargin = px2dp(9,outMetrics);
                 reactionTabs.get(i).addView(separator, lp);
             }
             reactionTabLastSelectedIndex = i;
-            reactionTabs.get(i).getParent().requestChildFocus(reactionTabs.get(i), reactionTabs.get(i));
+//            reactionTabs.get(i).getParent().requestChildFocus(reactionTabs.get(i), reactionTabs.get(i));
         }
     }
 
@@ -211,9 +217,17 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
                     list.remove(i);
                     if (reactionsPageAdapter != null) {
                         removeView(reactionsPageAdapter.getView(i));
-                        reactionsPageAdapter.notifyDataSetChanged();
+//                        reactionsPageAdapter.notifyDataSetChanged();
                     } else {
                         reactionsPageAdapter = new InfoReactionPagerAdapter(context, list, messageId, chatId);
+                    }
+
+                    for(int j =0; j<reactionTabs.size(); j++ ){
+                        if(reactionTabs.get(j).isSelected()){
+                            infoReactionsPager.setCurrentItem(j);
+                            onPageSelected(j);
+                            break;
+                        }
                     }
                     break;
                 }
@@ -221,19 +235,6 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
 
             if (reactionTabs.size() == 0) {
                 dismissAllowingStateLoss();
-            } else {
-
-                boolean isAnyTabSelected = false;
-                for (int i = 0; i < reactionTabs.size(); i++) {
-                    if (reactionTabs.get(i).isSelected()) {
-                        isAnyTabSelected = true;
-                        break;
-                    }
-                }
-                if (!isAnyTabSelected) {
-                    infoReactionsPager.setCurrentItem(0);
-                    onPageSelected(0);
-                }
             }
         } else {
             //Found the reaction:
@@ -280,7 +281,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
      * @param defunctPage
      */
     public void removeView (View defunctPage) {
-        int pageIndex = reactionsPageAdapter.removeView (infoReactionsPager, defunctPage);
+        reactionsPageAdapter.removeView (infoReactionsPager, defunctPage);
     }
 
     /**
