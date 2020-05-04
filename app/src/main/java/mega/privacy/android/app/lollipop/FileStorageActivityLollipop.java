@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,6 +23,7 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -68,6 +70,7 @@ import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.SDCardOperator;
 
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
@@ -1167,5 +1170,60 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				actionMode = startSupportActionMode(new ActionBarCallBack());
 			}
 		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
+
+		if (requestCode == REQUEST_CODE_TREE) {
+			if (intent == null) {
+				logDebug("intent NULL");
+				if (resultCode != Activity.RESULT_OK) {
+					if (isBasedOnFileStorage()) {
+						showSnackbar(viewContainer, getString(R.string.download_requires_permission));
+					}
+				} else {
+					onCannotWriteOnSDCard();
+				}
+				return;
+			}
+
+			Uri treeUri = intent.getData();
+			if (treeUri != null) {
+				DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
+				if (pickedDir != null && pickedDir.canWrite()) {
+					logDebug("sd card uri is " + treeUri);
+					dbH.setSDCardUri(treeUri.toString());
+					SDCardOperator sdCardOperator = null;
+					try {
+						sdCardOperator = new SDCardOperator(this);
+					} catch (SDCardOperator.SDCardException e) {
+						e.printStackTrace();
+						logError("SDCardOperator initialize failed", e);
+					}
+					if (sdCardOperator != null) {
+						if (isBasedOnFileStorage()) {
+							sdRoot = sdCardOperator.getSDCardRoot();
+							path = new File(sdRoot);
+							checkPath();
+						} else {
+							path = new File(getFullPathFromTreeUri(treeUri, this));
+							finishPickFolder();
+						}
+					} else {
+						onCannotWriteOnSDCard();
+					}
+				}
+			} else {
+				logDebug("tree uri is null!");
+				onCannotWriteOnSDCard();
+			}
+		}
+	}
+
+	private void onCannotWriteOnSDCard() {
+		showSnackbar(viewContainer, getString(R.string.no_external_SD_card_detected));
+		new Handler().postDelayed(this::openPickFromInternalStorage, 2000);
 	}
 }

@@ -54,7 +54,7 @@ public class SelectDownloadLocationDialog {
     protected DatabaseHandler dbH;
 
     public enum From {
-        NORMAL, SETTINGS, FILE_LINK, FOLDER_LINK, CHAT
+        NORMAL, FILE_LINK, FOLDER_LINK, CHAT
     }
 
     protected NodeController nodeController;
@@ -127,9 +127,6 @@ public class SelectDownloadLocationDialog {
         switch (from) {
             case NORMAL:
                 nodeController.requestLocalFolder(downloadInfo, sdRoot, null);
-                break;
-            case SETTINGS:
-                settingsFragment.toSelectFolder(sdRoot);
                 break;
             case FILE_LINK:
                 nodeController.intentPickFolder(document, url, sdRoot);
