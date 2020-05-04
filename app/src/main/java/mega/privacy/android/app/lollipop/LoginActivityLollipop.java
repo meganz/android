@@ -13,13 +13,15 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -42,13 +44,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 
-import static mega.privacy.android.app.utils.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -88,7 +89,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     private MegaApiAndroid megaApi;
     private MegaApiAndroid megaApiFolder;
 
-    private android.support.v7.app.AlertDialog alertDialogTransferOverquota;
+    private androidx.appcompat.app.AlertDialog alertDialogTransferOverquota;
 
     boolean waitingForConfirmAccount = false;
     String emailTemp = null;
@@ -351,13 +352,13 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
     public void showAlertIncorrectRK() {
         logDebug("showAlertIncorrectRK");
-        final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+        final androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
 
         dialogBuilder.setTitle(getString(R.string.incorrect_MK_title));
         dialogBuilder.setMessage(getString(R.string.incorrect_MK));
         dialogBuilder.setCancelable(false);
 
-        dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new android.content.DialogInterface.OnClickListener() {
+        dialogBuilder.setPositiveButton(getString(R.string.general_ok), new android.content.DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -365,7 +366,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
         });
 
-        android.support.v7.app.AlertDialog alert = dialogBuilder.create();
+        androidx.appcompat.app.AlertDialog alert = dialogBuilder.create();
         alert.show();
     }
 
@@ -373,12 +374,12 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         logDebug("showAlertLoggedOut");
         ((MegaApplication) getApplication()).setEsid(false);
         if(!isFinishing()){
-            final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+            final androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
 
             dialogBuilder.setTitle(getString(R.string.title_alert_logged_out));
             dialogBuilder.setMessage(getString(R.string.error_server_expired_session));
 
-            dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new android.content.DialogInterface.OnClickListener() {
+            dialogBuilder.setPositiveButton(getString(R.string.general_ok), new android.content.DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -386,7 +387,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 }
             });
 
-            android.support.v7.app.AlertDialog alert = dialogBuilder.create();
+            androidx.appcompat.app.AlertDialog alert = dialogBuilder.create();
             alert.show();
         }
     }
@@ -404,7 +405,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         }
 
         if(show){
-            android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+            androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
 
             LayoutInflater inflater = this.getLayoutInflater();
             View dialogView = inflater.inflate(R.layout.transfer_overquota_layout_not_logged, null);
@@ -510,7 +511,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
         builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
@@ -604,135 +605,24 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         setIntent(null);
     }
 
-    boolean loggerPermissionKarere = false;
-    boolean loggerPermissionSDK = false;
-
+    @Override
     public void showConfirmationEnableLogsKarere() {
-        logDebug("showConfirmationEnableLogsKarere");
-
         if (loginFragment != null) {
             loginFragment.numberOfClicksKarere = 0;
         }
 
         loginActivity = this;
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:{
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                            if (!hasStoragePermission) {
-                                loggerPermissionKarere = true;
-                                ActivityCompat.requestPermissions(loginActivity,
-                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        REQUEST_WRITE_STORAGE);
-                            } else {
-                                enableLogsKarere();
-                            }
-                        } else {
-                            enableLogsKarere();
-                        }
-                        break;
-                    }
-
-                    case DialogInterface.BUTTON_NEGATIVE: {
-                        break;
-                    }
-                }
-            }
-        };
-
-        android.support.v7.app.AlertDialog.Builder builder;
-        builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+        super.showConfirmationEnableLogsKarere();
     }
 
+    @Override
     public void showConfirmationEnableLogsSDK() {
-        logDebug("showConfirmationEnableLogsSDK");
-
         if (loginFragment != null) {
             loginFragment.numberOfClicksSDK = 0;
         }
 
         loginActivity = this;
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:{
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                            if (!hasStoragePermission) {
-                                loggerPermissionSDK = true;
-                                ActivityCompat.requestPermissions(loginActivity,
-                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                        REQUEST_WRITE_STORAGE);
-                            } else {
-                                enableLogsSDK();
-                            }
-                        } else {
-                            enableLogsSDK();
-                        }
-                        break;
-                    }
-
-                    case DialogInterface.BUTTON_NEGATIVE: {
-                        break;
-                    }
-                }
-            }
-        };
-
-        android.support.v7.app.AlertDialog.Builder builder;
-        builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        logDebug("onRequestPermissionsResult");
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
-            case REQUEST_WRITE_STORAGE:{
-                if (loggerPermissionKarere){
-                    loggerPermissionKarere = false;
-                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                        enableLogsKarere();
-                    }
-                }
-                else if (loggerPermissionSDK){
-                    loggerPermissionSDK = false;
-                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                        enableLogsSDK();
-                    }
-                }
-            }
-        }
-    }
-
-    public void enableLogsSDK() {
-        logDebug("enableLogsSDK");
-
-        dbH.setFileLoggerSDK(true);
-        setFileLoggerSDK(true);
-        MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-        showSnackbar(getString(R.string.settings_enable_logs));
-        logDebug("App Version: " + getVersion(this));
-    }
-
-    public void enableLogsKarere() {
-        logDebug("enableLogsKarere");
-
-        dbH.setFileLoggerKarere(true);
-        setFileLoggerKarere(true);
-        MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-        showSnackbar(getString(R.string.settings_enable_logs));
-        logDebug("App Version: " + getVersion(this));
+        super.showConfirmationEnableLogsSDK();
     }
 
     public void setWaitingForConfirmAccount(boolean waitingForConfirmAccount) {

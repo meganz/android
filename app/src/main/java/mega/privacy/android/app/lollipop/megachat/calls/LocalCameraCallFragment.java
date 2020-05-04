@@ -4,22 +4,25 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
 import java.nio.ByteBuffer;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
+
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-
+import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
 public class LocalCameraCallFragment extends Fragment implements MegaChatVideoListenerInterface {
 
@@ -32,8 +35,6 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     private long chatId;
     private MegaSurfaceRenderer localRenderer;
     private ImageView microIcon;
-
-
 
     public static LocalCameraCallFragment newInstance(long chatId) {
         logDebug("Chat ID "+chatId);
@@ -95,7 +96,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
                         holderHeight = viewHeight;
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
-                    this.bitmap = localRenderer.CreateBitmap(width, height);
+                    this.bitmap = localRenderer.createBitmap(width, height);
                     holder.setFixedSize(holderWidth, holderHeight);
                 } else {
                     this.width = -1;
@@ -106,9 +107,11 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         }
 
         if (bitmap == null) return;
-        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-        localRenderer.DrawBitmap(true, true);
 
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+        if (isVideoAllowed()) {
+            localRenderer.drawBitmap(true, true);
+        }
     }
 
     @Override

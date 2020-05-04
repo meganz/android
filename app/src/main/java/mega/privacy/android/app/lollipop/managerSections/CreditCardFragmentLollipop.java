@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -41,6 +41,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 
 public class CreditCardFragmentLollipop extends Fragment implements MegaRequestListenerInterface, OnClickListener, OnItemSelectedListener{
 	
@@ -546,7 +547,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 		
 			case 1:{
 				
-				((ManagerActivityLollipop)context).launchPayment(ManagerActivityLollipop.SKU_PRO_I_YEAR);
+				((ManagerActivityLollipop)context).launchPayment(SKU_PRO_I_YEAR);
 				
 //				for (int i=0;i<accounts.size();i++){
 //					
@@ -584,7 +585,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 				break;
 			}			
 			case 4:{
-				((ManagerActivityLollipop)context).launchPayment(ManagerActivityLollipop.SKU_PRO_LITE_YEAR);
+				((ManagerActivityLollipop)context).launchPayment(SKU_PRO_LITE_YEAR);
 				break;
 			}
 			

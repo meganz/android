@@ -22,6 +22,7 @@ import mega.privacy.android.app.jobservices.CameraUploadsService;
 import nz.mega.sdk.MegaApiJava;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 
 @TargetApi(21)
 public class JobUtil {
@@ -75,7 +76,7 @@ public class JobUtil {
 
     public static synchronized void startCameraUploadService(Context context) {
         boolean isOverQuota = isOverquota(context);
-        boolean hasReadPermission = Util.hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
+        boolean hasReadPermission = hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
         boolean isEnabled = isCameraUploadEnabled(context);
         logDebug("isOverQuota:" + isOverQuota +
                 ", hasStoragePermission:" + hasReadPermission +

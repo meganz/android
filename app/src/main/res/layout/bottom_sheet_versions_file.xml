@@ -90,7 +90,7 @@
         android:layout_marginLeft="16dp"
         android:background="@color/sliding_panel_separator"/>
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical">
@@ -134,6 +134,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/separator_revert"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
@@ -171,7 +172,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/separator_revert"
+                android:id="@+id/separator_delete"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
@@ -209,5 +210,5 @@
                     android:textSize="16sp"/>
             </LinearLayout>
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

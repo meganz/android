@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -33,15 +34,18 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
+import androidx.annotation.Nullable;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.core.content.ContextCompat;
+import android.text.Html;
+import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
-import android.support.v4.content.FileProvider;
+import androidx.core.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -72,7 +76,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
@@ -90,22 +93,29 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
+import static com.google.android.material.textfield.TextInputLayout.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
-import static android.content.Context.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class Util {
 
@@ -120,21 +130,6 @@ public class Util {
 	
 	// Debug flag to enable logging and some other things
 	public static boolean DEBUG = false;
-
-	public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
-	public static String base64EncodedPublicKey_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
-	public static String base64EncodedPublicKey_3 = "55k9FIh3vDXXTHJn4oM9JwFwbcZf1zmVLyes5ld7+G15SZ7QmCchqfY4N/a/qVcGFsfwqm";
-	public static String base64EncodedPublicKey_4 = "RU3VzOUwAYHb4mV/frPctPIRlJbzwCXpe3/mrcsAP+k6ECcd19uIUCPibXhsTkNbAk8CRkZ";
-	public static String base64EncodedPublicKey_5 = "KOy+czuZWfjWYx3Mp7srueyQ7xF6/as6FWrED0BlvmhJYj0yhTOTOopAXhGNEk7cUSFxqP2FKYX8e3pHm/uNZvKcSrLXbLUhQnULhn4WmKOQIDAQAB";
-	
-	/*public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlxJdfjvhsCAK1Lu5n6WtQf";
-	public static String base64EncodedPublicKey_2 = "MkjjOUCDDuM7zeiS3jsfCghG1bpwMmD4E8vQfPboyYtQBftdEG5GbWrqWJL+z6M/2SN";
-	public static String base64EncodedPublicKey_3 = "+6pHqExFw8fjzP/4/CDzHLhmITKTOegm/6cfMUWcrghZuiHKfM6n4vmNYrHy4Bpx68RJW+J4B";
-	public static String base64EncodedPublicKey_4 = "wL6PWE8ZGGeeJmU0eAJeRJMsNEwMrW2LATnIoJ4/qLYU4gKDINPMRaIE6/4pQnbd2NurWm8ZQT7XSMQZcisTqwRLS";
-	public static String base64EncodedPublicKey_5 = "YgjYKCXtjloP8QnKu0IGOoo79Cfs3Z9eC3sQ1fcLQsMM2wExlbnYI2KPTs0EGCmcMXrrO5MimGjYeW8GQlrKsbiZ0UwIDAQAB";
-	*/
-	public static boolean fileLoggerSDK = false;
-	public static boolean fileLoggerKarere = false;
 
 	public static HashMap<String, String> countryCodeDisplay;
 
@@ -512,19 +507,19 @@ public class Util {
 
 		Context context = MegaApplication.getInstance().getApplicationContext();
 		if (size < KB){
-			sizeString = size + " " + context.getString(R.string.label_file_size_byte);
+			sizeString = context.getString(R.string.label_file_size_byte, Long.toString(size));
 		}
 		else if (size < MB){
-			sizeString = decf.format(size/KB) + " " + context.getString(R.string.label_file_size_kilo_byte);
+			sizeString = context.getString(R.string.label_file_size_kilo_byte, decf.format(size/KB));
 		}
 		else if (size < GB){
-			sizeString = decf.format(size/MB) + " " + context.getString(R.string.label_file_size_mega_byte);
+			sizeString = context.getString(R.string.label_file_size_mega_byte, decf.format(size/MB));
 		}
 		else if (size < TB){
-			sizeString = decf.format(size/GB) + " " + context.getString(R.string.label_file_size_giga_byte);
+			sizeString = context.getString(R.string.label_file_size_giga_byte, decf.format(size/GB));
 		}
 		else{
-			sizeString = decf.format(size/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
+			sizeString = context.getString(R.string.label_file_size_tera_byte, decf.format(size/TB));
 		}
 		
 		return sizeString;
@@ -538,38 +533,13 @@ public class Util {
 
 		Context context = MegaApplication.getInstance().getApplicationContext();
         if (gbSize < TB){
-            sizeString = decf.format(gbSize) + " " + context.getString(R.string.label_file_size_giga_byte);
+            sizeString = context.getString(R.string.label_file_size_giga_byte, decf.format(gbSize));
         }
         else{
-            sizeString = decf.format(gbSize/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
+            sizeString = context.getString(R.string.label_file_size_tera_byte, decf.format(gbSize/TB));
         }
 
         return sizeString;
-    }
-
-	public static String getDateString(long date){
-		DateFormat datf = DateFormat.getDateTimeInstance();
-		String dateString = "";
-		
-		dateString = datf.format(new Date(date*1000));
-		
-		return dateString;
-	}
-
-	public static void setFileLoggerSDK(boolean fL){
-		fileLoggerSDK = fL;
-	}
-
-	public static boolean getFileLoggerSDK(){
-		return fileLoggerSDK;
-	}
-
-	public static void setFileLoggerKarere(boolean fL){
-		fileLoggerKarere = fL;
-	}
-
-    public static boolean getFileLoggerKarere(){
-        return fileLoggerKarere;
     }
 
 	public static void brandAlertDialog(AlertDialog dialog) {
@@ -1213,16 +1183,33 @@ public class Util {
 		return null;
 	}
 
-	public static void showAlert(Context context, String message, String title) {
-		logDebug("showAlert");
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		if(title!=null){
-			builder.setTitle(title);
-		}
-		builder.setMessage(message);
-		builder.setPositiveButton("OK",null);
-		builder.show();
-	}
+    public static AlertDialog showAlert(Context context, String message, String title) {
+        logDebug("showAlert");
+        return showAlert(context, message, title, null);
+    }
+
+    /**
+     * Show a simple alert dialog with a 'OK' button to dismiss itself.
+     *
+     * @param context Context
+     * @param message the text content.
+     * @param title the title of the dialog, optional.
+     * @param listener callback when press 'OK' button, optional.
+     * @return the created alert dialog, the caller should cancel the dialog when the context destoried, otherwise window will leak.
+     */
+    public static AlertDialog showAlert(Context context, String message, @Nullable String title, @Nullable DialogInterface.OnDismissListener listener) {
+        logDebug("showAlert");
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        if (title != null) {
+            builder.setTitle(title);
+        }
+        builder.setMessage(message);
+        builder.setPositiveButton(context.getString(R.string.general_ok), null);
+        if (listener != null) {
+            builder.setOnDismissListener(listener);
+        }
+        return builder.show();
+    }
 
 	public static long calculateTimestampMinDifference(String timeStamp) {
 		logDebug("calculateTimestampDifference");
@@ -1238,12 +1225,37 @@ public class Util {
 		return difference;
 	}
 
-	public static int getVersion(Context context) {
+	public static int getVersion() {
 		try {
+			Context context = MegaApplication.getInstance().getApplicationContext();
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_META_DATA);
 			return pInfo.versionCode;
 		} catch (PackageManager.NameNotFoundException e) {
 			return 0;
+		}
+	}
+
+	/**
+	 * Checks if the app has been upgraded and store the new version code.
+	 */
+	public static void checkAppUpgrade() {
+		final String APP_INFO_FILE = "APP_INFO";
+		final String APP_VERSION_CODE_KEY = "APP_VERSION_CODE";
+
+		Context context = MegaApplication.getInstance().getApplicationContext();
+		SharedPreferences preferences = context.getSharedPreferences(APP_INFO_FILE, Context.MODE_PRIVATE);
+
+		int oldVersionCode = preferences.getInt(APP_VERSION_CODE_KEY, 0);
+		int newVersionCode = getVersion();
+		if (oldVersionCode == 0 || oldVersionCode < newVersionCode) {
+			if (oldVersionCode == 0) {
+				logInfo("App Version: " + newVersionCode);
+			} else {
+				logInfo("App upgraded from " + oldVersionCode + " to " + newVersionCode);
+			}
+			preferences.edit().putInt(APP_VERSION_CODE_KEY, newVersionCode).apply();
+		} else {
+			logInfo("App Version: " + newVersionCode);
 		}
 	}
 
@@ -1274,76 +1286,12 @@ public class Util {
 		return cal;
 	}
 
-	public static boolean isChatEnabled (){
-		logDebug("isChatEnabled");
-		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-		ChatSettings chatSettings = dbH.getChatSettings();
-		boolean chatEnabled;
-
-		if(chatSettings!=null){
-			if(chatSettings.getEnabled()!=null){
-				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-				logDebug("A - chatEnabled: " + chatEnabled);
-				return chatEnabled;
-			}
-			else{
-				chatEnabled=true;
-				logDebug("B - chatEnabled: " + chatEnabled);
-				return chatEnabled;
-			}
-		}
-		else{
-			chatEnabled=true;
-			logDebug("C - chatEnabled: " + chatEnabled);
-			return chatEnabled;
-		}
-	}
-
 	public static boolean canVoluntaryVerifyPhoneNumber() {
         MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
 	    boolean hasNotVerified = api.smsVerifiedPhoneNumber() == null;
 	    boolean allowVerify = api.smsAllowedState() == 2;
 	    return hasNotVerified && allowVerify;
     }
-
-	public static void resetAndroidLogger(){
-
-		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-
-		boolean fileLogger = false;
-
-		DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-
-		if (dbH != null) {
-			MegaAttributes attrs = dbH.getAttributes();
-			if (attrs != null) {
-				if (attrs.getFileLoggerSDK() != null) {
-					try {
-						fileLogger = Boolean.parseBoolean(attrs.getFileLoggerSDK());
-					} catch (Exception e) {
-						fileLogger = false;
-					}
-				} else {
-					fileLogger = false;
-				}
-			} else {
-				fileLogger = false;
-			}
-		}
-
-		if (Util.DEBUG){
-			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-		}
-		else {
-			setFileLoggerSDK(fileLogger);
-			if (fileLogger) {
-				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-			} else {
-				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-			}
-		}
-	}
 
 	public static Bitmap getCircleBitmap(Bitmap bitmap) {
 		final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
@@ -1464,27 +1412,23 @@ public class Util {
 			}
 		}
 	}
-
-	public static void changeStatusBarColor(Context context, Window window, int color) {
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.setStatusBarColor(ContextCompat.getColor(context, color));
-	}
-
-    public static Bitmap createAvatarBackground(String colorString) {
+    public static Bitmap createAvatarBackground(int color) {
         Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(circle);
         Paint paintCircle = new Paint();
         paintCircle.setAntiAlias(true);
-        int color = (colorString == null) ?
-                ContextCompat.getColor(MegaApplication.getInstance().getApplicationContext(), R.color.lollipop_primary_color) :
-                Color.parseColor(colorString);
         paintCircle.setColor(color);
         int radius = circle.getWidth() / 2;
         c.drawCircle(radius, radius, radius, paintCircle);
         return circle;
     }
-    
+
+    public static void changeStatusBarColor(Context context, Window window, int color) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(ContextCompat.getColor(context, color));
+    }
+
 	public static MegaPreferences getPreferences (Context context) {
 		return DatabaseHandler.getDbHandler(context).getPreferences();
 	}
@@ -1518,28 +1462,73 @@ public class Util {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public static void showSnackBar(Context context,int snackbarType,String message,int idChat) {
-        if (context instanceof ChatFullScreenImageViewer) {
-            ((ChatFullScreenImageViewer)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof AudioVideoPlayerLollipop) {
-            ((AudioVideoPlayerLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof PdfViewerActivityLollipop) {
-            ((PdfViewerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof ChatActivityLollipop) {
-            ((ChatActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof NodeAttachmentHistoryActivity) {
-            ((NodeAttachmentHistoryActivity)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
-        } else if (context instanceof BaseActivity) {
-            View rootView = getRootViewFromContext(context);
-            if (rootView == null) {
-				logWarning("Unable to show snack bar, view does not exist");
-            } else {
-                ((BaseActivity)context).showSnackbar(snackbarType,rootView,message,idChat);
-            }
-        }
-    }
+    /**
+     * Method to display a NOT_SPACE_SNACKBAR_TYPE Snackbar
+     *
+     * Use this method only from controllers or services or when ut does not know what the context is.
+     *
+     * @param context Class where the Snackbar has to be shown
+     */
+	public static void showNotEnoughSpaceSnackbar(Context context) {
+		showSnackbar(context, NOT_SPACE_SNACKBAR_TYPE, null, INVALID_HANDLE);
+	}
+
+    /**
+     * Method to display a simple Snackbar
+     *
+     * Use this method only from controllers or services or when ut does not know what the context is.
+     *
+     * @param context Class where the Snackbar has to be shown
+     * @param message Text to shown in the snackbar
+     */
+	public static void showSnackbar(Context context, String message) {
+		showSnackbar(context, SNACKBAR_TYPE, message, INVALID_HANDLE);
+	}
+
+    /**
+     * Method to display a simple or action Snackbar.
+     *
+     * Use this method only from controllers or services or when ut does not know what the context is.
+     *
+     * @param context Class where the Snackbar has to be shown
+     * @param snackbarType specifies the type of the Snackbar.
+     *                     It can be SNACKBAR_TYPE, MESSAGE_SNACKBAR_TYPE or NOT_SPACE_SNACKBAR_TYPE
+     * @param message Text to shown in the snackbar
+     * @param idChat Chat ID. If this param has a valid value, different to -1, the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat
+     */
+	public static void showSnackbar(Context context, int snackbarType, String message, long idChat) {
+		if (context instanceof FullScreenImageViewerLollipop) {
+			((FullScreenImageViewerLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof FileInfoActivityLollipop) {
+			((FileInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof ContactFileListActivityLollipop) {
+			((ContactFileListActivityLollipop) context).showSnackbar(snackbarType, message);
+		} else if (context instanceof ContactInfoActivityLollipop) {
+			((ContactInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof GetLinkActivityLollipop) {
+			((GetLinkActivityLollipop) context).showSnackbar(message);
+		} else if (context instanceof ChatFullScreenImageViewer) {
+			((ChatFullScreenImageViewer) context).showSnackbar(snackbarType, message);
+		} else if (context instanceof AudioVideoPlayerLollipop) {
+			((AudioVideoPlayerLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof PdfViewerActivityLollipop) {
+			((PdfViewerActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof ChatActivityLollipop) {
+			((ChatActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof NodeAttachmentHistoryActivity) {
+			((NodeAttachmentHistoryActivity) context).showSnackbar(snackbarType, message);
+		} else if (context instanceof ManagerActivityLollipop) {
+			((ManagerActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
+		} else if (context instanceof BaseActivity) {
+			View rootView = getRootViewFromContext(context);
+			if (rootView != null) {
+				((BaseActivity) context).showSnackbar(snackbarType, rootView, message, idChat);
+				return;
+			}
+
+			logWarning("Unable to show snack bar, view does not exist or context is not instance of BaseActivity");
+		}
+	}
 
     private static View getRootViewFromContext(Context context) {
         BaseActivity activity = (BaseActivity)context;
@@ -1623,7 +1612,6 @@ public class Util {
 	}
 
 	public static void hideKeyboard(Activity activity, int flag){
-
 		View v = activity.getCurrentFocus();
 		if (v != null){
 			InputMethodManager imm = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
@@ -1632,17 +1620,12 @@ public class Util {
 	}
 
 	public static void hideKeyboardView(Context context, View v, int flag){
-
 		if (v != null){
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
 		}
 
 	}
-
-	public static boolean isPermissionGranted(Context context, String permission){
-        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
-    }
 
 	public static boolean isScreenInPortrait(Context context) {
 		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -1719,47 +1702,52 @@ public class Util {
 		return url;
 	}
 
-    public static boolean hasPermissions(Context context, String... permissions) {
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-			return true;
-		}
-
-		if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-	public static void requestPermission(Activity activity, int requestCode, String... permission) {
-		ActivityCompat.requestPermissions(activity,
-				permission,
-				requestCode);
+    /**
+     * Convert color integer to corresponding string in hex format.
+     *
+     * @param color An integer which represents a color.
+     * @return The color string in hex format, e.g., #FFABCDEF.
+     */
+	public static String getHexValue(int color){
+		return String.format("#%06X", 0xFFFFFF & color);
 	}
 
     public static void showKeyboardDelayed(final View view) {
-		logDebug("showKeyboardDelayed");
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                InputMethodManager imm =
-						(InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-            }
-        }, 50);
+		Handler handler = new Handler();
+        handler.postDelayed(() -> {
+			InputMethodManager imm =
+					(InputMethodManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+		}, 50);
     }
+
+    public static Spanned getSpannedHtmlText(String string) {
+
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
+		}
+
+		return Html.fromHtml(string);
+	}
+
+	public static void checkTakePicture(Activity activity, int option) {
+		if (isNecessaryDisableLocalCamera() != -1) {
+			if(option == TAKE_PHOTO_CODE) {
+				showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE, false);
+			}else if(option == TAKE_PICTURE_PROFILE_CODE){
+				showConfirmationOpenCamera(activity, ACTION_TAKE_PROFILE_PICTURE, false);
+			}
+			return;
+		}
+		takePicture(activity, option);
+	}
 
 	/**
 	 * This method is to start camera from Activity
 	 *
 	 * @param activity the activity the camera would start from
 	 */
-	public static void takePicture(Activity activity) {
+	public static void takePicture(Activity activity, int option) {
 		logDebug("takePicture");
 		File newFile = buildTempFile(activity, "picture.jpg");
 		try {
@@ -1772,7 +1760,7 @@ public class Util {
 		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 		cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		activity.startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+		activity.startActivityForResult(cameraIntent, option);
 	}
 
 	public static void resetActionBar(ActionBar aB) {
@@ -1791,5 +1779,14 @@ public class Util {
 
 	public static boolean isAndroid10() {
 		return Build.VERSION.SDK_INT >= ANDROID_10_Q;
+	}
+
+	public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus){
+		if (focus) {
+			textInputLayout.setEndIconMode(END_ICON_PASSWORD_TOGGLE);
+			textInputLayout.setEndIconDrawable(R.drawable.password_toggle);
+		} else {
+			textInputLayout.setEndIconMode(END_ICON_NONE);
+		}
 	}
 }

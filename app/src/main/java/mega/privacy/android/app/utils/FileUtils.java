@@ -5,10 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -37,7 +38,9 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class FileUtils {
 
@@ -50,6 +53,9 @@ public class FileUtils {
     public static final String OLD_MK_FILE = MAIN_DIR + File.separator + "MEGAMasterKey.txt";
 
     public static final String OLD_RK_FILE = MAIN_DIR + File.separator + "MEGARecoveryKey.txt";
+
+    private static final String VOLUME_EXTERNAL = "external";
+    private static final String VOLUME_INTERNAL = "internal";
 
     public static String getRecoveryKeyFileName() {
         return MegaApplication.getInstance().getApplicationContext().getString(R.string.general_rk) + ".txt";
@@ -77,7 +83,7 @@ public class FileUtils {
     }
 
     public static boolean isOnMegaDownloads(Context context, MegaNode node) {
-        File f = new File(getDownloadLocation(context), node.getName());
+        File f = new File(getDownloadLocation(), node.getName());
 
         if (isFileAvailable(f) && f.length() == node.getSize()) {
             return true;
@@ -113,7 +119,7 @@ public class FileUtils {
             return true;
         }
 
-        ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
         return false;
     }
 
@@ -126,10 +132,10 @@ public class FileUtils {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         activityManager.getMemoryInfo(mi);
 
-        if (mi.totalMem > Constants.BUFFER_COMP) {
-            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+        if (mi.totalMem > BUFFER_COMP) {
+            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
         } else {
-            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
         }
 
         String url = megaApi.httpServerGetLocalLink(node);
@@ -141,7 +147,7 @@ public class FileUtils {
             }
         }
 
-        ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
         return false;
     }
 
@@ -303,115 +309,56 @@ public class FileUtils {
         return size;
     }
 
-    public static String getLocalFile(Context context, String fileName, long fileSize,
-                                      String destDir)
-    {
-        Cursor cursor = null;
-        try
-        {
-            if(MimeTypeList.typeForName(fileName).isImage())
-            {
-                final String[] projection = { MediaStore.Images.Media.DATA };
-                final String selection = MediaStore.Images.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Images.Media.SIZE + " = ?";
-                final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
+    /**
+     * Checks if a local file exists
+     *
+     * @param context   the current context
+     * @param fileName  name of the file
+     * @param fileSize  size of the file
+     * @return The path of the file if the local file exists, null otherwise
+     */
+    public static String getLocalFile(Context context, String fileName, long fileSize) {
+        String data = MediaStore.Files.FileColumns.DATA;
+        final String[] projection = {data};
+        final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND " + MediaStore.Files.FileColumns.SIZE + " = ?";
+        final String[] selectionArgs = {fileName, String.valueOf(fileSize)};
+        Cursor cursor = context.getContentResolver().query(
+                MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection,
+                selectionArgs, null);
 
-                cursor = context.getContentResolver().query(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()){
-                        return path;
-                    }
-                }
-                if(cursor != null) cursor.close();
-
-                cursor = context.getContentResolver().query(
-                        MediaStore.Images.Media.INTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()) return path;
-                }
-                if(cursor != null) cursor.close();
-            }
-            else if(MimeTypeList.typeForName(fileName).isVideoReproducible())
-            {
-                final String[] projection = { MediaStore.Video.Media.DATA };
-                final String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Video.Media.SIZE + " = ?";
-                final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
-
-                cursor = context.getContentResolver().query(
-                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()) return path;
-                }
-                if(cursor != null) cursor.close();
-
-                cursor = context.getContentResolver().query(
-                        MediaStore.Video.Media.INTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()) return path;
-                }
-                if(cursor != null) cursor.close();
-            }
-            else if (MimeTypeList.typeForName(fileName).isAudio()) {
-                final String[] projection = { MediaStore.Audio.Media.DATA };
-                final String selection = MediaStore.Audio.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Audio.Media.SIZE + " = ?";
-                final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
-
-                cursor = context.getContentResolver().query(
-                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()) return path;
-                }
-                if(cursor != null) cursor.close();
-
-                cursor = context.getContentResolver().query(
-                        MediaStore.Video.Media.INTERNAL_CONTENT_URI, projection, selection,
-                        selectionArgs, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
-                    String path =  cursor.getString(dataColumn);
-                    cursor.close();
-                    cursor = null;
-                    if(new File(path).exists()) return path;
-                }
-                if(cursor != null) cursor.close();
-            }
-        } catch (Exception e)
-        {
-            if(cursor != null) cursor.close();
+        String path = checkFileInStorage(cursor, data);
+        if (path == null) {
+            cursor = context.getContentResolver().query(
+                    MediaStore.Files.getContentUri(VOLUME_INTERNAL), projection, selection,
+                    selectionArgs, null);
+            path = checkFileInStorage(cursor, data);
         }
 
-        //Not found, searching in the download folder
-        if(destDir != null)
-        {
-            File file = new File(destDir, fileName);
-            if(file.exists() && (file.length() == fileSize))
-                return file.getAbsolutePath();
+        return path;
+    }
+
+    /**
+     * Searches in the correspondent storage established if the file exists
+     *
+     * @param cursor    Cursor which contains all the requirements to find the file
+     * @param data      Column name in which search
+     * @return The path of the file if exists
+     */
+    private static String checkFileInStorage(Cursor cursor, String data) {
+        if (cursor != null && cursor.moveToFirst()) {
+            int dataColumn = cursor.getColumnIndexOrThrow(data);
+            String path = cursor.getString(dataColumn);
+            cursor.close();
+            cursor = null;
+            if (new File(path).exists()) {
+                return path;
+            }
         }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+
         return null;
     }
 
@@ -478,8 +425,8 @@ public class FileUtils {
         return false;
     }
 
-    public static String getDownloadLocation (Context context) {
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+    public static String getDownloadLocation () {
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(MegaApplication.getInstance());
         MegaPreferences prefs = dbH.getPreferences();
 
         if (prefs != null
@@ -632,6 +579,8 @@ public class FileUtils {
         return result;
     }
 
+
+
     /**
      * @param fileName The original file name
      * @return the file name without extension. For example, 1.jpg would return 1
@@ -658,6 +607,121 @@ public class FileUtils {
             title += ".pdf";
         }
         return title;
+    }
+
+    /**
+     * Gets the uri of a local file.
+     *
+     * @param context   current Context.
+     * @param file      file to get the uri.
+     * @return The uri of the file.
+     */
+    public static Uri getUriForFile(Context context, File file) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", file);
+        }
+
+        return Uri.fromFile(file);
+    }
+
+    /**
+     * Shares a file.
+     *
+     * @param context   current Context.
+     * @param file      file to share.
+     */
+    public static void shareFile(Context context, File file) {
+        Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+        shareIntent.setType(MimeTypeList.typeForName(file.getName()).getType() + "/*");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+    }
+
+    /**
+     * Checks if the node is already downloaded in the current selected folder
+     *
+     * @param node file to check
+     * @param localPath path of the local file already downloaded
+     * @param currenParentPath path of the current selected folder where the file is going to be downloaded
+     * @return true if the file is already downloaded in the selected folder, false otherwise
+     */
+
+    public static boolean isAlreadyDownloadedInCurrentPath(MegaNode node, String localPath, String currenParentPath, boolean downloadToSDCard, SDCardOperator sdCardOperator) {
+        File file = new File(localPath);
+
+        if (isFileAvailable(file) && !file.getParent().equals(currenParentPath)) {
+            try {
+                new Thread(new CopyFileThread(downloadToSDCard, localPath, currenParentPath, node.getName(), sdCardOperator)).start();
+            } catch (Exception e) {
+                logWarning("Exception copying file", e);
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Shows an snackbar to alert if:
+     *      only one file has to be downloaded and is not downloaded yet
+     *      several files have to be downloaded and some of them are already downloaded
+     *
+     * @param context activity where the snackbar has to be shown
+     * @param numberOfNodesPending pending downloads
+     * @param numberOfNodesAlreadyDownloaded files already downloaded
+     */
+    public static void showSnackBarWhenDownloading(Context context, int numberOfNodesPending, int numberOfNodesAlreadyDownloaded) {
+        logDebug(" Already downloaded: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
+
+        if (numberOfNodesAlreadyDownloaded == 0) {
+            showSnackbar(context, context.getResources().getQuantityString(R.plurals.download_began, numberOfNodesPending, numberOfNodesPending));
+        } else {
+            String msg;
+            msg = context.getResources().getQuantityString(R.plurals.file_already_downloaded, numberOfNodesAlreadyDownloaded, numberOfNodesAlreadyDownloaded);
+            if (numberOfNodesPending > 0) {
+                msg = msg + context.getResources().getQuantityString(R.plurals.file_pending_download, numberOfNodesPending, numberOfNodesPending);
+            }
+            showSnackbar(context, msg);
+        }
+    }
+
+
+    /**
+     * Shows a snackbar to alert the file was already downloaded and creates the video thumbnail if needed.
+     *
+     * @param context activity where the snackbar has to be shown
+     * @param node file to download
+     * @param localPath path where the file was already downloaded
+     * @param parentPath path where the file has to be downloaded this time
+     */
+    public static void checkDownload (Context context, MegaNode node, String localPath, String parentPath, boolean checkVideo, boolean downloadToSDCard, SDCardOperator sdCardOperator){
+        if (isAlreadyDownloadedInCurrentPath(node, localPath, parentPath, downloadToSDCard, sdCardOperator)) {
+            showSnackbar(context, context.getString(R.string.general_already_downloaded));
+        } else if (isFileAvailable(new File(localPath))){
+            showSnackbar(context, context.getString(R.string.copy_already_downloaded));
+        }
+
+        if (!checkVideo) return;
+
+        if (node != null && isVideoFile(parentPath + "/" + node.getName()) && !node.hasThumbnail()) {
+            MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+            try {
+                ThumbnailUtilsLollipop.createThumbnailVideo(context, localPath, megaApi, node.getHandle());
+            } catch (Exception e) {
+                logWarning("Exception creating video thumbnail", e);
+            }
+        }
+    }
+
+    /**
+     * According device's Android version to see if get file path and write permission by FileStorageActivity.
+     *
+     * @return true if using FileStorageActivity to get file path and write permission on the path.
+     *         false by SAF
+     */
+    public static boolean isBasedOnFileStorage() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;
     }
 }
 

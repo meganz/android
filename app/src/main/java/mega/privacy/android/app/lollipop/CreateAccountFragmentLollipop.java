@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.AppCompatEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
@@ -35,6 +35,7 @@ import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import nz.mega.sdk.MegaApiAndroid;
@@ -46,6 +47,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CreateAccountFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, OnKeyboardVisibilityListener {
 
@@ -82,9 +84,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     private TextView creatingAccountTextView;
     private ProgressBar createAccountProgressBar;
 
-    private ImageView toggleButtonPasswd;
-    private ImageView toggleButtonConfirmPasswd;
-    private boolean passwdVisibility;
     private LinearLayout containerPasswdElements;
     private ImageView firstShape;
     private ImageView secondShape;
@@ -145,11 +144,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         userPasswordConfirmError = v.findViewById(R.id.create_account_password_text_confirm_error_icon);
         userPasswordConfirmError.setVisibility(View.GONE);
 
-        toggleButtonPasswd = v.findViewById(R.id.toggle_button_passwd);
-        toggleButtonPasswd.setOnClickListener(this);
-        toggleButtonConfirmPasswd = v.findViewById(R.id.toggle_button_confirm_passwd);
-        toggleButtonConfirmPasswd.setOnClickListener(this);
-        passwdVisibility = false;
         passwdValid = false;
 
         userName.requestFocus();
@@ -235,20 +229,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         });
 
-        userPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    toggleButtonPasswd.setVisibility(View.VISIBLE);
-                    toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-                }
-                else {
-                    toggleButtonPasswd.setVisibility(View.GONE);
-                    passwdVisibility = false;
-                    showHidePassword(false);
-                }
-            }
-        });
+        userPassword.setOnFocusChangeListener((v1, hasFocus) -> setPasswordToggle(userPasswordLayout, hasFocus));
 
         userPasswordConfirm.addTextChangedListener(new TextWatcher() {
             @Override
@@ -267,20 +248,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         });
 
-        userPasswordConfirm.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    toggleButtonConfirmPasswd.setVisibility(View.VISIBLE);
-                    toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-                }
-                else {
-                    toggleButtonConfirmPasswd.setVisibility(View.GONE);
-                    passwdVisibility = false;
-                    showHidePassword(true);
-                }
-            }
-        });
+        userPasswordConfirm.setOnFocusChangeListener((v12, hasFocus) -> setPasswordToggle(userPasswordConfirmLayout, hasFocus));
 
         TextView tos = (TextView)v.findViewById(R.id.tos);
 
@@ -453,56 +421,19 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         userPasswordLayout.setError(" ");
     }
 
-    public void showHidePassword (boolean confirm) {
-        if(!passwdVisibility){
-            if (!confirm){
-                userPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                userPassword.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
-                userPassword.setSelection(userPassword.getText().length());
-            }
-            else {
-                userPasswordConfirm.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                userPasswordConfirm.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
-                userPasswordConfirm.setSelection(userPasswordConfirm.getText().length());
-            }
-        }else{
-            if (!confirm){
-                userPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                userPassword.setSelection(userPassword.getText().length());
-            }
-            else {
-                userPasswordConfirm.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                userPasswordConfirm.setSelection(userPasswordConfirm.getText().length());
-            }
-        }
-    }
-
-    void hidePasswordIfVisible () {
-        if (passwdVisibility) {
-            passwdVisibility = false;
-            toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-            showHidePassword(false);
-            toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-            showHidePassword(true);
-        }
-    }
-
     @Override
     public void onClick(View v) {
         logDebug("onClick");
 
         switch (v.getId()) {
             case R.id.create_account_chkTOS:
-                hidePasswordIfVisible();
                 break;
 
             case R.id.button_create_account_create:
-                hidePasswordIfVisible();
                 submitForm();
                 break;
 
             case R.id.button_login_create:
-                hidePasswordIfVisible();
                 ((LoginActivityLollipop) context).showFragment(LOGIN_FRAGMENT);
                 break;
 
@@ -513,7 +444,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //				browserIntent.setDataAndType(Uri.parse("http://www.google.es"), "text/html");
 //				browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
 //				startActivity(browserIntent);
-                hidePasswordIfVisible();
                 try {
                     String url = "https://mega.nz/terms";
                     Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
@@ -530,7 +460,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 break;
             case R.id.top:
                 logDebug("Show terms of password");
-                hidePasswordIfVisible();
                 try {
                     Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -543,31 +472,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     startActivity(viewIntent);
                 }
 
-                break;
-            case R.id.toggle_button_passwd:
-                if (passwdVisibility) {
-                    toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-                    passwdVisibility = false;
-                    showHidePassword(false);
-                }
-                else {
-                    toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_see));
-                    passwdVisibility = true;
-                    showHidePassword(false);
-                }
-                break;
-
-            case R.id.toggle_button_confirm_passwd:
-                if (passwdVisibility) {
-                    toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
-                    passwdVisibility = false;
-                    showHidePassword(true);
-                }
-                else {
-                    toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_see));
-                    passwdVisibility = true;
-                    showHidePassword(true);
-                }
                 break;
         }
     }
@@ -599,7 +503,20 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         createAccountProgressBar.setVisibility(View.VISIBLE);
         createAccountAndAcceptLayout.setVisibility(View.GONE);
 
-        megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
+        final String email = userEmail.getText() != null ? userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) : null;
+        final String password = userPassword.getText() != null ? userPassword.getText().toString() : null;
+        final String name = userName.getText() != null ? userName.getText().toString() : null;
+        final String lastName = userLastName.getText() != null ? userLastName.getText().toString() : null;
+
+        MegaAttributes attributes = MegaApplication.getInstance().getDbH().getAttributes();
+        final long lastPublicHandle = attributes != null ? attributes.getLastPublicHandle() : INVALID_HANDLE;
+
+        if (lastPublicHandle == INVALID_HANDLE) {
+            megaApi.createAccount(email, password, name, lastName, this);
+        } else {
+            megaApi.createAccount(email, password, name, lastName, lastPublicHandle,
+                    attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), this);
+        }
     }
 
     private boolean validateForm() {
@@ -690,20 +607,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             return getString(R.string.error_passwords_dont_match);
         }
         return null;
-    }
-
-    private void onKeysGenerated(final String privateKey, final String publicKey) {
-        if(!isOnline(context)){
-            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
-            return;
-        }
-
-        createAccountLayout.setVisibility(View.GONE);
-        creatingAccountLayout.setVisibility(View.VISIBLE);
-        creatingAccountTextView.setVisibility(View.VISIBLE);
-        createAccountProgressBar.setVisibility(View.VISIBLE);
-        megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
-//		megaApi.fastCreateAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), privateKey, userName.getText().toString().trim(), this);
     }
 
     @Override
@@ -807,7 +710,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         switch (editText.getId()){
             case R.id.create_account_email_text:{
-
                 userEmailLayout.setError(error);
                 userEmailLayout.setHintTextAppearance(R.style.InputTextAppearanceError);
                 userEmailError.setVisibility(View.VISIBLE);

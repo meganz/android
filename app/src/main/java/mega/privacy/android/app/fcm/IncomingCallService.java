@@ -11,8 +11,8 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -32,7 +32,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class IncomingCallService extends Service implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
@@ -171,35 +170,24 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
             isLoggingIn = true;
             MegaApplication.setLoggingIn(isLoggingIn);
 
-            if (isChatEnabled()) {
-                if (megaChatApi == null) {
-                    megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-                }
+            if (megaChatApi == null) {
+                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+            }
 
-                int ret = megaChatApi.getInitState();
+            int ret = megaChatApi.getInitState();
 
-                if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-                    ret = megaChatApi.init(gSession);
-                    logDebug("result of init ---> " + ret);
-                    chatSettings = dbH.getChatSettings();
-                    if (ret == MegaChatApi.INIT_NO_CACHE) {
-                        logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
+            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+                ret = megaChatApi.init(gSession);
+                logDebug("result of init ---> " + ret);
+                chatSettings = dbH.getChatSettings();
+                if (ret == MegaChatApi.INIT_NO_CACHE) {
+                    logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
 
-                    } else if (ret == MegaChatApi.INIT_ERROR) {
-                        logDebug("condition ret == MegaChatApi.INIT_ERROR");
-                        if (chatSettings == null) {
-                            logWarning("ERROR----> Switch OFF chat");
-                            chatSettings = new ChatSettings();
-                            chatSettings.setEnabled(false + "");
-                            dbH.setChatSettings(chatSettings);
-                        } else {
-                            logWarning("ERROR----> Switch OFF chat");
-                            dbH.setEnabledChat(false + "");
-                        }
-                        megaChatApi.logout(this);
-                    } else {
-                        logDebug("Chat correctly initialized");
-                    }
+                } else if (ret == MegaChatApi.INIT_ERROR) {
+                    logDebug("condition ret == MegaChatApi.INIT_ERROR");
+                    megaChatApi.logout(this);
+                } else {
+                    logDebug("Chat correctly initialized");
                 }
             }
 
@@ -237,13 +225,8 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
             MegaApplication.setLoggingIn(isLoggingIn);
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("OK fetch nodes");
-                if (isChatEnabled()) {
-                    logDebug("Chat enabled-->connectInBackground");
-//                    MegaApplication.isFireBaseConnection=true;
-                    megaChatApi.connectInBackground(this);
-                } else {
-                    logDebug("Chat NOT enabled - sendNotification");
-                }
+                logDebug("Chat --> connectInBackground");
+                megaChatApi.connectInBackground(this);
             } else {
                 logError("ERROR: " + e.getErrorString());
             }

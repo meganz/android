@@ -2,15 +2,11 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.text.format.DateUtils;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -25,7 +21,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -39,6 +34,7 @@ import nz.mega.sdk.MegaContactRequest;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
@@ -133,7 +129,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		}
         
         int status = contact.getStatus();
-        String timeStamp = String.valueOf(DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000));
+        String timeStamp = formatLongDateTime(contact.getCreationTime());
         switch (status) {
             case MegaContactRequest.STATUS_ACCEPTED: {
                 holder.textViewContent.setText(context.getString(R.string.contact_request_status_accepted,timeStamp));
@@ -194,8 +190,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 	
 	private void createDefaultAvatar(ViewHolderContactsRequestList holder){
-		int color = ContextCompat.getColor(context, R.color.lollipop_primary_color);
-		Bitmap defaultAvatar = getDefaultAvatar(context, color, holder.contactMail , AVATAR_SIZE, true);
+		Bitmap defaultAvatar = getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), holder.contactMail , AVATAR_SIZE, true);
 		holder.imageView.setImageBitmap(defaultAvatar);
 	}
 		

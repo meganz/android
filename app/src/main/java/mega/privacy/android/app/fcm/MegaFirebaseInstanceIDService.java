@@ -16,8 +16,9 @@ package mega.privacy.android.app.fcm;
  * limitations under the License.
  */
 
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.FirebaseInstanceIdService;
+import androidx.annotation.NonNull;
+
+import com.google.firebase.messaging.FirebaseMessagingService;
 
 import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaApiAndroid;
@@ -26,7 +27,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 
-public class MegaFirebaseInstanceIDService extends FirebaseInstanceIdService {
+public class MegaFirebaseInstanceIDService extends FirebaseMessagingService {
 
     MegaApiAndroid megaApi;
 
@@ -37,15 +38,15 @@ public class MegaFirebaseInstanceIDService extends FirebaseInstanceIdService {
      */
     // [START refresh_token]
     @Override
-    public void onTokenRefresh() {
-        // Get updated InstanceID token.
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        logDebug("Refreshed TOKEN: " + refreshedToken);
+    public void onNewToken(@NonNull String s) {
+        super.onNewToken(s);
+        // Get updated InstanceID token
+        logDebug("Refreshed TOKEN: " + s);
 
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
         // Instance ID token to your app server.
-        sendRegistrationToServer(refreshedToken);
+        sendRegistrationToServer(s);
     }
     // [END refresh_token]
 

@@ -1,7 +1,7 @@
 package mega.privacy.android.app.components;
 
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import android.util.AttributeSet;
 
 

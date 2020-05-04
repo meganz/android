@@ -46,7 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/login_email_text_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
                         app:errorEnabled="true"
                         app:errorTextAppearance="@style/InputTextAppearanceError">
 
-                        <android.support.v7.widget.AppCompatEditText
+                        <androidx.appcompat.widget.AppCompatEditText
                             android:id="@+id/login_email_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
                             android:inputType="textEmailAddress"
                             android:theme="@style/ColorControlStyle"/>
 
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -82,16 +82,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/login_password_text_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
                         android:hint="@string/password_text"
                         app:errorEnabled="true"
-                        app:errorTextAppearance="@style/InputTextAppearanceError">
+                        app:errorTextAppearance="@style/InputTextAppearanceError"
+                        app:endIconTint="@color/password_color_toggle">
 
-                        <android.support.v7.widget.AppCompatEditText
+                        <androidx.appcompat.widget.AppCompatEditText
                             android:id="@+id/login_password_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -100,18 +101,7 @@
                             android:inputType="textPassword"
                             android:theme="@style/ColorControlStyle"/>
 
-                    </android.support.design.widget.TextInputLayout>
-
-                    <ImageView
-                        android:id="@+id/toggle_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignTop="@+id/login_password_text_layout"
-                        android:layout_marginTop="15dp"
-                        android:padding="5dp"
-                        android:src="@drawable/ic_b_shared_read"
-                        android:visibility="gone"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -223,7 +213,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar_login"
                 app:title="@string/login_verification"
                 android:layout_width="match_parent"

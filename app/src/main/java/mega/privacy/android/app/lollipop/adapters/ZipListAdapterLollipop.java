@@ -3,8 +3,8 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.RecyclerView;
+import androidx.appcompat.app.ActionBar;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -19,6 +19,7 @@ import java.util.zip.ZipEntry;
 
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -38,7 +39,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 //		CheckBox checkbox;
 		ImageView imageView;
 		TextView textViewFileName;
-		TextView textViewFileSize;
+		EmojiTextView textViewFileSize;
 		RelativeLayout threeDotsLayout;
 
 		RelativeLayout itemLayout;
@@ -94,7 +95,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 		holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);
 		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 		holder.textViewFileName.getLayoutParams().width = px2dp((225 * scaleW), outMetrics);
-		holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
+		holder.textViewFileSize = convertView.findViewById(R.id.file_list_filesize);
 		holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);
 		holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
 		holder.threeDotsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_three_dots_layout);

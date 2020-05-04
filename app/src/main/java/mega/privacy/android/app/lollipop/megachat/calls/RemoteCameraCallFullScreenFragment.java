@@ -1,11 +1,10 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -13,16 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.nio.ByteBuffer;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
-
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-
 
 public class RemoteCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface, View.OnClickListener {
 
@@ -105,7 +101,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
                         holderHeight = viewHeight;
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
-                    this.bitmap = remoteRenderer.CreateBitmap(width, height);
+                    this.bitmap = remoteRenderer.createBitmap(width, height);
                     holder.setFixedSize(holderWidth, holderHeight);
                 } else {
                     this.width = -1;
@@ -116,8 +112,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         }
         if (bitmap == null) return;
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-        remoteRenderer.DrawBitmap(false, false);
-
+        remoteRenderer.drawBitmap(false, false);
     }
 
     @Override

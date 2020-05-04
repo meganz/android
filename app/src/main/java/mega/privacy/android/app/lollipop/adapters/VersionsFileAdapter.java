@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.ViewHolder;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -34,6 +34,7 @@ import mega.privacy.android.app.lollipop.VersionsFileActivity;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
@@ -279,7 +280,16 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 		holderList.itemLayout.setTag(holderList);
 		holderList.itemLayout.setOnClickListener(this);
-		holderList.itemLayout.setOnLongClickListener(this);
+
+		switch (((VersionsFileActivity) context).getAccessLevel()) {
+			case MegaShare.ACCESS_FULL:
+			case MegaShare.ACCESS_OWNER:
+				holderList.itemLayout.setOnLongClickListener(this);
+				break;
+
+			default:
+				holderList.itemLayout.setOnLongClickListener(null);
+		}
 
 		holderList.threeDotsLayout.setTag(holderList);
 		holderList.threeDotsLayout.setOnClickListener(this);
@@ -605,6 +615,18 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 	@Override
 	public boolean onLongClick(View view) {
+		ViewHolderVersion holder = (ViewHolderVersion) view.getTag();
+		int currentPosition = holder.getAdapterPosition();
+
+		if (!isMultipleSelect()) {
+			if (currentPosition < 0) {
+				logWarning("Position not valid: " + currentPosition);
+			} else {
+				setMultipleSelect(true);
+				((VersionsFileActivity) context).startActionMode(currentPosition);
+			}
+		}
+
 		return true;
 	}
 

@@ -3,10 +3,10 @@ package mega.privacy.android.app.lollipop.megaachievements;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -59,7 +59,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
-    private android.support.v7.app.AlertDialog successDialog;
+    private androidx.appcompat.app.AlertDialog successDialog;
 
     DisplayMetrics outMetrics;
 
@@ -80,20 +80,19 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             finish();
             return;
         }
-        if(isChatEnabled()){
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-            }
 
-            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-                logDebug("Refresh session - karere");
-                Intent intent = new Intent(this, LoginActivityLollipop.class);
-                intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
-                return;
-            }
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+        }
+
+        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+            logDebug("Refresh session - karere");
+            Intent intent = new Intent(this, LoginActivityLollipop.class);
+            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
         }
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -313,7 +312,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     public void showInviteConfirmationDialog(String contentText){
         logDebug("showInviteConfirmationDialog");
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.dialog_invite_friends_achievement, null);
         TextView content = dialogLayout.findViewById(R.id.invite_content);

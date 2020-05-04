@@ -6,20 +6,23 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.widget.RemoteViews;
 
 import com.shockwave.pdfium.PdfDocument;
@@ -38,7 +41,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoDownsampling;
-import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -129,6 +131,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private String notificationChannelId = NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID;
 	private String notificationChannelName = NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME;
 
+
+	/** the receiver and manager for the broadcast to listen to the pause event */
+	private BroadcastReceiver pauseBroadcastReceiver;
+	private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
+
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate() {
@@ -148,8 +155,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		canceled = false;
 		isOverquota = 0;
 
-		mapVideoDownsampling = new HashMap();
-		mapProgressTransfers = new HashMap();
+		mapVideoDownsampling = new HashMap<>();
+		mapProgressTransfers = new HashMap<>();
 
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -166,6 +173,17 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		mBuilderCompat = new NotificationCompat.Builder(ChatUploadService.this);
 
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+		// delay 1 second to refresh the pause notification to prevent update is missed
+		pauseBroadcastReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				new Handler().postDelayed(() -> {
+					updateProgressNotification();
+				}, 1000);
+			}
+		};
+		pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 	}
 
 	@Override
@@ -186,6 +204,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
             megaChatApi.saveCurrentState();
         }
 
+		pauseBroadcastManager.unregisterReceiver(pauseBroadcastReceiver);
 		super.onDestroy();
 	}
 
@@ -215,30 +234,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		return START_NOT_STICKY;
 	}
 
-	Bitmap.CompressFormat getCompressFormat(String name) {
-		String[] s = name.split("\\.");
-		String ext;
-		if (s != null && s.length > 1) {
-			ext = s[s.length-1];
-			switch (ext) {
-				case "jpeg" :
-				case "jpg":{
-					return Bitmap.CompressFormat.JPEG;
-				}
-				case "png": {
-					return Bitmap.CompressFormat.PNG;
-				}
-				case "webp":{
-					return Bitmap.CompressFormat.WEBP;
-				}
-				default: {
-					return Bitmap.CompressFormat.JPEG;
-				}
-			}
-		}
-		return Bitmap.CompressFormat.JPEG;
-	}
-
+	@SuppressWarnings("unchecked")
 	protected void onHandleIntent(final Intent intent) {
 		if (intent == null) return;
 
@@ -337,101 +333,32 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		PendingMessageSingle pendingMsg = pendingMsgs.get(0);
 		File file = new File(pendingMsg.getFilePath());
-
-		ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-		boolean isWIFI = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-		boolean isData = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();
+		boolean isData = ((ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE)).getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();
 
 		if(MimeTypeList.typeForName(file.getName()).isImage() && !MimeTypeList.typeForName(file.getName()).isGIF() && isData){
-			logDebug("DATA connection is Image");
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			Bitmap fileBitmap = BitmapFactory.decodeFile(file.getPath(), options);
-			if (fileBitmap != null) {
-				logDebug("DATA connection file decoded");
-				float width = options.outWidth;
-				float height = options.outHeight;
-				float totalPixels = width * height;
-				float division = DOWNSCALE_IMAGES_PX/totalPixels;
-				float factor = (float) Math.min(Math.sqrt(division), 1);
-				if (factor < 1) {
-					width *= factor;
-					height *= factor;
-					logDebug("DATA connection factor<1 totalPixels: " + totalPixels + " width: " + width + " height: " + height +
-							" DOWNSCALE_IMAGES_PX/totalPixels: " + division + " Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): " + Math.sqrt(division));
-					Bitmap scaleBitmap = Bitmap.createScaledBitmap(fileBitmap, (int)width, (int)height, false);
-					if (scaleBitmap != null) {
-						logDebug("DATA connection scaled Bitmap != null");
-						File outFile = buildChatTempFile(getApplicationContext(), file.getName());
-						if (outFile != null) {
-							logDebug("DATA connection new file != null");
-							FileOutputStream fOut;
-							try {
-								fOut = new FileOutputStream(outFile);
-								scaleBitmap.compress(getCompressFormat(file.getName()), 100, fOut);
-								fOut.flush();
-								fOut.close();
-								logDebug("DATA connection file compressed");
-								String fingerprint = megaApi.getFingerprint(outFile.getAbsolutePath());
-								for (PendingMessageSingle pendMsg : pendingMsgs) {
-									if (fingerprint != null) {
-										pendMsg.setFingerprint(fingerprint);
-									}
-									pendingMessages.add(pendMsg);
-								}
-								megaApi.startUploadWithTopPriority(outFile.getAbsolutePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-								logDebug("DATA connection file uploading");
-							} catch (Exception e){
-								for (PendingMessageSingle pendMsg : pendingMsgs) {
-									pendingMessages.add(pendMsg);
-								}
-								megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-								logError("DATA connection Exception compressing", e);
-							}
-							fileBitmap.recycle();
-							scaleBitmap.recycle();
-						}
-						else {
-							fileBitmap.recycle();
-							scaleBitmap.recycle();
-							for (PendingMessageSingle pendMsg : pendingMsgs) {
-								pendingMessages.add(pendMsg);
-							}
+			String uploadPath;
+			File compressedFile = checkImageBeforeUpload(file);
 
-							megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-							logWarning("DATA connection new file NULL");
-						}
+			if (isFileAvailable(compressedFile)) {
+				String fingerprint = megaApi.getFingerprint(compressedFile.getAbsolutePath());
+				for (PendingMessageSingle pendMsg : pendingMsgs) {
+					if (fingerprint != null) {
+						pendMsg.setFingerprint(fingerprint);
 					}
-					else {
-						fileBitmap.recycle();
-						for (PendingMessageSingle pendMsg : pendingMsgs) {
-							pendingMessages.add(pendMsg);
-						}
-
-						megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-						logWarning("DATA connection scaled Bitmap NULL");
-					}
+					pendingMessages.add(pendMsg);
 				}
-				else {
-					fileBitmap.recycle();
-					for (PendingMessageSingle pendMsg : pendingMsgs) {
-						pendingMessages.add(pendMsg);
-					}
 
-					megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-					logDebug("DATA connection factor >= 1 totalPixels: " + totalPixels + " width: " + width + " height: " + height +
-							" DOWNSCALE_IMAGES_PX/totalPixels: " + DOWNSCALE_IMAGES_PX/totalPixels+" Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): " + Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels));
-				}
-			}
-			else {
+				uploadPath = compressedFile.getAbsolutePath();
+			} else {
 				for (PendingMessageSingle pendMsg : pendingMsgs) {
 					pendingMessages.add(pendMsg);
 				}
 
-				megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
-				logWarning("DATA connection file NULL");
+				uploadPath = pendingMsg.getFilePath();
 			}
-		}
-		else if(MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)){
+
+			megaApi.startUploadWithTopPriority(uploadPath, parentNode, UPLOAD_APP_DATA_CHAT + ">" + pendingMsg.getId(), false);
+		} else if(MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)){
 			logDebug("DATA connection is Mp4Video");
 
 			try {
@@ -812,14 +739,20 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
         String message = "";
         if (isOverquota != 0){
             message = getString(R.string.overquota_alert_title);
-        }
-        else if(totalUploadsCompleted==totalUploads){
-            message = getResources().getQuantityString(R.plurals.upload_service_notification, totalUploads, totalUploadsCompleted, totalUploads);
-        }
-        else{
-            int inProgress = totalUploadsCompleted+1;
-            message = getResources().getQuantityString(R.plurals.upload_service_notification, totalUploads, inProgress, totalUploads);
-        }
+        } else if (totalUploadsCompleted == totalUploads) {
+			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+				message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalUploads, totalUploadsCompleted, totalUploads);
+			} else {
+				message = getResources().getQuantityString(R.plurals.upload_service_notification, totalUploads, totalUploadsCompleted, totalUploads);
+			}
+		} else {
+			int inProgress = totalUploadsCompleted + 1;
+			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+				message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalUploads, inProgress, totalUploads);
+			} else {
+				message = getResources().getQuantityString(R.plurals.upload_service_notification, totalUploads, inProgress, totalUploads);
+			}
+		}
 
         Intent intent;
         intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
@@ -1034,6 +967,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,MegaError error) {
+
+		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
+			LocalBroadcastManager.getInstance(getApplicationContext())
+					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+		}
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 			logDebug("onTransferFinish: " + transfer.getNodeHandle());

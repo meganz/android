@@ -4,10 +4,10 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -22,7 +22,7 @@ import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 
 public class PermissionsFragment extends Fragment implements View.OnClickListener {
 
@@ -39,13 +39,12 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     private LinearLayout setupLayout;
     private LinearLayout allowAccessLayout;
     private ImageView imgDisplay;
-    private TextView itemsText;
     private TextView titleDisplay;
     private TextView subtitleDisplay;
-    private LinearLayout itemsLayout;
+    // only for access contacts permission.
+    private TextView explanationDisplay;
 
     private boolean isAllowingAccessShown;
-    private int permissionsPosition = 0;
     private int numItems = 0;
     private int[] items = new int[PERMISSION_FLOW_PAGE_SIZE];
     private int currentPermission = 0;
@@ -82,11 +81,10 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         setupButton = v.findViewById(R.id.setup_button);
         setupButton.setOnClickListener(this);
         allowAccessLayout = v.findViewById(R.id.allow_access_fragment_container);
-        itemsText = v.findViewById(R.id.items_text);
         imgDisplay = v.findViewById(R.id.image_permissions);
         titleDisplay = v.findViewById(R.id.title_permissions);
         subtitleDisplay = v.findViewById(R.id.subtitle_permissions);
-        itemsLayout = v.findViewById(R.id.items_layout);
+        explanationDisplay = v.findViewById(R.id.subtitle_explanation);
 
         mImages = new int[]{
                 R.drawable.photos,
@@ -123,7 +121,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
         if (savedInstanceState == null) {
             numItems = 0;
-            permissionsPosition = 0;
             readGranted = hasPermissions(this.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
             writeGranted = hasPermissions(this.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
             cameraGranted = hasPermissions(this.getActivity(), Manifest.permission.CAMERA);
@@ -152,7 +149,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             showSetupLayout();
         } else {
             isAllowingAccessShown = savedInstanceState.getBoolean("isAllowingAccessShown", false);
-            permissionsPosition = savedInstanceState.getInt("permissionsPosition", 0);
             numItems = savedInstanceState.getInt("numItems", 0);
             currentPermission = savedInstanceState.getInt("currentPermission", 0);
             items = savedInstanceState.getIntArray("items");
@@ -169,12 +165,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
         if (isAllowingAccessShown) {
             ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
-        }
-
-        if (numItems == 1) {
-            itemsLayout.setVisibility(View.GONE);
-        } else {
-            itemsText.setText(getString(R.string.wizard_steps_indicator, permissionsPosition + 1, numItems));
         }
     }
 
@@ -206,10 +196,8 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             for (int i = 0; i < numItems; i++) {
                 if (items[i] == currentPermission) {
                     if (i + 1 < numItems) {
-                        permissionsPosition++;
                         currentPermission = items[i + 1];
                         setContent(currentPermission);
-                        itemsText.setText(getString(R.string.wizard_steps_indicator, permissionsPosition + 1, numItems));
                         break;
                     } else {
                         ((ManagerActivityLollipop) context).destroyPermissionsFragment();
@@ -223,6 +211,12 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         imgDisplay.setImageDrawable(ContextCompat.getDrawable(context, mImages[permission]));
         titleDisplay.setText(mTitles[permission]);
         subtitleDisplay.setText(mSubtitles[permission]);
+        // access contacts
+        if(permission == 3) {
+            explanationDisplay.setVisibility(View.VISIBLE);
+        } else {
+            explanationDisplay.setVisibility(View.GONE);
+        }
     }
 
     void askForPermission() {
@@ -319,7 +313,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("isAllowingAccessShown", isAllowingAccessShown);
-        outState.putInt("permissionsPosition", permissionsPosition);
         outState.putInt("numItems", numItems);
         outState.putInt("currentPermission", currentPermission);
         outState.putIntArray("items", items);

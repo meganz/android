@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.controllers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -12,11 +11,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
+import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
@@ -24,18 +24,19 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.listeners.ShareListener.CHANGE_PERMISSIONS_LISTENER;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.CallUtil.*;
 
 public class ContactController {
 
@@ -51,7 +52,7 @@ public class ContactController {
         if (megaApi == null){
             megaApi = MegaApplication.getInstance().getMegaApi();
         }
-        if(isChatEnabled() && megaChatApi == null){
+        if (megaChatApi == null) {
             megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         }
 
@@ -113,7 +114,7 @@ public class ContactController {
             }
         }
 
-        if (megaChatApi != null && participatingInACall(megaChatApi)) {
+        if (megaChatApi != null && participatingInACall()) {
             MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(c.getHandle());
             if (chatRoomTo != null) {
                 long chatId = chatRoomTo.getChatId();
@@ -371,29 +372,19 @@ public class ContactController {
         }
     }
 
-
-    public void addContactDB(String email){
-        logDebug("addContactDB");
-
+    public void addContactDB(String email) {
         MegaUser user = megaApi.getContact(email);
-        if(user!=null){
-            logDebug("User to add: " + user.getEmail());
-            //Check the user is not previously in the DB
-            if(dbH.findContactByHandle(String.valueOf(user.getHandle()))==null){
-                logDebug("The contact NOT exists -> add to DB");
-                MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "");
-                dbH.setContact(megaContactDB);
-                megaApi.getUserAttribute(user, 1, new ContactNameListener(context));
-                megaApi.getUserAttribute(user, 2, new ContactNameListener(context));
-            }
-            else{
-                logDebug("The contact already exists -> update");
-                megaApi.getUserAttribute(user, 1, new ContactNameListener(context));
-                megaApi.getUserAttribute(user, 2, new ContactNameListener(context));
-            }
+        if (user == null) return;
+        //Check the user is not previously in the DB
+        if (dbH.findContactByHandle(String.valueOf(user.getHandle())) == null) {
+            MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "");
+            dbH.setContact(megaContactDB);
         }
+        GetAttrUserListener listener = new GetAttrUserListener(context);
+        megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, listener);
+        megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, listener);
+        megaApi.getUserAlias(user.getHandle(), listener);
     }
-
 
     public void acceptInvitationContact(MegaContactRequest c){
         logDebug("acceptInvitationContact");
@@ -418,48 +409,6 @@ public class ContactController {
     public void removeInvitationContact(MegaContactRequest c){
         logDebug("removeInvitationContact");
         megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, (ManagerActivityLollipop) context);
-    }
-
-    public String getContactFullName(long userHandle){
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
-        if(contactDB!=null){
-
-            String name = contactDB.getName();
-            String lastName = contactDB.getLastName();
-
-            if(name==null){
-                name="";
-            }
-            if(lastName==null){
-                lastName="";
-            }
-            String fullName = "";
-
-            if (name.trim().length() <= 0){
-                fullName = lastName;
-            }
-            else{
-                fullName = name + " " + lastName;
-            }
-
-            if (fullName.trim().length() <= 0){
-                logWarning("Full name empty");
-                logDebug("Put email as fullname");
-                String mail = contactDB.getMail();
-                if(mail==null){
-                    mail="";
-                }
-                if (mail.trim().length() <= 0){
-                    return "";
-                }
-                else{
-                    return mail;
-                }
-            }
-
-            return fullName;
-        }
-        return "";
     }
 
     public String getFullName(String name, String lastName, String mail){
@@ -498,21 +447,31 @@ public class ContactController {
         return fullName;
     }
 
-    public void checkShares(List<MegaShare> shares, int newPermission, MegaNode node, MegaRequestListenerInterface changeListener) {
+    public ArrayList<String> getEmailShares(ArrayList<MegaShare> shares) {
+        if (shares == null || shares.isEmpty()) return null;
+
+        ArrayList<String> sharesEmails = new ArrayList<>();
+
         for (int i = 0; i < shares.size(); i++) {
-            String userId = shares.get(i).getUser();
-            changePermission(userId, newPermission, node, changeListener);
+            sharesEmails.add(shares.get(i).getUser());
+        }
+
+        return sharesEmails;
+    }
+
+    public void changePermissions(ArrayList<String> shares, int newPermission, MegaNode node) {
+        if (shares == null || shares.isEmpty()) return;
+
+        ShareListener shareListener = new ShareListener(context, CHANGE_PERMISSIONS_LISTENER, shares.size());
+
+        for (int i = 0; i < shares.size(); i++) {
+            changePermission(shares.get(i), newPermission, node, shareListener);
         }
     }
 
-    private void changePermission(String userId, int newPermission, MegaNode node, MegaRequestListenerInterface changeListener) {
-        if (userId != null) {
-            MegaUser megaUser = megaApi.getContact(userId);
-            if(megaUser != null){
-                megaApi.share(node, megaUser, newPermission, changeListener);
-            }else{
-                megaApi.share(node, userId, newPermission, changeListener);
-            }
+    public void changePermission(String email, int newPermission, MegaNode node, ShareListener shareListener) {
+        if (email != null) {
+            megaApi.share(node, email, newPermission, shareListener);
         }
     }
 }

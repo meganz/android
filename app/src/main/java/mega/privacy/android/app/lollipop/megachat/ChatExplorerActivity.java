@@ -3,12 +3,12 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -94,20 +94,19 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             finish();
             return;
         }
-        if(isChatEnabled()){
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-            }
 
-            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-                logDebug("Refresh session - karere");
-                Intent intent = new Intent(this, LoginActivityLollipop.class);
-                intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
-                return;
-            }
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+        }
+
+        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+            logDebug("Refresh session - karere");
+            Intent intent = new Intent(this, LoginActivityLollipop.class);
+            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
         }
 
         chatExplorerActivity = this;
@@ -145,7 +144,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             logDebug("Intent received");
             if(intent.getAction()!=null){
                 if(intent.getAction()== ACTION_FORWARD_MESSAGES){
-                    messagesIds = intent.getLongArrayExtra("ID_MESSAGES");
+                    messagesIds = intent.getLongArrayExtra(ID_MESSAGES);
                     logDebug("Number of messages to forward: " + messagesIds.length);
                     chatIdFrom = intent.getLongExtra("ID_CHAT_FROM", -1);
                 }
@@ -155,7 +154,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 if(nodeHandles!=null){
                     logDebug("Node handle is: " + nodeHandles[0]);
                 }
-                userHandles = intent.getLongArrayExtra("USER_HANDLES");
+                userHandles = intent.getLongArrayExtra(USER_HANDLES);
                 if(userHandles!=null){
                     logDebug("User handles size: " + userHandles.length);
                 }
@@ -212,11 +211,11 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
         searchView = (SearchView) searchMenuItem.getActionView();
 
-        SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
         searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
         searchAutoComplete.setHint(getString(R.string.hint_action_search));
-        View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+        View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
         v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 
         if (searchView != null){
@@ -391,11 +390,11 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         }
 
         if(userHandles!=null){
-            intent.putExtra("USER_HANDLES", userHandles);
+            intent.putExtra(USER_HANDLES, userHandles);
         }
 
         if(messagesIds!=null){
-            intent.putExtra("ID_MESSAGES", messagesIds);
+            intent.putExtra(ID_MESSAGES, messagesIds);
         }
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
         ArrayList<MegaUser> users = new ArrayList<>();
@@ -415,7 +414,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 chatHandles[i] = chats.get(i).getChatId();
             }
 
-            intent.putExtra("SELECTED_CHATS", chatHandles);
+            intent.putExtra(SELECTED_CHATS, chatHandles);
         }
 
         if (users != null && !users.isEmpty()) {
@@ -424,7 +423,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 userHandles[i] = users.get(i).getHandle();
             }
 
-            intent.putExtra("SELECTED_USERS", userHandles);
+            intent.putExtra(SELECTED_USERS, userHandles);
         }
 
         setResult(RESULT_OK, intent);

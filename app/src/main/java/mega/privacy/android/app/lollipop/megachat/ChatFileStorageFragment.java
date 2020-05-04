@@ -8,14 +8,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -81,7 +81,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
         prefs = dbH.getPreferences();
 
-        downloadLocationDefaultPath = getDownloadLocation(context);
+        downloadLocationDefaultPath = getDownloadLocation();
 
         super.onCreate(savedInstanceState);
         logDebug("After onCreate called super");
@@ -274,16 +274,17 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
     public void sendImages(){
         String filePath;
-        if(isMultipleselect()){
+        if (isMultipleselect()) {
             ((ChatActivityLollipop) getActivity()).setIsWaitingForMoreFiles(true);
-            for(Integer element:posSelected){
-                //filePath = mPhotoUris.get(element);
-                filePath = imagesPath.get(element);
+            for (int i = 0; i < posSelected.size(); i++) {
+                filePath = imagesPath.get(posSelected.get(i));
+                if (i == posSelected.size() - 1) {
+                    ((ChatActivityLollipop) getActivity()).setIsWaitingForMoreFiles(false);
+                }
                 ((ChatActivityLollipop) getActivity()).uploadPictureOrVoiceClip(filePath);
             }
             clearSelections();
             hideMultipleSelect();
-            ((ChatActivityLollipop) getActivity()).setIsWaitingForMoreFiles(false);
         }
     }
 

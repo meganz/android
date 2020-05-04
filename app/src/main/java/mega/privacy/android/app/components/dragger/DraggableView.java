@@ -2,10 +2,10 @@ package mega.privacy.android.app.components.dragger;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.ViewCompat;
+import androidx.annotation.Nullable;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.core.view.MotionEventCompat;
+import androidx.core.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -73,7 +73,7 @@ public class DraggableView extends FrameLayout{
         return viewAnimator;
     }
 
-    public void setViewAnimator(@Nullable ViewAnimator viewAnimator) {
+    public void setViewAnimator(@Nullable ViewAnimator<DraggableView> viewAnimator) {
         this.viewAnimator = viewAnimator;
     }
 

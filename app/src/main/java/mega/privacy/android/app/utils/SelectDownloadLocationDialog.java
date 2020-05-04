@@ -3,23 +3,24 @@ package mega.privacy.android.app.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Build;
-import android.support.v7.app.AlertDialog;
+
+import androidx.appcompat.app.AlertDialog;
 
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.fragments.settingsFragments.DownloadSettingsFragment;
 import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.utils.download.ChatDownloadInfo;
 import mega.privacy.android.app.utils.download.DownloadInfo;
 import mega.privacy.android.app.utils.download.DownloadLinkInfo;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.utils.FileUtils.isBasedOnFileStorage;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SelectDownloadLocationDialog {
@@ -58,7 +59,7 @@ public class SelectDownloadLocationDialog {
 
     protected NodeController nodeController;
 
-    protected SettingsFragmentLollipop settingsFragment;
+    protected DownloadSettingsFragment settingsFragment;
 
     protected ChatController chatController;
 
@@ -118,7 +119,7 @@ public class SelectDownloadLocationDialog {
         this.chatController = chatController;
     }
 
-    public void setSettingsFragment(SettingsFragmentLollipop settingsFragment) {
+    public void setSettingsFragment(DownloadSettingsFragment settingsFragment) {
         this.settingsFragment = settingsFragment;
     }
 
@@ -199,7 +200,7 @@ public class SelectDownloadLocationDialog {
                                     break;
                             }
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            if (isBasedOnFileStorage()) {
                                 try {
                                     sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                                     selectLocalFolder(sdCardRoot);

@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
@@ -75,14 +75,8 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         this.width = 0;
         this.height = 0;
         renderer = new MegaSurfaceRendererGroup(myTexture, peerId, cliendId);
-
-        if (peerId == megaChatApi.getMyUserHandle() && cliendId == megaChatApi.getMyClientidHandle(chatId)) {
-            logDebug("addChatLocalVideoListener  (LOCAL)  chatId: " + chatId);
-            megaChatApi.addChatLocalVideoListener(chatId, this);
-        } else {
-            logDebug("addChatRemoteVideoListener chatId: " + chatId + " ( peerId = " + peerId + ", clientId = " + cliendId + ")");
-            megaChatApi.addChatRemoteVideoListener(chatId, peerId, cliendId, this);
-        }
+        logDebug("addChatRemoteVideoListener chatId: " + chatId + " ( peerId = " + peerId + ", clientId = " + cliendId + ")");
+        megaChatApi.addChatRemoteVideoListener(chatId, peerId, cliendId, this);
         return v;
     }
 
@@ -97,22 +91,15 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
             int viewWidth = myTexture.getWidth();
             int viewHeight = myTexture.getHeight();
             if ((viewWidth != 0) && (viewHeight != 0)) {
-                int holderWidth = viewWidth < width ? viewWidth : width;
-                int holderHeight = holderWidth * viewHeight / viewWidth;
-                if (holderHeight > viewHeight) {
-                    holderHeight = viewHeight;
-                    holderWidth = holderHeight * viewWidth / viewHeight;
-                }
-                this.bitmap = renderer.CreateBitmap(width, height);
+                this.bitmap = renderer.createBitmap(width, height);
             } else {
                 this.width = -1;
                 this.height = -1;
             }
         }
-
         if (bitmap == null) return;
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-        renderer.DrawBitmap(false, false);
+        renderer.drawBitmap(false);
     }
 
     @Override
@@ -134,15 +121,10 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
             logDebug("removeView chatId: " + chatId);
             ((ViewGroup) myTexture.getParent()).removeView(myTexture);
         }
-
         if (megaChatApi == null) return;
-        if (peerId == megaChatApi.getMyUserHandle() && cliendId == megaChatApi.getMyClientidHandle(chatId)) {
-            logDebug("removeChatVideoListener (LOCAL) chatId: " + chatId);
-            megaChatApi.removeChatVideoListener(chatId, -1, -1, this);
-        } else {
-            logDebug("removeChatVideoListener chatId: " + chatId + " ( peerId = " + peerId + ", clientId = " + cliendId + ")");
-            megaChatApi.removeChatVideoListener(chatId, peerId, cliendId, this);
-        }
+        logDebug("removeChatVideoListener chatId: " + chatId + " ( peerId = " + peerId + ", clientId = " + cliendId + ")");
+        megaChatApi.removeChatVideoListener(chatId, peerId, cliendId, this);
+
     }
 
     @Override

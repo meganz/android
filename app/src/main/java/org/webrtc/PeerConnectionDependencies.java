@@ -10,7 +10,7 @@
 
 package org.webrtc;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * PeerConnectionDependencies holds all PeerConnection dependencies that are

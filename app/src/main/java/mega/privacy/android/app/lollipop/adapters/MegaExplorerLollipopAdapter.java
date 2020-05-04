@@ -6,8 +6,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,6 +37,7 @@ import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -51,6 +51,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 	
@@ -266,6 +267,10 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 holder.itemView.setOnClickListener(this);
             }
 
+            holder.permissionsIcon.setVisibility(View.GONE);
+            holder.textViewFileSize.setText(getInfoFolder(node, context));
+            holder.imageView.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
+
             if(node.isInShare()){
                 if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                     holder.textViewFileName.setMaxWidth(scaleWidthPx(260, outMetrics));
@@ -276,26 +281,13 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                     holder.textViewFileName.setMaxWidth(scaleWidthPx(200, outMetrics));
                     holder.textViewFileSize.setMaxWidth(scaleWidthPx(200, outMetrics));
                 }
-                holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
                 for(int j=0; j<sharesIncoming.size();j++){
                     MegaShare mS = sharesIncoming.get(j);
                     if(mS.getNodeHandle()==node.getHandle()){
                         MegaUser user= megaApi.getContact(mS.getUser());
                         if(user!=null){
-                            MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-                            if(contactDB!=null){
-                                if(!contactDB.getName().equals("")){
-                                    holder.textViewFileSize.setText(contactDB.getName()+" "+contactDB.getLastName());
-                                }
-                                else{
-                                    holder.textViewFileSize.setText(user.getEmail());
-                                }
-                            }
-                            else{
-                                logDebug("The contactDB is null: ");
-                                holder.textViewFileSize.setText(user.getEmail());
-                            }
+                            holder.textViewFileSize.setText(getMegaUserNameDB(user));
                         }
                         else{
                             holder.textViewFileSize.setText(mS.getUser());
@@ -316,27 +308,12 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                     holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
                 }
             }
-            else if(node.isOutShare()||megaApi.isPendingShare(node)) {
-                holder.permissionsIcon.setVisibility(View.GONE);
-                holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
-                holder.textViewFileSize.setText(getInfoFolder(node, context));
-
-            }else{
-                holder.permissionsIcon.setVisibility(View.GONE);
-                boolean isCU = isCameraUploads(node);
-                if(isCU){
-                    holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
-                }else{
-                    holder.imageView.setImageResource(R.drawable.ic_folder_list);
-                }
-                holder.textViewFileSize.setText(getInfoFolder(node, context));
-            }
         }
         else{
             holder.permissionsIcon.setVisibility(View.GONE);
 
             long nodeSize = node.getSize();
-            holder.textViewFileSize.setText(getSizeString(nodeSize));
+            holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
             setImageParams(holder.imageView, 48, 0);
 
@@ -413,18 +390,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.itemLayout.setBackgroundColor(Color.WHITE);
             holder.itemView.setOnLongClickListener(null);
 
-            if(node.isInShare()){
-                holder.folderIcon.setImageResource(R.drawable.ic_folder_incoming_list);
-            }
-            else if(node.isOutShare()||megaApi.isPendingShare(node)) {
-                holder.folderIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
-            }
-            else if(isCameraUploads(node)){
-                holder.folderIcon.setImageResource(R.drawable.ic_folder_image_list);
-            }
-            else{
-                holder.folderIcon.setImageResource(R.drawable.ic_folder_list);
-            }
+            holder.folderIcon.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
 
             if (disabledNodes != null && disabledNodes.contains(node.getHandle())) {
                 holder.folderIcon.setAlpha(.4f);
@@ -661,6 +627,11 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
     @Override
     public int getPlaceholderCount() {
         return placeholderCount;
+    }
+
+    @Override
+    public int getUnhandledItem() {
+        return -1;
     }
 
     /*

@@ -136,8 +136,7 @@
 
     <color name="keyboard_chat_separator">#1F000000</color>
     <color name="background_chat">#FFFFFFFF</color>
-    <!--<color name="disable_fab_chat_call">#CC444444</color>-->
-    <color name="disable_fab_chat_call">#FF6E6E6E</color>
+    <color name="disable_fab_chat_call">#444444</color>
     <color name="disable_fab_invite_contact">#A9E3D8</color>
 
 	<color name="disabled_radio_button_label">#FF8C8F90</color>
@@ -196,10 +195,22 @@
     <color name="statusbar_tour_3">#FFCC7300</color>
     <color name="statusbar_tour_4">#FF00948C</color>
 
+    <color name="business_alert_background">#FFF6F6F6</color>
+    <color name="expired_red">#FFE1000F</color>
+    <color name="grace_yellow">#FFF29907</color>
+    <color name="expired_business_admin_statusbar">#825572</color>
+    <color name="expired_business_user_statusbar">#29A6D1</color>
+    <color name="expired_business_admin">#966B87</color>
+    <color name="expired_business_user">#44BCE6</color>
+    <color name="business_color">#2BA6DE</color>
+
     <color name="black_40_alpha">#66000000</color>
 
     <color name="red_alert">#FF6464</color>
     <color name="status_bar_red_alert">#CF4949</color>
 
     <color name="reconnecting_bar">#FFF5A623</color>
+    <color name="voice_clip_bubble">#323232</color>
+    <color name="background_recording">#78252525</color>
+
 </resources>

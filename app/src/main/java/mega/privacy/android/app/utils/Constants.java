@@ -51,11 +51,13 @@ public class Constants {
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
     public static final String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
-    public static final String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
     public static final String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
     public static final String ACTION_FORWARD_MESSAGES = "ACTION_FORWARD_MESSAGES";
+    public static final String ACTION_OPEN_QR = "ACTION_OPEN_QR";
+    public static final String ACTION_TAKE_PICTURE = "ACTION_TAKE_PICTURE";
+    public static final String ACTION_TAKE_PROFILE_PICTURE = "ACTION_TAKE_PROFILE_PICTURE";
 
     public static final String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
@@ -65,6 +67,7 @@ public class Constants {
     public static final String EXTRA_RESULT_TRANSFER = "RESULT_TRANSFER";
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
+    public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
 
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
 
@@ -99,7 +102,6 @@ public class Constants {
     public static final int OVERQUOTA_ALERT = 5003;
     public static final int CC_FRAGMENT = 5004;
     public static final int FORTUMO_FRAGMENT = 5005;
-    public static final int MONTHLY_YEARLY_FRAGMENT = 5006;
     public static final int CENTILI_FRAGMENT = 5007;
     public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5008;
 
@@ -158,12 +160,14 @@ public class Constants {
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;
     public static final int TYPE_ERROR_RECORD = 3;
-    
+
     public static final int FREE = 0;
     public static final int PRO_I = 1;
     public static final int PRO_II = 2;
     public static final int PRO_III = 3;
     public static final int PRO_LITE = 4;
+    public static final int BUSINESS = 100;
+
 
     public static final int COLOR_STATUS_BAR_ACCENT = 1;
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
@@ -172,6 +176,7 @@ public class Constants {
     public static final int COLOR_STATUS_BAR_SMS_VERIFICATION = 5;
 
     public static final String CONTACT_LINK_BASE_URL = "https://mega.nz/C!";
+    public static final String DISPUTE_URL = "https://mega.nz/dispute";
     public static final String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
     public static final String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
@@ -243,9 +248,11 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ORDER = "INTENT_UPDATE_ORDER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_VIEW = "INTENT_UPDATE_VIEW";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
+    public static final String BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED = "INTENT_BUSINESS_EXPIRED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED = "INTENT_CHAT_ARCHIVED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP = "INTENT_CHAT_ARCHIVED_GROUP";
     public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
+    public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -271,6 +278,7 @@ public class Constants {
     public static final int FILE_INFO_SHARED_CONTACT_ADAPTER = 2022;
     public static final int GENERAL_OTHERS_ADAPTER = 2023;
     public static final int RECENTS_ADAPTER = 2024;
+    public static final int LINKS_ADAPTER = 2025;
 
     public static final int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
     public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -322,6 +330,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
     public static final String NOTIFICATION_CHANNEL_CHAT_NAME = "MEGA Chat";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID = "ChatSummaryNotification";
+    public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2 = "ChatSummaryNotificationV2";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME = "MEGA Chat Summary";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID = "ChatSummaryNotificationNoVibrate";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME = "MEGA Chat Summary (no vibration)";
@@ -340,6 +349,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
     public static final String CHAT_FOLDER = "My chat files";
     public static final String AUTHORITY_STRING_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider";
+    public static final String TYPE_TEXT_PLAIN = "text/plain";
 
     public static final int RICH_WARNING_TRUE = 1;
     public static final int RICH_WARNING_FALSE = 0;
@@ -370,6 +380,15 @@ public class Constants {
 
     public static final String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
 
+    public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
+    public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
+    public static final String AVATAR_PHONE_COLOR = "AVATAR_PHONE_COLOR";
+
+    /**
+     * A phone number pattern, which length should be in 5-22, and the beginning can have a '+'.
+     */
+    public static final Pattern PHONE_NUMBER_REGEX = Pattern.compile("^[+]?[0-9]{5,22}$");
+
     public static final Pattern EMAIL_ADDRESS
             = Pattern.compile(
             "[a-zA-Z0-9\\+\\.\\_\\%\\-\\&\\+]{1,256}" +
@@ -394,6 +413,7 @@ public class Constants {
 
     public static final int HEADER_VIEW_TYPE = 0;
     public static final int ITEM_VIEW_TYPE = 1;
+    public static final int ITEM_PROGRESS = 2;
 
     public static final int FILE_LINK = 200;
     public static final int FOLDER_LINK = 201;
@@ -403,6 +423,7 @@ public class Constants {
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String CHAT_ID = "chatHandle";
+    public static final String MESSAGE_ID = "messageId";
     public static final String CALL_ID = "callId";
     public static final String CHAT_ID_IN_PROGRESS = "chatHandleInProgress";
     public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
@@ -412,10 +433,27 @@ public class Constants {
     public static final String CHAT_TITLE = "CHAT_TITLE";
     public static final String SELECTED_CONTACTS = "SELECTED_CONTACTS";
     public static final String NODE_HANDLES = "NODE_HANDLES";
+    public static final String NAME = "name";
     public static final String HANDLE = "handle";
+    public static final String EMAIL = "email";
     public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
     public static final String VISIBLE_FRAGMENT = "VISIBLE_FRAGMENT";
+    public static final String SELECTED_CHATS = "SELECTED_CHATS";
+    public static final String SELECTED_USERS = "SELECTED_USERS";
+    public static final String ID_MESSAGES = "ID_MESSAGES";
+    public static final String USER_HANDLES = "USER_HANDLES";
+    public static final String URL_FILE_LINK = "URL_FILE_LINK";
+    public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
 
+    public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
+    public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
+
+    public static final String REGISTER_BUSINESS_ACCOUNT = "registerb";
+
+    public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
+    public static final int MAX_WIDTH_CONTACT_NAME_PORT = 200;
+    public static final int MAX_WIDTH_CONTACT_NAME_GRID_LAND = 150;
+    public static final int MAX_WIDTH_CONTACT_NAME_GRID_PORT = 120;
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;
     public static final int EMOJI_SIZE_HIGH = 30;
@@ -528,6 +566,11 @@ public class Constants {
     public static final String[] EMAIL_VERIFY_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#emailverify.+$",
             "^https://mega\\.nz/#emailverify.+$"
+    };
+
+    public static final String[] WEB_SESSION_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/#sitetransfer!.+$",
+            "^https://mega\\.nz/#sitetransfer!.+$"
     };
 
     //Types of blocked accounts

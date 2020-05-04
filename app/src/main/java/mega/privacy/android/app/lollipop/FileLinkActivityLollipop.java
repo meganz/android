@@ -15,16 +15,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -61,6 +60,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -77,8 +77,6 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 	Handler handler;
 	ProgressDialog statusDialog;
 	AlertDialog decryptionKeyDialog;
-
-	MenuItem shareMenuItem;
 
 	File previewFile = null;
 	Bitmap preview = null;
@@ -158,22 +156,21 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 				finish();
 				return;
 			}
-			if (isChatEnabled()) {
-				if (megaChatApi == null) {
-					megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-				}
 
-				if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-					logDebug("Refresh session - karere");
-					Intent intent = new Intent(this, LoginActivityLollipop.class);
-					intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-					intent.setData(Uri.parse(url));
-					intent.setAction(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL);
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					startActivity(intent);
-					finish();
-					return;
-				}
+			if (megaChatApi == null) {
+				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+			}
+
+			if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+				logDebug("Refresh session - karere");
+				Intent intent = new Intent(this, LoginActivityLollipop.class);
+				intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+				intent.setData(Uri.parse(url));
+				intent.setAction(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+				return;
 			}
 		}
 
@@ -239,11 +236,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu items for use in the action bar
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.file_link_action, menu);
-		shareMenuItem = menu.findItem(R.id.share_link);
-		shareMenuItem.setVisible(true);
-		menu.findItem(R.id.share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		getMenuInflater().inflate(R.menu.file_folder_link_action, menu);
 
 		collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
 		collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
@@ -264,11 +257,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 				break;
 			}
 			case R.id.share_link: {
-				if(url!=null){
-					shareLink(url);
-				}else{
-					logWarning("url NULL");
-				}
+				shareLink(this, url);
 				break;
 			}
 		}
@@ -325,7 +314,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 				return false;
 			}
 		});
-		input.setImeActionLabel(getString(R.string.cam_sync_ok),EditorInfo.IME_ACTION_DONE);
+		input.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -720,7 +709,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 			intent.putExtra(EXTRA_SERIALIZE_STRING, serializeString);
 			intent.putExtra("position", 0);
-			intent.putExtra("urlFileLink",url);
+			intent.putExtra(URL_FILE_LINK, url);
 			intent.putExtra("adapterType", FILE_LINK_ADAPTER);
 			intent.putExtra("parentNodeHandle", -1L);
 			intent.putExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
@@ -748,6 +737,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 				mediaIntent.putExtra("adapterType", FILE_LINK_ADAPTER);
 				mediaIntent.putExtra(EXTRA_SERIALIZE_STRING, serializeString);
+				mediaIntent.putExtra(URL_FILE_LINK, url);
 				internalIntent = true;
 			}
 			mediaIntent.putExtra("FILENAME", document.getName());
@@ -810,6 +800,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 			pdfIntent.putExtra(EXTRA_SERIALIZE_STRING, serializeString);
 			pdfIntent.putExtra("inside", true);
 			pdfIntent.putExtra("FILENAME", document.getName());
+			pdfIntent.putExtra(URL_FILE_LINK, url);
 
 			if (isOnline(this)){
 				if (megaApi.httpServerIsRunning() == 0) {
@@ -981,14 +972,6 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 		intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
 		startActivity(intent);
 		finish();
-	}
-
-	public void shareLink(String link){
-		logDebug("Link: " + link);
-		Intent intent = new Intent(Intent.ACTION_SEND);
-		intent.setType("text/plain");
-		intent.putExtra(Intent.EXTRA_TEXT, link);
-		startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
 	}
 
 }

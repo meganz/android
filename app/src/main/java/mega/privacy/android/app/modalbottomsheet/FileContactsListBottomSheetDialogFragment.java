@@ -1,23 +1,15 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.io.File;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -25,7 +17,6 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
@@ -35,285 +26,148 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
-public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
+public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    Context context;
-    MegaUser contact = null;
-    MegaNode node = null;
-    MegaShare share = null;
-    ContactController cC;
-    String nonContactEmail;
-
-    private BottomSheetBehavior mBehavior;
-    private LinearLayout items_layout;
-
-    public LinearLayout mainLinearLayout;
-    public EmojiTextView titleNameContactPanel;
-    public TextView titleMailContactPanel;
-    public RoundedImageView contactImageView;
-    public LinearLayout optionChangePermissions;
-    public LinearLayout optionDelete;
-    public LinearLayout optionInfo;
-
-    String fullName="";
-
-    DisplayMetrics outMetrics;
-    private int heightDisplay;
-
-    MegaApiAndroid megaApi;
-    DatabaseHandler dbH;
+    private MegaUser contact = null;
+    private MegaShare share = null;
+    private String nonContactEmail;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-
-        if(savedInstanceState!=null) {
-            logDebug("Bundle is NOT NULL");
-            String email = savedInstanceState.getString("email");
-            logDebug("Email of the contact: " + email);
-            if(email!=null){
+        if (savedInstanceState != null) {
+            String email = savedInstanceState.getString(EMAIL);
+            if (email != null) {
                 contact = megaApi.getContact(email);
-                if(contact==null){
+                if (contact == null) {
                     nonContactEmail = email;
                 }
             }
-        }
-        else{
-            logWarning("Bundle NULL");
-            if(context instanceof FileContactListActivityLollipop){
+        } else {
+            if (context instanceof FileContactListActivityLollipop) {
                 share = ((FileContactListActivityLollipop) context).getSelectedShare();
                 contact = ((FileContactListActivityLollipop) context).getSelectedContact();
-            }else if(context instanceof FileInfoActivityLollipop){
+            } else if (context instanceof FileInfoActivityLollipop) {
                 share = ((FileInfoActivityLollipop) context).getSelectedShare();
                 contact = ((FileInfoActivityLollipop) context).getSelectedContact();
             }
-            
-            if(contact==null){
+
+            if (contact == null) {
                 nonContactEmail = share.getUser();
             }
         }
-        dbH = DatabaseHandler.getDbHandler(getActivity());
     }
+
+    @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(final Dialog dialog, int style) {
-
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        heightDisplay = outMetrics.heightPixels;
-
         super.setupDialog(dialog, style);
-        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_file_contact_list, null);
 
-        mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.file_contact_list_bottom_sheet);
-        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_file_contact_list, null);
 
-        titleNameContactPanel = contentView.findViewById(R.id.file_contact_list_contact_name_text);
-        titleMailContactPanel = (TextView) contentView.findViewById(R.id.file_contact_list_contact_mail_text);
-        contactImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_file_contact_list_thumbnail);
+        mainLinearLayout = contentView.findViewById(R.id.file_contact_list_bottom_sheet);
+        items_layout = contentView.findViewById(R.id.items_layout);
 
-        optionChangePermissions = (LinearLayout) contentView.findViewById(R.id.file_contact_list_option_permissions_layout);
-        optionDelete = (LinearLayout) contentView.findViewById(R.id.file_contact_list_option_delete_layout);
+        EmojiTextView titleNameContactPanel = contentView.findViewById(R.id.file_contact_list_contact_name_text);
+        TextView titleMailContactPanel = contentView.findViewById(R.id.file_contact_list_contact_mail_text);
+        RoundedImageView contactImageView = contentView.findViewById(R.id.sliding_file_contact_list_thumbnail);
 
-        optionInfo = (LinearLayout) contentView.findViewById(R.id.file_contact_list_option_info_layout);
+        LinearLayout optionChangePermissions = contentView.findViewById(R.id.file_contact_list_option_permissions_layout);
+        LinearLayout optionDelete = contentView.findViewById(R.id.file_contact_list_option_delete_layout);
+        LinearLayout optionInfo = contentView.findViewById(R.id.file_contact_list_option_info_layout);
+
+        optionChangePermissions.setOnClickListener(this);
+        optionDelete.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
 
         titleNameContactPanel.setMaxWidthEmojis(scaleWidthPx(200, outMetrics));
         titleMailContactPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
 
-        optionChangePermissions.setOnClickListener(this);
-        optionDelete.setOnClickListener(this);
+        LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
 
-        LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
+        String fullName = contact != null ? getMegaUserNameDB(contact) : nonContactEmail;
 
-        if(contact!=null){
-            fullName = getFullName(contact);
-        }
-        else{
-            logWarning("Contact NULL");
-//            nonContactEmail
-            fullName = nonContactEmail;
-        }
-
-        if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
+        if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
             optionInfo.setVisibility(View.VISIBLE);
             separatorInfo.setVisibility(View.VISIBLE);
-        }
-        else{
+        } else {
             optionInfo.setVisibility(View.GONE);
             separatorInfo.setVisibility(View.GONE);
         }
 
         titleNameContactPanel.setText(fullName);
-        addAvatarContactPanel(contact);
+        setImageAvatar(contact, contact != null ? contact.getEmail() : nonContactEmail, fullName, contactImageView);
 
-        if(share!=null){
+        if (share != null) {
             int accessLevel = share.getAccess();
-            switch(accessLevel){
+            switch (accessLevel) {
                 case MegaShare.ACCESS_OWNER:
-                case MegaShare.ACCESS_FULL:{
+                case MegaShare.ACCESS_FULL:
                     titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_full_access));
                     break;
-                }
-                case MegaShare.ACCESS_READ:{
+
+                case MegaShare.ACCESS_READ:
                     titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_read_only));
                     break;
-                }
-                case MegaShare.ACCESS_READWRITE:{
+
+                case MegaShare.ACCESS_READWRITE:
                     titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_read_write));
                     break;
-                }
             }
-        }
-        else{
+
+            if (share.isPending()) {
+                titleMailContactPanel.append(" " + getString(R.string.pending_outshare_indicator));
+            }
+        } else {
             titleMailContactPanel.setText(contact.getEmail());
         }
 
         dialog.setContentView(contentView);
-        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//
-//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-//        }
-//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//        }
-
-        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-    }
-
-    public String getFullName(MegaUser contact){
-        String firstNameText ="";
-        String lastNameText ="";
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
-        if(contactDB!=null){
-            firstNameText = contactDB.getName();
-            lastNameText = contactDB.getLastName();
-
-            String fullName;
-
-            if (firstNameText.trim().length() <= 0){
-                fullName = lastNameText;
-            }
-            else{
-                fullName = firstNameText + " " + lastNameText;
-            }
-
-            if (fullName.trim().length() <= 0){
-                logDebug("Put email as fullname");
-                String email = contact.getEmail();
-                String[] splitEmail = email.split("[@._]");
-                fullName = splitEmail[0];
-            }
-
-            return fullName;
-        }
-        else{
-            String email = contact.getEmail();
-            String[] splitEmail = email.split("[@._]");
-            String fullName = splitEmail[0];
-            return fullName;
-        }
-    }
-
-    public void addAvatarContactPanel(MegaUser contact){
-
-        /*Default Avatar*/
-        int color = getColorAvatar(context, megaApi, contact);
-        contactImageView.setImageBitmap(getDefaultAvatar(context, color, fullName, AVATAR_SIZE, false));
-
-        /*Avatar*/
-        if(contact!=null){
-            String contactMail = contact.getEmail();
-            File avatar = buildAvatarFile(getActivity(),contactMail + ".jpg");
-            Bitmap bitmap = null;
-            if (isFileAvailable(avatar) && avatar.length() > 0){
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    avatar.delete();
-                }
-                else{
-                    contactImageView.setImageBitmap(bitmap);
-                    return;
-                }
-            }
-        }
+        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
     }
 
     @Override
     public void onClick(View v) {
-
-        switch(v.getId()){
-
-            case R.id.file_contact_list_option_permissions_layout:{
-                logDebug("Permissions layout");
-                if(context instanceof FileContactListActivityLollipop){
-                    ((FileContactListActivityLollipop)context).changePermissions();
-                }else if(context instanceof FileInfoActivityLollipop){
-                    ((FileInfoActivityLollipop)context).changePermissions();
-                }
-                break;
-            }
-            case R.id.file_contact_list_option_delete_layout:{
-                logDebug("Option delete");
-                if(context instanceof FileContactListActivityLollipop){
-                    ((FileContactListActivityLollipop)context).removeFileContactShare();
-                }else if(context instanceof FileInfoActivityLollipop){
-                    ((FileInfoActivityLollipop)context).removeFileContactShare();
-                }
-                break;
-            }
-            case R.id.file_contact_list_option_info_layout:{
-                logDebug("Option send file");
-                if(contact==null){
-                    logWarning("Selected contact NULL");
-                    return;
-                }
-
-                logDebug("Contact info participants panel");
-                Intent i = new Intent(context, ContactInfoActivityLollipop.class);
-                i.putExtra("name", share.getUser());
-                context.startActivity(i);
-                dismissAllowingStateLoss();
-                break;
-            }
+        if (contact == null) {
+            logWarning("Selected contact NULL");
+            return;
         }
 
-//        dismiss();
-        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-        mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        switch (v.getId()) {
+            case R.id.file_contact_list_option_permissions_layout:
+                if (context instanceof FileContactListActivityLollipop) {
+                    ((FileContactListActivityLollipop) context).changePermissions();
+                } else if (context instanceof FileInfoActivityLollipop) {
+                    ((FileInfoActivityLollipop) context).changePermissions();
+                }
+                break;
+
+            case R.id.file_contact_list_option_delete_layout:
+                if (context instanceof FileContactListActivityLollipop) {
+                    ((FileContactListActivityLollipop) context).removeFileContactShare();
+                } else if (context instanceof FileInfoActivityLollipop) {
+                    ((FileInfoActivityLollipop) context).removeFileContactShare();
+                }
+                break;
+
+            case R.id.file_contact_list_option_info_layout:
+                Intent i = new Intent(context, ContactInfoActivityLollipop.class);
+                i.putExtra(NAME, share.getUser());
+                context.startActivity(i);
+                break;
+        }
+
+        setStateBottomSheetBehaviorHidden();
     }
 
-
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.context = activity;
-    }
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState){
-        logDebug("onSaveInstanceState");
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         String email = contact.getEmail();
-        logDebug("Email of the contact: " + email);
-        outState.putString("email", email);
+        outState.putString(EMAIL, email);
     }
 }

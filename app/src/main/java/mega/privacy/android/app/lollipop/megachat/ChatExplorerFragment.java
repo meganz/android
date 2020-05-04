@@ -5,13 +5,13 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -54,6 +54,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -96,7 +97,6 @@ public class ChatExplorerFragment extends Fragment {
     private RelativeLayout contentLayout;
     private ProgressBar progressBar;
 
-    private boolean chatEnabled = true;
     private float density;
     private DisplayMetrics outMetrics;
     private Display display;
@@ -123,21 +123,13 @@ public class ChatExplorerFragment extends Fragment {
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
-        if(isChatEnabled()){
-            chatEnabled=true;
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-                if (context instanceof ChatExplorerActivity) {
-                    megaChatApi.addChatListener((ChatExplorerActivity) context);
-                }
-                else if (context instanceof FileExplorerActivityLollipop) {
-                    megaChatApi.addChatListener((FileExplorerActivityLollipop) context);
-                }
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+            if (context instanceof ChatExplorerActivity) {
+                megaChatApi.addChatListener((ChatExplorerActivity) context);
+            } else if (context instanceof FileExplorerActivityLollipop) {
+                megaChatApi.addChatListener((FileExplorerActivityLollipop) context);
             }
-        }
-        else{
-            logWarning("Chat not enabled!");
-            chatEnabled=false;
         }
 
         chatExplorerFragment = this;
@@ -333,17 +325,11 @@ public class ChatExplorerFragment extends Fragment {
             logDebug("Chat ID " + chat.getChatId() + " with PeerHandle: " + handle + " is NULL");
             return null;
         }
-
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(handle+""));
-        String fullName = "";
-        if(contactDB!=null){
-            ContactController cC = new ContactController(context);
-            fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), user.getEmail());
-        }
-        else{
+        MegaContactDB contactDB = getContactDB(handle);
+        String fullName = getContactNameDB(contactDB);
+        if (fullName == null) {
             fullName = user.getEmail();
         }
-
         if (handle != -1) {
             int userStatus = megaChatApi.getUserOnlineStatus(handle);
             if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
@@ -351,7 +337,6 @@ public class ChatExplorerFragment extends Fragment {
                 megaChatApi.requestLastGreen(handle, null);
             }
         }
-
         return new MegaContactAdapter(contactDB, user, fullName);
     }
 
@@ -398,17 +383,12 @@ public class ChatExplorerFragment extends Fragment {
         for (int i=0;i<contactsMEGA.size();i++){
             logDebug("Contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
             if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-
-                MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
-                String fullName = "";
-                if(contactDB!=null){
-                    ContactController cC = new ContactController(context);
-                    fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
-                }
-                else{
+                long contactHandle = contactsMEGA.get(i).getHandle();
+                MegaContactDB contactDB = getContactDB(contactHandle);
+                String fullName = getContactNameDB(contactDB);
+                if (fullName == null) {
                     fullName = contactsMEGA.get(i).getEmail();
                 }
-
                 MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
                 contacts.add(megaContactAdapter);
             }

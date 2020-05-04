@@ -10,12 +10,12 @@ import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.AppCompatEditText;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
@@ -90,9 +90,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private ActionBar aB;
 	Toolbar tB;
 
-	private ImageView toggleButtonNewPasswd;
-	private ImageView toggleButtonNewPasswd2;
-	private boolean passwdVisibility;
 	private LinearLayout containerPasswdElements;
 	private ImageView firstShape;
 	private ImageView secondShape;
@@ -143,11 +140,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		title = (TextView) findViewById(R.id.title_change_pass);
 
-		toggleButtonNewPasswd = (ImageView) findViewById(R.id.toggle_button_new_passwd);
-		toggleButtonNewPasswd.setOnClickListener(this);
-		toggleButtonNewPasswd2 = (ImageView) findViewById(R.id.toggle_button_new_passwd2);
-		toggleButtonNewPasswd2.setOnClickListener(this);
-		passwdVisibility = false;
 		passwdValid = false;
 
 		containerPasswdElements = (LinearLayout) findViewById(R.id.container_passwd_elements);
@@ -196,20 +188,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			}
 		});
 
-		newPassword1.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					toggleButtonNewPasswd.setVisibility(View.VISIBLE);
-					toggleButtonNewPasswd.setImageDrawable(ContextCompat.getDrawable(changePasswordActivity, R.drawable.ic_b_shared_read));
-				}
-				else {
-					toggleButtonNewPasswd.setVisibility(View.GONE);
-					passwdVisibility = false;
-					showHidePassword(R.id.toggle_button_new_passwd);
-				}
-			}
-		});
+		newPassword1.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(newPassword1Layout, hasFocus));
 
 		newPassword2Layout = findViewById(R.id.change_password_newPassword2_layout);
 		newPassword2 = findViewById(R.id.change_password_newPassword2);
@@ -233,22 +212,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			}
 		});
 
-		newPassword2.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					toggleButtonNewPasswd2.setVisibility(View.VISIBLE);
-					toggleButtonNewPasswd2.setImageDrawable(ContextCompat.getDrawable(changePasswordActivity, R.drawable.ic_b_shared_read));
-				}
-				else {
-					toggleButtonNewPasswd2.setVisibility(View.GONE);
-					passwdVisibility = false;
-					showHidePassword(R.id.toggle_button_new_passwd2);
-				}
-			}
-		});
+		newPassword2.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(newPassword2Layout, hasFocus));
 
-				
 		changePasswordButton = (Button) findViewById(R.id.action_change_password);
 		changePasswordButton.setOnClickListener(this);
 
@@ -836,22 +801,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	    return super.onOptionsItemSelected(item);
 	}
 
-	void hidePasswordIfVisible () {
-		if (passwdVisibility) {
-			passwdVisibility = false;
-			toggleButtonNewPasswd.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_shared_read));
-			showHidePassword(R.id.toggle_button_new_passwd);
-			toggleButtonNewPasswd2.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_shared_read));
-			showHidePassword(R.id.toggle_button_new_passwd2);
-		}
-	}
-
 	@Override
 	public void onClick(View v) {
 		logDebug("onClick");
 		switch(v.getId()){
 			case R.id.action_change_password: {
-				hidePasswordIfVisible();
 				if (changePassword) {
 					logDebug("Ok proceed to change");
 					onChangePasswordClick();
@@ -872,32 +826,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 				break;
 			}
-			case R.id.toggle_button_new_passwd: {
-				if (passwdVisibility) {
-					toggleButtonNewPasswd.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_shared_read));
-					passwdVisibility = false;
-					showHidePassword(R.id.toggle_button_new_passwd);
-				}
-				else {
-					toggleButtonNewPasswd.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_see));
-					passwdVisibility = true;
-					showHidePassword(R.id.toggle_button_new_passwd);
-				}
-				break;
-			}
-			case R.id.toggle_button_new_passwd2: {
-				if (passwdVisibility) {
-					toggleButtonNewPasswd2.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_shared_read));
-					passwdVisibility = false;
-					showHidePassword(R.id.toggle_button_new_passwd2);
-				}
-				else {
-					toggleButtonNewPasswd2.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_see));
-					passwdVisibility = true;
-					showHidePassword(R.id.toggle_button_new_passwd2);
-				}
-				break;
-			}
 			case R.id.lost_authentication_device: {
 				try {
 					String url = "https://mega.nz/recovery";
@@ -915,7 +843,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			}
             case R.id.top:
                 logDebug("Show top");
-                hidePasswordIfVisible();
                 try {
                     Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1026,38 +953,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		newPassword1Error.setVisibility(View.GONE);
 		newPassword1Layout.setError(" ");
-	}
-
-	public void showHidePassword (int type) {
-		if(!passwdVisibility){
-			switch (type) {
-				case R.id.toggle_button_new_passwd: {
-					newPassword1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-					newPassword1.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
-					newPassword1.setSelection(newPassword1.getText().length());
-					break;
-				}
-				case R.id.toggle_button_new_passwd2: {
-					newPassword2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-					newPassword2.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
-					newPassword2.setSelection(newPassword2.getText().length());
-					break;
-				}
-			}
-		}else{
-			switch (type) {
-				case R.id.toggle_button_new_passwd: {
-					newPassword1.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-					newPassword1.setSelection(newPassword1.getText().length());
-					break;
-				}
-				case R.id.toggle_button_new_passwd2: {
-					newPassword2.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-					newPassword2.setSelection(newPassword2.getText().length());
-					break;
-				}
-			}
-		}
 	}
 
 	public void onResetPasswordClick(boolean hasMk){

@@ -4,10 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -555,7 +555,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					figuresInstallAppLayout.setAlpha(0.5f);
 					installAppIcon.setAlpha(0.5f);
 					daysLeftInstallAppText.setPadding(scaleWidthPx(8,outMetrics), scaleHeightPx(4,outMetrics),scaleWidthPx(8,outMetrics),scaleHeightPx(4,outMetrics));
-					daysLeftInstallAppText.setText(context.getResources().getString(R.string.expired_achievement));
+					daysLeftInstallAppText.setText(context.getResources().getString(R.string.expired_label));
 				}
 
 			}else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
@@ -614,7 +614,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
                     figuresAddPhoneLayout.setAlpha(0.5f);
                     addPhoneIcon.setAlpha(0.5f);
                     daysLeftAddPhoneText.setPadding(scaleWidthPx(8,outMetrics), scaleHeightPx(4,outMetrics),scaleWidthPx(8,outMetrics),scaleHeightPx(4,outMetrics));
-                    daysLeftAddPhoneText.setText(context.getResources().getString(R.string.expired_achievement));
+                    daysLeftAddPhoneText.setText(context.getResources().getString(R.string.expired_label));
                 }
             }
 			else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL){
@@ -673,7 +673,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					figuresInstallDesktopLayout.setAlpha(0.5f);
 					installDesktopIcon.setAlpha(0.5f);
 					daysLeftInstallDesktopText.setPadding(scaleWidthPx(8,outMetrics), scaleHeightPx(4,outMetrics),scaleWidthPx(8,outMetrics),scaleHeightPx(4,outMetrics));
-					daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.expired_achievement));
+					daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.expired_label));
 				}
 
 			}
@@ -728,7 +728,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					figuresRegistrationLayout.setAlpha(0.5f);
 					registrationIcon.setAlpha(0.5f);
 					daysLeftRegistrationText.setPadding(scaleWidthPx(8,outMetrics), scaleHeightPx(4,outMetrics),scaleWidthPx(8,outMetrics),scaleHeightPx(4,outMetrics));
-					daysLeftRegistrationText.setText(context.getResources().getString(R.string.expired_achievement));
+					daysLeftRegistrationText.setText(context.getResources().getString(R.string.expired_label));
 				}
 			}
 			else{

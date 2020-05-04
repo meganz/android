@@ -57,7 +57,7 @@ public class UploadUtil {
         logDebug("uploadTakePicture");
         File imgFile = getCacheFile(context, TEMPORAL_FOLDER, "picture.jpg");
         if (!isFileAvailable(imgFile)) {
-            Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.general_error), -1);
+            Util.showSnackbar(context, context.getString(R.string.general_error));
             return;
         }
 
@@ -66,7 +66,7 @@ public class UploadUtil {
         File newFile = buildTempFile(context, name);
         imgFile.renameTo(newFile);
 
-        UploadUtil.uploadFile(context, newFile.getAbsolutePath(), parentHandle, megaApi);
+        uploadFile(context, newFile.getAbsolutePath(), parentHandle, megaApi);
     }
 
     /**
@@ -94,7 +94,7 @@ public class UploadUtil {
         if (fs.length > 1) {
             Dialog localCameraDialog;
             String[] sdCardOptions = activity.getResources().getStringArray(R.array.settings_storage_download_location_array);
-            android.support.v7.app.AlertDialog.Builder b = new android.support.v7.app.AlertDialog.Builder(activity);
+            androidx.appcompat.app.AlertDialog.Builder b = new androidx.appcompat.app.AlertDialog.Builder(activity);
 
             b.setTitle(activity.getResources().getString(R.string.upload_to_filesystem_from));
             b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {

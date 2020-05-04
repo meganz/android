@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.design.widget.AppBarLayout
+        <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/linear_layout_add"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
                             android:layout_marginLeft="72dp"
                             android:layout_marginRight="16dp"
                             android:layout_marginBottom="16dp"
-                            android:text="@string/allow_acces_contact_subtitle"
+                            android:text="@string/grant_mega_access_contacts"
                             android:textSize="14sp"/>
 
                         <Button
@@ -124,7 +124,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <android.support.v7.widget.RecyclerView
+                        <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/contacts_list"
                             android:layout_width="match_parent"
                             android:layout_height="88dp"/>
@@ -145,7 +145,15 @@
                     </RelativeLayout>
                 </FrameLayout>
             </LinearLayout>
-        </android.support.design.widget.AppBarLayout>
+            <View
+                android:id="@+id/invitation_banner_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider_upgrade_account"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_alignParentBottom="true"/>
+        </com.google.android.material.appbar.AppBarLayout>
 
         <ScrollView
             android:id="@+id/scroller"
@@ -218,7 +226,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent">
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/chat_recent_list_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

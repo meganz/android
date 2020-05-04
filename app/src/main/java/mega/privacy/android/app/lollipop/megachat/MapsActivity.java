@@ -16,13 +16,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -375,7 +375,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         builder.setTitle(R.string.gps_disabled)
                 .setMessage(R.string.open_location_settings)
                 .setCancelable(false)
-                .setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.general_ok, new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                     }
@@ -521,7 +521,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                                 View.MeasureSpec.makeMeasureSpec(mapWidth, View.MeasureSpec.EXACTLY));
                         mapView.layout(0, 0, mapWidth, mapWidth);
                         mapView.buildDrawingCache(true);
-                        Bitmap bitmap = Bitmap.createScaledBitmap(mapView.getDrawingCache(), SNAPSHOT_SIZE, SNAPSHOT_SIZE, false);
+                        Bitmap bitmap = Bitmap.createScaledBitmap(mapView.getDrawingCache(), SNAPSHOT_SIZE, SNAPSHOT_SIZE, true);
                         mapView.setDrawingCacheEnabled(false);
 
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();

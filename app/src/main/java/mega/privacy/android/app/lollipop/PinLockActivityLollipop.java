@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.SwitchCompat;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -39,7 +39,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -205,7 +204,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		logoutButton.setOnClickListener(this);
 
 		enterButton = (Button) findViewById(R.id.button_enter);
-		enterButton.setText(getString(R.string.cam_sync_ok));
+		enterButton.setText(getString(R.string.general_ok));
 		enterButton.setOnClickListener(this);
 
 		unlockText = (TextView) findViewById(R.id.unlock_text_view);
@@ -1613,22 +1612,8 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		logDebug("onRequestFinish");
-		if(request.getType() == MegaRequest.TYPE_LOGOUT){
-			if(Util.isChatEnabled()){
-				logDebug("END logout sdk request - wait chat logout");
-			}
-			else{
-				logDebug("END logout sdk request - chat disabled");
-
-				AccountController aC = new AccountController(this);
-				aC.logoutConfirmed(this);
-
-				Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-				tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				this.startActivity(tourIntent);
-				finish();
-			}
+		if (request.getType() == MegaRequest.TYPE_LOGOUT) {
+			logDebug("END logout sdk request - wait chat logout");
 		}
 	}
 

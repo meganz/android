@@ -6,8 +6,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -32,6 +32,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -83,7 +84,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         public ImageView savedOffline;
         public ImageView publicLinkImage;
         public TextView textViewFileName;
-        public TextView textViewMessageInfo;
+        public EmojiTextView textViewMessageInfo;
         public long document;
         public RelativeLayout itemLayout;
         String fullNameTitle;
@@ -351,7 +352,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             holderList.savedOffline = (ImageView)v.findViewById(R.id.file_list_saved_offline);
             holderList.publicLinkImage = (ImageView)v.findViewById(R.id.file_list_public_link);
             holderList.textViewFileName = (TextView)v.findViewById(R.id.file_list_filename);
-            holderList.textViewMessageInfo = (TextView)v.findViewById(R.id.file_list_filesize);
+            holderList.textViewMessageInfo = v.findViewById(R.id.file_list_filesize);
             holderList.threeDotsLayout = (RelativeLayout)v.findViewById(R.id.file_list_three_dots_layout);
             holderList.threeDotsImageView = (ImageView) v.findViewById(R.id.file_list_three_dots);
             holderList.versionsIcon = (ImageView) v.findViewById(R.id.file_list_versions_icon);
@@ -385,7 +386,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         } else if (viewType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_GRID) {
             logDebug("Type: ITEM_VIEW_TYPE_GRID");
 
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid_new,parent,false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid,parent,false);
             NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid holderGrid = new NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid(v);
 
             holderGrid.fileLayout = v.findViewById(R.id.item_file_grid_file);
@@ -398,7 +399,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             holderGrid.textViewFileName = (TextView)v.findViewById(R.id.file_grid_filename);
             holderGrid.textViewFileNameForFile = (TextView)v.findViewById(R.id.file_grid_filename_for_file);
             holderGrid.imageButtonThreeDotsForFile = (ImageButton)v.findViewById(R.id.file_grid_three_dots_for_file);
-            holderGrid.textViewMessageInfo = (TextView)v.findViewById(R.id.file_grid_filesize);
+            holderGrid.textViewMessageInfo = v.findViewById(R.id.file_grid_filesize);
             holderGrid.imageButtonThreeDots = (ImageButton)v.findViewById(R.id.file_grid_three_dots);
             holderGrid.savedOffline = (ImageView)v.findViewById(R.id.file_grid_saved_offline);
             holderGrid.publicLinkImage = (ImageView)v.findViewById(R.id.file_grid_public_link);

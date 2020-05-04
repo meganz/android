@@ -10,17 +10,17 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -69,8 +69,7 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
-import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -105,9 +104,11 @@ import static android.webkit.URLUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
@@ -236,7 +237,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private boolean importFileF;
 	private int importFragmentSelected = -1;
 	private String action;
-    private android.support.v7.app.AlertDialog renameDialog;
+    private androidx.appcompat.app.AlertDialog renameDialog;
 	private HashMap<String, String> nameFiles = new HashMap<>();
 
 	private MegaNode myChatFilesNode;
@@ -330,6 +331,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 		
 		@Override
+        @SuppressWarnings("unchecked")
 		protected List<ShareInfo> doInBackground(Intent... params) {
 			logDebug("OwnFilePrepareTask: doInBackground");
             Intent intent = params[0];
@@ -397,6 +399,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		logDebug("onCreate first");
@@ -475,10 +478,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		megaApi.addGlobalListener(this);
 
-		if (isChatEnabled()) {
-			if (megaChatApi == null) {
-				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
-			}
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 		}
 		
 		setContentView(R.layout.activity_file_explorer);
@@ -538,34 +539,19 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				prepareNodesText.setVisibility(View.GONE);
 				gSession = credentials.getSession();
 
-				if(isChatEnabled()){
-					logDebug("Chat is ENABLED");
+				int ret = megaChatApi.getInitState();
 
-					int ret = megaChatApi.getInitState();
-
-					if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
-						ret = megaChatApi.init(gSession);
-						logDebug("Result of init ---> " + ret);
-						chatSettings = dbH.getChatSettings();
-						if (ret == MegaChatApi.INIT_NO_CACHE) {
-							logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
-						}
-						else if (ret == MegaChatApi.INIT_ERROR) {
-							logDebug("Condition ret == MegaChatApi.INIT_ERROR");
-							if(chatSettings == null) {
-								logWarning("ERROR----> Switch OFF chat");
-								chatSettings = new ChatSettings();
-								chatSettings.setEnabled(false+"");
-								dbH.setChatSettings(chatSettings);
-							} else{
-								logWarning("ERROR----> Switch OFF chat");
-								dbH.setEnabledChat(false + "");
-							}
-							megaChatApi.logout(this);
-						}
-						else{
-							logDebug("onCreate: Chat correctly initialized");
-						}
+				if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+					ret = megaChatApi.init(gSession);
+					logDebug("Result of init ---> " + ret);
+					chatSettings = dbH.getChatSettings();
+					if (ret == MegaChatApi.INIT_NO_CACHE) {
+						logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
+					} else if (ret == MegaChatApi.INIT_ERROR) {
+						logDebug("Condition ret == MegaChatApi.INIT_ERROR");
+						megaChatApi.logout(this);
+					} else {
+						logDebug("onCreate: Chat correctly initialized");
 					}
 				}
 
@@ -724,9 +710,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				if(isChatFirst){
 					aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 					setView(SHOW_TABS, true, -1);
-					if (!isChatEnabled()) {
-						isChatFirst = false;
-					}
 				}
 				else{
 					aB.setTitle(getString(R.string.title_upload_explorer).toUpperCase());
@@ -772,21 +755,15 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				if (mTabsAdapterExplorer == null){
 					tabLayoutExplorer.setVisibility(View.VISIBLE);
 					viewPagerExplorer.setVisibility(View.VISIBLE);
-					if (isChatFirst && isChatEnabled()) {
-						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
-					}
-					else {
-						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
+					if (isChatFirst) {
+						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this, true);
+					} else {
+						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this);
 					}
 					viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 					tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
 					if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2 && !isChatFirst && tabToRemove == CHAT_TAB) {
-						mTabsAdapterExplorer.setTabRemoved(true);
-						tabLayoutExplorer.removeTabAt(2);
-						mTabsAdapterExplorer.notifyDataSetChanged();
-					}
-					else if (!isChatEnabled() && mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2) {
 						mTabsAdapterExplorer.setTabRemoved(true);
 						tabLayoutExplorer.removeTabAt(2);
 						mTabsAdapterExplorer.notifyDataSetChanged();
@@ -936,11 +913,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 		searchView = (SearchView) searchMenuItem.getActionView();
 
-		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+		SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
 		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
 		searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
 		searchAutoComplete.setHint(getString(R.string.hint_action_search));
-		View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+		View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
 		v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 
 		if (searchView != null){
@@ -1702,9 +1679,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 
 		if (infos == null) {
-		    showSnackbar(getString(R.string.upload_can_not_open));
-		}
-		else {
+			showSnackbar(getString(R.string.upload_can_not_open));
+		} else if (existsMyChatFilesFolder()) {
+			setMyChatFilesFolder(getMyChatFilesFolder());
+			checkIfFilesExistsInMEGA();
+		} else {
 			megaApi.getMyChatFilesFolder(new GetAttrUserListener(this));
 		}
 	}
@@ -1741,7 +1720,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				if(parentNode == null){
 					parentNode = megaApi.getRootNode();
 				}
-				showSnackbar(getString(R.string.upload_began));
+
+				backToCloud(parentNode.getHandle(), infos.size());
 				for (ShareInfo info : infos) {
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -1889,8 +1869,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			else{
 				onIntentProcessed();
 			}
-			logDebug("After UPLOAD click - back to Cloud");
-			this.backToCloud(handle);
 		}
 		else if (mode == IMPORT){
 			long parentHandle = handle;
@@ -1957,10 +1935,12 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
-	private void backToCloud(long handle){
+	private void backToCloud(long handle, int numberUploads){
 		logDebug("handle: " + handle);
 
-		Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
+		Intent startIntent = new Intent(this, ManagerActivityLollipop.class)
+				.putExtra(SHOW_MESSAGE_UPLOAD_STARTED, true)
+				.putExtra(NUMBER_UPLOADS, numberUploads);
 		if(handle!=-1){
 			startIntent.setAction(ACTION_OPEN_FOLDER);
 			startIntent.putExtra("PARENT_HANDLE", handle);
@@ -1981,7 +1961,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			file = createTemporalTextFile(this, name, data);
 		}
 		if(file!=null){
-			showSnackbar(getString(R.string.upload_began));
 			Intent intent = new Intent(this, UploadService.class);
 			intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
 			intent.putExtra(UploadService.EXTRA_NAME, file.getName());
@@ -1990,7 +1969,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			startService(intent);
 
 			logDebug("After UPLOAD click - back to Cloud");
-			this.backToCloud(parentNode.getHandle());
+			this.backToCloud(parentNode.getHandle(), 1);
 			finishActivity();
 		}
 		else{
@@ -2112,61 +2091,20 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 
 			if (error.getErrorCode() != MegaError.API_OK) {
-
+                logWarning("Login failed with error code: " + error.getErrorCode());
 				MegaApplication.setLoggingIn(false);
-
-				//ERROR LOGIN
-				String errorMessage;
-				if (error.getErrorCode() == MegaError.API_ENOENT) {
-					errorMessage = getString(R.string.error_incorrect_email_or_password);
-				}
-				else if (error.getErrorCode() == MegaError.API_ENOENT) {
-					errorMessage = getString(R.string.error_server_connection_problem);
-				}
-				else if (error.getErrorCode() == MegaError.API_ESID){
-					errorMessage = getString(R.string.error_server_expired_session);
-				}
-				else{
-					errorMessage = error.getErrorString();
-				}
-				
-				//Go to the login activity
-				/*
-				loginLoggingIn.setVisibility(View.GONE);
-				loginLogin.setVisibility(View.VISIBLE);
-				loginDelimiter.setVisibility(View.VISIBLE);
-				loginCreateAccount.setVisibility(View.VISIBLE);
-				queryingSignupLinkText.setVisibility(View.GONE);
-				confirmingAccountText.setVisibility(View.GONE);
-				generatingKeysText.setVisibility(View.GONE);
-				loggingInText.setVisibility(View.GONE);
-				fetchingNodesText.setVisibility(View.GONE);
-				prepareNodesText.setVisibility(View.GONE);*/
-				
-				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				dbH.clearCredentials();
-				if (dbH.getPreferences() != null){
-					dbH.clearPreferences();
-					dbH.setFirstTime(false);
-				}
 			}
 			else{
-				//LOGIN OK
-
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
-				
-				gSession = megaApi.dumpSession();
-				credentials = new UserCredentials(lastEmail, gSession, "", "", "");
 
-				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				dbH.clearCredentials();
-
+                gSession = megaApi.dumpSession();
+                credentials = new UserCredentials(lastEmail, gSession, "", "", "");
+                dbH.saveCredentials(credentials);
 				logDebug("Logged in with session");
-
 				megaApi.fetchNodes(this);
 			}
 		}
@@ -2192,33 +2130,17 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				
 				loginLoggingIn.setVisibility(View.GONE);
 
-				chatSettings = dbH.getChatSettings();
-				if(chatSettings!=null) {
-
-					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-					if(chatEnabled){
-
-						logDebug("Chat enabled-->connect");
-						if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
-							logDebug("Connection goes!!!");
-							megaChatApi.connect(this);
-						} else{
-							logWarning("Not launch connect: " + megaChatApi.getInitState());
-						}
-						MegaApplication.setLoggingIn(false);
-						afterLoginAndFetch();
-					} else{
-						logWarning("Chat NOT enabled - readyToManager");
-						MegaApplication.setLoggingIn(false);
-						afterLoginAndFetch();
-					}
-				} else{
-					logWarning("chatSettings NULL - readyToManager");
-					MegaApplication.setLoggingIn(false);
-					afterLoginAndFetch();
-
+				logDebug("Chat --> connect");
+				if ((megaChatApi.getInitState() != MegaChatApi.INIT_ERROR)) {
+					logDebug("Connection goes!!!");
+					megaChatApi.connect(this);
+				} else {
+					logWarning("Not launch connect: " + megaChatApi.getInitState());
 				}
-			}	
+
+				MegaApplication.setLoggingIn(false);
+				afterLoginAndFetch();
+			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY) {
 			filesChecked++;
@@ -2621,7 +2543,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
-		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
@@ -2667,7 +2589,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 
 		if (!users.isEmpty()) {
-			CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, -1, this, CreateChatToPerformActionListener.SEND_FILE_EXPLORER_CONTENT);
+			CreateChatListener listener = new CreateChatListener(chats, users, -1, this, CreateChatListener.SEND_FILE_EXPLORER_CONTENT);
 
 			for (MegaUser user : users) {
 				MegaChatPeerList peers = MegaChatPeerList.createInstance();
@@ -2907,7 +2829,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			}
 		});
 
-		input.setImeActionLabel(getString(R.string.cam_sync_ok),EditorInfo.IME_ACTION_DONE);
+		input.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -2924,7 +2846,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		else {
 			builder.setTitle(getString(R.string.context_new_file_name));
 		}
-		builder.setPositiveButton(getString(R.string.cam_sync_ok),
+		builder.setPositiveButton(getString(R.string.general_ok),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String value = input.getText().toString().trim();
@@ -2945,7 +2867,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
 
-		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
+		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
 			@Override
 			public void onClick(View v)
 			{
@@ -3150,7 +3072,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
             }
         });
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
@@ -3167,7 +3089,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
         builder.setView(layout);
         renameDialog = builder.create();
         renameDialog.show();
-        renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
+        renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String value = input.getText().toString().trim();
@@ -3244,9 +3166,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private ChatExplorerFragment getChatExplorerFragment () {
 
-		if (!isChatEnabled()) {
-			return null;
-		}
 		ChatExplorerFragment c;
 
 		if (importFileF) {
