@@ -1326,6 +1326,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+			intent.putExtra(FileStorageActivityLollipop.IS_CU_OR_MU_FOLDER,true);
 			startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_MEGA_SECONDARY_MEDIA_FOLDER) == 0){
@@ -1549,6 +1550,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_CAMERA_FOLDER,true);
+			intent.putExtra(FileStorageActivityLollipop.IS_CU_OR_MU_FOLDER,true);
 			startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD) == 0){
@@ -1568,6 +1570,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 							intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 							intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 							intent.putExtra(FileStorageActivityLollipop.EXTRA_CAMERA_FOLDER, true);
+							intent.putExtra(FileStorageActivityLollipop.IS_CU_OR_MU_FOLDER,true);
 							startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
 							break;
 						}
@@ -1583,6 +1586,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 									intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 									intent.putExtra(FileStorageActivityLollipop.EXTRA_CAMERA_FOLDER, true);
+									intent.putExtra(FileStorageActivityLollipop.IS_CU_OR_MU_FOLDER,true);
 									startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
 								}
 							}
