@@ -83,6 +83,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
 	private static final String PATH = "PATH";
+	public static final String IS_CU_OR_MU_FOLDER = "IS_CU_OR_MU_FOLDER";
 
 	public static final String EXTRA_URL = "fileurl";
 	public static final String EXTRA_SIZE = "filesize";
@@ -150,6 +151,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	private Boolean fromSettings, fromSaveRecoveryKey;
 	private Boolean cameraFolderSettings;
+	private Boolean isCUOrMUFolder;
 	private String sdRoot;
 	private boolean hasSDCard;
     private String prompt;
@@ -360,6 +362,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
 		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
 		cameraFolderSettings = intent.getBooleanExtra(EXTRA_CAMERA_FOLDER, false);
+		isCUOrMUFolder = intent.getBooleanExtra(IS_CU_OR_MU_FOLDER, false);
+
 		File[] fs = getExternalFilesDirs(null);
 		hasSDCard = fs.length > 1 && fs[1] != null;
 		
@@ -722,7 +726,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                     dbH.setLastUploadFolder(path.getAbsolutePath());
                 }
 				if (mode == Mode.PICK_FOLDER) {
-					if ((prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways()))
+					if (!isCUOrMUFolder && (prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways()))
 							&& dbH.getAskSetDownloadLocation()) {
 						showConfirmationSaveInSameLocation();
 					} else {
