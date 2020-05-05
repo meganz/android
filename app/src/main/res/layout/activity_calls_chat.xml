@@ -80,7 +80,7 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginRight="8dp"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/ic_mic_off_contact"
+                        android:src="@drawable/ic_own_mic_off"
                         android:visibility="gone" />
 
                     <!--Big Avatar in Group call-->
@@ -121,7 +121,7 @@
                         android:layout_alignTop="@+id/rl_avatar_big_camera_group_call"
                         android:layout_toRightOf="@+id/rl_avatar_big_camera_group_call"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/ic_mic_off_contact"
+                        android:src="@drawable/ic_own_mic_off"
                         android:visibility="gone" />
                 </RelativeLayout>
                 <!--RecyclerView (7 + users)-->
@@ -497,26 +497,40 @@
                 </RelativeLayout>
 
                 <!--Small avatar-->
-                <RelativeLayout
-                    android:id="@+id/call_chat_my_image_rl"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentBottom="true"
                     android:layout_marginRight="20dp"
-                    android:layout_marginBottom="110dp"
-                    android:background="@drawable/shape_call_chat">
+                    android:layout_marginBottom="110dp">
 
-                    <mega.privacy.android.app.components.RoundedImageView
-                        android:id="@+id/call_chat_my_image"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:scaleType="fitCenter"
-                        rounded:border_color="#4DFFFFFF"
-                        rounded:border_width="3dp"
-                        rounded:corner_radius="40dp" />
-                </RelativeLayout>
+                    <RelativeLayout
+                        android:id="@+id/call_chat_my_image_rl"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:background="@drawable/shape_call_chat">
+                        <mega.privacy.android.app.components.RoundedImageView
+                            android:id="@+id/call_chat_my_image"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true"
+                            android:scaleType="fitCenter"
+                            rounded:border_color="#4DFFFFFF"
+                            rounded:border_width="3dp"
+                            rounded:corner_radius="40dp" />
+                    </RelativeLayout>
+                    <ImageView
+                        android:id="@+id/micro_own_avatar"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignTop="@id/call_chat_my_image_rl"
+                        android:layout_gravity="right"
+                        android:background="@null"
+                        android:visibility="gone"
+                        android:src="@drawable/ic_own_mic_off"/>
+                </FrameLayout>
+
             </RelativeLayout>
 
 

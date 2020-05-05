@@ -165,11 +165,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         holderGrid.avatarLayout.setLayoutParams(layoutParams);
 
-        holderGrid.microAvatar = (ImageView) v.findViewById(R.id.micro_avatar);
-        holderGrid.microSurface = (ImageView) v.findViewById(R.id.micro_surface_view);
-        holderGrid.qualityLayout = (RelativeLayout) v.findViewById(R.id.rl_quality);
-        holderGrid.qualityIcon = (ImageView) v.findViewById(R.id.quality_icon);
-        holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
+        holderGrid.microAvatar = v.findViewById(R.id.micro_avatar);
+        holderGrid.microSurface = v.findViewById(R.id.micro_surface_view);
+        holderGrid.qualityLayout = v.findViewById(R.id.rl_quality);
+        holderGrid.qualityIcon = v.findViewById(R.id.quality_icon);
+        holderGrid.avatarImage = v.findViewById(R.id.avatar_image);
         holderGrid.avatarInitialLetter = v.findViewById(R.id.avatar_initial_letter);
         holderGrid.avatarImage.setImageBitmap(null);
         holderGrid.avatarInitialLetter.setText("");

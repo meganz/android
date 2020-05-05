@@ -1,9 +1,12 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
+
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
@@ -112,6 +115,12 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         if (isVideoAllowed()) {
             localRenderer.drawBitmap(true, true);
         }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        context = activity;
     }
 
     @Override
