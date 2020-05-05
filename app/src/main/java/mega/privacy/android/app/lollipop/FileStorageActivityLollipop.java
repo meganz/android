@@ -762,6 +762,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			return;
 		}
 
+		if (prefs == null) {
+			prefs = dbH.getPreferences();
+		}
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
 		View v = getLayoutInflater().inflate(R.layout.dialog_general_confirmation, null);
 		builder.setView(v);
