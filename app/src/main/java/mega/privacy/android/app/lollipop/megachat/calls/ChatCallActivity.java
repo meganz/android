@@ -610,25 +610,39 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         fourArrowVideo = findViewById(R.id.four_arrow_video);
 
         answerCallFAB = findViewById(R.id.answer_call_fab);
+        enableFab(answerCallFAB);
         answerCallFAB.hide();
+
         pauseFAB = findViewById(R.id.pause_fab);
         pauseFAB.setOnClickListener(this);
+        enableFab(pauseFAB);
         pauseFAB.hide();
+
         videoFAB = findViewById(R.id.video_fab);
         videoFAB.setOnClickListener(this);
+        enableFab(videoFAB);
         videoFAB.hide();
+
         rejectFAB = findViewById(R.id.reject_fab);
         rejectFAB.setOnClickListener(this);
+        enableFab(rejectFAB);
         rejectFAB.hide();
+
         speakerFAB = findViewById(R.id.speaker_fab);
         speakerFAB.setOnClickListener(this);
+        enableFab(speakerFAB);
         speakerFAB.hide();
+
         microFAB = findViewById(R.id.micro_fab);
         microFAB.setOnClickListener(this);
+        enableFab(microFAB);
         microFAB.hide();
+
         hangFAB = findViewById(R.id.hang_fab);
         hangFAB.setOnClickListener(this);
+        enableFab(hangFAB);
         hangFAB.hide();
+
         shake = AnimationUtils.loadAnimation(this, R.anim.shake);
 
         //Cameras in Group call
@@ -1675,9 +1689,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || callChat.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING || isSessionOnHold()) {
-            pauseFAB.setEnabled(false);
+            disableFab(pauseFAB);
         } else {
-            pauseFAB.setEnabled(true);
+            enableFab(pauseFAB);
         }
         if (callChat.isOnHold()) {
             pauseFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
@@ -1687,19 +1701,28 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         updateFABwithCallOnHold();
     }
 
+    private void disableFab(final FloatingActionButton fab){
+        fab.setEnabled(false);
+        fab.setAlpha(0.5f);
+    }
+    private void enableFab(final FloatingActionButton fab){
+        fab.setEnabled(true);
+        fab.setAlpha(1f);
+    }
+
     private void updateFABwithCallOnHold() {
         if (callChat.isOnHold()) {
-            speakerFAB.setEnabled(false);
-            videoFAB.setEnabled(false);
-            microFAB.setEnabled(false);
+            disableFab(speakerFAB);
+            disableFab(videoFAB);
+            disableFab(microFAB);
         }else if(isSessionOnHold()){
-            videoFAB.setEnabled(false);
-            speakerFAB.setEnabled(true);
-            microFAB.setEnabled(true);
+            enableFab(speakerFAB);
+            disableFab(videoFAB);
+            enableFab(microFAB);
         } else {
-            speakerFAB.setEnabled(true);
-            microFAB.setEnabled(true);
-            videoFAB.setEnabled(true);
+            enableFab(speakerFAB);
+            enableFab(videoFAB);
+            enableFab(microFAB);
         }
     }
 

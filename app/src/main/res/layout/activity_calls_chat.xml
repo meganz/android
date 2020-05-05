@@ -555,9 +555,10 @@
                     android:scaleType="center"
                     android:src="@drawable/ic_w_end_call"
                     android:visibility="gone"
+                    android:alpha="1"
                     app:backgroundTint="@color/delete_account"
                     app:borderWidth="0dp"
-                    app:elevation="6dp"
+                    app:elevation="0dp"
                     app:fabSize="normal"
                     app:pressedTranslationZ="12dp" />
 
@@ -588,10 +589,11 @@
                     android:background="@null"
                     android:scaleType="center"
                     android:src="@drawable/ic_call_hold_fab"
+                    android:alpha="1"
                     android:visibility="gone"
                     app:backgroundTint="@color/accentColor"
                     app:borderWidth="0dp"
-                    app:elevation="6dp"
+                    app:elevation="0dp"
                     app:fabSize="normal"
                     app:pressedTranslationZ="12dp" />
                 </FrameLayout>
@@ -611,10 +613,11 @@
                         android:background="@null"
                         android:scaleType="center"
                         android:src="@drawable/ic_speaker_on"
+                        android:alpha="1"
                         android:visibility="gone"
                         app:backgroundTint="@color/accentColor"
                         app:borderWidth="0dp"
-                        app:elevation="6dp"
+                        app:elevation="0dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
@@ -634,10 +637,11 @@
                             android:layout_gravity="bottom"
                             android:layout_marginBottom="24dp"
                             android:scaleType="center"
+                            android:alpha="1"
                             android:src="@drawable/ic_phone_white"
                             app:backgroundTint="@color/accentColor"
                             app:borderWidth="0dp"
-                            app:elevation="6dp"
+                            app:elevation="0dp"
                             app:fabSize="normal"
                             app:pressedTranslationZ="12dp" />
 
@@ -708,10 +712,11 @@
                         android:layout_marginBottom="24dp"
                         android:background="@null"
                         android:scaleType="center"
+                        android:alpha="1"
                         android:src="@drawable/ic_videocam_white"
                         app:backgroundTint="@color/accentColor"
                         app:borderWidth="0dp"
-                        app:elevation="6dp"
+                        app:elevation="0dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
@@ -781,7 +786,8 @@
                         android:src="@drawable/ic_record_audio_w"
                         app:backgroundTint="@color/accentColor"
                         app:borderWidth="0dp"
-                        app:elevation="6dp"
+                        android:alpha="1"
+                        app:elevation="0dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
@@ -796,7 +802,8 @@
                         android:src="@drawable/ic_w_end_call"
                         app:backgroundTint="@color/delete_account"
                         app:borderWidth="0dp"
-                        app:elevation="6dp"
+                        android:alpha="1"
+                        app:elevation="0dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
                 </FrameLayout>
