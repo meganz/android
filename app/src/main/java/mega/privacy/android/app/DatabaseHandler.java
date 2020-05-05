@@ -1573,7 +1573,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param chatSettings Chat settings to save.
 	 */
 	private void setChatSettings(SQLiteDatabase db, ChatSettings chatSettings) {
-		logDebug("setChatSettings");
+		if (chatSettings == null) {
+			logError("Error: Chat settings are null");
+			return;
+		}
 
 		db.execSQL("DELETE FROM " + TABLE_CHAT_SETTINGS);
 
