@@ -384,7 +384,7 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">Leave share</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Remove share</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">This link will not be publicly available anymore.</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">This link will not be publicly available anymore.</string>
     <plurals name="remove_links_warning_text">
         <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">This link will not be publicly available anymore.</item>
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>

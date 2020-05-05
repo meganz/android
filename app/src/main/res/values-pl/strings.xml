@@ -256,6 +256,7 @@
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">Udostępnione elementy</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Udostępnione katalogi</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Kosz</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Kontakty</string>
@@ -272,6 +273,7 @@
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Nadchodzące</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Wychodzące</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">Linki</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">Udostępnienia</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Udostępnione z</string>
@@ -382,7 +384,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">Pozostaw</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Usuń udostępnienie</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Usuń link</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Ten link nie będzie już dostępny publicznie.</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">Ten link nie będzie już dostępny publicznie.</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Ten link nie będzie już dostępny publicznie.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Zmień nazwę</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Otwórz link</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Otwórz</string>
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">Data</string>
     <string name="sortby_creation_date" context="category in sort by action">Data utworzenia</string>
     <string name="sortby_modification_date" context="category in sort by action">Data modyfikacji</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Link creation date</string>
     <string name="sortby_date_newest" context="sort files by date newest first">najnowsze</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">najstarsze</string>
 
@@ -910,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logowanie jest uruchomione</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logowanie jest zablokowane</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logs have not been enabled because you denied the required permissions</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Otwórz łącze</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Ten proces zajmuje więcej czasu niż standardowo. Prosimy czekać.</string>
@@ -1555,7 +1563,14 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Pokaż info</string>
 
-    <string name="context_link_removal_error" context="error message">Usunięcie linku nie powiodło się. Spróbuj ponownie później.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">Usunięcie linku nie powiodło się. Spróbuj ponownie później.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Some links removal failed. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">Działanie łącza nie powiodło się. Spróbuj ponownie później.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Wpisz adres e-mail użytkownika</string>
@@ -1827,6 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Brak [/B][A]udostępnionych katalogów[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Brak [/B][A]udostępnionych katalogów[/A][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Wysłane zgłoszenia</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Otrzymane zgłoszenia</string>
@@ -2725,6 +2741,13 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Możliwe, że używasz tego samego hasła do konta MEGA co do innych usług i że co najmniej jedna z tych innych usług doznała naruszenia danych.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Twoje hasło wyciekło i jest obecnie wykorzystywane przez złych aktorów do logowania się na twoje konta, w tym między innymi na twoje konto MEGA.</string>
 
+    <string name="add_nickname" context="Button to add a nickname for a user">Set nickname</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Edit nickname</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to added the nickname</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
+
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Ponowne połączenie</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Wróciłeś.</string>
 
@@ -2734,6 +2757,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">Nie masz uprawnień wymaganych do przywrócenia tego pliku. Aby kontynuować, możemy utworzyć nowy plik z cofniętymi danymi. Czy chcesz kontynuować?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Wersja została pomyślnie utworzona jako nowy plik.</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
+
     <string name="download_location" context="Download location label">Lokalizacja na pliki</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Czy zawsze zapisywać w tej lokalizacji?</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
 </resources>

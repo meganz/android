@@ -191,7 +191,7 @@
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Première fois sur MEGA ?</string>
     <string name="create_account" context="button that allows the user to create an account">Créer un compte</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Veuillez saisir votre adresse courriel.</string>
-    <string name="error_invalid_email" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Adresse courriel invalide</string>
+    <string name="error_invalid_email" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">L\'adresse courriel est invalide</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Veuillez saisir votre mot de passe</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Vous n\'êtes pas connecté au réseau</string>
     <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">Vous avez été déconnecté de cet appareil d\'un autre endroit</string>
@@ -256,6 +256,7 @@
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">Éléments partagés</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Dossiers partagés</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Corbeille</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Contacts</string>
@@ -272,6 +273,7 @@
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Entrants</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Sortants</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">Liens</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">Partages entrants</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Partages entrants avec</string>
@@ -382,7 +384,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">Quitter le partage</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Supprimer le partage</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Supprimer le lien</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Cela ne sera plus accessible publiquement.</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">Cela ne sera plus accessible publiquement.</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Cela ne sera plus accessible publiquement.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renommer</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Ouvrir un lien</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Ouvrir</string>
@@ -524,7 +530,7 @@
     <string name="rubbish_bin_emptied" context="success message when emptying the RB">La corbeille a été vidée avec succès</string>
     <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Erreur. La corbeille n\'a pas été vidée</string>
 
-    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Vous êtes sur le point d\'annuler votre abonnement MEGA. Si nous pouvons faire quoi que ce soit pour vous faire changer d\'idée, n\'hésitez pas à nous le dire.</string>
+    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Vous êtes sur le point d\'annuler votre abonnement MEGA. Si nous pouvons faire quoi que ce soit pour vous faire changer d\'idée, n\'hésitez pas à nous le communiquer.</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Rédigez votre commentaire ici</string>
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Envoyer</string>
     <!--
@@ -621,7 +627,7 @@
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">Changement du mot de passe</string>
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Mot de passe actuel</string>
     <string name="my_account_change_password_newPassword1" context="when changing the password">Nouveau mot de passe</string>
-    <string name="my_account_change_password_newPassword2" context="when changing the password">Confirmez le nouveau mot de passe</string>
+    <string name="my_account_change_password_newPassword2" context="when changing the password">Confirmer le nouveau mot de passe</string>
     <!--
     <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Incorrect current password or the new passwords you provided do not match. Please try again</string>
     -->
@@ -673,7 +679,7 @@
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Prendre une photo</string>
 
     <string name="ask_for_display_over_title" context="Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">Permettre les notifications pour les appels MEGA entrants</string>
-    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA a besoin de votre autorisation pour autoriser  l\'apparition de l\'interface d\'appel.</string>
+    <string name="ask_for_display_over_msg" context="Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10)">MEGA a besoin de votre autorisation pour autoriser l\'apparition de l\'interface d\'appel.</string>
     <string name="ask_for_display_over_explain" context="Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10)">Ne vous inquiétez pas, vous pouvez quand même accorder les autorisations à partir des paramètres de votre appareil.</string>
 
     <string name="cam_sync_wifi" context="the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected">Wi-Fi seulement</string>
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">Date</string>
     <string name="sortby_creation_date" context="category in sort by action">Date de création</string>
     <string name="sortby_modification_date" context="category in sort by action">Date de modification</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Link creation date</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Du plus récent</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Du plus ancien</string>
 
@@ -910,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">La journalisation est maintenant activée</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Les journaux sont maintenant désactivés</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logs have not been enabled because you denied the required permissions</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Ouvrir l\'emplacement</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Ce processus prend plus de temps que prévu. Veuillez patienter.</string>
@@ -968,7 +976,7 @@
     <string name="invalid_string" context="Error when the user leaves empty the password field">Erroné</string>
 
     <string name="invalid_input" context="Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email">L\'entrée est invalide</string>
-    <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Adresse courriel invalide</string>
+    <string name="invalid_email_title" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">L\'adresse courriel est invalide</string>
     <string name="invalid_email_text" context="Title of the alert dialog when the user tries to recover the pass of a non existing account">Veuillez vérifier l\'adresse courriel et ressayer.</string>
     <!--
     <string name="alert_not_logged_out" context="Alert to inform the user that have to be logged out to perform the action">You must be logged out to perform this action.</string>
@@ -1362,7 +1370,7 @@
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Espace de stockage</string>
     <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">de quota de transfert</string>
 
-    <string name="available_space" context="Label in section the storage tab in My Account Section">Disponibles</string>
+    <string name="available_space" context="Label in section the storage tab in My Account Section">Disponible</string>
     <string name="not_available" context="Label in section the storage tab in My Account Section when no info info is received">non disponible</string>
 
     <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">Aucun cycle de facturation</string>
@@ -1555,7 +1563,14 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Afficher les renseignements</string>
 
-    <string name="context_link_removal_error" context="error message">Échec de suppression du lien. Veuillez essayer ultérieurement.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">Échec de suppression du lien. Veuillez essayer ultérieurement.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Some links removal failed. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">Échec d\'action du lien. Veuillez ressayer ultérieurement.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Saisir l\'adresse courriel de l\'utilisateur</string>
@@ -1827,6 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Il n\'y a aucun [/B][A]dossier partagé entrant[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Il n\'y a aucun [/B][A]dossier partagé sortant[/A][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Demandes envoyées</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Demandes reçues</string>
@@ -1841,8 +1857,8 @@
     <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">Ce mot de passe résistera à la plupart des attaques en force typiques. Veuillez vous assurer de vous en souvenir.</string>
     <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">Ce mot de passe résistera à la plupart des attaques en force sophistiquées. Veuillez vous assurer de vous en souvenir.</string>
     <string name="pass_very_weak" context="Password very weak">Très vulnérable</string>
-    <string name="pass_weak" context="Password weak">Faible</string>
-    <string name="pass_medium" context="Password medium">Moyenne</string>
+    <string name="pass_weak" context="Password weak">Vulnérable</string>
+    <string name="pass_medium" context="Password medium">Moyen</string>
     <string name="pass_good" context="Password good">Bon</string>
     <string name="pass_strong" context="Password strong">Robuste</string>
 
@@ -2429,9 +2445,9 @@
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Il n\'y a aucune [/B][A]notification[/A][B].[/B]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">Configurer MEGA</string>
-    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA a besoin d\'accéder à vos photos à vos médias et à vos fichiers afin que vous puissiez les partager avec des amis, échanger des messages chiffrés et faire des appels chiffrés.</string>
+    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA a besoin d\'accéder à vos photos, à vos médias et à vos fichiers afin que vous puissiez les partager avec des amis, échanger des messages chiffrés et faire des appels chiffrés.</string>
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Autoriser l\'accès aux photos, aux médias et aux fichiers</string>
-    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">Pour partager des photos, des médias et des fichiers, MEGA a besoin de votre autorisation.</string>
+    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">Afin de partager des photos, des médias et des fichiers, MEGA a besoin de votre autorisation.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Activer l\'appareil photo</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Autorisez l\'accès à votre appareil photo pour numériser des documents, prendre des photos et faire des appels vidéo.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Autoriser les appels</string>
@@ -2716,7 +2732,7 @@
     <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Erreur. Le dossier %1$s n\'a pas été créé</string>
 
     <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Confirmation de votre adresse courriel</string>
-    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Votre compte a été verrouillé temporairement pour votre sécurité.</string>
+    <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">Votre compte a temporairement été verrouillé pour votre sécurité.</string>
     <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">[A]Veuillez confirmer votre adresse courriel[/A] et suivre les étapes du courriel de MEGA afin de déverrouiller votre compte.</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Pourquoi est-ce que je vois ceci ?</string>
     <string name="resend_email_label" cotext="Label of a button which action is resend an email">Renvoyer le courriel</string>
@@ -2724,6 +2740,13 @@
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Comptes verrouillés</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Il est possible que vous utilisiez le même mot de passe pour votre compte MEGA que pour d\'autres services et qu\'au moins l\'un de ses services ait souffert d\'une atteinte à la protection des données.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Votre mot de passe a été divulgué et est maintenant utilisé par des personnes malveillantes pour se connecter à vos comptes dont, mais sans s\'y limiter, à votre compte MEGA.</string>
+
+    <string name="add_nickname" context="Button to add a nickname for a user">Set nickname</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Edit nickname</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to added the nickname</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnexion</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Vous êtes de retour.</string>
@@ -2734,6 +2757,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">Vous n\'avez pas les droits exigés pour rétablir ce fichier. Afin de poursuivre, nous pouvons créer un nouveau fichier avec les données rétablies. Le souhaitez-vous ?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">La version a été créée avec succès en tant que nouveau fichier.</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
+
     <string name="download_location" context="Download location label">Emplacement de téléchargement</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Toujours enregistrer dans cet emplacement ?</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
 </resources>

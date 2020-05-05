@@ -256,6 +256,7 @@
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">Elemente partajate</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Foldere partajate</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Coș de gunoi</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Contacte</string>
@@ -272,6 +273,7 @@
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Primite</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Efectuate</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">Linkuri</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">Partajări primite</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Partajări primite cu</string>
@@ -382,7 +384,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">Părăsește partajarea</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Elimină partajarea</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Elimină linkul</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Acest link nu va mai fi disponibil publicului.</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">Acest link nu va mai fi disponibil publicului.</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Acest link nu va mai fi disponibil publicului.</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Redenumește</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Deschide un link</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Deschide</string>
@@ -790,7 +796,7 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nesetat</string>
-    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">Resetează codul PIN</string>
+    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">Schimbă PIN-ul</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">Blocare prin PIN</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Introdu</string>
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">Dată</string>
     <string name="sortby_creation_date" context="category in sort by action">Data creării</string>
     <string name="sortby_modification_date" context="category in sort by action">Data modificării</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Link creation date</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Cele mai noi</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Cele mai vechi</string>
 
@@ -910,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Jurnalele sunt acum activate</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Jurnalele sunt acum dezactivate</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logs have not been enabled because you denied the required permissions</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Deschide locația</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Procesul durează mai mult decât era de așteptat. Te rugăm să aștepți&#8230;</string>
@@ -1369,7 +1377,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]din %2$s[/A]</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Elimini din Salvate pentru offline?</string>
+    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Elimini din Ofline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Setează statusul</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Înlătură</string>
@@ -1555,7 +1563,14 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Afișează informații</string>
 
-    <string name="context_link_removal_error" context="error message">Eliminarea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">Eliminarea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Some links removal failed. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">Acțiunea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Scrie e-mailul utilizatorului</string>
@@ -1827,6 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Niciun [/B][A]folder partajat primit[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Niciun [/B][A]folder partajat trimis[/A][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Cereri trimise</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Cereri primite</string>
@@ -2253,7 +2269,7 @@
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Rotația cheii este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele din trecut.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] a creat un link al chatului.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] a șters linkul chatului.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] a eliminat linkul chatului.[/B]</string>
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">Șterge linkul chatului</string>
 
@@ -2725,6 +2741,13 @@
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">Este posibil să folosești aceeași parolă pentru contul tău MEGA ca și pentru alte servicii și că cel puțin unul dintre aceste alte servicii a suferit o încălcare a securității datelor.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">Parola ta s-a scurs și acum este folosită de persoane rău-intenționate pentru a se autentifica în conturile tale, inclusiv, dar nu numai, în contul tău MEGA.</string>
 
+    <string name="add_nickname" context="Button to add a nickname for a user">Set nickname</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Edit nickname</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to added the nickname</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
+
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Se reconectează</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Te-ai întors.</string>
 
@@ -2734,6 +2757,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">Nu ai permisiunile necesare pentru a reveni la versiunea anterioară pentru acest fișier. Pentru a continua, putem crea un nou fișier cu datele readuse la versiunea anterioară. Dorești să continui?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Versiunea a fost creată cu succes ca un fișier nou.</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
+
     <string name="download_location" context="Download location label">Locație de descărcare</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Salvezi întotdeauna în această locație?</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
 </resources>

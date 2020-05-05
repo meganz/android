@@ -256,6 +256,7 @@
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
+    <string name="title_shared_items" context="title of the screen that shows all the shared items">Itens compartilhados</string>
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Pastas compartilhadas</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Lixeira</string>
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Contatos</string>
@@ -272,6 +273,7 @@
     -->
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Entrada</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Saída</string>
+    <string name="tab_links_shares" context="Capital letters. Files with link. The title of a tab">Links</string>
 
     <string name="title_incoming_shares_explorer" context="Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible).">Compartilhado comigo</string>
     <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Compartilhado comigo por</string>
@@ -382,7 +384,11 @@
     <string name="alert_leave_share" context="Title alert before leaving a share.">Sair do compartilhamento</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Remover compartilhamento</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remover link</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">Este link já não estará disponível publicamente</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file. Singular.">Este link já não estará disponível publicamente</string>
+    <plurals name="remove_links_warning_text">
+        <item context="Warning that appears prior to remove a link of a file. Singular." quantity="one">Este link já não estará disponível publicamente</item>
+        <item context="Warning that appears prior to remove links of files. Plural." quantity="other">These links will not be publicly available anymore.</item>
+    </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renomear</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Abrir link</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Abrir</string>
@@ -711,7 +717,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Mostrar dispositivos avançados (SD externo)</string>
 	<string name="add_phone_number_label" context="Label of button on account page that ask user to add their phone number">Adicionar número de telefone</string>
 	<string name="verify_account_title" context="enter verification code page title">Confirme a sua conta</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">A sua conta foi temporariamente bloqueada devido a um abuso em potencial. Confirme o seu número de telefone para desbloquear a sua conta.</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">A sua conta foi temporariamente bloqueada devido a uma suspeita de infração. Por favor, confirme o seu número de telefone para desbloquear a sua conta.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">País</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">O seu telefone</string>
     <string name="general_back_button" context="Button label - go to previous page">Voltar</string>
@@ -864,6 +870,7 @@
     <string name="sortby_date" context="category in sort by action">Data</string>
     <string name="sortby_creation_date" context="category in sort by action">Data de criação</string>
     <string name="sortby_modification_date" context="category in sort by action">Data de modificação</string>
+    <string name="sortby_link_creation_date" context="category in sort by action">Link creation date</string>
     <string name="sortby_date_newest" context="sort files by date newest first">Mais recente</string>
     <string name="sortby_date_oldest" context="sort files by date oldest first">Mais antigo</string>
 
@@ -910,6 +917,7 @@
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Os logs estão ativos</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Os logs foram desativados</string>
+    <string name="logs_not_enabled_permissions" context="Message displayed when the user denies the required permissions during the logs activation">Logs have not been enabled because you denied the required permissions</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Abrir localização</string>
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Este processo está demorando mais do que o esperado. Por favor, espere.</string>
@@ -1438,7 +1446,7 @@
     <!--
     <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
     -->
-    <string name="transfer_unknown" context="Possible state of a transfer">desconhecido</string>
+    <string name="transfer_unknown" context="Possible state of a transfer">Desconhecido</string>
 
     <string name="paused_transfers_title" context="Title of the panel where the progress of the transfers is shown">Transferências pausadas</string>
 
@@ -1555,7 +1563,14 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Mostrar informações</string>
 
-    <string name="context_link_removal_error" context="error message">Não foi possível remover o link. Por favor, tente novamente mais tarde.</string>
+    <plurals name="context_link_removal_error">
+        <item context="Error message when removing public links of nodes. Singular." quantity="one">Não foi possível remover o link. Por favor, tente novamente mais tarde.</item>
+        <item context="Error message when removing public links of nodes. Plural." quantity="other">Some links removal failed. Please try again later.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item context="Message when a public links was removed successfully. Singular." quantity="one">Link removed successfully.</item>
+        <item context="Message when some public links were removed successfully. Plural." quantity="other">Links removed successfully.</item>
+    </plurals>
     <string name="context_link_action_error" context="error message">Não foi possível acessar o link. Por favor, tente novamente mais tarde.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Digite o email do usuário</string>
@@ -1827,6 +1842,7 @@
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]Não há [/B][A]Pastas compartilhadas comigo[/A][B].[/B]</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]Não há [/B][A]Pastas compartilhadas por mim[/A][B].[/B]</string>
+    <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No [/B][A]Public Links[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">solicitações enviadas</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">solicitações recebidas</string>
@@ -1844,7 +1860,7 @@
     <string name="pass_weak" context="Password weak">Fraca</string>
     <string name="pass_medium" context="Password medium">Média</string>
     <string name="pass_good" context="Password good">Boa</string>
-    <string name="pass_strong" context="Password strong">Forte</string>
+    <string name="pass_strong" context="Password strong">Segura</string>
 
     <string name="title_notification_call_in_progress" context="Text displayed in several parts when there is a call in progress (notification, recent chats list, etc).">Chamada em curso</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Pressione para voltar à chamada</string>
@@ -2010,7 +2026,7 @@
 
     <string name="subtitle_mega_rich_link_no_key" context="Subtitle of a MEGA rich link without the decryption key">Toque para digitar a chave de decodificação</string>
 
-    <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Por favor, digite uma senha mais forte</string>
+    <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Por favor, digite uma senha mais segura</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">Novo contato</string>
     <string name="title_storage_usage" context="title of usage storage section in Storage">Uso do armazenamento</string>
@@ -2715,7 +2731,7 @@
     <string name="my_chat_files_folder" context="Name by default of the folder where the files sent to the chat are stored in the cloud">Arquivos dos meus chats</string>
     <string name="error_creating_folder" context="Error shown when it was not possible to create a folder for any reason">Não foi possível criar a pasta %1$s</string>
 
-    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Confirme o seu endereço de email</string>
+    <string name="verify_email_label" context="Title of an alert screen indicating the user has to verify their email">Confirme o seu email</string>
     <string name="account_temporarily_suspended" context="Text informing user that their account has been suspended">A sua conta foi bloqueada temporalmente por motivos de segurança.</string>
     <string name="verify_email_and_follow_steps" context="Text informing user has to follow the steps of an email to unlock their account">Para desbloquear a sua conta, [A]confirme o seu email[/A] seguindo os passos indicados no email enviado pelo MEGA.</string>
     <string name="why_am_i_seeing_this" context="Question which takes the user to a help screen">Por que estou vendo isso?</string>
@@ -2724,6 +2740,13 @@
     <string name="locked_accounts_label" context="Title of a helping view about locked accounts">Contas bloqueadas</string>
     <string name="locked_accounts_text_1" cotext="Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description">É possível que você esteja usando no MEGA a mesma senha que usa em outros serviços, e que pelo menos um desses outros serviços tenha sofrido uma filtração de dados.</string>
     <string name="locked_accounts_text_2" cotext="Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description">A sua senha foi comprometida, e agora está sendo usada por pessoas mal intencionadas para fazer login nas suas contas, incluindo a sua conta no MEGA (mas não se limitando a ela).</string>
+
+    <string name="add_nickname" context="Button to add a nickname for a user">Set nickname</string>
+    <string name="edit_nickname" context="Button to update a nickname for a user">Edit nickname</string>
+    <string name="snackbar_nickname_added" context="Label showing that a nickname has been added">Nickname added</string>
+    <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">Nickname removed</string>
+    <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">An error occurred while trying to added the nickname</string>
+    <string name="nickname_title" context="title of a dialog to edit or remove the nickname">Nickname</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconectando</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Você voltou.</string>
@@ -2734,6 +2757,12 @@
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">Você não tem a permissão necessária para reverter este arquivo. Caso decida continuar, estará criando um novo arquivo com os dados revertidos. Você quer continuar?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">A versão foi criada como um novo arquivo.</string>
 
+    <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">on %1$s</string>
+
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Are you sure you want to remove all shares from %1$d folders?</string>
+
     <string name="download_location" context="Download location label">Local do download</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Salvar sempre nesta pasta?</string>
+
+    <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
 </resources>
