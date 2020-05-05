@@ -2,11 +2,9 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -45,7 +43,6 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
@@ -70,9 +67,7 @@ import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import nz.mega.sdk.MegaAccountDetails;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
@@ -86,6 +81,8 @@ import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.SDCardUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 @SuppressLint("NewApi")
@@ -135,7 +132,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	Preference cameraUploadVideoQueueSize;
 	TwoLineCheckPreference keepFileNames;
 	Preference localCameraUploadFolder;
-	Preference localCameraUploadFolderSDCard;
 	Preference megaCameraFolder;
 	Preference helpSendFeedback;
 	Preference cacheAdvancedOptions;
@@ -297,9 +293,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 		localCameraUploadFolder = findPreference(KEY_CAMERA_UPLOAD_CAMERA_FOLDER);
 		localCameraUploadFolder.setOnPreferenceClickListener(this);
-
-		localCameraUploadFolderSDCard = findPreference(KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD);
-		localCameraUploadFolderSDCard.setOnPreferenceClickListener(this);
 
 		megaCameraFolder = findPreference(KEY_CAMERA_UPLOAD_MEGA_FOLDER);
 		megaCameraFolder.setOnPreferenceClickListener(this);
@@ -506,80 +499,32 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				}
 
 				camSyncLocalPath = prefs.getCamSyncLocalPath();
-				if (camSyncLocalPath == null){
-					File cameraDownloadLocation = null;
-					if (Environment.getExternalStorageDirectory() != null){
-						cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-					}
-
-					cameraDownloadLocation.mkdirs();
+				if ((isTextEmpty(camSyncLocalPath) || (!isExternalSDCard && !isFileAvailable(new File(camSyncLocalPath))))
+						&& Environment.getExternalStorageDirectory() != null){
+					File cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 
 					dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
 					dbH.setCameraFolderExternalSDCard(false);
 					isExternalSDCard = false;
 					camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
-				}
-				else{
-					if (camSyncLocalPath.compareTo("") == 0){
-						File cameraDownloadLocation = null;
-						if (Environment.getExternalStorageDirectory() != null){
-							cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-						}
-
-						cameraDownloadLocation.mkdirs();
-
-						dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
-						dbH.setCameraFolderExternalSDCard(false);
-						isExternalSDCard = false;
-						camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
-					}
-					else{
-						File camFolder = new File(camSyncLocalPath);
-						if (!isExternalSDCard){
-							if(!camFolder.exists()){
-								File cameraDownloadLocation = null;
-								if (Environment.getExternalStorageDirectory() != null){
-									cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-								}
-
-								cameraDownloadLocation.mkdirs();
-
-								dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
-								camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
-							}
-						}
-						else{
-							Uri uri = Uri.parse(prefs.getUriExternalSDCard());
-
-							DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
-							String pickedDirName = pickedDir.getName();
-							if(pickedDirName!=null){
-								camSyncLocalPath = pickedDir.getName();
-								localCameraUploadFolder.setSummary(pickedDir.getName());
-								localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
-							}
-							else{
-								logDebug("pickedDirNAme NULL");
-							}
-						}
+				} else if (isExternalSDCard) {
+					Uri uri = Uri.parse(prefs.getUriExternalSDCard());
+					String pickedDirName = getSDCardDirName(uri);
+					if (pickedDirName!= null) {
+						camSyncLocalPath = pickedDirName;
+						localCameraUploadFolder.setSummary(pickedDirName);
+					} else {
+						logDebug("pickedDirNAme NULL");
 					}
 				}
 
 				//Check if the secondary sync is enabled
-				if (prefs.getSecondaryMediaFolderEnabled() == null){
+				if (prefs.getSecondaryMediaFolderEnabled() == null) {
 					dbH.setSecondaryUploadEnabled(false);
 					secondaryUpload = false;
-				}
-				else{
+				} else {
 					secondaryUpload = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
 					logDebug("Secondary is: " + secondaryUpload);
-
-					if(secondaryUpload){
-						secondaryUpload=true;
-					}
-					else{
-						secondaryUpload=false;
-					}
 				}
 			}
 
@@ -663,7 +608,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
 			cameraUploadHow.setSummary(wifi);
 			localCameraUploadFolder.setSummary(camSyncLocalPath);
-			localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
 			megaCameraFolder.setSummary(camSyncMegaPath);
 			localSecondaryFolder.setSummary(localSecondaryFolderPath);
 			megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
@@ -676,24 +620,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
                 disableVideoCompressionSizeSettings();
             }
 			cameraUploadCategory.addPreference(keepFileNames);
-
-			File[] fs = context.getExternalFilesDirs(null);
-			if (fs.length == 1){
-				cameraUploadCategory.addPreference(localCameraUploadFolder);
-				cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-			}
-			else{
-				if (fs.length > 1){
-					if (fs[1] == null){
-						cameraUploadCategory.addPreference(localCameraUploadFolder);
-						cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-					}
-					else{
-						cameraUploadCategory.removePreference(localCameraUploadFolder);
-						cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
-					}
-				}
-			}
+            cameraUploadCategory.addPreference(localCameraUploadFolder);
 
 			if(secondaryUpload){
 				//Check if the node exists in MEGA
@@ -766,13 +693,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
             cameraUploadOn.setSummary("");
 			cameraUploadHow.setSummary("");
 			localCameraUploadFolder.setSummary("");
-			localCameraUploadFolderSDCard.setSummary("");
 			megaCameraFolder.setSummary("");
 			localSecondaryFolder.setSummary("");
 			megaSecondaryFolder.setSummary("");
 			cameraUploadWhat.setSummary("");
 			cameraUploadCategory.removePreference(localCameraUploadFolder);
-			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
 			hideVideoQualitySettingsSection();
             removeRemoveGPS();
 			cameraUploadCategory.removePreference(keepFileNames);
@@ -1528,58 +1453,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			intent.putExtra(FileStorageActivityLollipop.IS_CU_OR_MU_FOLDER,true);
 			startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
 		}
-		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD) == 0){
-			logDebug("KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD");
-			Dialog localCameraDialog;
-			String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-	        AlertDialog.Builder b=new AlertDialog.Builder(context);
-
-			b.setTitle(getResources().getString(R.string.settings_local_camera_upload_folder));
-			b.setItems(sdCardOptions, new OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					switch(which){
-						case 0:{
-							Intent intent = new Intent(context, FileStorageActivityLollipop.class);
-							intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-							intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
-							intent.putExtra(FileStorageActivityLollipop.EXTRA_CAMERA_FOLDER, true);
-							intent.putExtra(FileStorageActivityLollipop.IS_CU_OR_MU_FOLDER,true);
-							startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
-							break;
-						}
-						case 1:{
-							File[] fs = context.getExternalFilesDirs(null);
-							if (fs.length > 1){
-								if (fs[1] != null){
-									Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-									startActivityForResult(intent, REQUEST_CODE_TREE_LOCAL_CAMERA);
-								}
-								else{
-									Intent intent = new Intent(context, FileStorageActivityLollipop.class);
-									intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-									intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
-									intent.putExtra(FileStorageActivityLollipop.EXTRA_CAMERA_FOLDER, true);
-									intent.putExtra(FileStorageActivityLollipop.IS_CU_OR_MU_FOLDER,true);
-									startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
-								}
-							}
-							break;
-						}
-					}
-				}
-			});
-			b.setNegativeButton(getResources().getString(R.string.general_cancel), new OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.cancel();
-				}
-			});
-			localCameraDialog = b.create();
-			localCameraDialog.show();
-		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_MEGA_FOLDER) == 0){
 			logDebug("Changing the MEGA folder for camera uploads");
 			if (!isOnline(context)){
@@ -1683,40 +1556,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 		prefs = dbH.getPreferences();
 		logDebug("REQUEST CODE: " + requestCode + "___RESULT CODE: " + resultCode);
-		if (requestCode == REQUEST_CODE_TREE_LOCAL_CAMERA && resultCode == Activity.RESULT_OK){
-			if (intent == null){
-				logWarning("intent NULL");
-				return;
-			}
-
-			Uri treeUri = intent.getData();
-
-			if (dbH == null){
-				dbH = DatabaseHandler.getDbHandler(context);
-			}
-
-			dbH.setUriExternalSDCard(treeUri.toString());
-			dbH.setCameraFolderExternalSDCard(true);
-			isExternalSDCard = true;
-
-			DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
-			String pickedDirName = pickedDir.getName();
-			if(pickedDirName!=null){
-				prefs.setCamSyncLocalPath(pickedDir.getName());
-				//prefs.setCamSyncHandle();
-				camSyncLocalPath = pickedDir.getName();
-				dbH.setCamSyncLocalPath(pickedDir.getName());
-				localCameraUploadFolder.setSummary(pickedDir.getName());
-				localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
-			}
-			else{
-				logWarning("pickedDirNAme NULL");
-			}
-
-			resetCUTimeStampsAndCache();
-			rescheduleCameraUpload(context);
-		}
-		else if(requestCode == SET_PIN){
+		if(requestCode == SET_PIN){
 			if(resultCode == Activity.RESULT_OK) {
 				logDebug("Set PIN Ok");
 
@@ -1734,13 +1574,19 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
                 return;
             }
 
-			prefs.setCamSyncLocalPath(cameraPath);
-			camSyncLocalPath = cameraPath;
-			dbH.setCamSyncLocalPath(cameraPath);
-			dbH.setCameraFolderExternalSDCard(false);
-			isExternalSDCard = false;
-			localCameraUploadFolder.setSummary(cameraPath);
-			localCameraUploadFolderSDCard.setSummary(cameraPath);
+			isExternalSDCard = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
+			if (isExternalSDCard) {
+				String pickedDirName = getSDCardDirName(Uri.parse(prefs.getUriExternalSDCard()));
+				prefs.setCamSyncLocalPath(pickedDirName);
+				camSyncLocalPath = pickedDirName;
+				dbH.setCamSyncLocalPath(pickedDirName);
+			} else {
+				prefs.setCamSyncLocalPath(cameraPath);
+				camSyncLocalPath = cameraPath;
+				dbH.setCamSyncLocalPath(cameraPath);
+			}
+
+			localCameraUploadFolder.setSummary(camSyncLocalPath);
             resetCUTimeStampsAndCache();
             rescheduleCameraUpload(context);
 		}
@@ -2269,8 +2115,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				}
 			} else {
 				Uri uri = Uri.parse(prefs.getUriExternalSDCard());
-				DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
-				String pickedDirName = pickedDir.getName();
+				String pickedDirName = getSDCardDirName(uri);
 				if (pickedDirName != null) {
 					camSyncLocalPath = pickedDirName;
 				} else {
@@ -2286,22 +2131,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 		dbH.setCamSyncLocalPath(cameraFolderLocation);
 		localCameraUploadFolder.setSummary(camSyncLocalPath);
-		localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
-		File[] fs = context.getExternalFilesDirs(null);
-		if (fs.length == 1) {
-			cameraUploadCategory.addPreference(localCameraUploadFolder);
-			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-		} else {
-			if (fs.length > 1) {
-				if (fs[1] == null) {
-					cameraUploadCategory.addPreference(localCameraUploadFolder);
-					cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-				} else {
-					cameraUploadCategory.removePreference(localCameraUploadFolder);
-					cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
-				}
-			}
-		}
+		cameraUploadCategory.addPreference(localCameraUploadFolder);
 	}
 
 	private void setupVideoOptionsForCameraUpload(){
@@ -2460,7 +2290,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
         cameraUploadCategory.removePreference(cameraUploadHow);
         cameraUploadCategory.removePreference(cameraUploadWhat);
         cameraUploadCategory.removePreference(localCameraUploadFolder);
-        cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
         cameraUploadCategory.removePreference(cameraUploadIncludeGPS);
 		hideVideoQualitySettingsSection();
         cameraUploadCategory.removePreference(keepFileNames);

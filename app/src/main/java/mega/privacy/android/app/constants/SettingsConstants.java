@@ -6,7 +6,6 @@ public class SettingsConstants {
     public static final int COMPRESSION_QUEUE_SIZE_MIN = 100;
     public static final int COMPRESSION_QUEUE_SIZE_MAX = 1000;
 
-    public static final int REQUEST_CODE_TREE_LOCAL_CAMERA = 1050;
     public static final int REQUEST_CAMERA_FOLDER = 2000;
     public static final int REQUEST_MEGA_CAMERA_FOLDER = 3000;
     public static final int REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER = 4000;
@@ -59,7 +58,6 @@ public class SettingsConstants {
     public static final String KEY_CAMERA_UPLOAD_WHAT_TO = "settings_camera_upload_what_to_upload";
     public static final String KEY_CAMERA_UPLOAD_VIDEO_QUALITY = "settings_video_upload_quality";
     public static final String KEY_CAMERA_UPLOAD_CAMERA_FOLDER = "settings_local_camera_upload_folder";
-    public static final String KEY_CAMERA_UPLOAD_CAMERA_FOLDER_SDCARD = "settings_local_camera_upload_folder_sdcard";
     public static final String KEY_CAMERA_UPLOAD_MEGA_FOLDER = "settings_mega_camera_folder";
 
     public static final String KEY_SECONDARY_MEDIA_FOLDER_ON = "settings_secondary_media_folder_on";
@@ -102,9 +100,6 @@ public class SettingsConstants {
     public static final int CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS = 1003;
     public static final int VIDEO_QUALITY_ORIGINAL = 0;
     public static final int VIDEO_QUALITY_MEDIUM = 1;
-
-    public static final int STORAGE_DOWNLOAD_LOCATION_INTERNAL_SD_CARD = 1001;
-    public static final int STORAGE_DOWNLOAD_LOCATION_EXTERNAL_SD_CARD = 1002;
 
     /**
      * Chat settings

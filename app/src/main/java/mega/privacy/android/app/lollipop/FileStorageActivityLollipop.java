@@ -17,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.PersistableBundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -30,8 +29,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -490,10 +487,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		if (cameraFolderSettings && Environment.getExternalStorageDirectory() != null) {
 			path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-			return;
-		}
-
-		if (prefs != null && prefs.getLastFolderUpload() != null) {
+		} else 	if (prefs != null && prefs.getLastFolderUpload() != null) {
 			path = new File(prefs.getLastFolderUpload());
 		}
 
@@ -1194,34 +1188,39 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 
 			Uri treeUri = intent.getData();
-			if (treeUri != null) {
-				DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
-				if (pickedDir != null && pickedDir.canWrite()) {
-					logDebug("sd card uri is " + treeUri);
-					dbH.setSDCardUri(treeUri.toString());
-					SDCardOperator sdCardOperator = null;
-					try {
-						sdCardOperator = new SDCardOperator(this);
-					} catch (SDCardOperator.SDCardException e) {
-						e.printStackTrace();
-						logError("SDCardOperator initialize failed", e);
-					}
-					if (sdCardOperator != null) {
-						if (isBasedOnFileStorage()) {
-							sdRoot = sdCardOperator.getSDCardRoot();
-							path = new File(sdRoot);
-							checkPath();
-						} else {
-							path = new File(getFullPathFromTreeUri(treeUri, this));
-							finishPickFolder();
-						}
-					} else {
-						onCannotWriteOnSDCard();
-					}
-				}
-			} else {
+			if (treeUri == null) {
 				logDebug("tree uri is null!");
 				onCannotWriteOnSDCard();
+			}
+
+			DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
+			if (pickedDir != null && pickedDir.canWrite()) {
+				logDebug("sd card uri is " + treeUri);
+				dbH.setSDCardUri(treeUri.toString());
+
+				SDCardOperator sdCardOperator = null;
+				try {
+					sdCardOperator = new SDCardOperator(this);
+				} catch (SDCardOperator.SDCardException e) {
+					e.printStackTrace();
+					logError("SDCardOperator initialize failed", e);
+				}
+				if (sdCardOperator != null) {
+					if (isBasedOnFileStorage()) {
+						sdRoot = sdCardOperator.getSDCardRoot();
+						path = new File(sdRoot);
+						checkPath();
+					} else {
+						path = new File(getFullPathFromTreeUri(treeUri, this));
+						if (cameraFolderSettings) {
+							dbH.setCameraFolderExternalSDCard(true);
+							dbH.setUriExternalSDCard(treeUri.toString());
+						}
+						finishPickFolder();
+					}
+				} else {
+					onCannotWriteOnSDCard();
+				}
 			}
 		}
 	}

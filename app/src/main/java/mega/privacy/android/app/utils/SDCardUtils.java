@@ -1,8 +1,13 @@
 package mega.privacy.android.app.utils;
 
 import android.content.Context;
+import android.net.Uri;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
+
+import mega.privacy.android.app.MegaApplication;
 
 public class SDCardUtils {
 
@@ -28,5 +33,10 @@ public class SDCardUtils {
             return localPath.startsWith(sdRoot);
         }
         return false;
+    }
+
+    public static String getSDCardDirName(Uri treeUri) {
+        DocumentFile pickedDir = DocumentFile.fromTreeUri(MegaApplication.getInstance(), treeUri);
+        return pickedDir != null && pickedDir.canWrite() ? pickedDir.getName() : null;
     }
 }
