@@ -17,7 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -179,7 +178,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	ChatSettings chatSettings;
 	String wifi = "";
 	String camSyncLocalPath = "";
-	boolean isExternalSDCard = false;
+	private boolean isExternalSDCardCU;
 	Long camSyncHandle = null;
 	MegaNode camSyncMegaNode = null;
 	String camSyncMegaPath = "";
@@ -195,6 +194,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	Long handleSecondaryMediaFolder = null;
 	MegaNode megaNodeSecondaryMediaFolder = null;
 	String megaPathSecMediaFolder = "";
+	private boolean isExternalSDCardMU;
 
 	public int numberOfClicksSDK = 0;
 	public int numberOfClicksKarere = 0;
@@ -397,7 +397,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				cameraUpload = Boolean.parseBoolean(prefs.getCamSyncEnabled());
 
 				if (prefs.getCameraFolderExternalSDCard() != null){
-					isExternalSDCard = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
+					isExternalSDCardCU = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
 				}
 				String tempHandle = prefs.getCamSyncHandle();
 				if(tempHandle!=null){
@@ -499,15 +499,15 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				}
 
 				camSyncLocalPath = prefs.getCamSyncLocalPath();
-				if ((isTextEmpty(camSyncLocalPath) || (!isExternalSDCard && !isFileAvailable(new File(camSyncLocalPath))))
+				if ((isTextEmpty(camSyncLocalPath) || (!isExternalSDCardCU && !isFileAvailable(new File(camSyncLocalPath))))
 						&& Environment.getExternalStorageDirectory() != null){
 					File cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 
 					dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
 					dbH.setCameraFolderExternalSDCard(false);
-					isExternalSDCard = false;
+					isExternalSDCardCU = false;
 					camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
-				} else if (isExternalSDCard) {
+				} else if (isExternalSDCardCU) {
 					Uri uri = Uri.parse(prefs.getUriExternalSDCard());
 					String pickedDirName = getSDCardDirName(uri);
 					if (pickedDirName!= null) {
@@ -1574,8 +1574,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
                 return;
             }
 
-			isExternalSDCard = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
-			if (isExternalSDCard) {
+			isExternalSDCardCU = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
+			if (isExternalSDCardCU) {
 				String pickedDirName = getSDCardDirName(Uri.parse(prefs.getUriExternalSDCard()));
 				prefs.setCamSyncLocalPath(pickedDirName);
 				camSyncLocalPath = pickedDirName;
@@ -2107,7 +2107,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
             cameraFolderLocation = getLocalDCIMFolderPath();
         }
 		if (camSyncLocalPath != null) {
-			if (!isExternalSDCard) {
+			if (!isExternalSDCardCU) {
 				File checkFile = new File(camSyncLocalPath);
 				if (!checkFile.exists()) {
 					logWarning("Local path not exist, use default camera folder path");
@@ -2125,7 +2125,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		} else {
 			logError("Local path is NULL");
 			dbH.setCameraFolderExternalSDCard(false);
-			isExternalSDCard = false;
+			isExternalSDCardCU = false;
 			camSyncLocalPath = cameraFolderLocation;
 		}
 

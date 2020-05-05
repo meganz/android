@@ -33,7 +33,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 57;
+	private static final int DATABASE_VERSION = 58;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -105,8 +105,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PREFERRED_VIEW_LIST = "preferredviewlist";
     private static final String KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera";
     private static final String KEY_URI_EXTERNAL_SD_CARD = "uriexternalsdcard";
+	private static final String KEY_URI_MEDIA_EXTERNAL_SD_CARD = "urimediaexternalsdcard";
     private static final String KEY_SD_CARD_URI = "sdcarduri";
     private static final String KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD = "camerafolderexternalsdcard";
+	private static final String KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD = "mediafolderexternalsdcard";
     private static final String KEY_CONTACT_HANDLE = "handle";
     private static final String KEY_CONTACT_MAIL = "mail";
     private static final String KEY_CONTACT_NAME = "name";
@@ -269,50 +271,52 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_CREDENTIALS_TABLE);
 
         String CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PREFERENCES + "("
-                + KEY_ID + " INTEGER PRIMARY KEY,"                  //0
-                + KEY_FIRST_LOGIN + " BOOLEAN, "                    //1
-                + KEY_CAM_SYNC_ENABLED + " BOOLEAN, "               //2
-                + KEY_CAM_SYNC_HANDLE + " TEXT, "                   //3
-                + KEY_CAM_SYNC_LOCAL_PATH + " TEXT, "               //4
-                + KEY_CAM_SYNC_WIFI + " BOOLEAN, "                  //5
-                + KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, "              //6
-                + KEY_PIN_LOCK_ENABLED + " TEXT, "                  //7
-                + KEY_PIN_LOCK_CODE + " TEXT, "                     //8
-                + KEY_STORAGE_ASK_ALWAYS + " TEXT, "                //9
-                + KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, "         //10
-                + KEY_CAM_SYNC_TIMESTAMP + " TEXT, "                //11
-                + KEY_CAM_SYNC_CHARGING + " BOOLEAN, "              //12
-                + KEY_LAST_UPLOAD_FOLDER + " TEXT, "                //13
-                + KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, "          //14
-                + KEY_SEC_FOLDER_ENABLED + " TEXT, "                //15
-                + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT, "             //16
-                + KEY_SEC_FOLDER_HANDLE + " TEXT, "                 //17
-                + KEY_SEC_SYNC_TIMESTAMP + " TEXT, "                //18
-                + KEY_KEEP_FILE_NAMES + " BOOLEAN, "                //19
-                + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN, "       //20
-                + KEY_PREFERRED_VIEW_LIST + " BOOLEAN, "            //21
-                + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN, "     //22
-                + KEY_URI_EXTERNAL_SD_CARD + " TEXT, "              //23
-                + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " //24
-                + KEY_PIN_LOCK_TYPE + " TEXT, "                     //25
-                + KEY_PREFERRED_SORT_CLOUD + " TEXT, "              //26
-                + KEY_PREFERRED_SORT_CONTACTS + " TEXT, "           //27
-                + KEY_PREFERRED_SORT_OTHERS + " TEXT,"              //28
-                + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               //29
-                + KEY_SMALL_GRID_CAMERA + " BOOLEAN,"               //30
-                + KEY_AUTO_PLAY + " BOOLEAN,"                       //31
-                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT,"               //32
-                + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          //33
-                + KEY_CHARGING_ON_SIZE + " TEXT,"                   //34
-                + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       //35
-                + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //36
-                + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           //37
-                + KEY_REMOVE_GPS + " TEXT,"                         //38
-                + KEY_SHOW_INVITE_BANNER + " TEXT,"                 //39
-                + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       //40
-				+ KEY_SD_CARD_URI + " TEXT,"                        //41
-                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT,"				//42
-				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN" + ")"; //43
+                + KEY_ID + " INTEGER PRIMARY KEY,"                  	//0
+                + KEY_FIRST_LOGIN + " BOOLEAN, "                    	//1
+                + KEY_CAM_SYNC_ENABLED + " BOOLEAN, "               	//2
+                + KEY_CAM_SYNC_HANDLE + " TEXT, "                   	//3
+                + KEY_CAM_SYNC_LOCAL_PATH + " TEXT, "               	//4
+                + KEY_CAM_SYNC_WIFI + " BOOLEAN, "                  	//5
+                + KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, "              	//6
+                + KEY_PIN_LOCK_ENABLED + " TEXT, "                  	//7
+                + KEY_PIN_LOCK_CODE + " TEXT, "                     	//8
+                + KEY_STORAGE_ASK_ALWAYS + " TEXT, "                	//9
+                + KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, "         	//10
+                + KEY_CAM_SYNC_TIMESTAMP + " TEXT, "                	//11
+                + KEY_CAM_SYNC_CHARGING + " BOOLEAN, "              	//12
+                + KEY_LAST_UPLOAD_FOLDER + " TEXT, "                	//13
+                + KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, "          	//14
+                + KEY_SEC_FOLDER_ENABLED + " TEXT, "                	//15
+                + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT, "             	//16
+                + KEY_SEC_FOLDER_HANDLE + " TEXT, "                 	//17
+                + KEY_SEC_SYNC_TIMESTAMP + " TEXT, "                	//18
+                + KEY_KEEP_FILE_NAMES + " BOOLEAN, "                	//19
+                + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN, "       	//20
+                + KEY_PREFERRED_VIEW_LIST + " BOOLEAN, "            	//21
+                + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN, "     	//22
+                + KEY_URI_EXTERNAL_SD_CARD + " TEXT, "              	//23
+                + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " 	//24
+                + KEY_PIN_LOCK_TYPE + " TEXT, "                     	//25
+                + KEY_PREFERRED_SORT_CLOUD + " TEXT, "              	//26
+                + KEY_PREFERRED_SORT_CONTACTS + " TEXT, "           	//27
+                + KEY_PREFERRED_SORT_OTHERS + " TEXT,"              	//28
+                + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               	//29
+                + KEY_SMALL_GRID_CAMERA + " BOOLEAN,"               	//30
+                + KEY_AUTO_PLAY + " BOOLEAN,"                       	//31
+                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT,"               	//32
+                + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          	//33
+                + KEY_CHARGING_ON_SIZE + " TEXT,"                   	//34
+                + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       	//35
+                + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           	//36
+                + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           	//37
+                + KEY_REMOVE_GPS + " TEXT,"                         	//38
+                + KEY_SHOW_INVITE_BANNER + " TEXT,"                 	//39
+                + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       	//40
+				+ KEY_SD_CARD_URI + " TEXT,"                        	//41
+                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT,"					//42
+				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"			//43
+				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"				//44
+				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN" + ")";	//45
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -801,6 +805,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 56) {
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_OFFLINE + " BOOLEAN;");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_TIMESTAMP + " TEXT;");
+		}
+
+		if (oldVersion <= 57) {
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_URI_MEDIA_EXTERNAL_SD_CARD + " = '" + encrypt("") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " = '" + encrypt("false") + "';");
 		}
 	}
 
@@ -2979,6 +2990,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
+	/**
+	 * Sets the local path selected from an external SD card as Media Uploads local folder.
+	 *
+	 * @param uriMediaExternalSdCard	local path
+	 */
+	public void setUriMediaExternalSdCard(String uriMediaExternalSdCard) {
+		setStringValue(TABLE_PREFERENCES, KEY_URI_MEDIA_EXTERNAL_SD_CARD, uriMediaExternalSdCard);
+	}
+
+	/**
+	 * Gets the local path selected in an external SD card as Media Uploads local folder.
+	 *
+	 * @return The Media Uploads path located in SD card
+	 */
+	public String getUriMediaExternalSdCard() {
+		return getStringValue(TABLE_PREFERENCES, KEY_URI_MEDIA_EXTERNAL_SD_CARD, "");
+	}
+
     public void setSDCardUri (String sdCardUri){
         setStringValue(TABLE_PREFERENCES, KEY_SD_CARD_URI, sdCardUri);
     }
@@ -2997,6 +3026,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
+	}
+
+	/**
+	 * Sets the flag to indicate if the local path selected as Media Uploads local folder belongs to an external SD card.
+	 *
+	 * @param mediaFolderExternalSdCard	true if the local path selected belongs to an external SD card, false otherwise
+	 */
+	public void setMediaFolderExternalSdCard(boolean mediaFolderExternalSdCard) {
+		setStringValue(TABLE_PREFERENCES, KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD, mediaFolderExternalSdCard + "");
+	}
+
+	/**
+	 * Gets the flag which indicates if the local path selected as Media Uploads local folder belongs to an external SD card.
+	 *
+	 * @return True if the local path belongs to an external SD card, false otherwise
+	 */
+	public boolean getMediaFolderExternalSdCard() {
+		return getBooleanValue(TABLE_PREFERENCES, KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD, false);
 	}
 
 	public void setPinLockType (String pinLockType){
