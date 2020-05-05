@@ -4,19 +4,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.listeners.RenameListener;
+import mega.privacy.android.app.listeners.SetAttrUserListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -263,5 +266,79 @@ public class CameraUploadUtil {
         intent.putExtra(EXTRA_IS_CU_SECONDARY_FOLDER, isSecondary);
         intent.putExtra(EXTRA_NODE_HANDLE, handle);
         LocalBroadcastManager.getInstance(MegaApplication.getInstance()).sendBroadcast(intent);
+    }
+
+    /**
+     * This method is executed when the user has never set Cu attribute
+     * Or the original cu folder has been deleted or put into rubbish bin
+     *
+     * @param context     the context where init process is executed
+     * @param isSecondary determine whether it is camera upload or secondary upload
+     */
+    public static void initCUFolderFromScratch(Context context, boolean isSecondary) {
+        if (isSecondary) {
+            initSecondaryFolderFromScratch(context);
+        } else {
+            initPrimaryFolderFromScratch(context);
+        }
+    }
+
+    private static void initPrimaryFolderFromScratch(Context context) {
+        MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
+        // Find previous camera upload folder, whose name is "Camera Uploads" in English
+        long primaryHandle = findDefaultFolder(CAMERA_UPLOADS_ENGLISH);
+        if (primaryHandle != INVALID_HANDLE) {
+            api.setCameraUploadsFolder(primaryHandle, new SetAttrUserListener(context));
+            // if current device language is not English, rename this folder as "Camera Uploads" in other language
+            if (!CAMERA_UPLOADS.equals(CAMERA_UPLOADS_ENGLISH)) {
+                api.renameNode(api.getNodeByHandle(primaryHandle), CAMERA_UPLOADS, new RenameListener(context));
+            }
+        }
+    }
+
+    private static void initSecondaryFolderFromScratch(Context context) {
+        MegaApiAndroid api = MegaApplication.getInstance().getMegaApi();
+        // Find previous camera upload folder, whose name is "Media Uploads" in English
+        long secondaryHandle = findDefaultFolder(SECONDARY_UPLOADS_ENGLISH);
+        if (secondaryHandle != INVALID_HANDLE) {
+            // if current device language is not English, rename this folder as "Media Uploads" in other language
+            api.setCameraUploadsFolderSecondary(secondaryHandle, new SetAttrUserListener(context));
+            Log.d("dfdf", "here is the secondaryHandle: " + secondaryHandle);
+            if (!SECONDARY_UPLOADS.equals(SECONDARY_UPLOADS_ENGLISH)) {
+                api.renameNode(api.getNodeByHandle(secondaryHandle), SECONDARY_UPLOADS, new RenameListener(context));
+            }
+        }
+    }
+
+    /**
+     * The method is to update local cu attribute in database
+     *
+     * @param handleInUserAttr updated folder handle
+     * @param isSecondary      whether this is about primary or secondary upload
+     * @return whether camera upload services should stop since folder is changed
+     */
+    public static boolean compareAndUpdateLocalFolderAttribute(long handleInUserAttr, boolean isSecondary) {
+        if (handleInUserAttr == INVALID_HANDLE) {
+            return false;
+        }
+
+        boolean shouldCUStop = false;
+
+        long primaryHandle = getPrimaryFolderHandle();
+        long secondaryHandle = getSecondaryFolderHandle();
+
+
+        //save changes to local DB
+        if (isSecondary && handleInUserAttr != secondaryHandle) {
+            dbH.setSecondaryFolderHandle(handleInUserAttr);
+            resetSecondaryTimeline();
+            shouldCUStop = true;
+
+        } else if (!isSecondary && handleInUserAttr != primaryHandle) {
+            dbH.setCamSyncHandle(handleInUserAttr);
+            resetPrimaryTimeline();
+            shouldCUStop = true;
+        }
+        return shouldCUStop;
     }
 }

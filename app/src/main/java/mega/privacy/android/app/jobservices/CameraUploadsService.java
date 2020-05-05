@@ -66,6 +66,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
+import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -229,7 +230,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         registerReceiver(pauseReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
         getAttrUserListener = new GetAttrUserListener(this);
         setAttrUserListener = new SetAttrUserListener(this);
-        createFolderListener = new CreateFolderListener(this);
+        createFolderListener = new CreateFolderListener(this, INIT_CU);
     }
 
     @Override
@@ -1295,19 +1296,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     public void onGetPrimaryFolderAttribute(MegaRequest request, MegaError e) {
         logDebug("onGetPrimaryAttribute: " + request.getNodeHandle() + " -> " + cameraUploadHandle);
-        //API_ENOENT means attribute never get set
         if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
             isPrimaryHandleSynced = true;
             long cuPrimaryHandleInUserAttr = request.getNodeHandle();
-            // when get an invalid hanle from cloud, need to upload local handle.
-            if (cuPrimaryHandleInUserAttr == INVALID_HANDLE && cameraUploadHandle != INVALID_HANDLE) {
-                megaApi.setCameraUploadsFolder(cameraUploadHandle, setAttrUserListener);
-            } else if (cameraUploadHandle != cuPrimaryHandleInUserAttr) {
-                //cloud setting takes priority, update local handle.
-                cameraUploadHandle = cuPrimaryHandleInUserAttr;
-                dbH.setCamSyncHandle(cameraUploadHandle);
-                resetPrimaryTimeline();
-            }
+            if (cameraUploadHandle != cuPrimaryHandleInUserAttr) cameraUploadHandle = cuPrimaryHandleInUserAttr;
         } else {
             logWarning("Get primary handle faild, finish process.");
             finish();
@@ -1319,13 +1311,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
             isSecondaryHandleSynced = true;
             long cuSecondaryHandleInUserAttr = request.getNodeHandle();
-            if (cuSecondaryHandleInUserAttr == INVALID_HANDLE && secondaryUploadHandle != INVALID_HANDLE) {
-                megaApi.setCameraUploadsFolderSecondary(secondaryUploadHandle, setAttrUserListener);
-            } else if(cuSecondaryHandleInUserAttr != secondaryUploadHandle) {
-                secondaryUploadHandle = cuSecondaryHandleInUserAttr;
-                dbH.setSecondaryFolderHandle(secondaryUploadHandle);
-                resetSecondaryTimeline();
-            }
+            if(cuSecondaryHandleInUserAttr != secondaryUploadHandle) secondaryUploadHandle = cuSecondaryHandleInUserAttr;
             // start to upload.
             startWorkerThread();
         } else {
@@ -1343,22 +1329,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     }
 
-    public void onCreateFolder(MegaRequest request, MegaError e) {
-        if (e.getErrorCode() == MegaError.API_OK) {
-            logDebug("Folder created: " + request.getName());
-            String name = request.getName();
-            long handle = request.getNodeHandle();
-            if (CAMERA_UPLOADS.equals(name)) {
-                // check if other client has created this folder already, if yes, delete it.
-                megaApi.setCameraUploadsFolder(handle, setAttrUserListener);
-            }
-            if (SECONDARY_UPLOADS.equals(name)) {
-                megaApi.setCameraUploadsFolderSecondary(handle, setAttrUserListener);
-            }
-        } else {
-            finish();
-        }
+    public void onCreateFolder(boolean isSuccessful) {
+        if (!isSuccessful) finish();
     }
+
     private void setLoginState(boolean b) {
         isLoggingIn = b;
         MegaApplication.setLoggingIn(b);

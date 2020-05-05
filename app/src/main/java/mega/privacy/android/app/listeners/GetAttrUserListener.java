@@ -3,7 +3,6 @@ package mega.privacy.android.app.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -16,6 +15,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 
 import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
+import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -79,7 +79,7 @@ public class GetAttrUserListener extends BaseListener {
                     dBH.setMyChatFilesFolderHandle(myChatFolderNode.getHandle());
                     myChatFolderFound = true;
                 } else if (!onlyDBUpdate) {
-                    api.createFolder(context.getString(R.string.my_chat_files_folder), api.getRootNode(), new CreateFolderListener(context, true));
+                    api.createFolder(context.getString(R.string.my_chat_files_folder), api.getRootNode(), new CreateFolderListener(context, MY_CHAT_FILES));
                 }
 
                 if (onlyDBUpdate) {
@@ -142,72 +142,15 @@ public class GetAttrUserListener extends BaseListener {
                 break;
 
             case USER_ATTR_CAMERA_UPLOADS_FOLDER:
-                if (context instanceof CameraUploadsService) {
-                    if (request.getFlag()) {
-                        ((CameraUploadsService) context).onGetSecondaryFolderAttribute(request, e);
-                    } else {
-                        ((CameraUploadsService) context).onGetPrimaryFolderAttribute(request, e);
-                    }
-                } else if (e.getErrorCode() == MegaError.API_OK) {
+                boolean isSecondary = request.getFlag();
+
+                if (e.getErrorCode() == MegaError.API_OK) {
                     synchronized (this) {
-                        MegaPreferences prefs = dBH.getPreferences();
                         long handleInUserAttr = request.getNodeHandle();
                         if (isNodeInRubbishOrDeleted(handleInUserAttr)) {
-                            boolean isSecondary = request.getFlag();
-                            if (isSecondary) {
-                                long secondaryHandle = findDefaultFolder(SECONDARY_UPLOADS);
-                                if (secondaryHandle == INVALID_HANDLE) {
-                                    secondaryHandle = findDefaultFolder(SECONDARY_UPLOADS_ENGLISH);
-                                }
-                                if (secondaryHandle == INVALID_HANDLE) {
-                                    if (prefs != null &&
-                                            prefs.getSecondaryMediaFolderEnabled() != null &&
-                                            Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
-                                        api.createFolder(SECONDARY_UPLOADS, api.getRootNode(), new CreateFolderListener(context));
-                                    }
-                                } else {
-                                    api.setCameraUploadsFolderSecondary(secondaryHandle, new SetAttrUserListener(context));
-                                    if (!SECONDARY_UPLOADS.equals(SECONDARY_UPLOADS_ENGLISH)) {
-                                        api.renameNode(api.getNodeByHandle(secondaryHandle), SECONDARY_UPLOADS, new RenameListener(context));
-                                    }
-                                }
-
-                            } else {
-                                long primaryHandle = findDefaultFolder(CAMERA_UPLOADS);
-                                if (primaryHandle == INVALID_HANDLE) {
-                                    primaryHandle = findDefaultFolder(CAMERA_UPLOADS_ENGLISH);
-                                }
-                                if (primaryHandle == INVALID_HANDLE) {
-                                    if (prefs != null &&
-                                            prefs.getCamSyncEnabled() != null &&
-                                            Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
-                                        api.createFolder(CAMERA_UPLOADS, api.getRootNode(), new CreateFolderListener(context));
-                                    }
-                                } else {
-                                    api.setCameraUploadsFolder(primaryHandle, new SetAttrUserListener(context));
-                                    if (!CAMERA_UPLOADS.equals(CAMERA_UPLOADS_ENGLISH)) {
-                                        api.renameNode(api.getNodeByHandle(primaryHandle), CAMERA_UPLOADS, new RenameListener(context));
-                                    }
-                                }
-                            }
+                            initCUFolderFromScratch(context, isSecondary);
                         } else {
-                            long primaryHandle = getPrimaryFolderHandle();
-                            long secondaryHandle = getSecondaryFolderHandle();
-                            boolean shouldCUStop = false;
-
-                            //save changes to local DB
-                            boolean isSecondary = request.getFlag();
-                            if (isSecondary && handleInUserAttr != secondaryHandle) {
-                                dBH.setSecondaryFolderHandle(handleInUserAttr);
-                                resetSecondaryTimeline();
-                                shouldCUStop = true;
-
-                            } else if (!isSecondary && handleInUserAttr != primaryHandle) {
-                                dBH.setCamSyncHandle(handleInUserAttr);
-                                resetPrimaryTimeline();
-                                shouldCUStop = true;
-                            }
-
+                            boolean shouldCUStop = compareAndUpdateLocalFolderAttribute(handleInUserAttr, isSecondary);
                             //stop CU if destination has changed
                             if (shouldCUStop && CameraUploadsService.isServiceRunning) {
                                 JobUtil.stopRunningCameraUploadService(context);
@@ -218,6 +161,20 @@ public class GetAttrUserListener extends BaseListener {
                                 forceUpdateCameraUploadFolderIcon(isSecondary, handleInUserAttr);
                             }
                         }
+                    }
+                } else if (e.getErrorCode() == MegaError.API_ENOENT) {
+                    initCUFolderFromScratch(context, isSecondary);
+                } else {
+                    String targetFolder = isSecondary ? SECONDARY_UPLOADS_ENGLISH : CAMERA_UPLOADS_ENGLISH;
+                    logError("Error getting: " + targetFolder + " " + e.getErrorString() );
+                }
+
+                if (context instanceof CameraUploadsService) {
+                    // The unique process run within shoudRun method in CameraUploadsService
+                    if (isSecondary) {
+                        ((CameraUploadsService) context).onGetSecondaryFolderAttribute(request, e);
+                    } else {
+                        ((CameraUploadsService) context).onGetPrimaryFolderAttribute(request, e);
                     }
                 }
                 break;

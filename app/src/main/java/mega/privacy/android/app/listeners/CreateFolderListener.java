@@ -20,15 +20,22 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CreateFolderListener extends BaseListener {
 
-    private boolean isMyChatFiles;
+    public enum ExtraAction {
+        NONE,
+        MY_CHAT_FILES,
+        INIT_CU
+    }
+
+    private ExtraAction extraAction;
 
     public CreateFolderListener(Context context) {
         super(context);
+        this.extraAction = ExtraAction.NONE;
     }
 
-    public CreateFolderListener(Context context, boolean isMyChatFiles) {
+    public CreateFolderListener(Context context, ExtraAction extraAction) {
         super(context);
-        this.isMyChatFiles = isMyChatFiles;
+        this.extraAction = extraAction;
     }
 
     @Override
@@ -39,11 +46,19 @@ public class CreateFolderListener extends BaseListener {
         MegaNode node = api.getNodeByHandle(handle);
         String name = request.getName();
 
+        if (extraAction == ExtraAction.INIT_CU && e.getErrorCode() == MegaError.API_OK) {
+            if (name.equals(CAMERA_UPLOADS)) {
+                api.setCameraUploadsFolder(handle, new SetAttrUserListener(context));
+            } else if (name.equals(SECONDARY_UPLOADS)) {
+                api.setCameraUploadsFolderSecondary(handle, new SetAttrUserListener(context));
+            }
+        }
+
         if (context instanceof FileExplorerActivityLollipop) {
             FileExplorerActivityLollipop fileExplorerActivityLollipop = (FileExplorerActivityLollipop) context;
 
             if (e.getErrorCode() == MegaError.API_OK) {
-                if (isMyChatFiles) {
+                if (extraAction == ExtraAction.MY_CHAT_FILES) {
                     fileExplorerActivityLollipop.setMyChatFilesFolder(node);
                     api.setMyChatFilesFolder(handle, new SetAttrUserListener(fileExplorerActivityLollipop));
                     fileExplorerActivityLollipop.checkIfFilesExistsInMEGA();
@@ -51,7 +66,7 @@ public class CreateFolderListener extends BaseListener {
                     fileExplorerActivityLollipop.finishCreateFolder(true, handle);
                 }
             } else {
-                if (isMyChatFiles) {
+                if (extraAction == ExtraAction.MY_CHAT_FILES) {
                     fileExplorerActivityLollipop.showSnackbar(context.getString(R.string.general_text_error));
                 } else {
                     fileExplorerActivityLollipop.finishCreateFolder(false, handle);
@@ -79,21 +94,11 @@ public class CreateFolderListener extends BaseListener {
                 api.setMyChatFilesFolder(handle, new SetAttrUserListener(nodeAttachmentHistoryActivity));
                 nodeAttachmentHistoryActivity.setMyChatFilesFolder(node);
                 nodeAttachmentHistoryActivity.handleStoredData();
-            } else if (context instanceof CameraUploadsService) {
-                ((CameraUploadsService) context).onCreateFolder(request, e);
             } else {
                 nodeAttachmentHistoryActivity.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error));
             }
         } else if (context instanceof CameraUploadsService) {
-            ((CameraUploadsService) context).onCreateFolder(request, e);
-        } else if (context instanceof MegaApplication) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                if (name.equals(CAMERA_UPLOADS)) {
-                    api.setCameraUploadsFolder(handle, new SetAttrUserListener(context));
-                } else if (name.equals(SECONDARY_UPLOADS)) {
-                    api.setCameraUploadsFolderSecondary(handle, new SetAttrUserListener(context));
-                }
-            }
+            ((CameraUploadsService) context).onCreateFolder(e.getErrorCode() == MegaError.API_OK);
         }
 
         if (e.getErrorCode() != MegaError.API_OK) {
