@@ -101,17 +101,6 @@
                             rounded:border_color="#4DFFFFFF"
                             rounded:border_width="3dp"
                             rounded:corner_radius="60dp" />
-
-                        <mega.privacy.android.app.components.twemoji.EmojiTextView
-                            android:id="@+id/initial_letter_big_camera_group_call"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_centerInParent="true"
-                            android:gravity="center_horizontal|center_vertical"
-                            android:textColor="@color/white"
-                            android:textSize="50sp"
-                            app:emojiSize="50sp"
-                            android:visibility="gone" />
                     </RelativeLayout>
                     <!--Micro Avatar-->
                     <ImageView
@@ -321,14 +310,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="8dp"
-                        android:background="@null"
-                        android:gravity="center"
-                        android:src="@drawable/ic_mutate_layout" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -367,25 +348,17 @@
                     android:gravity="center_horizontal"
                     android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="8dp"
-                        android:background="@null"
-                        android:gravity="center"
-                        android:src="@drawable/ic_mutate_layout" />
-
                     <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/text_mutate_contact_call"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:fontFamily="roboto"
-                        android:gravity="left"
                         android:maxWidth="250dp"
                         android:maxLines="3"
+                        android:gravity="left"
                         android:singleLine="false"
-                        android:textAlignment="center"
+                        android:textAlignment="gravity"
                         android:textColor="@color/white"
                         android:textSize="14sp"
                         app:emojiSize="12sp"
@@ -409,14 +382,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="8dp"
-                        android:background="@null"
-                        android:gravity="center"
-                        android:src="@drawable/ic_call_hold_small" />
 
                     <TextView
                         android:layout_width="wrap_content"

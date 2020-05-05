@@ -4,12 +4,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.SystemClock;
 import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.io.File;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -19,15 +23,21 @@ import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.getNicknameContact;
+import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class CallUtil {
 
@@ -378,6 +388,104 @@ public class CallUtil {
         String message = activity.getString(R.string.confirmation_open_camera_on_chat);
         builder.setTitle(R.string.title_confirmation_open_camera_on_chat);
         builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
+    /**
+     * Method to get the default avatar in calls.
+     * @param chat Chat room identifier where the call is.
+     * @param peerId User handle from whom the avatar is obtained.
+     * @param normalSize Avatar size.
+     * @param isList If the layout is a list.
+     * @return Bitmap with the default avatar created.
+     */
+    public static Bitmap getDefaultAvatarCall(MegaChatRoom chat, long peerId, boolean normalSize, boolean isList) {
+        String name = getUserNameCall(chat, peerId);
+
+        /*Default Avatar*/
+        int size;
+        if (normalSize) {
+            size = AVATAR_SIZE;
+        } else {
+            size = BIG_LETTER_SIZE;
+        }
+
+        return AvatarUtil.getDefaultAvatar(getColorAvatar(peerId), name, size, isList);
+    }
+
+    /**
+     *  Method to get the image avatar in calls.
+     *
+     * @param context Context of the Activity.
+     * @param chat Chat room identifier where the call is.
+     * @param peerId  User handle from whom the avatar is obtained.
+     * @return Bitmap with the image avatar created.
+     */
+    public static Bitmap getImageAvatarCall(Context context, MegaChatRoom chat, long peerId) {
+        /*Avatar*/
+        String mail = getUserMailCall(chat, peerId);
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+
+        if (peerId == megaChatApi.getMyUserHandle() || megaApi.getContact(mail) != null) {
+            File avatar = buildAvatarFile(context, mail + ".jpg");
+            Bitmap bitmap;
+            if (isFileAvailable(avatar) && avatar.exists() && avatar.length() > 0) {
+                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                if (bitmap != null) {
+                    return bitmap;
+                }
+            }
+
+            if (peerId != megaChatApi.getMyUserHandle()) {
+                megaApi.getUserAvatar(megaApi.getContact(mail), buildAvatarFile(context, mail + ".jpg").getAbsolutePath(), ((ChatCallActivity) context));
+            }
+
+        } else if (megaApi.getContact(mail) == null) {
+            String userHandleEncoded = MegaApiAndroid.userHandleToBase64(peerId);
+            megaApi.getUserAvatar(userHandleEncoded, buildAvatarFile(context, peerId + ".jpg").getAbsolutePath(), ((ChatCallActivity) context));
+        }
+        return null;
+    }
+
+    /**
+     * Method to get the email from a handle.
+     *
+     * @param chat Chat room identifier.
+     * @param peerId User handle from whom the email is obtained.
+     * @return The email.
+     */
+    public static String getUserMailCall(MegaChatRoom chat, long peerId){
+        if (peerId == MegaApplication.getInstance().getMegaChatApi().getMyUserHandle()) {
+            return MegaApplication.getInstance().getMegaChatApi().getMyEmail();
+        } else {
+            return chat.getPeerEmailByHandle(peerId);
+        }
+    }
+
+    /**
+     * Method to get the name from a handle.
+     *
+     * @param chat Chat room identifier.
+     * @param peerId User handle from whom the name is obtained.
+     * @return The name.
+     */
+    public static String getUserNameCall(MegaChatRoom chat, long peerId){
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        if (peerId == megaChatApi.getMyUserHandle()) {
+            return megaChatApi.getMyFullname();
+        }
+
+        String nickname = getNicknameContact(peerId);
+        if (nickname != null) {
+            return nickname;
+        }
+
+        String name = chat.getPeerFirstnameByHandle(peerId);
+        if(name != null){
+            return name;
+        }
+        return  chat.getPeerEmailByHandle(peerId);
     }
 
 }

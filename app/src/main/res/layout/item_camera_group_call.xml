@@ -82,15 +82,6 @@
                 rounded:border_color="#4DFFFFFF"
                 rounded:border_width="3dp"
                 rounded:corner_radius="60dp" />
-
-            <mega.privacy.android.app.components.twemoji.EmojiTextView
-                android:id="@+id/avatar_initial_letter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:textColor="@color/white"
-                android:layout_centerInParent="true"
-                android:visibility="gone"/>
         </RelativeLayout>
 
         <!--Micro Avatar-->
