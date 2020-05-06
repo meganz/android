@@ -1059,7 +1059,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 secondaryEnabled = false;
             } else {
                 secondaryEnabled = true;
-                localPathSecondary = prefs.getLocalPathSecondaryFolder();
+                if (dbH.getMediaFolderExternalSdCard()) {
+                    Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
+                    localPathSecondary = getFullPathFromTreeUri(uri,this);
+                } else {
+                    localPathSecondary = prefs.getLocalPathSecondaryFolder();
+                }
                 if(!localPathSecondary.endsWith(File.separator)) {
                     localPathSecondary += File.separator;
                 }

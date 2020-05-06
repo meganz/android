@@ -80,7 +80,23 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
 	private static final String PATH = "PATH";
-	public static final String IS_CU_OR_MU_FOLDER = "IS_CU_OR_MU_FOLDER";
+	public static final String PICK_FOLDER_TYPE = "PICK_FOLDER_TYPE";
+
+	public enum PickFolderType {
+		CU_FOLDER("CU_FOLDER"),
+		MU_FOLDER("MU_FOLDER"),
+		DOWNLOAD_FOLDER("DOWNLOAD_FOLDER");
+
+		private String folderType;
+
+		PickFolderType(String folderType) {
+			this.folderType = folderType;
+		}
+
+		public String getFolderType() {
+			return folderType;
+		}
+	}
 
 	public static final String EXTRA_URL = "fileurl";
 	public static final String EXTRA_SIZE = "filesize";
@@ -88,7 +104,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static final String EXTRA_DOCUMENT_HASHES = "document_hash";
 	public static final String EXTRA_FROM_SETTINGS = "from_settings";
 	public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
-	public static final String EXTRA_CAMERA_FOLDER = "camera_folder";
 	public static final String EXTRA_BUTTON_PREFIX = "button_prefix";
     public static final String EXTRA_SD_ROOT = "sd_root";
 	public static final String EXTRA_PATH = "filepath";
@@ -147,8 +162,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private RelativeLayout externalStorageLayout;
 	
 	private Boolean fromSettings, fromSaveRecoveryKey;
-	private Boolean cameraFolderSettings;
-	private Boolean isCUOrMUFolder;
+	private String pickFolderType;
 	private String sdRoot;
 	private boolean hasSDCard;
     private String prompt;
@@ -358,8 +372,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
 		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
-		cameraFolderSettings = intent.getBooleanExtra(EXTRA_CAMERA_FOLDER, false);
-		isCUOrMUFolder = intent.getBooleanExtra(IS_CU_OR_MU_FOLDER, false);
+		pickFolderType = intent.getStringExtra(PICK_FOLDER_TYPE);
 
 		File[] fs = getExternalFilesDirs(null);
 		hasSDCard = fs.length > 1 && fs[1] != null;
@@ -485,9 +498,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private void openPickFromInternalStorage() {
 		root = buildExternalStorageFile("");
 
-		if (cameraFolderSettings && Environment.getExternalStorageDirectory() != null) {
+		if (pickFolderType.equals(PickFolderType.CU_FOLDER.getFolderType()) && Environment.getExternalStorageDirectory() != null) {
 			path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-		} else 	if (prefs != null && prefs.getLastFolderUpload() != null) {
+		} else if (pickFolderType.equals(PickFolderType.MU_FOLDER.getFolderType()) && Environment.getExternalStorageDirectory() != null) {
+			path = Environment.getExternalStorageDirectory();
+		} else if (prefs != null && prefs.getLastFolderUpload() != null) {
 			path = new File(prefs.getLastFolderUpload());
 		}
 
@@ -720,6 +735,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                     dbH.setLastUploadFolder(path.getAbsolutePath());
                 }
 				if (mode == Mode.PICK_FOLDER) {
+					boolean isCUOrMUFolder = pickFolderType.equals(PickFolderType.CU_FOLDER.getFolderType()) || pickFolderType.equals(PickFolderType.MU_FOLDER.getFolderType());
+
 					if (!isCUOrMUFolder && (prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways()))
 							&& dbH.getAskSetDownloadLocation()) {
 						showConfirmationSaveInSameLocation();
@@ -1212,9 +1229,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 						checkPath();
 					} else {
 						path = new File(getFullPathFromTreeUri(treeUri, this));
-						if (cameraFolderSettings) {
+						if (pickFolderType.equals(PickFolderType.CU_FOLDER.getFolderType())) {
 							dbH.setCameraFolderExternalSDCard(true);
 							dbH.setUriExternalSDCard(treeUri.toString());
+						} else if (pickFolderType.equals(PickFolderType.MU_FOLDER.getFolderType())) {
+							dbH.setMediaFolderExternalSdCard(true);
+							dbH.setUriMediaExternalSdCard(treeUri.toString());
 						}
 						finishPickFolder();
 					}

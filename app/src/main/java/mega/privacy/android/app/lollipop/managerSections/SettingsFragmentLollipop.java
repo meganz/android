@@ -83,6 +83,7 @@ import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.SDCardUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends SettingsBaseFragment implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -499,13 +500,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				}
 
 				camSyncLocalPath = prefs.getCamSyncLocalPath();
-				if ((isTextEmpty(camSyncLocalPath) || (!isExternalSDCardCU && !isFileAvailable(new File(camSyncLocalPath))))
+				if ((isTextEmpty(camSyncLocalPath) || (!isExternalSDCardCU &&!isFileAvailable(new File(camSyncLocalPath))))
 						&& Environment.getExternalStorageDirectory() != null){
 					File cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-
 					dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
 					dbH.setCameraFolderExternalSDCard(false);
-					isExternalSDCardCU = false;
 					camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
 				} else if (isExternalSDCardCU) {
 					Uri uri = Uri.parse(prefs.getUriExternalSDCard());
@@ -514,7 +513,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 						camSyncLocalPath = pickedDirName;
 						localCameraUploadFolder.setSummary(pickedDirName);
 					} else {
-						logDebug("pickedDirNAme NULL");
+						logWarning("pickedDirNAme NULL");
 					}
 				}
 
@@ -526,6 +525,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 					secondaryUpload = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
 					logDebug("Secondary is: " + secondaryUpload);
 				}
+
+				isExternalSDCardMU = dbH.getMediaFolderExternalSdCard();
 			}
 
 			if (prefs.getPinLockEnabled() == null){
@@ -609,7 +610,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			cameraUploadHow.setSummary(wifi);
 			localCameraUploadFolder.setSummary(camSyncLocalPath);
 			megaCameraFolder.setSummary(camSyncMegaPath);
-			localSecondaryFolder.setSummary(localSecondaryFolderPath);
 			megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 			cameraUploadWhat.setSummary(fileUpload);
 			cameraUploadCharging.setChecked(charging);
@@ -656,24 +656,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				}
 
 				//check if the local secondary folder exists
-				localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
-				if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
-					logWarning("Secondary ON: invalid localSecondaryFolderPath");
-					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
-					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
-				}
-				else
-				{
-					File checkSecondaryFile = new File(localSecondaryFolderPath);
-					if(!checkSecondaryFile.exists()){
-						logWarning("Secondary ON: the local folder does not exist");
-						dbH.setSecondaryFolderPath("-1");
-						//If the secondary folder does not exist
-						Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
-						localSecondaryFolderPath = getString(R.string.settings_empty_folder);
-
-					}
-				}
+				checkMediaUploadsPath();
 
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 				localSecondaryFolder.setSummary(localSecondaryFolderPath);
@@ -768,6 +751,25 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
                 queueSizeInput.setSelection(input.length());
             }
         }
+	}
+
+	private void checkMediaUploadsPath() {
+		localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
+
+		if (isTextEmpty(localSecondaryFolderPath) || localSecondaryFolderPath.equals(Long.toString(INVALID_HANDLE)) || (!isExternalSDCardMU && !isFileAvailable(new File(localSecondaryFolderPath)))) {
+			logWarning("Secondary ON: invalid localSecondaryFolderPath");
+			localSecondaryFolderPath = getString(R.string.settings_empty_folder);
+			Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
+			if (!isFileAvailable(new File(localSecondaryFolderPath))) {
+				dbH.setSecondaryFolderPath(Long.toString(INVALID_HANDLE));
+			}
+		} else if (isExternalSDCardMU) {
+			Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
+			String pickedDirName = getSDCardDirName(uri);
+			if (pickedDirName!= null) {
+				localSecondaryFolderPath = pickedDirName;
+			}
+		}
 	}
 
 	public void updateCancelAccountSetting() {
@@ -1187,27 +1189,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 
 				prefs = dbH.getPreferences();
-				localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
-
-				//Check local folder
-				if(localSecondaryFolderPath!=null){
-					File checkSecondaryFile = new File(localSecondaryFolderPath);
-					if(!checkSecondaryFile.exists()){
-						dbH.setSecondaryFolderPath("-1");
-						//If the secondary folder does not exist any more
-						Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
-
-						if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
-							localSecondaryFolderPath = getString(R.string.settings_empty_folder);
-						}
-					}
-				}
-				else{
-					dbH.setSecondaryFolderPath("-1");
-					//If the secondary folder does not exist any more
-					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
-					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
-				}
+				checkMediaUploadsPath();
 
 				localSecondaryFolder.setSummary(localSecondaryFolderPath);
 				cameraUploadCategory.addPreference(localSecondaryFolder);
@@ -1226,7 +1208,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
-			intent.putExtra(FileStorageActivityLollipop.IS_CU_OR_MU_FOLDER,true);
+			intent.putExtra(FileStorageActivityLollipop.PICK_FOLDER_TYPE, FileStorageActivityLollipop.PickFolderType.MU_FOLDER.getFolderType());
 			startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_MEGA_SECONDARY_MEDIA_FOLDER) == 0){
@@ -1449,8 +1431,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_CAMERA_FOLDER,true);
-			intent.putExtra(FileStorageActivityLollipop.IS_CU_OR_MU_FOLDER,true);
+			intent.putExtra(FileStorageActivityLollipop.PICK_FOLDER_TYPE, FileStorageActivityLollipop.PickFolderType.CU_FOLDER.getFolderType());
 			startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_MEGA_FOLDER) == 0){
@@ -1575,17 +1556,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
             }
 
 			isExternalSDCardCU = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
-			if (isExternalSDCardCU) {
-				String pickedDirName = getSDCardDirName(Uri.parse(prefs.getUriExternalSDCard()));
-				prefs.setCamSyncLocalPath(pickedDirName);
-				camSyncLocalPath = pickedDirName;
-				dbH.setCamSyncLocalPath(pickedDirName);
-			} else {
-				prefs.setCamSyncLocalPath(cameraPath);
-				camSyncLocalPath = cameraPath;
-				dbH.setCamSyncLocalPath(cameraPath);
-			}
-
+			camSyncLocalPath = isExternalSDCardCU ? getSDCardDirName(Uri.parse(prefs.getUriExternalSDCard())) : cameraPath;
+			prefs.setCamSyncLocalPath(camSyncLocalPath);
+			dbH.setCamSyncLocalPath(camSyncLocalPath);
 			localCameraUploadFolder.setSummary(camSyncLocalPath);
             resetCUTimeStampsAndCache();
             rescheduleCameraUpload(context);
@@ -1598,11 +1571,13 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
                 return;
             }
 
-			dbH.setSecondaryFolderPath(secondaryPath);
-			localSecondaryFolder.setSummary(secondaryPath);
+			isExternalSDCardMU = dbH.getMediaFolderExternalSdCard();
+			localSecondaryFolderPath = isExternalSDCardMU ? getSDCardDirName(Uri.parse(dbH.getUriMediaExternalSdCard())) : secondaryPath;
+			dbH.setSecondaryFolderPath(localSecondaryFolderPath);
+			prefs.setLocalPathSecondaryFolder(localSecondaryFolderPath);
+			localSecondaryFolder.setSummary(localSecondaryFolderPath);
 			dbH.setSecSyncTimeStamp(0);
 			dbH.setSecVideoSyncTimeStamp(0);
-			prefs.setLocalPathSecondaryFolder(secondaryPath);
 			rescheduleCameraUpload(context);
 		}
 		else if (requestCode == REQUEST_MEGA_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
@@ -2182,22 +2157,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			}
 
 			//check if the local secondary folder exists
-			localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
-			if (localSecondaryFolderPath == null || localSecondaryFolderPath.equals("-1")) {
-				logWarning("Secondary ON: invalid localSecondaryFolderPath");
-				localSecondaryFolderPath = getString(R.string.settings_empty_folder);
-				Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
-			} else {
-				File checkSecondaryFile = new File(localSecondaryFolderPath);
-				if (!checkSecondaryFile.exists()) {
-					logDebug("Secondary ON: the local folder does not exist");
-					dbH.setSecondaryFolderPath("-1");
-					//If the secondary folder does not exist
-					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
-					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
-
-				}
-			}
+			checkMediaUploadsPath();
 
 			megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 			localSecondaryFolder.setSummary(localSecondaryFolderPath);
