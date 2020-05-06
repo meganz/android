@@ -197,15 +197,10 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		bandwidthSectionBusiness = v.findViewById(R.id.bandwidth_business);
 		//END -- BUSINESS ACCOUNT
 
-		setPricingInfo();
-		showAvailableAccount();
-
 		refreshAccountInfo();
 
-		int displayedAccountType = ((ManagerActivityLollipop) context).getDisplayedAccountType();
-		if (displayedAccountType != -1) {
-			onUpgradeClick(displayedAccountType);
-		}
+		setPricingInfo();
+		showAvailableAccount();
 
 		return v;
 	}
@@ -292,6 +287,13 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						bandwidthSectionBusiness.setText(getSpannedHtmlText(unlimitedTransfer));
 						break;
 				}
+			}
+		}
+
+		if (context instanceof ManagerActivityLollipop) {
+			int displayedAccountType = ((ManagerActivityLollipop) context).getDisplayedAccountType();
+			if (displayedAccountType != -1) {
+				onUpgradeClick(displayedAccountType);
 			}
 		}
 	}
