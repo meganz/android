@@ -65,8 +65,8 @@
         <!--Big Avatar-->
         <RelativeLayout
             android:id="@+id/avatar_rl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
             android:layout_centerInParent="true"
             android:gravity="center"
             android:layout_centerHorizontal="true"
@@ -75,13 +75,28 @@
             android:textAlignment="center"
             android:background="@android:color/transparent">
 
-            <mega.privacy.android.app.components.RoundedImageView
-                android:id="@+id/avatar_image"
-                android:layout_width="88dp"
-                android:layout_height="88dp"
-                rounded:border_color="#4DFFFFFF"
-                rounded:border_width="3dp"
-                rounded:corner_radius="60dp" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <mega.privacy.android.app.components.RoundedImageView
+                    android:id="@+id/avatar_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:scaleType="fitCenter"
+                    rounded:border_color="#4DFFFFFF"
+                    rounded:border_width="3dp"
+                    rounded:corner_radius="60dp" />
+                <ImageView
+                    android:id="@+id/avatar_image_on_hold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitCenter"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_call_hold_big"
+                    android:layout_gravity="center"
+                    android:visibility="gone"/>
+            </FrameLayout>
         </RelativeLayout>
 
         <!--Micro Avatar-->

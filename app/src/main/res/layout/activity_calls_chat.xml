@@ -177,14 +177,14 @@
                 <!--Big Avatar-->
                 <RelativeLayout
                     android:id="@+id/call_chat_contact_image_rl"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="128dp"
+                    android:layout_height="128dp"
                     android:layout_centerInParent="true"
                     android:background="@android:color/transparent"
                     android:gravity="center_horizontal|center_vertical">
                     <FrameLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/call_chat_contact_image"
                             android:layout_width="match_parent"
@@ -194,21 +194,11 @@
                             rounded:border_color="#4DFFFFFF"
                             rounded:border_width="3dp"
                             rounded:corner_radius="60dp" />
-                        <RelativeLayout
-                            android:id="@+id/call_chat_contact_image_shaded"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_alignLeft="@+id/call_chat_contact_image"
-                            android:layout_alignRight="@+id/call_chat_contact_image"
-                            android:layout_alignTop="@+id/call_chat_contact_image"
-                            android:layout_alignBottom="@+id/call_chat_contact_image"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@drawable/shape_avatar_call"
-                            android:visibility="gone"/>
                         <ImageView
                             android:id="@+id/avatar_on_hold"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:scaleType="fitCenter"
                             android:background="@android:color/transparent"
                             android:src="@drawable/ic_call_hold_big"
                             android:layout_gravity="center"
@@ -472,8 +462,8 @@
 
                     <RelativeLayout
                         android:id="@+id/call_chat_my_image_rl"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
+                        android:layout_width="88dp"
+                        android:layout_height="88dp"
                         android:background="@drawable/shape_call_chat">
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/call_chat_my_image"
