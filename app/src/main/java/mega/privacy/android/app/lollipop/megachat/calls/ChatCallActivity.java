@@ -119,6 +119,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private EmojiTextView mutateCallText;
     private RelativeLayout mutateOwnCallLayout;
     private RelativeLayout callOnHoldLayout;
+    private EmojiTextView callOnHoldText;
     private LinearLayout linearParticipants;
     private TextView participantText;
     private EmojiTextView infoUsersBar;
@@ -570,6 +571,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         linearParticipants.setVisibility(View.GONE);
         totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
         callOnHoldLayout = findViewById(R.id.call_on_hold_layout);
+        callOnHoldText = findViewById(R.id.call_on_hold_text);
         callOnHoldLayout.setVisibility(View.GONE);
         mutateOwnCallLayout = findViewById(R.id.mutate_own_call);
         mutateOwnCallLayout.setVisibility(View.GONE);
@@ -889,17 +891,33 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     /**
      * Method to get the default avatar and image if it has one, in group calls.
-     *
-     * @param peerId User handle.
+     * @param peer The selected participant.
      */
-    private void setAvatarPeerSelected(long peerId) {
+    private void setAvatarPeerSelected(InfoPeerGroupCall peer) {
         /*Default Avatar*/
-        avatarBigCameraGroupCallImage.setImageBitmap(getDefaultAvatarCall(chat, peerId, false, true));
+        avatarBigCameraGroupCallImage.setImageBitmap(getDefaultAvatarCall(chat, peer.getPeerId(), false, true));
 
         /*Avatar*/
-        Bitmap bitmap = getImageAvatarCall(this, chat, peerId);
+        Bitmap bitmap = getImageAvatarCall(this, chat, peer.getPeerId());
         if(bitmap != null){
             avatarBigCameraGroupCallImage.setImageBitmap(bitmap);
+        }
+        updatePeerSelectedOnHold(peer);
+    }
+
+    private void updatePeerSelectedOnHold(InfoPeerGroupCall peer){
+        MegaChatSession session = getSessionCall(peer.getPeerId(), peer.getClientId());
+        if(callChat.isOnHold() || session != null && session.isOnHold()){
+            avatarBigCameraGroupCallImage.setAlpha(0.5f);
+            if (callChat.isOnHold()){
+                callOnHoldText.setText(getString(R.string.call_on_hold));
+            }else if(session.isOnHold()){
+                callOnHoldText.setText(getString(R.string.session_on_hold, peer.getName()));
+            }
+            callOnHoldLayout.setVisibility(View.VISIBLE);
+        }else{
+            avatarBigCameraGroupCallImage.setAlpha(1f);
+            callOnHoldLayout.setVisibility(View.GONE);
         }
     }
 
@@ -2219,14 +2237,13 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void updateUserSelected() {
-        logDebug("updateUserSelected");
+        logDebug("Call status: "+callStatusToString(callChat.getStatus()));
+
         if (!statusCallInProgress(callChat.getStatus())) {
-            //I'M NOT IN THE CALL
-            logDebug("INCOMING");
-            if (peerSelected != null) return;
+            if (peerSelected != null)
+                return;
 
             parentBigCameraGroupCall.setVisibility(View.VISIBLE);
-
             removeBigFragment();
             fragmentBigCameraGroupCall.setVisibility(View.GONE);
 
@@ -2238,84 +2255,49 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
             avatarBigCameraGroupCallLayout.setVisibility(View.VISIBLE);
             InfoPeerGroupCall peerTemp = peersOnCall.get((peersOnCall.size()) - 1);
-            setAvatarPeerSelected(peerTemp.getPeerId());
-        } else {
-            //I'M IN THE CALL
-            logDebug("IN PROGRESS");
+            setAvatarPeerSelected(peerTemp);
 
-            if (peersOnCall.isEmpty()) return;
+        } else {
+            if (peersOnCall.isEmpty())
+                return;
 
             if (peerSelected == null) {
-                logWarning("peerSelected == null");
+                if (isManualMode)
+                    return;
 
-                if (isManualMode) return;
-
-                int position = 0;
-                peerSelected = peersOnCall.get(position);
-                logDebug("InProgress - new peerSelected (peerId = " + peerSelected.getPeerId() + ", clientId = " + peerSelected.getClientId() + ")");
-                for (int i = 0; i < peersOnCall.size(); i++) {
-                    if (i == position) {
-                        if (!peersOnCall.get(i).hasGreenLayer()) {
-                            peersOnCall.get(i).setGreenLayer(true);
-                            updateGreenLayer(i);
-                        }
-                    } else {
-                        if (peersOnCall.get(i).hasGreenLayer()) {
-                            peersOnCall.get(i).setGreenLayer(false);
-                            updateGreenLayer(i);
-                        }
-                    }
-                }
+                peerSelected = peersOnCall.get(0);
+                updatePeerSelectedLayer(peerSelected, false);
             } else {
-                logDebug("peerSelected != null");
-
-                //find if peerSelected is removed:
-                boolean peerContained = false;
-                for (int i = 0; i < peersOnCall.size(); i++) {
-                    if (peersOnCall.get(i).getPeerId() == peerSelected.getPeerId() && peersOnCall.get(i).getClientId() == peerSelected.getClientId()) {
-                        peerContained = true;
-                        break;
-                    }
-                }
-                if (!peerContained) {
-                    //it was removed
-                    int position = 0;
-                    peerSelected = peersOnCall.get(position);
-                    logDebug("InProgress - new peerSelected (peerId = " + peerSelected.getPeerId() + ", clientId = " + peerSelected.getClientId() + ")");
-                    for (int i = 0; i < peersOnCall.size(); i++) {
-                        if (i == position) {
-                            isManualMode = false;
-                            if (adapterList != null) {
-                                adapterList.updateMode(false);
-                            }
-                            if (!peersOnCall.get(i).hasGreenLayer()) {
-                                peersOnCall.get(i).setGreenLayer(true);
-                                updateGreenLayer(i);
-                            }
-                        } else {
-                            if (peersOnCall.get(i).hasGreenLayer()) {
-                                peersOnCall.get(i).setGreenLayer(false);
-                                updateGreenLayer(i);
-                            }
-                        }
-                    }
+                if (peersOnCall.contains(peerSelected)) {
+                    updatePeerSelectedLayer(peerSelected, false);
                 } else {
-
-                    logDebug("InProgress - peerSelected (peerId = " + peerSelected.getPeerId() + ", clientId = " + peerSelected.getClientId() + ")");
-                    for (int i = 0; i < peersOnCall.size(); i++) {
-                        if (peersOnCall.get(i).getPeerId() == peerSelected.getPeerId() && peersOnCall.get(i).getClientId() == peerSelected.getClientId()) {
-                            peersOnCall.get(i).setGreenLayer(true);
-                            updateGreenLayer(i);
-                        } else {
-                            if (peersOnCall.get(i).hasGreenLayer()) {
-                                peersOnCall.get(i).setGreenLayer(false);
-                                updateGreenLayer(i);
-                            }
-                        }
-                    }
+                    peerSelected = peersOnCall.get(0);
+                    updatePeerSelectedLayer(peerSelected, true);
                 }
             }
             updateStatusUserSelected();
+        }
+    }
+
+    private void updatePeerSelectedLayer(InfoPeerGroupCall peerSelected, boolean updateManualMode){
+        for(InfoPeerGroupCall peer:peersOnCall) {
+            if (peerSelected.getPeerId() == peer.getPeerId() && peerSelected.getClientId() == peer.getClientId()) {
+                if(updateManualMode){
+                    isManualMode = false;
+                    if (adapterList != null) {
+                        adapterList.updateMode(false);
+                    }
+                }
+                if (!peer.hasGreenLayer()) {
+                    peer.setGreenLayer(true);
+                    updateGreenLayer(peersOnCall.indexOf(peer));
+                }
+            }else{
+                if (peer.hasGreenLayer()) {
+                    peer.setGreenLayer(false);
+                    updateGreenLayer(peersOnCall.indexOf(peer));
+                }
+            }
         }
     }
 
@@ -2347,7 +2329,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         removeBigFragment();
 
         fragmentBigCameraGroupCall.setVisibility(View.GONE);
-        setAvatarPeerSelected(peerSelected.getPeerId());
+        setAvatarPeerSelected(peerSelected);
         parentBigCameraGroupCall.setVisibility(View.VISIBLE);
         avatarBigCameraGroupCallLayout.setVisibility(View.VISIBLE);
     }
@@ -2409,17 +2391,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         return getUserMailCall(chat, peerid);
     }
 
-    public void updateNonContactName(long peerid, String peerEmail) {
-        logDebug("Email found it");
-        if (!peersOnCall.isEmpty()) {
-            for (InfoPeerGroupCall peer : peersOnCall) {
-                if (peerid == peer.getPeerId()) {
-                    peer.setName(peerEmail);
-                }
-            }
-        }
-    }
-
     public void showSnackbar(String s) {
         logDebug("showSnackbar: " + s);
         showSnackbar(fragmentContainer, s);
@@ -2445,7 +2416,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         localCameraFragmentShowMicro(!callChat.hasLocalAudio() && callChat.hasLocalVideo());
 
-        if (callChat.isOnHold() || isSessionOnHold() || callChat.hasLocalAudio() || (callChat.hasLocalVideo() && mutateContactCallLayout.getVisibility() == View.VISIBLE)) {
+        if (callChat.isOnHold() || isSessionOnHold() || callChat.hasLocalAudio() || mutateContactCallLayout.getVisibility() == View.VISIBLE) {
             checkMutateOwnCallLayout(View.GONE);
             return;
         }
@@ -2639,6 +2610,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             adapterGrid.updateSessionOnHold(peerId, clienId);
         }else if(!lessThanSevenParticipants() && adapterList != null){
             adapterList.updateSessionOnHold(peerId, clienId);
+            if(peerSelected!= null){
+                updatePeerSelectedOnHold(peerSelected);
+            }
         }
     }
 
@@ -2656,6 +2630,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         if(chat.isGroup()){
             if (callChat.isOnHold()){
+                callOnHoldText.setText(getString(R.string.call_on_hold));
                 callOnHoldLayout.setVisibility(View.VISIBLE);
             }else{
                 callOnHoldLayout.setVisibility(View.GONE);
@@ -2665,6 +2640,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 adapterGrid.updateCallOnHold();
             }else if(!lessThanSevenParticipants() && adapterList != null){
                 adapterList.updateCallOnHold();
+                if(peerSelected!= null){
+                    updatePeerSelectedOnHold(peerSelected);
+                }
             }
         }else{
             MegaChatSession session = getSesionIndividualCall();
@@ -2673,6 +2651,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
 
             if (callChat.isOnHold() || isSessionOnHold()) {
+                callOnHoldText.setText(getString(R.string.call_on_hold));
                 callOnHoldLayout.setVisibility(View.VISIBLE);
                 checkMutateOwnCallLayout(View.GONE);
 

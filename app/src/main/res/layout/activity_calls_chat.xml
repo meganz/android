@@ -86,8 +86,8 @@
                     <!--Big Avatar in Group call-->
                     <RelativeLayout
                         android:id="@+id/rl_avatar_big_camera_group_call"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
+                        android:layout_width="128dp"
+                        android:layout_height="128dp"
                         android:layout_centerInParent="true"
                         android:background="@android:color/transparent"
                         android:gravity="center_horizontal|center_vertical">
@@ -373,7 +373,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
+                        android:id="@+id/call_on_hold_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@null"
@@ -385,6 +386,7 @@
                         android:textAlignment="gravity"
                         android:textColor="@color/white"
                         android:textSize="14sp"
+                        app:emojiSize="14sp"
                         android:textStyle="normal" />
 
                 </LinearLayout>
