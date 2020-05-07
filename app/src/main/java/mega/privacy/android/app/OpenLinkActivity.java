@@ -400,7 +400,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		if (url.contains(REQUIRES_TRANSFER_SESSION)) {
 			int start = url.indexOf(REQUIRES_TRANSFER_SESSION);
 			if (start != -1) {
-				String path = url.substring(start + 3);
+				String path = url.substring(start + REQUIRES_TRANSFER_SESSION.length());
 				megaApi.getSessionTransferURL(path, new SessionTransferURLListener(this));
 				return;
 			}
