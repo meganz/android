@@ -13,6 +13,7 @@ import java.io.File;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import nz.mega.sdk.MegaApiAndroid;
@@ -290,8 +291,8 @@ public class CameraUploadUtil {
         if (primaryHandle != INVALID_HANDLE) {
             api.setCameraUploadsFolder(primaryHandle, new SetAttrUserListener(context));
             // if current device language is not English, rename this folder as "Camera Uploads" in other language
-            if (!CAMERA_UPLOADS.equals(CAMERA_UPLOADS_ENGLISH)) {
-                api.renameNode(api.getNodeByHandle(primaryHandle), CAMERA_UPLOADS, new RenameListener(context));
+            if (!context.getString(R.string.section_photo_sync).equals(CAMERA_UPLOADS_ENGLISH)) {
+                api.renameNode(api.getNodeByHandle(primaryHandle), context.getString(R.string.section_photo_sync), new RenameListener(context));
             }
         }
     }
@@ -304,8 +305,8 @@ public class CameraUploadUtil {
             // if current device language is not English, rename this folder as "Media Uploads" in other language
             api.setCameraUploadsFolderSecondary(secondaryHandle, new SetAttrUserListener(context));
             Log.d("dfdf", "here is the secondaryHandle: " + secondaryHandle);
-            if (!SECONDARY_UPLOADS.equals(SECONDARY_UPLOADS_ENGLISH)) {
-                api.renameNode(api.getNodeByHandle(secondaryHandle), SECONDARY_UPLOADS, new RenameListener(context));
+            if (!context.getString(R.string.section_secondary_media_uploads).equals(SECONDARY_UPLOADS_ENGLISH)) {
+                api.renameNode(api.getNodeByHandle(secondaryHandle), context.getString(R.string.section_secondary_media_uploads), new RenameListener(context));
             }
         }
     }

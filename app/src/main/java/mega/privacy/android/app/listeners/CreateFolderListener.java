@@ -2,7 +2,6 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -13,8 +12,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 
-import static mega.privacy.android.app.jobservices.CameraUploadsService.CAMERA_UPLOADS;
-import static mega.privacy.android.app.jobservices.CameraUploadsService.SECONDARY_UPLOADS;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -47,9 +44,9 @@ public class CreateFolderListener extends BaseListener {
         String name = request.getName();
 
         if (extraAction == ExtraAction.INIT_CU && e.getErrorCode() == MegaError.API_OK) {
-            if (name.equals(CAMERA_UPLOADS)) {
+            if (name.equals(context.getString(R.string.section_photo_sync))) {
                 api.setCameraUploadsFolder(handle, new SetAttrUserListener(context));
-            } else if (name.equals(SECONDARY_UPLOADS)) {
+            } else if (name.equals(context.getString(R.string.section_secondary_media_uploads))) {
                 api.setCameraUploadsFolderSecondary(handle, new SetAttrUserListener(context));
             }
         }

@@ -424,19 +424,19 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 							dbH.setCamSyncHandle(-1);
 							camSyncHandle = (long) -1;
 							//Meanwhile is not created, set just the name
-							camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
+							camSyncMegaPath = getString(R.string.section_photo_sync);
 						}
 					}
 					else{
 						//Meanwhile is not created, set just the name
-						camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
+						camSyncMegaPath = getString(R.string.section_photo_sync);
 					}
 				}
 				else{
 					dbH.setCamSyncHandle(-1);
 					camSyncHandle = (long) -1;
 					//Meanwhile is not created, set just the name
-					camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
+					camSyncMegaPath = getString(R.string.section_photo_sync);
 				}
 
 				setWhatToUploadForCameraUpload();
@@ -712,16 +712,16 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 								megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
 							}
 							else{
-								megaPathSecMediaFolder = SECONDARY_UPLOADS;
+								megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
 							}
 						}
 						else{
-							megaPathSecMediaFolder = SECONDARY_UPLOADS;
+							megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
 						}
 					}
 					else{
 						logWarning("handleSecondaryMediaFolder empty string");
-						megaPathSecMediaFolder = SECONDARY_UPLOADS;
+						megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
 					}
 
 				}
@@ -729,7 +729,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 					logWarning("handleSecondaryMediaFolder Null");
 					dbH.setSecondaryFolderHandle(-1);
 					handleSecondaryMediaFolder = (long) -1;
-					megaPathSecMediaFolder = SECONDARY_UPLOADS;
+					megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
 				}
 
 				//check if the local secondary folder exists
@@ -1252,7 +1252,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
             if (secondaryUpload){
             	//If there is any possible secondary folder, set it as the default one
 				long setSecondaryFolderHandle = getSecondaryFolderHandle();
-				long possibleSecondaryFolderHandle = findDefaultFolder(SECONDARY_UPLOADS);
+				long possibleSecondaryFolderHandle = findDefaultFolder(getString(R.string.section_secondary_media_uploads));
 				if ((setSecondaryFolderHandle == INVALID_HANDLE || isNodeInRubbishOrDeleted(setSecondaryFolderHandle)) &&
 						possibleSecondaryFolderHandle != INVALID_HANDLE) {
 					megaApi.setCameraUploadsFolderSecondary(possibleSecondaryFolderHandle, setAttrUserListener);
@@ -1264,11 +1264,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				//Check MEGA folder
 				if(handleSecondaryMediaFolder!=null){
 					if(handleSecondaryMediaFolder==-1){
-						megaPathSecMediaFolder = SECONDARY_UPLOADS;
+						megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
 					}
 				}
 				else{
-					megaPathSecMediaFolder = SECONDARY_UPLOADS;
+					megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
 				}
 
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
@@ -2339,20 +2339,20 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 						if (megaNodeSecondaryMediaFolder != null) {
 							megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
 						} else {
-							megaPathSecMediaFolder = SECONDARY_UPLOADS;
+							megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
 						}
 					} else {
-						megaPathSecMediaFolder = SECONDARY_UPLOADS;
+						megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
 					}
 				} else {
 					logWarning("handleSecondaryMediaFolder empty string");
-					megaPathSecMediaFolder = SECONDARY_UPLOADS;
+					megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
 				}
 			} else {
 				logWarning("handleSecondaryMediaFolder Null");
 				dbH.setSecondaryFolderHandle(-1);
 				handleSecondaryMediaFolder = (long) -1;
-				megaPathSecMediaFolder = SECONDARY_UPLOADS;
+				megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
 			}
 
 			//check if the local secondary folder exists
@@ -2387,10 +2387,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 	private void setupPrimaryCloudFolder() {
 		if (camSyncHandle == null) {
-			camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
+			camSyncMegaPath = getString(R.string.section_photo_sync);
 		} else {
 			if (camSyncHandle == -1) {
-				camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
+				camSyncMegaPath = getString(R.string.section_photo_sync);
 			} else {
 				logDebug("camSyncHandle is " + camSyncHandle);
 			}

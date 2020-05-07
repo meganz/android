@@ -91,9 +91,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private static final String ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST";
     private static final int BATTERY_STATE_LOW = 20;
     private static final int LOW_BATTERY_LEVEL = 20;
-    public static final String CAMERA_UPLOADS = MegaApplication.getInstance().getString(R.string.section_photo_sync);
     public static final String CAMERA_UPLOADS_ENGLISH = "Camera Uploads";
-    public static final String SECONDARY_UPLOADS = MegaApplication.getInstance().getString(R.string.section_secondary_media_uploads);
     public static final String SECONDARY_UPLOADS_ENGLISH = "Media Uploads";
     public static final String ACTION_CANCEL = "CANCEL_SYNC";
     public static final String ACTION_STOP = "STOP_SYNC";
@@ -1002,9 +1000,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private int checkPrimaryFolder() {
         if (isNodeInRubbishOrDeleted(cameraUploadHandle)) {
-            cameraUploadHandle = findDefaultFolder(CAMERA_UPLOADS);
+            cameraUploadHandle = findDefaultFolder(getString(R.string.section_photo_sync));
             if (cameraUploadHandle == INVALID_HANDLE) {
-                megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), createFolderListener);
+                megaApi.createFolder(getString(R.string.section_photo_sync), megaApi.getRootNode(), createFolderListener);
                 return TARGET_FOLDER_NOT_EXIST;
             } else {
                 megaApi.setCameraUploadsFolder(cameraUploadHandle, setAttrUserListener);
@@ -1033,10 +1031,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if (secondaryEnabled) {
             logDebug("the secondary uploads are enabled");
             if (isNodeInRubbishOrDeleted(secondaryUploadHandle)) {
-                secondaryUploadHandle = findDefaultFolder(SECONDARY_UPLOADS);
+                secondaryUploadHandle = findDefaultFolder(getString(R.string.section_secondary_media_uploads));
                 if (secondaryUploadHandle == INVALID_HANDLE) {
                     logDebug("must create the folder");
-                    megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), createFolderListener);
+                    megaApi.createFolder(getString(R.string.section_secondary_media_uploads), megaApi.getRootNode(), createFolderListener);
                     return TARGET_FOLDER_NOT_EXIST;
                 } else {
                     megaApi.setCameraUploadsFolderSecondary(secondaryUploadHandle, setAttrUserListener);

@@ -1048,7 +1048,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                     return;
                 }
             } else {
-                if (n.getName().equals(CAMERA_UPLOADS)) {
+                if (n.getName().equals(context.getString(R.string.section_photo_sync))) {
                     if (prefs != null) {
                         prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
                     }
@@ -1060,7 +1060,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
             }
             
         } else {
-            if (n.getName().equals(CAMERA_UPLOADS)) {
+            if (n.getName().equals(context.getString(R.string.section_photo_sync))) {
                 
                 if (prefs != null) {
                     prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
@@ -1093,7 +1093,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 }
             }
         } else {
-            if (n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)) {
+            if (n.getName().equals(context.getString(R.string.section_secondary_media_uploads))) {
                 if (prefs != null) {
                     prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
                 }
