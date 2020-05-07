@@ -2790,27 +2790,29 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     adapterGrid.notifyItemRemoved(posRemoved);
                 }
                 adapterGrid.notifyDataSetChanged();
-            } else {
-                if (peersOnCall.size() == NECESSARY_CHANGE_OF_SIZES) {
-                    if (isAdded) {
-                        adapterGrid.notifyItemInserted(posInserted);
-                    }else{
-                        adapterGrid.notifyItemRemoved(posRemoved);
-                    }
+
+            } else if (peersOnCall.size() == NECESSARY_CHANGE_OF_SIZES) {
+                if (isAdded) {
+                    adapterGrid.notifyItemInserted(posInserted);
                     adapterGrid.notifyDataSetChanged();
 
                 } else {
-                    int rangeToUpdate;
-                    if (isAdded) {
-                        adapterGrid.notifyItemInserted(posInserted);
-                        rangeToUpdate = posInserted - 1;
-                    }else{
-                        adapterGrid.notifyItemRemoved(posRemoved);
-                        rangeToUpdate = posRemoved;
-                    }
-                    adapterGrid.notifyItemRangeChanged(rangeToUpdate, peersOnCall.size());
+                    adapterGrid.notifyItemRemoved(posRemoved);
+                    adapterGrid.notifyItemRangeChanged(posInserted - 1, peersOnCall.size());
                 }
+
+            } else {
+                int rangeToUpdate;
+                if (isAdded) {
+                    adapterGrid.notifyItemInserted(posInserted);
+                    rangeToUpdate = posInserted - 1;
+                } else {
+                    adapterGrid.notifyItemRemoved(posRemoved);
+                    rangeToUpdate = posRemoved;
+                }
+                adapterGrid.notifyItemRangeChanged(rangeToUpdate, peersOnCall.size());
             }
+
             resizeRecycler();
             adapterGrid.updateAvatarsPosition();
         } else {
