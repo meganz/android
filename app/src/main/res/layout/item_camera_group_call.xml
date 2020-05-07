@@ -62,7 +62,6 @@
         android:background="@android:color/transparent"
         android:visibility="gone">
 
-        <!--Big Avatar-->
         <RelativeLayout
             android:id="@+id/avatar_rl"
             android:layout_width="88dp"

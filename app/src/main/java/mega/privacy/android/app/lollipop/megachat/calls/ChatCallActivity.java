@@ -1208,6 +1208,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         } else {
             layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
         }
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
         layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
@@ -1703,7 +1704,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
                 ft.commitNowAllowingStateLoss();
             }
-            logDebug("************ optionsLocalCameraFragment myAvatar GONE ");
+
             myAvatarLayout.setVisibility(View.GONE);
             myAvatarMutedIcon.setVisibility(View.GONE);
             parentLocal.setVisibility(View.VISIBLE);
@@ -1894,13 +1895,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private void checkIndividualAudioCall(){
         if (isIndividualAudioCall()) {
-            logDebug("************ checkIndividualAudioCall myAvatar GONE ");
-
             myAvatarLayout.setVisibility(View.GONE);
             myAvatarMutedIcon.setVisibility(View.GONE);
         } else {
-            logDebug("************ checkIndividualAudioCall myAvatar VISIBLE ");
-
             myAvatarLayout.setVisibility(View.VISIBLE);
             checkOwnMuteIconAvatar();
         }
@@ -1953,10 +1950,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void updateChangesVideo(int position) {
         if (lessThanSevenParticipants() && adapterGrid != null) {
             adapterGrid.notifyItemChanged(position);
+            adapterGrid.updateAvatarsPosition();
             return;
         }
         if (!lessThanSevenParticipants() && adapterList != null) {
             adapterList.notifyItemChanged(position);
+            adapterList.updateAvatarsPosition();
             return;
         }
         updateUI();
@@ -2494,8 +2493,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     private void checkIncomingCall() {
         setAvatarLayout();
-        logDebug("************ checkIncomingCall myAvatar GONE ");
-
         myAvatarLayout.setVisibility(View.GONE);
         myAvatarMutedIcon.setVisibility(View.GONE);
         contactAvatarLayout.setVisibility(View.VISIBLE);
@@ -2817,6 +2814,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     adapterGrid.notifyItemRangeChanged(posRemoved, peersOnCall.size());
                 }
             }
+            adapterGrid.updateAvatarsPosition();
         } else {
             int posUpdated;
             if (isAdded) {
@@ -2828,6 +2826,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 adapterList.notifyItemRemoved(posUpdated);
             }
             adapterList.notifyItemRangeChanged(posUpdated, peersOnCall.size());
+            adapterList.updateAvatarsPosition();
             updateUserSelected();
         }
     }
@@ -2879,6 +2878,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             } else {
                 logDebug("Notify of changes");
                 adapterGrid.notifyDataSetChanged();
+                adapterGrid.updateAvatarsPosition();
             }
 
             if (statusCallInProgress(callChat.getStatus())) {
@@ -2903,6 +2903,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             } else {
                 logDebug("Notify of changes");
                 adapterList.notifyDataSetChanged();
+                adapterList.updateAvatarsPosition();
             }
 
             if (statusCallInProgress(callChat.getStatus())) {

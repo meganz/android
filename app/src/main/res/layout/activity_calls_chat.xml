@@ -535,39 +535,39 @@
 
                 <FrameLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginRight="36dp">
 
-                <!-- PAUSE -->
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/pause_fab"
-                    android:layout_width="54dp"
-                    android:layout_height="54dp"
-                    android:layout_marginBottom="24dp"
-                    android:background="@null"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_call_hold_fab"
-                    android:alpha="1"
-                    android:visibility="gone"
-                    app:backgroundTint="@color/accentColor"
-                    app:borderWidth="0dp"
-                    app:elevation="0dp"
-                    app:fabSize="normal"
-                    app:pressedTranslationZ="12dp" />
+                    <!-- PAUSE -->
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/pause_fab"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_marginBottom="24dp"
+                        android:background="@null"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_call_hold_fab"
+                        android:alpha="1"
+                        android:visibility="gone"
+                        app:backgroundTint="@color/accentColor"
+                        app:borderWidth="0dp"
+                        app:elevation="0dp"
+                        app:fabSize="normal"
+                        app:pressedTranslationZ="12dp" />
                 </FrameLayout>
 
                 <FrameLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginRight="36dp">
 
                     <!-- SPEAKER -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/speaker_fab"
-                        android:layout_width="54dp"
-                        android:layout_height="54dp"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
                         android:layout_marginBottom="24dp"
                         android:background="@null"
                         android:scaleType="center"
@@ -584,16 +584,16 @@
                     <RelativeLayout
                         android:id="@+id/relative_answer_call_fab"
                         android:layout_width="54dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
                         android:gravity="bottom|center_horizontal">
 
                         <com.google.android.material.floatingactionbutton.FloatingActionButton
                             android:id="@+id/answer_call_fab"
-                            android:layout_width="54dp"
-                            android:layout_height="54dp"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
                             android:layout_below="@+id/linear_arrow_call"
-                            android:layout_gravity="bottom"
+                            android:layout_gravity="center"
                             android:layout_marginBottom="24dp"
                             android:scaleType="center"
                             android:alpha="1"
@@ -655,7 +655,7 @@
                 <RelativeLayout
                     android:id="@+id/relative_video_fab"
                     android:layout_width="54dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginRight="36dp"
                     android:background="@android:color/transparent"
@@ -664,10 +664,10 @@
                     <!-- VIDEO -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/video_fab"
-                        android:layout_width="54dp"
-                        android:layout_height="54dp"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
                         android:layout_below="@+id/linear_arrow_video"
-                        android:layout_gravity="bottom"
+                        android:layout_gravity="center"
                         android:layout_marginBottom="24dp"
                         android:background="@null"
                         android:scaleType="center"
@@ -737,9 +737,9 @@
                     <!-- MICRO -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/micro_fab"
-                        android:layout_width="54dp"
-                        android:layout_height="54dp"
-                        android:layout_gravity="bottom"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_gravity="center"
                         android:background="@null"
                         android:scaleType="center"
                         android:src="@drawable/ic_record_audio_w"
@@ -753,8 +753,8 @@
                     <!-- REJECT -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/reject_fab"
-                        android:layout_width="54dp"
-                        android:layout_height="54dp"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
                         android:layout_gravity="bottom"
                         android:background="@null"
                         android:scaleType="center"
