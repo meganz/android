@@ -191,6 +191,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	private Handler handler;
 
+	private boolean pickingFromSDCard;
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -510,6 +512,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	private void openPickFromInternalStorage() {
+		pickingFromSDCard = false;
 		root = buildExternalStorageFile("");
 
 		if (pickFolderType.equals(PickFolderType.CU_FOLDER) && Environment.getExternalStorageDirectory() != null) {
@@ -528,7 +531,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	private void openPickFromSDCard() {
-		root = buildExternalStorageFile("");
+		pickingFromSDCard = true;
 
 		SDCardOperator sdCardOperator;
 		try {
@@ -560,8 +563,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 
 		if (sdRoot != null) {
-			path = new File(sdRoot);
+			openSDCardPath();
 		}
+	}
+
+	private void openSDCardPath() {
+		path = new File(sdRoot);
+		showRootWithSDView(false);
+		checkPath();
 	}
 
 	private void requestSDCardPermission(String sdCardRoot) {
@@ -602,6 +611,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		} else if (adapter != null && adapter.getItemCount() > 0) {
+			int count = adapter.getItemCount();
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -672,6 +682,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 					true, this);
 			return;
 		}
+
 		File[] files = path.listFiles();
 
 		if(files != null)
@@ -955,16 +966,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 	
 	/*
-	 * Count all selected items
-	 */
-	public int getItemCount(){
-		if(adapter!=null){
-			return adapter.getItemCount();
-		}
-		return 0;
-	}
-	
-	/*
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
@@ -983,7 +984,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		if ((hasSDCard && rootLevelLayout.getVisibility() == View.VISIBLE) || !hasSDCard && path.equals(root)) {
 				super.onBackPressed();
 		// Go one level higher otherwise
-		} else if (hasSDCard && path.equals(root)) {
+		} else if (hasSDCard && ((pickingFromSDCard && path.equals(new File(sdRoot)) || !pickingFromSDCard && path.equals(root)))) {
 			showRootWithSDView(true);
 		} else {
 			changeFolder(path.getParentFile());
@@ -1259,8 +1260,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				if (sdCardOperator != null) {
 					if (isBasedOnFileStorage()) {
 						sdRoot = sdCardOperator.getSDCardRoot();
-						path = new File(sdRoot);
-						checkPath();
+						openSDCardPath();
 					} else {
 						path = new File(getFullPathFromTreeUri(treeUri, this));
 

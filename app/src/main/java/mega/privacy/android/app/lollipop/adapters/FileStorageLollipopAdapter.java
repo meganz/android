@@ -176,13 +176,8 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
     // Set new files on folder change
     public void setFiles(List<FileDocument> newFiles) {
         logDebug("setFiles");
-        if (newFiles != null && newFiles.size() > 0) {
-            listFragment.setVisibility(View.VISIBLE);
-            currentFiles = newFiles;
-            notifyDataSetChanged();
-        } else {
-            listFragment.setVisibility(View.GONE);
-        }
+        currentFiles = newFiles;
+        notifyDataSetChanged();
     }
 
     public FileDocument getDocumentAt(int position) {
@@ -195,11 +190,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 
     @Override
     public int getItemCount() {
-        if (currentFiles == null) {
-            return 0;
-        }
-        int size = currentFiles.size();
-        return size == 0 ? 1 : size;
+        return currentFiles == null ? 0 : currentFiles.size();
     }
 
     public boolean isEnabled(int position) {
