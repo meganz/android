@@ -100,7 +100,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     final private static int ALPHA_ANIMATION = 600;
     final private static int ALPHA_ARROW_ANIMATION = 1000;
     final private static int DURATION_TOOLBAR_ANIMATION = 500;
-    final private static int NECESSARY_CHANGE_OF_SIZES = 4;
+    final private static int NECESSARY_CHANGE_OF_SIZES = 3;
     final private static int TYPE_JOIN = 1;
     final private static int TYPE_LEFT = -1;
     private final static int TITLE_TOOLBAR = 250;
@@ -2773,7 +2773,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     /**
      * Check when the number of participants changes in the call and update UI.
      */
-    private void checkParticipantChanges(boolean isAdded, int posRemoved) {
+    private void checkParticipantChanges(boolean isAdded, int posRemoved, int posInserted) {
 
         logDebug("Checking for changes in the number of participants");
         if ((lessThanSevenParticipants()  && adapterGrid == null) || (!lessThanSevenParticipants() && (adapterList == null || (isAdded && peersOnCall.size() == MIN_PEERS_LIST) || (!isAdded && peersOnCall.size() == MAX_PEERS_GRID)))) {
@@ -2781,12 +2781,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
+
         if (lessThanSevenParticipants()) {
             if (peersOnCall.size() < NECESSARY_CHANGE_OF_SIZES) {
-                recyclerViewLayout.setPadding(0, 0, 0, 0);
-                recyclerView.setColumnWidth((int) widthScreenPX);
                 if (isAdded) {
-                    int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
                     adapterGrid.notifyItemInserted(posInserted);
                 } else {
                     adapterGrid.notifyItemRemoved(posRemoved);
@@ -2794,31 +2792,30 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 adapterGrid.notifyDataSetChanged();
             } else {
                 if (peersOnCall.size() == NECESSARY_CHANGE_OF_SIZES) {
-                    recyclerViewLayout.setPadding(0, px2dp(136, outMetrics), 0, 0);
-                    recyclerView.setColumnWidth((int) widthScreenPX / 2);
-                    if (isAdded) {
-                        adapterGrid.notifyItemInserted(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
-                        adapterGrid.notifyDataSetChanged();
-                    }
-                } else {
-                    recyclerViewLayout.setPadding(0, 0, 0, 0);
-                    recyclerView.setColumnWidth((int) widthScreenPX / 2);
-                    int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
                     if (isAdded) {
                         adapterGrid.notifyItemInserted(posInserted);
-                        adapterGrid.notifyItemRangeChanged((posInserted - 1), peersOnCall.size());
+                    }else{
+                        adapterGrid.notifyItemRemoved(posRemoved);
                     }
-                }
-                if (!isAdded) {
-                    adapterGrid.notifyItemRemoved(posRemoved);
-                    adapterGrid.notifyItemRangeChanged(posRemoved, peersOnCall.size());
+                    adapterGrid.notifyDataSetChanged();
+
+                } else {
+                    int rangeToUpdate;
+                    if (isAdded) {
+                        adapterGrid.notifyItemInserted(posInserted);
+                        rangeToUpdate = posInserted - 1;
+                    }else{
+                        adapterGrid.notifyItemRemoved(posRemoved);
+                        rangeToUpdate = posRemoved;
+                    }
+                    adapterGrid.notifyItemRangeChanged(rangeToUpdate, peersOnCall.size());
                 }
             }
+            resizeRecycler();
             adapterGrid.updateAvatarsPosition();
         } else {
             int posUpdated;
             if (isAdded) {
-                int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
                 posUpdated = posInserted - 1;
                 adapterList.notifyItemInserted(posUpdated);
             } else {
@@ -2828,6 +2825,22 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             adapterList.notifyItemRangeChanged(posUpdated, peersOnCall.size());
             adapterList.updateAvatarsPosition();
             updateUserSelected();
+        }
+    }
+
+    private void resizeRecycler(){
+
+        if (peersOnCall.size() < NECESSARY_CHANGE_OF_SIZES) {
+            recyclerViewLayout.setPadding(0,  0, 0, 0);
+            recyclerView.setColumnWidth((int) widthScreenPX);
+        } else {
+            if (peersOnCall.size() == 4 || peersOnCall.size() == 3) {
+                recyclerViewLayout.setPadding(0, px2dp(100, outMetrics), 0, 0);
+            }else {
+                recyclerViewLayout.setPadding(0, 0, 0, 0);
+            }
+
+            recyclerView.setColumnWidth((int) widthScreenPX / 2);
         }
     }
 
@@ -2858,17 +2871,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             recyclerViewLayout.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.VISIBLE);
 
-            if (peersOnCall.size() < NECESSARY_CHANGE_OF_SIZES) {
-                recyclerViewLayout.setPadding(0, 0, 0, 0);
-                recyclerView.setColumnWidth((int) widthScreenPX);
-            } else {
-                if (peersOnCall.size() == NECESSARY_CHANGE_OF_SIZES) {
-                    recyclerViewLayout.setPadding(0, px2dp(136, outMetrics), 0, 0);
-                } else {
-                    recyclerViewLayout.setPadding(0, 0, 0, 0);
-                }
-                recyclerView.setColumnWidth((int) widthScreenPX / 2);
-            }
+            resizeRecycler();
 
             if (adapterGrid == null) {
                 logDebug("Need to create the adapter");
@@ -2936,7 +2939,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 updateInfoUsersBar(getString(R.string.contact_joined_the_call, getName(userPeerId)));
             }
 
-            checkParticipantChanges(true, -1);
+            checkParticipantChanges(true, -1, (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1)));
 
             if (statusCallInProgress(callStatus)) {
                 updateRemoteAV(callChat.getMegaChatSession(userPeerId, userClientId));
@@ -2958,8 +2961,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     updateInfoUsersBar(getString(R.string.contact_left_the_call, getName(userPeerId)));
                 }
 
+                int position = peersOnCall.indexOf(peer);
                 removeContact(peer);
-                checkParticipantChanges(false, peersOnCall.indexOf(peer));
+                checkParticipantChanges(false, position, -1);
                 break;
 
             }

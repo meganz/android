@@ -33,6 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
+                    android:nestedScrollingEnabled="false"
                     android:orientation="vertical">
 
                     <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
@@ -49,6 +50,7 @@
                         android:numColumns="auto_fit"
                         android:scrollbars="horizontal"
                         android:stretchMode="columnWidth"
+                        android:clipToPadding="true"
                         android:verticalSpacing="0dp" />
                 </RelativeLayout>
 

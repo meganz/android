@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -47,7 +48,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     private static final int SIZE_MUTE_ICON_LARGE = 24;
     private static final int MIN_USERS_GRID = 7;
     private static final int MARGIN_BUTTONS_BIG = 168;
-    private static final int MARGIN_BUTTONS_SMALL = 48;
+    private static final int MARGIN_BUTTONS_SMALL = 96;
     private static final int SIZE_VIDEO_PARTICIPANTS = 90;
 
     private Context context;
@@ -186,10 +187,10 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         int height;
         int width;
         int numPeersOnCall = peers.size();
-        if (numPeersOnCall < 4) {
+        if (numPeersOnCall < 3) {
             height = maxScreenHeight / numPeersOnCall;
             width = maxScreenWidth;
-        } else if (numPeersOnCall >= 4 && numPeersOnCall < 7) {
+        } else if (numPeersOnCall >= 3 && numPeersOnCall < 7) {
             height = maxScreenWidth / 2;
             width = maxScreenWidth / 2;
         } else {
@@ -201,7 +202,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             CustomizedGridRecyclerView.LayoutParams lp = (CustomizedGridRecyclerView.LayoutParams) holder.rlGeneral.getLayoutParams();
             lp.height = height;
             lp.width = width;
-            if (numPeersOnCall == 5 && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
+
+            if (numPeersOnCall == 3 && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
                 ViewGroup.LayoutParams layoutParamsPeer = holder.rlGeneral.getLayoutParams();
                 layoutParamsPeer.width = maxScreenWidth;
                 layoutParamsPeer.height = maxScreenWidth / 2;
@@ -393,40 +395,23 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
 
         int numPeersOnCall = peers.size();
-        if (numPeersOnCall == 2 && position == 1 && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
+        if (numPeersOnCall == 3 && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
+            ViewGroup.LayoutParams layoutParamsPeer = holder.rlGeneral.getLayoutParams();
+            layoutParamsPeer.width = maxScreenWidth;
+            layoutParamsPeer.height = maxScreenWidth / 2;
+            holder.rlGeneral.setLayoutParams(layoutParamsPeer);
+        }
+        if ((numPeersOnCall == 2) && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarLayout.getLayoutParams();
             layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            layoutParams.setMargins(0, 0, 0, px2dp(MARGIN_BUTTONS_SMALL, outMetrics));
+            layoutParams.setMargins(0, 0, 0, scaleHeightPx(MARGIN_BUTTONS_SMALL, outMetrics));
             holder.avatarLayout.setLayoutParams(layoutParams);
             return;
-        } else if (numPeersOnCall == 3) {
-            if (position == 2) {
-                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarLayout.getLayoutParams();
-                layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                layoutParams.setMargins(0, 0, 0, px2dp(MARGIN_BUTTONS_BIG, outMetrics));
-                holder.avatarLayout.setLayoutParams(layoutParams);
-                return;
-            } else if (position == 0) {
-                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarLayout.getLayoutParams();
-                layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-                layoutParams.setMargins(0, px2dp(MARGIN_BUTTONS_BIG, outMetrics), 0, 0);
-                holder.avatarLayout.setLayoutParams(layoutParams);
-                return;
-            }
-        }else if(numPeersOnCall == 5 && position == 4 && isItMe(chatId, peer.getPeerId(), peer.getClientId())){
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarLayout.getLayoutParams();
-            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            layoutParams.setMargins(0, 0, 0, px2dp(MARGIN_BUTTONS_BIG, outMetrics));
-            holder.avatarLayout.setLayoutParams(layoutParams);
         }
 
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarLayout.getLayoutParams();
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         layoutParams.setMargins(0, 0, 0, 0);
         holder.avatarLayout.setLayoutParams(layoutParams);
@@ -758,8 +743,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
      */
     public void updateSessionOnHold(long peerId, long clientId) {
         MegaChatCall call = ((ChatCallActivity) context).getCall();
-        MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peerId, clientId);
-
         for (InfoPeerGroupCall peer : peers) {
             if (peer.getPeerId() == peerId && peer.getClientId() == clientId) {
                 int position = peers.indexOf(peer);
