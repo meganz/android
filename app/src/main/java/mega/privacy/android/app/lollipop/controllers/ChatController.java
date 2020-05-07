@@ -1610,10 +1610,11 @@ public class ChatController {
             size += nodeList.get(i).getSize();
         }
 
-        ArrayList<String> serializedNodes = serializeNodes(nodeList);
-        boolean downloadToSDCard = false;
-        String downloadRoot = null;
-        SDCardOperator sdCardOperator = null;
+        SDCardOperator sdCardOperator = SDCardOperator.initSDCardOperator(context, parentPath);
+        if(sdCardOperator == null) {
+            requestLocalFolder(size, serializeNodes(nodeList));
+            return;
+        }
 
         if(nodeList.size() == 1) {
             logDebug("hashes.length == 1");
@@ -1630,7 +1631,7 @@ public class ChatController {
                 //Check if the file is already downloaded
                 MegaApplication app = MegaApplication.getInstance();
                 if (localPath != null) {
-                    checkDownload(context, tempNode, localPath, parentPath, true, downloadToSDCard, sdCardOperator);
+                    checkDownload(context, tempNode, localPath, parentPath, true, sdCardOperator);
 
                     if (!Boolean.parseBoolean(dbH.getAutoPlayEnabled()) || isVoiceClip(nodeList.get(0).getName())) {
                         return;
@@ -1763,9 +1764,9 @@ public class ChatController {
                 Map<MegaNode, String> dlFiles = new HashMap<>();
                 Map<Long, String> targets = new HashMap<>();
 
-                if (downloadToSDCard) {
+                if (sdCardOperator.isSDCardDownload()) {
                     targets.put(nodeToDownload.getHandle(), parentPath);
-                    dlFiles.put(nodeToDownload, downloadRoot);
+                    dlFiles.put(nodeToDownload, sdCardOperator.getDownloadRoot());
                 } else {
                     dlFiles.put(nodeToDownload, parentPath);
                 }
@@ -1802,7 +1803,7 @@ public class ChatController {
                         } else if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer) {
                             service.putExtra("fromMV", true);
                         }
-                        if (downloadToSDCard) {
+                        if (sdCardOperator.isSDCardDownload()) {
                             service = NodeController.getDownloadToSDCardIntent(service, path, targetPath, dbH.getSDCardUri());
                         } else {
                             service.putExtra(DownloadService.EXTRA_PATH, path);

@@ -61,7 +61,6 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class NodeController {
@@ -616,19 +615,10 @@ public class NodeController {
 
     public void download(String parentPath, String url, long size, long [] hashes, boolean highPriority){
         logDebug("files to download: "+hashes.length);
-        boolean downloadToSDCard = false;
-        String downloadRoot = null;
-        SDCardOperator sdCardOperator = null;
-
-        if (SDCardOperator.isSDCardPath(parentPath)) {
-            sdCardOperator = checkDownloadPath(context, parentPath);
-            if (sdCardOperator == null) {
-                requestLocalFolder(new DownloadInfo(highPriority, size, hashes), context.getString(R.string.no_external_SD_card_detected));
-                return;
-            }
-
-            downloadRoot = sdCardOperator.getDownloadRoot();
-            downloadToSDCard = !isTextEmpty(downloadRoot);
+        SDCardOperator sdCardOperator = SDCardOperator.initSDCardOperator(context, parentPath);
+        if(sdCardOperator == null) {
+            requestLocalFolder(new DownloadInfo(highPriority, size, hashes), context.getString(R.string.no_external_SD_card_detected));
+            return;
         }
 
         if (hashes.length == 1) {
@@ -644,7 +634,7 @@ public class NodeController {
                         && isFileDownloadedLatest(new File(localPath), tempNode)) {
                     logDebug("localPath != null");
 
-                    checkDownload(context, tempNode, localPath, parentPath, true, downloadToSDCard, sdCardOperator);
+                    checkDownload(context, tempNode, localPath, parentPath, true, sdCardOperator);
 
                     if (!Boolean.parseBoolean(dbH.getAutoPlayEnabled())) {
                         return;
@@ -791,17 +781,17 @@ public class NodeController {
                     Map<Long, String> targets = new HashMap<>();
                     if (node.getType() == MegaNode.TYPE_FOLDER) {
                         logDebug("MegaNode.TYPE_FOLDER");
-                        if (downloadToSDCard) {
+                        if (sdCardOperator.isSDCardDownload()) {
                             sdCardOperator.buildFileStructure(targets, parentPath, megaApi, node);
-                            getDlList(dlFiles, node, new File(downloadRoot, node.getName()));
+                            getDlList(dlFiles, node, new File(sdCardOperator.getDownloadRoot(), node.getName()));
                         } else {
                             getDlList(dlFiles, node, new File(parentPath, node.getName()));
                         }
                     } else {
                         logDebug("MegaNode.TYPE_FILE");
-                        if (downloadToSDCard) {
+                        if (sdCardOperator.isSDCardDownload()) {
                             targets.put(node.getHandle(), parentPath);
-                            dlFiles.put(node, downloadRoot);
+                            dlFiles.put(node, sdCardOperator.getDownloadRoot());
                         } else {
                             dlFiles.put(node, parentPath);
                         }
@@ -833,7 +823,7 @@ public class NodeController {
                             Intent service = new Intent(context, DownloadService.class);
                             service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
                             service.putExtra(DownloadService.EXTRA_URL, url);
-                            if(downloadToSDCard) {
+                            if(sdCardOperator.isSDCardDownload()) {
                                 service = getDownloadToSDCardIntent(service, path, targetPath, dbH.getSDCardUri());
                             } else {
                                 service.putExtra(DownloadService.EXTRA_PATH, path);
@@ -1540,19 +1530,10 @@ public class NodeController {
 
     public void downloadTo(MegaNode currentDocument, String parentPath, String url){
         logDebug("downloadTo");
-        boolean downloadToSDCard = false;
-        String downloadRoot = null;
-        SDCardOperator sdCardOperator = null;
-
-        if(SDCardOperator.isSDCardPath(parentPath)) {
-            sdCardOperator = checkDownloadPath(context, parentPath);
-            if (sdCardOperator == null) {
-                intentPickFolder(currentDocument, url);
-                return;
-            }
-
-            downloadRoot = sdCardOperator.getDownloadRoot();
-            downloadToSDCard = !isTextEmpty(downloadRoot);
+        SDCardOperator sdCardOperator = SDCardOperator.initSDCardOperator(context, parentPath);
+        if(sdCardOperator == null) {
+            intentPickFolder(currentDocument, url);
+            return;
         }
 
         double availableFreeSpace = Double.MAX_VALUE;
@@ -1566,7 +1547,7 @@ public class NodeController {
             logDebug("is file");
             final String localPath = getLocalFile(context, tempNode.getName(), tempNode.getSize());
             if(localPath != null){
-                checkDownload(context, tempNode, localPath, parentPath, false, downloadToSDCard, sdCardOperator);
+                checkDownload(context, tempNode, localPath, parentPath, false, sdCardOperator);
             } else{
                 logDebug("LocalPath is NULL");
                 showSnackbar(context, context.getResources().getQuantityString(R.plurals.download_began, 1, 1));
@@ -1588,8 +1569,8 @@ public class NodeController {
                         service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
                         service.putExtra(EXTRA_SERIALIZE_STRING, currentDocument.serialize());
                         service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-                        if (downloadToSDCard) {
-                            service = getDownloadToSDCardIntent(service, downloadRoot, path, dbH.getSDCardUri());
+                        if (sdCardOperator.isSDCardDownload()) {
+                            service = getDownloadToSDCardIntent(service, sdCardOperator.getDownloadRoot(), path, dbH.getSDCardUri());
                         } else {
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                         }

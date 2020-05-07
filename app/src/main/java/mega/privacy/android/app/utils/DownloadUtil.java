@@ -1,12 +1,9 @@
 package mega.privacy.android.app.utils;
 
 import android.content.Context;
-import android.os.Handler;
-import android.widget.Toast;
 
 import java.io.File;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
@@ -27,12 +24,12 @@ public class DownloadUtil {
      * @return true if the file is already downloaded in the selected folder, false otherwise
      */
 
-    private static boolean isAlreadyDownloadedInCurrentPath(MegaNode node, String localPath, String currenParentPath, boolean downloadToSDCard, SDCardOperator sdCardOperator) {
+    private static boolean isAlreadyDownloadedInCurrentPath(MegaNode node, String localPath, String currenParentPath, SDCardOperator sdCardOperator) {
         File file = new File(localPath);
 
         if (isFileAvailable(file) && !file.getParent().equals(currenParentPath)) {
             try {
-                new Thread(new CopyFileThread(downloadToSDCard, localPath, currenParentPath, node.getName(), sdCardOperator)).start();
+                new Thread(new CopyFileThread(localPath, currenParentPath, node.getName(), sdCardOperator)).start();
             } catch (Exception e) {
                 logWarning("Exception copying file", e);
             }
@@ -50,8 +47,8 @@ public class DownloadUtil {
      * @param localPath path where the file was already downloaded
      * @param parentPath path where the file has to be downloaded this time
      */
-    public static void checkDownload (Context context, MegaNode node, String localPath, String parentPath, boolean checkVideo, boolean downloadToSDCard, SDCardOperator sdCardOperator){
-        if (isAlreadyDownloadedInCurrentPath(node, localPath, parentPath, downloadToSDCard, sdCardOperator)) {
+    public static void checkDownload (Context context, MegaNode node, String localPath, String parentPath, boolean checkVideo, SDCardOperator sdCardOperator){
+        if (isAlreadyDownloadedInCurrentPath(node, localPath, parentPath, sdCardOperator)) {
             showSnackbar(context, context.getString(R.string.general_already_downloaded));
         } else if (isFileAvailable(new File(localPath))){
             showSnackbar(context, context.getString(R.string.copy_already_downloaded));
@@ -91,42 +88,5 @@ public class DownloadUtil {
             }
             showSnackbar(context, msg);
         }
-    }
-
-    public static SDCardOperator checkDownloadPath(Context context, String downloadPath) {
-        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-        boolean isSDCardPath = SDCardOperator.isSDCardPath(downloadPath);
-        SDCardOperator sdCardOperator = null;
-
-        try {
-            sdCardOperator = new SDCardOperator(context);
-        } catch (SDCardOperator.SDCardException e) {
-            e.printStackTrace();
-            logError("Initialize SDCardOperator failed", e);
-            // user uninstall the sd card. but default download location is still on the sd card
-            if (isSDCardPath) {
-                logDebug("select new path as download location.");
-                return null;
-            }
-        }
-        if (sdCardOperator != null && isSDCardPath) {
-            //user has installed another sd card.
-            if (sdCardOperator.isNewSDCardPath(downloadPath)) {
-                logDebug("new sd card, check permission.");
-                new Handler().postDelayed(() -> Toast.makeText(MegaApplication.getInstance(), R.string.old_sdcard_unavailable, Toast.LENGTH_LONG).show(), 1000);
-                return null;
-            }
-
-            if (!sdCardOperator.canWriteWithFile(downloadPath)) {
-                try {
-                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                } catch (SDCardOperator.SDCardException e) {
-                    e.printStackTrace();
-                    logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
-                    return null;
-                }
-            }
-        }
-        return sdCardOperator;
     }
 }

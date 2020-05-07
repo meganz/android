@@ -3,7 +3,10 @@ package mega.privacy.android.app.utils;
 import android.content.Context;
 import android.net.Uri;
 import androidx.documentfile.provider.DocumentFile;
+
+import android.os.Handler;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,11 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 
 public class SDCardOperator {
 
@@ -36,6 +43,8 @@ public class SDCardOperator {
 
     private DocumentFile sdCardRootDocument;
 
+    private boolean isSDCardDownload;
+
     //32kb
     private static final int BUFFER_SIZE = 32 * 1024;
 
@@ -45,9 +54,13 @@ public class SDCardOperator {
             super(message);
         }
 
-        public SDCardException(String message, Throwable cause) {
+        SDCardException(String message, Throwable cause) {
             super(message, cause);
         }
+    }
+
+    public SDCardOperator(boolean isSDCardDownload) {
+        this.isSDCardDownload = isSDCardDownload;
     }
 
     public SDCardOperator(Context context) throws SDCardException {
@@ -91,7 +104,7 @@ public class SDCardOperator {
         return sdCardRoot;
     }
 
-    public boolean isNewSDCardPath(String path) {
+    boolean isNewSDCardPath(String path) {
         return !path.startsWith(sdCardRoot);
     }
 
@@ -162,7 +175,7 @@ public class SDCardOperator {
         return parent.createDirectory(name);
     }
 
-    public void moveFile(String targetPath, File file) throws IOException {
+    void moveFile(String targetPath, File file) throws IOException {
         String name = file.getName();
         DocumentFile parent = getDocumentFileByPath(targetPath);
         DocumentFile df = parent.findFile(name);
@@ -215,5 +228,65 @@ public class SDCardOperator {
             }
         }
         return folders;
+    }
+
+    public boolean isSDCardDownload() {
+        return isSDCardDownload;
+    }
+
+    private void setSDCardDownload(boolean SDCardDownload) {
+        isSDCardDownload = SDCardDownload;
+    }
+
+    private static SDCardOperator checkDownloadPath(Context context, String downloadPath) {
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        boolean isSDCardPath = SDCardOperator.isSDCardPath(downloadPath);
+        SDCardOperator sdCardOperator = null;
+
+        try {
+            sdCardOperator = new SDCardOperator(context);
+        } catch (SDCardOperator.SDCardException e) {
+            e.printStackTrace();
+            logError("Initialize SDCardOperator failed", e);
+            // user uninstall the sd card. but default download location is still on the sd card
+            if (isSDCardPath) {
+                logDebug("select new path as download location.");
+                return null;
+            }
+        }
+        if (sdCardOperator != null && isSDCardPath) {
+            //user has installed another sd card.
+            if (sdCardOperator.isNewSDCardPath(downloadPath)) {
+                logDebug("new sd card, check permission.");
+                new Handler().postDelayed(() -> Toast.makeText(MegaApplication.getInstance(), R.string.old_sdcard_unavailable, Toast.LENGTH_LONG).show(), 1000);
+                return null;
+            }
+
+            if (!sdCardOperator.canWriteWithFile(downloadPath)) {
+                try {
+                    sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                } catch (SDCardOperator.SDCardException e) {
+                    e.printStackTrace();
+                    logError("SDCardOperator initDocumentFileRoot failed requestSDCardPermission", e);
+                    return null;
+                }
+            }
+        }
+        return sdCardOperator;
+    }
+
+    public static SDCardOperator initSDCardOperator(Context context, String parentPath) {
+        SDCardOperator sdCardOperator;
+
+        if(SDCardOperator.isSDCardPath(parentPath)) {
+            sdCardOperator =  checkDownloadPath(context, parentPath);
+            if (sdCardOperator != null) {
+                sdCardOperator.setSDCardDownload(!isTextEmpty(sdCardOperator.getDownloadRoot()));
+            }
+        } else {
+            sdCardOperator = new SDCardOperator(false);
+        }
+
+        return sdCardOperator;
     }
 }

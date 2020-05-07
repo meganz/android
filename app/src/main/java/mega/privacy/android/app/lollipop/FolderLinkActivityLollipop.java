@@ -847,9 +847,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 		}
 
-        boolean downloadToSDCard = false;
-        String downloadRoot = null;
-        SDCardOperator sdCardOperator = null;
+        SDCardOperator sdCardOperator = SDCardOperator.initSDCardOperator(this, parentPath);
+		if(sdCardOperator == null) {
+			toSelectFolder(hashes, size, getString(R.string.no_external_SD_card_detected));
+			return;
+		}
 
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
@@ -867,16 +869,16 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
 				Map<Long, String> targets = new HashMap<>();
 				if (node.getType() == MegaNode.TYPE_FOLDER) {
-                    if (downloadToSDCard) {
+                    if (sdCardOperator.isSDCardDownload()) {
                         sdCardOperator.buildFileStructure(targets, parentPath, megaApiFolder, node);
-                        getDlList(dlFiles, node, new File(downloadRoot, node.getName()));
+                        getDlList(dlFiles, node, new File(sdCardOperator.getDownloadRoot(), node.getName()));
                     } else {
                         getDlList(dlFiles, node, new File(parentPath, node.getName()));
                     }
 				} else {
-                    if (downloadToSDCard) {
+                    if (sdCardOperator.isSDCardDownload()) {
                         targets.put(node.getHandle(), parentPath);
-                        dlFiles.put(node, downloadRoot);
+                        dlFiles.put(node, sdCardOperator.getDownloadRoot());
                     } else {
                         dlFiles.put(node, parentPath);
                     }
@@ -915,7 +917,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						logDebug("start service");
 						logDebug("EXTRA_HASH: " + document.getHandle());
 						Intent service = new Intent(this, DownloadService.class);
-                        if(downloadToSDCard) {
+                        if(sdCardOperator.isSDCardDownload()) {
                             service = NodeController.getDownloadToSDCardIntent(service,path, targetPath, dbH.getSDCardUri());
                         } else {
                             service.putExtra(DownloadService.EXTRA_PATH, path);

@@ -7,8 +7,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class CopyFileThread implements Runnable {
 
-    private boolean copyToSDCard;
-
     private String path;
 
     private String targetPath;
@@ -17,8 +15,7 @@ public class CopyFileThread implements Runnable {
 
     private SDCardOperator operator;
 
-    public CopyFileThread(boolean copyToSDCard, String path, String targetPath, String fileName, SDCardOperator operator) {
-        this.copyToSDCard = copyToSDCard;
+    public CopyFileThread(String path, String targetPath, String fileName, SDCardOperator operator) {
         this.path = path;
         this.targetPath = targetPath;
         this.fileName = fileName;
@@ -29,7 +26,7 @@ public class CopyFileThread implements Runnable {
     public void run() {
         logDebug("Call to copyFile");
         try {
-            if (copyToSDCard) {
+            if (operator.isSDCardDownload()) {
                 operator.moveFile(targetPath, new File(path));
             } else {
                 copyFile(new File(path), new File(targetPath, fileName));
