@@ -163,7 +163,7 @@ import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
 
-public class AudioVideoPlayerLollipop extends DownloadableActivity implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
@@ -3153,8 +3153,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
                 }
             }
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, (adapterType == FROM_CHAT), nC);
         }
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");

@@ -118,7 +118,7 @@ import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FullScreenImageViewerLollipop extends DownloadableActivity implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
+public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
 
 	int[] screenPosition;
 	int mLeftDelta;
@@ -2170,8 +2170,6 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 				}
 				nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
 			}
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 

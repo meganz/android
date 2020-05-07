@@ -124,7 +124,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 
 @SuppressLint("NewApi")
-public class FileInfoActivityLollipop extends DownloadableActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
+public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
 
 	public static int MAX_WIDTH_FILENAME_LAND=400;
 	public static int MAX_WIDTH_FILENAME_LAND_2=400;
@@ -2427,8 +2427,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 nC = new NodeController(this);
             }
             nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 

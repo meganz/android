@@ -64,7 +64,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FileLinkActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, OnClickListener {
+public class FileLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener {
 	
 	FileLinkActivityLollipop fileLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -869,10 +869,7 @@ public class FileLinkActivityLollipop extends DownloadableActivity implements Me
 
 			NodeController nC = new NodeController(this);
 			nC.downloadTo(document, parentPath, url);
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, null);
-        }
-		else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+        } else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if (!isOnline(this)) {
 				try {
 					statusDialog.dismiss();

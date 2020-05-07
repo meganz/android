@@ -135,6 +135,7 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -265,7 +266,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 import static nz.mega.sdk.MegaApiJava.*;
 
-public class ManagerActivityLollipop extends DownloadableActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
         NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
 
 	public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
@@ -9403,7 +9404,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 	@Override
 	public void uploadFromSystem() {
-		chooseFromSystem(this);
+		pickFileFromFileSystem(this);
 	}
 
 	@Override
@@ -11584,8 +11585,6 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				service.putExtra(DownloadService.EXTRA_PATH, tempFolder.getAbsolutePath());
 				startService(service);
 			}
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
 			logDebug("requestCode == REQUEST_CODE_SELECT_FILE");

@@ -47,9 +47,7 @@ import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
-import mega.privacy.android.app.utils.DownloadChecker;
 import mega.privacy.android.app.utils.SDCardOperator;
-import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
 import mega.privacy.android.app.utils.download.DownloadInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -363,13 +361,8 @@ public class NodeController {
 
         if (askMe) {
             logDebug("askMe");
-            File[] fs = context.getExternalFilesDirs(null);
             final DownloadInfo downloadInfo = new DownloadInfo(highPriority, size, hashes);
-            if (fs.length <= 1 || fs[1] == null) {
-                requestLocalFolder(downloadInfo, null, null);
-            } else {
-                showSelectDownloadLocationDialog(downloadInfo);
-            }
+            requestLocalFolder(downloadInfo, null);
         } else {
             logDebug("NOT askMe");
             File defaultPathF = new File(downloadLocationDefaultPath);
@@ -378,16 +371,14 @@ public class NodeController {
         }
     }
 
-    public void requestLocalFolder (DownloadInfo downloadInfo,String sdRoot,String prompt) {
+    public void requestLocalFolder (DownloadInfo downloadInfo, String prompt) {
         Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
         intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, downloadInfo.getSize());
         intent.setClass(context, FileStorageActivityLollipop.class);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, downloadInfo.getHashes());
-        if(sdRoot != null) {
-            intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT,sdRoot);
-        }
+
         if(prompt != null) {
             intent.putExtra(FileStorageActivityLollipop.EXTRA_PROMPT, prompt);
         }
@@ -626,19 +617,6 @@ public class NodeController {
         boolean downloadToSDCard = false;
         String downloadRoot = null;
         SDCardOperator sdCardOperator = null;
-        if(SDCardOperator.isSDCardPath(parentPath)) {
-            DownloadInfo downloadInfo = new DownloadInfo(highPriority, size, hashes);
-            DownloadChecker checker = new DownloadChecker(context, parentPath, SelectDownloadLocationDialog.From.NORMAL);
-            checker.setNodeController(this);
-            checker.setDownloadInfo(downloadInfo);
-            if (checker.check()) {
-                downloadRoot = checker.getDownloadRoot();
-                sdCardOperator = checker.getSdCardOperator();
-                downloadToSDCard = (downloadRoot != null);
-            } else {
-                return;
-            }
-        }
 
         if (hashes == null){
             logWarning("hashes is null");
@@ -916,21 +894,6 @@ public class NodeController {
 
             showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
         }
-    }
-
-    public void showSelectDownloadLocationDialog(MegaNode document, String url) {
-        SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context, SelectDownloadLocationDialog.From.FILE_LINK);
-        selector.setDocument(document);
-        selector.setUrl(url);
-        selector.setNodeController(this);
-        selector.show();
-    }
-
-    public void showSelectDownloadLocationDialog(DownloadInfo downloadInfo) {
-        SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context, SelectDownloadLocationDialog.From.NORMAL);
-        selector.setDownloadInfo(downloadInfo);
-        selector.setNodeController(this);
-        selector.show();
     }
 
     /*
@@ -1560,37 +1523,26 @@ public class NodeController {
         }
 
         if (dbH.getCredentials() == null || dbH.getPreferences() == null) {
-            pickFolder(document, url);
+            intentPickFolder(document, url);
             return;
         }
 
         boolean askMe = askMe(context);
         if (askMe) {
-            pickFolder(document, url);
+            intentPickFolder(document, url);
         } else {
             String downloadLocationDefaultPath = getDownloadLocation();
             downloadTo(document, downloadLocationDefaultPath, url);
         }
     }
 
-    private void pickFolder(MegaNode document, String url) {
-        File[] fs = context.getExternalFilesDirs(null);
-        if(fs.length <= 1 || fs[1] == null) {
-            intentPickFolder(document, url, null);
-        } else {
-            showSelectDownloadLocationDialog(document, url);
-        }
-    }
-
-    public void intentPickFolder(MegaNode document, String url,String sdRoot) {
+    private void intentPickFolder(MegaNode document, String url) {
         Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.context_download_to));
         intent.setClass(context, FileStorageActivityLollipop.class);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
-        if(sdRoot != null) {
-            intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT,sdRoot);
-        }
+
         if (context instanceof FileLinkActivityLollipop) {
             ((FileLinkActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
         }
@@ -1610,19 +1562,6 @@ public class NodeController {
         boolean downloadToSDCard = false;
         String downloadRoot = null;
         SDCardOperator sdCardOperator = null;
-        if(SDCardOperator.isSDCardPath(parentPath)) {
-            DownloadChecker checker = new DownloadChecker(context, parentPath, SelectDownloadLocationDialog.From.FILE_LINK);
-            checker.setNodeController(this);
-            checker.setDocument(currentDocument);
-            checker.setUrl(url);
-            if (checker.check()) {
-                downloadRoot = checker.getDownloadRoot();
-                sdCardOperator = checker.getSdCardOperator();
-                downloadToSDCard = (downloadRoot != null);
-            } else {
-                return;
-            }
-        }
 
         double availableFreeSpace = Double.MAX_VALUE;
         try{

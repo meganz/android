@@ -108,13 +108,13 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.DownloadableActivity;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -177,7 +177,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 
-public class ChatActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -2987,10 +2987,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 logError("TAKE_PHOTO_CODE--->ERROR!");
             }
 
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, true, null);
-        }
-        else if (requestCode == REQUEST_CODE_SEND_LOCATION && resultCode == RESULT_OK) {
+        } else if (requestCode == REQUEST_CODE_SEND_LOCATION && resultCode == RESULT_OK) {
             if (intent == null) {
                 return;
             }

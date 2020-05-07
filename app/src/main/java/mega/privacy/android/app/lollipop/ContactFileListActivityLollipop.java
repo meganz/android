@@ -59,7 +59,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
@@ -89,7 +88,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 
-public class ContactFileListActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight, UploadBottomSheetDialogActionListener {
+public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight, UploadBottomSheetDialogActionListener {
 
 	FrameLayout fragmentContainer;
 
@@ -212,7 +211,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 
 	@Override
 	public void uploadFromSystem() {
-		chooseFromSystem(this);
+		pickFileFromFileSystem(this);
 	}
 
 	@Override
@@ -1067,9 +1066,7 @@ public class ContactFileListActivityLollipop extends DownloadableActivity implem
 				nC = new NodeController(this);
 			}
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
-		} else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, nC);
-        } else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
 			}
