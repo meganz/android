@@ -1297,6 +1297,11 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				if (skuDetailsList != null && skuDetailsList.size() > 0) {
 					mSkuDetailsList = skuDetailsList;
 					app.getMyAccountInfo().setAvailableSkus(skuDetailsList);
+
+					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
+					if (upAFL != null) {
+						upAFL.setPricingInfo();
+					}
 				}
 			}
 		};
