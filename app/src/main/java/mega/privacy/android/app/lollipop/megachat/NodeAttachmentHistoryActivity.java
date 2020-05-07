@@ -84,7 +84,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;

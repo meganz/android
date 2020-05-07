@@ -1731,8 +1731,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String chatHandle = decrypt(cursor.getString(1));
 				String notificationsEnabled = decrypt(cursor.getString(2));
                 logDebug("notificationsEnabled: " + notificationsEnabled);
-				String ringtone = decrypt(cursor.getString(3));
-				String notificationsSound = decrypt(cursor.getString(4));
 				String writtenText = decrypt(cursor.getString(5));
 
 				prefs = new ChatItemPreferences(chatHandle, notificationsEnabled, writtenText);

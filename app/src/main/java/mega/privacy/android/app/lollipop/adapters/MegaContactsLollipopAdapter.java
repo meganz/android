@@ -42,6 +42,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -299,32 +300,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		holder.contactMail = contact.getMegaUser().getEmail();
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
-		if (megaChatApi != null) {
-			int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
-			if (userStatus == MegaChatApi.STATUS_ONLINE) {
-				logDebug("This user is connected");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
-			} else if (userStatus == MegaChatApi.STATUS_AWAY) {
-				logDebug("This user is away");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
-			} else if (userStatus == MegaChatApi.STATUS_BUSY) {
-				logDebug("This user is busy");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
-			} else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
-				logDebug("This user is offline");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
-			} else if (userStatus == MegaChatApi.STATUS_INVALID) {
-				logWarning("INVALID status: " + userStatus);
-				holder.contactStateIcon.setVisibility(View.GONE);
-			} else {
-				logDebug("This user status is: " + userStatus);
-				holder.contactStateIcon.setVisibility(View.GONE);
-			}
-		}
+		setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle()), holder.contactStateIcon);
 		
 		if (multipleSelect && this.isItemChecked(position)) {
 				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_contact_grid_selected));
@@ -381,52 +357,9 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		logDebug("Contact: " + contact.getMegaUser().getEmail() + ", Handle: " + contact.getMegaUser().getHandle());
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
-		if (megaChatApi != null) {
-			int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
-			if (userStatus == MegaChatApi.STATUS_ONLINE) {
-				logDebug("This user is connected");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-				holder.textViewContent.setText(context.getString(R.string.online_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_AWAY) {
-				logDebug("This user is away");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
-
-				holder.textViewContent.setText(context.getString(R.string.away_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_BUSY) {
-				logDebug("This user is busy");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
-
-				holder.textViewContent.setText(context.getString(R.string.busy_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
-				logDebug("This user is offline");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-
-				holder.textViewContent.setText(context.getString(R.string.offline_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_INVALID) {
-				logWarning("INVALID status: " + userStatus);
-				holder.contactStateIcon.setVisibility(View.GONE);
-				holder.textViewContent.setVisibility(View.GONE);
-			} else {
-				logDebug("This user status is: " + userStatus);
-				holder.contactStateIcon.setVisibility(View.GONE);
-				holder.textViewContent.setVisibility(View.GONE);
-			}
-
-			if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
-				if (!contact.getLastGreen().isEmpty()) {
-					holder.textViewContent.setText(contact.getLastGreen());
-					holder.textViewContent.isMarqueeIsNecessary(context);
-				}
-			}
-		}
+		int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
+		setContactStatus(userStatus, holder.contactStateIcon, holder.textViewContent);
+		setContactLastGreen(context, userStatus, contact.getLastGreen(), holder.textViewContent);
 
 		holder.textViewContactName.setText(contact.getFullName());
 
@@ -488,52 +421,9 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		logDebug("Contact: " + contact.getMegaUser().getEmail() + ", Handle: " + contact.getMegaUser().getHandle());
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
-		if (megaChatApi != null) {
-			int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
-			if (userStatus == MegaChatApi.STATUS_ONLINE) {
-				logDebug("This user is connected");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-				holder.textViewContent.setText(context.getString(R.string.online_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_AWAY) {
-				logDebug("This user is away");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
-
-				holder.textViewContent.setText(context.getString(R.string.away_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_BUSY) {
-				logDebug("This user is busy");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
-
-				holder.textViewContent.setText(context.getString(R.string.busy_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
-				logDebug("This user is offline");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-
-				holder.textViewContent.setText(context.getString(R.string.offline_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_INVALID) {
-				logWarning("INVALID status: " + userStatus);
-				holder.contactStateIcon.setVisibility(View.GONE);
-				holder.textViewContent.setVisibility(View.GONE);
-			} else {
-				logDebug("This user status is: " + userStatus);
-				holder.contactStateIcon.setVisibility(View.GONE);
-				holder.textViewContent.setVisibility(View.GONE);
-			}
-
-			if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
-				if (!contact.getLastGreen().isEmpty()) {
-					holder.textViewContent.setText(contact.getLastGreen());
-					holder.textViewContent.isMarqueeIsNecessary(context);
-				}
-			}
-		}
+		int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
+		setContactStatus(userStatus, holder.contactStateIcon, holder.textViewContent);
+		setContactLastGreen(context, userStatus, contact.getLastGreen(), holder.textViewContent);
 
 		holder.textViewContactName.setText(contact.getFullName());
 
@@ -590,50 +480,9 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		logDebug("Contact: " + contact.getMegaUser().getEmail() + ", Handle: " + contact.getMegaUser().getHandle());
 
 		holder.contactStateIcon.setVisibility(View.VISIBLE);
-		if (megaChatApi != null) {
-			int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
-			if (userStatus == MegaChatApi.STATUS_ONLINE) {
-				logDebug("This user is connected");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-				holder.textViewContent.setText(context.getString(R.string.online_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_AWAY) {
-				logDebug("This user is away");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
-				holder.textViewContent.setText(context.getString(R.string.away_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_BUSY) {
-				logDebug("This user is busy");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
-				holder.textViewContent.setText(context.getString(R.string.busy_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
-				logDebug("This user is offline");
-				holder.contactStateIcon.setVisibility(View.VISIBLE);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-				holder.textViewContent.setText(context.getString(R.string.offline_status));
-				holder.textViewContent.setVisibility(View.VISIBLE);
-			} else if (userStatus == MegaChatApi.STATUS_INVALID) {
-				logWarning("INVALID status: " + userStatus);
-				holder.contactStateIcon.setVisibility(View.GONE);
-				holder.textViewContent.setVisibility(View.GONE);
-			} else {
-				logDebug("This user status is: " + userStatus);
-				holder.contactStateIcon.setVisibility(View.GONE);
-				holder.textViewContent.setVisibility(View.GONE);
-			}
-
-			if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
-				if (!contact.getLastGreen().isEmpty()) {
-					holder.textViewContent.setText(contact.getLastGreen());
-					holder.textViewContent.isMarqueeIsNecessary(context);
-				}
-			}
-		}
-
+        int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
+		setContactStatus(userStatus, holder.contactStateIcon, holder.textViewContent);
+		setContactLastGreen(context, userStatus, contact.getLastGreen(), holder.textViewContent);
 		holder.textViewContactName.setText(contact.getFullName());
 
 		if (!multipleSelect) {

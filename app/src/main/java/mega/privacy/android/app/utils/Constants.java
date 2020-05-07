@@ -423,6 +423,7 @@ public class Constants {
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String CHAT_ID = "chatHandle";
+    public static final String MESSAGE_ID = "messageId";
     public static final String CALL_ID = "callId";
     public static final String CHAT_ID_IN_PROGRESS = "chatHandleInProgress";
     public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
@@ -432,7 +433,9 @@ public class Constants {
     public static final String CHAT_TITLE = "CHAT_TITLE";
     public static final String SELECTED_CONTACTS = "SELECTED_CONTACTS";
     public static final String NODE_HANDLES = "NODE_HANDLES";
+    public static final String NAME = "name";
     public static final String HANDLE = "handle";
+    public static final String EMAIL = "email";
     public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
     public static final String VISIBLE_FRAGMENT = "VISIBLE_FRAGMENT";
     public static final String SELECTED_CHATS = "SELECTED_CHATS";
@@ -444,6 +447,8 @@ public class Constants {
 
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
+
+    public static final String REGISTER_BUSINESS_ACCOUNT = "registerb";
 
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
     public static final int MAX_WIDTH_CONTACT_NAME_PORT = 200;
@@ -561,6 +566,11 @@ public class Constants {
     public static final String[] EMAIL_VERIFY_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#emailverify.+$",
             "^https://mega\\.nz/#emailverify.+$"
+    };
+
+    public static final String[] WEB_SESSION_LINK_REGEXS = {
+            "^https://mega\\.co\\.nz/#sitetransfer!.+$",
+            "^https://mega\\.nz/#sitetransfer!.+$"
     };
 
     //Types of blocked accounts

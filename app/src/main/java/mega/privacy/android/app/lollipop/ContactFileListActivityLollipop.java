@@ -13,7 +13,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -78,7 +77,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -88,7 +87,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 
-public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight, UploadBottomSheetDialogActionListener {
+public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, UploadBottomSheetDialogActionListener {
 
 	FrameLayout fragmentContainer;
 
@@ -559,7 +558,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			userEmail = extras.getString("name");
+			userEmail = extras.getString(NAME);
 			int currNodePosition = extras.getInt("node_position", -1);
 
 			setContentView(R.layout.activity_main_contact_properties);
@@ -1569,18 +1568,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			cflF.clearSelections();
 			cflF.hideMultipleSelect();
 		}
-	}
-
-	@Override
-	public int getHeightToPanel(BottomSheetDialogFragment dialog) {
-		if (dialog instanceof ContactFileListBottomSheetDialogFragment) {
-			if (fragmentContainer != null && aB != null) {
-				final Rect r = new Rect();
-				fragmentContainer.getWindowVisibleDisplayFrame(r);
-				return (r.height() - aB.getHeight());
-			}
-		}
-		return -1;
 	}
 
 	public void openAdvancedDevices(long handleToDownload, boolean highPriority) {

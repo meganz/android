@@ -66,7 +66,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent(getContext(),ContactFileListActivityLollipop.class);
-                    i.putExtra("name",userEmail);
+                    i.putExtra(NAME, userEmail);
                     getContext().startActivity(i);
                 }
             });
@@ -190,7 +190,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             }
         } else {
             Intent i = new Intent(getContext(),ContactFileListActivityLollipop.class);
-            i.putExtra("name",userEmail);
+            i.putExtra(NAME, userEmail);
             i.putExtra("node_position",position);
             getContext().startActivity(i);
         }

@@ -798,7 +798,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     public void updateMuteIcon() {
         for (InfoPeerGroupCall peer : peers) {
             ViewHolderGroupCall holder = getHolder(peers.indexOf(peer));
-            if (!peer.isAudioOn() && peer.isVideoOn()) {
+            if (holder != null && !peer.isAudioOn() && peer.isVideoOn()) {
                 displayMuteIcon(holder.microSurface, peer);
             }
         }

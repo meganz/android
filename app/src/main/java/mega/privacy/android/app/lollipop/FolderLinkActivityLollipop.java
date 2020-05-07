@@ -88,7 +88,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DownloadUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;

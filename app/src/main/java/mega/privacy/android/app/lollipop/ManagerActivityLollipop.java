@@ -25,7 +25,6 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
 import android.os.Build;
@@ -109,7 +108,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -248,7 +246,7 @@ import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -265,8 +263,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 import static nz.mega.sdk.MegaApiJava.*;
 
-public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
-        NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
+public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
 
 	public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
@@ -415,6 +412,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private boolean userNameChanged;
 	private boolean userEmailChanged;
+
+	private AlertDialog reconnectDialog;
 
 	private LinearLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
@@ -850,8 +849,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						}
 
 						upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-						if(upAFL!=null){
-							upAFL.showAvailableAccount();
+						if (upAFL != null) {
+							if (drawerItem == DrawerItem.ACCOUNT && accountFragment == UPGRADE_ACCOUNT_FRAGMENT && megaApi.isBusinessAccount()) {
+								closeUpgradeAccountFragment();
+							} else {
+								upAFL.showAvailableAccount();
+							}
 						}
 
 						if(getSettingsFragment() != null){
@@ -859,6 +862,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						}
 
 						checkBusinessStatus();
+
+						if (megaApi.isBusinessAccount()) {
+							supportInvalidateOptionsMenu();
+						}
 					}
 				}
 				else if(actionType == UPDATE_CREDIT_CARD_SUBSCRIPTION){
@@ -2091,7 +2098,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			orderContacts = ORDER_DEFAULT_ASC;
 			orderOthers = ORDER_DEFAULT_ASC;
 		}
-		getOverflowMenu();
 
 		handler = new Handler();
 
@@ -2954,7 +2960,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 								Intent i = new Intent(this, FileInfoActivityLollipop.class);
 								i.putExtra("handle", nodeLink.getHandle());
-								i.putExtra("name", nodeLink.getName());
+								i.putExtra(NAME, nodeLink.getName());
 								startActivity(i);
 							}
 						}
@@ -4524,7 +4530,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			mBillingManager.destroy();
 		}
 		cancelSearch();
-
+        if(reconnectDialog != null) {
+            reconnectDialog.cancel();
+        }
     	super.onDestroy();
 	}
 
@@ -5062,7 +5070,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		try {
 			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.general_ok, dialogClickListener)
-					.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+					.setNegativeButton(R.string.general_cancel, dialogClickListener);
+            reconnectDialog = builder.create();
+            reconnectDialog.setCanceledOnTouchOutside(false);
+            reconnectDialog.show();
 		}
 		catch (Exception e){}
 	}
@@ -6142,20 +6153,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	selectDrawerItemLollipop(drawerItem);
 	}
 
-	private void getOverflowMenu() {
-		logDebug("getOverflowMenu");
-	     try {
-	        ViewConfiguration config = ViewConfiguration.get(this);
-	        Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-	        if(menuKeyField != null) {
-	            menuKeyField.setAccessible(true);
-	            menuKeyField.setBoolean(config, false);
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	}
-
 	public void showMyAccount(){
 		drawerItem = DrawerItem.ACCOUNT;
 		selectDrawerItemLollipop(drawerItem);
@@ -6845,39 +6842,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						return true;
 		    		}
 					else if (drawerItem == DrawerItem.ACCOUNT){
-
-						switch(accountFragment){
-							case UPGRADE_ACCOUNT_FRAGMENT:{
-								logDebug("Back to MyAccountFragment~ -> drawerItemPreUpgradeAccount");
-
-								setFirstNavigationLevel(true);
-								displayedAccountType=-1;
-								if (drawerItemPreUpgradeAccount != null) {
-									if (drawerItemPreUpgradeAccount == DrawerItem.ACCOUNT) {
-										if (accountFragmentPreUpgradeAccount == -1) {
-											accountFragment = MY_ACCOUNT_FRAGMENT;
-										}
-										else {
-											accountFragment = accountFragmentPreUpgradeAccount;
-										}
-									}
-									drawerItem = drawerItemPreUpgradeAccount;
-								}
-								else {
-									accountFragment = MY_ACCOUNT_FRAGMENT;
-									drawerItem = DrawerItem.ACCOUNT;
-								}
-								selectDrawerItemLollipop(drawerItem);
+						switch (accountFragment) {
+							case UPGRADE_ACCOUNT_FRAGMENT:
+								closeUpgradeAccountFragment();
 								return true;
-							}
-							case CC_FRAGMENT:{
+
+							case CC_FRAGMENT:
 								ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
-								if (ccFL != null){
+								if (ccFL != null) {
 									displayedAccountType = ccFL.getParameterType();
 								}
 								showUpAF();
 								return true;
-							}
 						}
 					}
 				}
@@ -7708,23 +7684,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	    		}
 	    		case UPGRADE_ACCOUNT_FRAGMENT:{
 					logDebug("Back to MyAccountFragment -> drawerItemPreUpgradeAccount");
-					displayedAccountType=-1;
-					if (drawerItemPreUpgradeAccount != null) {
-						if (drawerItemPreUpgradeAccount == DrawerItem.ACCOUNT) {
-							if (accountFragmentPreUpgradeAccount == -1) {
-								accountFragment = MY_ACCOUNT_FRAGMENT;
-							}
-							else {
-								accountFragment = accountFragmentPreUpgradeAccount;
-							}
-						}
-						drawerItem = drawerItemPreUpgradeAccount;
-					}
-					else {
-						accountFragment = MY_ACCOUNT_FRAGMENT;
-						drawerItem = DrawerItem.ACCOUNT;
-					}
-					selectDrawerItemLollipop(drawerItem);
+					closeUpgradeAccountFragment();
 	    			return;
 	    		}
 	    		case CC_FRAGMENT:{
@@ -7772,6 +7732,28 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			super.onBackPressed();
 			return;
 		}
+	}
+
+	private void closeUpgradeAccountFragment() {
+		setFirstNavigationLevel(true);
+		displayedAccountType = -1;
+
+		if (drawerItemPreUpgradeAccount != null) {
+			if (drawerItemPreUpgradeAccount == DrawerItem.ACCOUNT) {
+				if (accountFragmentPreUpgradeAccount == -1) {
+					accountFragment = MY_ACCOUNT_FRAGMENT;
+				} else {
+					accountFragment = accountFragmentPreUpgradeAccount;
+				}
+			}
+
+			drawerItem = drawerItemPreUpgradeAccount;
+		} else {
+			accountFragment = MY_ACCOUNT_FRAGMENT;
+			drawerItem = DrawerItem.ACCOUNT;
+		}
+
+		selectDrawerItemLollipop(drawerItem);
 	}
 
 	public void backToDrawerItem(int item) {
@@ -10837,35 +10819,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
         bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-	}
-
-	public int getHeightToPanel(BottomSheetDialogFragment dialog){
-
-		if(dialog instanceof NodeOptionsBottomSheetDialogFragment){
-			if(fragmentContainer != null && aB != null && tabLayoutCloud != null && tabLayoutCloud.getHeight() != 0){
-				final Rect r = new Rect();
-				fragmentContainer.getWindowVisibleDisplayFrame(r);
-				return (r.height() - aB.getHeight() - tabLayoutCloud.getHeight());
-			}
-			else if(fragmentContainer != null && aB != null && tabLayoutShares != null && tabLayoutShares.getHeight() != 0){
-				final Rect r = new Rect();
-				fragmentContainer.getWindowVisibleDisplayFrame(r);
-				return (r.height() - aB.getHeight() - tabLayoutShares.getHeight());
-			}
-			else if(fragmentContainer != null && aB != null && tabLayoutTransfers != null && tabLayoutTransfers.getHeight() != 0){
-				final Rect r = new Rect();
-				fragmentContainer.getWindowVisibleDisplayFrame(r);
-				return (r.height() - aB.getHeight() - tabLayoutTransfers.getHeight());
-			}
-		}
-		else if(dialog instanceof ContactsBottomSheetDialogFragment){
-			if(fragmentContainer != null && aB != null && tabLayoutContacts != null && tabLayoutContacts.getHeight() != 0){
-				final Rect r = new Rect();
-				fragmentContainer.getWindowVisibleDisplayFrame(r);
-				return (r.height() - aB.getHeight() - tabLayoutContacts.getHeight());
-			}
-		}
-		return -1;
 	}
 
 	public void updateAccountDetailsVisibleInfo(){

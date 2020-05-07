@@ -2978,7 +2978,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void showPropertiesActivity(){
         Intent i = new Intent(this, FileInfoActivityLollipop.class);
         if (isOffline){
-            i.putExtra("name", fileName);
+            i.putExtra(NAME, fileName);
             i.putExtra("adapterType", OFFLINE_ADAPTER);
             i.putExtra("path", path);
             if (pathNavigation != null){
@@ -3010,7 +3010,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             else if(adapterType == INBOX_ADAPTER){
                 i.putExtra("from", FROM_INBOX);
             }
-            i.putExtra("name", node.getName());
+            i.putExtra(NAME, node.getName());
         }
         startActivity(i);
         renamed = false;

@@ -1123,7 +1123,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
             emptyImageView.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.VISIBLE);
             
-            if (megaApi.getRootNode().getHandle() == n.getHandle()) {
+            if (megaApi.getRootNode() != null && megaApi.getRootNode().getHandle() == n.getHandle()) {
                 
                 if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);

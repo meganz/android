@@ -37,6 +37,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -188,60 +189,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			logDebug("participant: " + participant.getEmail() + ", handle: " + participant.getHandle());
 			((ViewHolderParticipantsList)holder).fullName = participant.getFullName();
 
-			int userStatus;
-
-			if(megaChatApi.getMyUserHandle() == participant.getHandle()){
-				userStatus = megaChatApi.getOnlineStatus();
-			}
-			else{
-				userStatus = megaChatApi.getUserOnlineStatus(participant.getHandle());
-			}
-
-			if(userStatus == MegaChatApi.STATUS_ONLINE){
-				logDebug("This user is connected");
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
-				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.online_status));
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
-			}
-			else if(userStatus == MegaChatApi.STATUS_AWAY){
-				logDebug("This user is away");
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
-				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
-				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.away_status));
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
-			}
-			else if(userStatus == MegaChatApi.STATUS_BUSY){
-				logDebug("This user is busy");
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
-				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
-				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.busy_status));
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
-			}
-			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
-				logDebug("This user is offline");
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
-				((ViewHolderParticipantsList) holder).statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-				((ViewHolderParticipantsList)holder).textViewContent.setText(context.getString(R.string.offline_status));
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.VISIBLE);
-			}
-			else if(userStatus == MegaChatApi.STATUS_INVALID){
-				logWarning("INVALID status: " + userStatus);
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.GONE);
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.GONE);
-			}
-			else{
-				logDebug("This user status is: " + userStatus);
-				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.GONE);
-				((ViewHolderParticipantsList)holder).textViewContent.setVisibility(View.GONE);
-			}
-
-			if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-				if(!participant.getLastGreen().isEmpty()){
-					((ViewHolderParticipantsList)holder).textViewContent.setText(participant.getLastGreen());
-					((ViewHolderParticipantsList)holder).textViewContent.isMarqueeIsNecessary(context);
-				}
-			}
+			int userStatus = megaChatApi.getUserOnlineStatus(participant.getHandle());
+			setContactStatus(userStatus, ((ViewHolderParticipantsList) holder).statusImage, ((ViewHolderParticipantsList) holder).textViewContent);
+			setContactLastGreen(context, userStatus, participant.getLastGreen(), ((ViewHolderParticipantsList) holder).textViewContent);
 			if (isMultipleSelect() && isItemChecked(position)) {
 				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_file_list_selected_row));
 			}

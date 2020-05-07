@@ -83,7 +83,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
-import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import nz.mega.sdk.MegaApiAndroid;
@@ -109,7 +109,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -231,7 +231,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     long parentHandle;
 	private String nickname;
 
-	private ContactInfoBottomSheetDialogFragment bottomSheetDialogFragment;
+	private ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment;
 	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
 
 	private AskForDisplayOverDialog askForDisplayOverDialog;
@@ -441,7 +441,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			removeContactChatLayout.setOnClickListener(this);
 
 			chatHandle = extras.getLong("handle",-1);
-			userEmailExtra = extras.getString("name");
+			userEmailExtra = extras.getString(NAME);
 			if (chatHandle != -1) {
 
 				logDebug("From chat!!");
@@ -1904,7 +1904,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
 		selectedNode = node;
-		bottomSheetDialogFragment = new ContactInfoBottomSheetDialogFragment();
+		bottomSheetDialogFragment = new ContactFileListBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
     

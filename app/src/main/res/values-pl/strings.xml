@@ -533,8 +533,8 @@
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Dziękujemy za opinię! Czy na pewno chcesz anulować swoja subskrypcję MEGA?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Twoja subskrypcja nie została anulowane. Prosimy o podane powodu anulowania</string>
     <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Dziękujemy za subskrypcję %1$s %2$s!</string>
-    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
-    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
+    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">Twoja nowa subskrypcja wejdzie w życie po wygaśnięciu obecnej, nowa cena zostanie naliczona w tym czasie.</string>
+    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subskrypcja wejdzie w życie po przetworzeniu płatności przez Google.</string>
     <string name="subscription_type_monthly" context="">Miesięcznie</string>
     <string name="subscription_type_yearly" context="">Rocznie</string>
 
@@ -790,7 +790,7 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nie ustawiono</string>
-    <string name="settings_reset_lock_code" context="settings of the pin lock">Zresetuj kod PIN</string>
+    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">Zmień PIN</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">Zabezpieczenie PIN</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Dalej</string>
@@ -1369,7 +1369,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]z %2$s[/A]</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Usunąć z Dostępnych offline?</string>
+    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Usunąć z trybu offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Ustaw status</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Anuluj</string>
@@ -1763,7 +1763,7 @@
 
     <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Opcje zaawansowane</string>
     <string name="download_requires_permission" context="Message to show when users deny to permit the permissions to read and write on external storage on setting default download location">Typ nośnika Mega wymaga Twojej zgody na pobieranie plików</string>
-    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Stara karta SD jest niedostępna. Ustaw nową lokalizację pobierania.</string>
+    <string name="old_sdcard_unavailable" context="Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location.">Stara karta SD nie jest dostępna. Ustaw nową katalog pobierania.</string>
     <string name="title_select_download_location" context="Dialog title to ask download to internal storage or external storage.">Wybierz lokalizację pobierania</string>
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">Nie przyznano uprawnień</string>
@@ -2354,8 +2354,8 @@
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Wybierz formę płatności</string>
 
     <string name="billing_period_title" context="title of billing period">Okres rozliczeniowy</string>
-    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
-    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]One-off (year)[/A] %s</string>
+    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]Jednorazowo (miesiąc)[/A] %s</string>
+    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]Jednorazowo (rok)[/A] %s</string>
     <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]Miesięcznie[/A] %s/miesiąc</string>
     <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]Rocznie[/A] %s/rok</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">Anuluj</string>
@@ -2367,7 +2367,7 @@
     <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (jednorazowe)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NOWY</string>
-    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Aby zaktualizować swoją bieżącą subskrypcję, skontaktuj się z pomocą techniczną w sprawie [A]planu niestandardowego[/A].</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Aby zaktualizować bieżącą subskrypcję, skontaktuj się z pomocą techniczną w sprawie [A]planu niestandardowego[/A].</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">Nazwa pliku</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Pokaż Ostatnio widziany&#8230;</string>
@@ -2419,7 +2419,7 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Czat Link skopiowany do schowka</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Od[/A] %s / [A]miesiąc[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user / [A]month[/A] *</string>
+    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]Od[/A] %s na użytkownika/[A]miesiąc[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Subskrypcja cykliczna może zostać anulowana w dowolnym momencie przed datą odnowienia.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Połączenie rozpoczęte</string>
 
@@ -2435,9 +2435,9 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Włącz kamerę</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Umożliwia dostęp do aparatu w celu skanowania dokumentów, robienia zdjęć i wykonywania połączeń wideo.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Włącz połączenia</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Włącz dostęp do kontaktów</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
-    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">Udziel dostępu do swojej książki adresowej</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Łatwo odkrywaj kontakty z książki adresowej na MEGA.</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA nie będzie wykorzystywać tych danych w żadnym innym celu i nigdy nie będzie wchodzić w interakcje z Twoimi kontaktami bez Twojej zgody.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Zezwalaj na dostęp do mikrofonu, aby wykonywać połączenia szyfrowane.</string>
     <string name="general_enable_access" context="General enable access">Udostępnik</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Udostępnione pliki</string>
@@ -2495,7 +2495,7 @@
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
     <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">Nadal możesz przyznać uprawnienia MEGA w ustawieniach urządzenia</string>
-    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
+    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">Jeśli zezwolisz MEGA na dostęp do książki adresowej, łatwiej będziesz mógł odkryć swoje kontakty. MEGA nie będzie wykorzystywać tych danych w żadnym innym celu i nigdy nie będzie wchodzić w interakcje z Twoimi kontaktami bez Twojej zgody.</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
         <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">Wiadomość przesłana dalej</item>
@@ -2526,7 +2526,7 @@
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">Zaproś kontakt teraz?</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">Zobacz, kto jest już na MEGA</string>
-    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
+    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Przyznaj MEGA dostęp do swojej książki adresowej, aby odkryć swoje kontakty w MEGA.</string>
     <string name="get_registered_contacts" context="Getting registered contacts">Ładuję kontakty na MEGA&#8230;</string>
 
 
@@ -2676,20 +2676,20 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Trwa ładowanie</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Proszę czekać&#8230;</string>
 
-    <string name="account_label" context="Head label to show the business account type">Account type</string>
+    <string name="account_label" context="Head label to show the business account type">Rodzaj konta</string>
     <string name="business_label" context="Label in My Account section to show user account type">Biznes</string>
     <string name="admin_label" context="Business user role">Admin</string>
     <string name="user_label" context="Business user role">Użytkownik</string>
     <string name="status_label" context="General label to show the status of something or someone">Status</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">Aktywne</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">Karencja</string>
-    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
+    <string name="grace_label" context="State to indicate a business account is in grace period">Okres karencji</string>
+    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">Zarządzanie użytkownikami jest dostępne tylko z poziomu przeglądarki internetowej.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Zużycie</string>
-    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
+    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Szczegóły użycia pamięci</string>
     <string name="overall_usage_label" context="Title of overall usage section in Storage">Ogólne wykorzystanie</string>
     <string name="transfer_label" context="Title of transfer section in Storage">Przesyłanie</string>
 
-    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
+    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">Nie możesz usunąć %1$s jako kontaktu, ponieważ są one częścią twojego konta firmowego.</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">Wystąpił problem z ostatnią płatnością. Proszę uzyskać dostęp do MEGA za pomocą przeglądarki na pulpicie, aby uzyskać więcej informacji.</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Twoje konto biznesowe wygasło</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">Wystąpił problem z przetwarzaniem Twojej płatności. Wyświetlanie MEGA jest ograniczone tylko do momentu rozwiązania tego problemu w przeglądarce internetowej na komputerze.</string>
@@ -2697,8 +2697,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Chociaż MEGA nie ma dostępu do twoich danych, administratorzy Twojej organizacji mają możliwość kontrolowania i przeglądania plików z kamery na Twoim koncie użytkownika</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Wystąpiły problemy</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Skontaktuj się z administratorem konta biznesowego, aby rozwiązać problem i aktywować konto.</string>
-    <string name="business_account_clarification" context="">** For genuine business purposes.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep the placeholder is to indicate if the space is refered to storage or transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]%1$s[/A] **</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Do prawdziwych celów biznesowych.</string>
+    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">NIELIMITOWANA [A]pamięc[/A]**</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">NIELIMITOWANY [A]Limit transferu[/A] **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Po wylogowaniu pliki z sekcji Offline zostaną usunięte z urządzenia.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Po wylogowaniu bieżące transfery zostaną anulowane.</string>
@@ -2731,7 +2732,7 @@
     <string name="create_new_file_action" context="Text shown for the action create new file">Utwórz nowy plik</string>
     <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Błąd uprawnień</string>
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">Nie masz uprawnień wymaganych do przywrócenia tego pliku. Aby kontynuować, możemy utworzyć nowy plik z cofniętymi danymi. Czy chcesz kontynuować?</string>
-    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
+    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Wersja została pomyślnie utworzona jako nowy plik.</string>
 
     <string name="download_location" context="Download location label">Lokalizacja na pliki</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Czy zawsze zapisywać w tej lokalizacji?</string>

@@ -799,7 +799,7 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Not set</string>
-    <string name="settings_reset_lock_code" context="settings of the pin lock">Reset PIN code</string>
+    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">Change PIN</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN Lock</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Enter</string>
@@ -1380,7 +1380,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]of %2$s[/A]</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Remove from Save for Offline?</string>
+    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Remove from Offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
@@ -2272,7 +2272,7 @@
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] created a chat link.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] deleted the chat link.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] removed the chat link.[/B]</string>
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">Delete chat link</string>
 
@@ -2438,7 +2438,7 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat link copied to the clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s / [A]month[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user / [A]month[/A] *</string>
+    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user/[A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Recurring subscription can be cancelled any time before the renewal date.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Call Started</string>
 
@@ -2704,7 +2704,7 @@
     <string name="grace_label" context="State to indicate a business account is in grace period">Grace period</string>
     <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available from a desktop web browser.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">Usage</string>
-    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
+    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Storage usage details</string>
     <string name="overall_usage_label" context="Title of overall usage section in Storage">Overall usage</string>
     <string name="transfer_label" context="Title of transfer section in Storage">Transfer</string>
 
@@ -2717,8 +2717,8 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Something went wrong</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contact your business account administrator to resolve the issue and activate your account.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** For genuine business purposes.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]Storage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]Transfer quota[/A] **</string>
+    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Storage[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Transfer quota[/A] **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">When you logout, files from your Offline section will be deleted from your device.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">When you logout, ongoing transfers will be cancelled.</string>

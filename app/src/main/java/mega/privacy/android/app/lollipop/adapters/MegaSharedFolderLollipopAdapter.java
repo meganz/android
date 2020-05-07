@@ -46,6 +46,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -273,32 +274,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				holder.textViewContactName.setText(getMegaUserNameDB(contact));
 
 				holder.stateIcon.setVisibility(View.VISIBLE);
-				if (megaChatApi != null) {
-					int userStatus = megaChatApi.getUserOnlineStatus(contact.getHandle());
-					if (userStatus == MegaChatApi.STATUS_ONLINE) {
-						logDebug("This user is connected");
-						holder.stateIcon.setVisibility(View.VISIBLE);
-						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
-					} else if (userStatus == MegaChatApi.STATUS_AWAY) {
-						logDebug("This user is away");
-						holder.stateIcon.setVisibility(View.VISIBLE);
-						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
-					} else if (userStatus == MegaChatApi.STATUS_BUSY) {
-						logDebug("This user is busy");
-						holder.stateIcon.setVisibility(View.VISIBLE);
-						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
-					} else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
-						logDebug("This user is offline");
-						holder.stateIcon.setVisibility(View.VISIBLE);
-						holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
-					} else if (userStatus == MegaChatApi.STATUS_INVALID) {
-						logWarning("INVALID status: " + userStatus);
-						holder.stateIcon.setVisibility(View.GONE);
-					} else {
-						logDebug("This user status is: " + userStatus);
-						holder.stateIcon.setVisibility(View.GONE);
-					}
-				}
+				setContactStatus(megaChatApi.getUserOnlineStatus(contact.getHandle()), holder.stateIcon);
 			}
 			else{
 				holder.textViewContactName.setText(holder.contactMail);
