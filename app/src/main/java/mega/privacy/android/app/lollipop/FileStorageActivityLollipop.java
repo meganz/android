@@ -27,6 +27,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -68,7 +71,6 @@ import mega.privacy.android.app.utils.SDCardOperator;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -551,15 +553,35 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			} catch (SDCardOperator.SDCardException e) {
 				e.printStackTrace();
 				logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
-				SDCardOperator.requestSDCardPermission(sdCardRoot, this, this);
+				requestSDCardPermission(sdCardRoot);
 			}
 		} else {
-			SDCardOperator.requestSDCardPermission(sdCardRoot, this, this);
+			requestSDCardPermission(sdCardRoot);
 		}
 
 		if (sdRoot != null) {
 			path = new File(sdRoot);
 		}
+	}
+
+	private void requestSDCardPermission(String sdCardRoot) {
+		Intent intent = null;
+		if (isBasedOnFileStorage()) {
+			StorageManager sm = getSystemService(StorageManager.class);
+			if (sm != null) {
+				StorageVolume volume = sm.getStorageVolume(new File(sdCardRoot));
+				if (volume != null) {
+					intent = volume.createAccessIntent(null);
+				}
+			}
+		}
+
+		//for below N or above P, open SAF
+		if (intent == null) {
+			intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+		}
+
+		startActivityForResult(intent, REQUEST_CODE_TREE);
 	}
 
 	private void showRootWithSDView(boolean show) {

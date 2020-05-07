@@ -42,7 +42,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.FileUtils.isVideoFile;
+import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;

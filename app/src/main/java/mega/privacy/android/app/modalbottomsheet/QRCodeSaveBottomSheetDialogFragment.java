@@ -24,7 +24,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {

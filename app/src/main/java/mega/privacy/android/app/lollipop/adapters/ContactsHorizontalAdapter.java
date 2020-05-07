@@ -31,7 +31,7 @@ import nz.mega.sdk.MegaContactRequest;
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 
