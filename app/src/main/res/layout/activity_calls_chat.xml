@@ -179,9 +179,10 @@
                     android:id="@+id/call_chat_contact_image_rl"
                     android:layout_width="128dp"
                     android:layout_height="128dp"
-                    android:layout_centerInParent="true"
-                    android:background="@android:color/transparent"
-                    android:gravity="center_horizontal|center_vertical">
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center_horizontal|top"
+                    android:layout_marginTop="218dp"
+                    android:background="@android:color/transparent">
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
@@ -212,7 +213,7 @@
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/call_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="56dp"
                 android:background="@drawable/gradient_shape_callschat"
                 android:fitsSystemWindows="true"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
@@ -220,8 +221,9 @@
 
                 <LinearLayout
                     android:id="@+id/toolbar_elements"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
+                    android:gravity="center_vertical"
                     android:orientation="vertical">
                     <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/title_toolbar"

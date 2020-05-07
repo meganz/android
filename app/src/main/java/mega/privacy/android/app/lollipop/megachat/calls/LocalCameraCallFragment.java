@@ -8,6 +8,9 @@ import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -66,12 +69,16 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
             return null;
         }
 
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+
         View v = inflater.inflate(R.layout.fragment_local_camera_call, container, false);
         localSurfaceView = v.findViewById(R.id.surface_local_video);
         localSurfaceView.setZOrderMediaOverlay(true);
         SurfaceHolder localSurfaceHolder = localSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        localRenderer = new MegaSurfaceRenderer(localSurfaceView);
+        localRenderer = new MegaSurfaceRenderer(localSurfaceView, true, metrics);
         microIcon = v.findViewById(R.id.micro_surface_view);
         microIcon.setVisibility(View.GONE);
         ((ChatCallActivity) context).refreshOwnMicro();
@@ -113,7 +120,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
         if (isVideoAllowed()) {
-            localRenderer.drawBitmap(true, true);
+            localRenderer.drawBitmap(true);
         }
     }
 

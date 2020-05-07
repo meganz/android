@@ -151,6 +151,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     private static boolean isBlockedDueToWeakAccount = false;
 	private static boolean isWebOpenDueToEmailVerification = false;
 	private static boolean isLoggingRunning = false;
+	private static boolean wasLocalVideoEnable = false;
 
 	MegaChatApiAndroid megaChatApi = null;
 
@@ -1540,5 +1541,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	public boolean isIsLoggingRunning() {
 		return isLoggingRunning;
+	}
+
+	public static boolean isWasLocalVideoEnable() {
+		return wasLocalVideoEnable;
+	}
+
+	public static void setWasLocalVideoEnable(boolean wasLocalVideoEnable) {
+		MegaApplication.wasLocalVideoEnable = wasLocalVideoEnable;
 	}
 }

@@ -488,4 +488,16 @@ public class CallUtil {
         return  chat.getPeerEmailByHandle(peerId);
     }
 
+    /**
+     * Method for finding out if the participant is me.
+     * @param peerId The Peer ID.
+     * @param clientId The Client ID.
+     * @return True if it's me. Otherwise, False.
+     */
+    public static boolean isItMe(long chatId, long peerId, long clientId) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        return peerId == megaChatApi.getMyUserHandle() && clientId == megaChatApi.getMyClientidHandle(chatId);
+    }
+
+
 }

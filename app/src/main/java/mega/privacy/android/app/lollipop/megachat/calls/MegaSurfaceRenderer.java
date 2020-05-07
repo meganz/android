@@ -20,6 +20,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
@@ -28,7 +29,10 @@ import org.webrtc.Logging;
 
 import java.nio.ByteBuffer;
 
+import mega.privacy.android.app.MegaApplication;
+
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.px2dp;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
 public class MegaSurfaceRenderer implements Callback {
@@ -39,6 +43,7 @@ public class MegaSurfaceRenderer implements Callback {
     private PorterDuffXfermode modesrcin;
     private int surfaceWidth = 0;
     private int surfaceHeight = 0;
+    private int CORNER_RADIUS = 20;
     // the bitmap used for drawing.
     private Bitmap bitmap = null;
     private ByteBuffer byteBuffer = null;
@@ -48,9 +53,10 @@ public class MegaSurfaceRenderer implements Callback {
     // Rect of the destination canvas to draw to
     private Rect dstRect = new Rect();
     private RectF dstRectf = new RectF();
+    private boolean isSmallCamera;
+    private DisplayMetrics outMetrics;
 
-
-    public MegaSurfaceRenderer(SurfaceView view) {
+    public MegaSurfaceRenderer(SurfaceView view, boolean isSmallCamera, DisplayMetrics outMetrics) {
         logDebug("MegaSurfaceRenderer() ");
         surfaceHolder = view.getHolder();
         if (surfaceHolder == null)
@@ -59,6 +65,8 @@ public class MegaSurfaceRenderer implements Callback {
         paint = new Paint();
         modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
+        this.isSmallCamera = isSmallCamera;
+        this.outMetrics = outMetrics;
     }
 
     // surfaceChanged and surfaceCreated share this function
@@ -87,21 +95,21 @@ public class MegaSurfaceRenderer implements Callback {
             dstRectf = new RectF(dstRect);
             float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
             float dstaspectratio = (float) dstRect.width() / dstRect.height();
-
             if (srcaspectratio != 0 && dstaspectratio != 0) {
-                if (srcaspectratio > dstaspectratio) {
+
+                if ((srcaspectratio > dstaspectratio && isSmallCamera) || (srcaspectratio <= dstaspectratio && !isSmallCamera)) {
                     float newHeight = dstRect.width() / srcaspectratio;
                     float decrease = dstRect.height() - newHeight;
                     dstRect.top += decrease / 2;
                     dstRect.bottom -= decrease / 2;
-                    dstRectf = new RectF(dstRect);
                 } else {
                     float newWidth = dstRect.height() * srcaspectratio;
                     float decrease = dstRect.width() - newWidth;
                     dstRect.left += decrease / 2;
                     dstRect.right -= decrease / 2;
-                    dstRectf = new RectF(dstRect);
                 }
+
+                dstRectf = new RectF(dstRect);
             }
         }
     }
@@ -177,10 +185,10 @@ public class MegaSurfaceRenderer implements Callback {
 
     /**
      * Draw video frames.
-     * @param inProgressCall Indicates if the call is in progress.
+     *
      * @param isLocal Indicates if the frames are from the local camera.
      */
-    public void drawBitmap(boolean inProgressCall, boolean isLocal) {
+    public void drawBitmap(boolean isLocal) {
         if (bitmap == null || surfaceHolder == null) return;
         Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas == null) return;
@@ -188,10 +196,10 @@ public class MegaSurfaceRenderer implements Callback {
             canvas.scale(-1, 1);
             canvas.translate(-canvas.getWidth(), 0);
         }
-        if (inProgressCall) {
+        if (isSmallCamera) {
             paint.reset();
             paint.setXfermode(modesrcover);
-            canvas.drawRoundRect(dstRectf, 20, 20, paint);
+            canvas.drawRoundRect(dstRectf, px2dp(CORNER_RADIUS, outMetrics), px2dp(CORNER_RADIUS, outMetrics), paint);
             paint.setXfermode(modesrcin);
         } else {
             paint = null;
