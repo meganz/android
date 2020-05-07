@@ -1832,7 +1832,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			camSyncMegaPath = camSyncMegaNode.getName();
 			megaCameraFolder.setSummary(camSyncMegaPath);
 		}
-		rescheduleCameraUpload(context);
 	}
 
 	@Override
