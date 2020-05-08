@@ -972,6 +972,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(sql);
     }
 
+	public void deleteAllPrimarySyncRecords(int type) {
+		String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + " WHERE " + KEY_SYNC_SECONDARY + " ='" + encrypt("false") + "'";
+		if (type != SyncRecord.TYPE_ANY) {
+			sql += " AND " + KEY_SYNC_TYPE + " = " + type;
+		}
+		db.execSQL(sql);
+	}
+
     public void deleteVideoRecordsByState(int state){
         String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_STATE + " = " + state + " AND "
