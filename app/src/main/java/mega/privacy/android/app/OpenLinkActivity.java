@@ -34,7 +34,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
 
-	private static final String REQUIRES_TRANSFER_SESSION = "fm" + SEPARATOR;
+	private static final String REQUIRES_TRANSFER_SESSION = "fm/";
 
 	private DatabaseHandler dbH = null;
 
