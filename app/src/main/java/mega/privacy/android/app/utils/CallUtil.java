@@ -125,18 +125,40 @@ public class CallUtil {
      *
      * @param context from which the action is done
      */
-    public static void returnCall(Context context) {
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MegaChatCall call = megaChatApi.getChatCall(getChatCallInProgress());
-        if (call == null)
-            return;
+    public static void returnActiveCall(Context context) {
+        ArrayList<Long> currentCalls = getCallsParticipating();
 
-        MegaApplication.setShowPinScreen(false);
-        Intent intent = new Intent(context, ChatCallActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(CHAT_ID, call.getChatid());
-        intent.putExtra(CALL_ID, call.getId());
-        context.startActivity(intent);
+        for(Long chatIdCall:currentCalls){
+            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
+            if(call != null && !call.isOnHold()){
+                MegaApplication.setShowPinScreen(false);
+                Intent intent = new Intent(context, ChatCallActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra(CHAT_ID, call.getChatid());
+                intent.putExtra(CALL_ID, call.getId());
+                context.startActivity(intent);
+            }
+        }
+    }
+    /**
+     * Open the call that is in progress
+     *
+     * @param context from which the action is done
+     */
+    public static void returnCall(Context context, long chatId) {
+        ArrayList<Long> currentCalls = getCallsParticipating();
+
+        for(Long chatIdCall:currentCalls){
+            if(chatIdCall == chatId){
+                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
+                MegaApplication.setShowPinScreen(false);
+                Intent intent = new Intent(context, ChatCallActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra(CHAT_ID, call.getChatid());
+                intent.putExtra(CALL_ID, call.getId());
+                context.startActivity(intent);
+            }
+        }
     }
 
     /**

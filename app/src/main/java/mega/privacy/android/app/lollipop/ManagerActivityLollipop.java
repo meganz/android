@@ -1512,7 +1512,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 				}else if(typesCameraPermission == START_CALL_PERMISSIONS){
 					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 						if(checkPermissionsCall()){
-							returnCall(this);
+							returnActiveCall(this);
 						}
 						typesCameraPermission = -1;
 					}
@@ -1643,7 +1643,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case RECORD_AUDIO: {
 				if(typesCameraPermission == START_CALL_PERMISSIONS && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 					if(checkPermissionsCall()){
-						returnCall(this);
+						returnActiveCall(this);
 					}
 					typesCameraPermission = -1;
 				}
@@ -7325,7 +7325,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			case R.id.action_return_call:{
 				logDebug("Action menu return to call in progress pressed");
 				if(checkPermissionsCall()){
-					returnCall(this);
+					returnActiveCall(this);
 				}
 				return true;
 			}
@@ -11312,7 +11312,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			case R.id.call_in_progress_layout:{
 				if(checkPermissionsCall()){
-					returnCall(this);
+					returnActiveCall(this);
 				}
 				break;
 			}

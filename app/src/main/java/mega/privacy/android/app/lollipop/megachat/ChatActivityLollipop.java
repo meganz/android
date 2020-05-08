@@ -2571,11 +2571,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logDebug("There is a call in this chat");
 
             if (participatingInACall()) {
-                long chatIdCallInProgress = getChatCallInProgress();
-                if (chatIdCallInProgress == chatRoom.getChatId()) {
-                    logDebug("I'm participating in the call of this chat");
-                    returnCall(this);
-                    return;
+                ArrayList<Long> chatsIDcalls = getCallsParticipating();
+                for(Long chatId:chatsIDcalls){
+                    if(chatId == chatRoom.getChatId()){
+                        logDebug("I'm participating in the call of this chat");
+                        returnCall(this, chatId);
+                        return;
+                    }
                 }
 
                 logDebug("I'm participating in another call from another chat");
