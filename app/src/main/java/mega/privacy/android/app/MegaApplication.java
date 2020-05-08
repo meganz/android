@@ -430,7 +430,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				switch (callStatus) {
 					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 					case MegaChatCall.CALL_STATUS_RING_IN:
-					case MegaChatCall.CALL_STATUS_JOINING:
 					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
 					case MegaChatCall.CALL_STATUS_RECONNECTING:
 
@@ -442,13 +441,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 							setAudioManagerValues(callStatus);
 						}
 
-						if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS
-								|| callStatus == MegaChatCall.CALL_STATUS_JOINING
-								|| callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
+						if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
 							removeChatAudioManager();
 							clearIncomingCallNotification(callId);
 						}
-
 						if (listAllCalls.size() == 1) {
 							checkOneCall(listAllCalls.get(0));
 						} else {
@@ -1243,7 +1239,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			logWarning("Launch not in correct status");
 			return;
 		}
-		logDebug("Open the call");
 		if (shouldNotify(this) && !isActivityVisible()) {
 			PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
 			if (pm != null) {
@@ -1272,7 +1267,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		for (int i = 0; i < handleList.size(); i++) {
 			if (openCallChatId != handleList.get(i)) {
 				MegaChatCall callToLaunch = megaChatApi.getChatCall(handleList.get(i));
-				if (callToLaunch != null) {
+				if (callToLaunch != null && !callToLaunch.isOnHold()) {
 					logDebug("Open call");
 					launchCallActivity(callToLaunch);
 					break;
@@ -1367,7 +1362,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	}
 
 	public void launchCallActivity(MegaChatCall call) {
-		logDebug("launchCallActivity: " + call.getStatus());
+		logDebug("Show the call screen: " + callStatusToString(call.getStatus()));
+
 		MegaApplication.setShowPinScreen(false);
 		Intent i = new Intent(this, ChatCallActivity.class);
 		i.putExtra(CHAT_ID, call.getChatid());
@@ -1512,7 +1508,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     public void unregisterReceiver(BroadcastReceiver receiver) {
         super.unregisterReceiver(receiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(logoutReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 	}
 
     public static boolean isVerifySMSShowed() {
