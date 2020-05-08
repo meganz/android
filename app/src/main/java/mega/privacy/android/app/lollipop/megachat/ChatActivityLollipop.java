@@ -163,7 +163,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -177,7 +177,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatActivityLollipop extends DownloadableActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
@@ -266,7 +266,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     boolean retryHistory = false;
 
-    public long lastIdMsgSeen = INVALID_HANDLE;
+    public long lastIdMsgSeen = MEGACHAT_INVALID_HANDLE;
     public long generalUnreadCount;
     boolean lastSeenReceived;
     int positionToScroll = INVALID_VALUE;
@@ -676,8 +676,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return;
         }
 
-        megaChatApi.addChatListener(this);
-        dbH = MegaApplication.getInstance().getDbH();
+        dbH = DatabaseHandler.getDbHandler(this);
 
         handler = new Handler();
 
@@ -1182,6 +1181,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         megaChatApi.closeChatRoom(idChat, this);
                         idChat = newIdChat;
                     }
+                    megaChatApi.addChatListener(this);
                     myUserHandle = megaChatApi.getMyUserHandle();
 
                     if(savedInstanceState!=null) {
@@ -1206,8 +1206,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                             }
                         }
 
-                        lastIdMsgSeen = savedInstanceState.getLong("lastMessageSeen", INVALID_HANDLE);
-                        isTurn = lastIdMsgSeen != INVALID_HANDLE;
+                        lastIdMsgSeen = savedInstanceState.getLong("lastMessageSeen", MEGACHAT_INVALID_HANDLE);
+                        isTurn = lastIdMsgSeen != MEGACHAT_INVALID_HANDLE;
 
                         generalUnreadCount = savedInstanceState.getLong("generalUnreadCount", 0);
 
@@ -1470,7 +1470,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logDebug("loadMessages:unread is 0");
 
             if (!isTurn) {
-                lastIdMsgSeen = INVALID_HANDLE;
+                lastIdMsgSeen = MEGACHAT_INVALID_HANDLE;
                 generalUnreadCount = 0;
             }
         } else {
@@ -3482,7 +3482,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 if (recordView.isRecordingNow()) break;
                 hideKeyboard();
                 if(isNecessaryDisableLocalCamera() != -1){
-                    showConfirmationOpenCamera(this, ACTION_TAKE_PICTURE);
+                    showConfirmationOpenCamera(this, ACTION_TAKE_PICTURE, false);
                     break;
                 }
                 controlCamera();
@@ -3703,7 +3703,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         int position = positionNewMessagesLayout;
 
         positionNewMessagesLayout = INVALID_VALUE;
-        lastIdMsgSeen = INVALID_HANDLE;
+        lastIdMsgSeen = MEGACHAT_INVALID_HANDLE;
         generalUnreadCount = 0;
         lastSeenReceived = true;
         newVisibility = false;
@@ -3796,25 +3796,20 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void editMessage(String text){
-        logDebug("editMessage: ");
-        MegaChatMessage msgEdited = null;
+    public void editMessage(String text) {
+        if (messageToEdit.getContent().equals(text)) return;
 
-        if(messageToEdit.getMsgId()!=-1){
-            msgEdited = megaChatApi.editMessage(idChat, messageToEdit.getMsgId(), text);
-        }
-        else{
-            msgEdited = megaChatApi.editMessage(idChat, messageToEdit.getTempId(), text);
-        }
+        MegaChatMessage msgEdited = megaChatApi.editMessage(idChat,
+                messageToEdit.getMsgId() != MEGACHAT_INVALID_HANDLE ? messageToEdit.getMsgId() : messageToEdit.getTempId(),
+                text);
 
-        if(msgEdited!=null){
+        if (msgEdited != null) {
             logDebug("Edited message: status: " + msgEdited.getStatus());
             AndroidMegaChatMessage androidMsgEdited = new AndroidMegaChatMessage(msgEdited);
             modifyMessageReceived(androidMsgEdited, false);
-        }
-        else{
+        } else {
             logWarning("Message cannot be edited!");
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_editing_message), -1);
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.error_editing_message), MEGACHAT_INVALID_HANDLE);
         }
     }
 
@@ -3870,8 +3865,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         MegaChatMessage msg = messagesSelected.get(0).getMessage();
                         MegaChatContainsMeta meta = msg.getContainsMeta();
                         messageToEdit = msg;
-                        textChat.setText(messageToEdit.getContent());
-                        textChat.setSelection(textChat.getText().length());
+
                         if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
                             sendLocation();
                             clearSelections();
@@ -5757,7 +5751,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         lastSeenReceived = unread == 0;
 
         if (unread == 0) {
-            lastIdMsgSeen = INVALID_HANDLE;
+            lastIdMsgSeen = MEGACHAT_INVALID_HANDLE;
             logDebug("loadMessages unread is 0");
         } else {
             lastIdMsgSeen = megaChatApi.getLastMessageSeenId(idChat);
@@ -7069,8 +7063,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     megaChatApi.closeChatRoom(idChat, this);
                 }
                 idChat = request.getChatHandle();
-
-                if (idChat != MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE) {
+                megaChatApi.addChatListener(this);
+                if (idChat != MEGACHAT_INVALID_HANDLE) {
                     dbH.setLastPublicHandle(idChat);
                     dbH.setLastPublicHandleTimeStamp();
                     dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CHAT);

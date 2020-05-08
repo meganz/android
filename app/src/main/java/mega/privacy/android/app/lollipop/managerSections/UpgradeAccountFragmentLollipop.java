@@ -1004,7 +1004,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.upgrade_business_layout:{
-				megaApi.getSessionTransferURL("registerb", new SessionTransferURLListener(context));
+				megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
 				break;
 			}
 		}
@@ -1201,7 +1201,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			switch (myAccountInfo.getAccountType()) {
 
 				case 0: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.free_account).toUpperCase());
+					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.free_account));
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#2bb200\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");

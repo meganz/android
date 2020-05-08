@@ -60,7 +60,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.listeners.ShareListener.*;
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -333,7 +333,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	    
 	    Bundle extras = getIntent().getExtras();
 		if (extras != null){
-			nodeHandle = extras.getLong("name");
+			nodeHandle = extras.getLong(NAME);
 			node=megaApi.getNodeByHandle(nodeHandle);
 			
 			setContentView(R.layout.activity_file_contact_list);
@@ -576,7 +576,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 			if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
 				Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-				i.putExtra("name", listContacts.get(position).getUser());
+				i.putExtra(NAME, listContacts.get(position).getUser());
 				startActivity(i);
 			}
 

@@ -68,7 +68,6 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -78,6 +77,7 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.adapters.MegaFileInfoSharedContactLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -106,12 +106,14 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -692,7 +694,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         separatorVersions = (View) findViewById(R.id.separator_versions);
 
         if (adapterType == OFFLINE_ADAPTER){
-            collapsingToolbar.setTitle(getIntent().getStringExtra("name").toUpperCase());
+            collapsingToolbar.setTitle(getIntent().getStringExtra(NAME).toUpperCase());
             availableOfflineLayout.setVisibility(View.GONE);
             sharedLayout.setVisibility(View.GONE);
             dividerSharedLayout.setVisibility(View.GONE);
@@ -922,33 +924,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
     }
 
     void setOwnerState(long userHandle) {
-        ownerState.setVisibility(View.VISIBLE);
-        if (megaChatApi != null) {
-            int userStatus = megaChatApi.getUserOnlineStatus(userHandle);
-            if (userStatus == MegaChatApi.STATUS_ONLINE) {
-                logDebug("This user is connected");
-                ownerState.setVisibility(View.VISIBLE);
-                ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_online));
-            } else if (userStatus == MegaChatApi.STATUS_AWAY) {
-                logDebug("This user is away");
-                ownerState.setVisibility(View.VISIBLE);
-                ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_away));
-            } else if (userStatus == MegaChatApi.STATUS_BUSY) {
-                logDebug("This user is busy");
-                ownerState.setVisibility(View.VISIBLE);
-                ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_busy));
-            } else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
-                logDebug("This user is offline");
-                ownerState.setVisibility(View.VISIBLE);
-                ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_offline));
-            } else if (userStatus == MegaChatApi.STATUS_INVALID) {
-                logWarning("INVALID status: " + userStatus);
-                ownerState.setVisibility(View.GONE);
-            } else {
-                logDebug("This user status is: " + userStatus);
-                ownerState.setVisibility(View.GONE);
-            }
-        }
+        setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ownerState);
     }
 
 	@Override
@@ -1716,7 +1692,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 			}
             case R.id.more_button:
                 Intent i = new Intent(this, FileContactListActivityLollipop.class);
-                i.putExtra("name", node.getHandle());
+                i.putExtra(NAME, node.getHandle());
                 startActivity(i);
                 break;
 			case R.id.file_properties_switch:{
@@ -1967,7 +1943,15 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
 		if (moveToRubbish){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
+			int stringMessageID;
+            if (getPrimaryFolderHandle() == handle && CameraUploadsService.isServiceRunning) {
+                stringMessageID = R.string.confirmation_move_cu_folder_to_rubbish;
+            } else if (getSecondaryFolderHandle() == handle && CameraUploadsService.isServiceRunning) {
+                stringMessageID = R.string.confirmation_move_mu_folder_to_rubbish;
+            } else {
+                stringMessageID = R.string.confirmation_move_to_rubbish;
+            }
+			String message= getResources().getString(stringMessageID);
 			builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
@@ -3062,7 +3046,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             MegaUser contact = megaApi.getContact(megaUser);
             if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 Intent i = new Intent(this,ContactInfoActivityLollipop.class);
-                i.putExtra("name",megaUser);
+                i.putExtra(NAME, megaUser);
                 startActivity(i);
             }
 

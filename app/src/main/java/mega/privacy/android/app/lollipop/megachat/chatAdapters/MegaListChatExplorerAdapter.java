@@ -36,12 +36,12 @@ import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -218,49 +218,9 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 setUserAvatar(holder, userHandleEncoded);
             }
 
-            if (megaChatApi != null) {
-                int userStatus = megaChatApi.getUserOnlineStatus(handle);
-                if (userStatus == MegaChatApi.STATUS_ONLINE) {
-                    logDebug("This user is connected");
-                    holder.stateIcon.setVisibility(View.VISIBLE);
-                    holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-                    holder.lastSeenStateText.setText(context.getString(R.string.online_status));
-                    holder.lastSeenStateText.setVisibility(View.VISIBLE);
-                } else if (userStatus == MegaChatApi.STATUS_AWAY) {
-                    logDebug("This user is away");
-                    holder.stateIcon.setVisibility(View.VISIBLE);
-                    holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
-                    holder.lastSeenStateText.setText(context.getString(R.string.away_status));
-                    holder.lastSeenStateText.setVisibility(View.VISIBLE);
-                } else if (userStatus == MegaChatApi.STATUS_BUSY) {
-                    logDebug("This user is busy");
-                    holder.stateIcon.setVisibility(View.VISIBLE);
-                    holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
-                    holder.lastSeenStateText.setText(context.getString(R.string.busy_status));
-                    holder.lastSeenStateText.setVisibility(View.VISIBLE);
-                } else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
-                    logDebug("This user is offline");
-                    holder.stateIcon.setVisibility(View.VISIBLE);
-                    holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-                    holder.lastSeenStateText.setText(context.getString(R.string.offline_status));
-                    holder.lastSeenStateText.setVisibility(View.VISIBLE);
-                } else if (userStatus == MegaChatApi.STATUS_INVALID) {
-                    logWarning("INVALID status: " + userStatus);
-                    holder.stateIcon.setVisibility(View.GONE);
-                    holder.lastSeenStateText.setVisibility(View.GONE);
-                } else {
-                    logDebug("This user status is: " + userStatus);
-                    holder.stateIcon.setVisibility(View.GONE);
-                    holder.lastSeenStateText.setVisibility(View.GONE);
-                }
-
-                if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
-                    if (contact != null && !contact.getLastGreen().isEmpty()) {
-                        holder.lastSeenStateText.setText(contact.getLastGreen());
-                        holder.lastSeenStateText.isMarqueeIsNecessary(context);
-                    }
-                }
-            }
+            int userStatus = megaChatApi.getUserOnlineStatus(handle);
+            setContactStatus(userStatus, holder.stateIcon, holder.lastSeenStateText);
+            setContactLastGreen(context, userStatus, contact.getLastGreen(), holder.lastSeenStateText);
         }
         
 

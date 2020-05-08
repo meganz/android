@@ -1733,9 +1733,9 @@ public class Util {
 	public static void checkTakePicture(Activity activity, int option) {
 		if (isNecessaryDisableLocalCamera() != -1) {
 			if(option == TAKE_PHOTO_CODE) {
-				showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE);
+				showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE, false);
 			}else if(option == TAKE_PICTURE_PROFILE_CODE){
-				showConfirmationOpenCamera(activity, ACTION_TAKE_PROFILE_PICTURE);
+				showConfirmationOpenCamera(activity, ACTION_TAKE_PROFILE_PICTURE, false);
 			}
 			return;
 		}

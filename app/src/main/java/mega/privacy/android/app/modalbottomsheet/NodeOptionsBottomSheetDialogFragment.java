@@ -1,22 +1,12 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -25,8 +15,6 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -34,11 +22,11 @@ import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -49,157 +37,81 @@ import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
-public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
+public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    private Context context;
     private MegaNode node = null;
     private NodeController nC;
 
-    private BottomSheetBehavior mBehavior;
-
-    private LinearLayout mainLinearLayout;
-    private CoordinatorLayout coordinatorLayout;
-
-    private ImageView nodeThumb;
-    private TextView nodeName;
     private TextView nodeInfo;
-    private ImageView nodeVersionsIcon;
-    private RelativeLayout nodeIconLayout;
-    private ImageView nodeIcon;
-    private ImageView permissionsIcon;
-    private LinearLayout optionDownload;
-    private LinearLayout optionOffline;
-    private TextView optionOfflineText;
-    private LinearLayout optionInfo;
-    private TextView optionInfoText;
-    private ImageView optionInfoImage;
-    private LinearLayout optionLink;
-    private TextView optionLinkText;
-    private ImageView optionLinkImage;
-    private LinearLayout optionRemoveLink;
-    private LinearLayout optionShare;
-    private LinearLayout optionShareFolder;
-    private TextView optionShareFolderText;
-    private LinearLayout optionClearShares;
-    private LinearLayout optionLeaveShares;
-    private LinearLayout optionSendChat;
-    private LinearLayout optionRename;
-    private LinearLayout optionMove;
-    private LinearLayout optionCopy;
-    private LinearLayout optionRubbishBin;
-    private LinearLayout optionRemove;
-    private LinearLayout optionRestoreFromRubbish;
-    private LinearLayout optionOpenFolder;
-    private LinearLayout optionOpenWith;
-
-    private LinearLayout items_layout;
-    private RelativeLayout node_head;
-
-    private DisplayMetrics outMetrics;
 
     private ManagerActivityLollipop.DrawerItem drawerItem;
-    private Bitmap thumb = null;
-
-    private MegaApiAndroid megaApi;
-    private DatabaseHandler dbH;
-
-    private int height = -1;
-    private boolean heightseted = false;
-    private int heightReal = -1;
-    private int heightDisplay;
-
-    private View contentView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        logDebug("onCreate");
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-
-        if(savedInstanceState!=null) {
-            logDebug("Bundle is NOT NULL");
-            long handle = savedInstanceState.getLong("handle", -1);
-            height = savedInstanceState.getInt("height", -1);
-            logDebug("Handle of the node: " + handle);
+        if (savedInstanceState != null) {
+            long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
-            if(context instanceof ManagerActivityLollipop){
-                drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+            if (context instanceof ManagerActivityLollipop) {
+                drawerItem = ManagerActivityLollipop.getDrawerItem();
             }
-        }
-        else{
-            logWarning("Bundle NULL");
-            if(context instanceof ManagerActivityLollipop){
+        } else {
+            if (context instanceof ManagerActivityLollipop) {
                 node = ((ManagerActivityLollipop) context).getSelectedNode();
-                drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                drawerItem = ManagerActivityLollipop.getDrawerItem();
             }
         }
 
         nC = new NodeController(context);
-
-        dbH = DatabaseHandler.getDbHandler(getActivity());
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(final Dialog dialog, int style) {
-
         super.setupDialog(dialog, style);
-        logDebug("setupDialog");
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        heightDisplay = outMetrics.heightPixels;
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
-
-        contentView.post(() -> heightReal = contentView.getHeight());
-
         mainLinearLayout = contentView.findViewById(R.id.node_bottom_sheet);
-
         items_layout = contentView.findViewById(R.id.items_layout_bottom_sheet_node);
-        node_head = contentView.findViewById(R.id.node_title_layout);
 
-        nodeThumb = contentView.findViewById(R.id.node_thumbnail);
-        nodeName = contentView.findViewById(R.id.node_name_text);
+        ImageView nodeThumb = contentView.findViewById(R.id.node_thumbnail);
+        TextView nodeName = contentView.findViewById(R.id.node_name_text);
         nodeInfo = contentView.findViewById(R.id.node_info_text);
-        nodeVersionsIcon = contentView.findViewById(R.id.node_info_versions_icon);
-        nodeIconLayout = contentView.findViewById(R.id.node_relative_layout_icon);
-        nodeIcon = contentView.findViewById(R.id.node_icon);
-        permissionsIcon = contentView.findViewById(R.id.permissions_icon);
+        ImageView nodeVersionsIcon = contentView.findViewById(R.id.node_info_versions_icon);
+        RelativeLayout nodeIconLayout = contentView.findViewById(R.id.node_relative_layout_icon);
+        ImageView nodeIcon = contentView.findViewById(R.id.node_icon);
+        ImageView permissionsIcon = contentView.findViewById(R.id.permissions_icon);
 
-        optionInfo = contentView.findViewById(R.id.option_properties_layout);
-        optionInfoText = contentView.findViewById(R.id.option_properties_text);
-        optionInfoImage = contentView.findViewById(R.id.option_properties_image);
+        LinearLayout optionInfo = contentView.findViewById(R.id.option_properties_layout);
+        TextView optionInfoText = contentView.findViewById(R.id.option_properties_text);
 //      counterSave
-        optionDownload = contentView.findViewById(R.id.option_download_layout);
-        optionOffline = contentView.findViewById(R.id.option_offline_layout);
-        optionOfflineText = contentView.findViewById(R.id.option_offline_text);
+        LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
+        LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
+        TextView optionOfflineText = contentView.findViewById(R.id.option_offline_text);
 //      counterShares
-        optionLink = contentView.findViewById(R.id.option_link_layout);
-        optionLinkText = contentView.findViewById(R.id.option_link_text);
-        optionLinkImage = contentView.findViewById(R.id.option_link_image);
-        optionRemoveLink = contentView.findViewById(R.id.option_remove_link_layout);
-        optionShare = contentView.findViewById(R.id.option_share_layout);
-        optionShareFolder = contentView.findViewById(R.id.option_share_folder_layout);
-        optionShareFolderText = contentView.findViewById(R.id.option_share_folder_text);
-        optionClearShares = contentView.findViewById(R.id.option_clear_share_layout);
-        optionSendChat = contentView.findViewById(R.id.option_send_chat_layout);
+        LinearLayout optionLink = contentView.findViewById(R.id.option_link_layout);
+        TextView optionLinkText = contentView.findViewById(R.id.option_link_text);
+        LinearLayout optionRemoveLink = contentView.findViewById(R.id.option_remove_link_layout);
+        LinearLayout optionShare = contentView.findViewById(R.id.option_share_layout);
+        LinearLayout optionShareFolder = contentView.findViewById(R.id.option_share_folder_layout);
+        TextView optionShareFolderText = contentView.findViewById(R.id.option_share_folder_text);
+        LinearLayout optionClearShares = contentView.findViewById(R.id.option_clear_share_layout);
+        LinearLayout optionSendChat = contentView.findViewById(R.id.option_send_chat_layout);
 //      counterModify
-        optionRename = contentView.findViewById(R.id.option_rename_layout);
-        optionMove = contentView.findViewById(R.id.option_move_layout);
-        optionCopy = contentView.findViewById(R.id.option_copy_layout);
-        optionRestoreFromRubbish = contentView.findViewById(R.id.option_restore_layout);
+        LinearLayout optionRename = contentView.findViewById(R.id.option_rename_layout);
+        LinearLayout optionMove = contentView.findViewById(R.id.option_move_layout);
+        LinearLayout optionCopy = contentView.findViewById(R.id.option_copy_layout);
+        LinearLayout optionRestoreFromRubbish = contentView.findViewById(R.id.option_restore_layout);
 //      counterOpen
-        optionOpenFolder = contentView.findViewById(R.id.option_open_folder_layout);
-        optionOpenWith = contentView.findViewById(R.id.option_open_with_layout);
+        LinearLayout optionOpenFolder = contentView.findViewById(R.id.option_open_folder_layout);
+        LinearLayout optionOpenWith = contentView.findViewById(R.id.option_open_with_layout);
 //      counterRemove
-        optionLeaveShares = contentView.findViewById(R.id.option_leave_share_layout);
-        optionRubbishBin = contentView.findViewById(R.id.option_rubbish_bin_layout);
-        optionRemove = contentView.findViewById(R.id.option_remove_layout);
+        LinearLayout optionLeaveShares = contentView.findViewById(R.id.option_leave_share_layout);
+        LinearLayout optionRubbishBin = contentView.findViewById(R.id.option_rubbish_bin_layout);
+        LinearLayout optionRemove = contentView.findViewById(R.id.option_remove_layout);
 
         optionDownload.setOnClickListener(this);
         optionOffline.setOnClickListener(this);
@@ -281,7 +193,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     params1.setMargins(20, 0, 12, 0);
                     nodeThumb.setLayoutParams(params1);
 
-                    thumb = getThumbnailFromCache(node);
+                    Bitmap thumb = getThumbnailFromCache(node);
                     if (thumb != null) {
                         nodeThumb.setImageBitmap(thumb);
                     } else {
@@ -306,7 +218,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
 
         switch (drawerItem) {
-            case CLOUD_DRIVE: {
+            case CLOUD_DRIVE:
                 logDebug("show Cloud bottom sheet");
                 if (((ManagerActivityLollipop) context).isOnRecents()) {
                     optionInfoText.setText(R.string.general_file_info);
@@ -340,7 +252,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     switch (accessLevel) {
                         case MegaShare.ACCESS_READWRITE:
                         case MegaShare.ACCESS_READ:
-                        case MegaShare.ACCESS_UNKNOWN: {
+                        case MegaShare.ACCESS_UNKNOWN:
                             counterModify--;
                             optionRename.setVisibility(View.GONE);
                             counterModify--;
@@ -354,9 +266,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             counterShares--;
                             optionRemoveLink.setVisibility(View.GONE);
                             break;
-                        }
+
                         case MegaShare.ACCESS_FULL:
-                        case MegaShare.ACCESS_OWNER: {
+                        case MegaShare.ACCESS_OWNER:
                             optionLink.setVisibility(View.VISIBLE);
                             if (node.isExported()) {
                                 nodeIconLayout.setVisibility(View.VISIBLE);
@@ -370,7 +282,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                                 optionRemoveLink.setVisibility(View.GONE);
                             }
                             break;
-                        }
                     }
                     break;
                 }
@@ -411,8 +322,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                 if (availableOffline(context, node)) {
                     optionOfflineText.setText(getString(R.string.context_delete_offline));
-                }
-                else {
+                } else {
                     optionOfflineText.setText(getString(R.string.save_for_offline));
                 }
                 optionInfo.setVisibility(View.VISIBLE);
@@ -433,8 +343,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 counterModify--;
                 optionRestoreFromRubbish.setVisibility(View.GONE);
                 break;
-            }
-            case RUBBISH_BIN: {
+
+            case RUBBISH_BIN:
                 logDebug("show Rubbish bottom sheet");
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
@@ -443,17 +353,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 }
 
                 long restoreHandle = node.getRestoreHandle();
-                if(restoreHandle!=-1){
+                if (restoreHandle != INVALID_HANDLE) {
                     MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
-                    if((!megaApi.isInRubbish(node)) || restoreNode==null || megaApi.isInRubbish(restoreNode)){
+                    if ((!megaApi.isInRubbish(node)) || restoreNode == null || megaApi.isInRubbish(restoreNode)) {
                         counterModify--;
                         optionRestoreFromRubbish.setVisibility(View.GONE);
-                    }
-                    else{
+                    } else {
                         optionRestoreFromRubbish.setVisibility(View.VISIBLE);
                     }
-                }
-                else{
+                } else {
                     counterModify--;
                     optionRestoreFromRubbish.setVisibility(View.GONE);
                 }
@@ -488,8 +396,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 counterShares--;
                 optionSendChat.setVisibility(View.GONE);
                 break;
-            }
-            case INBOX: {
+
+            case INBOX:
 
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
@@ -517,8 +425,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionDownload.setVisibility(View.VISIBLE);
                 if (availableOffline(context, node)) {
                     optionOfflineText.setText(getString(R.string.context_delete_offline));
-                }
-                else {
+                } else {
                     optionOfflineText.setText(getString(R.string.save_for_offline));
                 }
                 optionInfo.setVisibility(View.VISIBLE);
@@ -545,8 +452,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionRestoreFromRubbish.setVisibility(View.GONE);
 
                 break;
-            }
-            case SHARED_ITEMS: {
+
+            case SHARED_ITEMS:
 
                 int tabSelected = ((ManagerActivityLollipop) context).getTabItemShares();
                 if (tabSelected == 0) {
@@ -569,8 +476,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionDownload.setVisibility(View.VISIBLE);
                     if (availableOffline(context, node)) {
                         optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    }
-                    else {
+                    } else {
                         optionOfflineText.setText(getString(R.string.save_for_offline));
                     }
                     optionInfo.setVisibility(View.VISIBLE);
@@ -592,25 +498,25 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         permissionsIcon.setVisibility(View.VISIBLE);
 
                         switch (accessLevel) {
-                            case MegaShare.ACCESS_FULL: {
+                            case MegaShare.ACCESS_FULL:
                                 logDebug("LEVEL 0 - access FULL");
                                 permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
                                 break;
-                            }
-                            case MegaShare.ACCESS_READ: {
+
+                            case MegaShare.ACCESS_READ:
                                 logDebug("LEVEL 0 - access read");
                                 permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                                 break;
-                            }
-                            case MegaShare.ACCESS_READWRITE: {
+
+                            case MegaShare.ACCESS_READWRITE:
                                 logDebug("LEVEL 0 - readwrite");
                                 permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
-                            }
+                                break;
                         }
                     }
 
                     switch (accessLevel) {
-                        case MegaShare.ACCESS_FULL: {
+                        case MegaShare.ACCESS_FULL:
                             logDebug("access FULL");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
@@ -633,8 +539,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             }
 
                             break;
-                        }
-                        case MegaShare.ACCESS_READ: {
+
+                        case MegaShare.ACCESS_READ:
                             logDebug("access read");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
@@ -649,8 +555,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             counterRemove--;
                             optionRubbishBin.setVisibility(View.GONE);
                             break;
-                        }
-                        case MegaShare.ACCESS_READWRITE: {
+
+                        case MegaShare.ACCESS_READWRITE:
                             logDebug("readwrite");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
@@ -665,7 +571,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             counterRemove--;
                             optionRubbishBin.setVisibility(View.GONE);
                             break;
-                        }
                     }
                 } else if (tabSelected == 1) {
                     logDebug("showOptionsPanelOutgoing");
@@ -714,8 +619,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionDownload.setVisibility(View.VISIBLE);
                     if (availableOffline(context, node)) {
                         optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    }
-                    else {
+                    } else {
                         optionOfflineText.setText(getString(R.string.save_for_offline));
                     }
                     optionInfo.setVisibility(View.VISIBLE);
@@ -773,8 +677,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                     if (availableOffline(context, node)) {
                         optionOfflineText.setText(getString(R.string.context_delete_offline));
-                    }
-                    else {
+                    } else {
                         optionOfflineText.setText(getString(R.string.save_for_offline));
                     }
                     optionInfo.setVisibility(View.VISIBLE);
@@ -798,8 +701,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionRestoreFromRubbish.setVisibility(View.GONE);
 
                 break;
-            }
-            case SEARCH: {
+
+            case SEARCH:
                 if (node.isFolder()) {
                     optionInfoText.setText(R.string.general_folder_info);
                     optionShareFolder.setVisibility(View.VISIBLE);
@@ -851,26 +754,25 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionLeaveShares.setVisibility(View.VISIBLE);
 
                         switch (accessLevel) {
-                            case MegaShare.ACCESS_FULL: {
+                            case MegaShare.ACCESS_FULL:
                                 logDebug("LEVEL 0 - access FULL");
                                 nodeIcon.setImageResource(R.drawable.ic_shared_fullaccess);
                                 break;
-                            }
-                            case MegaShare.ACCESS_READ: {
+
+                            case MegaShare.ACCESS_READ:
                                 logDebug("LEVEL 0 - access read");
                                 nodeIcon.setImageResource(R.drawable.ic_shared_read);
                                 break;
-                            }
-                            case MegaShare.ACCESS_READWRITE: {
+
+                            case MegaShare.ACCESS_READWRITE:
                                 logDebug("LEVEL 0 - readwrite");
                                 nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
                                 break;
-                            }
                         }
                     }
 
                     switch (accessLevel) {
-                        case MegaShare.ACCESS_FULL: {
+                        case MegaShare.ACCESS_FULL:
                             logDebug("access FULL");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
@@ -893,8 +795,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             }
 
                             break;
-                        }
-                        case MegaShare.ACCESS_READ: {
+
+                        case MegaShare.ACCESS_READ:
                             logDebug("access read");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
@@ -909,8 +811,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             counterRemove--;
                             optionRubbishBin.setVisibility(View.GONE);
                             break;
-                        }
-                        case MegaShare.ACCESS_READWRITE: {
+
+                        case MegaShare.ACCESS_READWRITE:
                             logDebug("readwrite");
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
@@ -925,7 +827,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             counterRemove--;
                             optionRubbishBin.setVisibility(View.GONE);
                             break;
-                        }
                     }
                 } else {
                     if (node.isExported()) {
@@ -978,69 +879,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionRestoreFromRubbish.setVisibility(View.GONE);
                 }
                 break;
-            }
         }
 
-        if (counterSave <= 0){
-            separatorDownload.setVisibility(View.GONE);
-        }
-        else {
-            separatorDownload.setVisibility(View.VISIBLE);
-        }
-        if (counterShares <= 0){
-            separatorShares.setVisibility(View.GONE);
-        }
-        else {
-            separatorShares.setVisibility(View.VISIBLE);
-        }
-        if (counterModify <= 0){
-            separatorModify.setVisibility(View.GONE);
-        }
-        else {
-            separatorModify.setVisibility(View.VISIBLE);
-        }
-        if (counterOpen <= 0 || counterRemove <= 0) {
-            separatorOpen.setVisibility(View.GONE);
-        }
-        else {
-            separatorOpen.setVisibility(View.VISIBLE);
-        }
+        separatorDownload.setVisibility(counterSave <= 0 ? View.GONE : View.VISIBLE);
+        separatorShares.setVisibility(counterShares <= 0 ? View.GONE : View.VISIBLE);
+        separatorModify.setVisibility(counterModify <= 0 ? View.GONE : View.VISIBLE);
+        separatorOpen.setVisibility(counterOpen <= 0 || counterRemove <= 0 ? View.GONE : View.VISIBLE);
 
         dialog.setContentView(contentView);
-
-            mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-            mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
-            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
-            mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-                @Override
-                public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                    if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                        dismissAllowingStateLoss();
-                    }
-                }
-
-                @Override
-                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                    if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-                        ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-                        if (getActivity() != null && getActivity().findViewById(R.id.toolbar) != null) {
-                            int tBHeight = getActivity().findViewById(R.id.toolbar).getHeight();
-                            Rect rectangle = new Rect();
-                            getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
-                            int windowHeight = rectangle.bottom;
-                            int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8, context.getResources().getDisplayMetrics());
-                            int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
-
-                        logDebug("bottomSheet.height: "+mainLinearLayout.getHeight()+" maxHeight: "+maxHeight);
-                        if (mainLinearLayout.getHeight() > maxHeight) {
-                            params.height = maxHeight;
-                            bottomSheet.setLayoutParams(params);
-                        }
-                    }
-                }
-            }
-        });
+        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
     }
 
     private void showOwnerSharedFolder() {
@@ -1060,288 +907,180 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     @Override
     public void onClick(View v) {
+        if (node == null) {
+            logWarning("The selected node is NULL");
+            return;
+        }
 
-        switch(v.getId()){
+        ArrayList<Long> handleList = new ArrayList<>();
+        handleList.add(node.getHandle());
 
-            case R.id.option_download_layout:{
-                logDebug("Download option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
-                ArrayList<Long> handleList = new ArrayList<Long>();
-                handleList.add(node.getHandle());
+        Intent i;
+
+        switch (v.getId()) {
+            case R.id.option_download_layout:
                 nC.prepareForDownload(handleList, false);
                 break;
-            }
-            case R.id.option_offline_layout: {
-                if (node==null) {
-                    logWarning("The selected node is NULL");
-                    return;
-                }
+
+            case R.id.option_offline_layout:
                 if (availableOffline(context, node)) {
                     MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
                     removeFromOffline(mOffDelete);
-                }
-                else {
+                } else {
                     saveForOffline();
                 }
                 break;
-            }
-            case R.id.option_properties_layout:{
-                logDebug("Properties option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
-                Intent i = new Intent(context, FileInfoActivityLollipop.class);
-                i.putExtra("handle", node.getHandle());
 
-                if(drawerItem== ManagerActivityLollipop.DrawerItem.SHARED_ITEMS){
-                    if(((ManagerActivityLollipop) context).getTabItemShares()==0){
+            case R.id.option_properties_layout:
+                i = new Intent(context, FileInfoActivityLollipop.class);
+                i.putExtra(HANDLE, node.getHandle());
+
+                if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS) {
+                    if (((ManagerActivityLollipop) context).getTabItemShares() == 0) {
                         i.putExtra("from", FROM_INCOMING_SHARES);
-                        int dBT = ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming();
-                        if(dBT<=0){
-                            logDebug("First LEVEL is true: " + dBT);
-                            i.putExtra("firstLevel", true);
-                        }
-                        else{
-                            logDebug("First LEVEL is false: " + dBT);
-                            i.putExtra("firstLevel", false);
-                        }
+                        i.putExtra("firstLevel", ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming() <= 0);
                     } else if (((ManagerActivityLollipop) context).getTabItemShares() == 1) {
                         i.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
                     }
-                }
-                else if(drawerItem== ManagerActivityLollipop.DrawerItem.INBOX){
-                    if(((ManagerActivityLollipop) context).getTabItemShares()==0){
+                } else if (drawerItem == ManagerActivityLollipop.DrawerItem.INBOX) {
+                    if (((ManagerActivityLollipop) context).getTabItemShares() == 0) {
                         i.putExtra("from", FROM_INBOX);
                     }
-                }
-                else if (drawerItem == ManagerActivityLollipop.DrawerItem.SEARCH
+                } else if (drawerItem == ManagerActivityLollipop.DrawerItem.SEARCH
                         || (context instanceof ManagerActivityLollipop && ((ManagerActivityLollipop) context).isOnRecents())) {
-                    if (nC.nodeComesFromIncoming(node)){
+                    if (nC.nodeComesFromIncoming(node)) {
                         i.putExtra("from", FROM_INCOMING_SHARES);
                         int dBT = nC.getIncomingLevel(node);
-                        if(dBT<=0){
+                        if (dBT <= 0) {
                             i.putExtra("firstLevel", true);
-                        }
-                        else{
+                        } else {
                             i.putExtra("firstLevel", false);
                         }
                     }
                 }
-                i.putExtra("name", node.getName());
+                i.putExtra(NAME, node.getName());
 
-                ((ManagerActivityLollipop)context).startActivityForResult(i, REQUEST_CODE_FILE_INFO);
+                ((ManagerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_FILE_INFO);
                 dismissAllowingStateLoss();
                 break;
-            }
-            case R.id.option_link_layout:{
-                logDebug("Public link option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
+
+            case R.id.option_link_layout:
                 ((ManagerActivityLollipop) context).showGetLinkActivity(node.getHandle());
                 break;
-            }
-            case R.id.option_remove_link_layout:{
-                logDebug("REMOVE public link option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
+
+            case R.id.option_remove_link_layout:
                 ((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(node);
                 break;
-            }
-            case R.id.option_share_folder_layout:{
-                logDebug("Share option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
-                if(isOutShare(node)){
-                    Intent i = new Intent(context, FileContactListActivityLollipop.class);
-                    i.putExtra("name", node.getHandle());
+
+            case R.id.option_share_folder_layout:
+                if (isOutShare(node)) {
+                    i = new Intent(context, FileContactListActivityLollipop.class);
+                    i.putExtra(NAME, node.getHandle());
                     context.startActivity(i);
                     dismissAllowingStateLoss();
-                }
-                else{
+                } else {
                     nC.selectContactToShareFolder(node);
                     dismissAllowingStateLoss();
                 }
-
                 break;
-            }
-            case R.id.option_clear_share_layout:{
-                logDebug("Clear shares");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
+
+            case R.id.option_clear_share_layout:
                 ArrayList<MegaShare> shareList = megaApi.getOutShares(node);
                 ((ManagerActivityLollipop) context).showConfirmationRemoveAllSharingContacts(shareList, node);
                 break;
-            }
-            case R.id.option_leave_share_layout:{
-                logDebug("Leave share option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
+
+            case R.id.option_leave_share_layout:
                 ((ManagerActivityLollipop) context).showConfirmationLeaveIncomingShare(node);
                 break;
-            }
-            case R.id.option_send_chat_layout:{
-                logDebug("Send chat option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
+
+            case R.id.option_send_chat_layout:
                 nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
                 dismissAllowingStateLoss();
                 break;
-            }
-            case R.id.option_rename_layout:{
-                logDebug("Rename option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
+
+            case R.id.option_rename_layout:
                 ((ManagerActivityLollipop) context).showRenameDialog(node, node.getName());
 
                 break;
-            }
-            case R.id.option_move_layout:{
-                logDebug("Move option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
-                ArrayList<Long> handleList = new ArrayList<Long>();
-                handleList.add(node.getHandle());
+
+            case R.id.option_move_layout:
                 nC.chooseLocationToMoveNodes(handleList);
                 dismissAllowingStateLoss();
                 break;
-            }
-            case R.id.option_copy_layout:{
-                logDebug("Copy option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
-                ArrayList<Long> handleList = new ArrayList<Long>();
-                handleList.add(node.getHandle());
+
+            case R.id.option_copy_layout:
                 nC.chooseLocationToCopyNodes(handleList);
                 dismissAllowingStateLoss();
                 break;
-            }
-            case R.id.option_rubbish_bin_layout:{
-                logDebug("Move to rubbish option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
-                ArrayList<Long> handleList = new ArrayList<Long>();
-                handleList.add(node.getHandle());
+
+            case R.id.option_rubbish_bin_layout:
+            case R.id.option_remove_layout:
                 ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
                 break;
-            }
-            case R.id.option_remove_layout:{
-                logDebug("Remove option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
-                ArrayList<Long> handleList = new ArrayList<Long>();
-                handleList.add(node.getHandle());
-                ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
-                break;
-            }
-            case R.id.option_open_folder_layout:{
-                logDebug("Open folder option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
+
+            case R.id.option_open_folder_layout:
                 nC.openFolderFromSearch(node.getHandle());
                 dismissAllowingStateLoss();
                 break;
-            }
 
-            case R.id.option_open_with_layout:{
-                logDebug("Open with");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
-                UtilsModalBottomSheet.openWith(megaApi, context, node);
+            case R.id.option_open_with_layout:
+                openWith(node);
                 break;
-            }
-            case R.id.option_restore_layout:{
-                logDebug("Restore option");
-                if(node==null){
-                    logWarning("The selected node is NULL");
-                    return;
-                }
+
+            case R.id.option_restore_layout:
                 ((ManagerActivityLollipop) context).restoreFromRubbish(node);
-
                 break;
-            }
+
             case R.id.option_share_layout:
                 shareNode(context, node);
                 break;
         }
 
-        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-        mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        setStateBottomSheetBehaviorHidden();
     }
 
-    void refreshView () {
+    private void refreshView() {
         switch (drawerItem) {
             case CLOUD_DRIVE:
-            case RUBBISH_BIN: {
+            case RUBBISH_BIN:
                 ((ManagerActivityLollipop) context).onNodesCloudDriveUpdate();
                 break;
-            }
-            case INBOX: {
+
+            case INBOX:
                 ((ManagerActivityLollipop) context).onNodesInboxUpdate();
                 break;
-            }
-            case SHARED_ITEMS: {
+
+            case SHARED_ITEMS:
                 ((ManagerActivityLollipop) context).onNodesSharedUpdate();
                 break;
-            }
-            case SEARCH: {
+
+            case SEARCH:
                 ((ManagerActivityLollipop) context).onNodesSearchUpdate();
                 break;
-            }
         }
     }
 
-    void removeFromOffline (MegaOffline mOffDelete) {
+    private void removeFromOffline(MegaOffline mOffDelete) {
         removeOffline(mOffDelete, dbH, context);
-        refreshView ();
+        refreshView();
     }
 
-    void saveForOffline () {
+    private void saveForOffline() {
         int adapterType;
 
         switch (drawerItem) {
-            case INBOX: {
+            case INBOX:
                 adapterType = FROM_INBOX;
                 break;
-            }
-            case SHARED_ITEMS: {
+
+            case SHARED_ITEMS:
                 if (((ManagerActivityLollipop) context).getTabItemShares() == 0) {
                     adapterType = FROM_INCOMING_SHARES;
                     break;
                 }
-            }
-            default: {
+
+            default:
                 adapterType = FROM_OTHERS;
-            }
         }
 
         File offlineParent = getOfflineParentFile(context, adapterType, node, megaApi);
@@ -1366,29 +1105,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        logDebug("onAttach");
-        super.onAttach(activity);
-        this.context = activity;
-    }
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState){
-        logDebug("onSaveInstanceState");
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
-        logDebug("Handle of the node: " + handle);
-        outState.putLong("handle", handle);
-    }
-
-    public interface CustomHeight{
-        int getHeightToPanel(BottomSheetDialogFragment dialog);
+        outState.putLong(HANDLE, handle);
     }
 }

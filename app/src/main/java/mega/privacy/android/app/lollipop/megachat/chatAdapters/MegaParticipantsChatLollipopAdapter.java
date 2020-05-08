@@ -38,6 +38,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -397,48 +398,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderParticipantsList.userHandle = MegaApiAndroid.userHandleToBase64(participant.getHandle());
                 holderParticipantsList.fullName = participant.getFullName();
 
-                int userStatus;
-
-                if (megaChatApi.getMyUserHandle() == participant.getHandle()) {
-                    userStatus = megaChatApi.getOnlineStatus();
-                } else {
-                    userStatus = megaChatApi.getUserOnlineStatus(participant.getHandle());
-                }
-
-                holderParticipantsList.statusImage.setVisibility(View.VISIBLE);
-                holderParticipantsList.textViewContent.setVisibility(View.VISIBLE);
-
-                switch (userStatus) {
-                    case STATUS_ONLINE:
-                        holderParticipantsList.statusImage.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.circle_status_contact_online));
-                        holderParticipantsList.textViewContent.setText(groupChatInfoActivity.getString(R.string.online_status));
-                        break;
-
-                    case STATUS_AWAY:
-                        holderParticipantsList.statusImage.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.circle_status_contact_away));
-                        holderParticipantsList.textViewContent.setText(groupChatInfoActivity.getString(R.string.away_status));
-                        break;
-
-                    case STATUS_BUSY:
-                        holderParticipantsList.statusImage.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.circle_status_contact_busy));
-                        holderParticipantsList.textViewContent.setText(groupChatInfoActivity.getString(R.string.busy_status));
-                        break;
-
-                    case STATUS_OFFLINE:
-                        holderParticipantsList.statusImage.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.circle_status_contact_offline));
-                        holderParticipantsList.textViewContent.setText(groupChatInfoActivity.getString(R.string.offline_status));
-                        break;
-
-                    case STATUS_INVALID:
-                    default:
-                        holderParticipantsList.statusImage.setVisibility(View.GONE);
-                        holderParticipantsList.textViewContent.setVisibility(View.GONE);
-                }
-
-                if (userStatus != STATUS_ONLINE && userStatus != STATUS_BUSY && userStatus != STATUS_INVALID && !participant.getLastGreen().isEmpty()) {
-                    holderParticipantsList.textViewContent.setText(participant.getLastGreen());
-                    holderParticipantsList.textViewContent.isMarqueeIsNecessary(groupChatInfoActivity);
-                }
+                int userStatus = megaChatApi.getUserOnlineStatus(participant.getHandle());
+                setContactStatus(userStatus, ((ViewHolderParticipantsList) holder).statusImage, ((ViewHolderParticipantsList) holder).textViewContent);
+                setContactLastGreen(groupChatInfoActivity, userStatus, participant.getLastGreen(), ((ViewHolderParticipantsList) holder).textViewContent);
 
                 holderParticipantsList.textViewContactName.setText(holderParticipantsList.fullName);
                 holderParticipantsList.threeDotsLayout.setOnClickListener(this);

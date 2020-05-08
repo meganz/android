@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -101,6 +102,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
 
@@ -157,8 +159,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     DisplayMetrics outMetrics;
     DatabaseHandler dbH = null;
     MegaChatRoom chatRoom;
-
-    private ArrayList<Long> pendingPreviews = new ArrayList<>();
+    private HashMap<Long, Long> pendingPreviews = new HashMap<>();
 
     private class ChatVoiceClipAsyncTask extends AsyncTask<MegaNodeList, Void, Integer> {
         MegaChatLollipopAdapter.ViewHolderMessageChat holder;
@@ -205,9 +206,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         MegaChatLollipopAdapter.ViewHolderMessageChat holder;
         MegaNode node;
         Bitmap preview;
+        long msgId;
 
-        public ChatPreviewAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder) {
+        public ChatPreviewAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder, long msgId) {
             this.holder = holder;
+            this.msgId = msgId;
         }
 
         @Override
@@ -220,7 +223,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 previewCache.put(node.getHandle(), preview);
                 return 0;
             } else {
-                if (pendingPreviews.contains(node.getHandle())) {
+                if (pendingPreviews.containsKey(node.getHandle())) {
                     logDebug("The preview is already downloaded or added to the list");
                     return 1;
                 } else {
@@ -265,7 +268,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             } else if (param == 2) {
                 File previewFile = new File(getPreviewFolder(context), node.getBase64Handle() + ".jpg");
                 logDebug("GET PREVIEW OF HANDLE: " + node.getHandle() + " to download here: " + previewFile.getAbsolutePath());
-                pendingPreviews.add(node.getHandle());
+                pendingPreviews.put(node.getHandle(), msgId);
                 PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat) holder, megaChatAdapter, node);
                 megaApi.getPreview(node, previewFile.getAbsolutePath(), listener);
             }
@@ -278,10 +281,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         Bitmap preview;
         File cacheDir;
         File destination;
+        long msgId;
         MegaChatLollipopAdapter.ViewHolderMessageChat holder;
 
-        public ChatLocalPreviewAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder) {
+        public ChatLocalPreviewAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder, long msgId) {
             this.holder = holder;
+            this.msgId = msgId;
         }
 
         @Override
@@ -321,7 +326,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
 
-                if (pendingPreviews.contains(node.getHandle())) {
+                if (pendingPreviews.containsKey(node.getHandle())) {
                     logDebug("The image is already downloaded or added to the list");
                     return 1;
                 } else {
@@ -4650,7 +4655,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.forwardOwnLandscape.setVisibility(View.GONE);
                             }
                             try {
-                                new MegaChatLollipopAdapter.ChatPreviewAsyncTask(holder).execute(node);
+                                new MegaChatLollipopAdapter.ChatPreviewAsyncTask(holder, message.getMsgId()).execute(node);
                             } catch (Exception ex) {
                                 //Too many AsyncTasks
                                 logError("Too many AsyncTasks", ex);
@@ -4815,7 +4820,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.forwardOwnLandscape.setVisibility(View.GONE);
                             }
                             try {
-                                new MegaChatLollipopAdapter.ChatLocalPreviewAsyncTask(((ViewHolderMessageChat) holder)).execute(node);
+                                new MegaChatLollipopAdapter.ChatLocalPreviewAsyncTask(((ViewHolderMessageChat) holder), message.getMsgId()).execute(node);
 
                             } catch (Exception ex) {
                                 //Too many AsyncTasks
@@ -5100,7 +5105,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         } else {
                             try {
-                                new MegaChatLollipopAdapter.ChatPreviewAsyncTask(((ViewHolderMessageChat) holder)).execute(node);
+                                new MegaChatLollipopAdapter.ChatPreviewAsyncTask(holder, message.getMsgId()).execute(node);
 
                             } catch (Exception ex) {
                                 //Too many AsyncTasks
@@ -5118,7 +5123,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         } else {
 
                             try {
-                                new MegaChatLollipopAdapter.ChatLocalPreviewAsyncTask(((ViewHolderMessageChat) holder)).execute(node);
+                                new MegaChatLollipopAdapter.ChatLocalPreviewAsyncTask(holder, message.getMsgId()).execute(node);
 
                             } catch (Exception ex) {
                                 //Too many AsyncTasks
@@ -7121,10 +7126,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private void setPreview(long handle, MegaChatLollipopAdapter.ViewHolderMessageChat holder, MegaNode node) {
+    private void setPreview(long handle, MegaChatLollipopAdapter.ViewHolderMessageChat holder, MegaNode node, long msgId) {
         logDebug("handle: " + handle);
 
         if (holder != null) {
+            AndroidMegaChatMessage megaMessage = getMessageAt(holder.getCurrentPosition());
+
+            if(megaMessage == null || (msgId != INVALID_HANDLE && megaMessage.getMessage().getMsgId() != msgId))
+                return;
+
             File previewDir = getPreviewFolder(context);
             String base64 = MegaApiJava.handleToBase64(handle);
             File preview = new File(previewDir, base64 + ".jpg");
@@ -7640,9 +7650,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if (e.getErrorCode() == MegaError.API_OK) {
 
                     long handle = request.getNodeHandle();
-                    pendingPreviews.remove(handle);
+                    long msgId = INVALID_HANDLE;
+                    if(pendingPreviews.containsKey(handle)){
+                        msgId = pendingPreviews.get(handle);
+                        pendingPreviews.remove(handle);
+                    }
+                    setPreview(handle, holder, node, msgId);
 
-                    setPreview(handle, holder, node);
                 } else {
                     logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
                 }

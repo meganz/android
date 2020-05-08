@@ -88,7 +88,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 			return false;
 		}
-
 	}
 
 	public static OutgoingSharesFragmentLollipop newInstance() {
