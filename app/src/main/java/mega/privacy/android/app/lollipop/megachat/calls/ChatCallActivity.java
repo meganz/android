@@ -865,7 +865,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }else if(!lessThanSevenParticipants() && adapterList != null){
                     adapterList.updateAvatarImage(request.getEmail());
 
-                    if(chat != null && peerSelected != null && chat.getPeerEmailByHandle(peerSelected.getPeerId()).compareTo(request.getEmail()) == 0){
+                    if(chat != null && peerSelected != null && chat.getPeerEmailByHandle(peerSelected.getPeerId()) != null && chat.getPeerEmailByHandle(peerSelected.getPeerId()).compareTo(request.getEmail()) == 0){
                         File avatar = buildAvatarFile(this, request.getEmail() + ".jpg");
                         if(isFileAvailable(avatar) && avatar.exists() && avatar.length() > 0){
                             BitmapFactory.Options bOpts = new BitmapFactory.Options();
@@ -3146,13 +3146,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void checkParticipantChanges(boolean isAdded, int posRemoved, int posInserted) {
 
         logDebug("Checking for changes in the number of participants");
-        if ((lessThanSevenParticipants()  && adapterGrid == null) || (!lessThanSevenParticipants() && (adapterList == null || (isAdded && peersOnCall.size() == MIN_PEERS_LIST) || (!isAdded && peersOnCall.size() == MAX_PEERS_GRID)))) {
+        if ((lessThanSevenParticipants() && adapterGrid == null) ||
+                (lessThanSevenParticipants() && !isAdded && peersOnCall.size() == MAX_PEERS_GRID) ||
+                (!lessThanSevenParticipants() && adapterList == null) ||
+                (!lessThanSevenParticipants() && isAdded && peersOnCall.size() == MIN_PEERS_LIST)) {
             updateUI();
             return;
         }
 
-
         if (lessThanSevenParticipants()) {
+            recyclerView.getRecycledViewPool().clear();
             if (peersOnCall.size() < NECESSARY_CHANGE_OF_SIZES) {
                 if (isAdded) {
                     adapterGrid.notifyItemInserted(posInserted);
@@ -3187,6 +3190,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             adapterGrid.updateAvatarsPosition();
         } else {
             int posUpdated;
+            bigRecyclerView.getRecycledViewPool().clear();
             if (isAdded) {
                 posUpdated = posInserted - 1;
                 adapterList.notifyItemInserted(posUpdated);
@@ -3254,6 +3258,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 recyclerView.setAdapter(adapterGrid);
             } else {
                 logDebug("Notify of changes");
+                recyclerView.getRecycledViewPool().clear();
                 adapterGrid.notifyDataSetChanged();
                 adapterGrid.updateAvatarsPosition();
             }
@@ -3279,6 +3284,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 bigRecyclerView.setAdapter(adapterList);
             } else {
                 logDebug("Notify of changes");
+                bigRecyclerView.getRecycledViewPool().clear();
                 adapterList.notifyDataSetChanged();
                 adapterList.updateAvatarsPosition();
             }
