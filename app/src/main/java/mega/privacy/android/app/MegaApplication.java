@@ -233,9 +233,13 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 				logDebug("TYPE_FETCH_NODES");
 				if (e.getErrorCode() == MegaError.API_OK){
 					askForFullAccountInfo();
+					GetAttrUserListener listener = new GetAttrUserListener(getApplicationContext(), true);
 					if (dbH != null && dbH.getMyChatFilesFolderHandle() == INVALID_HANDLE) {
-						megaApi.getMyChatFilesFolder(new GetAttrUserListener(getApplicationContext(), true));
+						megaApi.getMyChatFilesFolder(listener);
 					}
+					//Ask for MU and CU folder when App in init state
+					megaApi.getCameraUploadsFolder(listener);
+					megaApi.getCameraUploadsFolderSecondary(listener);
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -1511,7 +1515,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     public void unregisterReceiver(BroadcastReceiver receiver) {
         super.unregisterReceiver(receiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(logoutReceiver);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 	}
 
     public static boolean isVerifySMSShowed() {

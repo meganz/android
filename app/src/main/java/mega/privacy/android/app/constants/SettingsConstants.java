@@ -12,6 +12,7 @@ public class SettingsConstants {
     public static final int REQUEST_MEGA_SECONDARY_MEDIA_FOLDER = 5000;
     public static final String KEY_SET_QUEUE_DIALOG = "KEY_SET_QUEUE_DIALOG";
     public static final String KEY_SET_QUEUE_SIZE = "KEY_SET_QUEUE_SIZE";
+    public final static String SELECTED_MEGA_FOLDER = "SELECT_MEGA_FOLDER";
 
     public static final int DEFAULT_CONVENTION_QUEUE_SIZE = 200;
 

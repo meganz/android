@@ -145,6 +145,7 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
@@ -240,6 +241,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
@@ -250,6 +252,7 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -918,6 +921,30 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
     };
 
+	private BroadcastReceiver receiverCUAttrChanged = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			synchronized (this){
+				long handleInUserAttr = intent.getLongExtra(EXTRA_NODE_HANDLE, -1);
+				boolean isSecondary = intent.getBooleanExtra(EXTRA_IS_CU_SECONDARY_FOLDER, false);
+				if (isSecondary && drawerItem == DrawerItem.MEDIA_UPLOADS) {
+					secondaryMediaUploadsClicked();
+				} else if (!isSecondary && drawerItem == DrawerItem.CAMERA_UPLOADS) {
+					cameraUploadsClicked();
+				}
+
+				//refresh settings if user is on that page
+				if (getSettingsFragment() != null) {
+					getSettingsFragment().setCUDestinationFolder(isSecondary, handleInUserAttr);
+				}
+
+				//update folder icon
+				onNodesCloudDriveUpdate();
+			}
+		}
+	};
+
 	private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -947,7 +974,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         public void onReceive(Context context,Intent intent) {
             try {
 				logDebug("cameraUploadLauncherReceiver: Start service here");
-                startCameraUploadService(ManagerActivityLollipop.this);
+                startCameraUploadServiceIgnoreAttr(ManagerActivityLollipop.this);
             } catch (Exception e) {
 				logError("cameraUploadLauncherReceiver: Exception", e);
             }
@@ -1926,6 +1953,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			localBroadcastManager.registerReceiver(networkReceiver,
 					new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+
+			localBroadcastManager.registerReceiver(receiverCUAttrChanged,
+					new IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE));
 
 			localBroadcastManager.registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
             localBroadcastManager.registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
@@ -4523,6 +4553,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatArchivedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
 
 		unregisterReceiver(cameraUploadLauncherReceiver);
 
@@ -5791,6 +5822,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 				if (muFLol == null) {
 					muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
+				} else {
+					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
 				}
 
 				replaceFragment(muFLol, FragmentTag.MEDIA_UPLOADS.getTag());
@@ -7425,9 +7458,41 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			refreshSearch();
 		}
 
+        checkCameraUploadFolder();
 		refreshRubbishBin();
 		setToolbarTitle();
 	}
+
+    private void checkCameraUploadFolder() {
+    	if (!CameraUploadsService.uploadingInProgress) return;
+
+        long primaryHandle = getPrimaryFolderHandle();
+        long secondaryHandle = getSecondaryFolderHandle();
+		MegaPreferences prefs = dbH.getPreferences();
+		boolean isSecondaryEnabled = false;
+		if(prefs != null) {
+			isSecondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
+		}
+        boolean isPrimaryFolderInRubbish = isNodeInRubbish(primaryHandle);
+        boolean isSecondaryFolderInRubbish = isSecondaryEnabled && isNodeInRubbish(secondaryHandle);
+
+        if (isSecondaryFolderInRubbish && !isPrimaryFolderInRubbish) {
+			logDebug("MU folder is deleted, backup settings and disable MU.");
+			backupTimestampsAndFolderHandle();
+			disableMediaUploadProcess();
+			if (getSettingsFragment() != null) {
+				sttFLol.disableMediaUploadUIProcess();
+
+			}
+		} else if (isPrimaryFolderInRubbish) {
+			logDebug("CU folder is deleted, backup settings and disable CU.");
+			backupTimestampsAndFolderHandle();
+			disableCameraUploadSettingProcess(false);
+			if (getSettingsFragment() != null) {
+				sttFLol.disableCameraUploadUIProcess();
+			}
+		}
+    }
 
 	public void refreshRubbishBin () {
 		rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
@@ -8283,7 +8348,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if(handleList!=null){
 
 			if (handleList.size() > 0){
-				MegaNode p = megaApi.getNodeByHandle(handleList.get(0));
+				Long handle = handleList.get(0);
+				MegaNode p = megaApi.getNodeByHandle(handle);
 				while (megaApi.getParentNode(p) != null){
 					p = megaApi.getParentNode(p);
 				}
@@ -8292,7 +8358,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setMoveToRubbish(true);
 
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+					if (getPrimaryFolderHandle() == handle && CameraUploadsService.isServiceRunning) {
+						builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
+					} else if (getSecondaryFolderHandle() == handle && CameraUploadsService.isServiceRunning) {
+						builder.setMessage(R.string.confirmation_move_mu_folder_to_rubbish);
+					} else {
+						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+					}
 
 					builder.setPositiveButton(R.string.general_move, dialogClickListener);
 					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
@@ -14693,6 +14765,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		onNodesSharedUpdate();
 
 		onNodesInboxUpdate();
+
+		checkCameraUploadFolder();
 
 		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 		if (cuFL != null){
