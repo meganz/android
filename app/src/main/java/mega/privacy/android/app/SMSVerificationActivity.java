@@ -327,16 +327,18 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     }
     
     private void validateFields() {
-        //validate phone number
-        String phoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumberInput.getText().toString(),selectedCountryCode);
-        if(phoneNumber != null){
+        String inputPhoneNumber = phoneNumberInput.getText().toString();
+        logDebug("Generate normalized number for [" + inputPhoneNumber + "] with country code: " + selectedCountryCode);
+        String phoneNumber = PhoneNumberUtils.formatNumberToE164(inputPhoneNumber, selectedCountryCode);
+        // a valid normalized phone number must start with "+".
+        if(phoneNumber != null && phoneNumber.startsWith("+")){
             isPhoneNumberValid = true;
         }else{
             phoneNumberInput.setHint("");
             isPhoneNumberValid = false;
         }
 
-        isSelectedCountryValid = selectedDialCode != null && selectedDialCode.length() >= 3;
+        isSelectedCountryValid = selectedDialCode != null;
         
         logDebug("isSelectedCountryValid: " + isSelectedCountryValid + " , isPhoneNumberValid: " + isPhoneNumberValid);
     }

@@ -533,8 +533,8 @@
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">フィードバック、ありがとうございます。本当に、MEGA 定期契約をキャンセルしてしまうのですか？</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">あなたのサブスクリプションはキャンセルされていません。キャンセルの理由をご入力ください</string>
     <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">%1$s %2$sをご契約いただきありがとうございます！</string>
-    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">New subscription takes effect when the old one expires, and the new price will be charged at the same time.</string>
-    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Subscription will take effect when payment get processed by Google.</string>
+    <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">現在のサブスクリプションの有効期限が切れると、新しいサブスクリプションが有効になり、その時点で新しい価格が請求されます。</string>
+    <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">サブスクリプションは、お支払いがGoogleによって処理されると有効になります。</string>
     <string name="subscription_type_monthly" context="">月ごと</string>
     <string name="subscription_type_yearly" context="">年間</string>
 
@@ -790,7 +790,7 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未設定</string>
-    <string name="settings_reset_lock_code" context="settings of the pin lock">PINコードをリセット</string>
+    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">PINを変更</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN ロック</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">入力</string>
@@ -1369,7 +1369,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]/%2$s[/A]</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">「オフライン用に保存されました」から削除しますか？　</string>
+    <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">オフラインから削除しますか？　</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">ステータスの設定</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">終了する</string>
@@ -2354,8 +2354,8 @@
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">支払い方法選択</string>
 
     <string name="billing_period_title" context="title of billing period">お支払い請求期間</string>
-    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]One-off (month)[/A] %s</string>
-    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]One-off (year)[/A] %s</string>
+    <string name="billed_one_off_month" context="Option of one-off (month) billing. Placeholder: purchase price.">[A]1回限り（月）[/A] %s</string>
+    <string name="billed_one_off_year" context="Option of one-off (year) billing. Placeholder: purchase price.">[A]1回限り（年）[/A] %s</string>
     <string name="billed_monthly_text" context="Option of monthly billing period. Placeholder: purchase price">[A]毎月[/A]%s/月</string>
     <string name="billed_yearly_text" context="Option of yearly billing period. Placeholder: purchase price">[A]年間[/A] %s/年</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">キャンセルする</string>
@@ -2367,7 +2367,7 @@
     <string name="payment_method_centili" context="one of the payment methods">[A]モバイルキャリア[/A]（一回限り）</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">新</string>
-    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">あなたの現在のサブスクリプションからアップグレードするには、[A]カスタムプラン[/A]用にサポートにお問い合わせください。</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">あなたの現在のサブスクリプションをアップグレードするには、[A]カスタムプラン[/A]用にサポートにお問い合わせください。</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">ファイル名</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">最終ログインを表示&#8230;</string>
@@ -2419,7 +2419,7 @@
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">チャットリンクをクリップボードにコピーしました</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]月[/A] / %s [A]から[/A] *</string>
-    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">[A]From[/A] %s per user / [A]month[/A] *</string>
+    <string name="type_business_month" context="Label to show the price of business plan in the upgrade account section">%s[A]から[/A]（1ユーザー/[A]月[/A]）*</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* 自動更新のサブスクリプションは、更新日の前にいつでもキャンセルできます</string>
     <string name="call_started_messages" context="Message shown when a call starts.">通話が開始しました</string>
 
@@ -2435,9 +2435,9 @@
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">カメラを有効にする</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">あなたのカメラへのアクセスを許可して、ドキュメントのスキャン、写真の撮影、ビデオ通話を行います。</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">通話を有効にする</string>
-    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">連絡先へのアクセスを有効にする</string>
-    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">Easily discover contacts from your address book on MEGA.</string>
-    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGA will not use this data for any other purpose and will never interact with your contacts without your consent.</string>
+    <string name="allow_acces_contact_title" cotext="Title of the screen asking permissions for contacts">アドレス帳へのアクセスを許可する</string>
+    <string name="allow_acces_contact_subtitle" context="Subtitle of the screen asking permissions for contacts">MEGAのあなたのアドレス帳から連絡先を簡単に見つけます。</string>
+    <string name="allow_access_contact_explanation" context="Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose">MEGAはこのデータを他の目的に使用せず、あなたの同意なしにあなたの連絡先とやり取りすることは絶対にございません。</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">あなたのマイクへのアクセスを許可して、暗号化通話を行います。</string>
     <string name="general_enable_access" context="General enable access">アクセスを許可</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">共有ファイル</string>
@@ -2495,7 +2495,7 @@
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
     <string name="on_permanently_denied" context="After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings.">端末の設定でいつでもMEGAに権限を付与できます</string>
-    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">If you allow MEGA to access your contacts, you will be able to see which of them have MEGA accounts. MEGA won’t contact them.</string>
+    <string name="explanation_for_contacts_permission" context="Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission.">MEGAにアドレス帳へのアクセスを許可すると、あなたの連絡先をより簡単に見つけることができます。MEGAはこのデータを他の目的に使用せず、あなたの同意なしにあなたの連絡先とやり取りすることは絶対にございません。</string>
 
     <plurals name="messages_forwarded_success_plural" formatted="false">
         <item context="Confirmation message after forwarding one or several messages, version item" quantity="one">転送済みメッセージ</item>
@@ -2526,7 +2526,7 @@
     </plurals>
     <string name="no_local_contacts_on_mega" context="Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account.">連絡先を今すぐ招待しますか？</string>
     <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">すでにMEGAにいる人を確認</string>
-    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">Grant MEGA access to your address book to discover your contacts on MEGA.</string>
+    <string name="grant_mega_access_contacts" context="In APP, text used to ask for access to contacts">MEGAにアドレス帳へのアクセスを許可して、MEGAの連絡先を見つけます。</string>
     <string name="get_registered_contacts" context="Getting registered contacts">MEGAにいる連絡先を読み込んでいます&#8230;</string>
 
 
@@ -2676,20 +2676,20 @@
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">ローディング</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">しばらくお待ちください&#8230;</string>
 
-    <string name="account_label" context="Head label to show the business account type">Account type</string>
+    <string name="account_label" context="Head label to show the business account type">アカウントタイプ</string>
     <string name="business_label" context="Label in My Account section to show user account type">ビジネス</string>
     <string name="admin_label" context="Business user role">管理者</string>
     <string name="user_label" context="Business user role">ユーザー</string>
     <string name="status_label" context="General label to show the status of something or someone">ステータス</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">ログイン有効</string>
     <string name="grace_label" context="State to indicate a business account is in grace period">猶予期間</string>
-    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">User management is only available in a desktop web browser.</string>
+    <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">ユーザー管理は、デスクトップウェブブラウザからのみご利用いただけます。</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">ご利用内容</string>
-    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">Usage storage details</string>
+    <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">ストレージ使用状況詳細</string>
     <string name="overall_usage_label" context="Title of overall usage section in Storage">全体的な使用状況</string>
     <string name="transfer_label" context="Title of transfer section in Storage">転送</string>
 
-    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">You cannot remove %1$s as a contact as they are part of your Business account.</string>
+    <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">%1$sさんはあなたのビジネスアカウントの一部であるため、連絡先から削除できません。</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">最後のお支払いに問題がございました。詳細については、デスクトップブラウザを使用してMEGAにアクセスしてください。</string>
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">あなたのビジネスアカウントは期限切れです</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">お支払いの処理中に問題が発生しました。MEGAは、この問題がデスクトップウェブブラウザで修正されるまで、表示のみに制限されています。</string>
@@ -2697,8 +2697,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGAはあなたのデータにアクセスしませんが、貴組織の管理者様は、あなたのユーザーアカウントのカメラアップロードを管理し、表示することができます。</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">ちょと、うまく行かなかったようです。</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">あなたのビジネスアカウント管理者に連絡して問題を解決し、あなたのアカウントを有効にしてください。</string>
-    <string name="business_account_clarification" context="">** For genuine business purposes.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep the placeholder is to indicate if the space is refered to storage or transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">UNLIMITED [A]%1$s[/A] **</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** 本物のビジネス目的用。</string>
+    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">無制限[A]ストレージ[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">無制限[A]転送容量[/A] **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">ログアウトすると、あなたのオフラインセクションのファイルはお使いの端末から削除されます。</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">ログアウトすると、現在進行中の転送はキャンセルされます。</string>
@@ -2731,7 +2732,7 @@
     <string name="create_new_file_action" context="Text shown for the action create new file">新規ファイルを作成</string>
     <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">許可エラー</string>
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">このファイルを元に戻すために必要な権限がありません。続行するために、復元されたデータを使用して新しいファイルを作成できます。続行しますか？</string>
-    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Version created as a new file successfully.</string>
+    <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">バージョンは新しいファイルとして正常に作成されました。</string>
 
     <string name="download_location" context="Download location label">ダウンロード先</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">常にこの場所に保存しますか？</string>
