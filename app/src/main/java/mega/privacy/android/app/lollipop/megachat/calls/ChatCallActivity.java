@@ -353,12 +353,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     protected void onNewIntent(Intent intent){
         super.onNewIntent(intent);
+        logDebug("onNewIntent ");
         Bundle extras = intent.getExtras();
         logDebug("Action: " + getIntent().getAction());
-        if (extras == null) return;
+        if (extras == null)
+            return;
 
         long newChatId = extras.getLong(CHAT_ID, -1);
-        if (megaChatApi == null) return;
+        if (megaChatApi == null)
+            return;
 
         if (chatId != -1 && chatId == newChatId) {
             logDebug("Same calls");
@@ -384,15 +387,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
             if (chatIdReceived != getCurrentChatid()) {
                 logWarning("Call in different chat");
-                long callIdReceived = intent.getLongExtra(UPDATE_CALL_ID, -1);
-                if (callIdReceived != callChat.getId() && (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) || intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD))) {
+                long callIdReceived = intent.getLongExtra(UPDATE_CALL_ID, INVALID_CALL);
+                if (callChat != null && callIdReceived != callChat.getId() && (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) || intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD))) {
                     checkAnotherCallOnHold();
                 }
                 return;
             }
 
             long callIdReceived  = intent.getLongExtra(UPDATE_CALL_ID, -1);
-            if (callIdReceived  == -1 || callIdReceived  != callChat.getId()) {
+            if (callChat == null || callIdReceived  == INVALID_CALL || callIdReceived  != callChat.getId()) {
                 logWarning("Call recovered is incorrect");
                 return;
             }
@@ -1298,7 +1301,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 break;
 
             case R.id.another_call_on_hold_layout:
-                returnToAnotherCallOnHold();
+                returnToAnotherCallOnHold(getAnotherCallOnHold(callChat.getId()));
                 break;
 
             case R.id.video_fab:
@@ -1342,8 +1345,13 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
             case R.id.on_hold_fab:
                 logDebug("Click on call on hold fab");
-                megaChatApi.setCallOnHold(chatId, !callChat.isOnHold(), this);
-                sendSignalPresence();
+                MegaChatCall callOnHold = getAnotherCallOnHold(callChat.getId());
+                if (callOnHold == null) {
+                    megaChatApi.setCallOnHold(chatId, !callChat.isOnHold(), this);
+                    sendSignalPresence();
+                } else {
+                    returnToAnotherCallOnHold(callOnHold);
+                }
                 break;
 
             case R.id.reject_fab:
@@ -1736,8 +1744,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     /**
      * Method for returning to a call on hold and activating it. The call will be put on hold.
      */
-    private void returnToAnotherCallOnHold(){
-        MegaChatCall callOnHold = getAnotherCallOnHold(callChat.getId());
+    private void returnToAnotherCallOnHold(MegaChatCall callOnHold){
         if(callOnHold == null){
             logWarning("There is no other call on hold");
             return;
@@ -1772,6 +1779,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     private void updateAnotherCallOnHoldbar(MegaChatCall callOnHold){
         if(callOnHold != null){
+            activateChrono(false, anotherCallOnHoldChrono, callOnHold);
             activateChrono(true, anotherCallOnHoldChrono, callOnHold);
             anotherCallOnHoldLayout.setVisibility(View.VISIBLE);
 

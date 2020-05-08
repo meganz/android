@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -31,10 +32,10 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.getNicknameContact;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
+import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -79,22 +80,44 @@ public class CallUtil {
      * @return A long data type. It's the id of chat.
      */
     public static long getChatCallInProgress() {
+        ArrayList<Long> listCalls = new ArrayList<>();
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
         if (listCallsRequestSent != null && listCallsRequestSent.size() > 0) {
-            return listCallsRequestSent.get(0);
+            for(int i = 0; i < listCallsRequestSent.size(); i++){
+                listCalls.add(listCallsRequestSent.get(i));
+            }
         }
 
         MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
         if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
-            return listCallsInProgress.get(0);
+            for(int i = 0; i < listCallsInProgress.size(); i++){
+                listCalls.add(listCallsInProgress.get(i));
+            }
+        }
+        MegaHandleList listCallsJoining = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_JOINING);
+        if (listCallsJoining != null && listCallsJoining.size() > 0) {
+            for(int i = 0; i < listCallsJoining.size(); i++){
+                listCalls.add(listCallsJoining.get(i));
+            }
         }
 
         MegaHandleList listCallsInReconnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RECONNECTING);
         if (listCallsInReconnecting != null && listCallsInReconnecting.size() > 0) {
-            return listCallsInReconnecting.get(0);
+            for(int i = 0; i < listCallsInReconnecting.size(); i++){
+                listCalls.add(listCallsInReconnecting.get(i));
+            }
         }
-        return -1;
+
+        if (!listCalls.isEmpty()) {
+            for (Long idChat : listCalls) {
+                if (!megaChatApi.getChatCall(idChat).isOnHold()) {
+                    return idChat;
+                }
+            }
+        }
+
+        return INVALID_CALL;
     }
 
     /**
@@ -104,15 +127,14 @@ public class CallUtil {
      */
     public static void returnCall(Context context) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (megaChatApi.getChatCall(getChatCallInProgress()) == null)
+        MegaChatCall call = megaChatApi.getChatCall(getChatCallInProgress());
+        if (call == null)
             return;
 
-        long chatId = getChatCallInProgress();
-        MegaChatCall call = megaChatApi.getChatCall(chatId);
         MegaApplication.setShowPinScreen(false);
         Intent intent = new Intent(context, ChatCallActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(CHAT_ID, chatId);
+        intent.putExtra(CHAT_ID, call.getChatid());
         intent.putExtra(CALL_ID, call.getId());
         context.startActivity(intent);
     }
@@ -130,11 +152,30 @@ public class CallUtil {
         if (callInProgressLayout == null){
             return;
         }
+        ArrayList<Long> currentChatCallsList = getCallsParticipating();
 
-        if (!participatingInACall()) {
+        if (!participatingInACall() || currentChatCallsList == null) {
             callInProgressLayout.setVisibility(View.GONE);
             activateChrono(false, callInProgressChrono, null);
             return;
+        }
+
+        if (currentChatCallsList != null) {
+            ArrayList<MegaChatCall> callsActive = new ArrayList<>();
+
+            for (Long chatIdCall : currentChatCallsList) {
+                MegaChatCall current = megaChatApi.getChatCall(chatIdCall);
+                if (current != null) {
+                    if (!current.isOnHold()) {
+                        callsActive.add(current);
+                    }
+                }
+            }
+            if (callsActive.isEmpty()) {
+                callInProgressLayout.setVisibility(View.GONE);
+                activateChrono(false, callInProgressChrono, null);
+                return;
+            }
         }
 
         long chatId = getChatCallInProgress();
@@ -546,5 +587,46 @@ public class CallUtil {
         }
 
         return null;
+    }
+
+    /**
+     * Retrieve the calls I'm participating in.
+     *
+     * @return The list of chats IDs with call.
+     */
+    public static ArrayList<Long> getCallsParticipating() {
+        ArrayList<Long> listCalls = new ArrayList<>();
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
+        if (listCallsRequestSent != null && listCallsRequestSent.size() > 0) {
+            for(int i = 0; i < listCallsRequestSent.size(); i++){
+                listCalls.add(listCallsRequestSent.get(i));
+            }
+        }
+
+        MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
+        if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
+            for(int i = 0; i < listCallsInProgress.size(); i++){
+                listCalls.add(listCallsInProgress.get(i));
+            }
+        }
+        MegaHandleList listCallsJoining = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_JOINING);
+        if (listCallsJoining != null && listCallsJoining.size() > 0) {
+            for(int i = 0; i < listCallsJoining.size(); i++){
+                listCalls.add(listCallsJoining.get(i));
+            }
+        }
+
+        MegaHandleList listCallsInReconnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RECONNECTING);
+        if (listCallsInReconnecting != null && listCallsInReconnecting.size() > 0) {
+            for(int i = 0; i < listCallsInReconnecting.size(); i++){
+                listCalls.add(listCallsInReconnecting.get(i));
+            }
+        }
+
+        if (listCalls.isEmpty())
+            return null;
+
+        return listCalls;
     }
 }

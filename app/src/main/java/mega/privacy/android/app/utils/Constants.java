@@ -420,12 +420,13 @@ public class Constants {
     public static final int CHAT_LINK = 202;
     public static final int CONTACT_LINK = 203;
     public static final int ERROR_LINK = -1;
+    public static final int INVALID_CALL = -1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String CHAT_ID = "chatHandle";
     public static final String CALL_ID = "callId";
-    public static final String CHAT_ID_IN_PROGRESS = "chatHandleInProgress";
-    public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
+    public static final String CHAT_ID_OF_CURRENT_CALL = "chatHandleInProgress";
+    public static final String CHAT_ID_OF_INCOMING_CALL = "chatHandleToAnswer";
     public static final String SECOND_CALL = "SECOND_CALL";
     public static final String PEER_ID = "peerId";
     public static final String CLIENT_ID = "clientId";

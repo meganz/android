@@ -1273,6 +1273,14 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 						break;
 				}
 			}
+
+			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
+				if (isScreenInPortrait(ManagerActivityLollipop.this)) {
+					setCallWidget();
+				} else {
+					supportInvalidateOptionsMenu();
+				}
+			}
 		}
 	};
 
@@ -1924,6 +1932,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 			IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
 			filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
+			filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
 			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));

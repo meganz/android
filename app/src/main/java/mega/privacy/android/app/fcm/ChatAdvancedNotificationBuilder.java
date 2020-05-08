@@ -783,9 +783,134 @@ public final class ChatAdvancedNotificationBuilder {
         return fullName;
     }
 
+    /**
+     * Method for knowing which buttons need to be displayed in notifications.
+     *
+     * @param isGroup True, if the incoming call is a group call. False, if the incoming call is a individual call.
+     * @return The list of buttons to be displayed.
+     */
+    private ArrayList<String> getNecessaryButtons(boolean isGroup) {
+        ArrayList<String> buttons = new ArrayList<>();
+        ArrayList<Long> currentCalls = getCallsParticipating();
+
+        if (participatingInACall() && currentCalls != null) {
+
+            ArrayList<MegaChatCall> callsOnHold = new ArrayList<>();
+            ArrayList<MegaChatCall> callsActive = new ArrayList<>();
+            for (Long currentCall : currentCalls) {
+                MegaChatCall current = megaChatApi.getChatCall(currentCall);
+                if (current != null) {
+                    if (current.isOnHold()) {
+                        callsOnHold.add(current);
+                    } else {
+                        callsActive.add(current);
+                    }
+                }
+            }
+
+            if ((!callsActive.isEmpty() && callsOnHold.isEmpty()) || (callsActive.isEmpty() && !callsOnHold.isEmpty())) {
+                if (!isGroup) {
+                    buttons.add(CallNotificationIntentService.DECLINE);
+                    buttons.add(CallNotificationIntentService.HOLD_ANSWER);
+                    buttons.add(CallNotificationIntentService.END_ANSWER);
+                    return buttons;
+                }
+
+                buttons.add(CallNotificationIntentService.IGNORE);
+                buttons.add(CallNotificationIntentService.HOLD_JOIN);
+                buttons.add(CallNotificationIntentService.END_JOIN);
+                return buttons;
+            }
+
+            if (!callsActive.isEmpty() && !callsOnHold.isEmpty()) {
+                if (!isGroup) {
+                    buttons.add(CallNotificationIntentService.DECLINE);
+                    buttons.add(CallNotificationIntentService.END_ANSWER);
+                    return buttons;
+                }
+
+                buttons.add(CallNotificationIntentService.IGNORE);
+                buttons.add(CallNotificationIntentService.END_JOIN);
+                return buttons;
+            }
+        }
+
+        if (isGroup) {
+            buttons.add(CallNotificationIntentService.DECLINE);
+            buttons.add(CallNotificationIntentService.ANSWER);
+            return buttons;
+        }
+
+        buttons.add(CallNotificationIntentService.IGNORE);
+        buttons.add(CallNotificationIntentService.ANSWER);
+        return buttons;
+    }
+
+    /**
+     * Method for obtaining the number of request required.
+     *
+     * @param type Type of button.
+     * @return Number of request needed.
+     */
+    private int getNumberRequestNotifications(String type) {
+        switch (type) {
+            case CallNotificationIntentService.ANSWER:
+            case CallNotificationIntentService.HOLD_ANSWER:
+            case CallNotificationIntentService.HOLD_JOIN:
+            case CallNotificationIntentService.END_ANSWER:
+            case CallNotificationIntentService.END_JOIN:
+                return 2;
+            default:
+                return 1;
+        }
+    }
+
+    /**
+     * Method to create the necessary actions depending on the buttons.
+     *
+     * @param chatHandleInProgress Chat ID of current call.
+     * @param chatCallToAnswer     Chat ID of incoming call.
+     * @param notificationId       Notification ID.
+     * @param type                 Type of button.
+     * @return The action created.
+     */
+    private NotificationCompat.Action createNeccessaryAction(long chatHandleInProgress, long chatCallToAnswer, int notificationId, String type) {
+        Intent intent = new Intent(context, CallNotificationIntentService.class);
+        intent.putExtra(CHAT_ID_OF_CURRENT_CALL, chatHandleInProgress);
+        intent.putExtra(CHAT_ID_OF_INCOMING_CALL, chatCallToAnswer);
+        intent.setAction(type);
+        int requestCode = notificationId + getNumberRequestNotifications(type);
+        PendingIntent pendingIntent = PendingIntent.getService(context, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        NotificationCompat.Action action = null;
+        switch (type) {
+            case CallNotificationIntentService.ANSWER:
+                action = new NotificationCompat.Action.Builder(R.drawable.ic_call_filled, context.getString(R.string.answer_call_incoming).toUpperCase(), pendingIntent).build();
+                break;
+            case CallNotificationIntentService.DECLINE:
+                action = new NotificationCompat.Action.Builder(R.drawable.ic_remove_not, context.getString(R.string.contact_decline).toUpperCase(), pendingIntent).build();
+                break;
+            case CallNotificationIntentService.IGNORE:
+                action = new NotificationCompat.Action.Builder(R.drawable.ic_remove_not, context.getString(R.string.ignore_call_incoming).toUpperCase(), pendingIntent).build();
+                break;
+            case CallNotificationIntentService.HOLD_ANSWER:
+                action = new NotificationCompat.Action.Builder(R.drawable.ic_transfers_pause, context.getString(R.string.hold_and_answer_call_incoming).toUpperCase(), pendingIntent).build();
+                break;
+            case CallNotificationIntentService.HOLD_JOIN:
+                action = new NotificationCompat.Action.Builder(R.drawable.ic_transfers_pause, context.getString(R.string.hold_and_join_call_incoming).toUpperCase(), pendingIntent).build();
+                break;
+            case CallNotificationIntentService.END_ANSWER:
+                action = new NotificationCompat.Action.Builder(R.drawable.ic_remove_not, context.getString(R.string.end_and_answer_call_incoming).toUpperCase(), pendingIntent).build();
+                break;
+            case CallNotificationIntentService.END_JOIN:
+                action = new NotificationCompat.Action.Builder(R.drawable.ic_remove_not, context.getString(R.string.end_and_join_call_incoming).toUpperCase(), pendingIntent).build();
+                break;
+        }
+
+        return action;
+    }
+
     public void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
-        logDebug("Call to answer ID: " + callToAnswer.getChatid() +
-                ", Call in progress ID: " + callInProgress.getChatid());
+        logDebug("Call to answer ID: " + callToAnswer.getChatid() + ", Call in progress ID: " + callInProgress.getChatid());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1){
             MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(callToAnswer.getChatid());
@@ -799,28 +924,24 @@ public final class ChatAdvancedNotificationBuilder {
 //        int notificationId = NOTIFICATION_INCOMING_CALL;
             long chatCallId = callToAnswer.getId();
             String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
+
             int notificationId = (notificationCallId).hashCode();
 
             Intent ignoreIntent = new Intent(context, CallNotificationIntentService.class);
-            ignoreIntent.putExtra(CHAT_ID_IN_PROGRESS, chatHandleInProgress);
-            ignoreIntent.putExtra(CHAT_ID_TO_ANSWER, callToAnswer.getChatid());
+            ignoreIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, chatHandleInProgress);
+            ignoreIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
             ignoreIntent.setAction(CallNotificationIntentService.IGNORE);
             int requestCodeIgnore = notificationId + 1;
             PendingIntent pendingIntentIgnore = PendingIntent.getService(context, requestCodeIgnore, ignoreIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
-            Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
-            answerIntent.putExtra(CHAT_ID_IN_PROGRESS, chatHandleInProgress);
-            answerIntent.putExtra(CHAT_ID_TO_ANSWER, callToAnswer.getChatid());
-            answerIntent.setAction(CallNotificationIntentService.ANSWER);
-            int requestCodeAnswer = notificationId + 2;
-            PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer /* Request code */, answerIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
+            ArrayList<String> types = getNecessaryButtons(chatToAnswer.isGroup());
+            ArrayList<NotificationCompat.Action> actions = new ArrayList<>();
 
-            NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(R.drawable.ic_call_filled, context.getString(R.string.answer_call_incoming).toUpperCase(), pendingIntentAnswer).build();
-            NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(R.drawable.ic_remove_not, context.getString(R.string.ignore_call_incoming).toUpperCase(), pendingIntentIgnore).build();
+            for(String type:types){
+                actions.add(createNeccessaryAction(chatHandleInProgress,callToAnswer.getChatid(),notificationId, type));
+            }
 
             long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
-
-
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                 logDebug("Oreo");
@@ -837,17 +958,32 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationManager.createNotificationChannel(channel);
 
                 NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
-                notificationBuilderO
-                        .setSmallIcon(R.drawable.ic_stat_notify)
-                        .setContentText(context.getString(R.string.notification_subtitle_incoming))
-                        .setAutoCancel(false)
-                        .setContentIntent(null)
-                        .setVibrate(pattern)
-                        .addAction(actionAnswer)
-                        .addAction(actionIgnore)
-                        .setDeleteIntent(pendingIntentIgnore)
-                        .setColor(ContextCompat.getColor(context, R.color.mega))
-                        .setPriority(NotificationManager.IMPORTANCE_HIGH);
+                if(actions.size() == 3){
+                    notificationBuilderO
+                            .setSmallIcon(R.drawable.ic_stat_notify)
+                            .setContentText(context.getString(R.string.notification_subtitle_incoming))
+                            .setAutoCancel(false)
+                            .setContentIntent(null)
+                            .setVibrate(pattern)
+                            .addAction(actions.get(0))
+                            .addAction(actions.get(1))
+                            .addAction(actions.get(2))
+                            .setDeleteIntent(pendingIntentIgnore)
+                            .setColor(ContextCompat.getColor(context, R.color.mega))
+                            .setPriority(NotificationManager.IMPORTANCE_HIGH);
+                }else{
+                    notificationBuilderO
+                            .setSmallIcon(R.drawable.ic_stat_notify)
+                            .setContentText(context.getString(R.string.notification_subtitle_incoming))
+                            .setAutoCancel(false)
+                            .setContentIntent(null)
+                            .setVibrate(pattern)
+                            .addAction(actions.get(0))
+                            .addAction(actions.get(1))
+                            .setDeleteIntent(pendingIntentIgnore)
+                            .setColor(ContextCompat.getColor(context, R.color.mega))
+                            .setPriority(NotificationManager.IMPORTANCE_HIGH);
+                }
 
                 if(chatToAnswer.isGroup()){
                     notificationBuilderO.setContentTitle(chatToAnswer.getTitle());
@@ -869,14 +1005,26 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
-                notificationBuilder
-                        .setSmallIcon(R.drawable.ic_stat_notify)
-                        .setContentText(context.getString(R.string.notification_subtitle_incoming))
-                        .setAutoCancel(false)
-                        .setContentIntent(null)
-                        .addAction(actionAnswer)
-                        .addAction(actionIgnore)
-                        .setDeleteIntent(pendingIntentIgnore);
+                if(actions.size() == 3){
+                    notificationBuilder
+                            .setSmallIcon(R.drawable.ic_stat_notify)
+                            .setContentText(context.getString(R.string.notification_subtitle_incoming))
+                            .setAutoCancel(false)
+                            .setContentIntent(null)
+                            .addAction(actions.get(0))
+                            .addAction(actions.get(1))
+                            .addAction(actions.get(2))
+                            .setDeleteIntent(pendingIntentIgnore);
+                }else{
+                    notificationBuilder
+                            .setSmallIcon(R.drawable.ic_stat_notify)
+                            .setContentText(context.getString(R.string.notification_subtitle_incoming))
+                            .setAutoCancel(false)
+                            .setContentIntent(null)
+                            .addAction(actions.get(0))
+                            .addAction(actions.get(1))
+                            .setDeleteIntent(pendingIntentIgnore);
+                }
 
                 if(chatToAnswer.isGroup()){
                     notificationBuilder.setContentTitle(chatToAnswer.getTitle());
