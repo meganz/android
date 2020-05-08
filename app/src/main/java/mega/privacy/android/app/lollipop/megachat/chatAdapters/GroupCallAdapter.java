@@ -31,7 +31,6 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 
-import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -47,7 +46,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     private static final int SIZE_MUTE_ICON_SMALL = 15;
     private static final int SIZE_MUTE_ICON_LARGE = 24;
     private static final int MIN_USERS_GRID = 7;
-    private static final int MARGIN_BUTTONS_BIG = 168;
     private static final int MARGIN_BUTTONS_SMALL = 96;
     private static final int SIZE_VIDEO_PARTICIPANTS = 90;
 
@@ -67,9 +65,10 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId) {
 
-        if(peers!=null){
+        if (peers != null) {
             logDebug("peers: " + peers.size());
         }
+
         this.context = context;
         this.recyclerViewFragment = recyclerView;
         this.peers = peers;
@@ -326,7 +325,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
 
         /*Avatar*/
-        holder.avatarMicroLayout.setVisibility(GONE);
+        holder.avatarMicroLayout.setVisibility(View.GONE);
         holder.microAvatar.setVisibility(View.GONE);
         holder.avatarLayout.setVisibility(View.GONE);
 
@@ -455,7 +454,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             if (isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
                 holder.avatarImageCallOnHold.setVisibility(View.VISIBLE);
             } else {
-                holder.avatarImageCallOnHold.setVisibility(GONE);
+                holder.avatarImageCallOnHold.setVisibility(View.GONE);
             }
             holder.avatarImage.setAlpha(0.5f);
         } else {
@@ -465,13 +464,13 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 holder.avatarImageCallOnHold.setVisibility(View.VISIBLE);
                 holder.avatarImage.setAlpha(0.5f);
             } else {
-                holder.avatarImageCallOnHold.setVisibility(GONE);
+                holder.avatarImageCallOnHold.setVisibility(View.GONE);
                 holder.avatarImage.setAlpha(1f);
             }
         }
 
         /*Video*/
-        holder.surfaceMicroLayout.setVisibility(GONE);
+        holder.surfaceMicroLayout.setVisibility(View.GONE);
         if (peer.getListener() != null) {
 
             if (isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
@@ -674,6 +673,12 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
     }
 
+    /**
+     * Method to updating the mute icon in the video.
+     *
+     * @param microSurface ImageView of the icon.
+     * @param peer         Participant in which the icon is to be displayed.
+     */
     private void displayMuteIconInVideo(final ImageView microSurface, InfoPeerGroupCall peer) {
         int peerPosition = peers.indexOf(peer);
         boolean smallIcon = !(peers.size() < 7);
@@ -696,6 +701,9 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         microSurface.setLayoutParams(paramsMicroSurface);
     }
 
+    /**
+     * Method for checking whether the mute icon needs to be repositioned.
+     */
     public void updateMuteIcon() {
         for (InfoPeerGroupCall peer : peers) {
             ViewHolderGroupCall holder = getHolder(peers.indexOf(peer));
@@ -828,6 +836,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         return actionBarHeight;
     }
 
+    /**
+     * Method to update the manual mode for calls with more than 7 participants.
+     *
+     * @param flag True, if it needs to be activated. False, if it needs to be deactivated.
+     */
     public void updateMode(boolean flag){
         isManualMode = flag;
     }
@@ -879,7 +892,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                         ((ViewGroup) peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
                     }
 
-                    peer.getListener().getSurfaceView().setVisibility(GONE);
+                    peer.getListener().getSurfaceView().setVisibility(View.GONE);
                     peer.setListener(null);
 
                 }
@@ -929,5 +942,4 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             return 0;
         }
     }
-
 }

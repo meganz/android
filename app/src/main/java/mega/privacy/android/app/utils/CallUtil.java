@@ -190,6 +190,13 @@ public class CallUtil {
         return (call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS);
     }
 
+    /**
+     * Method to activate or deactivate the chronometer of a call.
+     *
+     * @param activateChrono True, if it must be activated. False, if it must be deactivated.
+     * @param chronometer    The cronometer.
+     * @param call           The call.
+     */
     public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall call) {
         if (chronometer == null)
             return;
@@ -466,7 +473,7 @@ public class CallUtil {
     /**
      * Method to get the name from a handle.
      *
-     * @param chat Chat room identifier.
+     * @param chat   Chat room identifier.
      * @param peerId User handle from whom the name is obtained.
      * @return The name.
      */
@@ -490,7 +497,8 @@ public class CallUtil {
 
     /**
      * Method for finding out if the participant is me.
-     * @param peerId The Peer ID.
+     *
+     * @param peerId   The Peer ID.
      * @param clientId The Client ID.
      * @return True if it's me. Otherwise, False.
      */
@@ -499,5 +507,44 @@ public class CallUtil {
         return peerId == megaChatApi.getMyUserHandle() && clientId == megaChatApi.getMyClientidHandle(chatId);
     }
 
+    /**
+     * Method to get the call on hold if it's different than the current call.
+     *
+     * @param callId The current call ID.
+     * @return The call on hold.
+     */
+    public static MegaChatCall getAnotherCallOnHold(long callId) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
+        if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
+            for (int i = 0; i < listCallsInProgress.size(); i++) {
+                MegaChatCall call = megaChatApi.getChatCall(listCallsInProgress.get(i));
+                if (call != null && call.isOnHold() && call.getId() != callId) {
+                    return call;
+                }
+            }
+        }
 
+        MegaHandleList listCallsJoining = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_JOINING);
+        if (listCallsJoining != null && listCallsJoining.size() > 0) {
+            for (int i = 0; i < listCallsJoining.size(); i++) {
+                MegaChatCall call = megaChatApi.getChatCall(listCallsJoining.get(i));
+                if (call != null && call.isOnHold() && call.getId() != callId) {
+                    return call;
+                }
+            }
+        }
+
+        MegaHandleList listCallsReconnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RECONNECTING);
+        if (listCallsReconnecting != null && listCallsReconnecting.size() > 0) {
+            for (int i = 0; i < listCallsReconnecting.size(); i++) {
+                MegaChatCall call = megaChatApi.getChatCall(listCallsReconnecting.get(i));
+                if (call != null && call.isOnHold() && call.getId() != callId) {
+                    return call;
+                }
+            }
+        }
+
+        return null;
+    }
 }
