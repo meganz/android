@@ -1239,6 +1239,19 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			logWarning("Launch not in correct status");
 			return;
 		}
+
+		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+		if( callToLaunch.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && chatRoom != null && chatRoom.isGroup() ){
+			try {
+				stopService(new Intent(this, IncomingCallService.class));
+				ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+				notificationBuilder.checkOneGroupCall(chatId);
+			} catch (Exception e) {
+				logError("EXCEPTION", e);
+			}
+			return;
+		}
+
 		if (shouldNotify(this) && !isActivityVisible()) {
 			PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
 			if (pm != null) {

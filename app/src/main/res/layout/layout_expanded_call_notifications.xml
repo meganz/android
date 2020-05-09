@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/call_notif_layout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="14dp"
+        android:orientation="horizontal" >
+        <!--        Avatar-->
+        <RelativeLayout
+            android:id="@+id/avatar_layout"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical|left"
+            android:gravity="left|center_vertical"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp">
+
+            <ImageView
+                android:id="@+id/avatar_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:scaleType="fitCenter" />
+        </RelativeLayout>
+
+        <!--Title-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/chat_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/file_list_first_row"
+                android:maxLines="1"
+                android:textSize="16sp"
+                style="@style/TextAppearance.Compat.Notification.Title"/>
+
+            <TextView
+                android:id="@+id/call_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_below="@id/chat_title"
+                android:textColor="@color/grey_info_menu"
+                android:maxLines="1"
+                android:textSize="14sp"
+                style="@style/TextAppearance.Compat.Notification.Info"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:layout_marginLeft="72dp"-->
+<!--        android:layout_marginBottom="16dp"-->
+<!--        android:background="@color/chat_sliding_panel_separator"/>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/ignore_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:layout_marginRight="25dp"
+            android:layout_marginLeft="16dp"
+            android:text="IGNORE"
+            android:textStyle="bold"
+            android:textColor="@color/accentColor"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/answer_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ANSWER"
+            android:textStyle="bold"
+            android:textColor="@color/accentColor"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+</LinearLayout>

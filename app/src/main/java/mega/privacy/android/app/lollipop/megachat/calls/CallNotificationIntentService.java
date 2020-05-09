@@ -64,7 +64,13 @@ public class CallNotificationIntentService extends IntentService implements Mega
             case CallNotificationIntentService.END_ANSWER:
             case CallNotificationIntentService.END_JOIN:
                 logDebug("Hanging up current call ... ");
-                megaChatApi.hangChatCall(chatIdCurrentCall, this);
+                if(chatIdCurrentCall == MEGACHAT_INVALID_HANDLE){
+                    logDebug("Answering incoming call ...");
+                    MegaApplication.setSpeakerStatus(chatIdIncomingCall, false);
+                    megaChatApi.answerChatCall(chatIdIncomingCall, false, this);
+                }else{
+                    megaChatApi.hangChatCall(chatIdCurrentCall, this);
+                }
                 break;
             case CallNotificationIntentService.DECLINE:
                 logDebug("Hanging up incoming call ... ");
