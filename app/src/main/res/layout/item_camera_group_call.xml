@@ -6,7 +6,7 @@
     android:background="@android:color/transparent">
 
     <RelativeLayout
-        android:id="@+id/rl_surface_and_micro"
+        android:id="@+id/video_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -24,17 +24,6 @@
             android:layout_centerInParent="true"
             android:background="@android:color/transparent">
         </RelativeLayout>
-        <ImageView
-            android:id="@+id/micro_surface_view"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignTop="@+id/parent_surface_view"
-            android:layout_marginTop="10dp"
-            android:layout_alignRight="@+id/parent_surface_view"
-            android:layout_margin="10dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_own_mic_off"
-            android:visibility="gone"/>
         <RelativeLayout
             android:id="@+id/rl_quality"
             android:layout_width="match_parent"
@@ -53,7 +42,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/layout_avatar_micro"
+        android:id="@+id/avatar_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
@@ -63,7 +52,7 @@
         android:visibility="gone">
 
         <RelativeLayout
-            android:id="@+id/avatar_rl"
+            android:id="@+id/avatar_background"
             android:layout_width="88dp"
             android:layout_height="88dp"
             android:layout_centerInParent="true"
@@ -72,17 +61,13 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:textAlignment="center"
-            android:background="@android:color/transparent">
+            android:background="@drawable/shape_call_chat">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
                 <mega.privacy.android.app.components.RoundedImageView
                     android:id="@+id/avatar_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_centerInParent="true"
-                    android:scaleType="fitCenter"
                     rounded:border_color="#4DFFFFFF"
                     rounded:border_width="3dp"
                     rounded:corner_radius="60dp" />
@@ -90,25 +75,30 @@
                     android:id="@+id/avatar_image_on_hold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scaleType="fitCenter"
+                    android:layout_centerInParent="true"
                     android:background="@android:color/transparent"
                     android:src="@drawable/ic_call_hold_big"
-                    android:layout_gravity="center"
                     android:visibility="gone"/>
-            </FrameLayout>
         </RelativeLayout>
+    </RelativeLayout>
 
-        <!--Micro Avatar-->
+    <RelativeLayout
+        android:id="@+id/mute_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:gravity="top|right"
+        android:visibility="gone">
+
         <ImageView
-            android:id="@+id/micro_avatar"
+            android:id="@+id/mute_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_toRightOf="@+id/avatar_rl"
-            android:layout_alignTop="@+id/avatar_rl"
-            android:background="@android:color/transparent"
-            android:visibility="gone"
+            android:background="@null"
             android:src="@drawable/ic_own_mic_off"/>
-
     </RelativeLayout>
 
     <RelativeLayout

@@ -162,10 +162,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private ViewGroup parentLocalFS;
     private ViewGroup parentRemoteFS;
     private FrameLayout fragmentBigCameraGroupCall;
-    private ImageView microFragmentBigCameraGroupCall;
+    private ImageView muteIconPeerSelected;
     private ViewGroup parentBigCameraGroupCall;
     private RelativeLayout avatarBigCameraGroupCallLayout;
-    private ImageView avatarBigCameraGroupCallMicro;
     private RoundedImageView avatarBigCameraGroupCallImage;
     private AppRTCAudioManager rtcAudioManager = null;
     private Animation shake;
@@ -713,16 +712,13 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         fragmentBigCameraGroupCall = findViewById(R.id.fragment_big_camera_group_call);
         fragmentBigCameraGroupCall.setVisibility(View.GONE);
-        microFragmentBigCameraGroupCall = findViewById(R.id.micro_fragment_big_camera_group_call);
-        microFragmentBigCameraGroupCall.setVisibility(View.GONE);
-
         avatarBigCameraGroupCallLayout = findViewById(R.id.rl_avatar_big_camera_group_call);
-        avatarBigCameraGroupCallMicro = findViewById(R.id.micro_avatar_big_camera_group_call);
         avatarBigCameraGroupCallImage = findViewById(R.id.image_big_camera_group_call);
-
-        avatarBigCameraGroupCallMicro.setVisibility(View.GONE);
         avatarBigCameraGroupCallLayout.setVisibility(View.GONE);
         parentBigCameraGroupCall.setVisibility(View.GONE);
+
+        muteIconPeerSelected = findViewById(R.id.mute_icon_peer_selected);
+        muteIconPeerSelected.setVisibility(View.GONE);
 
         //Recycler View for 7-8 peers (because 9-10 without video)
         bigRecyclerViewLayout = findViewById(R.id.rl_big_recycler_view);
@@ -959,6 +955,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             avatarBigCameraGroupCallImage.setAlpha(1f);
             callOnHoldLayout.setVisibility(View.GONE);
         }
+        refreshParticipantSelectedMuteIcon(peerSelected);
     }
 
     /**
@@ -2016,16 +2013,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     updateChangesAudio(i);
 
                     if (!lessThanSevenParticipants() && peerSelected != null && peerSelected.getPeerId() == session.getPeerid() && peerSelected.getClientId() == session.getClientid()) {
-                        if (session.hasAudio()) {
-                            avatarBigCameraGroupCallMicro.setVisibility(View.GONE);
-                            microFragmentBigCameraGroupCall.setVisibility(View.GONE);
-                        } else if (peerSelected.isVideoOn()) {
-                            avatarBigCameraGroupCallMicro.setVisibility(View.GONE);
-                            microFragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
-                        } else {
-                            avatarBigCameraGroupCallMicro.setVisibility(View.VISIBLE);
-                            microFragmentBigCameraGroupCall.setVisibility(View.GONE);
-                        }
+                        refreshParticipantSelectedMuteIcon(peerSelected);
                     }
                     break;
 
@@ -2128,17 +2116,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 updateChangesVideo(i);
 
                 if (!lessThanSevenParticipants() && peerSelected != null && peerSelected.getPeerId() == session.getPeerid() && peerSelected.getClientId() == session.getClientid()) {
-                    if (session.hasVideo()) {
-
-                        createParticipantSelectedVideo(peerSelected.getPeerId(), peerSelected.getClientId());
-                        avatarBigCameraGroupCallMicro.setVisibility(View.GONE);
-                        microFragmentBigCameraGroupCall.setVisibility(peerSelected.isAudioOn() ? View.GONE : View.VISIBLE);
-                    } else {
-
-                        createParticipantSelectedAvatar(peerSelected);
-                        microFragmentBigCameraGroupCall.setVisibility(View.GONE);
-                        avatarBigCameraGroupCallMicro.setVisibility(peerSelected.isAudioOn() ? View.GONE : View.VISIBLE);
-                    }
+                    updateParticipantSelectedStatus(session);
                 }
                 break;
 
@@ -2481,26 +2459,31 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     /**
      * Method for updating the status of the selected participant.
      */
-    private void updateParticipantSelectedStatus() {
-        if (peerSelected.isVideoOn()) {
-
+    private void updateParticipantSelectedStatus(MegaChatSession session) {
+        if (peerSelected.isVideoOn() && !callChat.isOnHold() && session != null && !session.isOnHold()) {
             createParticipantSelectedVideo(peerSelected.getPeerId(), peerSelected.getClientId());
-            avatarBigCameraGroupCallMicro.setVisibility(View.GONE);
-            if (peerSelected.isAudioOn()) {
-                microFragmentBigCameraGroupCall.setVisibility(View.GONE);
-            } else {
-                microFragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
-            }
         } else {
-
             createParticipantSelectedAvatar(peerSelected);
-            microFragmentBigCameraGroupCall.setVisibility(View.GONE);
-            if (peerSelected.isAudioOn()) {
-                avatarBigCameraGroupCallMicro.setVisibility(View.GONE);
-            } else {
-                avatarBigCameraGroupCallMicro.setVisibility(View.VISIBLE);
-            }
         }
+        refreshParticipantSelectedMuteIcon(peerSelected);
+    }
+
+    /**
+     * Method for show or hide the mute icon in the participantSelected.
+     *
+     * @param peerSelected The participant selected.
+     */
+    private void refreshParticipantSelectedMuteIcon(InfoPeerGroupCall peerSelected) {
+        if (lessThanSevenParticipants() || peerSelected == null)
+            return;
+
+        MegaChatSession session = getSessionCall(peerSelected.getPeerId(), peerSelected.getClientId());
+        if (session == null || session.isOnHold() || session.hasAudio() || callChat.isOnHold()) {
+            muteIconPeerSelected.setVisibility(View.GONE);
+            return;
+        }
+
+        muteIconPeerSelected.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -2545,7 +2528,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     updateParticipantSelectedLayer(peerSelected, true);
                 }
             }
-            updateParticipantSelectedStatus();
+            updateParticipantSelectedStatus(getSessionCall(peerSelected.getPeerId(), peerSelected.getClientId()));
         }
     }
 
@@ -3014,7 +2997,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }else if(!lessThanSevenParticipants() && adapterList != null){
                 adapterList.updateCallOnHold();
                 if(peerSelected!= null){
-                    updateParticipantSelectedInCallOnHold(peerSelected);
+                    updateParticipantSelectedStatus(getSessionCall(peerSelected.getPeerId(), peerSelected.getClientId()));
                 }
             }
         }else{
@@ -3208,7 +3191,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method for updating the margins and number of columns of the recycler view.
      */
     private void updateRecyclerView() {
-
         if (peersOnCall.size() == 4 || peersOnCall.size() == 3) {
             recyclerViewLayout.setPadding(0, px2dp(100, outMetrics), 0, 0);
         } else {

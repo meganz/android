@@ -31,6 +31,9 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 
+import static android.view.Gravity.RIGHT;
+import static android.view.Gravity.TOP;
+import static android.widget.RelativeLayout.TRUE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -41,9 +44,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
-    private static final int MARGIN_MUTE_ICON_SMALL = 7;
-    private static final int MARGIN_MUTE_ICON_LARGE = 15;
-    private static final int SIZE_MUTE_ICON_SMALL = 15;
+    private static final int MARGIN_MUTE_ICON_SMALL = 3;
+    private static final int MARGIN_MUTE_ICON_LARGE = 16;
     private static final int SIZE_MUTE_ICON_LARGE = 24;
     private static final int MIN_USERS_GRID = 7;
     private static final int MARGIN_BUTTONS_SMALL = 96;
@@ -96,16 +98,16 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         RelativeLayout rlGeneral;
         RelativeLayout greenLayer;
-        RelativeLayout avatarMicroLayout;
         RelativeLayout avatarLayout;
+        RelativeLayout avatarBackground;
         RoundedImageView avatarImage;
         ImageView avatarImageCallOnHold;
-        ImageView microAvatar;
-        ImageView microSurface;
+        RelativeLayout muteIconLayout;
+        ImageView muteIcon;
         RelativeLayout qualityLayout;
         ImageView qualityIcon;
         RelativeLayout parentSurfaceView;
-        RelativeLayout surfaceMicroLayout;
+        RelativeLayout videoLayout;
         long peerId;
 
         public ViewHolderGroupCall(View itemView) {
@@ -143,14 +145,14 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         holderGrid.rlGeneral = v.findViewById(R.id.general);
         holderGrid.greenLayer = v.findViewById(R.id.green_layer);
-        holderGrid.surfaceMicroLayout = v.findViewById(R.id.rl_surface_and_micro);
+        holderGrid.videoLayout = v.findViewById(R.id.video_layout);
 
         holderGrid.parentSurfaceView = v.findViewById(R.id.parent_surface_view);
-        holderGrid.avatarMicroLayout = v.findViewById(R.id.layout_avatar_micro);
+        holderGrid.avatarLayout = v.findViewById(R.id.avatar_layout);
 
-        holderGrid.avatarLayout = v.findViewById(R.id.avatar_rl);
-        holderGrid.microAvatar = v.findViewById(R.id.micro_avatar);
-        holderGrid.microSurface = v.findViewById(R.id.micro_surface_view);
+        holderGrid.avatarBackground = v.findViewById(R.id.avatar_background);
+        holderGrid.muteIconLayout = v.findViewById(R.id.mute_layout);
+        holderGrid.muteIcon = v.findViewById(R.id.mute_icon);
         holderGrid.qualityLayout = v.findViewById(R.id.rl_quality);
         holderGrid.qualityIcon = v.findViewById(R.id.quality_icon);
         holderGrid.avatarImage = v.findViewById(R.id.avatar_image);
@@ -202,7 +204,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             lp.height = height;
             lp.width = width;
 
-            if (numPeersOnCall == 3 && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
+            if (numPeersOnCall == 3 && position == 2) {
                 ViewGroup.LayoutParams layoutParamsPeer = holder.rlGeneral.getLayoutParams();
                 layoutParamsPeer.width = maxScreenWidth;
                 layoutParamsPeer.height = maxScreenWidth / 2;
@@ -265,7 +267,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 int sizeLayout;
                 if (numPeersOnCall < 2) {
                     sizeLayout = maxScreenWidth;
-                } else if (numPeersOnCall >= 2 && numPeersOnCall <= 3) {
+                } else if (numPeersOnCall == 2) {
                     sizeLayout = maxScreenHeight / numPeersOnCall;
                 } else {
                     sizeLayout = maxScreenWidth / 2;
@@ -274,15 +276,15 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.parentSurfaceView.getLayoutParams();
                 layoutParamsSurface.width = sizeLayout;
                 layoutParamsSurface.height = sizeLayout;
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                if (numPeersOnCall >= 1 && numPeersOnCall <= 3) {
-                    layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, TRUE);
+                if (numPeersOnCall == 1 || numPeersOnCall == 2) {
+                    layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, TRUE);
                 }
-                if (numPeersOnCall == 4) {
+                if (numPeersOnCall == 3 || numPeersOnCall == 4) {
                     if ((position < 2)) {
-                        layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                        layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, TRUE);
                     } else {
-                        layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+                        layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, TRUE);
                     }
                 } else {
                     layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
@@ -294,6 +296,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
             /*Hide the avatar and show the video*/
             activateVideo(position, holder, peer);
+            checkParticipantAudio(position, holder, peer);
 
         } else {
 
@@ -302,12 +305,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             deactivateVideo(position, holder, peer);
         }
 
-        checkParticipantAudio(position, holder, peer);
-
         checkParticipantQuality(position, holder, peer);
 
         checkPeerSelected(position, holder, peer);
     }
+
 
     /**
      * Method for activating a participant's video.
@@ -325,9 +327,9 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
 
         /*Avatar*/
-        holder.avatarMicroLayout.setVisibility(View.GONE);
-        holder.microAvatar.setVisibility(View.GONE);
         holder.avatarLayout.setVisibility(View.GONE);
+        holder.muteIconLayout.setVisibility(View.GONE);
+        holder.avatarBackground.setVisibility(View.GONE);
 
         /*Video*/
         if (peer.getListener() == null) {
@@ -375,7 +377,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             }
         }
 
-        holder.surfaceMicroLayout.setVisibility(View.VISIBLE);
+        holder.videoLayout.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -400,21 +402,30 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             layoutParamsPeer.height = maxScreenWidth / 2;
             holder.rlGeneral.setLayoutParams(layoutParamsPeer);
         }
+
         if ((numPeersOnCall == 2) && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarLayout.getLayoutParams();
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarBackground.getLayoutParams();
+            layoutParams.width = px2dp(88, outMetrics);
+            layoutParams.height = px2dp(88, outMetrics);
             layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, TRUE);
             layoutParams.setMargins(0, 0, 0, scaleHeightPx(MARGIN_BUTTONS_SMALL, outMetrics));
-            holder.avatarLayout.setLayoutParams(layoutParams);
+            holder.avatarBackground.setLayoutParams(layoutParams);
+            holder.avatarBackground.setGravity(RelativeLayout.CENTER_IN_PARENT);
             return;
         }
 
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarLayout.getLayoutParams();
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarBackground.getLayoutParams();
+        layoutParams.width = px2dp(88, outMetrics);
+        layoutParams.height = px2dp(88, outMetrics);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, TRUE);
         layoutParams.setMargins(0, 0, 0, 0);
-        holder.avatarLayout.setLayoutParams(layoutParams);
+        holder.avatarBackground.setLayoutParams(layoutParams);
+        holder.avatarBackground.setGravity(RelativeLayout.CENTER_IN_PARENT);
+
     }
+
 
     /**
      * Method for deactivating a participant's video.
@@ -447,7 +458,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
 
         displayAvatar(position, holder, peer);
-        holder.avatarLayout.setVisibility(View.VISIBLE);
+        holder.avatarBackground.setVisibility(View.VISIBLE);
 
         /*Avatar in call on hold*/
         if (call.isOnHold()) {
@@ -457,20 +468,23 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 holder.avatarImageCallOnHold.setVisibility(View.GONE);
             }
             holder.avatarImage.setAlpha(0.5f);
+
         } else {
             /*Avatar in session on hold*/
             MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peer.getPeerId(), peer.getClientId());
-            if (session != null && session.isOnHold()) {
+            if(session != null && session.isOnHold()){
                 holder.avatarImageCallOnHold.setVisibility(View.VISIBLE);
                 holder.avatarImage.setAlpha(0.5f);
-            } else {
+            }else {
                 holder.avatarImageCallOnHold.setVisibility(View.GONE);
                 holder.avatarImage.setAlpha(1f);
             }
         }
 
+        holder.avatarLayout.setVisibility(View.VISIBLE);
+
         /*Video*/
-        holder.surfaceMicroLayout.setVisibility(View.GONE);
+        holder.videoLayout.setVisibility(View.GONE);
         if (peer.getListener() != null) {
 
             if (isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
@@ -490,7 +504,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             peer.setListener(null);
         }
 
-        holder.avatarMicroLayout.setVisibility(View.VISIBLE);
+        checkParticipantAudio(position, holder, peer);
     }
 
     /**
@@ -501,59 +515,30 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
      * @param peer     Participant with changes in the audio.
      */
     private void checkParticipantAudio(int position, ViewHolderGroupCall holder, final InfoPeerGroupCall peer){
+        MegaChatCall call = ((ChatCallActivity) context).getCall();
+        if (call == null) {
+            return;
+        }
+
         if (holder == null) {
             holder = getHolder(position);
             if (holder == null)
                 return;
         }
 
-        if(!isEstablishedCall(chatId) || peer.isAudioOn()){
-            holder.microAvatar.setVisibility(View.GONE);
-            holder.microSurface.setVisibility(View.GONE);
+        if (!isEstablishedCall(chatId) || peer.isAudioOn() || call.isOnHold()) {
+            holder.muteIconLayout.setVisibility(View.GONE);
             return;
         }
 
-        if(peer.isVideoOn()){
-            holder.microAvatar.setVisibility(View.GONE);
-            holder.microSurface.setVisibility(View.VISIBLE);
-            displayMuteIconInVideo(holder.microSurface, peer);
+        MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peer.getPeerId(), peer.getClientId());
+        if (session != null && (session.isOnHold() || session.hasAudio())) {
+            holder.muteIconLayout.setVisibility(View.GONE);
             return;
         }
 
-        holder.microSurface.setVisibility(View.GONE);
-
-        MegaChatSession session = ((ChatCallActivity)context).getSessionCall(peer.getPeerId(), peer.getClientId());
-        if(!peer.isVideoOn() && session != null && session.isOnHold()){
-            holder.microAvatar.setVisibility(View.GONE);
-            return;
-        }
-
-        holder.microAvatar.setVisibility(View.VISIBLE);
-
-        RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holder.microAvatar.getLayoutParams());
-        int size;
-        int sizeImage;
-        int margin;
-        if (peers.size() < 7) {
-            size = px2dp(24, outMetrics);
-            sizeImage = px2dp(88, outMetrics);
-            margin = px2dp(10, outMetrics);
-        } else {
-            size = px2dp(88, outMetrics);
-            sizeImage = px2dp(60, outMetrics);
-            margin = 0;
-        }
-        paramsMicroAvatar.height = size;
-        paramsMicroAvatar.width = size;
-        paramsMicroAvatar.setMargins(margin, 0, 0, 0);
-        paramsMicroAvatar.addRule(RelativeLayout.RIGHT_OF, R.id.avatar_rl);
-        paramsMicroAvatar.addRule(RelativeLayout.ALIGN_TOP, R.id.avatar_rl);
-        holder.microAvatar.setLayoutParams(paramsMicroAvatar);
-
-        ViewGroup.LayoutParams paramsAvatarImage = holder.avatarImage.getLayoutParams();
-        paramsAvatarImage.width = sizeImage;
-        paramsAvatarImage.height = sizeImage;
-        holder.avatarImage.setLayoutParams(paramsAvatarImage);
+        holder.muteIconLayout.setVisibility(View.VISIBLE);
+        displayMuteIconInVideo(holder.muteIconLayout, holder.muteIcon, peer);
     }
 
     /**
@@ -607,8 +592,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         paramsQuality.height = size;
         paramsQuality.width = size;
         paramsQuality.setMargins(margin, 0, 0, margin);
-        paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-        paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+        paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, TRUE);
+        paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_LEFT, TRUE);
         holder.qualityIcon.setLayoutParams(paramsQuality);
     }
 
@@ -676,13 +661,12 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     /**
      * Method to updating the mute icon in the video.
      *
-     * @param microSurface ImageView of the icon.
+     * @param muteIcon ImageView of the icon.
      * @param peer         Participant in which the icon is to be displayed.
      */
-    private void displayMuteIconInVideo(final ImageView microSurface, InfoPeerGroupCall peer) {
+    private void displayMuteIconInVideo(final RelativeLayout muteIconLayout, final ImageView muteIcon, InfoPeerGroupCall peer) {
         int peerPosition = peers.indexOf(peer);
         boolean smallIcon = !(peers.size() < 7);
-        int iconSize = smallIcon ? SIZE_MUTE_ICON_SMALL : SIZE_MUTE_ICON_LARGE;
         int iconRightMargin = px2dp(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
         int iconTopMargin = px2dp(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
 
@@ -692,13 +676,17 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             }
         }
 
-        RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(microSurface.getLayoutParams());
-        paramsMicroSurface.height = px2dp(iconSize, outMetrics);
-        paramsMicroSurface.width = px2dp(iconSize, outMetrics);
+        RelativeLayout.LayoutParams paramsImage = new RelativeLayout.LayoutParams(muteIcon.getLayoutParams());
+        paramsImage.height = px2dp(SIZE_MUTE_ICON_LARGE, outMetrics);
+        paramsImage.width = px2dp(SIZE_MUTE_ICON_LARGE, outMetrics);
+        muteIcon.setLayoutParams(paramsImage);
+
+        RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(muteIconLayout.getLayoutParams());
+        paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, TRUE);
+        paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, TRUE);
         paramsMicroSurface.setMargins(0, iconTopMargin, iconRightMargin, 0);
-        paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
-        paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
-        microSurface.setLayoutParams(paramsMicroSurface);
+        muteIconLayout.setLayoutParams(paramsMicroSurface);
+        muteIconLayout.setGravity(TOP|RIGHT);
     }
 
     /**
@@ -707,8 +695,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     public void updateMuteIcon() {
         for (InfoPeerGroupCall peer : peers) {
             ViewHolderGroupCall holder = getHolder(peers.indexOf(peer));
-            if (holder != null && !peer.isAudioOn() && peer.isVideoOn()) {
-                displayMuteIconInVideo(holder.microSurface, peer);
+            if (holder != null && !peer.isAudioOn()) {
+                displayMuteIconInVideo(holder.muteIconLayout, holder.muteIcon, peer);
             }
         }
     }

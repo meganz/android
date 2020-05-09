@@ -1071,7 +1071,7 @@ public final class ChatAdvancedNotificationBuilder {
     public void showIncomingGroupCallNotification(MegaChatCall callToAnswer) {
         logDebug("Call to answer ID: " + callToAnswer.getChatid());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
 
             MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(callToAnswer.getChatid());
             long chatCallId = callToAnswer.getId();
@@ -1082,19 +1082,16 @@ public final class ChatAdvancedNotificationBuilder {
             ignoreIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
             ignoreIntent.setAction(CallNotificationIntentService.IGNORE);
             int requestCodeIgnore = notificationId + 1;
-            PendingIntent pendingIntentIgnore = PendingIntent.getService(context, requestCodeIgnore, ignoreIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
-            NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(R.drawable.ic_remove_not, context.getString(R.string.ignore_call_incoming).toUpperCase(), pendingIntentIgnore).build();
+            PendingIntent pendingIntentIgnore = PendingIntent.getService(context, requestCodeIgnore, ignoreIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
             Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
             answerIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
             answerIntent.setAction(CallNotificationIntentService.ANSWER);
             int requestCodeAnswer = notificationId + 1;
-            PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer /* Request code */, answerIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
-            NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(R.drawable.ic_call_filled, context.getString(R.string.answer_call_incoming).toUpperCase(), pendingIntentAnswer).build();
+            PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
             long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
-
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 logDebug("Oreo");
 
                 //Create a channel for android Oreo or higher
@@ -1103,99 +1100,71 @@ public final class ChatAdvancedNotificationBuilder {
                 channel.enableLights(true);
                 channel.enableVibration(true);
                 channel.setShowBadge(true);
-
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
                 notificationManager.createNotificationChannel(channel);
 
-                Bitmap avatarIcon = setUserAvatar(chatToAnswer);
-                String titleChat;
-                String titleCall;
-                if(chatToAnswer.isGroup()){
-                    titleChat = chatToAnswer.getTitle();
-                    titleCall =  context.getString(R.string.title_notification_incoming_group_call);
-                }
-                else{
-                    titleChat = getFullName(chatToAnswer);
-                    titleCall = context.getString(R.string.title_notification_incoming_individual_call);
-                }
-
-                RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.layout_call_notifications);
-                notificationLayout.setTextViewText(R.id.chat_title, titleChat);
-                notificationLayout.setTextViewText(R.id.call_title, titleCall);
-                RemoteViews notificationLayoutExpanded = new RemoteViews(context.getPackageName(), R.layout.layout_expanded_call_notifications);
-                notificationLayoutExpanded.setTextViewText(R.id.chat_title, titleChat);
-                notificationLayoutExpanded.setTextViewText(R.id.call_title, titleCall);
-                if(avatarIcon != null) {
-                    notificationLayout.setImageViewBitmap(R.id.avatar_image, avatarIcon);
-                    notificationLayoutExpanded.setImageViewBitmap(R.id.avatar_image, avatarIcon);
-
-                }
-
-                NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
-                notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
-                notificationBuilderO.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
-                notificationBuilderO.setCustomContentView(notificationLayout);
-                notificationBuilderO.setCustomBigContentView(notificationLayoutExpanded);
-                notificationBuilderO.setSmallIcon(R.drawable.ic_stat_notify);
-                notificationBuilderO.setColor(ContextCompat.getColor(context, R.color.mega));
-                notificationBuilderO.setAutoCancel(true);
-                notificationBuilderO.setVibrate(pattern);
-                notificationBuilderO.setDeleteIntent(pendingIntentIgnore);
-
-                notify(notificationId, notificationBuilderO.build());
-
-            }else{
-                logDebug("Nougat");
-
+            } else {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-                Bitmap avatarIcon = setUserAvatar(chatToAnswer);
-                String titleChat;
-                String titleCall;
-                if(chatToAnswer.isGroup()){
-                    titleChat = chatToAnswer.getTitle();
-                    titleCall =  context.getString(R.string.title_notification_incoming_group_call);
-                }
-                else{
-                    titleChat = getFullName(chatToAnswer);
-                    titleCall = context.getString(R.string.title_notification_incoming_individual_call);
-                }
-
-                RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.layout_call_notifications);
-                notificationLayout.setTextViewText(R.id.chat_title, titleChat);
-                notificationLayout.setTextViewText(R.id.call_title, titleCall);
-                RemoteViews notificationLayoutExpanded = new RemoteViews(context.getPackageName(), R.layout.layout_expanded_call_notifications);
-                notificationLayoutExpanded.setTextViewText(R.id.chat_title, titleChat);
-                notificationLayoutExpanded.setTextViewText(R.id.call_title, titleCall);
-                if(avatarIcon != null) {
-                    notificationLayout.setImageViewBitmap(R.id.avatar_image, avatarIcon);
-                    notificationLayoutExpanded.setImageViewBitmap(R.id.avatar_image, avatarIcon);
-
-                }
-
-                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
-                notificationBuilder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
-                notificationBuilder.setCustomContentView(notificationLayout);
-                notificationBuilder.setCustomBigContentView(notificationLayoutExpanded);
-                notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify);
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
-                notificationBuilder.setAutoCancel(true);
-                notificationBuilder.setVibrate(pattern);
-                notificationBuilder.setDeleteIntent(pendingIntentIgnore);
-
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-                    //API 25 = Android 7.1
-                    notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-                } else {
-                    notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-                }
-
-                //Show the notification:
-                notify(notificationId, notificationBuilder.build());
             }
-        }
-        else{
+
+            /*Customize notification*/
+            Bitmap avatarIcon = setUserAvatar(chatToAnswer);
+            String titleChat;
+            String titleCall;
+            if (chatToAnswer.isGroup()) {
+                titleChat = chatToAnswer.getTitle();
+                titleCall = context.getString(R.string.title_notification_incoming_group_call);
+            } else {
+                titleChat = getFullName(chatToAnswer);
+                titleCall = context.getString(R.string.title_notification_incoming_individual_call);
+            }
+
+            /*Normal*/
+            RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.layout_call_notifications);
+            notificationLayout.setTextViewText(R.id.chat_title, titleChat);
+            notificationLayout.setTextViewText(R.id.call_title, titleCall);
+            if (avatarIcon != null) {
+                notificationLayout.setImageViewBitmap(R.id.avatar_image, avatarIcon);
+            }
+            notificationLayout.setTextViewText(R.id.answer_button_text, context.getString(R.string.answer_call_incoming).toUpperCase());
+            notificationLayout.setTextViewText(R.id.ignore_button_text, context.getString(R.string.ignore_call_incoming).toUpperCase());
+
+            notificationLayout.setOnClickPendingIntent(R.id.answer_button_layout, pendingIntentAnswer);
+            notificationLayout.setOnClickPendingIntent(R.id.ignore_button_layout, pendingIntentIgnore);
+
+            /*Expanded*/
+            RemoteViews notificationLayoutExpanded = new RemoteViews(context.getPackageName(), R.layout.layout_expanded_call_notifications);
+            notificationLayoutExpanded.setTextViewText(R.id.chat_title, titleChat);
+            notificationLayoutExpanded.setTextViewText(R.id.call_title, titleCall);
+            if (avatarIcon != null) {
+                notificationLayoutExpanded.setImageViewBitmap(R.id.avatar_image, avatarIcon);
+            }
+            notificationLayoutExpanded.setTextViewText(R.id.answer_button_text, context.getString(R.string.answer_call_incoming).toUpperCase());
+            notificationLayoutExpanded.setTextViewText(R.id.ignore_button_text, context.getString(R.string.ignore_call_incoming).toUpperCase());
+            notificationLayoutExpanded.setOnClickPendingIntent(R.id.answer_button_layout, pendingIntentAnswer);
+            notificationLayoutExpanded.setOnClickPendingIntent(R.id.ignore_button_layout, pendingIntentIgnore);
+
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
+            notificationBuilder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+            notificationBuilder.setCustomContentView(notificationLayout);
+            notificationBuilder.setContentIntent(null);
+            notificationBuilder.setCustomBigContentView(notificationLayoutExpanded);
+            notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify);
+            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
+            notificationBuilder.setAutoCancel(true);
+            notificationBuilder.setVibrate(pattern);
+            notificationBuilder.setDeleteIntent(pendingIntentIgnore);
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+                //API 25 = Android 7.1
+                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+            } else {
+                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+            }
+
+            notify(notificationId, notificationBuilder.build());
+        } else {
             logWarning("Not supported incoming call notification: " + Build.VERSION.SDK_INT);
         }
     }

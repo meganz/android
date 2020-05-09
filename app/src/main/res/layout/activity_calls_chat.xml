@@ -72,19 +72,6 @@
                         android:background="@android:color/transparent"
                         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-                    <!--Micro Video-->
-                    <ImageView
-                        android:id="@+id/micro_fragment_big_camera_group_call"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginRight="8dp"
-                        android:background="@android:color/transparent"
-                        android:src="@drawable/ic_own_mic_off"
-                        android:visibility="gone" />
-
                     <!--Big Avatar in Group call-->
                     <RelativeLayout
                         android:id="@+id/rl_avatar_big_camera_group_call"
@@ -104,13 +91,15 @@
                             rounded:border_width="3dp"
                             rounded:corner_radius="60dp" />
                     </RelativeLayout>
-                    <!--Micro Avatar-->
+
                     <ImageView
-                        android:id="@+id/micro_avatar_big_camera_group_call"
+                        android:id="@+id/mute_icon_peer_selected"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:layout_alignTop="@+id/rl_avatar_big_camera_group_call"
-                        android:layout_toRightOf="@+id/rl_avatar_big_camera_group_call"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginRight="16dp"
                         android:background="@android:color/transparent"
                         android:src="@drawable/ic_own_mic_off"
                         android:visibility="gone" />
@@ -499,7 +488,7 @@
                 </RelativeLayout>
 
                 <!--Small avatar-->
-                <FrameLayout
+                <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -531,7 +520,7 @@
                         android:background="@null"
                         android:visibility="gone"
                         android:src="@drawable/ic_own_mic_off"/>
-                </FrameLayout>
+                </RelativeLayout>
 
             </RelativeLayout>
 
