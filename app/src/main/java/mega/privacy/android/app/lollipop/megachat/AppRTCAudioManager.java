@@ -251,9 +251,11 @@ public class AppRTCAudioManager {
             // best possible VoIP performance.
             // work around (bug13963): android 7 devices make big echo while mode set, so only apply it to other version of OS
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                logDebug("Mode communication");
                 audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             }
         }else if(apprtcContext instanceof ChatActivityLollipop){
+            logDebug("Mode communication");
             audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
 
         }

@@ -276,7 +276,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         } else {
             this.startService(intentService);
         }
-        application.createChatAudioManager();
+
         titleToolbar.setText(chat.getTitle());
         updateSubTitle();
 
@@ -984,7 +984,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (rtcAudioManager != null) {
             rtcAudioManager.startProximitySensor();
         }
-        application.createChatAudioManager();
+
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
@@ -1159,7 +1159,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void stopSpeakerAudioManger() {
-        if (rtcAudioManager == null) return;
+        if (rtcAudioManager == null)
+            return;
         logDebug("stopSpeakerAudioManger");
 
         try {
@@ -1828,7 +1829,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             speakerFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_speaker_off));
         }
-
         application.setAudioManagerValues(callChat.getStatus());
     }
 
@@ -2490,6 +2490,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     private void checkTerminatingCall() {
         clearHandlers();
+        application.removeChatAudioManager();
         stopSpeakerAudioManger();
         MegaApplication.setSpeakerStatus(chatId, false);
         finishActivity();

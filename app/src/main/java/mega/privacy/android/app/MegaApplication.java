@@ -438,6 +438,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 							return;
 
 						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+							createChatAudioManager();
 							setAudioManagerValues(callStatus);
 						}
 
@@ -1329,9 +1330,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	}
 
 	public void createChatAudioManager() {
-		if (chatAudioManager != null) {
+		if (chatAudioManager != null)
 			return;
-		}
 
 		chatAudioManager = ChatAudioManager.create(getApplicationContext());
 	}
@@ -1346,8 +1346,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	}
 
 	public void setAudioManagerValues(int callStatus){
-		createChatAudioManager();
-		if(chatAudioManager != null) {
+		if (chatAudioManager != null) {
 			MegaHandleList listCallsRequest = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
 			MegaHandleList listCallsRing = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
 			chatAudioManager.setAudioManagerValues(callStatus, listCallsRequest, listCallsRing);
@@ -1366,7 +1365,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	}
 
 	public void launchCallActivity(MegaChatCall call) {
-		logDebug("launchCallActivity: " + call.getStatus());
+		logDebug("Show the call " + callStatusToString(call.getStatus()) + " screen.");
 		MegaApplication.setShowPinScreen(false);
 		Intent i = new Intent(this, ChatCallActivity.class);
 		i.putExtra(CHAT_ID, call.getChatid());

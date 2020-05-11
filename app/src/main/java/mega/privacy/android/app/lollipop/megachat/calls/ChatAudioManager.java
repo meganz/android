@@ -36,12 +36,13 @@ public class ChatAudioManager {
     }
 
     public void initializeAudioManager() {
+        logDebug("Initializing audio manager in mode normal...");
+
         if (audioManager != null) {
             audioManager.setMode(AudioManager.MODE_NORMAL);
             return;
         }
 
-        logDebug("Initializing audio manager...");
         audioManager = (AudioManager) myContext.getSystemService(Context.AUDIO_SERVICE);
         audioManager.setMode(AudioManager.MODE_NORMAL);
     }
@@ -54,7 +55,6 @@ public class ChatAudioManager {
                 logDebug("There was also an incoming call (stop incoming call sound)");
                 stopAudioSignals();
             }
-
             outgoingCallSound();
 
         } else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
@@ -91,9 +91,9 @@ public class ChatAudioManager {
             logError("Error preparing mediaPlayer", e);
             return;
         }
+
         logDebug("Start outgoing call sound");
         mediaPlayer.start();
-
     }
 
     private void incomingCallSound() {
@@ -150,7 +150,6 @@ public class ChatAudioManager {
 
     public void stopAudioSignals() {
         if (audioManager != null) {
-            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             audioManager = null;
         }
 
