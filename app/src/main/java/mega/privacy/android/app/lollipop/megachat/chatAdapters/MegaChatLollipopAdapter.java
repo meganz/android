@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -63,6 +64,7 @@ import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatAttachmentAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -102,7 +104,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
-public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
+public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener, RotatableAdapter {
 
     private static int MAX_WIDTH_FILENAME_LAND = 455;
     private static int MAX_WIDTH_FILENAME_PORT = 180;
@@ -146,10 +148,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private SparseBooleanArray selectedItems;
     private MegaChatLollipopAdapter megaChatAdapter;
     private ArrayList<MessageVoiceClip> messagesPlaying;
+    private int placeholderCount = 0;
 
     private Handler handlerVoiceNotes;
     private Runnable runnableVC;
-
     ChatController cC;
 
     private long myUserHandle = -1;
@@ -3628,8 +3630,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void bindNormalMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
-        logDebug("position: " + position);
-
         MegaChatMessage message = androidMessage.getMessage();
         if (message.getUserHandle() == myUserHandle) {
             logDebug("MY message handle!!: " + message.getMsgId());
@@ -6060,7 +6060,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void toggleSelection(int pos) {
-        logDebug("toggleSelection");
+        logDebug("The position selected is "+pos);
 
         if (selectedItems.get(pos, false)) {
             logDebug("Delete pos: " + pos);
@@ -6084,17 +6084,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void updateSelectionOnScroll() {
-        logDebug("updateSelectionOnScroll");
-
         List<Integer> selected = getSelectedItems();
-        selectedItems.clear();
+//        selectedItems.clear();
+//
+//        for (int i = 0; i < selected.size(); i++) {
+//            int pos = selected.get(i);
+//            selectedItems.put(pos + 1, true);
+//            notifyItemChanged(pos);
+//            notifyItemChanged(pos + 1);
 
-        for (int i = 0; i < selected.size(); i++) {
-            int pos = selected.get(i);
-            selectedItems.put(pos + 1, true);
-            notifyItemChanged(pos);
-            notifyItemChanged(pos + 1);
-        }
+//        }
     }
 
     public void clearSelections() {
@@ -6104,10 +6103,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 toggleSelection(i);
             }
         }
-//        if (selectedItems != null) {
-//            selectedItems.clear();
-//        }
-//        notifyDataSetChanged();
     }
 
     private boolean isItemChecked(int position) {
@@ -6119,11 +6114,30 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public List<Integer> getSelectedItems() {
-        List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-        for (int i = 0; i < selectedItems.size(); i++) {
-            items.add(selectedItems.keyAt(i));
+        if (selectedItems != null) {
+            List<Integer> items = new ArrayList<>(selectedItems.size());
+            for (int i = 0; i < selectedItems.size(); i++) {
+                items.add(selectedItems.keyAt(i));
+            }
+            return items;
         }
-        return items;
+
+        return null;
+    }
+
+    @Override
+    public int getFolderCount() {
+        return 0;
+    }
+
+    @Override
+    public int getPlaceholderCount() {
+        return placeholderCount;
+    }
+
+    @Override
+    public int getUnhandledItem() {
+        return 0;
     }
 
     /*
@@ -6131,8 +6145,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     public AndroidMegaChatMessage getMessageAt(int positionInAdapter) {
         try {
-            if (messages != null) {
-                return messages.get(positionInAdapter - 1);
+            if (this.messages != null) {
+                return this.messages.get(positionInAdapter - 1);
             }
         } catch (IndexOutOfBoundsException e) {
         }
@@ -6172,6 +6186,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public void setMessages(ArrayList<AndroidMegaChatMessage> messages) {
         this.messages = messages;
+        placeholderCount = 0;
         notifyDataSetChanged();
     }
 
