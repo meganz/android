@@ -421,6 +421,8 @@ public class Constants {
     public static final int CONTACT_LINK = 203;
     public static final int ERROR_LINK = -1;
     public static final int INVALID_CALL = -1;
+    public static final int INVALID_CALL_PEER_ID = -1;
+    public static final int INVALID_CALL_CLIENT_ID = -1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String CHAT_ID = "chatHandle";

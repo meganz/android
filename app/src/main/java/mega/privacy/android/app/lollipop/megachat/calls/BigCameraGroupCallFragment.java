@@ -29,9 +29,10 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
     private long chatId;
     private long peerId;
     private long cliendId;
+    private int numParticipants;
     private MegaSurfaceRendererGroup renderer;
 
-    public static BigCameraGroupCallFragment newInstance(long chatId, long peerId, long cliendId) {
+    public static BigCameraGroupCallFragment newInstance(long chatId, long peerId, long cliendId, int numParticipants) {
         logDebug("newInstance");
         BigCameraGroupCallFragment f = new BigCameraGroupCallFragment();
 
@@ -39,7 +40,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         args.putLong("chatId", chatId);
         args.putLong("peerId", peerId);
         args.putLong("cliendId", cliendId);
-
+        args.putInt("numParticipants", numParticipants);
         f.setArguments(args);
         return f;
     }
@@ -55,6 +56,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         this.chatId = args.getLong("chatId", -1);
         this.peerId = args.getLong("peerId", -1);
         this.cliendId = args.getLong("cliendId", -1);
+        this.numParticipants = args.getInt("numParticipants", -1);
 
         super.onCreate(savedInstanceState);
         logDebug("After onCreate called super");
@@ -74,7 +76,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         myTexture.setVisibility(View.VISIBLE);
         this.width = 0;
         this.height = 0;
-        renderer = new MegaSurfaceRendererGroup(myTexture, peerId, cliendId);
+        renderer = new MegaSurfaceRendererGroup(myTexture, peerId, cliendId, numParticipants);
         logDebug("addChatRemoteVideoListener chatId: " + chatId + " ( peerId = " + peerId + ", clientId = " + cliendId + ")");
         megaChatApi.addChatRemoteVideoListener(chatId, peerId, cliendId, this);
         return v;

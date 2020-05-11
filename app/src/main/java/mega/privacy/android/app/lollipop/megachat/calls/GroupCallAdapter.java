@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.megachat.chatAdapters;
+package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.TextureView;
@@ -19,20 +18,15 @@ import java.io.File;
 import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
-import mega.privacy.android.app.lollipop.megachat.calls.InfoPeerGroupCall;
-import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 
-import static android.view.Gravity.RIGHT;
-import static android.view.Gravity.TOP;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.widget.RelativeLayout.TRUE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -188,35 +182,28 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         int height;
         int width;
         int numPeersOnCall = peers.size();
+
         if (numPeersOnCall < 3) {
             height = maxScreenHeight / numPeersOnCall;
             width = maxScreenWidth;
-        } else if (numPeersOnCall >= 3 && numPeersOnCall < 7) {
+        }else if (numPeersOnCall >= 3 && numPeersOnCall < 7) {
             height = maxScreenWidth / 2;
-            width = maxScreenWidth / 2;
+            if(numPeersOnCall == 3 && position == numPeersOnCall -1) {
+                width = maxScreenWidth;
+            }else{
+                width = maxScreenWidth / 2;
+            }
         } else {
             height = px2dp(SIZE_VIDEO_PARTICIPANTS, outMetrics);
             width = px2dp(SIZE_VIDEO_PARTICIPANTS, outMetrics);
         }
 
-        if (numPeersOnCall < 7) {
-            CustomizedGridRecyclerView.LayoutParams lp = (CustomizedGridRecyclerView.LayoutParams) holder.rlGeneral.getLayoutParams();
-            lp.height = height;
-            lp.width = width;
-
-            if (numPeersOnCall == 3 && position == 2) {
-                ViewGroup.LayoutParams layoutParamsPeer = holder.rlGeneral.getLayoutParams();
-                layoutParamsPeer.width = maxScreenWidth;
-                layoutParamsPeer.height = maxScreenWidth / 2;
-                holder.rlGeneral.setLayoutParams(layoutParamsPeer);
-            }
-            holder.rlGeneral.setLayoutParams(lp);
-
-        } else {
-            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) holder.rlGeneral.getLayoutParams();
-            lp.height = height;
-            lp.width = width;
-            holder.rlGeneral.setLayoutParams(lp);
+        ViewGroup.LayoutParams lp = holder.rlGeneral.getLayoutParams();
+        lp.height = height;
+        lp.width = width;
+        holder.rlGeneral.setLayoutParams(lp);
+        if (numPeersOnCall == 3 && position == numPeersOnCall - 1) {
+            displayMuteIcon(position, holder, peer);
         }
     }
 
@@ -231,7 +218,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     public void onBindViewHolderGrid (final ViewHolderGroupCallGrid holder, final int position){
-        logDebug("Position: " + position);
+        logDebug("Updating position... " + position);
 
         final InfoPeerGroupCall peer = getNodeAt(position);
         MegaChatCall call = ((ChatCallActivity)context).getCall();
@@ -249,7 +236,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         if (isEstablishedCall(chatId)) {
             holder.rlGeneral.setOnClickListener(v -> {
                 if (getItemCount() < MIN_USERS_GRID) {
-                    ((ChatCallActivity) context).remoteCameraClick();
+                    ((ChatCallActivity) context).remoteCameraClick(false);
                 } else {
                     ((ChatCallActivity) context).itemClicked(peer);
                 }
@@ -258,49 +245,21 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.rlGeneral.setOnClickListener(null);
         }
 
-        MegaChatSession session = ((ChatCallActivity)context).getSessionCall(peer.getPeerId(), peer.getClientId());
+        MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peer.getPeerId(), peer.getClientId());
         if (peer.isVideoOn() && !call.isOnHold() && (session == null || !session.isOnHold())) {
             logDebug("The video is ON, the call is not on hold, the session is not on hold");
 
-            if (numPeersOnCall < 7) {
-                /*Distribution of participants depending on the number of participants in the call*/
-                int sizeLayout;
-                if (numPeersOnCall < 2) {
-                    sizeLayout = maxScreenWidth;
-                } else if (numPeersOnCall == 2) {
-                    sizeLayout = maxScreenHeight / numPeersOnCall;
-                } else {
-                    sizeLayout = maxScreenWidth / 2;
-                }
-
-                RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.parentSurfaceView.getLayoutParams();
-                layoutParamsSurface.width = sizeLayout;
-                layoutParamsSurface.height = sizeLayout;
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, TRUE);
-                if (numPeersOnCall == 1 || numPeersOnCall == 2) {
-                    layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, TRUE);
-                }
-                if (numPeersOnCall == 3 || numPeersOnCall == 4) {
-                    if ((position < 2)) {
-                        layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, TRUE);
-                    } else {
-                        layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, TRUE);
-                    }
-                } else {
-                    layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-                    layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-                }
-
-                holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
-            }
+            resizeLayout(position, holder.parentSurfaceView);
 
             /*Hide the avatar and show the video*/
             activateVideo(position, holder, peer);
             checkParticipantAudio(position, holder, peer);
 
         } else {
-
             logDebug("The video is OFF or the call is not on hold or the session is not on hold");
+
+            resizeLayout(position, holder.avatarLayout);
+
             /*Hide the video and show the avatar*/
             deactivateVideo(position, holder, peer);
         }
@@ -310,6 +269,53 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         checkPeerSelected(position, holder, peer);
     }
 
+    /**
+     * Distribution of participants depending on the number of participants in the call.
+     *
+     * @param position Position of the participant in the adapter.
+     * @param layout Layout to be resized.
+     */
+    private void resizeLayout(int position, final RelativeLayout layout){
+        if( peers.size() >= 7)
+            return;
+
+       int numPeersOnCall = peers.size();
+
+        /*Distribution of participants depending on the number of participants in the call*/
+        int width;
+        int height;
+
+        if (numPeersOnCall == 1) {
+            width = maxScreenWidth;
+            height = maxScreenWidth;
+        } else if (numPeersOnCall == 2) {
+            width = maxScreenHeight / numPeersOnCall;
+            height = maxScreenHeight / numPeersOnCall;
+        } else {
+            width = maxScreenWidth / 2;
+            height = maxScreenWidth / 2;
+        }
+
+        RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) layout.getLayoutParams();
+        layoutParamsSurface.width = width;
+        layoutParamsSurface.height = height;
+        layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, TRUE);
+        if (numPeersOnCall == 1 || numPeersOnCall == 2) {
+            layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, TRUE);
+        }
+        if (numPeersOnCall == 3 || numPeersOnCall == 4) {
+            if ((position < 2)) {
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, TRUE);
+            } else {
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, TRUE);
+            }
+        } else {
+            layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+            layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        }
+
+       layout.setLayoutParams(layoutParamsSurface);
+    }
 
     /**
      * Method for activating a participant's video.
@@ -335,10 +341,10 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         if (peer.getListener() == null) {
             holder.parentSurfaceView.removeAllViews();
             TextureView myTexture = new TextureView(context);
-            myTexture.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+            myTexture.setLayoutParams(new RelativeLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
             myTexture.setAlpha(1.0f);
             myTexture.setRotation(0);
-            GroupCallListener listenerPeer = new GroupCallListener(context, myTexture, peer.getPeerId(), peer.getClientId(), isItMe(chatId, peer.getPeerId(), peer.getClientId()));
+            GroupCallListener listenerPeer = new GroupCallListener(context, myTexture, peer.getPeerId(), peer.getClientId(), chatId, peers.size());
             peer.setListener(listenerPeer);
 
             if (isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
@@ -396,14 +402,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
 
         int numPeersOnCall = peers.size();
-        if (numPeersOnCall == 3 && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
-            ViewGroup.LayoutParams layoutParamsPeer = holder.rlGeneral.getLayoutParams();
-            layoutParamsPeer.width = maxScreenWidth;
-            layoutParamsPeer.height = maxScreenWidth / 2;
-            holder.rlGeneral.setLayoutParams(layoutParamsPeer);
-        }
-
-        if ((numPeersOnCall == 2) && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
+        if (numPeersOnCall == 2 && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarBackground.getLayoutParams();
             layoutParams.width = px2dp(88, outMetrics);
             layoutParams.height = px2dp(88, outMetrics);
@@ -538,7 +537,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
 
         holder.muteIconLayout.setVisibility(View.VISIBLE);
-        displayMuteIconInVideo(holder.muteIconLayout, holder.muteIcon, peer);
+        displayMuteIcon(position, holder, peer);
     }
 
     /**
@@ -661,32 +660,43 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     /**
      * Method to updating the mute icon in the video.
      *
-     * @param muteIcon ImageView of the icon.
-     * @param peer         Participant in which the icon is to be displayed.
+     * @param position Position of the participant in the adapter.
+     * @param holder   The GroupCallAdapter.ViewHolderGroupCall in this position.
+     * @param peer     Participant in which the icon is to be displayed.
      */
-    private void displayMuteIconInVideo(final RelativeLayout muteIconLayout, final ImageView muteIcon, InfoPeerGroupCall peer) {
-        int peerPosition = peers.indexOf(peer);
+    private void displayMuteIcon(int position, ViewHolderGroupCall holder, final InfoPeerGroupCall peer) {
+        if (holder == null) {
+            holder = getHolder(position);
+            if (holder == null) {
+                return;
+            }
+        }
+
         boolean smallIcon = !(peers.size() < 7);
         int iconRightMargin = px2dp(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
         int iconTopMargin = px2dp(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
 
-        if (!smallIcon && ((ChatCallActivity) context).isActionBarShowing() && (peers.size() == 2 || peers.size() == 5 || peers.size() == 6)) {
-            if (peerPosition == 0 || (peerPosition == 1 && peers.size() != 2)) {
-                iconTopMargin += getActionBarHeight();
+        if (!smallIcon && ((ChatCallActivity) context).isActionBarShowing() && peers.size() == 2) {
+            if (position == 0 || (position == 1 && peers.size() != 2)) {
+                iconTopMargin += getActionBarHeight(context);
             }
         }
 
-        RelativeLayout.LayoutParams paramsImage = new RelativeLayout.LayoutParams(muteIcon.getLayoutParams());
+        RelativeLayout.LayoutParams paramsImage = new RelativeLayout.LayoutParams(holder.muteIcon.getLayoutParams());
         paramsImage.height = px2dp(SIZE_MUTE_ICON_LARGE, outMetrics);
         paramsImage.width = px2dp(SIZE_MUTE_ICON_LARGE, outMetrics);
-        muteIcon.setLayoutParams(paramsImage);
+        holder.muteIcon.setLayoutParams(paramsImage);
 
-        RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(muteIconLayout.getLayoutParams());
-        paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, TRUE);
-        paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, TRUE);
+        RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.muteIconLayout.getLayoutParams());
+        if (peer.isVideoOn()) {
+            paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, holder.videoLayout.getId());
+            paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, holder.videoLayout.getId());
+        } else {
+            paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, holder.avatarLayout.getId());
+            paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, holder.avatarLayout.getId());
+        }
         paramsMicroSurface.setMargins(0, iconTopMargin, iconRightMargin, 0);
-        muteIconLayout.setLayoutParams(paramsMicroSurface);
-        muteIconLayout.setGravity(TOP|RIGHT);
+        holder.muteIconLayout.setLayoutParams(paramsMicroSurface);
     }
 
     /**
@@ -694,9 +704,10 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
      */
     public void updateMuteIcon() {
         for (InfoPeerGroupCall peer : peers) {
-            ViewHolderGroupCall holder = getHolder(peers.indexOf(peer));
+            int position = peers.indexOf(peer);
+            ViewHolderGroupCall holder = getHolder(position);
             if (holder != null && !peer.isAudioOn()) {
-                displayMuteIconInVideo(holder.muteIconLayout, holder.muteIcon, peer);
+                displayMuteIcon(position, holder, peer);
             }
         }
     }
@@ -804,24 +815,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         } else {
             notifyItemChanged(position);
         }
-    }
-
-    /**
-     * Method for obtaining the height of the action bar.
-     *
-     * @return The height of actionbar.
-     */
-    private int getActionBarHeight() {
-        int actionBarHeight = ((ChatCallActivity) context).getSupportActionBar().getHeight();
-        if (actionBarHeight != 0) {
-            return actionBarHeight;
-        }
-
-        final TypedValue tv = new TypedValue();
-        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            return TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
-        }
-        return actionBarHeight;
     }
 
     /**

@@ -52,9 +52,9 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     private Rect dstRect = new Rect();
     private RectF dstRectf = new RectF();
     private TextureView myTexture = null;
+    private int numParticipants;
 
-
-    public MegaSurfaceRendererGroup(TextureView view, long peerId, long clientId) {
+    public MegaSurfaceRendererGroup(TextureView view, long peerId, long clientId, int numParticipants) {
         logDebug("MegaSurfaceRendererGroup()");
 
         this.myTexture = view;
@@ -65,6 +65,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
         this.peerId = peerId;
         this.clientId = clientId;
+        this.numParticipants = numParticipants;
         listeners = new ArrayList<>();
     }
 
@@ -82,12 +83,32 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     }
 
     private void adjustAspectRatio() {
-        logDebug("adjustAspectRatio()");
         if (bitmap != null && dstRect.height() != 0) {
             dstRect.top = 0;
             dstRect.left = 0;
             dstRect.right = surfaceWidth;
             dstRect.bottom = surfaceHeight;
+//            if (numParticipants == 1) {
+//                dstRectf = new RectF(dstRect);
+//                float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
+//                float dstaspectratio = (float) dstRect.width() / dstRect.height();
+//                if (srcaspectratio != 0 && dstaspectratio != 0) {
+//
+//                    if (srcaspectratio <= dstaspectratio) {
+//                        float newHeight = dstRect.width() / srcaspectratio;
+//                        float decrease = dstRect.height() - newHeight;
+//                        dstRect.top += decrease / 2;
+//                        dstRect.bottom -= decrease / 2;
+//                    } else {
+//                        float newWidth = dstRect.height() * srcaspectratio;
+//                        float decrease = dstRect.width() - newWidth;
+//                        dstRect.left += decrease / 2;
+//                        dstRect.right -= decrease / 2;
+//                    }
+//
+//                    dstRectf = new RectF(dstRect);
+//                }
+//            }
         }
     }
 
@@ -101,46 +122,53 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             }
         }
 
+        srcRect.left = 0;
+        srcRect.top = 0;
         if (height == width) {
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            srcRect.top = 0;
             srcRect.bottom = height;
-            srcRect.left = 0;
             srcRect.right = width;
-            logDebug("width == height. sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
-
         } else if (height > width) {
             bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
-            srcRect.top = 0;
             srcRect.bottom = width;
-            srcRect.left = 0;
             srcRect.right = width;
-            logDebug("height > width. sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
-
         } else {
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            srcRect.left = 0;
             srcRect.right = height;
-            srcRect.top = 0;
             srcRect.bottom = height;
-            logDebug("height < width. sRect(T " + srcRect.top + " -B " + srcRect.bottom + ")(L " + srcRect.left + " - R " + srcRect.right + ")");
         }
+//        if (numParticipants == 1 || height == width) {
+//            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//            srcRect.bottom = height;
+//            srcRect.right = width;
+//        } else if (height > width) {
+//            bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
+//            srcRect.bottom = width;
+//            srcRect.right = width;
+//        } else {
+//            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//            srcRect.right = height;
+//            srcRect.bottom = height;
+//        }
         adjustAspectRatio();
         return bitmap;
     }
 
     public void drawBitmap(boolean isLocal) {
-        if (bitmap == null || myTexture == null) return;
+        if (bitmap == null || myTexture == null)
+            return;
 
         Canvas canvas = myTexture.lockCanvas();
-        if (canvas == null) return;
+        if (canvas == null)
+            return;
+
         if (isLocal && isFrontCameraInUse()) {
             canvas.scale(-1, 1);
             canvas.translate(-canvas.getWidth(), 0);
         }
+
         canvas.drawBitmap(bitmap, srcRect, dstRect, null);
         myTexture.unlockCanvasAndPost(canvas);
-
     }
 
     private void notifyStateToAll() {

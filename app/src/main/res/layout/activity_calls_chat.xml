@@ -33,7 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:nestedScrollingEnabled="false"
+                    android:background="@color/blue"
                     android:orientation="vertical">
 
                     <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
@@ -131,9 +131,8 @@
                 android:layout_height="match_parent"
                 android:background="@color/black">
 
-                <!--Local camera FS-->
                 <RelativeLayout
-                    android:id="@+id/parent_layout_local_camera_FS"
+                    android:id="@+id/full_screen_parent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
@@ -142,62 +141,11 @@
                     android:background="@android:color/transparent">
 
                     <FrameLayout
-                        android:id="@+id/fragment_container_local_cameraFS"
+                        android:id="@+id/full_screen_fragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@android:color/transparent" />
                 </RelativeLayout>
-
-                <!--Remote camera FS-->
-                <RelativeLayout
-                    android:id="@+id/parent_layout_remote_camera_FS"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:background="@android:color/transparent">
-
-                    <FrameLayout
-                        android:id="@+id/fragment_container_remote_cameraFS"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@android:color/transparent" />
-                </RelativeLayout>
-
-                <!--Big Avatar-->
-                <RelativeLayout
-                    android:id="@+id/call_chat_contact_image_rl"
-                    android:layout_width="128dp"
-                    android:layout_height="128dp"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center_horizontal|top"
-                    android:layout_marginTop="218dp"
-                    android:background="@android:color/transparent">
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-                        <mega.privacy.android.app.components.RoundedImageView
-                            android:id="@+id/call_chat_contact_image"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_centerInParent="true"
-                            android:scaleType="fitCenter"
-                            rounded:border_color="#4DFFFFFF"
-                            rounded:border_width="3dp"
-                            rounded:corner_radius="60dp" />
-                        <ImageView
-                            android:id="@+id/avatar_on_hold"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:scaleType="fitCenter"
-                            android:background="@android:color/transparent"
-                            android:src="@drawable/ic_call_hold_big"
-                            android:layout_gravity="center"
-                            android:visibility="gone" />
-                    </FrameLayout>
-                </RelativeLayout>
-
             </RelativeLayout>
 
             <!-- Toolbar -->
@@ -499,17 +447,16 @@
                     <RelativeLayout
                         android:id="@+id/call_chat_my_image_rl"
                         android:layout_width="88dp"
-                        android:layout_height="88dp"
-                        android:background="@drawable/shape_call_chat">
+                        android:layout_height="88dp">
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/call_chat_my_image"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_centerInParent="true"
-                            android:scaleType="fitCenter"
-                            rounded:border_color="#4DFFFFFF"
+                            android:scaleType="center"
+                            rounded:border_color="@color/very_transparent_black"
                             rounded:border_width="3dp"
-                            rounded:corner_radius="40dp" />
+                            rounded:corner_radius="60dp"/>
                     </RelativeLayout>
                     <ImageView
                         android:id="@+id/micro_own_avatar"

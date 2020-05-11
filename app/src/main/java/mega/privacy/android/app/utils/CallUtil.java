@@ -6,8 +6,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.SystemClock;
 import androidx.core.content.ContextCompat;
+
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.RelativeLayout;
@@ -470,7 +478,6 @@ public class CallUtil {
      */
     public static Bitmap getDefaultAvatarCall(MegaChatRoom chat, long peerId, boolean normalSize, boolean isList) {
         String name = getUserNameCall(chat, peerId);
-
         /*Default Avatar*/
         int size;
         if (normalSize) {
@@ -650,5 +657,23 @@ public class CallUtil {
             return null;
 
         return listCalls;
+    }
+
+    /**
+     * Method for obtaining the height of the action bar.
+     *
+     * @return The height of actionbar.
+     */
+    public static int getActionBarHeight(Context context) {
+        int actionBarHeight = ((ChatCallActivity) context).getSupportActionBar().getHeight();
+        if (actionBarHeight != 0) {
+            return actionBarHeight;
+        }
+
+        final TypedValue tv = new TypedValue();
+        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            return TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
+        }
+        return actionBarHeight;
     }
 }
