@@ -157,6 +157,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_TRANSFER_PATH = "transferpath";
 	private static final String KEY_TRANSFER_OFFLINE = "transferoffline";
 	private static final String KEY_TRANSFER_TIMESTAMP = "transfertimestamp";
+	private static final String KEY_TRANSFER_ERROR = "transfererror";
 	public static final int MAX_TRANSFERS = 100;
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
@@ -372,7 +373,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_TRANSFER_FILENAME + " TEXT, " + KEY_TRANSFER_TYPE + " TEXT, " +
 				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT, " + KEY_TRANSFER_PATH + " TEXT, " +
-				KEY_TRANSFER_OFFLINE + " BOOLEAN, " + KEY_TRANSFER_TIMESTAMP + " TEXT" + ")";
+				KEY_TRANSFER_OFFLINE + " BOOLEAN, " + KEY_TRANSFER_TIMESTAMP + " TEXT, " + KEY_TRANSFER_ERROR + " TEXT" + ")";
 		db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
 
 		String CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS " + TABLE_EPHEMERAL + "("
@@ -812,6 +813,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_URI_MEDIA_EXTERNAL_SD_CARD + " = '" + encrypt("") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " = '" + encrypt("false") + "';");
+
+			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_ERROR + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_ERROR + " = '" + encrypt("") + "';");
 		}
 	}
 
@@ -1793,6 +1797,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_TRANSFER_PATH, encrypt(transfer.getPath()));
 		values.put(KEY_TRANSFER_OFFLINE, encrypt(transfer.getIsOfflineFile() + ""));
 		values.put(KEY_TRANSFER_TIMESTAMP, encrypt(transfer.getTimeStamp() + ""));
+		values.put(KEY_TRANSFER_ERROR, encrypt(transfer.getError() + ""));
 
 		db.insert(TABLE_COMPLETED_TRANSFERS, null, values);
 
@@ -1825,8 +1830,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String path = decrypt(cursor.getString(6));
 					boolean offline = Boolean.parseBoolean(decrypt(cursor.getString(7)));
 					long timeStamp = Long.parseLong(decrypt(cursor.getString(8)));
+					String error = decrypt(cursor.getString(9));
 
-					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp);
+					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp, error);
 					cTs.add(cT);
 				} while (cursor.moveToPrevious());
 			}

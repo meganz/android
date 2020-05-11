@@ -16,14 +16,14 @@
         android:layout_width="21dp"
         android:layout_height="21dp"
         android:src="@drawable/ic_download_transfers"
-        android:layout_alignRight="@id/transfers_list_thumbnail"
+        android:layout_alignEnd="@id/transfers_list_thumbnail"
         android:layout_alignTop="@id/transfers_list_thumbnail" />
     
     <TextView
         android:id="@+id/transfers_list_filename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/transfers_list_thumbnail"
+        android:layout_toEndOf="@id/transfers_list_thumbnail"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
 		android:layout_marginRight="13dp"
@@ -36,20 +36,19 @@
         android:id="@+id/transfers_list_completed_image"
         android:layout_width="wrap_content"
         android:layout_height="25dp"
-        android:layout_marginBottom="14dp" 
-        android:layout_toRightOf="@id/transfers_list_thumbnail"
+        android:layout_marginBottom="14dp"
+        android:layout_toEndOf="@id/transfers_list_thumbnail"
         android:layout_below="@id/transfers_list_filename"
-        android:layout_alignLeft="@id/transfers_list_filename" />
+        android:layout_alignStart="@id/transfers_list_filename" />
     
     <TextView
         android:id="@+id/transfers_list_completed_text"
         android:layout_width="wrap_content"
         android:layout_height="25dp"
-        android:layout_toRightOf="@id/transfers_list_completed_image"
+        android:layout_toEndOf="@id/transfers_list_completed_image"
         android:layout_below="@+id/transfers_list_filename"
         android:textColor="@color/file_list_second_row"
-        android:layout_marginLeft="5dp"
-		android:layout_marginRight="13dp"
+		android:layout_marginEnd="13dp"
 		android:singleLine="true"
 		android:ellipsize="middle"/>
 
@@ -60,8 +59,8 @@
 		android:src="@drawable/ic_close_grey"
 		android:background="@null"
 		android:layout_centerVertical="true"
-		android:layout_marginRight="16dp"
-		android:layout_alignParentRight="true"/>
+		android:layout_marginEnd="16dp"
+		android:layout_alignParentEnd="true"/>
 
     <ImageView
         android:id="@+id/transfers_list_option_pause"
@@ -72,19 +71,19 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="12dp"
         android:layout_marginLeft="12dp"
-        android:layout_toLeftOf="@id/transfers_list_option_remove"/>
+        android:layout_toStartOf="@id/transfers_list_option_remove"/>
 
     <ProgressBar
 	    android:id="@+id/transfers_list_bar"
 		android:layout_width="fill_parent"
 		android:layout_height="5dp"
 		style="@style/UsedSpaceProgressBar"  
-        android:layout_marginLeft="13dp" 
-        android:layout_marginRight="16dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="10dp"
 		android:layout_below="@id/transfers_list_filename"
-		android:layout_toLeftOf="@id/transfers_list_option_pause"
-        android:layout_toRightOf="@id/transfers_list_thumbnail" />
+		android:layout_toStartOf="@id/transfers_list_option_pause"
+        android:layout_toEndOf="@id/transfers_list_thumbnail" />
 
 </RelativeLayout>
 

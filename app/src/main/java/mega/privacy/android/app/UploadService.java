@@ -663,7 +663,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             }else{
                 totalFileUploadsCompleted++;
                 mapProgressFileTransfers.put(transfer.getTag(), transfer);
-                dbH.setCompletedTransfer(new AndroidCompletedTransfer(transfer));
+                dbH.setCompletedTransfer(new AndroidCompletedTransfer(transfer, error));
             }
 
 			if (canceled) {

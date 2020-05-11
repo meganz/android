@@ -1482,7 +1482,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(!isVoiceClip) transfersCount--;
 
 			if(!transfer.isFolderTransfer()){
-				dbH.setCompletedTransfer(new AndroidCompletedTransfer(transfer));
+				dbH.setCompletedTransfer(new AndroidCompletedTransfer(transfer, error));
 
 				if (!isVoiceClip) {
 					updateProgressNotification();

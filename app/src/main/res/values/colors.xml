@@ -213,4 +213,6 @@
     <color name="voice_clip_bubble">#323232</color>
     <color name="background_recording">#78252525</color>
 
+    <color name="failed_transfer">#E1000F</color>
+
 </resources>

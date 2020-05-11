@@ -3,6 +3,8 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.TypedValue;
@@ -28,6 +30,7 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaCompletedTransfersAdapter.ViewHolderTransfer> implements OnClickListener {
 
@@ -139,6 +142,10 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers);
 		}
 
+		holder.textViewCompleted.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+        RelativeLayout.LayoutParams params1 =  (RelativeLayout.LayoutParams) holder.imageViewCompleted.getLayoutParams();
+        params1.rightMargin = px2dp(5, context.getResources().getDisplayMetrics());
+
 		int state = transfer.getState();
 		logDebug("State of the transfer: " + state);
 		switch (state) {
@@ -147,12 +154,21 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_complete_transfer);
 				break;
 
+			case MegaTransfer.STATE_FAILED:
+				holder.textViewCompleted.setTextColor(ContextCompat.getColor(context, R.color.failed_transfer));
+				holder.textViewCompleted.setText(String.format("%s: %s", context.getString(R.string.failed_label), transfer.getError()));
+                params1.rightMargin = 0;
+				holder.imageViewCompleted.setImageBitmap(null);
+				break;
+
 			default:
 				logError("Default status -- error, this should be completed state always");
 				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				break;
 		}
+
+        holder.imageViewCompleted.setLayoutParams(params1);
 
 		holder.itemLayout.setBackgroundColor(Color.WHITE);
 	}

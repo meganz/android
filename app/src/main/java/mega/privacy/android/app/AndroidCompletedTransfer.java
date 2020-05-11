@@ -4,6 +4,8 @@ package mega.privacy.android.app;
 import java.io.File;
 
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 
@@ -23,8 +25,9 @@ public class AndroidCompletedTransfer {
     private String path;
     private boolean isOfflineFile;
     private long timeStamp;
+    private String error;
 
-    public AndroidCompletedTransfer(int id, String fileName, int type, int state, String size, String nodeHandle, String path, boolean isOfflineFile, long timeStamp) {
+    public AndroidCompletedTransfer(int id, String fileName, int type, int state, String size, String nodeHandle, String path, boolean isOfflineFile, long timeStamp, String error) {
         this.id = id;
         this.fileName = fileName;
         this.type = type;
@@ -34,9 +37,10 @@ public class AndroidCompletedTransfer {
         this.path = removeLastFileSeparator(path);
         this.isOfflineFile = isOfflineFile;
         this.timeStamp = timeStamp;
+        this.error = error;
     }
 
-    public AndroidCompletedTransfer (MegaTransfer transfer) {
+    public AndroidCompletedTransfer (MegaTransfer transfer, MegaError error) {
         this.fileName = transfer.getFileName();
         this.type = transfer.getType();
         this.state = transfer.getState();
@@ -44,6 +48,7 @@ public class AndroidCompletedTransfer {
         this.nodeHandle = transfer.getNodeHandle() + "";
         this.path = getTransferPath(transfer);
         this.timeStamp = System.currentTimeMillis();
+        this.error = MegaApiJava.getTranslatedErrorString(error);
     }
 
     public String getFileName() {
@@ -116,6 +121,14 @@ public class AndroidCompletedTransfer {
 
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public String getError() {
+        return error;
     }
 
     private String removeLastFileSeparator(String path) {

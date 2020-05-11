@@ -15018,12 +15018,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		builder.show();
 	}
 
-	public void addCompletedTransfer(MegaTransfer transfer){
+	public void addCompletedTransfer(MegaTransfer transfer, MegaError e){
 		logDebug("Node Handle: " + transfer.getNodeHandle());
 
 		completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 		if (completedTFLol != null) {
-			completedTFLol.transferFinish(new AndroidCompletedTransfer(transfer));
+			completedTFLol.transferFinish(new AndroidCompletedTransfer(transfer, e));
 		}
 	}
 
@@ -15105,7 +15105,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 
 				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
-					addCompletedTransfer(transfer);
+					addCompletedTransfer(transfer, e);
 				}
 
 				int pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();

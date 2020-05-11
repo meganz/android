@@ -2774,4 +2774,6 @@
 
     <string name="file_provider_title" context="Title of the File Provider activity">Attach from&#8230;</string>
     <string name="storage_root_label" context="Storage root label">Storage root</string>
+
+    <string name="failed_label" context="Label describing some action failed">Failed</string>
 </resources>
