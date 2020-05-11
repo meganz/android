@@ -1,7 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -13,9 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.MegaApplication;
@@ -25,56 +22,58 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.MimeTypeList.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
 
-public class ManageTransferBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
+public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+    private static final String TRANSFER_ID = "TRANSFER_ID";
+
     private ManagerActivityLollipop managerActivity;
 
     private AndroidCompletedTransfer transfer;
     private long handle;
-
-    private BottomSheetBehavior mBehavior;
-
-    private ImageView thumbnail;
-    private ImageView type;
-    private ImageView stateIcon;
-    private TextView name;
-    private TextView location;
-    private LinearLayout viewInFolderOption;
-    private LinearLayout getLinkOption;
-    private LinearLayout clearOption;
+    private int transferId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        managerActivity = (ManagerActivityLollipop) context;
+
         if (savedInstanceState == null) {
             transfer = managerActivity.getSelectedTransfer();
+            transferId = transfer.getId();
         } else {
-
+            transferId = savedInstanceState.getInt(TRANSFER_ID, -1);
+            transfer = dbH.getcompletedTransfer(transferId);
         }
     }
 
     @Override
     public void setupDialog(Dialog dialog, int style) {
-        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_manage_transfer, null);
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_manage_transfer, null);
+        mainLinearLayout = contentView.findViewById(R.id.manage_transfer_bottom_sheet);
+        items_layout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
         if (transfer == null) return;
 
         managerActivity = (ManagerActivityLollipop) getActivity();
 
-        thumbnail = contentView.findViewById(R.id.manage_transfer_thumbnail);
-        type = contentView.findViewById(R.id.manage_transfer_small_icon);
-        stateIcon = contentView.findViewById(R.id.manage_transfer_completed_image);
-        name = contentView.findViewById(R.id.manage_transfer_filename);
-        location = contentView.findViewById(R.id.manage_transfer_location);
+        ImageView thumbnail = contentView.findViewById(R.id.manage_transfer_thumbnail);
+        ImageView type = contentView.findViewById(R.id.manage_transfer_small_icon);
+        ImageView stateIcon = contentView.findViewById(R.id.manage_transfer_completed_image);
+        TextView name = contentView.findViewById(R.id.manage_transfer_filename);
+        TextView location = contentView.findViewById(R.id.manage_transfer_location);
 
-        viewInFolderOption = contentView.findViewById(R.id.option_view_layout);
+        LinearLayout viewInFolderOption = contentView.findViewById(R.id.option_view_layout);
         viewInFolderOption.setOnClickListener(this);
-        getLinkOption = contentView.findViewById(R.id.option_get_link_layout);
+        LinearLayout getLinkOption = contentView.findViewById(R.id.option_get_link_layout);
         getLinkOption.setOnClickListener(this);
-        clearOption = contentView.findViewById(R.id.option_clear_layout);
+        LinearLayout clearOption = contentView.findViewById(R.id.option_clear_layout);
         clearOption.setOnClickListener(this);
+        TextView clearText = contentView.findViewById(R.id.option_clear_text);
+        LinearLayout retryOption = contentView.findViewById(R.id.option_retry_layout);
+        retryOption.setOnClickListener(this);
 
         name.setText(transfer.getFileName());
 
@@ -86,10 +85,27 @@ public class ManageTransferBottomSheetDialogFragment extends BottomSheetDialogFr
             type.setImageResource(R.drawable.ic_upload_transfers);
         }
 
+        location.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+        RelativeLayout.LayoutParams params =  (RelativeLayout.LayoutParams) stateIcon.getLayoutParams();
+        params.rightMargin = px2dp(5, context.getResources().getDisplayMetrics());
+
         switch (transfer.getState()) {
             case STATE_COMPLETED:
                 location.setText(transfer.getPath());
                 stateIcon.setImageResource(R.drawable.ic_complete_transfer);
+                retryOption.setVisibility(View.GONE);
+                clearText.setText(R.string.general_clear);
+                break;
+
+            case STATE_FAILED:
+                location.setTextColor(ContextCompat.getColor(context, R.color.failed_transfer));
+                location.setText(String.format("%s: %s", context.getString(R.string.failed_label), transfer.getError()));
+                params.rightMargin = 0;
+                stateIcon.setImageBitmap(null);
+                viewInFolderOption.setVisibility(View.GONE);
+                contentView.findViewById(R.id.separator_get_link).setVisibility(View.GONE);
+                getLinkOption.setVisibility(View.GONE);
+                clearText.setText(R.string.action_cancel_transfer);
                 break;
 
             default:
@@ -97,6 +113,8 @@ public class ManageTransferBottomSheetDialogFragment extends BottomSheetDialogFr
                 stateIcon.setImageResource(R.drawable.ic_queue);
                 break;
         }
+
+        stateIcon.setLayoutParams(params);
 
         thumbnail.setImageResource(typeForName(transfer.getFileName()).getIconResourceId());
 
@@ -124,9 +142,7 @@ public class ManageTransferBottomSheetDialogFragment extends BottomSheetDialogFr
         }
 
         dialog.setContentView(contentView);
-
-        mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
     }
 
     @Override
@@ -143,19 +159,18 @@ public class ManageTransferBottomSheetDialogFragment extends BottomSheetDialogFr
             case R.id.option_clear_layout:
                 managerActivity.removeTransfer(transfer);
                 break;
+
+            case R.id.option_retry_layout:
+                managerActivity.retryTransfer(transfer);
+                break;
         }
 
-        mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        managerActivity = (ManagerActivityLollipop) getActivity();
+        setStateBottomSheetBehaviorHidden();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putInt(TRANSFER_ID, transferId);
     }
 }

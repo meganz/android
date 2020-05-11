@@ -26,8 +26,10 @@ public class AndroidCompletedTransfer {
     private boolean isOfflineFile;
     private long timeStamp;
     private String error;
+    private String originalPath;
+    private long parentHandle;
 
-    public AndroidCompletedTransfer(int id, String fileName, int type, int state, String size, String nodeHandle, String path, boolean isOfflineFile, long timeStamp, String error) {
+    public AndroidCompletedTransfer(int id, String fileName, int type, int state, String size, String nodeHandle, String path, boolean isOfflineFile, long timeStamp, String error, String originalPath, long parentHandle) {
         this.id = id;
         this.fileName = fileName;
         this.type = type;
@@ -38,6 +40,8 @@ public class AndroidCompletedTransfer {
         this.isOfflineFile = isOfflineFile;
         this.timeStamp = timeStamp;
         this.error = error;
+        this.originalPath = originalPath;
+        this.parentHandle = parentHandle;
     }
 
     public AndroidCompletedTransfer (MegaTransfer transfer, MegaError error) {
@@ -49,6 +53,8 @@ public class AndroidCompletedTransfer {
         this.path = getTransferPath(transfer);
         this.timeStamp = System.currentTimeMillis();
         this.error = MegaApiJava.getTranslatedErrorString(error);
+        this.originalPath = transfer.getPath();
+        this.parentHandle = transfer.getParentHandle();
     }
 
     public String getFileName() {
@@ -123,12 +129,28 @@ public class AndroidCompletedTransfer {
         this.timeStamp = timeStamp;
     }
 
+    public String getError() {
+        return error;
+    }
+
     public void setError(String error) {
         this.error = error;
     }
 
-    public String getError() {
-        return error;
+    public String getOriginalPath() {
+        return originalPath;
+    }
+
+    public void setOriginalPath(String originalPath) {
+        this.originalPath = originalPath;
+    }
+
+    public long getParentHandle() {
+        return parentHandle;
+    }
+
+    public void setParentHandle(long parentHandle) {
+        this.parentHandle = parentHandle;
     }
 
     private String removeLastFileSeparator(String path) {

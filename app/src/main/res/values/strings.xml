@@ -2776,4 +2776,5 @@
     <string name="storage_root_label" context="Storage root label">Storage root</string>
 
     <string name="failed_label" context="Label describing some action failed">Failed</string>
+    <string name="action_cancel_transfer" context="Action cancel transfer">Cancel transfer</string>
 </resources>

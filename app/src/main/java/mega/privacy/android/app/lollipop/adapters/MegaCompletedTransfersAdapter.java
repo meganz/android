@@ -146,9 +146,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
         RelativeLayout.LayoutParams params1 =  (RelativeLayout.LayoutParams) holder.imageViewCompleted.getLayoutParams();
         params1.rightMargin = px2dp(5, context.getResources().getDisplayMetrics());
 
-		int state = transfer.getState();
-		logDebug("State of the transfer: " + state);
-		switch (state) {
+		switch (transfer.getState()) {
 			case MegaTransfer.STATE_COMPLETED:
 				holder.textViewCompleted.setText(transfer.getPath());
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_complete_transfer);

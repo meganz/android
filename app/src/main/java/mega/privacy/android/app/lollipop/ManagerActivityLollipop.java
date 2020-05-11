@@ -16738,6 +16738,28 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	public void retryTransfer(AndroidCompletedTransfer transfer) {
+		dbH.deleteTransfer(transfer.getId());
+
+		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
+			ArrayList<Long> handleList = new ArrayList<>();
+			handleList.add(Long.parseLong(transfer.getNodeHandle()));
+			nC.prepareForDownload(handleList, false);
+		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+			File file = new File(transfer.getOriginalPath());
+			if (!isFileAvailable(file)) {
+//				Show error
+				return;
+			}
+
+			ArrayList<String> paths = new ArrayList<>();
+			paths.add(transfer.getOriginalPath());
+
+			UploadServiceTask uploadServiceTask = new UploadServiceTask(file.getParentFile().getAbsolutePath(), paths, transfer.getParentHandle());
+			uploadServiceTask.start();
+		}
+	}
+
 	public void openTransferLocation(AndroidCompletedTransfer transfer) {
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
 			if (transfer.getIsOfflineFile()) {

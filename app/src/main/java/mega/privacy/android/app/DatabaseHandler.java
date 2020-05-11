@@ -158,6 +158,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_TRANSFER_OFFLINE = "transferoffline";
 	private static final String KEY_TRANSFER_TIMESTAMP = "transfertimestamp";
 	private static final String KEY_TRANSFER_ERROR = "transfererror";
+	private static final String KEY_TRANSFER_ORIGINAL_PATH = "transferoriginalpath";
+	private static final String KEY_TRANSFER_PARENT_HANDLE = "transferparenthandle";
 	public static final int MAX_TRANSFERS = 100;
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
@@ -373,7 +375,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_TRANSFER_FILENAME + " TEXT, " + KEY_TRANSFER_TYPE + " TEXT, " +
 				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT, " + KEY_TRANSFER_PATH + " TEXT, " +
-				KEY_TRANSFER_OFFLINE + " BOOLEAN, " + KEY_TRANSFER_TIMESTAMP + " TEXT, " + KEY_TRANSFER_ERROR + " TEXT" + ")";
+				KEY_TRANSFER_OFFLINE + " BOOLEAN, " + KEY_TRANSFER_TIMESTAMP + " TEXT, " + KEY_TRANSFER_ERROR + " TEXT, " +
+				KEY_TRANSFER_ORIGINAL_PATH + " TEXT, " + KEY_TRANSFER_PARENT_HANDLE + " TEXT" + ")";
 		db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
 
 		String CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS " + TABLE_EPHEMERAL + "("
@@ -816,6 +819,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_ERROR + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_ERROR + " = '" + encrypt("") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_ORIGINAL_PATH + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_ORIGINAL_PATH + " = '" + encrypt("") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_PARENT_HANDLE + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_PARENT_HANDLE + " = '" + encrypt("") + "';");
 		}
 	}
 
@@ -1787,6 +1794,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.delete(TABLE_COMPLETED_TRANSFERS, KEY_ID + "=" + id, null);
 	}
 
+	public AndroidCompletedTransfer getcompletedTransfer(int id) {
+		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS + " WHERE " + KEY_ID + " = '" + id + "'";
+
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (cursor != null && cursor.moveToFirst()) {
+			id = Integer.parseInt(cursor.getString(0));
+			String filename = decrypt(cursor.getString(1));
+			String type =  decrypt(cursor.getString(2));
+			int typeInt = Integer.parseInt(type);
+			String state = decrypt(cursor.getString(3));
+			int stateInt = Integer.parseInt(state);
+			String size = decrypt(cursor.getString(4));
+			String nodeHandle = decrypt(cursor.getString(5));
+			String path = decrypt(cursor.getString(6));
+			boolean offline = Boolean.parseBoolean(decrypt(cursor.getString(7)));
+			long timeStamp = Long.parseLong(decrypt(cursor.getString(8)));
+			String error = decrypt(cursor.getString(9));
+			String originalPath = decrypt(cursor.getString(10));
+			long parentHandle = Long.parseLong(decrypt(cursor.getString(11)));
+
+			AndroidCompletedTransfer transfer = new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp, error, originalPath, parentHandle);
+			cursor.close();
+			return transfer;
+		}
+		return null;
+	}
+
 	public void setCompletedTransfer(AndroidCompletedTransfer transfer){
 		ContentValues values = new ContentValues();
 		values.put(KEY_TRANSFER_FILENAME, encrypt(transfer.getFileName()));
@@ -1797,7 +1832,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_TRANSFER_PATH, encrypt(transfer.getPath()));
 		values.put(KEY_TRANSFER_OFFLINE, encrypt(transfer.getIsOfflineFile() + ""));
 		values.put(KEY_TRANSFER_TIMESTAMP, encrypt(transfer.getTimeStamp() + ""));
-		values.put(KEY_TRANSFER_ERROR, encrypt(transfer.getError() + ""));
+		values.put(KEY_TRANSFER_ERROR, encrypt(transfer.getError()));
+		values.put(KEY_TRANSFER_ORIGINAL_PATH, encrypt(transfer.getOriginalPath()));
+		values.put(KEY_TRANSFER_PARENT_HANDLE, encrypt(transfer.getParentHandle() + ""));
 
 		db.insert(TABLE_COMPLETED_TRANSFERS, null, values);
 
@@ -1831,8 +1868,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					boolean offline = Boolean.parseBoolean(decrypt(cursor.getString(7)));
 					long timeStamp = Long.parseLong(decrypt(cursor.getString(8)));
 					String error = decrypt(cursor.getString(9));
+					String originalPath = decrypt(cursor.getString(10));
+					long parentHandle = Long.parseLong(decrypt(cursor.getString(11)));
 
-					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp, error);
+					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp, error, originalPath, parentHandle);
 					cTs.add(cT);
 				} while (cursor.moveToPrevious());
 			}
