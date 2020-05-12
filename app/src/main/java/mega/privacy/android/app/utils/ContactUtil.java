@@ -39,6 +39,10 @@ public class ContactUtil {
     }
 
     public static String getContactNameDB(MegaContactDB contactDB) {
+        if (contactDB == null) {
+            return null;
+        }
+
         String nicknameText = contactDB.getNickname();
         if (nicknameText != null) {
             return nicknameText;
@@ -46,10 +50,9 @@ public class ContactUtil {
 
         String firstNameText = contactDB.getName();
         String lastNameText = contactDB.getLastName();
-
         String emailText = contactDB.getMail();
-        String nameResult = buildFullName(firstNameText, lastNameText, emailText);
-        return nameResult;
+
+        return buildFullName(firstNameText, lastNameText, emailText);
     }
 
     public static String getContactNameDB(long contactHandle) {
