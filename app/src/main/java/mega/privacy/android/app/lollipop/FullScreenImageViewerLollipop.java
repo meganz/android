@@ -720,7 +720,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 					Intent i = new Intent(this, FileInfoActivityLollipop.class);
 					i.putExtra("handle", node.getHandle());
-					i.putExtra("name", node.getName());
+					i.putExtra(NAME, node.getName());
 					if (nC == null) {
 						nC = new NodeController(this);
 					}
