@@ -47,7 +47,6 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
     private SurfaceView surfaceView = null;
     private RelativeLayout avatarLayout;
     private RoundedImageView avatarImage;
-    private MegaChatCall call;
     private MegaChatRoom chatRoom;
 
     public static FragmentIndividualCall newInstance(long chatId, long peerid, long clientid, boolean isSmallCamera) {
@@ -73,9 +72,7 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
 
         megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         this.chatRoom = megaChatApi.getChatRoom(chatId);
-        this.call = megaChatApi.getChatCall(chatId);
-
-        if (chatRoom == null || call == null)
+        if (chatRoom == null || megaChatApi.getChatCall(chatId) == null)
             return;
 
         if (peerid == INVALID_CALL_PEER_ID) {
@@ -140,7 +137,9 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * @return The session.
      */
     private MegaChatSession getSession() {
-        if (isItMe(chatId, peerid, clientid))
+        MegaChatCall call = ((ChatCallActivity)context).getCall();
+
+        if (call == null || isItMe(chatId, peerid, clientid))
             return null;
 
         return call.getMegaChatSession(peerid, clientid);
@@ -292,7 +291,6 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
 
 
         deactivateVideo();
-
         showOnHoldImage();
     }
 
@@ -304,6 +302,7 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
             return;
 
         avatarLayout.setVisibility(View.VISIBLE);
+        MegaChatCall call = ((ChatCallActivity)context).getCall();
 
         if ((call != null && call.isOnHold()) || (getSession() != null && getSession().isOnHold())) {
             avatarImageOnHold.setVisibility(View.VISIBLE);
@@ -377,7 +376,7 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
     public void changeUser(long newChatId, long callId, long newPeerId, long newClientId, MegaChatSession session) {
         logDebug(" Current peerI: " + peerid + ", new peerId = " + newPeerId + ". Current clientId: " + clientid + ", new clientId = " + newClientId);
 
-        if (isSmallCamera || (newPeerId == peerid && newClientId == clientid))
+        if (isSmallCamera || (newPeerId == peerid && newClientId == clientid) || ((ChatCallActivity)context).getCall().getId() != callId)
             return;
 
         deactivateVideo();
@@ -388,9 +387,6 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
         if (newChatId != chatId) {
             this.chatId = newChatId;
             this.chatRoom = megaChatApi.getChatRoom(chatId);
-        }
-        if (call.getId() != callId) {
-            this.call = megaChatApi.getChatCall(chatId);
         }
 
         updateAvatar(peerid);
