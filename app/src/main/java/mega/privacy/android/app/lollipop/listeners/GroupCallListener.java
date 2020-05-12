@@ -91,10 +91,12 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
         return height;
     }
 
-    public Bitmap getLastFrame() {
-        Bitmap bitmap = myTexture.getBitmap();
-        Bitmap.createScaledBitmap(bitmap, bitmap.getWidth(), bitmap.getHeight(), true);
-        return bitmap;
+    public Bitmap getLastFrame(int width, int height) {
+        if (myTexture != null) {
+            Bitmap bitmap = myTexture.getBitmap(width, height);
+            return bitmap;
+        }
+        return null;
     }
 }
 

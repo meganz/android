@@ -2058,7 +2058,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * @return True if it's audio only. False if it's video.
      */
     private boolean isOnlyAudioCall() {
-        return callChat != null && callChat.getNumParticipants(MegaChatCall.VIDEO) <= 0;
+        return getCall() != null && callChat.getNumParticipants(MegaChatCall.VIDEO) <= 0;
     }
 
     /**
@@ -2251,7 +2251,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        if (getCall() == null) return;
+        if (getCall() == null)
+            return;
+
         int usersWithVideo = callChat.getNumParticipants(MegaChatCall.VIDEO);
         if (usersWithVideo <= 0) {
             linearParticipants.setVisibility(View.GONE);

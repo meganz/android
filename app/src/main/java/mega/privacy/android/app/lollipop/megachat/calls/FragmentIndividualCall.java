@@ -27,27 +27,27 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FragmentIndividualCall extends Fragment implements View.OnClickListener {
 
-    private RelativeLayout muteLayout;
-    private RelativeLayout videoLayout;
-    private ImageView avatarImageOnHold;
-
     private IndividualCallListener listener = null;
     private Context context;
     private MegaChatApiAndroid megaChatApi;
     private Display display;
     private DisplayMetrics outMetrics;
 
-    private View contentView;
-
+    private MegaChatRoom chatRoom;
     private long chatId;
     private long peerid;
     private long clientid;
+
     private boolean isSmallCamera;
 
+    private View contentView;
     private SurfaceView surfaceView = null;
     private RelativeLayout avatarLayout;
     private RoundedImageView avatarImage;
-    private MegaChatRoom chatRoom;
+
+    private RelativeLayout muteLayout;
+    private RelativeLayout videoLayout;
+    private ImageView avatarImageOnHold;
 
     public static FragmentIndividualCall newInstance(long chatId, long peerid, long clientid, boolean isSmallCamera) {
         logDebug("Chat ID: " + chatId);
@@ -121,14 +121,10 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
             avatarImageOnHold.setVisibility(View.GONE);
         }
 
-        init();
-
-        return contentView;
-    }
-
-    private void init() {
         updateAvatar(peerid);
         checkValues(peerid, clientid, null);
+
+        return contentView;
     }
 
     /**
@@ -289,7 +285,6 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
         if (avatarLayout == null)
             return;
 
-
         deactivateVideo();
         showOnHoldImage();
     }
@@ -374,7 +369,6 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * @param session     The session with the contact.
      */
     public void changeUser(long newChatId, long callId, long newPeerId, long newClientId, MegaChatSession session) {
-        logDebug(" Current peerI: " + peerid + ", new peerId = " + newPeerId + ". Current clientId: " + clientid + ", new clientId = " + newClientId);
 
         if (isSmallCamera || (newPeerId == peerid && newClientId == clientid) || ((ChatCallActivity)context).getCall().getId() != callId)
             return;
@@ -393,7 +387,6 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
         checkValues(peerid, clientid, session);
     }
 
-
     /**
      * Method to destroy the surfaceView.
      */
@@ -409,6 +402,7 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
                 videoLayout.setVisibility(View.GONE);
             }
         }
+
         if (listener != null) {
             logDebug("Removing remote video listener");
             if (isItMe(chatId, peerid, clientid)) {
