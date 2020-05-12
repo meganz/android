@@ -214,5 +214,7 @@
     <color name="background_recording">#78252525</color>
 
     <color name="failed_transfer">#E1000F</color>
+    <color name="download_green">#31B500</color>
+    <color name="upload_blue">#2BA6DE</color>
 
 </resources>

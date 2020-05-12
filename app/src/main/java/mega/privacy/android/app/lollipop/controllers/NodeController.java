@@ -366,8 +366,6 @@ public class NodeController {
             requestLocalFolder(downloadInfo, null);
         } else {
             logDebug("NOT askMe");
-            File defaultPathF = new File(downloadLocationDefaultPath);
-            defaultPathF.mkdirs();
             checkSizeBeforeDownload(downloadLocationDefaultPath, null, size, hashes, highPriority);
         }
     }
@@ -768,103 +766,103 @@ public class NodeController {
                     logWarning("localPath is NULL");
                 }
             }
+        }
 
-            int numberOfNodesAlreadyDownloaded = 0;
-            int numberOfNodesPending = 0;
+        int numberOfNodesAlreadyDownloaded = 0;
+        int numberOfNodesPending = 0;
 
-            for (long hash : hashes) {
-                logDebug("hashes.length more than 1");
-                MegaNode node = megaApi.getNodeByHandle(hash);
-                if(node != null){
-                    logDebug("node NOT null");
-                    Map<MegaNode, String> dlFiles = new HashMap<>();
-                    Map<Long, String> targets = new HashMap<>();
-                    if (node.getType() == MegaNode.TYPE_FOLDER) {
-                        logDebug("MegaNode.TYPE_FOLDER");
-                        if (sdCardOperator.isSDCardDownload()) {
-                            sdCardOperator.buildFileStructure(targets, parentPath, megaApi, node);
-                            getDlList(dlFiles, node, new File(sdCardOperator.getDownloadRoot(), node.getName()));
-                        } else {
-                            getDlList(dlFiles, node, new File(parentPath, node.getName()));
-                        }
+        for (long hash : hashes) {
+            logDebug("hashes.length more than 1");
+            MegaNode node = megaApi.getNodeByHandle(hash);
+            if(node != null){
+                logDebug("node NOT null");
+                Map<MegaNode, String> dlFiles = new HashMap<>();
+                Map<Long, String> targets = new HashMap<>();
+                if (node.getType() == MegaNode.TYPE_FOLDER) {
+                    logDebug("MegaNode.TYPE_FOLDER");
+                    if (sdCardOperator.isSDCardDownload()) {
+                        sdCardOperator.buildFileStructure(targets, parentPath, megaApi, node);
+                        getDlList(dlFiles, node, new File(sdCardOperator.getDownloadRoot(), node.getName()));
                     } else {
-                        logDebug("MegaNode.TYPE_FILE");
-                        if (sdCardOperator.isSDCardDownload()) {
-                            targets.put(node.getHandle(), parentPath);
-                            dlFiles.put(node, sdCardOperator.getDownloadRoot());
+                        getDlList(dlFiles, node, new File(parentPath, node.getName()));
+                    }
+                } else {
+                    logDebug("MegaNode.TYPE_FILE");
+                    if (sdCardOperator.isSDCardDownload()) {
+                        targets.put(node.getHandle(), parentPath);
+                        dlFiles.put(node, sdCardOperator.getDownloadRoot());
+                    } else {
+                        dlFiles.put(node, parentPath);
+                    }
+                }
+
+                for (MegaNode document : dlFiles.keySet()) {
+                    String path = dlFiles.get(document);
+                    String targetPath = targets.get(document.getHandle());
+
+                    File destDir = new File(path);
+                    File destFile;
+                    destDir.mkdirs();
+                    if (destDir.isDirectory()){
+                        destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
+                    }
+                    else{
+                        destFile = destDir;
+                    }
+
+                    if (isFileAvailable(destFile)
+                            && document.getSize() == destFile.length()
+                            && isFileDownloadedLatest(destFile, document)) {
+                        numberOfNodesAlreadyDownloaded++;
+                        logWarning(destFile.getAbsolutePath() + " already downloaded");
+                    }
+                    else {
+                        numberOfNodesPending++;
+                        logDebug("Start service");
+                        Intent service = new Intent(context, DownloadService.class);
+                        service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+                        service.putExtra(DownloadService.EXTRA_URL, url);
+                        if(sdCardOperator.isSDCardDownload()) {
+                            service = getDownloadToSDCardIntent(service, path, targetPath, dbH.getSDCardUri());
                         } else {
-                            dlFiles.put(node, parentPath);
+                            service.putExtra(DownloadService.EXTRA_PATH, path);
                         }
+                        service.putExtra(DownloadService.EXTRA_URL, url);
+                        service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+                        service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
+                        if(highPriority){
+                            service.putExtra(HIGH_PRIORITY_TRANSFER, true);
+                        }
+                        if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
+                            service.putExtra("fromMV", true);
+                        }
+                        context.startService(service);
                     }
-
-                    for (MegaNode document : dlFiles.keySet()) {
-                        String path = dlFiles.get(document);
-                        String targetPath = targets.get(document.getHandle());
-
-                        File destDir = new File(path);
-                        File destFile;
-                        destDir.mkdirs();
-                        if (destDir.isDirectory()){
-                            destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
-                        }
-                        else{
-                            destFile = destDir;
-                        }
-
-                        if (isFileAvailable(destFile)
-                                && document.getSize() == destFile.length()
-                                && isFileDownloadedLatest(destFile, document)) {
-                            numberOfNodesAlreadyDownloaded++;
-                            logWarning(destFile.getAbsolutePath() + " already downloaded");
-                        }
-                        else {
-                            numberOfNodesPending++;
-                            logDebug("Start service");
-                            Intent service = new Intent(context, DownloadService.class);
-                            service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-                            service.putExtra(DownloadService.EXTRA_URL, url);
-                            if(sdCardOperator.isSDCardDownload()) {
-                                service = getDownloadToSDCardIntent(service, path, targetPath, dbH.getSDCardUri());
-                            } else {
-                                service.putExtra(DownloadService.EXTRA_PATH, path);
-                            }
-                            service.putExtra(DownloadService.EXTRA_URL, url);
-                            service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-                            service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
-                            if(highPriority){
-                                service.putExtra(HIGH_PRIORITY_TRANSFER, true);
-                            }
-                            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
-                                service.putExtra("fromMV", true);
-                            }
-                            context.startService(service);
-                        }
-                    }
-                }
-                else if(url != null) {
-                    logDebug("URL NOT null");
-                    logDebug("Start service");
-                    Intent service = new Intent(context, DownloadService.class);
-                    service.putExtra(DownloadService.EXTRA_HASH, hash);
-                    service.putExtra(DownloadService.EXTRA_URL, url);
-                    service.putExtra(DownloadService.EXTRA_SIZE, size);
-                    service.putExtra(DownloadService.EXTRA_PATH, parentPath);
-                    service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
-                    if(highPriority){
-                        service.putExtra(HIGH_PRIORITY_TRANSFER, true);
-                    }
-                    if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
-                        service.putExtra("fromMV", true);
-                    }
-                    context.startService(service);
-                }
-                else {
-                    logWarning("Node NOT fOUND!!!!!");
                 }
             }
-
-            showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
+            else if(url != null) {
+                logDebug("URL NOT null");
+                logDebug("Start service");
+                Intent service = new Intent(context, DownloadService.class);
+                service.putExtra(DownloadService.EXTRA_HASH, hash);
+                service.putExtra(DownloadService.EXTRA_URL, url);
+                service.putExtra(DownloadService.EXTRA_SIZE, size);
+                service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+                service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
+                if(highPriority){
+                    service.putExtra(HIGH_PRIORITY_TRANSFER, true);
+                }
+                if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
+                    service.putExtra("fromMV", true);
+                }
+                context.startService(service);
+            }
+            else {
+                logWarning("Node NOT fOUND!!!!!");
+            }
         }
+
+        showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded);
     }
 
     /*

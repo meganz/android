@@ -92,13 +92,7 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 				super.onScrolled(recyclerView, dx, dy);
-				if (listView != null) {
-					if (listView.canScrollVertically(-1)) {
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					} else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
-				}
+				checkScroll();
 			}
 		});
 
@@ -129,6 +123,16 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		listView.setAdapter(adapter);
 
 		return v;
+	}
+
+	public void checkScroll() {
+		if (listView == null) return;
+
+		if (listView.canScrollVertically(-1)) {
+			((ManagerActivityLollipop) context).changeActionBarElevation(true);
+		} else {
+			((ManagerActivityLollipop) context).changeActionBarElevation(false);
+		}
 	}
 
 	private void setCompletedTransfers() {

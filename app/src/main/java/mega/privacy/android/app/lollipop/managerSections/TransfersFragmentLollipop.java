@@ -88,13 +88,7 @@ public class TransfersFragmentLollipop extends Fragment {
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 				super.onScrolled(recyclerView, dx, dy);
-				if (listView != null) {
-					if (listView.canScrollVertically(-1)) {
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					} else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
-				}
+				checkScroll();
 			}
 		});
 
@@ -120,7 +114,7 @@ public class TransfersFragmentLollipop extends Fragment {
 
 		setTransfers();
 
-		adapter = new MegaTransfersLollipopAdapter(context, this, tL, listView);
+		adapter = new MegaTransfersLollipopAdapter(context, tL, listView);
 
 		adapter.setMultipleSelect(false);
 		listView.setAdapter(adapter);
@@ -128,8 +122,19 @@ public class TransfersFragmentLollipop extends Fragment {
 		return v;
 	}
 
+	public void checkScroll() {
+		if (listView == null) return;
+
+		if (listView.canScrollVertically(-1)) {
+			((ManagerActivityLollipop) context).changeActionBarElevation(true);
+		} else {
+			((ManagerActivityLollipop) context).changeActionBarElevation(false);
+		}
+	}
+
 	private void setTransfers() {
 		logDebug("setTransfers");
+		tL.clear();
 
 		for (int i = 0; i < ((ManagerActivityLollipop) context).transfersInProgress.size(); i++) {
 			MegaTransfer transfer = megaApi.getTransferByTag(((ManagerActivityLollipop) context).transfersInProgress.get(i));

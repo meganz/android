@@ -2440,7 +2440,22 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		//Tab section Transfers
 		tabLayoutTransfers =  (TabLayout) findViewById(R.id.sliding_tabs_transfers);
-		viewPagerTransfers = (ViewPager) findViewById(R.id.transfers_tabs_pager);
+		viewPagerTransfers = findViewById(R.id.transfers_tabs_pager);
+		viewPagerTransfers.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			}
+
+			@Override
+			public void onPageSelected(int position) {
+				supportInvalidateOptionsMenu();
+				checkScrollElevation();
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int state) {
+			}
+		});
 
 		callInProgressLayout = findViewById(R.id.call_in_progress_layout);
 		callInProgressLayout.setOnClickListener(this);
@@ -5567,18 +5582,20 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			switch (indexTransfers) {
 				case COMPLETED_TAB:
 					viewPagerTransfers.setCurrentItem(COMPLETED_TAB);
+					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
 					break;
 
 				default:
 					viewPagerTransfers.setCurrentItem(PENDING_TAB);
+					refreshFragment(FragmentTag.TRANSFERS.getTag());
 					break;
 			}
+
+			indexTransfers = viewPagerTransfers.getCurrentItem();
 		}
 
 		setToolbarTitle();
-
 		showFabButton();
-
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -6132,6 +6149,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 }
                 break;
             }
+
+			case TRANSFERS: {
+				if (getTabItemTransfers() == PENDING_TAB && getTransfersFragment() != null) {
+					tFLol.checkScroll();
+				} else  if (getTabItemTransfers() == COMPLETED_TAB && getCompletedTransfersFragment() != null) {
+					completedTFLol.checkScroll();
+				}
+			}
         }
     }
 
@@ -6693,21 +6718,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					break;
 
 				case TRANSFERS:
-					cancelAllTransfersMenuItem.setVisible(true);
-
-					if (getCompletedTransfersFragment() != null && completedTFLol.isAnyTransferCompleted()) {
+					if (getTabItemTransfers() == PENDING_TAB && getTransfersFragment() != null && transfersInProgress.size() > 0) {
+						pauseTransfersMenuIcon.setVisible(true);
+						cancelAllTransfersMenuItem.setVisible(true);
+					} else if (getTabItemTransfers() == COMPLETED_TAB && getCompletedTransfersFragment() != null && completedTFLol.isAnyTransferCompleted()) {
 						clearCompletedTransfers.setVisible(true);
 					}
 
-					if (getTransfersFragment() != null && transfersInProgress.size() > 0) {
-						if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-							playTransfersMenuIcon.setVisible(true);
-							cancelAllTransfersMenuItem.setVisible(true);
-						} else {
-							pauseTransfersMenuIcon.setVisible(true);
-							cancelAllTransfersMenuItem.setVisible(true);
-						}
-					}
 					break;
 
 				case SETTINGS:
@@ -14052,7 +14069,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					logDebug("Show PAUSE button");
 					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 					if (tFLol != null){
-						if (drawerItem == DrawerItem.TRANSFERS) {
+						if (drawerItem == DrawerItem.TRANSFERS && getTransfersFragment() != null) {
 							pauseTransfersMenuIcon.setVisible(true);
 							playTransfersMenuIcon.setVisible(false);
 						}
@@ -14064,10 +14081,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("One MegaRequest.TYPE_PAUSE_TRANSFER");
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				int pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-
-				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-				if (tFLol != null){
+				if (getTransfersFragment() != null){
 					tFLol.changeStatusButton(request.getTransferTag());
 				}
 			}
@@ -14083,13 +14097,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setTransfersWidget();
 				}
 
-				if (drawerItem == DrawerItem.TRANSFERS) {
-					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-					if (tFLol != null){
-						pauseTransfersMenuIcon.setVisible(false);
-						playTransfersMenuIcon.setVisible(false);
-						cancelAllTransfersMenuItem.setVisible(false);
-					}
+				if (drawerItem == DrawerItem.TRANSFERS && getTransfersFragment() != null) {
+					pauseTransfersMenuIcon.setVisible(false);
+					playTransfersMenuIcon.setVisible(false);
+					cancelAllTransfersMenuItem.setVisible(false);
 				}
 			}
 			else{
@@ -14885,137 +14896,73 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	public void pauseIndividualTransfer(MegaTransfer mT) {
-		if (mT == null) {
-			logWarning("Transfer object is null.");
-			return;
-		}
+    public void pauseIndividualTransfer(MegaTransfer mT) {
+        if (mT == null) {
+            logWarning("Transfer object is null.");
+            return;
+        }
 
-		if (mT.getState() == MegaTransfer.STATE_PAUSED) {
-			logDebug("Resume transfer - Node handle: " + mT.getNodeHandle());
-			megaApi.pauseTransfer(mT, false, managerActivity);
+        logDebug("Resume transfer - Node handle: " + mT.getNodeHandle());
+        megaApi.pauseTransfer(mT, mT.getState() != MegaTransfer.STATE_PAUSED, managerActivity);
+    }
+
+	public void showConfirmationClearCompletedTransfers() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(getResources().getString(R.string.confirmation_to_clear_completed_transfers))
+				.setPositiveButton(R.string.general_clear, (dialog, which) -> {
+					logDebug("Pressed button positive to clear transfers");
+					dbH.emptyCompletedTransfers();
+
+					if (getCompletedTransfersFragment() != null) {
+						completedTFLol.updateCompletedTransfers();
+					}
+					supportInvalidateOptionsMenu();
+				})
+				.setNegativeButton(R.string.general_cancel, null)
+				.show();
+	}
+
+	public void showConfirmationCancelTransfer(final MegaTransfer mT, final boolean cancel) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		int message;
+		int positiveButton;
+
+		if (cancel) {
+			message = R.string.cancel_transfer_confirmation;
+			positiveButton = R.string.context_delete;
+		} else if (mT.getState() == MegaTransfer.STATE_PAUSED) {
+			message = R.string.menu_resume_individual_transfer;
+			positiveButton = R.string.button_resume_individual_transfer;
 		} else {
-			logDebug("Pause transfer - Node handle: " + mT.getNodeHandle());
-			megaApi.pauseTransfer(mT, true, managerActivity);
+			message = R.string.menu_pause_individual_transfer;
+			positiveButton = R.string.action_pause;
 		}
-	}
 
-	public void showConfirmationClearCompletedTransfers (){
-		logDebug("showConfirmationClearCompletedTransfers");
-
-		//Show confirmation message
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE: {
-						logDebug("Pressed button positive to clear transfers");
-						dbH.emptyCompletedTransfers();
-						completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
-						if (completedTFLol != null) {
-							completedTFLol.updateCompletedTransfers();
-						}
-						supportInvalidateOptionsMenu();
-						break;
+		builder.setMessage(message)
+				.setPositiveButton(positiveButton, (dialog, which) -> {
+					logDebug("Pressed button positive to cancel transfer");
+					if (cancel) {
+						megaApi.cancelTransfer(mT, managerActivity);
+					} else {
+						pauseIndividualTransfer(mT);
 					}
-					case DialogInterface.BUTTON_NEGATIVE: {
-						break;
-					}
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
-
-		builder.setMessage(getResources().getString(R.string.confirmation_to_clear_completed_transfers));
-		builder.setPositiveButton(R.string.general_clear, dialogClickListener);
-		builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
-
-		builder.show();
+				})
+				.setNegativeButton(R.string.general_cancel, null)
+				.show();
 	}
 
-	public void showConfirmationCancelTransfer (MegaTransfer t, boolean cancelValue){
-		logDebug("showConfirmationCancelTransfer");
-		final MegaTransfer mT = t;
-		final boolean cancel = cancelValue;
-
-		//Show confirmation message
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						logDebug("Pressed button positive to cancel transfer");
-						if(cancel){
-							megaApi.cancelTransfer(mT, managerActivity);
-						}
-						else{
-							pauseIndividualTransfer(mT);
-						}
-
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						break;
-				}
-			}
-		};
-
+	public void showConfirmationCancelAllTransfers() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
-		if(cancel){
-
-			builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
-			builder.setPositiveButton(R.string.context_delete, dialogClickListener);
-			builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
-		}
-		else {
-
-			if(mT.getState()==MegaTransfer.STATE_PAUSED){
-				builder.setMessage(getResources().getString(R.string.menu_resume_individual_transfer));
-				builder.setPositiveButton(R.string.button_resume_individual_transfer, dialogClickListener);
-				builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
-			}
-			else{
-				builder.setMessage(getResources().getString(R.string.menu_pause_individual_transfer));
-				builder.setPositiveButton(R.string.action_pause, dialogClickListener);
-				builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
-			}
-
-		}
-		builder.show();
-	}
-
-	public void showConfirmationCancelAllTransfers (){
-		logDebug("showConfirmationCancelAllTransfers");
-
-		//Show confirmation message
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						logDebug("Pressed button positive to cancel transfer");
-						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-                        cancelAllUploads(ManagerActivityLollipop.this);
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
-
-		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
-		builder.setPositiveButton(R.string.context_delete, dialogClickListener);
-		builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
-
-		builder.show();
+		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation))
+				.setNegativeButton(R.string.context_delete, (dialog, which) -> {
+					logDebug("Pressed button positive to cancel transfer");
+					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+					cancelAllUploads(ManagerActivityLollipop.this);
+					refreshFragment(FragmentTag.TRANSFERS.getTag());
+				})
+				.setPositiveButton(R.string.general_cancel, null)
+				.show();
 	}
 
 	public void addCompletedTransfer(MegaTransfer transfer, MegaError e){
@@ -15374,6 +15321,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (viewPagerMyAccount == null) return ERROR_TAB;
 
 		return viewPagerMyAccount.getCurrentItem();
+	}
+
+	private int getTabItemTransfers() {
+		return viewPagerTransfers == null ? ERROR_TAB : viewPagerTransfers.getCurrentItem();
 	}
 
 	public void setTabItemShares(int index){
@@ -16746,16 +16697,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			handleList.add(Long.parseLong(transfer.getNodeHandle()));
 			nC.prepareForDownload(handleList, false);
 		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
-			File file = new File(transfer.getOriginalPath());
-			if (!isFileAvailable(file)) {
-//				Show error
-				return;
+			String originalPath = transfer.getOriginalPath();
+			int lastSeparator = originalPath.lastIndexOf(SEPARATOR);
+			String parentFolder = "";
+			if (lastSeparator != -1) {
+				parentFolder = originalPath.substring(0, lastSeparator + 1);
 			}
 
 			ArrayList<String> paths = new ArrayList<>();
-			paths.add(transfer.getOriginalPath());
+			paths.add(originalPath);
 
-			UploadServiceTask uploadServiceTask = new UploadServiceTask(file.getParentFile().getAbsolutePath(), paths, transfer.getParentHandle());
+			UploadServiceTask uploadServiceTask = new UploadServiceTask(parentFolder, paths, transfer.getParentHandle());
 			uploadServiceTask.start();
 		}
 	}

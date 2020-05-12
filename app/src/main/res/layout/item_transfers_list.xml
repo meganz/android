@@ -27,6 +27,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
 		android:layout_marginRight="13dp"
+		android:layout_toLeftOf="@+id/transfers_list_option_pause"
         android:textColor="@color/file_list_first_row"
         android:ellipsize="middle"
         android:textSize="16sp"
@@ -73,17 +74,24 @@
         android:layout_marginLeft="12dp"
         android:layout_toStartOf="@id/transfers_list_option_remove"/>
 
-    <ProgressBar
-	    android:id="@+id/transfers_list_bar"
-		android:layout_width="fill_parent"
-		android:layout_height="5dp"
-		style="@style/UsedSpaceProgressBar"  
-        android:layout_marginStart="13dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="10dp"
-		android:layout_below="@id/transfers_list_filename"
-		android:layout_toStartOf="@id/transfers_list_option_pause"
-        android:layout_toEndOf="@id/transfers_list_thumbnail" />
+    <TextView
+        android:id="@+id/transfers_progress_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+		android:layout_marginStart="13dp"
+		android:layout_toEndOf="@id/transfers_list_thumbnail"
+        android:layout_below="@+id/transfers_list_filename"/>
+
+    <TextView
+        android:id="@+id/transfers_speed_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+		android:textColor="@color/text_secondary"
+		android:layout_marginStart="9dp"
+        android:layout_below="@+id/transfers_list_filename"
+        android:layout_toEndOf="@+id/transfers_progress_text"/>
 
 </RelativeLayout>
 

@@ -58,12 +58,13 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		public TextView textViewFileName;
 		public ImageView imageViewCompleted;
 		public TextView textViewCompleted;
-		public ProgressBar transferProgressBar;
 		public RelativeLayout itemLayout;
 		public ImageView optionRemove;
 		public ImageView optionPause;
 		public int currentPosition;
 		public long document;
+		public TextView progressText;
+		public TextView speedText;
 	}
 
 	public void setTransfers(ArrayList<AndroidCompletedTransfer> transfers) {
@@ -81,9 +82,10 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		holder.imageView = v.findViewById(R.id.transfers_list_thumbnail);
 		holder.iconDownloadUploadView = v.findViewById(R.id.transfers_list_small_icon);
 		holder.textViewFileName = v.findViewById(R.id.transfers_list_filename);
+		holder.progressText = v.findViewById(R.id.transfers_progress_text);
+		holder.speedText = v.findViewById(R.id.transfers_speed_text);
 		holder.imageViewCompleted =  v.findViewById(R.id.transfers_list_completed_image);
 		holder.textViewCompleted = v.findViewById(R.id.transfers_list_completed_text);
-		holder.transferProgressBar = v.findViewById(R.id.transfers_list_bar);
 		holder.optionRemove = v.findViewById(R.id.transfers_list_option_remove);
 		holder.optionPause = v.findViewById(R.id.transfers_list_option_pause);
 		v.setTag(holder);
@@ -101,7 +103,8 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		holder.textViewFileName.setText(fileName);
 		holder.optionPause.setVisibility(View.GONE);
 		holder.optionRemove.setVisibility(View.GONE);
-		holder.transferProgressBar.setVisibility(View.GONE);
+		holder.progressText.setVisibility(View.GONE);
+		holder.speedText.setVisibility(View.GONE);
 
 		holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();

@@ -129,8 +129,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
             if (thumb != null) {
                 RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) thumbnail.getLayoutParams();
-                params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, getContext().getResources().getDisplayMetrics());
-                params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, getContext().getResources().getDisplayMetrics());
+                params1.height = params1.width = px2dp(36, outMetrics);
                 params1.setMargins(54, 0, 18, 0);
                 thumbnail.setLayoutParams(params1);
 
