@@ -54,58 +54,23 @@
                         android:verticalSpacing="0dp" />
                 </RelativeLayout>
 
-                <!--Layout big Camera in Group call (7 + users)-->
+<!--                Layout big Camera in Group call (7 + users)-->
                 <RelativeLayout
-                    android:id="@+id/parent_layout_big_camera_group_call"
+                    android:id="@+id/peer_selected_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="96dp"
+                    android:layout_height="424dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
                     android:background="@android:color/transparent"
                     android:visibility="gone">
 
-                    <!--Remote camera in Group call-->
                     <FrameLayout
-                        android:id="@+id/fragment_big_camera_group_call"
+                        android:id="@+id/fragment_peer_selected"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-                    <!--Big Avatar in Group call-->
-                    <RelativeLayout
-                        android:id="@+id/rl_avatar_big_camera_group_call"
-                        android:layout_width="128dp"
-                        android:layout_height="128dp"
-                        android:layout_centerInParent="true"
-                        android:background="@android:color/transparent"
-                        android:gravity="center_horizontal|center_vertical">
-
-                        <mega.privacy.android.app.components.RoundedImageView
-                            android:id="@+id/image_big_camera_group_call"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_centerInParent="true"
-                            android:scaleType="fitCenter"
-                            rounded:border_color="#4DFFFFFF"
-                            rounded:border_width="3dp"
-                            rounded:corner_radius="60dp" />
-                    </RelativeLayout>
-
-                    <ImageView
-                        android:id="@+id/mute_icon_peer_selected"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginRight="16dp"
-                        android:background="@android:color/transparent"
-                        android:src="@drawable/ic_own_mic_off"
-                        android:visibility="gone" />
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
                 </RelativeLayout>
-                <!--RecyclerView (7 + users)-->
-
                 <RelativeLayout
                     android:id="@+id/rl_big_recycler_view"
                     android:layout_width="match_parent"

@@ -38,7 +38,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.ViewHolderGroupCall> implements MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener {
 
-    private static final int MARGIN_MUTE_ICON_SMALL = 3;
+    private static final int MARGIN_MUTE_ICON_SMALL = 4;
     private static final int MARGIN_MUTE_ICON_LARGE = 16;
     private static final int SIZE_MUTE_ICON_LARGE = 24;
     private static final int MIN_USERS_GRID = 7;
@@ -408,9 +408,9 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         int numPeersOnCall = peers.size();
         int size;
         if(numPeersOnCall < 7){
-            size = px2dp(SIZE_SMALL_AVATAR, outMetrics);
-        }else{
             size = px2dp(SIZE_BIG_AVATAR, outMetrics);
+        }else{
+            size = px2dp(SIZE_SMALL_AVATAR, outMetrics);
         }
         if (numPeersOnCall == 2 && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarBackground.getLayoutParams();
