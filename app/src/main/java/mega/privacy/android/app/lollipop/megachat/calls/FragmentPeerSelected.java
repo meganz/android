@@ -161,11 +161,11 @@ public class FragmentPeerSelected extends Fragment implements View.OnClickListen
         if (callChat == null || peerId != peerid || clientId != clientid || isItMe(chatId, peerId, clientId))
             return;
 
+
         if (session != null && session.hasVideo() && !callChat.isOnHold() && !((ChatCallActivity) context).isSessionOnHold()) {
             activateVideo();
             return;
         }
-
         showAvatar();
         showMuteIcon(peerid, clientid);
     }
@@ -316,14 +316,14 @@ public class FragmentPeerSelected extends Fragment implements View.OnClickListen
      * @param callId      Call ID.
      * @param newPeerId   Peer ID.
      * @param newClientId Client ID.
-     * @param session     The session with the contact.
      */
-    public void changePeerSelected(long newChatId, long callId, long newPeerId, long newClientId, MegaChatSession session) {
+    public void changePeerSelected(long newChatId, long callId, long newPeerId, long newClientId) {
 
         if ((newPeerId == peerid && newClientId == clientid) || ((ChatCallActivity) context).getCall().getId() != callId)
             return;
 
         deactivateVideo();
+        avatarImage.setImageBitmap(null);
 
         this.peerid = newPeerId;
         this.clientid = newClientId;
@@ -333,7 +333,8 @@ public class FragmentPeerSelected extends Fragment implements View.OnClickListen
         }
 
         setAvatarPeerSelected(peerid);
-        checkValues(peerid, clientid, session);
+        MegaChatSession session = ((ChatCallActivity)context).getSessionCall(newPeerId, newClientId);
+        checkValues(newPeerId, newClientId, session);
     }
 
     /**

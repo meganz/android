@@ -938,29 +938,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     /**
-     * Method to update the selected participant's interface when the call is on hold.
-     *
-     * @param peer Participant selected.
-     */
-    private void updateParticipantSelectedInCallOnHold(InfoPeerGroupCall peer){
-        MegaChatSession session = getSessionCall(peer.getPeerId(), peer.getClientId());
-        if(callChat.isOnHold() || session != null && session.isOnHold()){
-            if (callChat.isOnHold()){
-                callOnHoldText.setText(getString(R.string.call_on_hold));
-            }else if(session.isOnHold()){
-                callOnHoldText.setText(getString(R.string.session_on_hold, peer.getName()));
-            }
-            callOnHoldLayout.setVisibility(View.VISIBLE);
-        }else{
-            callOnHoldLayout.setVisibility(View.GONE);
-        }
-        if (cameraFragmentPeerSelected != null) {
-            cameraFragmentPeerSelected.showOnHoldImage();
-            cameraFragmentPeerSelected.showMuteIcon(peerSelected.getPeerId(), peerSelected.getClientId());
-        }
-    }
-
-    /**
      * Method to know if the action bar is being displayed.
      *
      * @return True if it's visible. False if it's hidden.
@@ -2120,6 +2097,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     public void itemClicked(InfoPeerGroupCall peer) {
         logDebug("userSelected: -> (peerId = " + peer.getPeerId() + ", clientId = " + peer.getClientId() + ")");
         if (peerSelected.getPeerId() == peer.getPeerId() && peerSelected.getClientId() == peer.getClientId()) {
+
             //I touched the same user that is now in big fragment:
             if (isManualMode) {
                 isManualMode = false;
@@ -2376,9 +2354,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         }
-
         if(cameraFragmentPeerSelected != null){
-            cameraFragmentPeerSelected.changePeerSelected(chatId, callChat.getId(), peerSelected.getPeerId(), peerSelected.getClientId(), null);
+            cameraFragmentPeerSelected.changePeerSelected(chatId, callChat.getId(), peerSelected.getPeerId(), peerSelected.getClientId());
         }else{
             createPeerSelectedFragment();
         }
@@ -2409,6 +2386,30 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     updateGreenLayer(peersOnCall.indexOf(peer));
                 }
             }
+        }
+    }
+
+    /**
+     * Method to update the selected participant's interface when the call is on hold.
+     *
+     * @param peer Participant selected.
+     */
+    private void updateParticipantSelectedInCallOnHold(InfoPeerGroupCall peer){
+        MegaChatSession session = getSessionCall(peer.getPeerId(), peer.getClientId());
+        if(callChat.isOnHold() || session != null && session.isOnHold()){
+            if (callChat.isOnHold()){
+                callOnHoldText.setText(getString(R.string.call_on_hold));
+            }else if(session.isOnHold()){
+                callOnHoldText.setText(getString(R.string.session_on_hold, peer.getName()));
+            }
+            callOnHoldLayout.setVisibility(View.VISIBLE);
+        }else{
+            callOnHoldLayout.setVisibility(View.GONE);
+        }
+
+        if (cameraFragmentPeerSelected != null) {
+            cameraFragmentPeerSelected.showOnHoldImage();
+            cameraFragmentPeerSelected.showMuteIcon(peerSelected.getPeerId(), peerSelected.getClientId());
         }
     }
 
@@ -3049,6 +3050,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (statusCallInProgress(callChat.getStatus())) {
                 adapterList.updateMuteIcon();
             }
+
             updateParticipantSelected();
         }
     }
