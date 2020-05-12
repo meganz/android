@@ -236,7 +236,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         if (isEstablishedCall(chatId)) {
             holder.rlGeneral.setOnClickListener(v -> {
                 if (getItemCount() < MIN_USERS_GRID) {
-                    ((ChatCallActivity) context).remoteCameraClick(false);
+                    ((ChatCallActivity) context).remoteCameraClick();
                 } else {
                     ((ChatCallActivity) context).itemClicked(peer);
                 }

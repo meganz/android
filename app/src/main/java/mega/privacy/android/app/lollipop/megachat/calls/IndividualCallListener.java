@@ -25,23 +25,24 @@ public class IndividualCallListener implements MegaChatVideoListenerInterface {
     private MegaSurfaceRenderer renderer;
     private SurfaceHolder surfaceHolder;
     private Bitmap bitmap;
-    private long chatId;
-    private long peerid;
-    private long clientid;
 
-    public IndividualCallListener(Context context, SurfaceView video, long peerid, long clientid, long chatId, DisplayMetrics outMetrics) {
+    public IndividualCallListener(Context context, SurfaceView video, long peerid, long clientid, long chatId, DisplayMetrics outMetrics, boolean isSmallCamera) {
         this.context = context;
         this.width = 0;
         this.height = 0;
-        this.chatId = chatId;
-        this.peerid = peerid;
-        this.clientid = clientid;
         this.surfaceView = video;
         this.isLocal = isItMe(chatId, peerid, clientid);
-        this.surfaceView.setZOrderMediaOverlay(true);
+        if (!isSmallCamera && !isLocal) {
+            this.surfaceView.setZOrderOnTop(false);
+            this.surfaceView.setZOrderMediaOverlay(false);
+        } else if (!isSmallCamera && isLocal) {
+            this.surfaceView.setZOrderMediaOverlay(true);
+        } else if (isSmallCamera && isLocal) {
+            this.surfaceView.setZOrderMediaOverlay(true);
+        }
         surfaceHolder = this.surfaceView.getHolder();
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        this.renderer = new MegaSurfaceRenderer(this.surfaceView, false, outMetrics);
+        this.renderer = new MegaSurfaceRenderer(this.surfaceView, isSmallCamera, outMetrics);
     }
 
     @Override
@@ -87,20 +88,20 @@ public class IndividualCallListener implements MegaChatVideoListenerInterface {
         return renderer;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
     public int getWidth() {
         return width;
     }
 
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
     public int getHeight() {
         return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
 

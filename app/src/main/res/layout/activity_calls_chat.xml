@@ -416,7 +416,7 @@
 
                 <!--Local camera-->
                 <RelativeLayout
-                    android:id="@+id/parent_layout_local_camera"
+                    android:id="@+id/small_camera_parent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="5dp"
@@ -426,49 +426,16 @@
                     android:background="@android:color/transparent">
 
                     <FrameLayout
-                        android:id="@+id/fragment_container_local_camera"
+                        android:id="@+id/small_camera_fragment"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentBottom="true"
                         android:layout_marginRight="20dp"
                         android:layout_marginBottom="10dp"
                         android:background="@android:color/transparent"
                         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
                 </RelativeLayout>
-
-                <!--Small avatar-->
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginBottom="110dp">
-
-                    <RelativeLayout
-                        android:id="@+id/call_chat_my_image_rl"
-                        android:layout_width="88dp"
-                        android:layout_height="88dp">
-                        <mega.privacy.android.app.components.RoundedImageView
-                            android:id="@+id/call_chat_my_image"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_centerInParent="true"
-                            android:scaleType="center"
-                            rounded:border_color="@color/very_transparent_black"
-                            rounded:border_width="3dp"
-                            rounded:corner_radius="60dp"/>
-                    </RelativeLayout>
-                    <ImageView
-                        android:id="@+id/micro_own_avatar"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_alignTop="@id/call_chat_my_image_rl"
-                        android:layout_gravity="right"
-                        android:background="@null"
-                        android:visibility="gone"
-                        android:src="@drawable/ic_own_mic_off"/>
-                </RelativeLayout>
-
             </RelativeLayout>
 
 
