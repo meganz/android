@@ -133,13 +133,13 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * @param newPeerId Peer ID.
      */
     private void updateAvatar(long newPeerId) {
-        if (peerid != newPeerId)
+        if (peerid != newPeerId || avatarImage == null)
             return;
 
         chatRoom = megaChatApi.getChatRoom(chatId);
 
         /*Default Avatar*/
-        Bitmap defaultBitmap = getDefaultAvatarCall(chatRoom, peerid, isSmallCamera, true);
+        Bitmap defaultBitmap = getDefaultAvatarCall(chatRoom, peerid, true, true);
         avatarImage.setImageBitmap(defaultBitmap);
 
         /*Avatar*/
@@ -240,7 +240,7 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * Method for updating the muted call bar on individual calls.
      */
     public void checkIndividualAudioCall() {
-        if (!isSmallCamera)
+        if (avatarLayout == null || !isSmallCamera)
             return;
 
         if (((ChatCallActivity) context).isIndividualAudioCall()) {
@@ -276,7 +276,7 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * Method to show the call on hold image.
      */
     public void showOnHoldImage() {
-        if (isSmallCamera)
+        if (avatarLayout == null || isSmallCamera)
             return;
 
         avatarLayout.setVisibility(View.VISIBLE);
@@ -296,7 +296,7 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * Method to hide the avatar.
      */
     private void hideAvatar() {
-        if (avatarLayout.getVisibility() == View.GONE)
+        if (avatarLayout == null || avatarLayout.getVisibility() == View.GONE)
             return;
 
         if (!isSmallCamera) {

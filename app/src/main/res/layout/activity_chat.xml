@@ -474,6 +474,38 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/call_on_hold_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="22dp"
+                    android:animateLayoutChanges="true"
+                    android:background="@drawable/border_call_on_hold"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_call"
+                            android:layout_marginLeft="8dp"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/call_on_hold"
+                            android:textAllCaps="true"
+                            android:textSize="16sp"
+                            android:textStyle="normal"/>
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+
+                <RelativeLayout
                     android:id="@+id/message_jump_layout"
                     android:layout_width="163dp"
                     android:layout_height="36dp"

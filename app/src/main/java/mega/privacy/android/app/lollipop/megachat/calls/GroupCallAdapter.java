@@ -170,48 +170,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     /**
-     * Method for distributing the screen to the participants.
-     *
-     * @param position Position of the participant in the adapter.
-     * @param holder   The GroupCallAdapter.ViewHolderGroupCall in this position.
-     * @param peer     Participant participant to be placed.
-     */
-    private void refreshRecycler(int position, ViewHolderGroupCall holder, final InfoPeerGroupCall peer) {
-        if (holder == null) {
-            holder = getHolder(position);
-            if (holder == null)
-                return;
-        }
-
-        int height;
-        int width;
-        int numPeersOnCall = peers.size();
-
-        if (numPeersOnCall < 3) {
-            height = maxScreenHeight / numPeersOnCall;
-            width = maxScreenWidth;
-        }else if (numPeersOnCall >= 3 && numPeersOnCall < 7) {
-            height = maxScreenWidth / 2;
-            if(numPeersOnCall == 3 && position == numPeersOnCall -1) {
-                width = maxScreenWidth;
-            }else{
-                width = maxScreenWidth / 2;
-            }
-        } else {
-            height = px2dp(SIZE_VIDEO_PARTICIPANTS, outMetrics);
-            width = px2dp(SIZE_VIDEO_PARTICIPANTS, outMetrics);
-        }
-
-        ViewGroup.LayoutParams lp = holder.rlGeneral.getLayoutParams();
-        lp.height = height;
-        lp.width = width;
-        holder.rlGeneral.setLayoutParams(lp);
-        if (numPeersOnCall == 3 && position == numPeersOnCall - 1) {
-            displayMuteIcon(position, holder, peer);
-        }
-    }
-
-    /**
      * Method to get the holder.
      *
      * @param position Position in the adapter.
@@ -274,16 +232,58 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     /**
+     * Method for distributing the screen to the participants.
+     *
+     * @param position Position of the participant in the adapter.
+     * @param holder   The GroupCallAdapter.ViewHolderGroupCall in this position.
+     * @param peer     Participant participant to be placed.
+     */
+    private void refreshRecycler(int position, ViewHolderGroupCall holder, final InfoPeerGroupCall peer) {
+        if (holder == null) {
+            holder = getHolder(position);
+            if (holder == null)
+                return;
+        }
+
+        int height;
+        int width;
+        int numPeersOnCall = peers.size();
+
+        if (numPeersOnCall < 3) {
+            height = maxScreenHeight / numPeersOnCall;
+            width = maxScreenWidth;
+        }else if (numPeersOnCall >= 3 && numPeersOnCall < 7) {
+            height = maxScreenWidth / 2;
+            if(numPeersOnCall == 3 && position == numPeersOnCall -1) {
+                width = maxScreenWidth;
+            }else{
+                width = maxScreenWidth / 2;
+            }
+        } else {
+            height = px2dp(SIZE_VIDEO_PARTICIPANTS, outMetrics);
+            width = px2dp(SIZE_VIDEO_PARTICIPANTS, outMetrics);
+        }
+
+        ViewGroup.LayoutParams lp = holder.rlGeneral.getLayoutParams();
+        lp.height = height;
+        lp.width = width;
+        holder.rlGeneral.setLayoutParams(lp);
+        if (numPeersOnCall == 3 && position == numPeersOnCall - 1) {
+            displayMuteIcon(position, holder, peer);
+        }
+    }
+
+
+    /**
      * Distribution of participants depending on the number of participants in the call.
      *
      * @param position Position of the participant in the adapter.
      * @param layout   Layout to be resized.
      */
     private void resizeLayout(int position, final RelativeLayout layout){
-        if( peers.size() >= 7)
+        int numPeersOnCall = peers.size();
+        if(numPeersOnCall >= 7)
             return;
-
-       int numPeersOnCall = peers.size();
 
         /*Distribution of participants depending on the number of participants in the call*/
         int width;
@@ -304,15 +304,16 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         layoutParamsSurface.width = width;
         layoutParamsSurface.height = height;
         layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, TRUE);
-        if (numPeersOnCall == 1 || numPeersOnCall == 2) {
+        if (numPeersOnCall >= 1 && numPeersOnCall <= 2) {
             layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, TRUE);
-        }
-        if (numPeersOnCall == 3 || numPeersOnCall == 4) {
+
+        } else if (numPeersOnCall >= 3 && numPeersOnCall <= 4) {
             if ((position < 2)) {
                 layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, TRUE);
             } else {
                 layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, TRUE);
             }
+
         } else {
             layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
             layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
@@ -413,13 +414,13 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             size = px2dp(SIZE_SMALL_AVATAR, outMetrics);
         }
         if (numPeersOnCall == 2 && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarBackground.getLayoutParams();
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.avatarImage.getLayoutParams();
             layoutParams.width = size;
             layoutParams.height = size;
             layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, TRUE);
             layoutParams.setMargins(0, 0, 0, scaleHeightPx(MARGIN_BUTTONS_SMALL, outMetrics));
-            holder.avatarBackground.setLayoutParams(layoutParams);
+            holder.avatarImage.setLayoutParams(layoutParams);
             holder.avatarBackground.setGravity(RelativeLayout.CENTER_IN_PARENT);
             return;
         }
@@ -430,7 +431,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, TRUE);
         layoutParams.setMargins(0, 0, 0, 0);
-        holder.avatarBackground.setLayoutParams(layoutParams);
+        holder.avatarImage.setLayoutParams(layoutParams);
         holder.avatarBackground.setGravity(RelativeLayout.CENTER_IN_PARENT);
     }
 
@@ -466,26 +467,18 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         displayAvatar(position, holder, peer);
         holder.avatarBackground.setVisibility(View.VISIBLE);
+        MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peer.getPeerId(), peer.getClientId());
 
-        /*Avatar in call on hold*/
-        if (call.isOnHold()) {
-            if (isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
-                holder.avatarImageCallOnHold.setVisibility(View.VISIBLE);
-            } else {
-                holder.avatarImageCallOnHold.setVisibility(View.GONE);
-            }
+        boolean shouldBeShown = (call.isOnHold() && isItMe(chatId, peer.getPeerId(), peer.getClientId()))
+                || (session != null && session.isOnHold());
+
+        if (shouldBeShown) {
+            holder.avatarImageCallOnHold.setVisibility(View.VISIBLE);
             holder.avatarImage.setAlpha(0.5f);
-
         } else {
-            /*Avatar in session on hold*/
-            MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peer.getPeerId(), peer.getClientId());
-            if(session != null && session.isOnHold()){
-                holder.avatarImageCallOnHold.setVisibility(View.VISIBLE);
-                holder.avatarImage.setAlpha(0.5f);
-            }else {
-                holder.avatarImageCallOnHold.setVisibility(View.GONE);
-                holder.avatarImage.setAlpha(1f);
-            }
+            holder.avatarImageCallOnHold.setVisibility(View.GONE);
+            holder.avatarImage.setAlpha(1f);
+
         }
 
         holder.avatarLayout.setVisibility(View.VISIBLE);

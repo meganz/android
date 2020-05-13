@@ -1275,6 +1275,16 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			}
 
 			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
+				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+
+				if (chatIdReceived == -1)
+					return;
+
+				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+				if (rChatFL != null && rChatFL.isVisible()) {
+					rChatFL.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
+				}
+
 				if (isScreenInPortrait(ManagerActivityLollipop.this)) {
 					setCallWidget();
 				} else {

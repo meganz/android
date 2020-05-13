@@ -133,8 +133,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private TextView participantText;
     private EmojiTextView infoUsersBar;
     private RelativeLayout reconnectingLayout;
-    private RelativeLayout anotherCallOnHoldLayout;
-    private Chronometer anotherCallOnHoldChrono;
+    private RelativeLayout anotherCallLayout;
+    private EmojiTextView anotherCallTitle;
+    private TextView anotherCallSubtitle;
     private TextView reconnectingText;
 
     private RelativeLayout smallElementsIndividualCallLayout;
@@ -309,7 +310,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             showInitialFABConfiguration();
         }
 
-        updateAnotherCallOnHoldbar(getAnotherCallOnHold(callChat.getId()));
+        checkCallOnHold();
+        updateAnotherCallOnHoldbar(callChat.getChatid());
     }
 
     /**
@@ -717,10 +719,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         reconnectingLayout.setVisibility(View.GONE);
         reconnectingText = findViewById(R.id.reconnecting_text);
 
-        anotherCallOnHoldLayout = findViewById(R.id.another_call_on_hold_layout);
-        anotherCallOnHoldChrono = findViewById(R.id.another_call_on_hold_chrono);
-        anotherCallOnHoldLayout.setOnClickListener(this);
-        anotherCallOnHoldLayout.setVisibility(View.GONE);
+        anotherCallLayout = findViewById(R.id.another_call_layout);
+        anotherCallLayout.setOnClickListener(this);
+        anotherCallTitle = findViewById(R.id.another_call_title);
+        anotherCallSubtitle = findViewById(R.id.another_call_subtitle);
+        anotherCallLayout.setVisibility(View.GONE);
 
         isManualMode = false;
 
@@ -1275,8 +1278,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (getCall() == null) return;
 
         switch (v.getId()) {
-            case R.id.another_call_on_hold_layout:
-                returnToAnotherCallOnHold(getAnotherCallOnHold(callChat.getId()));
+            case R.id.another_call_layout:
+                returnToAnotherCall();
                 break;
 
             case R.id.video_fab:
@@ -1322,8 +1325,17 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 logDebug("Click on call on hold fab");
                 MegaChatCall callOnHold = getAnotherCallOnHold(callChat.getId());
                 if (callOnHold == null) {
-                    megaChatApi.setCallOnHold(chatId, !callChat.isOnHold(), this);
-                    sendSignalPresence();
+                    if(getCall() == null)
+                        break;
+
+                    if(callChat.isOnHold()){
+                        checkAnotherCallActive();
+                    }else{
+                        logDebug("Change CURRENT call to ON HOLD");
+                        megaChatApi.setCallOnHold(chatId, true, this);
+                        sendSignalPresence();
+                    }
+
                 } else {
                     returnToAnotherCallOnHold(callOnHold);
                 }
@@ -1721,6 +1733,27 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     /**
+     * Method to control when a call waiting is switched to active.
+     */
+    private void checkAnotherCallActive(){
+        ArrayList<Long> chatsIDsWithCallActive = getCallsParticipating();
+
+        if (chatsIDsWithCallActive != null || !chatsIDsWithCallActive.isEmpty()) {
+            for (Long anotherChatId : chatsIDsWithCallActive) {
+                if (callChat.getChatid() != anotherChatId && megaChatApi.getChatCall(anotherChatId) != null && !megaChatApi.getChatCall(anotherChatId).isOnHold()) {
+                    logDebug("Change ANOTHER call to ON HOLD");
+                    megaChatApi.setCallOnHold(anotherChatId, true, this);
+                    break;
+                }
+            }
+        }
+
+        logDebug("Change CURRENT call to ACTIVE");
+        megaChatApi.setCallOnHold(chatId, false, this);
+        sendSignalPresence();
+    }
+
+    /**
      * Method for returning to a call on hold and activating it. The call will be put on hold.
      */
     private void returnToAnotherCallOnHold(MegaChatCall callOnHold){
@@ -1735,10 +1768,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        logDebug("Current call is put on hold");
+        logDebug("Change CURRENT call to ON HOLD");
         megaChatApi.setCallOnHold(chatId, true, this);
 
-        logDebug("Call on hold becomes active");
+        logDebug("Change ANOTHER call to ACTIVE");
         megaChatApi.setCallOnHold(chatCallOnHold.getChatId(), false, this);
 
         sendSignalPresence();
@@ -1752,20 +1785,75 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     /**
+     * Method for returning to a call on hold or call active.
+     */
+    private void returnToAnotherCall(){
+        if(getCall()==null)
+            return;
+        ArrayList<Long> chatsIDsWithCallActive = getCallsParticipating();
+
+        if(chatsIDsWithCallActive == null || chatsIDsWithCallActive.isEmpty())
+            return;
+
+        for(Long anotherChatId:chatsIDsWithCallActive){
+            if(callChat.getChatid() != anotherChatId){
+                logDebug("Returning to another call");
+                MegaApplication.setSpeakerStatus(anotherChatId, false);
+                MegaApplication.setShowPinScreen(false);
+                Intent intentOpenCall = new Intent(this, ChatCallActivity.class);
+                intentOpenCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intentOpenCall.putExtra(CHAT_ID, anotherChatId);
+                startActivity(intentOpenCall);
+                return;
+            }
+        }
+    }
+
+    /**
      * Update the bar if there are calls on hold in other chats or not.
      *
-     * @param callOnHold The call on hold.
+     * @param currentChatId The current chat ID.
      */
-    private void updateAnotherCallOnHoldbar(MegaChatCall callOnHold){
-        if(callOnHold != null){
-            activateChrono(false, anotherCallOnHoldChrono, callOnHold);
-            activateChrono(true, anotherCallOnHoldChrono, callOnHold);
-            anotherCallOnHoldLayout.setVisibility(View.VISIBLE);
-
-        }else{
-            activateChrono(false, anotherCallOnHoldChrono, callOnHold);
-            anotherCallOnHoldLayout.setVisibility(View.GONE);
+    private void updateAnotherCallOnHoldbar(long currentChatId){
+        ArrayList<Long> chatsIDsWithCallActive = getCallsParticipating();
+        if(chatsIDsWithCallActive == null || chatsIDsWithCallActive.isEmpty()){
+            anotherCallLayout.setVisibility(View.GONE);
+            return;
         }
+
+        if(getCall() != null && callChat.isOnHold()){
+            logDebug("Current call ON HOLD, look for other");
+            for(Long anotherChatId:chatsIDsWithCallActive){
+                if(anotherChatId != currentChatId) {
+                    MegaChatCall call = megaChatApi.getChatCall(anotherChatId);
+                    if(!call.isOnHold()){
+                        logDebug("Another call ACTIVE");
+                        MegaChatRoom anotherChat = megaChatApi.getChatRoom(anotherChatId);
+                        anotherCallTitle.setText(anotherChat.getTitle());
+                        anotherCallSubtitle.setText(getString(R.string.call_in_progress_layout));
+                        anotherCallLayout.setVisibility(View.VISIBLE);
+                        return;
+                    }
+                }
+            }
+        }else{
+            logDebug("Current call ACTIVE, look for other");
+            for(Long anotherChatId:chatsIDsWithCallActive){
+                if(anotherChatId != currentChatId) {
+                    MegaChatCall call = megaChatApi.getChatCall(anotherChatId);
+                    if(call.isOnHold()){
+                        logDebug("Another call ON HOLD");
+                        MegaChatRoom anotherChat = megaChatApi.getChatRoom(anotherChatId);
+                        anotherCallTitle.setText(anotherChat.getTitle());
+                        anotherCallSubtitle.setText(getString(R.string.call_on_hold));
+                        anotherCallLayout.setVisibility(View.VISIBLE);
+                        return;
+                    }
+                }
+            }
+        }
+
+        anotherCallLayout.setVisibility(View.GONE);
     }
 
     /**
@@ -2571,7 +2659,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         MegaChatCall callOnHold = getAnotherCallOnHold(callChat.getId());
 
         updateOnHoldFabButton(callOnHold);
-        updateAnotherCallOnHoldbar(callOnHold);
+        updateAnotherCallOnHoldbar(callChat.getChatid());
     }
 
     /**

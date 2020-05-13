@@ -52,25 +52,25 @@
 
         <RelativeLayout
             android:id="@+id/avatar_background"
-            android:layout_width="88dp"
-            android:layout_height="88dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
            android:gravity="center"
             android:layout_centerInParent="true"
             android:textAlignment="center">
 
                 <mega.privacy.android.app.components.RoundedImageView
                     android:id="@+id/avatar_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="88dp"
+                    android:layout_height="88dp"
                     android:layout_centerInParent="true"
-                    android:scaleType="center"
+                    android:scaleType="fitCenter"
                     rounded:border_color="@color/border_avatar_call"
                     rounded:border_width="3dp"
                     rounded:corner_radius="60dp" />
                 <ImageView
                     android:id="@+id/avatar_image_on_hold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="22dp"
+                    android:layout_height="32dp"
                     android:layout_centerInParent="true"
                     android:background="@android:color/transparent"
                     android:src="@drawable/ic_call_hold_big"

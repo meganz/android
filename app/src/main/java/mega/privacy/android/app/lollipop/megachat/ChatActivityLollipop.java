@@ -164,6 +164,7 @@ import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMess
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -352,6 +353,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     RelativeLayout callInProgressLayout;
     TextView callInProgressText;
     Chronometer callInProgressChrono;
+    RelativeLayout callOnHoldLayout;
 
     boolean startVideo = false;
 
@@ -553,7 +555,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 return;
             }
 
-            if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
+            if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) || intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
                 updateLayout(callStatus);
 
@@ -694,6 +696,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
         filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
         filterCall.addAction(ACTION_CHANGE_COMPOSITION);
+        filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
         LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filterCall);
 
         IntentFilter filterSession = new IntentFilter(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
@@ -793,6 +796,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         callInProgressText = findViewById(R.id.call_in_progress_text);
         callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
         callInProgressChrono.setVisibility(View.GONE);
+        callOnHoldLayout = findViewById(R.id.call_on_hold_layout);
+        callOnHoldLayout.setOnClickListener(this);
+        callOnHoldLayout.setVisibility(View.GONE);
 
         /*Recording views*/
         recordingLayout = findViewById(R.id.recording_layout);
@@ -3381,14 +3387,25 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 onBackPressed();
                 break;
             }
-            case R.id.call_in_progress_layout:{
-                logDebug("call_in_progress_layout");
+            case R.id.call_on_hold_layout:
+                if (participatingInACall()) {
+                    ArrayList<Long> chatsIDcalls = getCallsParticipating();
+                    for (Long chatId : chatsIDcalls) {
+                        if (chatId == chatRoom.getChatId()) {
+                            logDebug("I'm participating in the call of this chat");
+                            returnCall(this, chatId);
+                            break;
+                        }
+                    }
+                }
+                break;
+            case R.id.call_in_progress_layout:
                 startVideo = false;
                 if(checkPermissionsCall()){
                     startCall();
                 }
                 break;
-            }
+
             case R.id.send_message_icon_chat:{
                 logDebug("send_message_icon_chat");
                 writingLayout.setClickable(false);
@@ -8150,6 +8167,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.GONE) {
             callInProgressLayout.setVisibility(View.GONE);
             callInProgressLayout.setOnClickListener(null);
+            callOnHoldLayout.setVisibility(View.GONE);
             setSubtitleVisibility();
         }
     }
@@ -8181,13 +8199,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING && !isStatusConnected(this, idChat)))
             return;
 
+        if(call.isOnHold()){
+            callOnHoldLayout.setVisibility(View.VISIBLE);
+        }else{
+            callOnHoldLayout.setVisibility(View.GONE);
+        }
+
         logDebug("Call status "+callStatusToString(call.getStatus())+". Group chat: "+isGroup());
         switch (call.getStatus()){
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
             case MegaChatCall.CALL_STATUS_RING_IN:
                 if (isGroup()) {
                     usersWithVideo();
-
                     long callerHandle = call.getCaller();
                     String textLayout;
                     if (callerHandle != -1 && getPeerFullName(callerHandle) != null) {

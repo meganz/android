@@ -462,9 +462,9 @@ public class Constants {
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND = 350;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT = 200;
     public static final int MAX_WIDTH_ADD_CONTACTS = 60;
-    public static final int BIG_LETTER_SIZE = 150;
+    public static final int BIG_LETTER_SIZE = 170;
     public static final int AVATAR_SIZE_GRID = 75;
-    public static final int AVATAR_SIZE = 100;
+    public static final int AVATAR_SIZE = 150;
 
     public static final String SEPARATOR = File.separator;
 
