@@ -353,7 +353,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     RelativeLayout callInProgressLayout;
     TextView callInProgressText;
     Chronometer callInProgressChrono;
-    RelativeLayout callOnHoldLayout;
 
     boolean startVideo = false;
 
@@ -796,9 +795,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         callInProgressText = findViewById(R.id.call_in_progress_text);
         callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
         callInProgressChrono.setVisibility(View.GONE);
-        callOnHoldLayout = findViewById(R.id.call_on_hold_layout);
-        callOnHoldLayout.setOnClickListener(this);
-        callOnHoldLayout.setVisibility(View.GONE);
 
         /*Recording views*/
         recordingLayout = findViewById(R.id.recording_layout);
@@ -8167,7 +8163,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.GONE) {
             callInProgressLayout.setVisibility(View.GONE);
             callInProgressLayout.setOnClickListener(null);
-            callOnHoldLayout.setVisibility(View.GONE);
             setSubtitleVisibility();
         }
     }
@@ -8198,12 +8193,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         MegaChatCall call = megaChatApi.getChatCall(idChat);
         if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING && !isStatusConnected(this, idChat)))
             return;
-
-        if(call.isOnHold()){
-            callOnHoldLayout.setVisibility(View.VISIBLE);
-        }else{
-            callOnHoldLayout.setVisibility(View.GONE);
-        }
 
         logDebug("Call status "+callStatusToString(call.getStatus())+". Group chat: "+isGroup());
         switch (call.getStatus()){
@@ -8285,7 +8274,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private void updateCallInProgressLayout(){
         MegaChatCall call = megaChatApi.getChatCall(idChat);
         if (call == null) return;
-        showCallInProgressLayout(getString(R.string.call_in_progress_layout), true, call);
+
+        if(call.isOnHold()){
+            showCallInProgressLayout(getString(R.string.call_on_hold), true, call);
+        }else{
+            showCallInProgressLayout(getString(R.string.call_in_progress_layout), true, call);
+        }
+
         callInProgressLayout.setOnClickListener(this);
         if (isGroup()) {
             subtitleCall.setVisibility(View.VISIBLE);

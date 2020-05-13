@@ -276,8 +276,9 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * Method to show the call on hold image.
      */
     public void showOnHoldImage() {
-        if (avatarLayout == null || isSmallCamera)
+        if (avatarLayout == null || isSmallCamera) {
             return;
+        }
 
         avatarLayout.setVisibility(View.VISIBLE);
         MegaChatCall call = ((ChatCallActivity)context).getCall();

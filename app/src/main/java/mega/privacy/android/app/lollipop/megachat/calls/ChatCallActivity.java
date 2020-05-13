@@ -421,7 +421,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         chat = megaChatApi.getChatRoom(chatId);
         int callStatus = callChat.getStatus();
-        logDebug("Checking the call status, it is " + callStatusToString(callStatus));
         createSmallFragment();
         createFullScreenFragment();
 
