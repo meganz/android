@@ -177,7 +177,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionSendChat.setVisibility(View.GONE);
             } else {
                 long nodeSize = node.getSize();
-                nodeInfo.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
+                nodeInfo.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getCreationTime())));
 
                 if (megaApi.hasVersions(node)) {
                     nodeVersionsIcon.setVisibility(View.VISIBLE);
