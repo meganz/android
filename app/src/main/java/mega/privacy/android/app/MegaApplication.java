@@ -432,7 +432,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					case MegaChatCall.CALL_STATUS_RING_IN:
 					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
 					case MegaChatCall.CALL_STATUS_RECONNECTING:
-
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
 						if (listAllCalls == null || listAllCalls.size() == 0)
 							return;
@@ -452,10 +451,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						}
 						break;
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
+						clearIncomingCallNotification(callId);
 						removeValues(chatId);
 						break;
 
 					case MegaChatCall.CALL_STATUS_DESTROYED:
+						clearIncomingCallNotification(callId);
 						checkCallDestroyed(chatId);
 						break;
 				}

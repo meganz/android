@@ -10,10 +10,9 @@
         android:id="@+id/title_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="14dp"
         android:layout_marginBottom="14dp"
         android:orientation="horizontal" >
-        <!--        Avatar-->
         <RelativeLayout
             android:id="@+id/avatar_layout"
             android:layout_width="40dp"
@@ -62,13 +61,6 @@
 
     </LinearLayout>
 
-    <!--    <LinearLayout-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="1dp"-->
-    <!--        android:layout_marginLeft="72dp"-->
-    <!--        android:layout_marginBottom="16dp"-->
-    <!--        android:background="@color/chat_sliding_panel_separator"/>-->
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -80,8 +72,7 @@
             android:gravity="left|center_vertical"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="10dp">
+            android:layout_marginRight="25dp">
             <TextView
                 android:id="@+id/ignore_button_text"
                 android:layout_width="wrap_content"
