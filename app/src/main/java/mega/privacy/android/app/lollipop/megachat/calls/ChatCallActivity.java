@@ -348,6 +348,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method for creating the full screen camera in individual calls.
      */
     private void createFullScreenFragment(){
+
         if(getCall() == null || cameraFragmentFullScreen != null)
             return;
 
@@ -466,9 +467,28 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         } else if (newChatId != -1) {
             logDebug("Different call");
+            refreshUI();
             chatId = newChatId;
             initialUI(chatId);
         }
+    }
+
+    /**
+     * Refresh the UI, when a different calls starts.
+     *
+     */
+    private void refreshUI(){
+        removeSmallFragment();
+        removeFullScreenFragment();
+        removePeerSelectedFragment();
+        anotherCallLayout.setVisibility(View.GONE);
+        callOnHoldLayout.setVisibility(View.GONE);
+        mutateOwnCallLayout.setVisibility(View.GONE);
+        mutateContactCallLayout.setVisibility(View.GONE);
+        reconnectingLayout.setVisibility(View.GONE);
+        mutateContactCallLayout.setVisibility(View.GONE);
+        infoUsersBar.setVisibility(View.GONE);
+
     }
 
     /**
@@ -1974,8 +1994,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method for updating the contact muted call bar.
      */
     private void refreshContactMicro(MegaChatSession session) {
-        if(session == null)
+        if(session == null || chat.isGroup()) {
+            mutateContactCallLayout.setVisibility(View.GONE);
             return;
+        }
 
         logDebug("Session status is " + sessionStatusToString(session.getStatus()));
         if (session.isOnHold() || callChat.isOnHold() || session.getStatus() == MegaChatSession.SESSION_STATUS_INITIAL || session.hasAudio()) {
@@ -2554,7 +2576,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * @param option True, if it must be shown. False, if it must be hidden.
      */
     private void checkMutateOwnCallLayout(int option) {
-        if (mutateOwnCallLayout.getVisibility() == option)
+        if ( mutateOwnCallLayout == null || mutateOwnCallLayout.getVisibility() == option)
             return;
 
         mutateOwnCallLayout.setVisibility(option);
@@ -2564,8 +2586,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method for updating the own muted call bar.
      */
     public void refreshOwnMicro() {
-        if (chat.isGroup() || getCall() == null)
+        if (chat.isGroup() || getCall() == null){
+            checkMutateOwnCallLayout(View.GONE);
             return;
+        }
 
         boolean shoudShown = !callChat.isOnHold() && !isSessionOnHold() && !callChat.hasLocalAudio();
 

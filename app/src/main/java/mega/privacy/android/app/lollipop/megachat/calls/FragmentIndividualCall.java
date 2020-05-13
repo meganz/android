@@ -133,8 +133,10 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * @param newPeerId Peer ID.
      */
     private void updateAvatar(long newPeerId) {
-        if (peerid != newPeerId || avatarImage == null)
+        if (peerid != newPeerId || avatarImage == null) {
+            logError("Error updating the avatar");
             return;
+        }
 
         chatRoom = megaChatApi.getChatRoom(chatId);
 
@@ -158,8 +160,10 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      */
     public void checkValues(long peerId, long clientId, MegaChatSession session) {
         MegaChatCall callChat = ((ChatCallActivity) context).getCall();
-        if (callChat == null || peerId != peerid || clientId != clientid)
+        if (callChat == null || peerId != peerid || clientId != clientid) {
+            logError("Error checking values");
             return;
+        }
 
         if (isItMe(chatId, peerId, clientId)) {
             if (callChat.hasLocalVideo() && !callChat.isOnHold() && !((ChatCallActivity) context).isSessionOnHold()) {
@@ -184,8 +188,10 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * Method for activating the video.
      */
     private void activateVideo() {
-        if (surfaceView == null || surfaceView.getVisibility() == View.VISIBLE)
+        if (surfaceView == null || surfaceView.getVisibility() == View.VISIBLE) {
+            logError("Error activating video");
             return;
+        }
 
         hideAvatar();
 
@@ -201,7 +207,7 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
             listener.setWidth(0);
         }
 
-        if (isSmallCamera) {
+        if (isSmallCamera && videoLayout != null) {
             videoLayout.setVisibility(View.VISIBLE);
         }
         surfaceView.setVisibility(View.VISIBLE);
@@ -212,12 +218,13 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      */
     private void deactivateVideo() {
         if (surfaceView == null || listener == null || surfaceView.getVisibility() == View.GONE) {
+            logError("Error deactivating video");
             return;
         }
 
         logDebug("Removing suface view");
         surfaceView.setVisibility(View.GONE);
-        if (isSmallCamera) {
+        if (isSmallCamera && videoLayout != null) {
             videoLayout.setVisibility(View.GONE);
         }
 
@@ -240,8 +247,10 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * Method for updating the muted call bar on individual calls.
      */
     public void checkIndividualAudioCall() {
-        if (avatarLayout == null || !isSmallCamera)
+        if (avatarLayout == null || !isSmallCamera) {
+            logError("Error checking if is only audio call");
             return;
+        }
 
         if (((ChatCallActivity) context).isIndividualAudioCall()) {
             hideAvatar();
@@ -265,9 +274,6 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * Method to show the avatar.
      */
     private void showAvatar() {
-        if (avatarLayout == null)
-            return;
-
         deactivateVideo();
         showOnHoldImage();
     }
@@ -277,6 +283,7 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      */
     public void showOnHoldImage() {
         if (avatarLayout == null || isSmallCamera) {
+            logError("Error showing the avatar");
             return;
         }
 
@@ -297,8 +304,10 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * Method to hide the avatar.
      */
     private void hideAvatar() {
-        if (avatarLayout == null || avatarLayout.getVisibility() == View.GONE)
+        if (avatarLayout == null || avatarLayout.getVisibility() == View.GONE) {
+            logError("Error hidding the avatar");
             return;
+        }
 
         if (!isSmallCamera) {
             avatarImageOnHold.setVisibility(View.GONE);
@@ -355,8 +364,10 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      */
     public void changeUser(long newChatId, long callId, long newPeerId, long newClientId, MegaChatSession session) {
 
-        if (isSmallCamera || (newPeerId == peerid && newClientId == clientid) || ((ChatCallActivity)context).getCall().getId() != callId)
+        if (isSmallCamera || (newPeerId == peerid && newClientId == clientid) || ((ChatCallActivity)context).getCall().getId() != callId) {
+            logError("Error changing the user");
             return;
+        }
 
         deactivateVideo();
 

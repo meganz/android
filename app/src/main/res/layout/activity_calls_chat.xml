@@ -191,114 +191,6 @@
             </androidx.appcompat.widget.Toolbar>
 
             <RelativeLayout
-                android:id="@+id/mutate_own_call"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/call_toolbar"
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:background="@drawable/gradient_shape_callschat"
-                android:gravity="center_vertical|center_horizontal"
-                android:minHeight="36dp"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:ellipsize="end"
-                        android:fontFamily="roboto"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:text="@string/muted_own_micro"
-                        android:textAlignment="gravity"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:textStyle="normal" />
-
-                </LinearLayout>
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/mutate_contact_call"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/call_toolbar"
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:background="@drawable/gradient_shape_callschat"
-                android:gravity="center_vertical|center_horizontal"
-                android:minHeight="36dp"
-                android:paddingLeft="16dp"
-                android:paddingTop="10dp"
-                android:paddingRight="16dp"
-                android:paddingBottom="10dp"
-                android:visibility="visible">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="horizontal">
-
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
-                        android:id="@+id/text_mutate_contact_call"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:fontFamily="roboto"
-                        android:maxWidth="250dp"
-                        android:maxLines="3"
-                        android:gravity="left"
-                        android:singleLine="false"
-                        android:textAlignment="gravity"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        app:emojiSize="12sp"
-                        android:textStyle="normal" />
-
-                </LinearLayout>
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/call_on_hold_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/call_toolbar"
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:background="@drawable/gradient_shape_callschat"
-                android:gravity="center_vertical|center_horizontal"
-                android:minHeight="36dp"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
-                        android:id="@+id/call_on_hold_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:ellipsize="end"
-                        android:fontFamily="roboto"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:text="@string/call_on_hold"
-                        android:textAlignment="gravity"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        app:emojiSize="14sp"
-                        android:textStyle="normal" />
-
-                </LinearLayout>
-            </RelativeLayout>
-
-            <RelativeLayout
                 android:id="@+id/another_call_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -349,6 +241,114 @@
                         android:textStyle="normal"/>
                 </LinearLayout>
 
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/mutate_own_call"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/another_call_layout"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:background="@drawable/gradient_shape_callschat"
+                android:gravity="center_vertical|center_horizontal"
+                android:minHeight="36dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:ellipsize="end"
+                        android:fontFamily="roboto"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/muted_own_micro"
+                        android:textAlignment="gravity"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="normal" />
+
+                </LinearLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/mutate_contact_call"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/another_call_layout"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:background="@drawable/gradient_shape_callschat"
+                android:gravity="center_vertical|center_horizontal"
+                android:minHeight="36dp"
+                android:paddingLeft="16dp"
+                android:paddingTop="10dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="10dp"
+                android:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
+                        android:id="@+id/text_mutate_contact_call"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="roboto"
+                        android:maxWidth="250dp"
+                        android:maxLines="3"
+                        android:gravity="left"
+                        android:singleLine="false"
+                        android:textAlignment="gravity"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        app:emojiSize="12sp"
+                        android:textStyle="normal" />
+
+                </LinearLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/call_on_hold_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/another_call_layout"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:background="@drawable/gradient_shape_callschat"
+                android:gravity="center_vertical|center_horizontal"
+                android:minHeight="36dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
+                        android:id="@+id/call_on_hold_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:ellipsize="end"
+                        android:fontFamily="roboto"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="@string/call_on_hold"
+                        android:textAlignment="gravity"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        app:emojiSize="14sp"
+                        android:textStyle="normal" />
+
+                </LinearLayout>
             </RelativeLayout>
 
             <RelativeLayout
