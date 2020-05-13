@@ -92,6 +92,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 
@@ -415,10 +416,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			if (intent == null || intent.getAction() == null)
 				return;
 
-			long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
-			long callId = intent.getLongExtra(UPDATE_CALL_ID, -1);
-			if (chatId == -1 || callId == -1)
+			long chatId = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+			long callId = intent.getLongExtra(UPDATE_CALL_ID, MEGACHAT_INVALID_HANDLE);
+			if (chatId == MEGACHAT_INVALID_HANDLE || callId == MEGACHAT_INVALID_HANDLE) {
+				logError("Error. Chat id " + chatId + ", Call id "+callId);
 				return;
+			}
 
 			if (intent.getAction().equals(ACTION_UPDATE_CALL)) {
 				stopService(new Intent(getInstance(), IncomingCallService.class));
@@ -432,10 +435,12 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					case MegaChatCall.CALL_STATUS_JOINING:
 					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
 					case MegaChatCall.CALL_STATUS_RECONNECTING:
-
+						logDebug("Call status is "+callStatusToString(callStatus));
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
-						if (listAllCalls == null || listAllCalls.size() == 0)
+						if (listAllCalls == null || listAllCalls.size() == 0){
+							logError("Calls not found");
 							return;
+						}
 
 						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
 							createChatAudioManager();
