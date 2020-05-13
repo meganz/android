@@ -27,6 +27,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 
@@ -211,8 +212,20 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			case MegaTransfer.STATE_COMPLETING:
 			case MegaTransfer.STATE_RETRYING:
 			case MegaTransfer.STATE_QUEUED:
-                holder.textViewCompleted.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_queued));
+				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD && megaApi.getBandwidthOverquotaDelay() > 0) {
+					holder.imageViewCompleted.setVisibility(View.GONE);
+					holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.over_quota_yellow));
+					holder.progressText.setVisibility(View.VISIBLE);
+					holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_transfer_over_quota)));
+				} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD && ((ManagerActivityLollipop) context).getStorageState() == MegaApiJava.STORAGE_STATE_RED) {
+					holder.imageViewCompleted.setVisibility(View.GONE);
+					holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.over_quota_yellow));
+					holder.progressText.setVisibility(View.VISIBLE);
+					holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_storage_over_quota)));
+				} else {
+					holder.textViewCompleted.setVisibility(View.VISIBLE);
+					holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_queued));
+				}
 				break;
 
 			default:

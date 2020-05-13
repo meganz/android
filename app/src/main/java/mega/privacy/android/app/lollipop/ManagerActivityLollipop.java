@@ -268,6 +268,8 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
 
+	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
+
 	public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
 	private static final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
@@ -412,6 +414,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     private boolean showStorageAlertWithDelay;
 
 	private boolean isStorageStatusDialogShown = false;
+
+	private boolean isTransferOverQuotaWarningShown;
+	private AlertDialog transferOverQuotaWarning;
 
 	private boolean userNameChanged;
 	private boolean userEmailChanged;
@@ -1822,6 +1827,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			outState.putString(BUSINESS_CU_FRAGMENT, businessCUF);
 			outState.putBoolean(BUSINESS_CU_FIRST_TIME, businessCUFirstTime);
 		}
+
+		outState.putBoolean(TRANSFER_OVER_QUOTA_SHOWN, isTransferOverQuotaWarningShown);
 	}
 
 	@Override
@@ -1918,6 +1925,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				businessCUF = savedInstanceState.getString(BUSINESS_CU_FRAGMENT);
 				businessCUFirstTime = savedInstanceState.getBoolean(BUSINESS_CU_FIRST_TIME, false);
 			}
+			isTransferOverQuotaWarningShown = savedInstanceState.getBoolean(TRANSFER_OVER_QUOTA_SHOWN, false);
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -3260,6 +3268,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		checkBusinessStatus();
+
+		if (shouldShowTransferOverQuotaWarning()) {
+			showTransferOverQuotaWarning();
+		}
 
 		logDebug("END onCreate");
 	}
@@ -16759,6 +16771,34 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 			}
 		}
+	}
+
+	private boolean shouldShowTransferOverQuotaWarning() {
+		return drawerItem == DrawerItem.TRANSFERS && isTransferOverQuotaWarningShown && transferOverQuotaWarning == null;
+	}
+
+	public int getStorageState() {
+		return storageState;
+	}
+
+	public void showTransferOverQuotaWarning() {
+		if (!shouldShowTransferOverQuotaWarning()) return;
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		transferOverQuotaWarning = builder.setTitle(R.string.title_transfer_over_quota)
+				.setMessage(R.string.warning_transfer_over_quota)
+				.setPositiveButton(R.string.context_delete, (dialog, which) -> {
+					logDebug("Pressed button positive to cancel transfer");
+					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+					cancelAllUploads(ManagerActivityLollipop.this);
+					refreshFragment(FragmentTag.TRANSFERS.getTag());
+				})
+				.setNegativeButton(R.string.general_dismiss, null)
+				.show();
+		isTransferOverQuotaWarningShown = true;
+
+		transferOverQuotaWarning.setOnDismissListener(dialog -> isTransferOverQuotaWarningShown = false);
 	}
 
 	private RubbishBinFragmentLollipop getRubbishBinFragment() {
