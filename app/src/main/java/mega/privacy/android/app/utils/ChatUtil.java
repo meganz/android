@@ -39,6 +39,7 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
@@ -47,6 +48,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 
 public class ChatUtil {
 
@@ -111,7 +113,7 @@ public class ChatUtil {
         final AlertDialog shareLinkDialog = builder.create();
 
         TextView nameGroup = (TextView) v.findViewById(R.id.group_name_text);
-        nameGroup.setText(chat.getTitle());
+        nameGroup.setText(getTitleChat(chat));
         TextView chatLinkText = (TextView) v.findViewById(R.id.chat_link_text);
         chatLinkText.setText(chatLink);
 
@@ -485,4 +487,18 @@ public class ChatUtil {
             contactStateText.isMarqueeIsNecessary(context);
         }
     }
+
+    /**
+     * Method for obtaining the title of a chat.
+     *
+     * @param chat The chat room.
+     * @return String with the title.
+     */
+    public static String getTitleChat(MegaChatRoom chat) {
+        if (!chat.isActive()) {
+            return chat.getTitle();
+        }
+        return MegaApplication.getInstance().getString(R.string.inactive_chat_title, formatLongDateTime(chat.getCreationTs()));
+    }
+
 }

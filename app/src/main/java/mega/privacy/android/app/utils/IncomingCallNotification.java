@@ -24,6 +24,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.isAndroid10;
 
@@ -95,7 +96,7 @@ public class IncomingCallNotification {
 
         MegaChatRoom chat = megaChatApi.getChatRoom(callToLaunch.getChatid());
         if (chat != null) {
-            mBuilderCompat.setContentTitle(chat.getTitle());
+            mBuilderCompat.setContentTitle(getTitleChat(chat));
         }
 
         notificationManager.notify(INCOMING_CALL_NOTI_ID, mBuilderCompat.build());
