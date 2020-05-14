@@ -489,16 +489,30 @@ public class ChatUtil {
     }
 
     /**
-     * Method for obtaining the title of a chat.
+     * Method for obtaining the title of a MegaChatRoom.
      *
      * @param chat The chat room.
      * @return String with the title.
      */
     public static String getTitleChat(MegaChatRoom chat) {
-        if (!chat.isActive()) {
+        if (chat.isActive()) {
             return chat.getTitle();
         }
-        return MegaApplication.getInstance().getString(R.string.inactive_chat_title, formatLongDateTime(chat.getCreationTs()));
+        return MegaApplication.getInstance().getString(R.string.inactive_chat_title, formatDate(MegaApplication.getInstance().getBaseContext(), chat.getCreationTs(), DATE_YYYY_MM_DD_FORMAT));
+    }
+
+    /**
+     * Method for obtaining the title of a MegaChatListItem.
+     *
+     * @param chat The chat room.
+     * @return String with the title.
+     */
+    public static String getTitleChat(MegaChatListItem chat) {
+        if (chat.isActive()) {
+            return chat.getTitle();
+        }
+
+        return getTitleChat(MegaApplication.getInstance().getMegaChatApi().getChatRoom(chat.getChatId()));
     }
 
 }

@@ -25,6 +25,7 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_SHORT_FORMAT = 1;
     public static final int DATE_SHORT_SHORT_FORMAT = 2;
     public static final int DATE_MM_DD_YYYY_FORMAT = 3;
+    public static final int DATE_YYYY_MM_DD_FORMAT = 4;
 
     int type;
 
@@ -144,6 +145,9 @@ public class TimeUtils implements Comparator<Calendar> {
                 break;
             case DATE_MM_DD_YYYY_FORMAT:
                 df = new SimpleDateFormat("MMM d, YYYY");
+                break;
+            case DATE_YYYY_MM_DD_FORMAT:
+                df = new SimpleDateFormat("YYYY-MM-d HH:mm");
                 break;
             default:
                 df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());

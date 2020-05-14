@@ -271,7 +271,7 @@ public final class ChatAdvancedNotificationBuilder {
                         }
 
                         CharSequence cs = " ";
-                        String title = chats.get(i).getTitle();
+                        String title = getTitleChat(chats.get(i));
                         if (chats.get(i).isGroup()) {
                             long lastMsgSender = message.getUserHandle();
 
