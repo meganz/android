@@ -17,6 +17,7 @@ import android.provider.MediaStore;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -28,7 +29,6 @@ import android.text.style.StyleSpan;
 import android.text.util.Linkify;
 import android.util.Base64;
 import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -51,9 +51,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -145,7 +143,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     boolean multipleSelect;
-    private SparseBooleanArray selectedItems;
+    HashMap<Long, Integer> messagesSelectedInChat = new HashMap<>();
+
     private MegaChatLollipopAdapter megaChatAdapter;
     private ArrayList<MessageVoiceClip> messagesPlaying;
     private int placeholderCount = 0;
@@ -2631,7 +2630,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.urlOwnMessageText.setLinksClickable(false);
                 }
 
-                checkMultiselectionMode(position, holder, true);
+                checkMultiselectionMode(position, holder, true, message.getMsgId());
 
                 if (!multipleSelect) {
                     if (positionClicked != -1 && positionClicked == position) {
@@ -2746,7 +2745,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).urlContactMessageText.setLinksClickable(false);
                 }
 
-                checkMultiselectionMode(position, holder, false);
+                checkMultiselectionMode(position, holder, false, message.getMsgId());
 
                 if (!multipleSelect) {
                     if (positionClicked != -1 && positionClicked == position) {
@@ -3062,7 +3061,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageWarningButtonsLayout.setVisibility(View.GONE);
             holder.urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
-            checkMultiselectionMode(position, holder, true);
+            checkMultiselectionMode(position, holder, true, message.getMsgId());
 
             if (!multipleSelect) {
                 if (positionClicked != -1 && positionClicked == position) {
@@ -3160,7 +3159,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.forwardContactMessageLocation.setOnClickListener(this);
             }
 
-            checkMultiselectionMode(position, holder, false);
+            checkMultiselectionMode(position, holder, false, message.getMsgId());
 
             if (!multipleSelect) {
                 if (positionClicked != -1 && positionClicked == position) {
@@ -3420,7 +3419,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-            checkMultiselectionMode(position, holder, true);
+            checkMultiselectionMode(position, holder, true, message.getMsgId());
 
             if (!multipleSelect) {
                 if (positionClicked != -1 && positionClicked == position) {
@@ -3617,7 +3616,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-            checkMultiselectionMode(position, holder, false);
+            checkMultiselectionMode(position, holder, false, message.getMsgId());
 
             if(!multipleSelect){
                 if(positionClicked != -1 && positionClicked == position){
@@ -3829,7 +3828,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.contentOwnMessageText.setLinksClickable(false);
                 }
 
-                checkMultiselectionMode(position, holder, true);
+                checkMultiselectionMode(position, holder, true, message.getMsgId());
 
             }else if (message.isDeleted()) {
                 logDebug("MY Message is deleted");
@@ -3913,7 +3912,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.contentOwnMessageText.setLinksClickable(false);
                 }
 
-                checkMultiselectionMode(position, holder, true);
+                checkMultiselectionMode(position, holder, true, message.getMsgId());
             }
         } else {
             long userHandle = message.getUserHandle();
@@ -4001,7 +4000,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(false);
                 }
 
-                checkMultiselectionMode(position, holder, false);
+                checkMultiselectionMode(position, holder, false, message.getMsgId());
 
             }else if (message.isDeleted()) {
                 logDebug("Message is deleted");
@@ -4092,7 +4091,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(false);
                 }
 
-                checkMultiselectionMode(position, holder, false);
+                checkMultiselectionMode(position, holder, false, message.getMsgId());
             }
         }
     }
@@ -4199,7 +4198,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageFileName.setVisibility(View.VISIBLE);
             holder.contentOwnMessageFileSize.setVisibility(View.VISIBLE);
 
-            checkMultiselectionMode(position, holder, true);
+            checkMultiselectionMode(position, holder, true, message.getMsgId());
 
             if (!multipleSelect) {
                 if (positionClicked != -1 && positionClicked == position) {
@@ -4512,7 +4511,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageFileSize.setVisibility(View.VISIBLE);
             holder.contentContactMessageContactLayout.setVisibility(View.GONE);
 
-            checkMultiselectionMode(position, holder, false);
+            checkMultiselectionMode(position, holder, false, message.getMsgId());
 
             if (!multipleSelect) {
                 if (positionClicked != -1 && positionClicked == position) {
@@ -4927,7 +4926,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.retryAlert.setVisibility(View.GONE);
             }
 
-            checkMultiselectionMode(positionInAdapter, holder, true);
+            checkMultiselectionMode(positionInAdapter, holder, true, message.getMsgId());
 
             if (multipleSelect) {
                 holder.contentOwnMessageVoiceClipPlay.setOnClickListener(null);
@@ -5083,7 +5082,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageVoiceClipDuration.setVisibility(View.VISIBLE);
             holder.contentContactMessageVoiceClipSeekBar.setVisibility(View.VISIBLE);
 
-            checkMultiselectionMode(positionInAdapter, holder, false);
+            checkMultiselectionMode(positionInAdapter, holder, false, message.getMsgId());
 
             if (multipleSelect) {
                 holder.contentContactMessageVoiceClipPlay.setOnClickListener(null);
@@ -5209,7 +5208,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
             }
 
-           checkMultiselectionMode(position, holder, true);
+           checkMultiselectionMode(position, holder, true, message.getMsgId());
 
             if (!multipleSelect) {
                 if (positionClicked != -1 && positionClicked == position) {
@@ -5307,7 +5306,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
             }
 
-            checkMultiselectionMode(position, holder, false);
+            checkMultiselectionMode(position, holder, false, message.getMsgId());
 
             if (!multipleSelect) {
                 if (positionClicked != -1 && positionClicked == position) {
@@ -5473,7 +5472,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
         ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.GONE);
 
-        checkMultiselectionMode(position, holder, false);
+        checkMultiselectionMode(position, holder, false, message.getMsgId());
 
         String textToShow = "";
         int messageType = message.getType();
@@ -6047,7 +6046,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         return multipleSelect;
     }
 
-
     public void setMultipleSelect(boolean multipleSelect) {
         logDebug("setMultipleSelect");
         if (this.multipleSelect != multipleSelect) {
@@ -6055,74 +6053,132 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             notifyDataSetChanged();
         }
         if (this.multipleSelect) {
-            selectedItems = new SparseBooleanArray();
+            messagesSelectedInChat.clear();
         }
     }
 
-    public void toggleSelection(int pos) {
-        logDebug("The position selected is "+pos);
-
-        if (selectedItems.get(pos, false)) {
-            logDebug("Delete pos: " + pos);
-            selectedItems.delete(pos);
-        } else {
-            logDebug("Put pos: " + pos);
-            selectedItems.put(pos, true);
+    /**
+     * Method for selecting or deselecting a chat message.
+     *
+     * @param msgId    The messages ID.
+     */
+    public void toggleSelection(long msgId){
+        logDebug("The message selected is "+msgId);
+        int position = INVALID_POSITION;
+        for (AndroidMegaChatMessage message : messages) {
+            if (message.getMessage().getMsgId() == msgId) {
+                position = messages.indexOf(message);
+            }
         }
-        notifyItemChanged(pos);
-        if (selectedItems.size() == 0){
+
+        if (messagesSelectedInChat.get(msgId) != null) {
+            logDebug("Message removed");
+            messagesSelectedInChat.remove(msgId);
+        } else {
+            logDebug("Message selected");
+            messagesSelectedInChat.put(msgId, position);
+        }
+
+        notifyItemChanged(position + 1);
+
+        if (messagesSelectedInChat.isEmpty()) {
             ((ChatActivityLollipop) context).updateActionModeTitle();
         }
     }
 
+    /**
+     * Method for selecting all chat messages.
+     */
     public void selectAll() {
-        for (int i = 0; i < this.getItemCount(); i++) {
-            if (!isItemChecked(i)) {
-                toggleSelection(i);
+        for(AndroidMegaChatMessage message:messages){
+            if(!isItemChecked(message.getMessage().getMsgId())){
+                toggleSelection(message.getMessage().getMsgId());
             }
+
         }
     }
 
-    public void updateSelectionOnScroll() {
-        List<Integer> selected = getSelectedItems();
-//        selectedItems.clear();
-//
-//        for (int i = 0; i < selected.size(); i++) {
-//            int pos = selected.get(i);
-//            selectedItems.put(pos + 1, true);
-//            notifyItemChanged(pos);
-//            notifyItemChanged(pos + 1);
-
-//        }
-    }
-
+    /**
+     * Method for deselecting all chat messages.
+     */
     public void clearSelections() {
-        logDebug("clearSelection");
-        for (int i= 0; i<this.getItemCount();i++){
-            if(isItemChecked(i)){
-                toggleSelection(i);
+        for(AndroidMegaChatMessage message:messages){
+            if(isItemChecked(message.getMessage().getMsgId())){
+                toggleSelection(message.getMessage().getMsgId());
             }
         }
     }
 
-    private boolean isItemChecked(int position) {
-        return selectedItems.get(position);
+    /**
+     * Method to know if a message is selected or not.
+     *
+     * @param msgId The message ID.
+     * @return True, if selected. False, if not selected.
+     */
+    private boolean isItemChecked(long msgId) {
+        if (messagesSelectedInChat.get(msgId) != null) {
+            return true;
+        }
+
+        return false;
     }
 
+    /**
+     * Method for obtaining how many messages are selected.
+     *
+     * @return The number of selected messages.
+     */
     public int getSelectedItemCount() {
-        return selectedItems.size();
+        return messagesSelectedInChat.size();
     }
 
-    public List<Integer> getSelectedItems() {
-        if (selectedItems != null) {
-            List<Integer> items = new ArrayList<>(selectedItems.size());
-            for (int i = 0; i < selectedItems.size(); i++) {
-                items.add(selectedItems.keyAt(i));
+    /**
+     * Method for obtaining the selected messages.
+     *
+     * @return The selected messages.
+     */
+    public ArrayList<Integer> getSelectedItems() {
+        if(messagesSelectedInChat == null || messagesSelectedInChat.isEmpty())
+            return null;
+
+        ArrayList<Integer> positionsMessagesSelected = new ArrayList<>();
+        for (HashMap.Entry<Long, Integer> message: messagesSelectedInChat.entrySet()) {
+            positionsMessagesSelected.add(message.getValue());
+        }
+        return positionsMessagesSelected;
+    }
+
+    /*
+     * Get list of all selected chats
+     */
+    public ArrayList<AndroidMegaChatMessage> getSelectedMessages() {
+        ArrayList<AndroidMegaChatMessage> returnedMessages = new ArrayList<>();
+        if (messagesSelectedInChat == null || messagesSelectedInChat.isEmpty())
+            return messages;
+
+        for (HashMap.Entry<Long, Integer> messageSelected : messagesSelectedInChat.entrySet()) {
+            for (AndroidMegaChatMessage message : messages) {
+                if (message.getMessage().getMsgId() == messageSelected.getKey()) {
+                    returnedMessages.add(message);
+                }
             }
-            return items;
         }
 
-        return null;
+        return returnedMessages;
+    }
+
+    /**
+     * Method get message in the array of messages.
+     *
+     * @param position The message position.
+     * @return The message.
+     */
+    public AndroidMegaChatMessage getMessageAtPosition(int position) {
+        if (messages == null || messages.isEmpty() || messages.get(position) == null) {
+            return null;
+        }
+
+        return messages.get(position);
     }
 
     @Override
@@ -6138,41 +6194,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public int getUnhandledItem() {
         return 0;
-    }
-
-    /*
-     * Get request at specified position
-     */
-    public AndroidMegaChatMessage getMessageAt(int positionInAdapter) {
-        try {
-            if (this.messages != null) {
-                return this.messages.get(positionInAdapter - 1);
-            }
-        } catch (IndexOutOfBoundsException e) {
-        }
-        return null;
-    }
-
-
-    /*
-     * Get list of all selected chats
-     */
-    public ArrayList<AndroidMegaChatMessage> getSelectedMessages() {
-        ArrayList<AndroidMegaChatMessage> messages = new ArrayList<AndroidMegaChatMessage>();
-
-        if(selectedItems!=null){
-            for (int i = 0; i < selectedItems.size(); i++) {
-                if (selectedItems.valueAt(i) == true) {
-
-                    AndroidMegaChatMessage m = getMessageAt(selectedItems.keyAt(i));
-                    if (m != null) {
-                        messages.add(m);
-                    }
-                }
-            }
-        }
-
-        return messages;
     }
 
     public Object getItem(int position) {
@@ -6221,6 +6242,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             int itemCount = messages.size() - position;
             notifyItemRangeChanged(position, itemCount);
         }
+    }
+
+    /**
+     * Get request at specified position in Adapter.
+     *
+     * @param positionInAdapter The position in adapter.
+     * @return The message.
+     */
+    public AndroidMegaChatMessage getMessageAt(int positionInAdapter) {
+        try {
+            if (this.messages != null) {
+                return this.messages.get(positionInAdapter - 1);
+            }
+        } catch (IndexOutOfBoundsException e) {
+        }
+        return null;
     }
 
     public void loadPreviousMessages(ArrayList<AndroidMegaChatMessage> messages, int counter) {
@@ -7753,28 +7790,28 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private void checkMultiselectionMode(int position, final ViewHolderMessageChat holder, boolean ownMessage) {
-        if (isHolderNull(position, holder))
+    private void checkMultiselectionMode(int positionInAdapter, final ViewHolderMessageChat holder, boolean ownMessage, long messageId) {
+        if (isHolderNull(positionInAdapter, holder))
             return;
 
         if (multipleSelect) {
             if (ownMessage) {
                 holder.ownMessageSelectLayout.setVisibility(View.VISIBLE);
-                if (this.isItemChecked(position)) {
+                if (this.isItemChecked(messageId)) {
                     holder.ownMessageSelectIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_select_chatroom));
                 } else {
                     holder.ownMessageSelectIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unselect_chatroom));
                 }
             } else {
                 holder.contactMessageSelectLayout.setVisibility(View.VISIBLE);
-                if (this.isItemChecked(position)) {
+                if (this.isItemChecked(messageId)) {
                     holder.contactMessageSelectIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_select_chatroom));
                 } else {
                     holder.contactMessageSelectIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unselect_chatroom));
                 }
             }
 
-        } else if (!multipleSelect && positionClicked != -1 && positionClicked == position) {
+        } else if (!multipleSelect && positionClicked != -1 && positionClicked == positionInAdapter) {
             listFragment.smoothScrollToPosition(positionClicked);
         }
     }

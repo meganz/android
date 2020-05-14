@@ -189,7 +189,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     private static final String MESSAGE_HANDLE_PLAYING = "messageHandleVoicePlaying";
     private static final String USER_HANDLE_PLAYING = "userHandleVoicePlaying";
     private final static String SELECTED_ITEMS = "selectedItems";
-    private final static String LAST_PLACE_HOLDER_COUNT = "lastPlaceHolderCount";
 
     private final static int NUMBER_MESSAGES_TO_LOAD = 20;
     private final static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -256,7 +255,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     boolean isLoadingHistory = false;
     private AlertDialog errorOpenChatDialog;
     long numberToLoad = -1;
-    ArrayList<Integer> recoveredSelectedItems = null;
+    ArrayList<Integer> recoveredSelectedPositions = null;
 
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private AlertDialog chatAlertDialog;
@@ -451,7 +450,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     private MegaNode myChatFilesFolder;
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
-    private int lastPlaceHolderCount;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -1220,8 +1218,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         mOutputFilePath = savedInstanceState.getString("mOutputFilePath");
                         isShareLinkDialogDismissed = savedInstanceState.getBoolean("isShareLinkDialogDismissed", false);
                         isLocationDialogShown = savedInstanceState.getBoolean("isLocationDialogShown", false);
-                        recoveredSelectedItems = (ArrayList<Integer>) savedInstanceState.getSerializable(SELECTED_ITEMS);
-                        lastPlaceHolderCount = savedInstanceState.getInt(LAST_PLACE_HOLDER_COUNT, -1);
+                        recoveredSelectedPositions = (ArrayList<Integer>) savedInstanceState.getSerializable(SELECTED_ITEMS);
 
                         if(visibilityMessageJump){
                             if(typeMessageJump == TYPE_MESSAGE_NEW_MESSAGE){
@@ -3840,43 +3837,26 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void multipleItemClick(int position) {
-        adapter.toggleSelection(position);
-    }
     private void reDoTheSelectionAfterRotation() {
-        if (recoveredSelectedItems == null)
+        if (recoveredSelectedPositions == null)
             return;
 
         if (adapter == null)
             return;
 
-        if (recoveredSelectedItems.size() > 0) {
+        if (recoveredSelectedPositions.size() > 0) {
             activateActionMode();
-            for (int selectedItem : recoveredSelectedItems) {
-                multipleItemClick(transferPosition(selectedItem, adapter));
+
+            for (int position : recoveredSelectedPositions) {
+                AndroidMegaChatMessage msg = adapter.getMessageAtPosition(position);
+                if(msg != null) {
+                    adapter.toggleSelection(msg.getMessage().getMsgId());
+                }
             }
         }
 
         updateActionModeTitle();
     }
-
-    /**
-     * @param originalPosition original position before rotation
-     * @param adapter the adapter where rotation happens
-     * @return the list position after rotation of adapter
-     */
-    private int transferPosition(int originalPosition, RotatableAdapter adapter) {
-        int position;
-
-        if (isScreenInPortrait(this)) {
-            position = originalPosition - (lastPlaceHolderCount - adapter.getPlaceholderCount());
-        } else {
-            position = originalPosition + (adapter.getPlaceholderCount() - lastPlaceHolderCount);
-        }
-
-        return position;
-    }
-
 
     public void activateActionModeWithItem(int positionInAdapter) {
         logDebug("activateActionModeWithItem");
@@ -4005,7 +3985,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             logDebug("onDestroyActionMode");
             adapter.setMultipleSelect(false);
             editingMessage = false;
-            recoveredSelectedItems = null;
+            recoveredSelectedPositions = null;
             clearSelections();
             changeStatusBarColorActionMode(chatActivity, getWindow(), handler, 0);
         }
@@ -4490,7 +4470,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                             logDebug("Message id: " + m.getMessage().getMsgId());
                             logDebug("Timestamp: " + m.getMessage().getTimestamp());
                             if (isSelectableMessage(m)) {
-                                adapter.toggleSelection(positionInAdapter);
+                                adapter.toggleSelection(m.getMessage().getMsgId());
                                 List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
                                 if (!messages.isEmpty()) {
                                     updateActionModeTitle();
@@ -6278,6 +6258,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             logDebug("addMessage: " + messages.size());
             updateActionModeTitle();
+            reDoTheSelectionAfterRotation();
+            recoveredSelectedPositions = null;
+
         }
 
         logDebug("AFTER updateMessagesLoaded: " + messages.size() + " messages in list");
@@ -6434,13 +6417,11 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         setShowAvatar(0);
 
-        if(adapter.isMultipleSelect()){
-            adapter.updateSelectionOnScroll();
-        }
     }
 
     public void appendMessageAnotherMS(AndroidMegaChatMessage msg){
         logDebug("appendMessageAnotherMS");
+
         messages.add(msg);
         int lastIndex = messages.size()-1;
 
@@ -7693,10 +7674,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
         RotatableAdapter currentAdapter = getAdapter();
         if(currentAdapter != null & adapter.isMultipleSelect()){
-            ArrayList<Integer> selectedItems = (ArrayList<Integer>) (currentAdapter.getSelectedItems());
-            outState.putSerializable(SELECTED_ITEMS, selectedItems);
-            outState.putInt(LAST_PLACE_HOLDER_COUNT, currentAdapter.getPlaceholderCount());
-            lastPlaceHolderCount = -1;
+            ArrayList<Integer> selectedPositions= (ArrayList<Integer>) (currentAdapter.getSelectedItems());
+            outState.putSerializable(SELECTED_ITEMS, selectedPositions);
         }
 
         MessageVoiceClip messageVoiceClip = adapter.getVoiceClipPlaying();
@@ -7975,9 +7954,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if(aB != null && aB.getTitle() != null){
                 titleToolbar.setText(adjustForLargeFont(titleToolbar.getText().toString()));
             }
-
-            reDoTheSelectionAfterRotation();
-            recoveredSelectedItems = null;
             updateActionModeTitle();
         }
     }
