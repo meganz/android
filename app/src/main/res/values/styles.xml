@@ -457,4 +457,9 @@
         <item name="android:textColor">@color/accentColor</item>
         <item name="android:background">@android:color/transparent</item>
     </style>
+
+    <style name="RoundedButtonStyle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/transfers_progress_widget"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_width="56dp"
+    android:layout_height="56dp">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/transfers_fab_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:id="@+id/transfers_button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:backgroundTint="@color/white"
-        android:src="@drawable/ic_transfers_upload"
-        app:borderWidth="0dp" />
+        android:background="@drawable/transfers_circle_shape"/>
 
     <ProgressBar
-        android:id="@+id/transfers_progress_fab_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:id="@+id/transfers_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"/>
 
     <ImageView
-        android:id="@+id/transfers_status_fab_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_toEndOf="@id/transfers_fab_button"
-        android:src="@drawable/ic_transfers_paused" />
+        android:id="@+id/transfers_status"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="8dp"/>
 
 </RelativeLayout>

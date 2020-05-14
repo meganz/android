@@ -217,5 +217,6 @@
     <color name="download_green">#31B500</color>
     <color name="upload_blue">#2BA6DE</color>
     <color name="over_quota_yellow">#F5A623</color>
+    <color name="incomplete_progress">#4D000000</color>
 
 </resources>

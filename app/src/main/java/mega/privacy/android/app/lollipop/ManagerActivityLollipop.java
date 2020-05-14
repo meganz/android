@@ -73,7 +73,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -139,6 +138,7 @@ import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.TransferWidget;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
@@ -545,14 +545,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private TransfersPageAdapter mTabsAdapterTransfers;
 	private ViewPager viewPagerTransfers;
 
-	private RelativeLayout transfersOverViewLayout;
-	private LinearLayout transfersTextLayout;
-	private TextView transfersTitleText;
-	private TextView transfersNumberText;
-	private ImageView playButton;
-	private RelativeLayout actionLayout;
-	private RelativeLayout dotsOptionsTransfersLayout;
-	private ProgressBar progressBarTransfers;
+	private TransferWidget transfersWidget;
 
 	private RelativeLayout callInProgressLayout;
 	private Chronometer callInProgressChrono;
@@ -2471,6 +2464,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		callInProgressText = findViewById(R.id.call_in_progress_text);
 		callInProgressLayout.setVisibility(View.GONE);
 
+		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_progress_widget);
+		transfersWidget = new TransferWidget(this, transfersWidgetLayout);
+		transfersWidgetLayout.findViewById(R.id.transfers_button).setOnClickListener(v -> selectDrawerItemLollipop(drawerItem = DrawerItem.TRANSFERS));
+
         if (!isOnline(this)){
 			logDebug("No network -> SHOW OFFLINE MODE");
 
@@ -2502,21 +2499,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 			}
         }
-
-		transfersOverViewLayout = findViewById(R.id.transfers_overview_item_layout);
-		transfersOverViewLayout.setOnClickListener(this);
-		transfersTextLayout = findViewById(R.id.transfers_text_layout);
-		transfersTitleText = findViewById(R.id.transfers_overview_title);
-		transfersNumberText = findViewById(R.id.transfers_overview_number);
-
-		playButton = findViewById(R.id.transfers_overview_button);
-		actionLayout = findViewById(R.id.transfers_overview_action_layout);
-		actionLayout.setOnClickListener(this);
-		dotsOptionsTransfersLayout = findViewById(R.id.transfers_overview_three_dots_layout);
-		dotsOptionsTransfersLayout.setOnClickListener(this);
-		progressBarTransfers = findViewById(R.id.transfers_overview_progress_bar);
-
-		putTransfersWidget();
 
 		///Check the MK or RK file
 		logInfo("App version: " + getVersion());
@@ -5575,6 +5557,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void selectDrawerItemTransfers(){
 		logDebug("selectDrawerItemTransfers");
 
+        transfersWidget.hide();
 		tB.setVisibility(View.VISIBLE);
 
 		drawerItem = DrawerItem.TRANSFERS;
@@ -5745,7 +5728,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	drawerItem = item;
 		((MegaApplication)getApplication()).setRecentChatVisible(false);
 		resetActionBar(aB);
-		setTransfersWidget();
+		transfersWidget.update();
 		setCallWidget();
 
 		if (item != DrawerItem.CHAT) {
@@ -11257,7 +11240,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		switch(v.getId()){
 			case R.id.navigation_drawer_add_phone_number_button:{
-                Intent intent = new Intent(this,SMSVerificationActivity.class) ;
+                Intent intent = new Intent(this,SMSVerificationActivity.class);
                 startActivity(intent);
 				break;
 			}
@@ -14061,10 +14044,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 
 			if (e.getErrorCode() == MegaError.API_OK) {
-
-				if(drawerItem == DrawerItem.CLOUD_DRIVE){
-					updateTransferButton();
-				}
+			    transfersWidget.updateState();
 
 				if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
 					logDebug("Show PLAY button");
@@ -14105,9 +14085,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
 			if (e.getErrorCode() == MegaError.API_OK){
-				if (drawerItem == DrawerItem.CLOUD_DRIVE){
-					setTransfersWidget();
-				}
+				transfersWidget.hide();
 
 				if (drawerItem == DrawerItem.TRANSFERS && getTransfersFragment() != null) {
 					pauseTransfersMenuIcon.setVisible(false);
@@ -14125,9 +14103,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("REQUEST OK - wait for onTransferFinish()");
-				if (drawerItem == DrawerItem.CLOUD_DRIVE){
-					setTransfersWidget();
-				}
+				transfersWidget.update();
 				supportInvalidateOptionsMenu();
 			}
 			else{
@@ -15005,10 +14981,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			if(!transfer.isFolderTransfer()){
 				transfersInProgress.add(transfer.getTag());
-
-				if (drawerItem == DrawerItem.CLOUD_DRIVE){
-					setTransfersWidget();
-				}
+				transfersWidget.update(transfer.getType());
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
@@ -15087,16 +15060,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				onNodesSearchUpdate();
 				onNodesSharedUpdate();
 
-				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-				if (tFLol != null){
+                transfersWidget.update();
+				if (getTransfersFragment() != null){
 					tFLol.transferFinish(transfer.getTag());
-				}
-				else{
-					logWarning("tF is null!");
-				}
-
-				if (drawerItem == DrawerItem.CLOUD_DRIVE){
-					setTransfersWidget();
 				}
 			}
 		}
@@ -15128,12 +15094,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(transferCallback<transfer.getNotificationNumber()){
 					transferCallback = transfer.getNotificationNumber();
 
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
-						setTransfersWidget();
-					}
-
-					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-					if (tFLol != null){
+                    transfersWidget.update(transfer.getType());
+                    if (getTransfersFragment() != null){
 						tFLol.transferUpdate(transfer);
 					}
 
@@ -15149,9 +15111,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
 			if (e.getValue() != 0) {
 				logDebug("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
-				if (drawerItem == DrawerItem.CLOUD_DRIVE){
-					setTransfersWidget();
-				}
+                transfersWidget.update();
 			}
 			else {
 				logWarning("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
@@ -16479,72 +16439,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	/**
-	 * This method sets the transfers widget when there are transfers in progress
-	 * and it is in Cloud Drive section or Recents section
-	 */
-	public void setTransfersWidget() {
-		logDebug("setTransfersWidget");
-
-		if (!isOnline(this) || transfersOverViewLayout == null) return;
-
-		if (drawerItem != DrawerItem.CLOUD_DRIVE) {
-			transfersOverViewLayout.setVisibility(View.GONE);
-			return;
-		}
-
-		//Check transfers in progress
-		int pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-		int totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
-
-		long totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
-		long totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
-
-		if (pendingTransfers > 0) {
-			logDebug("Transfers in progress");
-			transfersOverViewLayout.setVisibility(View.VISIBLE);
-			dotsOptionsTransfersLayout.setOnClickListener(this);
-			actionLayout.setOnClickListener(this);
-
-			updateTransferButton();
-
-			int progressPercent = (int) Math.round((double) totalSizeTransfered / totalSizePendingTransfer * 100);
-			progressBarTransfers.setProgress(progressPercent);
-			logDebug("Progress Percent: " + progressPercent);
-
-			long delay = megaApi.getBandwidthOverquotaDelay();
-			if (delay == 0) {
-//				transfersTitleText.setText(getString(R.string.section_transfers));
-			} else {
-				logDebug("Overquota delay activated until: " + delay);
-				transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
-			}
-
-			int inProgress = totalTransfers - pendingTransfers + 1;
-
-			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers, totalTransfers, inProgress, totalTransfers);
-			transfersNumberText.setText(progressText);
-		} else {
-			logDebug("NO TRANSFERS in progress");
-			if (transfersOverViewLayout != null) {
-				transfersOverViewLayout.setVisibility(View.GONE);
-			}
-			dotsOptionsTransfersLayout.setOnClickListener(null);
-			actionLayout.setOnClickListener(null);
-		}
-	}
-
-	private void putTransfersWidget(){
-		if(isScreenInPortrait(this)) {
-			transfersOverViewLayout.getLayoutParams().height = px2dp(72, outMetrics);
-			transfersTextLayout.setOrientation(LinearLayout.VERTICAL);
-		}else{
-			transfersOverViewLayout.getLayoutParams().height = px2dp(50, outMetrics);
-			transfersTextLayout.setOrientation(LinearLayout.HORIZONTAL);
-		}
-		transfersOverViewLayout.requestLayout();
-	}
-
-	/**
 	 * This method sets "Tap to return to call" banner when there is a call in progress
 	 * and it is in Cloud Drive section, Recents section, Incoming section, Outgoing section or in the chats list.
 	 */
@@ -16608,28 +16502,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 		if (returnCallMenuItem != null) {
 			returnCallMenuItem.setVisible(false);
-		}
-	}
-
-	/**
-	 * This method updates the action button, play or pause, of the
-	 * transfers widget
-	 */
-	private void updateTransferButton() {
-		logDebug("updateTransferButton");
-
-		if (transfersOverViewLayout.getVisibility() == View.VISIBLE) {
-			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-				logDebug("show PLAY button");
-				playButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_play));
-				transfersTitleText.setText(getString(R.string.paused_transfers_title));
-			} else {
-				logDebug("show PAUSE button");
-				playButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_pause));
-				transfersTitleText.setText(getString(R.string.section_transfers));
-			}
-		} else {
-			logDebug("Transfer panel not visible");
 		}
 	}
 
