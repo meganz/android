@@ -6579,9 +6579,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         logDebug("handle: " + handle);
 
         if (holder != null) {
-            MegaChatMessage holderMessage = getMessageAt(holder.getCurrentPosition()).getMessage();
+            AndroidMegaChatMessage megaMessage = getMessageAt(holder.getCurrentPosition());
 
-            if(msgId != INVALID_HANDLE && holderMessage.getMsgId() != msgId)
+            if(megaMessage == null || (msgId != INVALID_HANDLE && megaMessage.getMessage().getMsgId() != msgId))
                 return;
 
             File previewDir = getPreviewFolder(context);

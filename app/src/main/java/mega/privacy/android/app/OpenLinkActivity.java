@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
+import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -32,6 +33,8 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
+
+	private static final String REQUIRES_TRANSFER_SESSION = "fm/";
 
 	private DatabaseHandler dbH = null;
 
@@ -72,7 +75,14 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		// Email verification link
 		if (matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
 			logDebug("Open email verification link");
-			app.setIsWebOpenDueToEmailVerification(true);
+			MegaApplication.setIsWebOpenDueToEmailVerification(true);
+			openWebLink(url);
+			return;
+		}
+
+		// Web session link
+		if (matchRegexs(url, WEB_SESSION_LINK_REGEXS)) {
+			logDebug("Open web session link");
 			openWebLink(url);
 			return;
 		}
@@ -383,10 +393,22 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		// Browser open the link which does not require app to handle
 		logDebug("Browser open link: " + url);
+		checkIfRequiresTransferSession(url);
+	}
+
+	private void checkIfRequiresTransferSession(String url) {
+		if (url.contains(REQUIRES_TRANSFER_SESSION)) {
+			int start = url.indexOf(REQUIRES_TRANSFER_SESSION);
+			if (start != -1) {
+				String path = url.substring(start + REQUIRES_TRANSFER_SESSION.length());
+				megaApi.getSessionTransferURL(path, new SessionTransferURLListener(this));
+				return;
+			}
+		}
 		openWebLink(url);
 	}
 
-	private void openWebLink(String url) {
+	public void openWebLink(String url) {
 		Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
 		openIntent.setData(Uri.parse(url));
 		startActivity(openIntent);

@@ -701,7 +701,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                 }
 				if (mode == Mode.PICK_FOLDER) {
 					if ((prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways()))
-							&& dbH.getAskSetDownloadLocation()) {
+							&& dbH.getAskSetDownloadLocation() && !cameraFolderSettings) {
 						showConfirmationSaveInSameLocation();
 					} else {
 						finishPickFolder();
