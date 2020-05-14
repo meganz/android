@@ -330,7 +330,8 @@
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_delete_msg"
+                    android:src="@drawable/ic_clear_white"
+                    android:tint="@color/dark_primary_color"
                     android:visibility="visible" />
 
                 <TextView
@@ -360,7 +361,8 @@
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_delete_msg"
+                    android:src="@drawable/ic_clear_white"
+                    android:tint="@color/dark_primary_color"
                     android:visibility="visible" />
 
                 <TextView

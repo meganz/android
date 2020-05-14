@@ -111,7 +111,8 @@
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_open_with"
+                    android:src="@drawable/ic_b_open_with"
+                    android:tint="@color/mail_my_account"
                     android:visibility="visible" />
 
                 <TextView

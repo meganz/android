@@ -80,7 +80,8 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="16dp"
                         android:layout_marginRight="32dp"
-                        android:src="@drawable/ic_edit_msg"
+                        android:src="@drawable/ic_rename_white"
+                        android:tint="@color/mail_my_account"
                         android:visibility="visible" />
 
                     <TextView
@@ -118,7 +119,8 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="16dp"
                         android:layout_marginRight="32dp"
-                        android:src="@drawable/ic_copy_grey"
+                        android:src="@drawable/ic_copy_white"
+                        android:tint="@color/mail_my_account"
                         android:visibility="visible" />
 
                     <TextView
@@ -195,7 +197,8 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="16dp"
                         android:layout_marginRight="32dp"
-                        android:src="@drawable/ic_delete_msg"
+                        android:src="@drawable/ic_clear_white"
+                        android:tint="@color/dark_primary_color"
                         android:visibility="visible" />
 
                     <TextView

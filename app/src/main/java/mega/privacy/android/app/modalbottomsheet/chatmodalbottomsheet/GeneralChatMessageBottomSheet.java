@@ -2,7 +2,6 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
