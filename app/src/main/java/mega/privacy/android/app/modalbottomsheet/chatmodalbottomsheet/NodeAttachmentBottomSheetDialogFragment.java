@@ -228,7 +228,11 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             showSingleNodeSelected();
         }
 
-        separatorInfo.setVisibility(optionView.getVisibility());
+        if(optionView.getVisibility() == View.VISIBLE || optionImport.getVisibility() == View.VISIBLE){
+            separatorInfo.setVisibility(View.VISIBLE);
+        }else{
+            separatorRemove.setVisibility(View.GONE);
+        }
 
         if ((optionDownload.getVisibility() == View.GONE && optionImport.getVisibility() == View.GONE && optionForward.getVisibility() == View.GONE && optionSaveOffline.getVisibility() == View.GONE)
                 || optionRemove.getVisibility() == View.GONE) {

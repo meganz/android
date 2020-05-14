@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -56,6 +57,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         chatC = new ChatController(context);
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
@@ -178,12 +180,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         }
 
         setStateBottomSheetBehaviorHidden();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
     }
 
     @Override

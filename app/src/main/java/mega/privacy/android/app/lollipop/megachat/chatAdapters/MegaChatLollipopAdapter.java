@@ -528,7 +528,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         logDebug("New adapter");
         this.context = _context;
         this.messages = _messages;
-        this.positionClicked = -1;
+        this.positionClicked = INVALID_POSITION;
         this.chatRoom = chatRoom;
         this.removedMessages = _removedMessages;
         this.messagesPlaying = _messagesPlaying;
@@ -2633,7 +2633,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 checkMultiselectionMode(position, holder, true, message.getMsgId());
 
                 if (!multipleSelect) {
-                    if (positionClicked != -1 && positionClicked == position) {
+                    if (positionClicked != INVALID_POSITION && positionClicked == position) {
                         holder.forwardOwnRichLinks.setEnabled(false);
                     } else {
                         holder.forwardOwnRichLinks.setEnabled(true);
@@ -2748,7 +2748,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 checkMultiselectionMode(position, holder, false, message.getMsgId());
 
                 if (!multipleSelect) {
-                    if (positionClicked != -1 && positionClicked == position) {
+                    if (positionClicked != INVALID_POSITION && positionClicked == position) {
                         holder.forwardContactRichLinks.setEnabled(false);
                     } else {
                         holder.forwardContactRichLinks.setEnabled(true);
@@ -3064,7 +3064,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             checkMultiselectionMode(position, holder, true, message.getMsgId());
 
             if (!multipleSelect) {
-                if (positionClicked != -1 && positionClicked == position) {
+                if (positionClicked != INVALID_POSITION && positionClicked == position) {
                     holder.forwardOwnMessageLocation.setEnabled(false);
                 } else {
                     holder.forwardOwnMessageLocation.setEnabled(true);
@@ -3162,7 +3162,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             checkMultiselectionMode(position, holder, false, message.getMsgId());
 
             if (!multipleSelect) {
-                if (positionClicked != -1 && positionClicked == position) {
+                if (positionClicked != INVALID_POSITION && positionClicked == position) {
                     holder.forwardContactMessageLocation.setEnabled(false);
                 } else {
                     holder.forwardContactMessageLocation.setEnabled(true);
@@ -3422,7 +3422,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             checkMultiselectionMode(position, holder, true, message.getMsgId());
 
             if (!multipleSelect) {
-                if (positionClicked != -1 && positionClicked == position) {
+                if (positionClicked != INVALID_POSITION && positionClicked == position) {
                     holder.forwardOwnRichLinks.setEnabled(false);
                 } else {
                     holder.forwardOwnRichLinks.setEnabled(true);
@@ -3619,7 +3619,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             checkMultiselectionMode(position, holder, false, message.getMsgId());
 
             if(!multipleSelect){
-                if(positionClicked != -1 && positionClicked == position){
+                if(positionClicked != INVALID_POSITION && positionClicked == position){
                     holder.forwardContactRichLinks.setEnabled(false);
                 }else{
                     holder.forwardContactRichLinks.setEnabled(true);
@@ -4201,7 +4201,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             checkMultiselectionMode(position, holder, true, message.getMsgId());
 
             if (!multipleSelect) {
-                if (positionClicked != -1 && positionClicked == position) {
+                if (positionClicked != INVALID_POSITION && positionClicked == position) {
                     holder.forwardOwnFile.setEnabled(false);
                     holder.forwardOwnPortrait.setEnabled(false);
                     holder.forwardOwnLandscape.setEnabled(false);
@@ -4514,7 +4514,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             checkMultiselectionMode(position, holder, false, message.getMsgId());
 
             if (!multipleSelect) {
-                if (positionClicked != -1 && positionClicked == position) {
+                if (positionClicked != INVALID_POSITION && positionClicked == position) {
                     holder.forwardContactFile.setEnabled(false);
                     holder.forwardContactPreviewPortrait.setEnabled(false);
                     holder.forwardContactPreviewLandscape.setEnabled(false);
@@ -5211,7 +5211,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
            checkMultiselectionMode(position, holder, true, message.getMsgId());
 
             if (!multipleSelect) {
-                if (positionClicked != -1 && positionClicked == position) {
+                if (positionClicked != INVALID_POSITION && positionClicked == position) {
                     holder.forwardOwnContact.setEnabled(false);
                 } else {
                     holder.forwardOwnContact.setEnabled(true);
@@ -5309,7 +5309,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             checkMultiselectionMode(position, holder, false, message.getMsgId());
 
             if (!multipleSelect) {
-                if (positionClicked != -1 && positionClicked == position) {
+                if (positionClicked != INVALID_POSITION && positionClicked == position) {
                     holder.forwardContactContact.setEnabled(false);
                 } else {
                     holder.forwardContactContact.setEnabled(true);
@@ -7811,7 +7811,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-        } else if (!multipleSelect && positionClicked != -1 && positionClicked == positionInAdapter) {
+        } else if (positionClicked != INVALID_POSITION && positionClicked == positionInAdapter) {
             listFragment.smoothScrollToPosition(positionClicked);
         }
     }

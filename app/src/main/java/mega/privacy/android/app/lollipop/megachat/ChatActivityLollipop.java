@@ -371,15 +371,15 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
     ChatActivityLollipop chatActivity;
 
-    MenuItem importIcon;
-    MenuItem callMenuItem;
-    MenuItem videoMenuItem;
-    MenuItem selectMenuItem;
-    MenuItem inviteMenuItem;
-    MenuItem clearHistoryMenuItem;
-    MenuItem contactInfoMenuItem;
-    MenuItem leaveMenuItem;
-    MenuItem archiveMenuItem;
+    private MenuItem importIcon;
+    private MenuItem callMenuItem;
+    private MenuItem videoMenuItem;
+    private MenuItem selectMenuItem;
+    private MenuItem inviteMenuItem;
+    private MenuItem clearHistoryMenuItem;
+    private MenuItem contactInfoMenuItem;
+    private MenuItem leaveMenuItem;
+    private MenuItem archiveMenuItem;
 
     String intentAction;
     MegaChatLollipopAdapter adapter;
@@ -3744,18 +3744,14 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    public void copyMessage(AndroidMegaChatMessage message) {
-        String text = chatC.createSingleManagementString(message, chatRoom);
-
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            clipboard.setText(text);
-        } else {
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
-            clipboard.setPrimaryClip(clip);
-        }
-        showSnackbar(SNACKBAR_TYPE, getString(R.string.messages_copied_clipboard), -1);
+    /**
+     * Method for copying a message.
+     *
+     * @param message The message.
+     * @return The copied text.
+     */
+    public String copyMessage(AndroidMegaChatMessage message) {
+        return chatC.createSingleManagementString(message, chatRoom);
     }
 
     public void editMessage(ArrayList<AndroidMegaChatMessage> messagesSelected) {
@@ -3771,7 +3767,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
             sendLocation();
             finishMultiselectionMode();
-
         } else {
             textChat.setText(messageToEdit.getContent());
             textChat.setSelection(textChat.getText().length());
@@ -3875,46 +3870,34 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             ArrayList<AndroidMegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
             switch(item.getItemId()){
-                case R.id.chat_cab_menu_edit:{
+                case R.id.chat_cab_menu_edit:
                     logDebug("Edit text");
                     editMessage(messagesSelected);
                     break;
-                }
-                case R.id.chat_cab_menu_forward:{
+
+                case R.id.chat_cab_menu_forward:
                     logDebug("Forward message");
                     forwardMessages(messagesSelected);
                     break;
-                }
-                case R.id.chat_cab_menu_copy:{
+
+                case R.id.chat_cab_menu_copy:
                     finishMultiselectionMode();
                     String text = "";
-
                     if (messagesSelected.size() == 1) {
-                        copyMessage(messagesSelected.get(0));
-
+                       text = copyMessage(messagesSelected.get(0));
                     } else {
                         text = copyMessages(messagesSelected);
-                        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            clipboard.setText(text);
-
-                        } else {
-                            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
-                            clipboard.setPrimaryClip(clip);
-                        }
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.messages_copied_clipboard), -1);
                     }
-
+                    copyToClipboard(text);
                     break;
-                }
-                case R.id.chat_cab_menu_delete:{
+
+                case R.id.chat_cab_menu_delete:
                     finishMultiselectionMode();
                     //Delete
                     showConfirmationDeleteMessages(messagesSelected, chatRoom);
                     break;
-                }
-                case R.id.chat_cab_menu_download: {
+
+                case R.id.chat_cab_menu_download:
                     logDebug("chat_cab_menu_download ");
                     clearSelections();
                     hideMultipleSelect();
@@ -3929,13 +3912,13 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     }
                     chatC.prepareForChatDownload(list);
                     break;
-                }
-                case R.id.chat_cab_menu_import:{
+
+                case R.id.chat_cab_menu_import:
                     finishMultiselectionMode();
                     chatC.importNodesFromAndroidMessages(messagesSelected);
                     break;
-                }
-                case R.id.chat_cab_menu_offline:{
+
+                case R.id.chat_cab_menu_offline:
                     finishMultiselectionMode();
                     if (!checkPermissionWriteStorage(REQUEST_WRITE_STORAGE_OFFLINE)) {
                         preservedMessagesSelected = messagesSelected;
@@ -3943,7 +3926,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     }
                     chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom);
                     break;
-                }
+
             }
             return false;
         }
@@ -3964,6 +3947,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 builder.append("\n");
             }
             return builder.toString();
+        }
+
+        /**
+         * Method for copying a text to the clipboard.
+         *
+         * @param text The text.
+         */
+        private void copyToClipboard(String text) {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+            clipboard.setPrimaryClip(clip);
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.messages_copied_clipboard), -1);
         }
 
         @Override
@@ -4789,14 +4784,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                     showGeneralChatMessageBottomSheet(m, positionInMessages);
                                 }else{
                                     String url = richLinkMessage.getUrl();
-
                                     if (richLinkMessage.isChat()) {
                                         loadChatLink(url);
-                                    } else if (richLinkMessage.getNode() != null) {
-                                        openMegaLink(url, richLinkMessage.getNode().isFile());
                                     } else {
-                                        openMegaLink(url, richLinkMessage.isFile());
-
+                                        openMegaLink(url, richLinkMessage.getNode() != null ? richLinkMessage.getNode().isFile() : richLinkMessage.isFile());
                                     }
                                 }
                             }
