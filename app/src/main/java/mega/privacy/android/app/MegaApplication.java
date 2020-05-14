@@ -442,7 +442,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 							return;
 						}
 
-						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN || callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
 							createChatAudioManager();
 							setAudioManagerValues(callStatus);
 						}
@@ -1351,7 +1351,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	}
 
 	public void setAudioManagerValues(int callStatus){
-		if (chatAudioManager != null) {
+        if (chatAudioManager != null) {
 			MegaHandleList listCallsRequest = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
 			MegaHandleList listCallsRing = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
 			chatAudioManager.setAudioManagerValues(callStatus, listCallsRequest, listCallsRing);
