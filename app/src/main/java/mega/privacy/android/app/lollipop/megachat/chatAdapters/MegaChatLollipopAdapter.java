@@ -1695,6 +1695,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ChatActivityLollipop) context).setNewVisibility(true);
                 ((ChatActivityLollipop) context).positionNewMessagesLayout = position;
                 return;
+
             }
         }
 
