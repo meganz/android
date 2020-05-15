@@ -638,7 +638,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 } else if (tabSelected == 2) {
                     if (node.isFolder()) {
                         optionInfoText.setText(R.string.general_folder_info);
-                        optionShare.setVisibility(View.VISIBLE);
+                        optionShareFolder.setVisibility(View.VISIBLE);
                         if (isOutShare(node)) {
                             optionShareFolderText.setText(R.string.context_sharing_folder);
                         } else {
@@ -647,7 +647,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     } else {
                         optionInfoText.setText(R.string.general_file_info);
                         counterShares--;
-                        optionShare.setVisibility(View.GONE);
+                        optionShareFolder.setVisibility(View.GONE);
                     }
 
                     if (node.isExported()) {
