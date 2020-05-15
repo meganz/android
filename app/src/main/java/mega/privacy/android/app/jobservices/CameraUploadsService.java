@@ -20,10 +20,12 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.StatFs;
 import android.provider.MediaStore;
+
 import androidx.annotation.Nullable;
-import androidx.exifinterface.media.ExifInterface;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.exifinterface.media.ExifInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -952,6 +954,22 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             return SHOULD_RUN_STATE_FAILED;
         }
 
+        if (!checkPrimaryLocalFolder()) {
+            mNotification = createNotification(getString(R.string.section_photo_sync), getString(R.string.camera_notif_primary_local_unavailable), null, false);
+            mNotificationManager.notify(1909, mNotification);
+            return SHOULD_RUN_STATE_FAILED;
+        } else {
+            mNotificationManager.cancel(1909);
+        }
+
+        if(!checkSecondaryLocalFolder()) {
+            mNotification = createNotification(getString(R.string.section_photo_sync), getString(R.string.camera_notif_secondary_local_unavailable), null, false);
+            mNotificationManager.notify(1909, mNotification);
+            return SHOULD_RUN_STATE_FAILED;
+        } else {
+            mNotificationManager.cancel(1909);
+        }
+
         if (!localPath.endsWith(SEPARATOR)) {
             localPath += SEPARATOR;
         }
@@ -996,6 +1014,35 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         return secondaryFolderResult;
+    }
+
+    private boolean checkPrimaryLocalFolder() {
+        // check primary local folder
+        if (Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard())) {
+            Uri uri = Uri.parse(prefs.getUriExternalSDCard());
+            DocumentFile file = DocumentFile.fromTreeUri(this, uri);
+            if (file == null) {
+                logError("Local folder on sd card is unavailabe.");
+                return false;
+            }
+            return file.exists();
+        } else {
+            return new File(localPath).exists();
+        }
+    }
+
+    private boolean checkSecondaryLocalFolder() {
+        // check secondary local folder if media upload is enabled
+        if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
+            String path = prefs.getLocalPathSecondaryFolder();
+            if(path == null) {
+                return false;
+            } else {
+                return new File(path).exists();
+            }
+        }
+        // if not enable secondary
+        return true;
     }
 
     private int checkPrimaryFolder() {

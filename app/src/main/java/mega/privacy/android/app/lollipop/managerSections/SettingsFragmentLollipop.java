@@ -2456,9 +2456,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	 */
 	public void disableMediaUploadUIProcess() {
 		logDebug("changes to sec folder only");
-		secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
-		cameraUploadCategory.removePreference(localSecondaryFolder);
-		cameraUploadCategory.removePreference(megaSecondaryFolder);
+        secondaryUpload = false;
+        secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
+        cameraUploadCategory.removePreference(localSecondaryFolder);
+        cameraUploadCategory.removePreference(megaSecondaryFolder);
 	}
 	/**
 	 * Disable CameraUpload UI related process

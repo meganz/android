@@ -7452,14 +7452,12 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 			refreshSearch();
 		}
 
-        checkCameraUploadFolder();
+        checkCameraUploadFolder(true);
 		refreshRubbishBin();
 		setToolbarTitle();
 	}
 
-    private void checkCameraUploadFolder() {
-    	if (!CameraUploadsService.uploadingInProgress) return;
-
+    private void checkCameraUploadFolder(boolean shouldDisable) {
         long primaryHandle = getPrimaryFolderHandle();
         long secondaryHandle = getSecondaryFolderHandle();
 		MegaPreferences prefs = dbH.getPreferences();
@@ -7472,19 +7470,26 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
         if (isSecondaryFolderInRubbish && !isPrimaryFolderInRubbish) {
 			logDebug("MU folder is deleted, backup settings and disable MU.");
-			backupTimestampsAndFolderHandle();
-			disableMediaUploadProcess();
-			if (getSettingsFragment() != null) {
-				sttFLol.disableMediaUploadUIProcess();
-
-			}
+            if (shouldDisable) {
+                backupTimestampsAndFolderHandle();
+                disableMediaUploadProcess();
+                if (getSettingsFragment() != null) {
+                    sttFLol.disableMediaUploadUIProcess();
+                }
+            } else {
+                stopRunningCameraUploadService(app);
+            }
 		} else if (isPrimaryFolderInRubbish) {
-			logDebug("CU folder is deleted, backup settings and disable CU.");
-			backupTimestampsAndFolderHandle();
-			disableCameraUploadSettingProcess(false);
-			if (getSettingsFragment() != null) {
-				sttFLol.disableCameraUploadUIProcess();
-			}
+            logDebug("CU folder is deleted, backup settings and disable CU.");
+            if (shouldDisable) {
+                backupTimestampsAndFolderHandle();
+                disableCameraUploadSettingProcess(false);
+                if (getSettingsFragment() != null) {
+                    sttFLol.disableCameraUploadUIProcess();
+                }
+            } else {
+                stopRunningCameraUploadService(app);
+            }
 		}
     }
 
@@ -8352,9 +8357,9 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 					setMoveToRubbish(true);
 
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					if (getPrimaryFolderHandle() == handle && CameraUploadsService.isServiceRunning) {
+					if (getPrimaryFolderHandle() == handle ) {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
-					} else if (getSecondaryFolderHandle() == handle && CameraUploadsService.isServiceRunning) {
+					} else if (getSecondaryFolderHandle() == handle ) {
 						builder.setMessage(R.string.confirmation_move_mu_folder_to_rubbish);
 					} else {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
@@ -14754,7 +14759,7 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 
 		onNodesInboxUpdate();
 
-		checkCameraUploadFolder();
+		checkCameraUploadFolder(false);
 
 		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 		if (cuFL != null){
