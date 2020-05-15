@@ -49,6 +49,7 @@ import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
@@ -157,7 +158,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private NetworkStateReceiver networkStateReceiver;
 	private BroadcastReceiver logoutReceiver;
 	private ChatAudioManager chatAudioManager = null;
-	private static MegaApplication singleApplicationInstance;
+    private AppRTCAudioManager rtcAudioManager = null;
+
+    private static MegaApplication singleApplicationInstance;
 
 	private PowerManager.WakeLock wakeLock;
 
@@ -441,7 +444,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						if (listAllCalls == null || listAllCalls.size() == 0)
 							return;
 
-						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+						if (callStatus == MegaChatCall.CALL_STATUS_RING_IN || callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
+                            createChatAudioManager();
 							setAudioManagerValues(callStatus);
 						}
 
@@ -1289,6 +1293,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 	private void removeValues(long chatId) {
 		removeStatusVideoAndSpeaker(chatId);
 		removeChatAudioManager();
+        removeRTCAudioManager();
 	}
 
 	private void checkCallDestroyed(long chatId) {
@@ -1332,26 +1337,98 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		hashMapVideo.remove(chatId);
 	}
 
+    /**
+     * Create or update the AppRTCAudioManager for the in progress call.
+     *
+     * @param isSpeakerOn the speaker status.
+     */
+    public void createRTCAudioManager(boolean isSpeakerOn) {
+        if (rtcAudioManager != null) {
+            logDebug("Updating RTC Audio Manager values...");
+            rtcAudioManager.updateSpeakerStatus(isSpeakerOn);
+            return;
+        }
+
+        logDebug("Creating RTC Audio Manager...");
+        rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn);
+        startProximitySensor();
+        rtcAudioManager.setOnProximitySensorListener(isNear -> {
+            Intent intent = new Intent(BROADCAST_ACTION_INTENT_PROXIMITY_SENSOR);
+            intent.putExtra(UPDATE_PROXIMITY_SENSOR_STATUS, isNear);
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        });
+    }
+
+    /**
+     * Remove the AppRTCAudioManager.
+     */
+    public void removeRTCAudioManager() {
+        if (rtcAudioManager == null)
+            return;
+
+        try {
+            logDebug("Removing RTC Audio Manager...");
+            unregisterProximitySensor();
+            rtcAudioManager.stop();
+            rtcAudioManager = null;
+        } catch (Exception e) {
+            logError("Exception stopping speaker audio manager", e);
+        }
+    }
+
+    /**
+     * Activate the proximity sensor.
+     */
+    public void startProximitySensor() {
+        if (rtcAudioManager != null) {
+            logDebug("Starting proximity sensor...");
+            rtcAudioManager.startProximitySensor();
+        }
+    }
+
+    /**
+     * Deactivates the proximity sensor
+     */
+    public void unregisterProximitySensor() {
+        if (rtcAudioManager != null) {
+            logDebug("Stopping proximity sensor...");
+            rtcAudioManager.unregisterProximitySensor();
+        }
+    }
+
+    /**
+     * Create the ChatAudioManager for the incoming and outgoing call.
+     */
 	public void createChatAudioManager() {
 		if (chatAudioManager != null) {
 			return;
 		}
 
+        logDebug("Creating Chat Audio Manager...");
 		chatAudioManager = ChatAudioManager.create(getApplicationContext());
 	}
 
+    /**
+     * Remove the ChatAudioManager.
+     */
 	public void removeChatAudioManager() {
 		if (chatAudioManager == null) {
 			return;
 		}
 
+        logDebug("Removing Chat Audio Manager...");
 		chatAudioManager.stopAudioSignals();
 		chatAudioManager = null;
 	}
 
+    /**
+     * Update the values of the ChatAudioManager depending on the call status.
+     *
+     * @param callStatus The current call status.
+     */
 	public void setAudioManagerValues(int callStatus){
-		createChatAudioManager();
 		if(chatAudioManager != null) {
+            logDebug("Updating values of Chat Audio Manager...");
 			MegaHandleList listCallsRequest = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
 			MegaHandleList listCallsRing = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
 			chatAudioManager.setAudioManagerValues(callStatus, listCallsRequest, listCallsRing);
