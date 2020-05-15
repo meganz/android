@@ -150,7 +150,6 @@ public class ChatAudioManager {
 
     public void stopAudioSignals() {
         if (audioManager != null) {
-            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             audioManager = null;
         }
 

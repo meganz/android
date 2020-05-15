@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -15,40 +14,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import java.nio.ByteBuffer;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
-import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static mega.privacy.android.app.utils.CallUtil.getDefaultAvatarCall;
-import static mega.privacy.android.app.utils.CallUtil.getImageAvatarCall;
-import static mega.privacy.android.app.utils.CallUtil.isItMe;
-import static mega.privacy.android.app.utils.Constants.CHAT_ID;
-import static mega.privacy.android.app.utils.Constants.CLIENT_ID;
-import static mega.privacy.android.app.utils.Constants.INVALID_CALL_CLIENT_ID;
-import static mega.privacy.android.app.utils.Constants.INVALID_CALL_PEER_ID;
-import static mega.privacy.android.app.utils.Constants.PEER_ID;
+import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.px2dp;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class FragmentPeerSelected extends Fragment implements View.OnClickListener {
+public class FragmentPeerSelected extends BaseFragment implements View.OnClickListener {
 
     private GroupCallListener listener = null;
-    private Context context;
-    private MegaChatApiAndroid megaChatApi;
-    private Display display;
-    private DisplayMetrics outMetrics;
-
     private MegaChatRoom chatRoom;
     private long chatId;
     private long peerid;
@@ -77,7 +62,7 @@ public class FragmentPeerSelected extends Fragment implements View.OnClickListen
         this.chatId = args.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
         this.peerid = args.getLong(PEER_ID, INVALID_CALL_PEER_ID);
         this.clientid = args.getLong(CLIENT_ID, INVALID_CALL_CLIENT_ID);
-        megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+
         this.chatRoom = megaChatApi.getChatRoom(chatId);
         if (chatRoom == null || megaChatApi.getChatCall(chatId) == null)
             return;
@@ -85,10 +70,6 @@ public class FragmentPeerSelected extends Fragment implements View.OnClickListen
         if (peerid == INVALID_CALL_PEER_ID) {
             this.peerid = chatRoom.getPeerHandle(0);
         }
-
-        display = ((ChatCallActivity) context).getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
 
         super.onCreate(savedInstanceState);
     }
@@ -112,7 +93,7 @@ public class FragmentPeerSelected extends Fragment implements View.OnClickListen
         muteLayout = contentView.findViewById(R.id.mute_layout);
 
         setAvatarPeerSelected(peerid);
-        checkValues(peerid, clientid, null);
+        checkValues(peerid, clientid);
 
         return contentView;
     }
@@ -137,7 +118,6 @@ public class FragmentPeerSelected extends Fragment implements View.OnClickListen
         if (bitmap != null) {
             avatarImage.setImageBitmap(bitmap);
         }
-//        ((ChatCallActivity)context). updateParticipantSelectedInCallOnHold(peer);
     }
 
     /**
@@ -154,18 +134,20 @@ public class FragmentPeerSelected extends Fragment implements View.OnClickListen
      *
      * @param peerId   Peer ID.
      * @param clientId Client ID.
-     * @param session  The state of the session.
      */
-    public void checkValues(long peerId, long clientId, MegaChatSession session) {
+    public void checkValues(long peerId, long clientId) {
         MegaChatCall callChat = ((ChatCallActivity) context).getCall();
+
         if (callChat == null || peerId != peerid || clientId != clientid || isItMe(chatId, peerId, clientId))
             return;
 
+        MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peerId, clientId);
 
         if (session != null && session.hasVideo() && !callChat.isOnHold() && !((ChatCallActivity) context).isSessionOnHold()) {
             activateVideo();
             return;
         }
+
         showAvatar();
         showMuteIcon(peerid, clientid);
     }
@@ -318,7 +300,6 @@ public class FragmentPeerSelected extends Fragment implements View.OnClickListen
      * @param newClientId Client ID.
      */
     public void changePeerSelected(long newChatId, long callId, long newPeerId, long newClientId) {
-
         if ((newPeerId == peerid && newClientId == clientid) || ((ChatCallActivity) context).getCall().getId() != callId)
             return;
 
@@ -333,8 +314,7 @@ public class FragmentPeerSelected extends Fragment implements View.OnClickListen
         }
 
         setAvatarPeerSelected(peerid);
-        MegaChatSession session = ((ChatCallActivity)context).getSessionCall(newPeerId, newClientId);
-        checkValues(newPeerId, newClientId, session);
+        checkValues(newPeerId, newClientId);
     }
 
     /**
@@ -360,13 +340,6 @@ public class FragmentPeerSelected extends Fragment implements View.OnClickListen
             }
             listener = null;
         }
-
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
     }
 
     @Override

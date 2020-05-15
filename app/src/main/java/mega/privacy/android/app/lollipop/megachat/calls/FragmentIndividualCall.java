@@ -11,28 +11,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
 import androidx.fragment.app.Fragment;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.fragments.BaseFragment;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
+
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class FragmentIndividualCall extends Fragment implements View.OnClickListener {
+public class FragmentIndividualCall extends BaseFragment implements View.OnClickListener {
 
     private IndividualCallListener listener = null;
-    private Context context;
-    private MegaChatApiAndroid megaChatApi;
-    private Display display;
-    private DisplayMetrics outMetrics;
-
     private MegaChatRoom chatRoom;
     private long chatId;
     private long peerid;
@@ -70,7 +69,6 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
         this.clientid = args.getLong(CLIENT_ID, INVALID_CALL_CLIENT_ID);
         this.isSmallCamera = args.getBoolean(TYPE_CAMERA, false);
 
-        megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         this.chatRoom = megaChatApi.getChatRoom(chatId);
         if (chatRoom == null || megaChatApi.getChatCall(chatId) == null)
             return;
@@ -78,10 +76,6 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
         if (peerid == INVALID_CALL_PEER_ID) {
             this.peerid = chatRoom.getPeerHandle(0);
         }
-
-        display = ((ChatCallActivity) context).getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
 
         logDebug("Chat ID: " + chatId);
         super.onCreate(savedInstanceState);
@@ -122,7 +116,7 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
         }
 
         updateAvatar(peerid);
-        checkValues(peerid, clientid, null);
+        checkValues(peerid, clientid);
 
         return contentView;
     }
@@ -156,9 +150,8 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      *
      * @param peerId   Peer ID.
      * @param clientId Client ID.
-     * @param session  The state of the session.
      */
-    public void checkValues(long peerId, long clientId, MegaChatSession session) {
+    public void checkValues(long peerId, long clientId) {
         MegaChatCall callChat = ((ChatCallActivity) context).getCall();
         if (callChat == null || peerId != peerid || clientId != clientid) {
             logError("Error checking values");
@@ -174,6 +167,8 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
             showAvatar();
             return;
         }
+
+        MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peerId, clientId);
 
         if (session != null && session.hasVideo() && !callChat.isOnHold() && !((ChatCallActivity) context).isSessionOnHold()) {
             activateVideo();
@@ -288,10 +283,10 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
         }
 
         avatarLayout.setVisibility(View.VISIBLE);
-        MegaChatCall call = ((ChatCallActivity)context).getCall();
-        MegaChatSession session = ((ChatCallActivity)context).getSessionCall(peerid, clientid);
+        MegaChatCall call = ((ChatCallActivity) context).getCall();
+        MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peerid, clientid);
 
-        if ((call != null && call.isOnHold()) || ( session!= null && session.isOnHold())) {
+        if ((call != null && call.isOnHold()) || (session != null && session.isOnHold())) {
             avatarImageOnHold.setVisibility(View.VISIBLE);
             avatarImage.setAlpha(0.5f);
         } else {
@@ -360,11 +355,10 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
      * @param callId      Call ID.
      * @param newPeerId   Peer ID.
      * @param newClientId Client ID.
-     * @param session     The session with the contact.
      */
-    public void changeUser(long newChatId, long callId, long newPeerId, long newClientId, MegaChatSession session) {
+    public void changeUser(long newChatId, long callId, long newPeerId, long newClientId) {
 
-        if (isSmallCamera || (newPeerId == peerid && newClientId == clientid) || ((ChatCallActivity)context).getCall().getId() != callId) {
+        if (isSmallCamera || (newPeerId == peerid && newClientId == clientid) || ((ChatCallActivity) context).getCall().getId() != callId) {
             logError("Error changing the user");
             return;
         }
@@ -380,7 +374,7 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
         }
 
         updateAvatar(peerid);
-        checkValues(peerid, clientid, session);
+        checkValues(peerid, clientid);
     }
 
     /**
@@ -408,12 +402,6 @@ public class FragmentIndividualCall extends Fragment implements View.OnClickList
             }
             listener = null;
         }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
     }
 
     @Override

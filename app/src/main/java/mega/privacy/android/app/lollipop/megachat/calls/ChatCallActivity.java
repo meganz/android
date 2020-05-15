@@ -289,7 +289,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         } else {
             this.startService(intentService);
         }
-        application.createChatAudioManager();
+
         titleToolbar.setText(chat.getTitle());
         updateSubTitle();
 
@@ -637,7 +637,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                     if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
                         if(cameraFragmentFullScreen != null){
-                            cameraFragmentFullScreen.changeUser(chatId, callChat.getId(), peerId, clientId, session);
+                            cameraFragmentFullScreen.changeUser(chatId, callChat.getId(), peerId, clientId);
                         }
                         hideReconnecting();
                         updateAVFlags(session);
@@ -1065,7 +1065,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (rtcAudioManager != null) {
             rtcAudioManager.startProximitySensor();
         }
-        application.createChatAudioManager();
+
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
@@ -1631,11 +1631,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         if (!chat.isGroup()) {
             if(cameraFragmentFullScreen != null){
-                cameraFragmentFullScreen.checkValues(megaChatApi.getMyUserHandle(), megaChatApi.getMyClientidHandle(chatId), null);
+                cameraFragmentFullScreen.checkValues(megaChatApi.getMyUserHandle(), megaChatApi.getMyClientidHandle(chatId));
             }
 
             if(cameraFragmentSmall != null){
-                cameraFragmentSmall.checkValues(megaChatApi.getMyUserHandle(), megaChatApi.getMyClientidHandle(chatId), null);
+                cameraFragmentSmall.checkValues(megaChatApi.getMyUserHandle(), megaChatApi.getMyClientidHandle(chatId));
             }
 
         } else {
@@ -2042,7 +2042,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         logDebug("User has video " + session.hasVideo());
 
         if(cameraFragmentFullScreen != null){
-            cameraFragmentFullScreen.checkValues(session.getPeerid(), session.getClientid(), session);
+            cameraFragmentFullScreen.checkValues(session.getPeerid(), session.getClientid());
         }
 
         if (!callChat.hasLocalVideo() && cameraFragmentSmall != null) {
@@ -2065,7 +2065,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 updateChangesVideo(i);
 
                 if (!lessThanSevenParticipants() && peerSelected != null && peerSelected.getPeerId() == session.getPeerid() && peerSelected.getClientId() == session.getClientid()) {
-                    updateParticipantSelectedStatus(session);
+                    updateParticipantSelectedStatus();
                 }
                 break;
 
@@ -2114,7 +2114,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void createAppRTCAudioManager(boolean isSpeakerOn){
-        rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn);
+
+        if(rtcAudioManager == null) {
+            rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn);
+        }
         rtcAudioManager.setOnProximitySensorListener(isNear -> {
             boolean realStatus = application.getVideoStatus(callChat.getChatid());
             if(!realStatus){
@@ -2421,9 +2424,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     /**
      * Method for updating the status of the selected participant.
      */
-    private void updateParticipantSelectedStatus(MegaChatSession session) {
+    private void updateParticipantSelectedStatus() {
         if(cameraFragmentPeerSelected != null && peerSelected != null){
-            cameraFragmentPeerSelected.checkValues(peerSelected.getPeerId(), peerSelected.getClientId(), session);
+            cameraFragmentPeerSelected.checkValues(peerSelected.getPeerId(), peerSelected.getClientId());
         }
     }
 
@@ -2778,6 +2781,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      */
     private void checkTerminatingCall() {
         clearHandlers();
+        application.removeChatAudioManager();
         stopSpeakerAudioManger();
         MegaApplication.setSpeakerStatus(chatId, false);
         finishActivity();
@@ -2883,7 +2887,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }else if(!lessThanSevenParticipants() && adapterList != null){
                 adapterList.updateCallOnHold();
                 if(peerSelected!= null){
-                    updateParticipantSelectedStatus(getSessionCall(peerSelected.getPeerId(), peerSelected.getClientId()));
+                    updateParticipantSelectedStatus();
                 }
             }
         }else{
