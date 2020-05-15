@@ -20,6 +20,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.StatFs;
 import android.provider.MediaStore;
+import android.service.notification.StatusBarNotification;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -87,6 +88,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
+    public static final int  LOCAL_FOLDER_REMINDER_NOTI_ID = 1909;
     private static final String OVER_QUOTA_NOTIFICATION_CHANNEL_ID = "overquotanotification";
     private static final String ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE";
     private static final String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
@@ -955,19 +957,17 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (!checkPrimaryLocalFolder()) {
-            mNotification = createNotification(getString(R.string.section_photo_sync), getString(R.string.camera_notif_primary_local_unavailable), null, false);
-            mNotificationManager.notify(1909, mNotification);
+            localFolderUnavailableNotification(R.string.camera_notif_primary_local_unavailable);
             return SHOULD_RUN_STATE_FAILED;
         } else {
-            mNotificationManager.cancel(1909);
+            mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_NOTI_ID);
         }
 
         if(!checkSecondaryLocalFolder()) {
-            mNotification = createNotification(getString(R.string.section_photo_sync), getString(R.string.camera_notif_secondary_local_unavailable), null, false);
-            mNotificationManager.notify(1909, mNotification);
+            localFolderUnavailableNotification(R.string.camera_notif_secondary_local_unavailable);
             return SHOULD_RUN_STATE_FAILED;
         } else {
-            mNotificationManager.cancel(1909);
+            mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_NOTI_ID);
         }
 
         if (!localPath.endsWith(SEPARATOR)) {
@@ -1014,6 +1014,21 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         return secondaryFolderResult;
+    }
+
+    private void localFolderUnavailableNotification(int resId) {
+        boolean isShowing = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            for(StatusBarNotification notification : mNotificationManager.getActiveNotifications()) {
+                if(notification.getId() == LOCAL_FOLDER_REMINDER_NOTI_ID) {
+                    isShowing = true;
+                }
+            }
+        }
+        if(!isShowing) {
+            mNotification = createNotification(getString(R.string.section_photo_sync), getString(resId), null, false);
+            mNotificationManager.notify(LOCAL_FOLDER_REMINDER_NOTI_ID, mNotification);
+        }
     }
 
     private boolean checkPrimaryLocalFolder() {
