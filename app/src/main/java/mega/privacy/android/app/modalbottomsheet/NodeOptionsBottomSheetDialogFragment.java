@@ -301,6 +301,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionInfoText.setText(R.string.general_file_info);
                     counterShares--;
                     optionShareFolder.setVisibility(View.GONE);
+                    counterShares--;
+                    optionClearShares.setVisibility(View.GONE);
                 }
 
                 if (node.isExported()) {
