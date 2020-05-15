@@ -127,9 +127,10 @@
             android:layout_marginTop="?attr/actionBarSize">
 
             <include layout="@layout/transfers_widget"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_marginEnd="16dp"
+                android:layout_width="59dp"
+                android:layout_height="65dp"
+                android:layout_marginEnd="13dp"
+                android:layout_marginBottom="7dp"
                 android:layout_alignParentEnd="true"
                 android:layout_above="@+id/floating_button"/>
 
@@ -137,7 +138,8 @@
                 android:id="@+id/floating_button"
                 android:layout_width="@dimen/fab_button_diameter"
                 android:layout_height="@dimen/fab_button_diameter"
-                android:layout_margin="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
                 android:src="@drawable/ic_add_white"
                 android:stateListAnimator="@anim/button_elevation"
                 android:tint="@android:color/white"
