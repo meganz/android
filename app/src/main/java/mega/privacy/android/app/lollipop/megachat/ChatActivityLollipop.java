@@ -556,7 +556,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) || intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
                 int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
-                updateLayout(callStatus);
+                updateCallBar();
 
                 switch (callStatus) {
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS:
@@ -7995,6 +7995,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             } else {
                 setAsRead = false;
             }
+            updateCallBar();
             setChatSubtitle();
             supportInvalidateOptionsMenu();
         }
@@ -8143,6 +8144,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void showCallInProgressLayout(String text, boolean chrono, MegaChatCall call) {
+
         if (callInProgressText != null) {
             callInProgressText.setText(text);
         }
@@ -8156,6 +8158,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void hideCallInProgressLayout(MegaChatCall call) {
+
         invalidateOptionsMenu();
         activateChrono(false, callInProgressChrono, call);
         activateChrono(false, subtitleChronoCall, call);
@@ -8167,7 +8170,21 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
     }
 
-    private void updateLayout(int callStatus) {
+    private void updateCallBar() {
+        if (chatRoom == null || chatRoom.isPreview() ||
+                !chatRoom.isActive() || !isStatusConnected(this, idChat) ||
+                megaChatApi.getNumCalls() <= 0 || !participatingInACall() && !megaChatApi.hasCallInChatRoom(idChat)) {
+
+            setSubtitleVisibility();
+            MegaChatCall call = megaChatApi.getChatCall(idChat);
+            hideCallInProgressLayout(call);
+        }
+
+        MegaChatCall callInThisChat = megaChatApi.getChatCall(idChat);
+        if (callInThisChat == null)
+            return;
+
+        int callStatus = callInThisChat.getStatus();
         if (callStatus == MegaChatCall.CALL_STATUS_DESTROYED) {
             setSubtitleVisibility();
             MegaChatCall call = megaChatApi.getChatCall(idChat);
