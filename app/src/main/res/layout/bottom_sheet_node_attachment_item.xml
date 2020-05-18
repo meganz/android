@@ -112,7 +112,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_b_open_with"
-                    android:tint="@color/mail_my_account"
+                    android:alpha="0.54"
                     android:visibility="visible" />
 
                 <TextView
@@ -266,7 +266,7 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
-                    android:text="@string/add_to_cloud"
+                    android:text="@string/add_to_cloud_node_chat"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
@@ -328,7 +328,7 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
-                    android:text="@string/save_for_offline"
+                    android:text="@string/save_to_offline"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>

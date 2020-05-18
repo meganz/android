@@ -232,7 +232,7 @@
                     android:layout_marginLeft="18dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:text="@string/contact_properties_activity"
+                    android:text="@string/file_properties_info_info_file"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -292,6 +292,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/ic_add_contact_chat_item"
+                    android:tint="@color/mail_my_account"
                     android:visibility="visible" />
 
                 <TextView
@@ -301,7 +302,7 @@
                     android:layout_marginLeft="18dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:text="@string/menu_add_contact"
+                    android:text="@string/contact_invite"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -336,37 +337,6 @@
 
                 <TextView
                     android:id="@+id/delete_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:text="@string/delete_button"
-                    android:textColor="@color/dark_primary_color"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_remove_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/option_remove_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:src="@drawable/ic_clear_white"
-                    android:tint="@color/dark_primary_color"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/option_remove_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="18dp"

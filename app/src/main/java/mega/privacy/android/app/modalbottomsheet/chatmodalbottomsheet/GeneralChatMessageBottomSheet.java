@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
 import java.util.ArrayList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -74,6 +76,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         LinearLayout optionSelect = contentView.findViewById(R.id.select_layout);
         LinearLayout deleteSeparator = contentView.findViewById(R.id.delete_separator);
         LinearLayout optionDelete = contentView.findViewById(R.id.delete_layout);
+        TextView textDelete = contentView.findViewById(R.id.delete_text);
 
         optionForward.setOnClickListener(this);
         optionEdit.setOnClickListener(this);
@@ -129,6 +132,11 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isDeletable()) {
                     optionDelete.setVisibility(View.GONE);
                 } else {
+                    if (message.getMessage().getType() == MegaChatMessage.TYPE_NORMAL && message.getRichLinkMessage() == null) {
+                        textDelete.setText(getString(R.string.delete_button));
+                    } else {
+                        textDelete.setText(getString(R.string.context_remove));
+                    }
                     optionDelete.setVisibility(View.VISIBLE);
                 }
             }
@@ -170,7 +178,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.copy_layout:
-                ((ChatActivityLollipop) context).copyMessage(message);
+                String text = ((ChatActivityLollipop) context).copyMessage(message);
+                ((ChatActivityLollipop) context).copyToClipboard(text);
                 break;
 
             case R.id.delete_layout:

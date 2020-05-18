@@ -207,7 +207,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginRight="15dp"
-                        android:text="@string/delete_button"
+                        android:text="@string/context_remove"
                         android:textColor="@color/dark_primary_color"
                         android:textSize="16sp" />
                 </LinearLayout>

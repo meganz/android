@@ -1219,7 +1219,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         mOutputFilePath = savedInstanceState.getString("mOutputFilePath");
                         isShareLinkDialogDismissed = savedInstanceState.getBoolean("isShareLinkDialogDismissed", false);
                         isLocationDialogShown = savedInstanceState.getBoolean("isLocationDialogShown", false);
-                        recoveredSelectedPositions = (ArrayList<Integer>) savedInstanceState.getSerializable(SELECTED_ITEMS);
+                        recoveredSelectedPositions = savedInstanceState.getIntegerArrayList(SELECTED_ITEMS);
 
                         if(visibilityMessageJump){
                             if(typeMessageJump == TYPE_MESSAGE_NEW_MESSAGE){
@@ -3755,6 +3755,19 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         return chatC.createSingleManagementString(message, chatRoom);
     }
 
+    /**
+     * Method for copying a text to the clipboard.
+     *
+     * @param text The text.
+     */
+    public void copyToClipboard(String text) {
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+        clipboard.setPrimaryClip(clip);
+        showSnackbar(SNACKBAR_TYPE, getString(R.string.messages_copied_clipboard), -1);
+    }
+
+
     public void editMessage(ArrayList<AndroidMegaChatMessage> messagesSelected) {
         if (messagesSelected.isEmpty() || messagesSelected.get(0) == null)
             return;
@@ -3768,7 +3781,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
             sendLocation();
             finishMultiselectionMode();
-            actionMode.invalidate();
         } else {
             textChat.setText(messageToEdit.getContent());
             textChat.setSelection(textChat.getText().length());
@@ -3829,10 +3841,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
     }
 
     private void reDoTheSelectionAfterRotation() {
-        if (recoveredSelectedPositions == null)
-            return;
-
-        if (adapter == null)
+        if (recoveredSelectedPositions == null || adapter == null)
             return;
 
         if (recoveredSelectedPositions.size() > 0) {
@@ -3945,17 +3954,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             return builder.toString();
         }
 
-        /**
-         * Method for copying a text to the clipboard.
-         *
-         * @param text The text.
-         */
-        private void copyToClipboard(String text) {
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
-            clipboard.setPrimaryClip(clip);
-            showSnackbar(SNACKBAR_TYPE, getString(R.string.messages_copied_clipboard), -1);
-        }
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -7662,7 +7660,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         RotatableAdapter currentAdapter = getAdapter();
         if(currentAdapter != null & adapter.isMultipleSelect()){
             ArrayList<Integer> selectedPositions= (ArrayList<Integer>) (currentAdapter.getSelectedItems());
-            outState.putSerializable(SELECTED_ITEMS, selectedPositions);
+            outState.putIntegerArrayList(SELECTED_ITEMS, selectedPositions);
         }
 
         MessageVoiceClip messageVoiceClip = adapter.getVoiceClipPlaying();

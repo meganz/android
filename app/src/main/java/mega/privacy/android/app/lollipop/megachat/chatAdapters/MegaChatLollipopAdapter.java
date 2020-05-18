@@ -6116,11 +6116,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * @return True, if selected. False, if not selected.
      */
     private boolean isItemChecked(long msgId) {
-        if (messagesSelectedInChat.get(msgId) != null) {
-            return true;
-        }
-
-        return false;
+        return messagesSelectedInChat.get(msgId) != null;
     }
 
     /**
@@ -6154,7 +6150,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public ArrayList<AndroidMegaChatMessage> getSelectedMessages() {
         ArrayList<AndroidMegaChatMessage> returnedMessages = new ArrayList<>();
         if (messagesSelectedInChat == null || messagesSelectedInChat.isEmpty())
-            return messages;
+            return returnedMessages;
 
         for (HashMap.Entry<Long, Integer> messageSelected : messagesSelectedInChat.entrySet()) {
             for (AndroidMegaChatMessage message : messages) {
@@ -6174,11 +6170,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * @return The message.
      */
     public AndroidMegaChatMessage getMessageAtPosition(int position) {
-        if (messages == null || messages.isEmpty() || messages.get(position) == null) {
-            return null;
-        }
-
-        return messages.get(position);
+        return messages == null || messages.isEmpty() || messages.get(position) == null ? null : messages.get(position);
     }
 
     @Override
@@ -6251,13 +6243,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * @return The message.
      */
     public AndroidMegaChatMessage getMessageAt(int positionInAdapter) {
-        try {
-            if (this.messages != null) {
-                return this.messages.get(positionInAdapter - 1);
-            }
-        } catch (IndexOutOfBoundsException e) {
-        }
-        return null;
+        int position = positionInAdapter - 1;
+        return messages != null && positionInAdapter >= 0 && positionInAdapter < messages.size() ? messages.get(position) : null;
     }
 
     public void loadPreviousMessages(ArrayList<AndroidMegaChatMessage> messages, int counter) {

@@ -106,7 +106,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         LinearLayout optionInfo = contentView.findViewById(R.id.option_info_layout);
         LinearLayout optionStartConversation = contentView.findViewById(R.id.option_start_conversation_layout);
         LinearLayout optionInvite = contentView.findViewById(R.id.option_invite_layout);
-        LinearLayout optionRemove = contentView.findViewById(R.id.option_remove_layout);
         LinearLayout optionForward = contentView.findViewById(R.id.forward_layout);
         LinearLayout optionSelect = contentView.findViewById(R.id.select_layout);
         LinearLayout optionDeleteMessage = contentView.findViewById(R.id.delete_layout);
@@ -123,8 +122,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         LinearLayout viewSeparator = contentView.findViewById(R.id.view_separator);
         LinearLayout selectSeparator = contentView.findViewById(R.id.select_separator);
         LinearLayout deleteMessageSeparator = contentView.findViewById(R.id.delete_separator);
-
-        optionRemove.setVisibility(View.GONE);
 
         if (isScreenInPortrait(context)) {
             titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
