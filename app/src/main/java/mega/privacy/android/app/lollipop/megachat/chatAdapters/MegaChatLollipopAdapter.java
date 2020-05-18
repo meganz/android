@@ -85,12 +85,14 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -5636,14 +5638,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             long userCount = message.getUsersCount();
 
             if (userCount == 1) {
-                String name = "";
-                name = message.getUserName(0);
-                if (name.trim().isEmpty()) {
-                    name = message.getUserEmail(0);
-                }
-                String email = message.getUserEmail(0);
-                holder.contentOwnMessageContactName.setText(converterShortCodes(name));
-                holder.contentOwnMessageContactEmail.setText(email);
+                holder.contentOwnMessageContactName.setText(converterShortCodes(getNameContactAttachment(message)));
+                holder.contentOwnMessageContactEmail.setText(message.getUserEmail(0));
                 setUserAvatar(holder, message);
             } else {
                 //Show default avatar with userCount
@@ -5751,14 +5747,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             long userCount = message.getUsersCount();
 
             if (userCount == 1) {
-                String name = "";
-                name = message.getUserName(0);
-                if (name.trim().isEmpty()) {
-                    name = message.getUserEmail(0);
-                }
-                String email = message.getUserEmail(0);
-                holder.contentContactMessageContactName.setText(converterShortCodes(name));
-                holder.contentContactMessageContactEmail.setText(email);
+                holder.contentContactMessageContactName.setText(converterShortCodes(getNameContactAttachment(message)));
+                holder.contentContactMessageContactEmail.setText(message.getUserEmail(0));
                 setUserAvatar(holder, message);
 
             } else {
@@ -5805,6 +5795,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
+    }
+
+    /**
+     * Method for obtaining the name of an attached contact
+     *
+     * @param message The message sent or received.
+     * @return The name or nick of the contact.
+     */
+    private String getNameContactAttachment(MegaChatMessage message) {
+        String email = message.getUserEmail(0);
+        MegaUser megaUser = megaApi.getContact(email);
+        String name = getMegaUserNameDB(megaUser);
+        if (name == null) {
+            name = message.getUserName(0);
+            if (isTextEmpty(name)) {
+                name = email;
+            }
+        }
+        return name;
     }
 
     public void bindChangeTitleMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
