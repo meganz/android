@@ -6,14 +6,17 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
@@ -43,7 +46,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -62,13 +64,17 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.constants.SettingsConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 /*
@@ -92,6 +98,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static final String EXTRA_CONTENT_URI = "CONTENT_URI";
 	public static final String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
 
+	private static int errorEBloqued = 0;
 	private int errorCount = 0;
 	private int alreadyDownloaded = 0;
 
@@ -144,13 +151,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private Intent intent;
 
+	/** the receiver and manager for the broadcast to listen to the pause event */
+	private BroadcastReceiver pauseBroadcastReceiver;
+	private LocalBroadcastManager pauseBroadcastManager = LocalBroadcastManager.getInstance(this);
+
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
 		super.onCreate();
 		logDebug("onCreate");
 
-		app = (MegaApplication)getApplication();
+		app = MegaApplication.getInstance();
 		megaApi = app.getMegaApi();
 		megaApiFolder = app.getMegaApiFolder();
 		megaChatApi = app.getMegaChatApi();
@@ -161,10 +172,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		storeToAdvacedDevices = new HashMap<Long, Uri>();
 		fromMediaViewers = new HashMap<>();
 
-		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-            wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-        }
+		int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -178,6 +186,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		rootNode = megaApi.getRootNode();
+
+		// delay 1 second to refresh the pause notification to prevent update is missed
+		pauseBroadcastReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				new Handler().postDelayed(() -> {
+					updateProgressNotification();
+				}, 1000);
+			}
+		};
+		pauseBroadcastManager.registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+
 	}
 
 	@Override
@@ -204,6 +224,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         if (fs.length > 1 && fs[1] != null) {
             purgeDirectory(fs[1]);
         }
+        pauseBroadcastManager.unregisterReceiver(pauseBroadcastReceiver);
 		super.onDestroy();
 	}
 
@@ -217,14 +238,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			return START_NOT_STICKY;
 		}
 
-		if (intent.getAction() != null){
-			if (intent.getAction().equals(ACTION_CANCEL)){
-				logDebug("Cancel intent");
-				canceled = true;
-				megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
-				megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
-				return START_NOT_STICKY;
-			}
+		if (intent.getAction() != null && intent.getAction().equals(ACTION_CANCEL)){
+			logDebug("Cancel intent");
+			canceled = true;
+			megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
+			return START_NOT_STICKY;
 		}
 
 		onHandleIntent(intent);
@@ -268,34 +286,23 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					isLoggingIn = true;
 					MegaApplication.setLoggingIn(isLoggingIn);
 
-					if (isChatEnabled()) {
-						if (megaChatApi == null) {
-							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-						}
+					if (megaChatApi == null) {
+						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+					}
 
-						int ret = megaChatApi.getInitState();
+					int ret = megaChatApi.getInitState();
 
-						if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
-							ret = megaChatApi.init(gSession);
-							logDebug("result of init ---> " + ret);
-							chatSettings = dbH.getChatSettings();
-							if (ret == MegaChatApi.INIT_NO_CACHE) {
-								logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-							} else if (ret == MegaChatApi.INIT_ERROR) {
-								logDebug("condition ret == MegaChatApi.INIT_ERROR");
-								if (chatSettings == null) {
-									logError("ERROR----> Switch OFF chat");
-									chatSettings = new ChatSettings();
-									chatSettings.setEnabled(false+"");
-									dbH.setChatSettings(chatSettings);
-								} else {
-									logError("ERROR----> Switch OFF chat");
-									dbH.setEnabledChat(false + "");
-								}
-								megaChatApi.logout(this);
-							} else {
-								logDebug("Chat correctly initialized");
-							}
+					if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+						ret = megaChatApi.init(gSession);
+						logDebug("result of init ---> " + ret);
+						chatSettings = dbH.getChatSettings();
+						if (ret == MegaChatApi.INIT_NO_CACHE) {
+							logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
+						} else if (ret == MegaChatApi.INIT_ERROR) {
+							logDebug("condition ret == MegaChatApi.INIT_ERROR");
+							megaChatApi.logout(this);
+						} else {
+							logDebug("Chat correctly initialized");
 						}
 					}
 
@@ -317,7 +324,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		String serialize = intent.getStringExtra(EXTRA_SERIALIZE_STRING);
 
-		if(serialize!=null){
+		if(serialize != null){
 			logDebug("serializeString: " + serialize);
 			currentDocument = MegaNode.unserialize(serialize);
 			if(currentDocument != null){
@@ -327,14 +334,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			else{
 				logWarning("Node is NULL after unserialize");
 			}
-		}
-		else{
-			if (isFolderLink){
-				currentDocument = megaApiFolder.getNodeByHandle(hash);
-			}
-			else{
-				currentDocument = megaApi.getNodeByHandle(hash);
-			}
+		} else if (isFolderLink) {
+			currentDocument = megaApiFolder.getNodeByHandle(hash);
+		} else {
+			currentDocument = megaApi.getNodeByHandle(hash);
 		}
 
         if(intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN)!=null){
@@ -381,7 +384,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			logDebug("checkCurrentFile == false");
 
 			alreadyDownloaded++;
-            if ((megaApi.getNumPendingDownloads() == 0) && (megaApiFolder.getNumPendingDownloads() == 0)){
+            if (megaApi.getNumPendingDownloads() == 0){
                 onQueueComplete(currentDocument.getHandle());
             }
 
@@ -395,120 +398,49 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             lock.acquire();
         }
 
-        if(contentUri!=null){
-			logDebug("contentUri is NOT null");
-            //To download to Advanced Devices
-			logDebug("Download to advanced devices checked");
-            currentDir = new File(intent.getStringExtra(EXTRA_PATH));
-            currentDir.mkdirs();
+        if (contentUri != null || currentDir.isDirectory()) {
+			if (contentUri != null) {
+				//To download to Advanced Devices
+				currentDir = new File(intent.getStringExtra(EXTRA_PATH));
+				currentDir.mkdirs();
 
-            if (!currentDir.isDirectory()){
-				logWarning("currentDir is not a directory");
-            }
-            storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
+				if (!currentDir.isDirectory()) {
+					logWarning("currentDir is not a directory");
+				}
 
-			if (currentDir.getAbsolutePath().contains(OFFLINE_DIR)){
-				logDebug("currentDir contains OFFLINE_DIR");
+				storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
+			} else if (currentFile.exists()) {
+				//Check the fingerprint
+				String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
+				String megaFingerprint = megaApi.getFingerprint(currentDocument);
+
+				if (!isTextEmpty(localFingerprint)
+						&& !isTextEmpty(megaFingerprint)
+						&& localFingerprint.equals(megaFingerprint)) {
+					logDebug("Delete the old version");
+					currentFile.delete();
+				}
+			}
+
+			if (currentDir.getAbsolutePath().contains(OFFLINE_DIR)) {
+//			Save for offline: do not open when finishes
 				openFile = false;
 			}
-			else {
-				logDebug("currentDir is NOT on OFFLINE_DIR: openFile->" + openFile);
-			}
 
-			if (isFolderLink){
-				if (dbH.getCredentials() == null) {
-					megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-					logWarning("getCredentials null");
-					return;
-				}
-
-				logDebug("Folder link node");
-				MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(currentDocument);
-				if (currentDocumentAuth == null){
-					logWarning("CurrentDocumentAuth is null");
-					megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-					return;
-				}
-				else{
-					logDebug("CurrentDocumentAuth is not null");
-					currentDocument = megaApiFolder.authorizeNode(currentDocument);
-				}
+			if (isFolderLink) {
+				currentDocument = megaApiFolder.authorizeNode(currentDocument);
 			}
 
 			logDebug("CurrentDocument is not null");
-
 			if (highPriority) {
 				String data = isVoiceClipType(type) ? EXTRA_VOICE_CLIP : "";
 				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
 			} else {
 				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 			}
-        }
-        else{
-			logDebug("contentUri NULL");
-            if (currentDir.isDirectory()){
-				logDebug("To download(dir)");
-
-                if(currentFile.exists()){
-					logDebug("The file already exists!");
-                    //Check the fingerprint
-                    String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
-                    String megaFingerprint = megaApi.getFingerprint(currentDocument);
-
-                    if((localFingerprint!=null) && (!localFingerprint.isEmpty()) && (megaFingerprint!=null) && (!megaFingerprint.isEmpty()))
-                    {
-                        if(localFingerprint.compareTo(megaFingerprint)!=0)
-                        {
-							logDebug("Delete the old version");
-                            currentFile.delete();
-                        }
-                    }
-                }
-
-                if (currentDocument.isFolder()){
-					logDebug("IS FOLDER");
-                }
-                else{
-					logDebug("IS FILE");
-                }
-
-				if (currentDir.getAbsolutePath().contains(OFFLINE_DIR)){
-					logDebug("currentDir contains OFFLINE_DIR");
-					openFile = false;
-				}
-				else {
-					logDebug("currentDir is NOT on OFFLINE_DIR: openFile->" + openFile);
-				}
-
-                if (isFolderLink){
-
-					logDebug("Folder link node");
-                    MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(currentDocument);
-                    if (currentDocumentAuth == null){
-						logWarning("CurrentDocumentAuth is null");
-                        megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-                        return;
-                    }
-                    else{
-						logDebug("CurrentDocumentAuth is not null");
-						currentDocument = megaApiFolder.authorizeNode(currentDocument);
-					}
-                }
-
-				logDebug("CurrentDocument is not null");
-				if(highPriority){
-					String data = isVoiceClipType(type)? EXTRA_VOICE_CLIP : "";
-					megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
-				}
-				else{
-					megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-				}
-
-            }
-            else{
-				logWarning("currentDir is not a directory");
-            }
-        }
+		} else {
+			logWarning("currentDir is not a directory");
+		}
     }
 
 	private void onQueueComplete(long handle) {
@@ -525,15 +457,30 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
 		rootNode = null;
-		int total = megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads();
+		int total = megaApi.getNumPendingDownloads();
 		logDebug("onQueueComplete: total of files before reset " + total);
 		if(total <= 0){
 			logDebug("onQueueComplete: reset total downloads");
+			if (megaApi.getTotalDownloads() > 0) {
+				Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED);
+				intent.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER);
+				intent.putExtra(NUMBER_FILES, megaApi.getTotalDownloads());
+				LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+			}
+
 			megaApi.resetTotalDownloads();
-			megaApiFolder.resetTotalDownloads();
+			errorEBloqued = 0;
 			errorCount = 0;
 			alreadyDownloaded = 0;
 		}
+	}
+
+	private void sendTakenDownAlert() {
+	    if (errorEBloqued <= 0) return;
+
+		Intent intent = new Intent(BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES);
+		intent.putExtra(NUMBER_FILES, errorEBloqued);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
 	private File getDir(MegaNode document, Intent intent) {
@@ -579,7 +526,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		logDebug("showCompleteNotification");
 		String notificationTitle, size;
 
-        int totalDownloads = megaApi.getTotalDownloads() + megaApiFolder.getTotalDownloads();
+        int totalDownloads = megaApi.getTotalDownloads();
 
 		if(alreadyDownloaded>0 && errorCount>0){
 			int totalNumber = totalDownloads + errorCount + alreadyDownloaded;
@@ -596,6 +543,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			size = getResources().getQuantityString(R.plurals.already_downloaded_service, alreadyDownloaded, alreadyDownloaded);
 		}
 		else if(errorCount>0){
+            sendTakenDownAlert();
 			int totalNumber = totalDownloads + errorCount;
 			notificationTitle = getResources().getQuantityString(R.plurals.download_service_final_notification_with_details, totalNumber, totalDownloads, totalNumber);
 
@@ -603,15 +551,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else{
 			notificationTitle = getResources().getQuantityString(R.plurals.download_service_final_notification, totalDownloads, totalDownloads);
-			String totalBytes = getSizeString(megaApi.getTotalDownloadedBytes()+megaApiFolder.getTotalDownloadedBytes());
+			String totalBytes = getSizeString(megaApi.getTotalDownloadedBytes());
 			size = getString(R.string.general_total_size, totalBytes);
 		}
 
-		Intent intent = null;
-		if(totalDownloads != 1)
-		{
-			intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
+		Intent intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
+		intent.setAction(ACTION_SHOW_TRANSFERS);
+		intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
 
+		PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		if (totalDownloads != 1) {
 			logDebug("Show notification");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
@@ -623,7 +573,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				mBuilderCompatO
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+						.setContentIntent(pendingIntent)
 						.setAutoCancel(true).setTicker(notificationTitle)
 						.setContentTitle(notificationTitle).setContentText(size)
 						.setOngoing(false);
@@ -635,7 +585,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			else {
 				mBuilderCompat
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+						.setContentIntent(pendingIntent)
 						.setAutoCancel(true).setTicker(notificationTitle)
 						.setContentTitle(notificationTitle).setContentText(size)
 						.setOngoing(false);
@@ -730,7 +680,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 								mBuilderCompatO
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -740,7 +690,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							else {
 								mBuilderCompat
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -820,7 +770,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 								mBuilderCompatO
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -830,7 +780,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							else {
 								mBuilderCompat
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -911,7 +861,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 								mBuilderCompatO
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -923,7 +873,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							else {
 								mBuilderCompat
 										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setContentIntent(pendingIntent)
 										.setAutoCancel(true).setTicker(notificationTitle)
 										.setContentTitle(notificationTitle).setContentText(size)
 										.setOngoing(false);
@@ -990,7 +940,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 											mBuilderCompatO
 													.setSmallIcon(R.drawable.ic_stat_notify)
-													.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+													.setContentIntent(pendingIntent)
 													.setAutoCancel(true).setTicker(notificationTitle)
 													.setContentTitle(notificationTitle).setContentText(size)
 													.setOngoing(false);
@@ -1002,7 +952,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 										else {
 											mBuilderCompat
 													.setSmallIcon(R.drawable.ic_stat_notify)
-													.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+													.setContentIntent(pendingIntent)
 													.setAutoCancel(true).setTicker(notificationTitle)
 													.setContentTitle(notificationTitle).setContentText(size)
 													.setOngoing(false);
@@ -1044,7 +994,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 									mBuilderCompatO
 											.setSmallIcon(R.drawable.ic_stat_notify)
-											.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+											.setContentIntent(pendingIntent)
 											.setAutoCancel(true).setTicker(notificationTitle)
 											.setContentTitle(notificationTitle).setContentText(size)
 											.setOngoing(false);
@@ -1056,7 +1006,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								else {
 									mBuilderCompat
 											.setSmallIcon(R.drawable.ic_stat_notify)
-											.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+											.setContentIntent(pendingIntent)
 											.setAutoCancel(true).setTicker(notificationTitle)
 											.setContentTitle(notificationTitle).setContentText(size)
 											.setOngoing(false);
@@ -1122,7 +1072,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 							mBuilderCompatO
 									.setSmallIcon(R.drawable.ic_stat_notify)
-									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+									.setContentIntent(pendingIntent)
 									.setAutoCancel(true).setTicker(notificationTitle)
 									.setContentTitle(notificationTitle).setContentText(size)
 									.setOngoing(false);
@@ -1134,7 +1084,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else {
 							mBuilderCompat
 									.setSmallIcon(R.drawable.ic_stat_notify)
-									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+									.setContentIntent(pendingIntent)
 									.setAutoCancel(true).setTicker(notificationTitle)
 									.setContentTitle(notificationTitle).setContentText(size)
 									.setOngoing(false);
@@ -1149,8 +1099,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				} else {
 					openFile = true; //Set the openFile to the default
 
-					intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
-
 					logDebug("Show notification");
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 						NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
@@ -1162,7 +1110,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						mBuilderCompatO
 								.setSmallIcon(R.drawable.ic_stat_notify)
-								.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+								.setContentIntent(pendingIntent)
 								.setAutoCancel(true).setTicker(notificationTitle)
 								.setContentTitle(notificationTitle).setContentText(size)
 								.setOngoing(false);
@@ -1174,7 +1122,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					else {
 						mBuilderCompat
 								.setSmallIcon(R.drawable.ic_stat_notify)
-								.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+								.setContentIntent(pendingIntent)
 								.setAutoCancel(true).setTicker(notificationTitle)
 								.setContentTitle(notificationTitle).setContentText(size)
 								.setOngoing(false);
@@ -1190,7 +1138,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			catch (Exception e){
 				openFile = true; //Set the openFile to the default
 				logError("Exception", e);
-				intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
 				logDebug("Show notification");
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1203,7 +1150,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 					mBuilderCompatO
 							.setSmallIcon(R.drawable.ic_stat_notify)
-							.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+							.setContentIntent(pendingIntent)
 							.setAutoCancel(true).setTicker(notificationTitle)
 							.setContentTitle(notificationTitle).setContentText(size)
 							.setOngoing(false);
@@ -1215,7 +1162,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				else {
 					mBuilderCompat
 							.setSmallIcon(R.drawable.ic_stat_notify)
-							.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+							.setContentIntent(pendingIntent)
 							.setAutoCancel(true).setTicker(notificationTitle)
 							.setContentTitle(notificationTitle).setContentText(size)
 							.setOngoing(false);
@@ -1237,11 +1184,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
 
-		int pendingTransfers = megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads();
-        int totalTransfers = megaApi.getTotalDownloads() + megaApiFolder.getTotalDownloads();
+		int pendingTransfers = megaApi.getNumPendingDownloads();
+        int totalTransfers = megaApi.getTotalDownloads();
 
-        long totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApiFolder.getTotalDownloadBytes();
-        long totalSizeTransferred = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
+        long totalSizePendingTransfer = megaApi.getTotalDownloadBytes();
+        long totalSizeTransferred = megaApi.getTotalDownloadedBytes();
 
 		boolean update;
 
@@ -1262,10 +1209,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		if(update){
-			//refresh UI every 1 seconds to avoid too much workload on main thread
+			/* refresh UI every 1 seconds to avoid too much workload on main thread
+			 * while in paused status, the update should not be avoided*/
 			if(!isOverquota) {
 				long now = System.currentTimeMillis();
-				if (now - lastUpdated > ONTRANSFERUPDATE_REFRESH_MILLIS) {
+				if (now - lastUpdated > ONTRANSFERUPDATE_REFRESH_MILLIS || megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ) {
 					lastUpdated = now;
 				} else {
 					return;
@@ -1280,7 +1228,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			else{
 				int inProgress = totalTransfers - pendingTransfers + 1;
-				message = getResources().getQuantityString(R.plurals.download_service_notification, totalTransfers, inProgress, totalTransfers);
+
+				if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)) {
+					message = getResources().getQuantityString(R.plurals.download_service_paused_notification, totalTransfers, inProgress, totalTransfers);
+				} else {
+					message = getResources().getQuantityString(R.plurals.download_service_notification, totalTransfers, inProgress, totalTransfers);
+				}
 			}
 
 			Intent intent;
@@ -1296,13 +1249,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				contentText = getString(R.string.download_touch_to_cancel);
 				intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
 				intent.setAction(ACTION_CANCEL_DOWNLOAD);
-				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 			}
 			else{
 				contentText = getString(R.string.download_touch_to_show);
 				intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
 				intent.setAction(ACTION_SHOW_TRANSFERS);
-				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+				intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 			}
 
 			int currentapiVersion = android.os.Build.VERSION.SDK_INT;
@@ -1382,8 +1336,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void showTransferOverquotaNotification(){
 		logDebug("showTransferOverquotaNotification");
 
-		long totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApiFolder.getTotalDownloadBytes();
-		long totalSizeTransferred = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
+		long totalSizePendingTransfer = megaApi.getTotalDownloadBytes();
+		long totalSizeTransferred = megaApi.getTotalDownloadedBytes();
 
 		int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
 		logDebug("Progress: " + progressPercent + "%");
@@ -1402,12 +1356,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			dbH.clearEphemeral();
 			intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
 			intent.setAction(ACTION_OVERQUOTA_TRANSFER);
-			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		}
 		else{
 			intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
 			intent.setAction(ACTION_OVERQUOTA_TRANSFER);
-			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		}
 
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
@@ -1503,7 +1457,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void
 	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		logDebug("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
+		logDebug("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads());
 
 		if (isVoiceClipType(transfer.getAppData())) return;
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
@@ -1516,6 +1470,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
 		logDebug("Node handle: " + transfer.getNodeHandle() + ", Type = " + transfer.getType());
 
+		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
+			LocalBroadcastManager.getInstance(getApplicationContext())
+					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+		}
+
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 
 			boolean isVoiceClip = isVoiceClipType(transfer.getAppData());
@@ -1525,7 +1484,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(!transfer.isFolderTransfer()){
 				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
 					String size = getSizeString(transfer.getTotalBytes());
-					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
+					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"", transfer.getParentPath());
 					dbH.setCompletedTransfer(completedTransfer);
 				}
 
@@ -1673,6 +1632,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							localFile.delete();
 						}
 					}else{
+						if (error.getErrorCode() == MegaError.API_EBLOCKED) {
+							errorEBloqued++;
+						}
+
 						if(!transfer.isFolderTransfer()){
 							errorCount++;
 						}
@@ -1683,7 +1646,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			if(isVoiceClip) return;
 
-			if ((megaApi.getNumPendingDownloads() == 0) && (transfersCount==0) && (megaApiFolder.getNumPendingDownloads() == 0)){
+			if (megaApi.getNumPendingDownloads() == 0 && transfersCount==0){
 				onQueueComplete(transfer.getNodeHandle());
 			}
 		}
@@ -1774,7 +1737,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					if(credentials!=null){
 						logDebug("Credentials is NOT null");
 					}
-					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
+					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes();
 					isOverquota = true;
 					logDebug("Downloaded bytes to reach overquota: " + downloadedBytesToOverquota);
 					showTransferOverquotaNotification();
@@ -1819,26 +1782,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (e.getErrorCode() == MegaError.API_OK){
-				chatSettings = dbH.getChatSettings();
-				if(chatSettings!=null) {
-					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-					if(chatEnabled){
-						logDebug("Chat enabled-->connect");
-						megaChatApi.connectInBackground(this);
-						isLoggingIn = false;
-						MegaApplication.setLoggingIn(isLoggingIn);
-					}
-					else{
-						logDebug("Chat NOT enabled - readyToManager");
-						isLoggingIn = false;
-						MegaApplication.setLoggingIn(isLoggingIn);
-					}
-				}
-				else{
-					logWarning("chatSettings NULL - readyToManager");
-					isLoggingIn = false;
-					MegaApplication.setLoggingIn(isLoggingIn);
-				}
+				logDebug("Chat --> connect");
+				megaChatApi.connectInBackground(this);
+				isLoggingIn = false;
+				MegaApplication.setLoggingIn(isLoggingIn);
 
 				for (int i=0;i<pendingIntents.size();i++){
 					onHandleIntent(pendingIntents.get(i));
@@ -1943,7 +1890,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private void refreshSettingsFragment() {
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
-		intent.setAction(SettingsFragmentLollipop.ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
+		intent.setAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 }

@@ -174,16 +174,9 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         optionSendContact.setOnClickListener(this);
         optionShareFolder.setOnClickListener(this);
 
-        if (isChatEnabled()) {
-            optionSendFile.setVisibility(View.VISIBLE);
-            optionStartConversation.setVisibility(View.VISIBLE);
-            optionSendContact.setVisibility(View.VISIBLE);
-        }
-        else {
-            optionSendFile.setVisibility(View.GONE);
-            optionStartConversation.setVisibility(View.GONE);
-            optionSendContact.setVisibility(View.GONE);
-        }
+        optionSendFile.setVisibility(View.VISIBLE);
+        optionStartConversation.setVisibility(View.VISIBLE);
+        optionSendContact.setVisibility(View.VISIBLE);
 
         if(contact!=null){
             fullName = contact.getFullName();
@@ -195,51 +188,39 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
             addAvatarContactPanel(contact);
 
-            if(isChatEnabled()){
-
-                if (megaChatApi == null){
-                    megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-                }
-
-                optionStartConversation.setVisibility(View.VISIBLE);
-                optionStartConversation.setOnClickListener(this);
-
-                contactStateIcon.setVisibility(View.VISIBLE);
-                if (megaChatApi != null){
-                    int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
-                    if(userStatus == MegaChatApi.STATUS_ONLINE){
-                        logDebug("This user is connected");
-                        contactStateIcon.setVisibility(View.VISIBLE);
-                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-                    }
-                    else if(userStatus == MegaChatApi.STATUS_AWAY){
-                        logDebug("This user is away");
-                        contactStateIcon.setVisibility(View.VISIBLE);
-                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
-                    }
-                    else if(userStatus == MegaChatApi.STATUS_BUSY){
-                        logDebug("This user is busy");
-                        contactStateIcon.setVisibility(View.VISIBLE);
-                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
-                    }
-                    else if(userStatus == MegaChatApi.STATUS_OFFLINE){
-                        logDebug("This user is offline");
-                        contactStateIcon.setVisibility(View.VISIBLE);
-                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-                    }
-                    else if(userStatus == MegaChatApi.STATUS_INVALID){
-                        logWarning("INVALID status: "+userStatus);
-                        contactStateIcon.setVisibility(View.GONE);
-                    }
-                    else{
-                        logDebug("This user status is: " + userStatus);
-                        contactStateIcon.setVisibility(View.GONE);
-                    }
-                }
+            if (megaChatApi == null) {
+                megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
-            else{
-                optionStartConversation.setVisibility(View.GONE);
-                contactStateIcon.setVisibility(View.GONE);
+
+            optionStartConversation.setVisibility(View.VISIBLE);
+            optionStartConversation.setOnClickListener(this);
+
+            contactStateIcon.setVisibility(View.VISIBLE);
+            if (megaChatApi != null) {
+                int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
+                if (userStatus == MegaChatApi.STATUS_ONLINE) {
+                    logDebug("This user is connected");
+                    contactStateIcon.setVisibility(View.VISIBLE);
+                    contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+                } else if (userStatus == MegaChatApi.STATUS_AWAY) {
+                    logDebug("This user is away");
+                    contactStateIcon.setVisibility(View.VISIBLE);
+                    contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+                } else if (userStatus == MegaChatApi.STATUS_BUSY) {
+                    logDebug("This user is busy");
+                    contactStateIcon.setVisibility(View.VISIBLE);
+                    contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+                } else if (userStatus == MegaChatApi.STATUS_OFFLINE) {
+                    logDebug("This user is offline");
+                    contactStateIcon.setVisibility(View.VISIBLE);
+                    contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+                } else if (userStatus == MegaChatApi.STATUS_INVALID) {
+                    logWarning("INVALID status: " + userStatus);
+                    contactStateIcon.setVisibility(View.GONE);
+                } else {
+                    logDebug("This user status is: " + userStatus);
+                    contactStateIcon.setVisibility(View.GONE);
+                }
             }
 
             dialog.setContentView(contentView);

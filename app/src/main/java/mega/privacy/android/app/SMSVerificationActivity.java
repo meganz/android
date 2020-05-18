@@ -485,7 +485,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 }
             } else {
                 logWarning("The country code is not responded correctly");
-                Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.verify_account_not_loading_country_code), -1);
+                Util.showSnackbar(this, getString(R.string.verify_account_not_loading_country_code));
             }
         }
     }

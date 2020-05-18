@@ -75,7 +75,7 @@ import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
@@ -114,6 +114,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
@@ -412,13 +413,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			renameIcon.setVisible(true);
 			moveIcon.setVisible(true);
 			copyIcon .setVisible(true);
-
-			if(isChatEnabled()){
-				chatIcon.setVisible(true);
-			}
-			else{
-				chatIcon.setVisible(false);
-			}
+			chatIcon.setVisible(true);
 
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 			final long handle = node.getHandle();
@@ -439,12 +434,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 		else if (adapterType == INCOMING_SHARES_ADAPTER || fromIncoming) {
 			propertiesIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			if(isChatEnabled()){
-				chatIcon.setVisible(true);
-			}
-			else{
-				chatIcon.setVisible(false);
-			}
+
+			chatIcon.setVisible(true);
 			copyIcon.setVisible(true);
 			removeIcon.setVisible(false);
 			getlinkIcon.setVisible(false);
@@ -607,12 +598,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 							renameIcon.setVisible(true);
 							moveIcon.setVisible(true);
 							moveToTrashIcon.setVisible(true);
-							if(isChatEnabled()){
-								chatIcon.setVisible(true);
-							}
-							else{
-								chatIcon.setVisible(false);
-							}
+							chatIcon.setVisible(true);
 							break;
 						}
 						case MegaShare.ACCESS_READWRITE:
@@ -626,12 +612,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 					}
 
 				}else{
-					if(isChatEnabled()){
-						chatIcon.setVisible(true);
-					}
-					else{
-						chatIcon.setVisible(false);
-					}
+					chatIcon.setVisible(true);
 					renameIcon.setVisible(true);
 					moveIcon.setVisible(true);
 
@@ -687,6 +668,9 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+					if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
+						return false;
+					}
 					shareIt = false;
 			    	showGetLinkActivity(node.getHandle());
 					break;
@@ -723,6 +707,11 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 
 			case R.id.full_image_viewer_remove_link: {
 				shareIt = false;
+
+				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+				if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
+					return false;
+				}
 				android.support.v7.app.AlertDialog removeLinkDialog;
 				android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
@@ -822,7 +811,6 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 					Intent i = new Intent(this, FileInfoActivityLollipop.class);
 					i.putExtra("handle", node.getHandle());
-					i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 					i.putExtra("name", node.getName());
 					if (nC == null) {
 						nC = new NodeController(this);
@@ -1007,20 +995,16 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 
-		if(isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
-			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-				intentLogin.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intentLogin);
-				finish();
-				return;
-			}
-		}else{
-			megaChatApi=null;
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+		}
+		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+			Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+			intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+			intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intentLogin);
+			finish();
+			return;
 		}
 
 		dbH = DatabaseHandler.getDbHandler(this);
@@ -2384,8 +2368,8 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
+			long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
 			long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
 
 			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
@@ -2410,7 +2394,7 @@ public class FullScreenImageViewerLollipop extends DownloadableActivity implemen
 					}
 
 					if(nodeHandles!=null){
-						CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, nodeHandles[0], this, CreateChatToPerformActionListener.SEND_FILE);
+						CreateChatListener listener = new CreateChatListener(chats, users, nodeHandles[0], this, CreateChatListener.SEND_FILE);
 						for (MegaUser user : users) {
 							MegaChatPeerList peers = MegaChatPeerList.createInstance();
 							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);

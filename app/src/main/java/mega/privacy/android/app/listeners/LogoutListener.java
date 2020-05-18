@@ -39,7 +39,7 @@ public class LogoutListener extends BaseListener {
                 ((WeakAccountProtectionAlertActivity) context).finish();
             }
         } else {
-            showSnackBar(context, SNACKBAR_TYPE, context.getString(R.string.general_error), -1);
+            showSnackbar(context, SNACKBAR_TYPE, context.getString(R.string.general_error), -1);
         }
     }
 }

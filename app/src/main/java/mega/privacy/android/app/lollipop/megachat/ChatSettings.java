@@ -2,14 +2,12 @@ package mega.privacy.android.app.lollipop.megachat;
 
 public class ChatSettings {
 
-    String enabled = "";
     String notificationsEnabled = "";
     String notificationsSound = "";
     String vibrationEnabled = "";
     String sendOriginalAttachments = "";
 
-    public ChatSettings(String enabled, String notificationsEnabled, String notificationsSound, String vibrationEnabled, String sendOriginalAttachments) {
-        this.enabled = enabled;
+    public ChatSettings(String notificationsEnabled, String notificationsSound, String vibrationEnabled, String sendOriginalAttachments) {
         this.notificationsEnabled = notificationsEnabled;
         this.notificationsSound = notificationsSound;
         this.vibrationEnabled = vibrationEnabled;
@@ -17,19 +15,10 @@ public class ChatSettings {
     }
 
     public ChatSettings() {
-        this.enabled = true+"";
         this.notificationsEnabled = true+"";
         this.notificationsSound = "";
         this.vibrationEnabled = true+"";
         this.sendOriginalAttachments = false+"";
-    }
-
-    public String getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(String enabled) {
-        this.enabled = enabled;
     }
 
     public String getNotificationsEnabled() {

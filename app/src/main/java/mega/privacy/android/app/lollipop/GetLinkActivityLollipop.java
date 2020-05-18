@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -17,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 
 import java.util.ArrayList;
 
@@ -37,7 +37,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
 
 public class GetLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface {
 
@@ -104,20 +103,18 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 			return;
 		}
 
-		if(isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+		}
 
-			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				logDebug("Refresh session - karere");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
-				return;
-			}
+		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+			logDebug("Refresh session - karere");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
 		}
 
 		intentReceived = getIntent();
@@ -194,6 +191,12 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		showFragment(visibleFragment);
+
+		if (isBusinessExpired()) {
+			setFinishActivityAtError(true);
+			LocalBroadcastManager.getInstance(getApplicationContext())
+					.sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
+		}
 	}
 
     @Override
@@ -342,7 +345,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (e.getErrorCode() == MegaError.API_OK) {
 			logDebug("link: " + request.getLink());
-			
+
 			//for megaApi.encryptLinkWithPassword() case, request.getNodeHandle() returns -1 and cause selectedNode set to null
 			long handle = request.getNodeHandle();
 			if(handle == -1){
@@ -356,7 +359,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 					getLinkFragment.requestFinish(request, e);
 				}
 			}
-		} else {
+		} else if (e.getErrorCode() != MegaError.API_EBUSINESSPASTDUE){
 			logWarning("Error: " + e.getErrorString());
 			showSnackbar(getString(R.string.context_no_link));
 		}

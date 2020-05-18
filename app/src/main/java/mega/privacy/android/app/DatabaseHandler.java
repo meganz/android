@@ -24,16 +24,16 @@ import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 52;
+	private static final int DATABASE_VERSION = 55;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -101,6 +101,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SEC_SYNC_TIMESTAMP = "secondarySyncTimeStamp";
     private static final String KEY_SEC_VIDEO_SYNC_TIMESTAMP = "secondaryVideoSyncTimeStamp";
     private static final String KEY_STORAGE_ADVANCED_DEVICES = "storageadvanceddevices";
+	private static final String KEY_ASK_SET_DOWNLOAD_LOCATION = "askSetDefaultDownloadLocation";
     private static final String KEY_PREFERRED_VIEW_LIST = "preferredviewlist";
     private static final String KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera";
     private static final String KEY_URI_EXTERNAL_SD_CARD = "uriexternalsdcard";
@@ -138,11 +139,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_NONCONTACT_LASTNAME = "noncontactlastname";
 	private static final String KEY_NONCONTACT_EMAIL = "noncontactemail";
 
-	private static final String KEY_CHAT_ENABLED = "chatenabled";
 	private static final String KEY_CHAT_NOTIFICATIONS_ENABLED = "chatnotifications";
 	private static final String KEY_CHAT_SOUND_NOTIFICATIONS = "chatnotificationsound";
 	private static final String KEY_CHAT_VIBRATION_ENABLED = "chatvibrationenabled";
-	private static final String KEY_CHAT_STATUS = "chatstatus";
 	private static final String KEY_CHAT_SEND_ORIGINALS = "sendoriginalsattachments";
 
 	private static final String KEY_INVALIDATE_SDK_CACHE = "invalidatesdkcache";
@@ -152,6 +151,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_TRANSFER_STATE = "transferstate";
 	private static final String KEY_TRANSFER_SIZE = "transfersize";
 	private static final String KEY_TRANSFER_HANDLE = "transferhandle";
+	private static final String KEY_TRANSFER_PATH = "transferpath";
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
 	private static final String KEY_SMALL_GRID_CAMERA = "smallgridcamera";
@@ -204,6 +204,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = "lastpublichandletimestamp";
 	private static final String KEY_LAST_PUBLIC_HANDLE_TYPE = "lastpublichandletype";
 	private static final String KEY_STORAGE_STATE = "storagestate";
+	private static final String KEY_MY_CHAT_FILES_FOLDER_HANDLE = "mychatfilesfolderhandle";
 
 	private static final String KEY_PENDING_MSG_ID_CHAT = "idchat";
 	private static final String KEY_PENDING_MSG_TIMESTAMP = "timestamp";
@@ -306,31 +307,33 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_SHOW_INVITE_BANNER + " TEXT,"                 //39
                 + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       //40
 				+ KEY_SD_CARD_URI + " TEXT,"                        //41
-                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT" + ")";        //42
+                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT,"				//42
+				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN" + ")"; //43
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
 		String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY, "                                                                                      //0
-				+ KEY_ATTR_ONLINE + " TEXT, "                                                                                            //1
-				+ KEY_ATTR_INTENTS + " TEXT, "                                                                                           //2
-				+ KEY_ATTR_ASK_SIZE_DOWNLOAD + " BOOLEAN, "                                                                              //3
-				+ KEY_ATTR_ASK_NOAPP_DOWNLOAD + " BOOLEAN, "                                                                             //4
-				+ KEY_FILE_LOGGER_SDK + " TEXT, "                                                                                        //5
-				+ KEY_ACCOUNT_DETAILS_TIMESTAMP + " TEXT, "                                                                              //6
-				+ KEY_PAYMENT_METHODS_TIMESTAMP + " TEXT, "                                                                              //7
-				+ KEY_PRICING_TIMESTAMP + " TEXT, "                                                                                      //8
-				+ KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + " TEXT, "                                                                     //9
-				+ KEY_INVALIDATE_SDK_CACHE + " TEXT, "                                                                                   //10
-				+ KEY_FILE_LOGGER_KARERE + " TEXT, "                                                                                     //11
-				+ KEY_USE_HTTPS_ONLY + " TEXT, "                                                                                         //12
-				+ KEY_SHOW_COPYRIGHT + " TEXT, "                                                                                         //13
-				+ KEY_SHOW_NOTIF_OFF + " TEXT, "                                                                                         //14
-				+ KEY_STAGING + " TEXT, "                                                                                                //15
-				+ KEY_LAST_PUBLIC_HANDLE + " TEXT, "                                                                                     //16
-				+ KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " TEXT, "                                                                           //17
-				+ KEY_STORAGE_STATE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.STORAGE_STATE_UNKNOWN)) + "',"           //18
-				+ KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "'" //19
+				+ KEY_ID + " INTEGER PRIMARY KEY, "                                                                                         //0
+				+ KEY_ATTR_ONLINE + " TEXT, "                                                                                               //1
+				+ KEY_ATTR_INTENTS + " TEXT, "                                                                                              //2
+				+ KEY_ATTR_ASK_SIZE_DOWNLOAD + " BOOLEAN, "                                                                                 //3
+				+ KEY_ATTR_ASK_NOAPP_DOWNLOAD + " BOOLEAN, "                                                                                //4
+				+ KEY_FILE_LOGGER_SDK + " TEXT, "                                                                                           //5
+				+ KEY_ACCOUNT_DETAILS_TIMESTAMP + " TEXT, "                                                                                 //6
+				+ KEY_PAYMENT_METHODS_TIMESTAMP + " TEXT, "                                                                                 //7
+				+ KEY_PRICING_TIMESTAMP + " TEXT, "                                                                                         //8
+				+ KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + " TEXT, "                                                                        //9
+				+ KEY_INVALIDATE_SDK_CACHE + " TEXT, "                                                                                      //10
+				+ KEY_FILE_LOGGER_KARERE + " TEXT, "                                                                                        //11
+				+ KEY_USE_HTTPS_ONLY + " TEXT, "                                                                                            //12
+				+ KEY_SHOW_COPYRIGHT + " TEXT, "                                                                                            //13
+				+ KEY_SHOW_NOTIF_OFF + " TEXT, "                                                                                            //14
+				+ KEY_STAGING + " TEXT, "                                                                                                   //15
+				+ KEY_LAST_PUBLIC_HANDLE + " TEXT, "                                                                                        //16
+				+ KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " TEXT, "                                                                              //17
+				+ KEY_STORAGE_STATE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.STORAGE_STATE_UNKNOWN)) + "',"              //18
+				+ KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "', "  //19
+				+ KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT DEFAULT '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "'" 		    //20
 				+ ")";
 		db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
@@ -350,13 +353,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_NONCONTACT_TABLE);
 
 		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_ENABLED + " BOOLEAN, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
-				KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN, "+ KEY_CHAT_STATUS + " TEXT, "+ KEY_CHAT_SEND_ORIGINALS + " BOOLEAN"+")";
+				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " + KEY_CHAT_SOUND_NOTIFICATIONS + " TEXT, "
+				+ KEY_CHAT_VIBRATION_ENABLED + " BOOLEAN, " + KEY_CHAT_SEND_ORIGINALS + " BOOLEAN" + ")";
 		db.execSQL(CREATE_CHAT_TABLE);
 
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_TRANSFER_FILENAME + " TEXT, " + KEY_TRANSFER_TYPE + " TEXT, " +
-				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT"+")";
+				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT, " + KEY_TRANSFER_PATH + " TEXT" + ")";
 		db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
 
 		String CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS " + TABLE_EPHEMERAL + "("
@@ -586,7 +589,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL(CREATE_NONCONTACT_TABLE);
 
 			String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
-					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_ENABLED + " BOOLEAN, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
+					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
 					KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN"+")";
 			db.execSQL(CREATE_CHAT_TABLE);
 		}
@@ -597,11 +600,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 			db.execSQL("ALTER TABLE " + TABLE_CREDENTIALS + " ADD COLUMN " + KEY_LAST_NAME + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_LAST_NAME + " = '" + encrypt("") + "';");
-		}
-
-		if (oldVersion <= 24){
-			db.execSQL("ALTER TABLE " + TABLE_CHAT_SETTINGS + " ADD COLUMN " + KEY_CHAT_STATUS + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_STATUS + " = '" + encrypt(MegaChatApi.STATUS_ONLINE+"") + "';");
 		}
 
 		if (oldVersion <= 25){
@@ -766,6 +764,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 51) {
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_LAST_PUBLIC_HANDLE_TYPE + " = '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "';");
+		}
+
+		if (oldVersion <= 52) {
+			ChatSettings chatSettings = getChatSettingsFromDBv52(db);
+			db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
+			onCreate(db);
+			setChatSettings(db, chatSettings);
+		}
+
+		if (oldVersion <= 53) {
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_ASK_SET_DOWNLOAD_LOCATION + " = '" + encrypt("true") + "';");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_ASK_ALWAYS + " = '" + encrypt("true") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_PATH + " TEXT;");
+		}
+
+		if (oldVersion <= 54) {
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_MY_CHAT_FILES_FOLDER_HANDLE + " = '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "';");
 		}
 	}
 
@@ -1317,8 +1334,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public ArrayList<MegaContactGetter.MegaContact> getMegaContacts() {
         String sql = "SELECT * FROM " + TABLE_MEGA_CONTACTS;
         Cursor cursor = db.rawQuery(sql, null);
+        ArrayList<MegaContactGetter.MegaContact> contacts = new ArrayList<>();
         if (cursor != null) {
-            ArrayList<MegaContactGetter.MegaContact> contacts = new ArrayList<>();
             try {
                 MegaContactGetter.MegaContact contact;
                 while(cursor.moveToNext()) {
@@ -1337,12 +1354,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     contacts.add(contact);
                 }
-                return contacts;
             } finally {
                 cursor.close();
             }
         }
-        return null;
+        return contacts;
     }
 
     public void clearMegaContacts() {
@@ -1487,7 +1503,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return prefs;
 	}
 
-	public ChatSettings getChatSettings(){
+	/**
+	 * Get chat settings from the DB v52 (previous to remove the setting to enable/disable the chat).
+	 * KEY_CHAT_ENABLED and KEY_CHAT_STATUS have been removed in DB v53.
+	 * @return Chat settings.
+	 */
+	private ChatSettings getChatSettingsFromDBv52(SQLiteDatabase db){
         logDebug("getChatSettings");
 		ChatSettings chatSettings = null;
 
@@ -1501,45 +1522,63 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String vibrationEnabled = decrypt(cursor.getString(4));
 			String chatStatus = decrypt(cursor.getString(5));
 			String sendOriginalAttachments = decrypt(cursor.getString(6));
-			chatSettings = new ChatSettings(enabled, notificationsEnabled, notificationSound, vibrationEnabled, sendOriginalAttachments);
+			chatSettings = new ChatSettings(notificationsEnabled, notificationSound, vibrationEnabled, sendOriginalAttachments);
 		}
 		cursor.close();
 
 		return chatSettings;
 	}
 
-	public void setChatSettings(ChatSettings chatSettings){
-        logDebug("setChatSettings");
+	/**
+	 * Get chat settings from the current DB.
+	 * @return Chat settings.
+	 */
+	public ChatSettings getChatSettings(){
+		logDebug("getChatSettings");
+		ChatSettings chatSettings = null;
 
-        db.execSQL("DELETE FROM " + TABLE_CHAT_SETTINGS);
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String notificationsEnabled = decrypt(cursor.getString(1));
+			String notificationSound = decrypt(cursor.getString(2));
+			String vibrationEnabled = decrypt(cursor.getString(3));
+			String sendOriginalAttachments = decrypt(cursor.getString(4));
+			chatSettings = new ChatSettings(notificationsEnabled, notificationSound, vibrationEnabled, sendOriginalAttachments);
+		}
+		cursor.close();
+
+		return chatSettings;
+	}
+
+	/**
+	 * Save chat settings in the current DB.
+	 * @param chatSettings Chat settings to save.
+	 */
+	public void setChatSettings(ChatSettings chatSettings){
+		setChatSettings(db, chatSettings);
+	}
+
+	/**
+	 * Save chat settings in the DB.
+	 * @param db DB object to save the settings.
+	 * @param chatSettings Chat settings to save.
+	 */
+	private void setChatSettings(SQLiteDatabase db, ChatSettings chatSettings) {
+		if (chatSettings == null) {
+			logError("Error: Chat settings are null");
+			return;
+		}
+
+		db.execSQL("DELETE FROM " + TABLE_CHAT_SETTINGS);
 
 		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_ENABLED, encrypt(chatSettings.getEnabled()));
 		values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, encrypt(chatSettings.getNotificationsEnabled()));
 		values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(chatSettings.getNotificationsSound()));
 		values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(chatSettings.getVibrationEnabled()));
-
 		values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(chatSettings.getSendOriginalAttachments()));
 
 		db.insert(TABLE_CHAT_SETTINGS, null, values);
-	}
-
-	public void setEnabledChat(String enabled){
-        logDebug("setEnabledChat");
-
-		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
-		ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_ENABLED + "= '" + encrypt(enabled) + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-			values.put(KEY_CHAT_ENABLED, encrypt(enabled));
-			db.insert(TABLE_CHAT_SETTINGS, null, values);
-		}
-		cursor.close();
 	}
 
 	public void setSendOriginalAttachments(String originalAttachments){
@@ -1710,6 +1749,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_TRANSFER_STATE, encrypt(transfer.getState()+""));
 		values.put(KEY_TRANSFER_SIZE, encrypt(transfer.getSize()));
 		values.put(KEY_TRANSFER_HANDLE, encrypt(transfer.getNodeHandle()));
+		values.put(KEY_TRANSFER_PATH, encrypt(transfer.getPath()));
 
 		db.insert(TABLE_COMPLETED_TRANSFERS, null, values);
 	}
@@ -1735,8 +1775,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					int stateInt = Integer.parseInt(state);
 					String size = decrypt(cursor.getString(4));
 					String nodeHandle = decrypt(cursor.getString(5));
+					String path = decrypt(cursor.getString(6));
 
-					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(filename, typeInt, stateInt, size, nodeHandle);
+					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(filename, typeInt, stateInt, size, nodeHandle, path);
 					cTs.add(cT);
 				} while (cursor.moveToPrevious());
 			}
@@ -1844,6 +1885,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_LAST_PUBLIC_HANDLE_TIMESTAMP, encrypt(Long.toString(attr.getLastPublicHandleTimeStamp())));
 		values.put(KEY_STORAGE_STATE, encrypt(Integer.toString(attr.getStorageState())));
 		values.put(KEY_LAST_PUBLIC_HANDLE_TYPE, encrypt(Integer.toString(attr.getLastPublicHandleType())));
+		values.put(KEY_MY_CHAT_FILES_FOLDER_HANDLE, encrypt(Long.toString(attr.getMyChatFilesFolderHandle())));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 
@@ -1873,6 +1915,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String lastPublicHandleTimeStamp = decrypt(cursor.getString(17));
 			String storageState = decrypt(cursor.getString(18));
 			String lastPublicHandleType = decrypt(cursor.getString(19));
+			String myChatFilesFolderHandle = decrypt(cursor.getString(20));
 
 			attr = new MegaAttributes(online,
 					intents != null && !intents.isEmpty() ? Integer.parseInt(intents) : 0,
@@ -1881,7 +1924,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff,
 					staging, lastPublicHandle, lastPublicHandleTimeStamp,
 					lastPublicHandleType != null && !lastPublicHandleType.isEmpty() ? Integer.parseInt(lastPublicHandleType) : MegaApiJava.AFFILIATE_TYPE_INVALID,
-					storageState != null && !storageState.isEmpty() ? Integer.parseInt(storageState) : MegaApiJava.STORAGE_STATE_UNKNOWN);
+					storageState != null && !storageState.isEmpty() ? Integer.parseInt(storageState) : MegaApiJava.STORAGE_STATE_UNKNOWN,
+					myChatFilesFolderHandle);
 		}
 		cursor.close();
 
@@ -3136,6 +3180,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 	/**
+	 * Get a long value from the database.
+	 *
+	 * @param tableName    Name of the database's table.
+	 * @param columnName   Name of the table's column.
+	 * @param defaultValue Default value to return if no result found.
+	 * @return Long value selected from the database.
+	 */
+	private long getLongValue(String tableName, String columnName, long defaultValue) {
+		try {
+			String value = getStringValue(tableName, columnName, Long.toString(defaultValue));
+			if (!isTextEmpty(value)) {
+				return Long.parseLong(value);
+			}
+		} catch (Exception e) {
+			logWarning("EXCEPTION - Return default value: " + defaultValue, e);
+		}
+
+		return defaultValue;
+	}
+
+	/**
 	 * Set a String value into the database.
 	 *
 	 * @param tableName  Name of the database's table.
@@ -3182,6 +3247,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return value;
 	}
 
+	/**
+	 * Get a boolean value from the database.
+	 *
+	 * @param tableName    Name of the database's table.
+	 * @param columnName   Name of the table's column.
+	 * @param defaultValue Default value to return if no result found.
+	 * @return Boolean value selected from the database.
+	 */
+	private boolean getBooleanValue(String tableName, String columnName, boolean defaultValue) {
+		try {
+			String value = getStringValue(tableName, columnName, Boolean.toString(defaultValue));
+			if (value != null && !value.isEmpty()) {
+				return Boolean.valueOf(value);
+			}
+		} catch (Exception e) {
+			logWarning("EXCEPTION - Return default value: " + defaultValue, e);
+		}
+
+		return defaultValue;
+	}
+
 	public void setPinLockEnabled (boolean pinLockEnabled){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
@@ -3214,36 +3300,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
-	public void setStorageAskAlways (boolean storageAskAlways){
-		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-        ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_ASK_ALWAYS + "= '" + encrypt(storageAskAlways + "") + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-	        values.put(KEY_STORAGE_ASK_ALWAYS, encrypt(storageAskAlways + ""));
-	        db.insert(TABLE_PREFERENCES, null, values);
-		}
-		cursor.close();
+	public void setStorageAskAlways(boolean storageAskAlways) {
+		setStringValue(TABLE_PREFERENCES, KEY_STORAGE_ASK_ALWAYS, storageAskAlways + "");
 	}
 
-	public void setStorageAdvancedDevices (boolean storageAdvancedDevices){
-		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-        ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_ADVANCED_DEVICES + "= '" + encrypt(storageAdvancedDevices + "") + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-	        values.put(KEY_STORAGE_ADVANCED_DEVICES, encrypt(storageAdvancedDevices + ""));
-	        db.insert(TABLE_PREFERENCES, null, values);
-		}
-		cursor.close();
+	/**
+	 * Sets the flag to indicate if should ask the user about set the current path as default download location.
+	 *
+	 * @param askSetDownloadLocation true if should ask, false otherwise.
+	 */
+	public void setAskSetDownloadLocation(boolean askSetDownloadLocation) {
+		setStringValue(TABLE_PREFERENCES, KEY_ASK_SET_DOWNLOAD_LOCATION, askSetDownloadLocation + "");
+	}
+
+	/**
+	 * Gets the flag which indicates if should ask the user about set the current path as default download location.
+	 *
+	 * @return true if should ask, false otherwise.
+	 */
+	public boolean getAskSetDownloadLocation() {
+		return getBooleanValue(TABLE_PREFERENCES, KEY_ASK_SET_DOWNLOAD_LOCATION, true);
 	}
 
 	public void setStorageDownloadLocation (String storageDownloadLocation){
@@ -3512,6 +3588,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		setIntValue(TABLE_ATTRIBUTES, KEY_STORAGE_STATE, storageState);
 	}
 
+	/**
+	 * Get the handle of "My chat files" folder from the database.
+	 *
+	 * @return Handle value.
+	 */
+	public long getMyChatFilesFolderHandle() {
+		logInfo("Getting the storage state from DB");
+		return getLongValue(TABLE_ATTRIBUTES, KEY_MY_CHAT_FILES_FOLDER_HANDLE, MegaApiJava.INVALID_HANDLE);
+	}
+
+	/**
+	 * Set the handle of "My chat files" folder into the database.
+	 *
+	 * @param myChatFilesFolderHandle Handle value.
+	 */
+	public void setMyChatFilesFolderHandle(long myChatFilesFolderHandle) {
+		logInfo("Setting the storage state in the DB");
+		setLongValue(TABLE_ATTRIBUTES, KEY_MY_CHAT_FILES_FOLDER_HANDLE, myChatFilesFolderHandle);
+	}
+
 	public String getShowNotifOff (){
 
 		String selectQuery = "SELECT " + KEY_SHOW_NOTIF_OFF + " FROM " + TABLE_ATTRIBUTES + " WHERE " + KEY_ID + " = '1'";
@@ -3572,6 +3668,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void clearCredentials(){
+	    logWarning("Clear local credentials!");
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);
         onCreate(db);
 	}
@@ -3601,10 +3698,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             lastPublicHandle = attributes.getLastPublicHandle();
             lastPublicHandleTimeStamp = attributes.getLastPublicHandleTimeStamp();
             lastPublicHandleType = attributes.getLastPublicHandleType();
-        }
-        catch(Exception e){
-            lastPublicHandle = MegaApiJava.INVALID_HANDLE;
-        }
+		} catch (Exception e) {
+			logWarning("EXCEPTION getting last public handle info.", e);
+			lastPublicHandle = MegaApiJava.INVALID_HANDLE;
+		}
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
 		onCreate(db);
 		if (lastPublicHandle != MegaApiJava.INVALID_HANDLE) {
@@ -3612,8 +3709,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		        setLastPublicHandle(lastPublicHandle);
 		        setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp);
 				setLastPublicHandleType(lastPublicHandleType);
-            }
-            catch (Exception e){}
+			} catch (Exception e) {
+				logWarning("EXCEPTION saving last public handle info.", e);
+			}
         }
 	}
 

@@ -255,7 +255,6 @@
 	<!--<string name="download_downloading" context="Title header on the download page while the file is downloading.">Завантаження</string>-->
 	<!--<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">Передача</string>-->
 	<string name="download_preparing_files" context="message before the download or upload start ">Підготовка файлів</string>
-    <string name="download_began" context="message when the download starts">Завантаження розпочато</string>
     <!--<string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Ви хочете скасувати завантаження?</string>-->
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">Натисніть щоб скасувати завантаження</string>
     <string name="download_touch_to_show" context="Hint how to cancel the download">Натисніть щоб побачити всі передачі</string>
@@ -402,8 +401,7 @@
 	<string name="upload_prepare" context="Status text at the beginning of an upload">Обробка файлу</string>
 	<string name="error_temporary_unavaible" context="error message when downloading a file">Ресурс тимчасово недоступний, повторіть спробу пізніше</string>
 	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Не можу відкрити вибраний файл</string>
-	<string name="upload_began" context="when an upload starts, a message is shown to the user">Відвантаження розпочато</string>
-	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Розархівований файл</string>
+    <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Розархівований файл</string>
 		
 	<string name="error_io_problem" context="error message while browsing the local filesystem">Проблема файлової системи</string>
 	<string name="general_error" context="error message while browsing the local filesystem">Сталася помилка під час виконання</string>
@@ -469,8 +467,8 @@
     
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Тільки Wi-Fi</string>
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi або тарифний план</string>
-    <string name="cam_sync_ok" context="Answer for confirmation dialog.">ОК</string>
-    <string name="cam_sync_skip" context="skip the step of camera upload">Пропустити</string>
+    <string name="general_ok" context="Answer for confirmation dialog.">ОК</string>
+    <string name="general_skip" context="skip the step of camera upload">Пропустити</string>
     <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Процес відвантаження з камери</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Ви бажаєте відмінити завантаження з камери?</string>
     <!--<string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Тека призначення недоступна</string>-->

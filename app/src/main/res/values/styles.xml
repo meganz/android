@@ -93,6 +93,10 @@
         <item name="preferenceTheme">@style/PreferenceStyle</item>
     </style>
 
+    <style name="PreferencesScreen" parent="Theme.Megaactionbar">
+        <item name="colorControlNormal">@color/text_secondary</item>
+    </style>
+
     <style name="Theme.Megaactionbar.InfoScreens" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
 
@@ -273,13 +277,14 @@
     </style>
 
     <style name="ButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:minHeight">24dp</item>
         <item name="android:minWidth">44dp</item>
-    </style>
-
-    <style name="ButtonStyleWithoutBorder" parent="@style/Widget.AppCompat.Button.Borderless">
-        <item name="android:minHeight">24dp</item>
-        <item name="android:minWidth">44dp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
     </style>
 
     <style name="PreferenceStyle" parent="@style/PreferenceThemeOverlay.v14.Material">
@@ -289,7 +294,7 @@
     <style name="PreferenceCategoryStyle" parent="@style/Preference.Category.Material">
         <item name="android:layout">@layout/my_category_preference</item>
     </style>
-    
+
     <style name="InputTextAppearanceError" parent="TextAppearance.Design.Error">
         <item name="android:textColor">@color/dark_primary_color</item>
     </style>
@@ -424,6 +429,15 @@
         <item name="android:textColor">@color/grey_achievements_invite_friends</item>
     </style>
 
+    <style name="alert_diaolog_btn">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:textColor">@color/accentColor</item>
+        <item name="android:background">@null</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
     <style name="how_works_second_p" parent="how_works_first_p">
         <item name="android:layout_marginTop">16dp</item>
         <item name="android:layout_marginBottom">24dp</item>
@@ -431,5 +445,30 @@
         <item name="android:lineSpacingMultiplier">1.67</item>
         <item name="android:textStyle">italic</item>
         <item name="android:textColor">@color/grey_achievements_invite_friends_sub</item>
+    </style>
+
+    <style name="taken_down_icon">
+        <item name="android:layout_width">16dp</item>
+        <item name="android:layout_height">16dp</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:background">@null</item>
+        <item name="android:tint">@color/login_warning</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="ButtonStyleWithoutBorder" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:minHeight">24dp</item>
+        <item name="android:minWidth">44dp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+
+    <style name="TransparentBackgroundButtonWithoutBorder" parent="ButtonStyleWithoutBorder">
+        <item name="android:textColor">@color/accentColor</item>
+        <item name="android:background">@android:color/transparent</item>
     </style>
 </resources>

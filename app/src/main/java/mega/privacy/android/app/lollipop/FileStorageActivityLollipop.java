@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
@@ -45,6 +46,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -77,6 +79,10 @@ import static mega.privacy.android.app.utils.Util.*;
 
 
 public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
+
+	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
+	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
+	public static final String IS_CU_OR_MU_FOLDER = "IS_CU_OR_MU_FOLDER";
 
 	public static final String EXTRA_URL = "fileurl";
 	public static final String EXTRA_SIZE = "filesize";
@@ -137,6 +143,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	private Boolean fromSettings, fromSaveRecoveryKey;
 	private Boolean cameraFolderSettings;
+	private Boolean isCUOrMUFolder;
 	private String sdRoot;
 	private boolean hasSDCard;
     private String prompt;
@@ -160,6 +167,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private ActionMode actionMode;
 	
 	private AlertDialog newFolderDialog;
+	private AlertDialog setDownloadLocationDialog;
+	private boolean isSetDownloadLocationShown;
+	private boolean confirmationChecked;
 
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
@@ -376,11 +386,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		Intent intent = getIntent();
 		prompt = intent.getStringExtra(EXTRA_PROMPT);
 		if (prompt != null) {
-			showSnackBar(this, SNACKBAR_TYPE, prompt, -1);
+			showSnackbar(viewContainer, prompt);
 		}
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
 		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
 		cameraFolderSettings = intent.getBooleanExtra(EXTRA_CAMERA_FOLDER, false);
+		isCUOrMUFolder = intent.getBooleanExtra(IS_CU_OR_MU_FOLDER, false);
 		sdRoot = intent.getStringExtra(EXTRA_SD_ROOT);
 		hasSDCard = (sdRoot != null);
 		
@@ -402,6 +413,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 
 			fromSaveRecoveryKey = savedInstanceState.getBoolean(EXTRA_SAVE_RECOVERY_KEY, false);
+
+			isSetDownloadLocationShown = savedInstanceState.getBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, false);
+			confirmationChecked = savedInstanceState.getBoolean(IS_CONFIRMATION_CHECKED, false);
 		}
 		
         viewContainer = (RelativeLayout) findViewById(R.id.file_storage_container);
@@ -481,8 +495,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		lastPositionStack = new Stack<>();
 
+		prefs = dbH.getPreferences();
 		if(!hasSDCard) {
-            prefs = dbH.getPreferences();
             if (prefs == null){
                 path = buildExternalStorageFile(DOWNLOAD_DIR);
             }
@@ -524,6 +538,20 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		path.mkdirs();
 		changeFolder(path);
 		logDebug("Path to show: " + path);
+
+		if (isSetDownloadLocationShown) {
+			showConfirmationSaveInSameLocation();
+		}
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		if (isScreenInPortrait(this)) {
+			emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+		} else {
+			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+		}
 	}
 
 	@Override
@@ -675,15 +703,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                     dbH.setLastUploadFolder(path.getAbsolutePath());
                 }
 				if (mode == Mode.PICK_FOLDER) {
-					logDebug("Mode.PICK_FOLDER");
-					Intent intent = new Intent();
-					intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
-					intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes);
-					intent.putStringArrayListExtra(EXTRA_SERIALIZED_NODES, serializedNodes);
-					intent.putExtra(EXTRA_URL, url);
-					intent.putExtra(EXTRA_SIZE, size);
-					setResult(RESULT_OK, intent);
-					finish();
+					if (!isCUOrMUFolder && (prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways()))
+							&& dbH.getAskSetDownloadLocation()) {
+						showConfirmationSaveInSameLocation();
+					} else {
+						finishPickFolder();
+					}
 				}
 				else {
 					logDebug("Mode.PICK_FILE");
@@ -728,7 +753,78 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 		
 	}
-	
+
+	/**
+	 * This dialog is shown when the user is selecting the download location.
+	 * It asks if they want to set the current chosen location as default.
+	 * It the user enables the checkbox, the dialog should not appear again.
+	 *
+	 */
+	private void showConfirmationSaveInSameLocation(){
+		if (setDownloadLocationDialog != null && setDownloadLocationDialog.isShowing()) {
+			return;
+		}
+
+		if (prefs == null) {
+			prefs = dbH.getPreferences();
+		}
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+		View v = getLayoutInflater().inflate(R.layout.dialog_general_confirmation, null);
+		builder.setView(v);
+
+		TextView text = v.findViewById(R.id.confirmation_text);
+		text.setText(R.string.confirmation_download_location);
+
+		Button cancelButton = v.findViewById(R.id.negative_button);
+		cancelButton.setText(R.string.general_negative_button);
+		cancelButton.setOnClickListener(v2 -> setDownloadLocationDialog.dismiss());
+
+		Button confirmationButton = v.findViewById(R.id.positive_button);
+		confirmationButton.setText(R.string.general_yes);
+		confirmationButton.setOnClickListener(v3 -> {
+			setDownloadLocationDialog.dismiss();
+			dbH.setStorageAskAlways(false);
+			dbH.setStorageDownloadLocation(path.getAbsolutePath());
+			prefs.setStorageDownloadLocation(path.getAbsolutePath());
+		});
+
+		CheckBox checkBox = v.findViewById(R.id.confirmation_checkbox);
+		checkBox.setChecked(confirmationChecked);
+
+		LinearLayout checkBoxLayout = v.findViewById(R.id.confirmation_checkbox_layout);
+		checkBoxLayout.setOnClickListener(v1 -> checkBox.setChecked(!checkBox.isChecked()));
+
+		builder.setCancelable(false);
+		builder.setOnDismissListener(dialog -> {
+			isSetDownloadLocationShown = false;
+			dbH.setAskSetDownloadLocation(!checkBox.isChecked());
+			finishPickFolder();
+		});
+		setDownloadLocationDialog = builder.create();
+		setDownloadLocationDialog.show();
+		isSetDownloadLocationShown = true;
+	}
+
+	private void finishPickFolder() {
+		Intent intent = new Intent();
+		intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
+		intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes);
+		intent.putStringArrayListExtra(EXTRA_SERIALIZED_NODES, serializedNodes);
+		intent.putExtra(EXTRA_URL, url);
+		intent.putExtra(EXTRA_SIZE, size);
+		setResult(RESULT_OK, intent);
+		finish();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+		outState.putBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, isSetDownloadLocationShown);
+		outState.putBoolean(IS_CONFIRMATION_CHECKED, confirmationChecked);
+
+		super.onSaveInstanceState(outState, outPersistentState);
+	}
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {

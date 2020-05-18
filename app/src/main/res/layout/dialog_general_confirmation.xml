@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/confirmation_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="@color/name_my_account"
+        android:fontFamily="sans-serif-light"
+        android:textStyle="bold"/>
+
+    <LinearLayout
+        android:id="@+id/confirmation_checkbox_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="30dp">
+
+        <CheckBox
+            android:id="@+id/confirmation_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/ColorControlStyle"/>
+
+        <TextView
+            android:id="@+id/do_not_show_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="12dp"
+            android:textSize="14sp"
+            android:textColor="@color/file_properties_text_available"
+            android:text="@string/general_do_not_show"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/buttons_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginTop="30dp">
+
+        <Button
+            android:id="@+id/positive_button"
+            android:layout_alignParentRight="true"
+            style="@style/TransparentBackgroundButtonWithoutBorder"/>
+
+        <Button
+            android:id="@+id/negative_button"
+            android:layout_toLeftOf="@+id/positive_button"
+            android:layout_marginRight="30dp"
+            style="@style/TransparentBackgroundButtonWithoutBorder"/>
+    </RelativeLayout>
+
+</LinearLayout>

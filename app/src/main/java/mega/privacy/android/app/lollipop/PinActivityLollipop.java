@@ -19,30 +19,10 @@ public class PinActivityLollipop extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		if (megaApi == null){
-			megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		}
-
-		if(isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
-			}
-		}
 	}
 
 	@Override
 	protected void onPause() {
-		logDebug("onPause");
-		if (megaApi == null){
-			megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		}
-
-		if(isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
-			}
-		}
 		PinUtil.pause(this);
 		lastStart = System.currentTimeMillis();
 		super.onPause();
@@ -50,24 +30,8 @@ public class PinActivityLollipop extends BaseActivity {
 	
 	@Override
 	protected void onResume() {
-		logDebug("onResume");
-
 		super.onResume();
         setAppFontSize(this);
-
-		if (megaApi == null){
-			megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		}
-
-		if(isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
-			}
-		}
-
-		if (megaChatApi != null){
-			megaChatApi.retryPendingConnections(false, null);
-		}
 
 		if(MegaApplication.isShowPinScreen()){
 			PinUtil.resume(this);
