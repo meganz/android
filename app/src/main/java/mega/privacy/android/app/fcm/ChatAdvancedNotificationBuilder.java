@@ -449,6 +449,10 @@ public final class ChatAdvancedNotificationBuilder {
                 messageContent = converterShortCodes(messageContent);
                 String sender = chat.getPeerFirstnameByHandle(msg.getUserHandle());
                 sender = converterShortCodes(sender);
+                String nickName = getNicknameContact(msg.getUserHandle());
+                if(nickName != null){
+                    sender = converterShortCodes(nickName);
+                }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     messagingStyleContentO.addMessage(messageContent, msg.getTimestamp(), sender);
