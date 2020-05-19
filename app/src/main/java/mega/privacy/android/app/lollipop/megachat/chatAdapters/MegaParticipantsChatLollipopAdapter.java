@@ -623,7 +623,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
     public void updateParticipant(int position, ArrayList<MegaChatParticipant> participants) {
         this.participants = participants;
-        notifyItemChanged(position);
+        //Taking into account the header position += 1;
+        notifyItemChanged(position + 1);
     }
 
     public void removeParticipant(int position, ArrayList<MegaChatParticipant> participants) {
@@ -665,7 +666,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         logDebug("position: " + position);
 
         if (listFragment.findViewHolderForAdapterPosition(position) instanceof MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList) {
-            notifyItemChanged(position);
+            //Taking into account the header position += 1;
+            notifyItemChanged(position + 1);
         }
     }
 

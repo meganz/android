@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -644,14 +645,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         });
         input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE);
 
-        builder.setTitle(getString(R.string.context_rename))
-                .setPositiveButton(getString(R.string.context_rename), (dialog, whichButton) -> changeTitle(input))
-                .setNegativeButton(getString(android.R.string.cancel), null)
+        builder.setTitle(R.string.context_rename)
+                .setPositiveButton(getString(R.string.context_rename), null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .setView(layout)
                 .setOnDismissListener(dialog -> hideKeyboard(groupChatInfoActivity, InputMethodManager.HIDE_NOT_ALWAYS));
 
         changeTitleDialog = builder.create();
         changeTitleDialog.show();
+        changeTitleDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> changeTitle(input));
     }
 
     private void changeTitle(EmojiEditText input) {

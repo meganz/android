@@ -143,7 +143,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             optionInvite.setVisibility(View.GONE);
 
-            setImageAvatar(megaChatApi.getMyEmail(), myFullName, contactImageView);
+            setImageAvatar(megaApi.getMyUser(), megaChatApi.getMyEmail(), myFullName, contactImageView);
         } else {
             String fullName = getNicknameContact(participantHandle);
             if (fullName == null) {
