@@ -1424,16 +1424,10 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         setPreviewersView();
         titleToolbar.setText(chatRoom.getTitle());
         setChatSubtitle();
-
-        if (!chatRoom.isPublic()) {
-            privateIconToolbar.setVisibility(View.VISIBLE);
-        } else {
-            privateIconToolbar.setVisibility(View.GONE);
-        }
-
+        privateIconToolbar.setVisibility(chatRoom.isPublic() ? View.GONE : View.VISIBLE);
         isOpeningChat = true;
 
-        String textToShowB = String.format(getString(R.string.chat_loading_messages));
+        String textToShowB = getString(R.string.chat_loading_messages);
 
         try {
             textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
