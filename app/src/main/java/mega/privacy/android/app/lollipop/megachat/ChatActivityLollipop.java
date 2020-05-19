@@ -45,7 +45,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -1600,8 +1599,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     }else {
                         setBottomLayout(SHOW_JOIN_LAYOUT);
                     }
-
-                    return;
                 }
                 else {
                     logDebug("Check permissions group chat");
@@ -1807,6 +1804,12 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 }
             } else {
                 customSubtitle.append(participantName);
+                if (i == participantsCount - 1) {
+                    String firstNames = customSubtitle.toString();
+                    if (!isTextEmpty(firstNames)) {
+                        groupalSubtitleToolbar.setText(adjustForLargeFont(firstNames));
+                    }
+                }
             }
         }
 
@@ -1823,7 +1826,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
      * @return  True if there are more participants after the current position, false otherwise.
      */
     private boolean areMoreParticipants(long position) {
-        return chatRoom.getPeerCount() > position + 1;
+        return chatRoom.getPeerCount() > position;
     }
 
     /**
@@ -5251,6 +5254,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if(msg.isDeleted()){
                 logDebug("DELETED MESSAGE!!!!");
+                numberToLoad--;
                 return;
             }
 
@@ -5260,6 +5264,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
             if(msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT) {
                 logDebug("TYPE_REVOKE_NODE_ATTACHMENT MESSAGE!!!!");
+                numberToLoad--;
                 return;
             }
 
@@ -5318,6 +5323,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                                 }
                                 else{
                                     logDebug("Modify attachment");
+                                    numberToLoad--;
                                     return;
                                 }
                             }
@@ -5327,6 +5333,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                     int returnValue = modifyMessageReceived(androidMsg, true);
                     if(returnValue!=-1){
                         logDebug("Message " + returnValue + " modified!");
+                        numberToLoad--;
                         return;
                     }
                     addInBufferSending(androidMsg);
@@ -5341,6 +5348,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 int returnValue = modifyMessageReceived(androidMsg, true);
                 if(returnValue!=-1){
                     logDebug("Message " + returnValue + " modified!");
+                    numberToLoad--;
                     return;
                 }
                 addInBufferSending(androidMsg);
@@ -5394,31 +5402,41 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
             if (stateHistory == MegaChatApi.SOURCE_ERROR) {
                 logDebug("SOURCE_ERROR: wait to CHAT ONLINE connection");
                 retryHistory = true;
-            } else if (stateHistory == MegaChatApi.SOURCE_NONE) {
+            } else if (thereAreNotMoreMessages()) {
                 logDebug("SOURCE_NONE: there are no more messages");
                 fullHistoryReceivedOnLoad();
             } else if (bufferMessages.size() == NUMBER_MESSAGES_TO_LOAD) {
-                logDebug("All the messages asked are loaded");
-                long messagesLoadedCount = bufferMessages.size() + messages.size();
-                fullHistoryReceivedOnLoad();
-
-                if (messagesLoadedCount < Math.abs(generalUnreadCount) && messagesLoadedCount < MAX_NUMBER_MESSAGES_TO_LOAD_NOT_SEEN) {
-                    askForMoreMessages();
-                }
+                allMessagesRequestedAreLoaded();
             } else {
                 long pendingMessagesCount = numberToLoad - bufferMessages.size();
                 if (pendingMessagesCount > 0) {
                     logDebug("Fewer messages received (" + bufferMessages.size() + ") than asked (" + NUMBER_MESSAGES_TO_LOAD + "): ask for the rest of messages (" + pendingMessagesCount + ")");
                     askForMoreMessages(pendingMessagesCount);
 
-                    if (stateHistory == MegaChatApi.SOURCE_NONE) {
+                    if (thereAreNotMoreMessages()) {
                         logDebug("SOURCE_NONE: there are no more messages");
                         fullHistoryReceivedOnLoad();
                     }
+                } else {
+                    allMessagesRequestedAreLoaded();
                 }
             }
         }
         logDebug("END onMessageLoaded - messages.size=" + messages.size());
+    }
+
+    private void allMessagesRequestedAreLoaded() {
+        logDebug("All the messages asked are loaded");
+        long messagesLoadedCount = bufferMessages.size() + messages.size();
+        fullHistoryReceivedOnLoad();
+
+        if (messagesLoadedCount < Math.abs(generalUnreadCount) && messagesLoadedCount < MAX_NUMBER_MESSAGES_TO_LOAD_NOT_SEEN) {
+            askForMoreMessages();
+        }
+    }
+
+    public boolean thereAreNotMoreMessages() {
+        return stateHistory == MegaChatApi.SOURCE_NONE;
     }
 
     /**
