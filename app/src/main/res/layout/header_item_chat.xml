@@ -162,6 +162,6 @@
         android:id="@+id/loading_messages_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/loading_group_chat_messages"/>
+        android:src="@drawable/loading_chat_messages"/>
 
 </RelativeLayout>

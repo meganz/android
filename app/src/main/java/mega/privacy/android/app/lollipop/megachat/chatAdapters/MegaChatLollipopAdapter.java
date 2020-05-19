@@ -1276,6 +1276,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             boolean isFullHistoryLoaded = megaChatApi.isFullHistoryLoaded(chatRoom.getChatId());
             holderHeaderChat.firstMessage.setVisibility(isFullHistoryLoaded ? View.VISIBLE : View.GONE);
             holderHeaderChat.loadingMessages.setVisibility(isFullHistoryLoaded ? View.GONE : View.VISIBLE);
+            holderHeaderChat.loadingMessages.setImageDrawable(ContextCompat.getDrawable(context,
+                    isScreenInPortrait(context) ? R.drawable.loading_chat_messages : R.drawable.loading_chat_messages_landscape));
         } else {
             logDebug("ViewHolderMessageChat: " + position);
             AndroidMegaChatMessage androidMessage = messages.get(position - 1);
