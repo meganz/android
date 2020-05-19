@@ -55,7 +55,6 @@ import mega.privacy.android.app.activities.settingsActivities.DownloadPreference
 import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
@@ -94,7 +93,8 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends SettingsBaseFragment implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
 
-	Handler handler = new Handler();
+    public static final String INVAILD_PATH = "-1";
+    Handler handler = new Handler();
 
 	PreferenceCategory qrCodeCategory;
 	SwitchPreferenceCompat qrCodeAutoAcceptSwitch;
@@ -734,7 +734,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 				//check if the local secondary folder exists
 				localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
-				if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
+				if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals(INVAILD_PATH)){
 					logWarning("Secondary ON: invalid localSecondaryFolderPath");
 					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
 					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
@@ -744,7 +744,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 					File checkSecondaryFile = new File(localSecondaryFolderPath);
 					if(!checkSecondaryFile.exists()){
 						logWarning("Secondary ON: the local folder does not exist");
-						dbH.setSecondaryFolderPath("-1");
+						dbH.setSecondaryFolderPath(INVAILD_PATH);
 						//If the secondary folder does not exist
 						Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 						localSecondaryFolderPath = getString(R.string.settings_empty_folder);
@@ -1284,13 +1284,13 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 						//If the secondary folder does not exist any more
 						Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 
-						if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
+						if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals(INVAILD_PATH)){
 							localSecondaryFolderPath = getString(R.string.settings_empty_folder);
 						}
 					}
 				}
 				else{
-					dbH.setSecondaryFolderPath("-1");
+					dbH.setSecondaryFolderPath(INVAILD_PATH);
 					//If the secondary folder does not exist any more
 					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
@@ -1805,9 +1805,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			if (intent != null) {
 				switch (intent.getAction()) {
 					case ACTION_REFRESH_CAMERA_UPLOADS_SETTING:
-						cameraUpload = intent.getBooleanExtra(CAMERA_UPLOADS_STATUS, false);
 						refreshCameraUploadsSettings();
 						break;
+                    case ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING:
+                        // disable UI elements of media upload omly
+                        disableMediaUploadUIProcess();
+                        break;
 					case ACTION_REFRESH_CLEAR_OFFLINE_SETTING:
 						taskGetSizeOffline();
 						break;
@@ -1842,6 +1845,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
+		filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
 		filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
 		LocalBroadcastManager.getInstance(context).registerReceiver(receiver, filter);
 
@@ -2357,7 +2361,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
 			//check if the local secondary folder exists
 			localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
-			if (localSecondaryFolderPath == null || localSecondaryFolderPath.equals("-1")) {
+			if (localSecondaryFolderPath == null || localSecondaryFolderPath.equals(INVAILD_PATH)) {
 				logWarning("Secondary ON: invalid localSecondaryFolderPath");
 				localSecondaryFolderPath = getString(R.string.settings_empty_folder);
 				Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
@@ -2365,7 +2369,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				File checkSecondaryFile = new File(localSecondaryFolderPath);
 				if (!checkSecondaryFile.exists()) {
 					logDebug("Secondary ON: the local folder does not exist");
-					dbH.setSecondaryFolderPath("-1");
+					dbH.setSecondaryFolderPath(INVAILD_PATH);
 					//If the secondary folder does not exist
 					Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 					localSecondaryFolderPath = getString(R.string.settings_empty_folder);

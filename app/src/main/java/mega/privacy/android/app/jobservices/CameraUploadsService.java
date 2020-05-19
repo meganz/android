@@ -27,6 +27,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.exifinterface.media.ExifInterface;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,9 +68,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
+import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
+import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.INVAILD_PATH;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.FileUtils.*;
@@ -88,7 +90,8 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
-    public static final int  LOCAL_FOLDER_REMINDER_NOTI_ID = 1909;
+    public static final int  LOCAL_FOLDER_REMINDER_PRIMARY = 1908;
+    public static final int  LOCAL_FOLDER_REMINDER_SECONDARY = 1909;
     private static final String OVER_QUOTA_NOTIFICATION_CHANNEL_ID = "overquotanotification";
     private static final String ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE";
     private static final String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
@@ -957,17 +960,26 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (!checkPrimaryLocalFolder()) {
-            localFolderUnavailableNotification(R.string.camera_notif_primary_local_unavailable);
+            localFolderUnavailableNotification(R.string.camera_notif_primary_local_unavailable,LOCAL_FOLDER_REMINDER_PRIMARY);
+            disableCameraUploadSettingProcess();
+            dbH.setCamSyncLocalPath("");
+            dbH.setSecondaryFolderPath(INVAILD_PATH);
+            //refresh settings fragment UI
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING));
             return SHOULD_RUN_STATE_FAILED;
         } else {
-            mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_NOTI_ID);
+            mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_PRIMARY);
         }
 
         if(!checkSecondaryLocalFolder()) {
-            localFolderUnavailableNotification(R.string.camera_notif_secondary_local_unavailable);
+            localFolderUnavailableNotification(R.string.camera_notif_secondary_local_unavailable,LOCAL_FOLDER_REMINDER_SECONDARY);
+            // disable media upload only
+            disableMediaUploadProcess();
+            dbH.setSecondaryFolderPath(INVAILD_PATH);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING));
             return SHOULD_RUN_STATE_FAILED;
         } else {
-            mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_NOTI_ID);
+            mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_SECONDARY);
         }
 
         if (!localPath.endsWith(SEPARATOR)) {
@@ -1016,18 +1028,18 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         return secondaryFolderResult;
     }
 
-    private void localFolderUnavailableNotification(int resId) {
+    private void localFolderUnavailableNotification(int resId, int notiId) {
         boolean isShowing = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             for(StatusBarNotification notification : mNotificationManager.getActiveNotifications()) {
-                if(notification.getId() == LOCAL_FOLDER_REMINDER_NOTI_ID) {
+                if(notification.getId() == notiId) {
                     isShowing = true;
                 }
             }
         }
         if(!isShowing) {
             mNotification = createNotification(getString(R.string.section_photo_sync), getString(resId), null, false);
-            mNotificationManager.notify(LOCAL_FOLDER_REMINDER_NOTI_ID, mNotification);
+            mNotificationManager.notify(notiId, mNotification);
         }
     }
 

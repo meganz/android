@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -230,7 +231,7 @@ public class CameraUploadUtil {
      */
     public static void disableCameraUploadSettingProcess(boolean clearCamsyncRecords) {
         resetCUTimestampsAndCache(clearCamsyncRecords);
-        new Handler().postDelayed(() -> {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (dbH.shouldClearCamsyncRecords()) {
                 dbH.deleteAllSyncRecords(TYPE_ANY);
                 dbH.saveShouldClearCamsyncRecords(false);

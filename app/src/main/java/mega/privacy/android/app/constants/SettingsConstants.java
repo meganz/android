@@ -2,6 +2,7 @@ package mega.privacy.android.app.constants;
 
 public class SettingsConstants {
     public static final String ACTION_REFRESH_CAMERA_UPLOADS_SETTING = "ACTION_REFRESH_CAMERA_UPLOADS_SETTING";
+    public static final String ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING = "ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING";
     public static final String ACTION_REFRESH_CLEAR_OFFLINE_SETTING = "ACTION_REFRESH_CLEAR_OFFLINE_SETTING";
     public static final int COMPRESSION_QUEUE_SIZE_MIN = 100;
     public static final int COMPRESSION_QUEUE_SIZE_MAX = 1000;
