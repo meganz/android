@@ -3776,8 +3776,7 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         MegaChatMessage msg = messagesSelected.get(0).getMessage();
         MegaChatContainsMeta meta = msg.getContainsMeta();
         messageToEdit = msg;
-        textChat.setText(messageToEdit.getContent());
-        textChat.setSelection(textChat.getText().length());
+
         if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
             sendLocation();
             finishMultiselectionMode();
