@@ -2332,6 +2332,7 @@
     <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]blocked you as a contact.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notifications [A](%1$d)[/A]</string>
+    <string name="section_notification_user_with_nickname" context="Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown">[A]%s (%s)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Account deleted</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]The account [/B][A]%s[/A][B] has been deleted.[/B]</string>
