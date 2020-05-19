@@ -603,12 +603,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                 if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
                     logDebug("The session on hold change");
-                    if(!chat.isGroup() && callChat.hasLocalVideo() && session.isOnHold()){
-                        MegaApplication.setWasLocalVideoEnable(true);
-                        megaChatApi.disableVideo(chatIdReceived, ChatCallActivity.this);
-                    }else{
-                        MegaApplication.setWasLocalVideoEnable(false);
-                    }
                     if(chat.isGroup()){
                         checkSessionOnHold(peerId, clientId);
                     }else{
@@ -2863,9 +2857,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        if(callChat.hasLocalVideo()) {
-            updateLocalVideoStatus();
-        }
+        updateLocalVideoStatus();
 
         if(chat.isGroup()){
             if (callChat.isOnHold()){

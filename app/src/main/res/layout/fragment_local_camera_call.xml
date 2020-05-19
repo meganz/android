@@ -38,7 +38,7 @@
                 android:id="@+id/avatar_image"
                 android:layout_width="88dp"
                 android:layout_height="88dp"
-                android:scaleType="center"
+                android:scaleType="fitCenter"
                 rounded:border_color="@color/border_avatar_call"
                 rounded:border_width="3dp"
                 rounded:corner_radius="60dp" />

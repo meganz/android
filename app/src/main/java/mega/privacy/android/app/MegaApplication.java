@@ -70,6 +70,7 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
@@ -410,6 +411,9 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		e.printStackTrace();
 	}
 
+	/**
+	 * Method for controlling changes in the call.
+	 */
 	private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -462,6 +466,52 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 						break;
 				}
 			}
+		}
+	};
+
+	/**
+	 * Method for controlling changes in sessions.
+	 */
+	private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
+			long chatIdOfCurrentCall = getChatCallInProgress();
+			if (chatIdReceived != chatIdOfCurrentCall) {
+				logWarning("Call in different chat");
+				return;
+			}
+
+			MegaChatCall call = megaChatApi.getChatCall(chatIdOfCurrentCall);
+			MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatIdOfCurrentCall);
+			if (call == null || chatRoom == null) {
+				logWarning("Call not found");
+				return;
+			}
+
+			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
+
+				long peerId = intent.getLongExtra(UPDATE_PEER_ID, -1);
+				long clientId = intent.getLongExtra(UPDATE_CLIENT_ID, -1);
+				MegaChatSession session = call.getMegaChatSession(peerId, clientId);
+
+				logDebug("The session on hold change");
+
+				if (chatRoom.isGroup()) {
+					logDebug("Is a group");
+					return;
+				}
+				if (call.hasLocalVideo() && session.isOnHold()) {
+					setWasLocalVideoEnable(true);
+					megaChatApi.disableVideo(chatIdReceived, null);
+				} else {
+					setWasLocalVideoEnable(false);
+				}
+			}
+
 		}
 	};
 
@@ -531,6 +581,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		filter.addAction(ACTION_CALL_STATUS_UPDATE);
 		filter.addAction(ACTION_UPDATE_CALL);
 		LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
+
+		IntentFilter filterSession = new IntentFilter(BROADCAST_ACTION_INTENT_SESSION_UPDATE);
+		filterSession.addAction(ACTION_CHANGE_SESSION_ON_HOLD);
+		LocalBroadcastManager.getInstance(this).registerReceiver(chatSessionUpdateReceiver, filterSession);
 
 		logoutReceiver = new BroadcastReceiver() {
             @Override
@@ -1554,7 +1608,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		return wasLocalVideoEnable;
 	}
 
-	public static void setWasLocalVideoEnable(boolean wasLocalVideoEnable) {
+	private static void setWasLocalVideoEnable(boolean wasLocalVideoEnable) {
 		MegaApplication.wasLocalVideoEnable = wasLocalVideoEnable;
 	}
 }

@@ -270,6 +270,10 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
      */
     private void showAvatar() {
         deactivateVideo();
+        if (isSmallCamera) {
+            checkIndividualAudioCall();
+            return;
+        }
         showOnHoldImage();
     }
 
