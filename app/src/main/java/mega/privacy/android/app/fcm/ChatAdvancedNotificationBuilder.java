@@ -326,10 +326,7 @@ public final class ChatAdvancedNotificationBuilder {
             String messageContent;
 
             if (userCount == 1) {
-                messageContent = msg.getUserName(0);
-                if (isTextEmpty(messageContent)) {
-                    messageContent = msg.getUserEmail(0);
-                }
+                messageContent = getNameContactAttachment(msg);
             } else {
                 StringBuilder name = new StringBuilder("");
                 name.append(msg.getUserName(0));

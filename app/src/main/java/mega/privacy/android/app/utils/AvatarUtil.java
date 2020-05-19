@@ -309,16 +309,15 @@ public class AvatarUtil {
      * Checks if already exists the avatar of a participant.
      * First with the handle and if not exists, then with the email.
      *
-     * @param nameFileHandle
-     * @param nameFileEmail
-     * @return
+     * @param nameFileHandle    participant's handle
+     * @param nameFileEmail     participant's email
+     * @return The participan's avatar if exists
      */
     public static Bitmap getUserAvatar(String nameFileHandle, String nameFileEmail) {
         Bitmap bitmap = getAvatarBitmap(nameFileHandle);
 
         if (bitmap == null) {
             bitmap = getAvatarBitmap(nameFileEmail);
-
         }
 
         return bitmap;

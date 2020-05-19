@@ -30,11 +30,9 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.utils.AvatarUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -48,6 +46,10 @@ import static nz.mega.sdk.MegaChatApi.*;
 
 public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<MegaParticipantsChatLollipopAdapter.ViewHolderParticipants> implements OnClickListener {
 
+    private static final int HEADER_POSITION = 0;
+    private static final int ADD_PARTICIPANTS_POSITION = 1;
+    private static final int COUNT_HEADER_POSITION = 1;
+    private static final int COUNT_HEADER_AND_ADD_PARTICIPANTS_POSITIONS = 2;
     private final static int MAX_WIDTH_CHAT_TITLE_PORT = 200;
     private final static int MAX_WIDTH_CHAT_TITLE_LAND = 300;
     private static final int ITEM_VIEW_TYPE_NORMAL = 0;
@@ -125,8 +127,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         public ViewHolderAddParticipant(View v) {
             super(v);
         }
-
-        private ImageView imageView;
     }
 
     public static class ViewHolderParticipantsHeader extends ViewHolderParticipants {
@@ -134,22 +134,16 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
             super(v);
         }
 
-        private LinearLayout infoLayout;
-        private RelativeLayout avatarLayout;
         private TextView infoNumParticipantsText;
-        private RelativeLayout infoTextContainerLayout;
         private ImageView editImageView;
         private LinearLayout notificationsLayout;
         private SwitchCompat notificationsSwitch;
-        private TextView notificationsTitle;
         private View dividerNotifications;
         private LinearLayout chatLinkLayout;
-        private TextView chatLinkTitleText;
         private View chatLinkSeparator;
         private LinearLayout privateLayout;
         private View privateSeparator;
         private RelativeLayout sharedFilesLayout;
-        private View dividerSharedFilesLayout;
         private RelativeLayout clearChatLayout;
         private View dividerClearLayout;
         private RelativeLayout leaveChatLayout;
@@ -161,25 +155,20 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         private RelativeLayout observersLayout;
         private TextView observersNumberText;
         private View observersSeparator;
-        private TextView participantsTitle;
         private RoundedImageView avatarImageView;
         private EmojiTextView infoTitleChatText;
     }
 
     @Override
     public ViewHolderParticipants onCreateViewHolder(ViewGroup parent, int viewType) {
-        logDebug("onCreateViewHolder");
-
         View v;
+
         switch (viewType) {
             case ITEM_VIEW_TYPE_HEADER:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_header_group_participants, parent, false);
                 ViewHolderParticipantsHeader holderHeader = new ViewHolderParticipantsHeader(v);
 
                 holderHeader.avatarImageView = v.findViewById(R.id.chat_group_properties_thumbnail);
-                holderHeader.infoLayout = v.findViewById(R.id.chat_group_contact_properties_info_layout);
-                holderHeader.avatarLayout = v.findViewById(R.id.chat_group_properties_avatar_layout);
-                holderHeader.infoTextContainerLayout = v.findViewById(R.id.chat_group_contact_properties_info_text_container);
                 holderHeader.infoTitleChatText = v.findViewById(R.id.chat_group_contact_properties_info_title);
                 if (isScreenInPortrait(groupChatInfoActivity)) {
                     holderHeader.infoTitleChatText.setMaxWidthEmojis(px2dp(MAX_WIDTH_CHAT_TITLE_PORT, outMetrics));
@@ -192,8 +181,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 //Notifications Layout
                 holderHeader.notificationsLayout = v.findViewById(R.id.chat_group_contact_properties_notifications_layout);
-
-                holderHeader.notificationsTitle = v.findViewById(R.id.chat_group_contact_properties_notifications_title);
                 holderHeader.notificationsSwitch = v.findViewById(R.id.chat_group_contact_properties_switch);
                 holderHeader.notificationsSwitch.setOnClickListener(this);
                 holderHeader.dividerNotifications = v.findViewById(R.id.divider_notifications_layout);
@@ -202,7 +189,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 //Chat links
                 holderHeader.chatLinkLayout = v.findViewById(R.id.chat_group_contact_properties_chat_link_layout);
-                holderHeader.chatLinkTitleText = v.findViewById(R.id.chat_group_contact_properties_chat_link);
                 holderHeader.chatLinkSeparator = v.findViewById(R.id.divider_chat_link_layout);
 
                 //Private chat
@@ -212,7 +198,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 //Chat Shared Files Layout
                 holderHeader.sharedFilesLayout = v.findViewById(R.id.chat_group_contact_properties_chat_files_shared_layout);
                 holderHeader.sharedFilesLayout.setOnClickListener(this);
-                holderHeader.dividerSharedFilesLayout = v.findViewById(R.id.divider_chat_files_shared_layout);
 
                 //Clear chat Layout
                 holderHeader.clearChatLayout = v.findViewById(R.id.chat_group_contact_properties_clear_layout);
@@ -237,8 +222,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderHeader.observersLayout = v.findViewById(R.id.chat_group_observers_layout);
                 holderHeader.observersNumberText = v.findViewById(R.id.chat_group_observers_number_text);
                 holderHeader.observersSeparator = v.findViewById(R.id.divider_observers_layout);
-
-                holderHeader.participantsTitle = v.findViewById(R.id.chat_group_contact_properties_title_text);
 
                 return holderHeader;
 
@@ -275,7 +258,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 holderAddParticipant.itemLayout = v.findViewById(R.id.add_participant_list_item_layout);
                 holderAddParticipant.itemLayout.setOnClickListener(this);
-                holderAddParticipant.imageView = v.findViewById(R.id.add_participant_list_icon);
 
                 v.setTag(holderAddParticipant);
                 return holderAddParticipant;
@@ -291,7 +273,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
             case ITEM_VIEW_TYPE_HEADER:
                 ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) holder;
 
-                int color = ContextCompat.getColor(groupChatInfoActivity, R.color.divider_upgrade_account);
                 String title = getChat().getTitle();
                 holderHeader.avatarImageView.setImageBitmap(getDefaultAvatar(getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR), title, AVATAR_SIZE, true));
 
@@ -497,17 +478,17 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
     @Override
     public int getItemCount() {
         if (isNotPreviewAndLastParticipantModerator()) {
-            return participants.size() + 2;
+            return participants.size() + COUNT_HEADER_AND_ADD_PARTICIPANTS_POSITIONS;
         } else {
-            return participants.size() + 1;
+            return participants.size() + COUNT_HEADER_POSITION;
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
+        if (position == HEADER_POSITION) {
             return ITEM_VIEW_TYPE_HEADER;
-        } else if (position == 1 && isNotPreviewAndLastParticipantModerator()) {
+        } else if (isNotPreviewAndLastParticipantModerator() && position == ADD_PARTICIPANTS_POSITION) {
             return ITEM_VIEW_TYPE_ADD_PARTICIPANT;
         } else {
             return ITEM_VIEW_TYPE_NORMAL;
@@ -529,9 +510,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
      */
     public int getParticipantPositionInArray(int adapterPosition) {
         if (isNotPreviewAndLastParticipantModerator()) {
-            return adapterPosition - 2;
+            return adapterPosition - COUNT_HEADER_AND_ADD_PARTICIPANTS_POSITIONS;
         } else {
-            return adapterPosition - 1;
+            return adapterPosition - COUNT_HEADER_POSITION;
         }
     }
 
@@ -616,6 +597,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         }
     }
 
+    /**
+     * Sets the participants in the adapter and notifies it.
+     *
+     * @param participants  participants' list to set
+     */
     public void setParticipants(ArrayList<MegaChatParticipant> participants) {
         this.participants = participants;
         notifyDataSetChanged();
@@ -624,50 +610,20 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
     public void updateParticipant(int position, ArrayList<MegaChatParticipant> participants) {
         this.participants = participants;
         //Taking into account the header position += 1;
-        notifyItemChanged(position + 1);
+        notifyItemChanged(position + COUNT_HEADER_POSITION);
     }
 
-    public void removeParticipant(int position, ArrayList<MegaChatParticipant> participants) {
-        this.participants = participants;
-        notifyItemRemoved(position);
-    }
-
-    public String getDescription(ArrayList<MegaNode> nodes) {
-        int numFolders = 0;
-        int numFiles = 0;
-
-        for (int i = 0; i < nodes.size(); i++) {
-            MegaNode c = nodes.get(i);
-            if (c.isFolder()) {
-                numFolders++;
-            } else {
-                numFiles++;
-            }
-        }
-
-        String info = "";
-        if (numFolders > 0) {
-            info = numFolders + " " + groupChatInfoActivity.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-            if (numFiles > 0) {
-                info = info + ", " + numFiles + " " + groupChatInfoActivity.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-            }
-        } else {
-            if (numFiles == 0) {
-                info = numFiles + " " + groupChatInfoActivity.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-            } else {
-                info = numFiles + " " + groupChatInfoActivity.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-            }
-        }
-
-        return info;
-    }
-
+    /**
+     * Updates a participant due to a change in their status.
+     *
+     * @param position  participant's position in the adapter without taking into account the header item
+     */
     public void updateContactStatus(int position) {
         logDebug("position: " + position);
 
         if (listFragment.findViewHolderForAdapterPosition(position) instanceof MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList) {
             //Taking into account the header position += 1;
-            notifyItemChanged(position + 1);
+            notifyItemChanged(position + COUNT_HEADER_POSITION);
         }
     }
 

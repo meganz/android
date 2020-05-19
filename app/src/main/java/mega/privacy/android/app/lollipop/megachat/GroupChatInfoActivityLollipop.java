@@ -249,7 +249,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
      * @return The text to show in name field.
      */
     private String getParticipantName(long handle) {
-        String fullName = getNicknameContact(handle);
+        String fullName = getContactNameDB(handle);
 
         if (fullName == null) {
             fullName = chat.getPeerFullnameByHandle(handle);
@@ -258,7 +258,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if (isTextEmpty(fullName)) {
             fullName = chat.getPeerEmailByHandle(handle);
         }
-
         return fullName;
     }
 
@@ -311,6 +310,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             if (participant.getHandle() == contactHandle) {
                 int pos = participants.indexOf(participant);
                 participants.get(pos).setFullName(getParticipantName(contactHandle));
+                pos = chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR ? pos + 1 : pos;
                 adapter.updateParticipant(pos, participants);
                 break;
             }
@@ -389,6 +389,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
+    /**
+     * Shows an alert dialog to confirm the deletion of a participant.
+     *
+     * @param handle        participant's handle
+     * @param chatToChange  identifier of the chat where the participant has to be removed
+     */
     public void showRemoveParticipantConfirmation(long handle, MegaChatRoom chatToChange) {
         logDebug("Participant Handle: " + handle + ", Chat ID: " + chatToChange.getChatId());
 
@@ -498,19 +504,19 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         View.OnClickListener clickListener = v -> {
             switch (v.getId()) {
-                case R.id.change_permissions_dialog_administrator_layout: {
+                case R.id.change_permissions_dialog_administrator_layout:
                     changePermissions(MegaChatRoom.PRIV_MODERATOR);
                     break;
-                }
-                case R.id.change_permissions_dialog_member_layout: {
+
+                case R.id.change_permissions_dialog_member_layout:
                     changePermissions(MegaChatRoom.PRIV_STANDARD);
                     break;
-                }
-                case R.id.change_permissions_dialog_observer_layout: {
+
+                case R.id.change_permissions_dialog_observer_layout:
                     changePermissions(MegaChatRoom.PRIV_RO);
                     break;
-                }
             }
+
             if (dialog != null) {
                 dialog.dismiss();
             }
@@ -774,7 +780,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             logDebug("My user handle: " + megaChatApi.getMyUserHandle());
 
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                if (request.getUserHandle() == -1) {
+                if (request.getUserHandle() == INVALID_HANDLE) {
                     logDebug("I left the chatroom");
                     finish();
                 } else {
@@ -1226,7 +1232,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     private void checkIfShouldAskForUsersAttributes() {
         if (pendingParticipantRequests.isEmpty()) return;
 
-        HashMap<Integer, MegaChatParticipant> copyOfpendingParticipantRequests = new HashMap<>(pendingParticipantRequests);
+        HashMap<Integer, MegaChatParticipant> copyOfPendingParticipantRequests = new HashMap<>(pendingParticipantRequests);
         pendingParticipantRequests.clear();
 
         MegaHandleList handleList = MegaHandleList.createInstance();
@@ -1235,18 +1241,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         int lastPosition = linearLayoutManager.findLastVisibleItemPosition();
 
         for (int i = firstPosition; i <= lastPosition; i++) {
-            MegaChatParticipant participant = copyOfpendingParticipantRequests.get(i);
+            MegaChatParticipant participant = copyOfPendingParticipantRequests.get(i);
             if (participant != null) {
                 participantRequests.put(i, participant);
                 handleList.addMegaHandle(participant.getHandle());
             }
 
-            copyOfpendingParticipantRequests.remove(i);
+            copyOfPendingParticipantRequests.remove(i);
         }
 
         requestUserAttributes(handleList, participantRequests);
 
-        checkIfShouldAskForMoreUsersAttributes(copyOfpendingParticipantRequests);
+        checkIfShouldAskForMoreUsersAttributes(copyOfPendingParticipantRequests);
     }
 
     /**
@@ -1288,7 +1294,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
      * @param participantRequests   HashMap in which the participants and their positions in the adapter are stored
      */
     private void requestUserAttributes(MegaHandleList handleList, HashMap<Integer, MegaChatParticipant> participantRequests) {
-        long size = handleList.size();
         if (handleList.size() > 0) {
             megaChatApi.loadUserAttributes(chatHandle, handleList, chat.getAuthorizationToken(), new GetPeerAttributesListener(this, participantRequests));
         }
@@ -1358,6 +1363,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         return selectedHandleParticipant;
     }
 
+    /**
+     * Checks if the notifications of the chat are enabled.
+     *
+     * @return true if the notifications of the chat are enabled, false otherwise
+     */
     public boolean areGeneralChatNotificationsAvailable() {
         return chatSettings != null || chatSettings.getNotificationsEnabled() == null ? true : Boolean.parseBoolean(chatSettings.getNotificationsEnabled());
     }

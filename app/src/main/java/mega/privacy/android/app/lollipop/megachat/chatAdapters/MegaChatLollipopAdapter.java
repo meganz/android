@@ -1273,13 +1273,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (holder instanceof ViewHolderHeaderChat) {
             ViewHolderHeaderChat holderHeaderChat = (ViewHolderHeaderChat) holder;
 
-            if (megaChatApi.isFullHistoryLoaded(chatRoom.getChatId())) {
-                holderHeaderChat.firstMessage.setVisibility(View.VISIBLE);
-                holderHeaderChat.loadingMessages.setVisibility(View.GONE);
-            } else {
-                holderHeaderChat.firstMessage.setVisibility(View.GONE);
-                holderHeaderChat.loadingMessages.setVisibility(View.VISIBLE);
-            }
+            boolean isFullHistoryLoaded = megaChatApi.isFullHistoryLoaded(chatRoom.getChatId());
+            holderHeaderChat.firstMessage.setVisibility(isFullHistoryLoaded ? View.VISIBLE : View.GONE);
+            holderHeaderChat.loadingMessages.setVisibility(isFullHistoryLoaded ? View.GONE : View.VISIBLE);
         } else {
             logDebug("ViewHolderMessageChat: " + position);
             AndroidMegaChatMessage androidMessage = messages.get(position - 1);
@@ -1674,9 +1670,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        ownMessageParams.setMargins(scaleWidthPx(11, outMetrics), scaleHeightPx(-14, outMetrics), scaleWidthPx(62, outMetrics), scaleHeightPx(16, outMetrics));
 //        ((ViewHolderMessageChat)holder).contentOwnMessageText.setLayoutParams(ownMessageParams);
 
-        if (((ChatActivityLollipop) context).lastIdMsgSeen != -1) {
+        if (((ChatActivityLollipop) context).getLastIdMsgSeen() != -1) {
 
-            if (((ChatActivityLollipop) context).lastIdMsgSeen == message.getMsgId()) {
+            if (((ChatActivityLollipop) context).getLastIdMsgSeen() == message.getMsgId()) {
 
                 logDebug("Last message ID match!");
 
@@ -1702,8 +1698,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 String numberString;
-                long unreadMessages = Math.abs(((ChatActivityLollipop) context).generalUnreadCount);
-                if (((ChatActivityLollipop) context).generalUnreadCount < 0) {
+                long unreadMessages = Math.abs(((ChatActivityLollipop) context).getGeneralUnreadCount());
+                if (((ChatActivityLollipop) context).getGeneralUnreadCount() < 0) {
                     numberString = "+" + unreadMessages;
                 } else {
                     numberString = unreadMessages + "";
@@ -1717,7 +1713,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ChatActivityLollipop) context).setNewVisibility(true);
 
                 logDebug("Set positionNewMessagesLayout: "+position);
-                ((ChatActivityLollipop) context).positionNewMessagesLayout = position;
+                ((ChatActivityLollipop) context).setPositionNewMessagesLayout(position);
             } else {
                 ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
             }
