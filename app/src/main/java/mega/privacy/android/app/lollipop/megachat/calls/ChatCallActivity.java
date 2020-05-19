@@ -2490,16 +2490,17 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     /**
      * Method to update the selected participant's interface when the call is on hold.
-     *
-     * @param peer Participant selected.
      */
-    private void updateParticipantSelectedInCallOnHold(InfoPeerGroupCall peer){
-        MegaChatSession session = getSessionCall(peer.getPeerId(), peer.getClientId());
+    private void updateParticipantSelectedInCallOnHold(){
+        if(peerSelected == null)
+            return;
+
+        MegaChatSession session = getSessionCall(peerSelected.getPeerId(), peerSelected.getClientId());
         if(callChat.isOnHold() || session != null && session.isOnHold()){
             if (callChat.isOnHold()){
                 callOnHoldText.setText(getString(R.string.call_on_hold));
             }else if(session.isOnHold()){
-                callOnHoldText.setText(getString(R.string.session_on_hold, peer.getName()));
+                callOnHoldText.setText(getString(R.string.session_on_hold, peerSelected.getName()));
             }
             callOnHoldLayout.setVisibility(View.VISIBLE);
         }else{
@@ -2507,7 +2508,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         if (cameraFragmentPeerSelected != null) {
-            cameraFragmentPeerSelected.showOnHoldImage();
+            cameraFragmentPeerSelected.showOnHoldImage(peerSelected.getPeerId(), peerSelected.getClientId());
             cameraFragmentPeerSelected.showMuteIcon(peerSelected.getPeerId(), peerSelected.getClientId());
         }
     }
@@ -2844,7 +2845,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         } else if (!lessThanSevenParticipants() && adapterList != null) {
             adapterList.updateSessionOnHold(peerid, clientid);
             if (peerSelected != null) {
-                updateParticipantSelectedInCallOnHold(peerSelected);
+                updateParticipantSelectedInCallOnHold();
             }
         }
     }

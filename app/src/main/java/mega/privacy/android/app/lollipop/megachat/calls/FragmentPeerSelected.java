@@ -1,25 +1,18 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
-
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
@@ -28,7 +21,7 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.px2dp;
+import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FragmentPeerSelected extends BaseFragment implements View.OnClickListener {
@@ -104,7 +97,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
      * @param peerId The selected participant.
      */
     private void setAvatarPeerSelected(long peerId) {
-        if (peerid != peerId)
+        if (this.peerid != peerId)
             return;
 
         chatRoom = megaChatApi.getChatRoom(chatId);
@@ -124,7 +117,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
      * Method to add the bitmap to the avatar.
      */
     public void setAvatar(long peerId, Bitmap bitmap) {
-        if (!isItMe(chatId, peerid, clientid) && peerId == peerid && bitmap != null && avatarImage != null) {
+        if (!isItMe(chatId, this.peerid, this.clientid) && peerId == this.peerid && bitmap != null && avatarImage != null) {
             avatarImage.setImageBitmap(bitmap);
         }
     }
@@ -138,7 +131,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
     public void checkValues(long peerId, long clientId) {
         MegaChatCall callChat = ((ChatCallActivity) context).getCall();
 
-        if (callChat == null || peerId != peerid || clientId != clientid || isItMe(chatId, peerId, clientId))
+        if (callChat == null || peerId != this.peerid || clientId != this.clientid || isItMe(chatId, peerId, clientId))
             return;
 
         MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peerId, clientId);
@@ -149,7 +142,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
         }
 
         showAvatar();
-        showMuteIcon(peerid, clientid);
+        showMuteIcon(this.peerid, this.clientid);
     }
 
     /**
@@ -235,13 +228,16 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
             return;
 
         deactivateVideo();
-        showOnHoldImage();
+        showOnHoldImage(this.peerid, this.clientid);
     }
 
     /**
      * Method to show the call on hold image.
      */
-    public void showOnHoldImage() {
+    public void showOnHoldImage(long peerid, long clientid) {
+        if(peerid != this.peerid || clientid != this.clientid)
+            return;
+
         avatarLayout.setVisibility(View.VISIBLE);
         MegaChatCall call = ((ChatCallActivity) context).getCall();
         MegaChatSession session = ((ChatCallActivity) context).getSessionCall(peerid, clientid);
@@ -268,7 +264,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
      * Method to show the mute icon.
      */
     public void showMuteIcon(long peerid, long clientid) {
-        if (peerid != this.peerid || clientid != clientid || muteLayout == null)
+        if (peerid != this.peerid || clientid != this.clientid || muteLayout == null)
             return;
 
         MegaChatCall call = ((ChatCallActivity) context).getCall();
@@ -300,7 +296,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
      * @param newClientId Client ID.
      */
     public void changePeerSelected(long newChatId, long callId, long newPeerId, long newClientId) {
-        if ((newPeerId == peerid && newClientId == clientid) || ((ChatCallActivity) context).getCall().getId() != callId)
+        if ((newPeerId == this.peerid && newClientId == this.clientid) || ((ChatCallActivity) context).getCall().getId() != callId)
             return;
 
         deactivateVideo();
@@ -320,7 +316,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
     /**
      * Method to destroy the surfaceView.
      */
-    public void removeSurfaceView() {
+    private void removeSurfaceView() {
         videoLayout.setVisibility(View.GONE);
 
         if (listener != null) {
