@@ -470,30 +470,21 @@ public class CallUtil {
 
     /**
      * Method to get the default avatar in calls.
-     * @param chat Chat room identifier where the call is.
-     * @param peerId User handle from whom the avatar is obtained.
-     * @param normalSize Avatar size.
-     * @param isList If the layout is a list.
+     *
+     * @param context    Context of the Activity.
+     * @param chat       Chat room identifier where the call is.
+     * @param peerId     User handle from whom the avatar is obtained.
      * @return Bitmap with the default avatar created.
      */
-    public static Bitmap getDefaultAvatarCall(MegaChatRoom chat, long peerId, boolean normalSize, boolean isList) {
-        String name = getUserNameCall(chat, peerId);
-        /*Default Avatar*/
-        int size;
-        if (normalSize) {
-            size = AVATAR_SIZE;
-        } else {
-            size = BIG_LETTER_SIZE;
-        }
-
-        return AvatarUtil.getDefaultAvatar(getColorAvatar(peerId), name, size, isList);
+    public static Bitmap getDefaultAvatarCall(Context context, MegaChatRoom chat, long peerId) {
+        return AvatarUtil.getDefaultAvatar(getColorAvatar(peerId), getUserNameCall(chat, peerId), px2dp(AVATAR_SIZE_CALLS, ((ChatCallActivity) context).getOutMetrics()), true);
     }
 
     /**
-     *  Method to get the image avatar in calls.
+     * Method to get the image avatar in calls.
      *
      * @param context Context of the Activity.
-     * @param chat Chat room identifier where the call is.
+     * @param chat    Chat room identifier where the call is.
      * @param peerId  User handle from whom the avatar is obtained.
      * @return Bitmap with the image avatar created.
      */

@@ -492,7 +492,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         logDebug("Deactivating video");
 
         /*Avatar*/
-        Bitmap defaultBitmap = getDefaultAvatarCall(chatRoom, peer.getPeerId(), true, true);
+        Bitmap defaultBitmap = getDefaultAvatarCall(context, chatRoom, peer.getPeerId());
 
         holder.avatarImage.setImageBitmap(defaultBitmap);
         Bitmap bitmap = getImageAvatarCall(context, chatRoom, peer.getPeerId());

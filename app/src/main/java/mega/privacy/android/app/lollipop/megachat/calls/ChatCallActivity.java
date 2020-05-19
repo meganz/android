@@ -108,9 +108,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private MegaChatRoom chat;
     private MegaChatCall callChat;
 
-    private Display display;
-    private DisplayMetrics outMetrics;
-    private float widthScreenPX, heightScreenPX;
+    private float widthScreenPX;
 
     private InfoPeerGroupCall peerSelected = null;
     private ArrayList<InfoPeerGroupCall> peersOnCall = new ArrayList<>();
@@ -655,17 +653,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         setContentView(R.layout.activity_calls_chat);
         application.setShowPinScreen(true);
 
-        display = getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
             statusBarHeight = getResources().getDimensionPixelSize(resourceId);
         }
 
-        widthScreenPX = outMetrics.widthPixels;
-        heightScreenPX = outMetrics.heightPixels - statusBarHeight;
+        widthScreenPX = getOutMetrics().widthPixels;
 
         if (megaApi == null) {
             megaApi = application.getMegaApi();
@@ -710,7 +703,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         titleToolbar = tB.findViewById(R.id.title_toolbar);
         titleToolbar.setText(" ");
-        titleToolbar.setMaxWidthEmojis(px2dp(TITLE_TOOLBAR, outMetrics));
+        titleToolbar.setMaxWidthEmojis(px2dp(TITLE_TOOLBAR, getOutMetrics()));
 
         subtitleToobar = tB.findViewById(R.id.subtitle_toolbar);
         callInProgressChrono = tB.findViewById(R.id.simple_chronometer);
@@ -2927,12 +2920,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         int qualityLevel = session.getNetworkQuality();
         for (int i = 0; i < peersOnCall.size(); i++) {
             if (peersOnCall.get(i).getPeerId() == session.getPeerid() && peersOnCall.get(i).getClientId() == session.getClientid()) {
-                if (qualityLevel < 2 && peersOnCall.get(i).isGoodQuality()) {
+                if (qualityLevel == 0 && peersOnCall.get(i).isGoodQuality()) {
                     //Bad quality
                     peersOnCall.get(i).setGoodQuality(false);
                 }
 
-                if (qualityLevel >= 2 && !peersOnCall.get(i).isGoodQuality()) {
+                if (qualityLevel > 0 && !peersOnCall.get(i).isGoodQuality()) {
                     //Good quality
                     peersOnCall.get(i).setGoodQuality(true);
                 }
@@ -3086,7 +3079,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if(peersOnCall.size() < NECESSARY_CHANGE_OF_SIZES){
             marginTop = 0;
         }else if (peersOnCall.size() == 3 || peersOnCall.size() == 4) {
-            marginTop = height + px2dp(60,outMetrics);
+            marginTop = height + px2dp(60, getOutMetrics());
         }else{
             marginTop = height;
         }

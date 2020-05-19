@@ -135,7 +135,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
         chatRoom = megaChatApi.getChatRoom(chatId);
 
         /*Default Avatar*/
-        Bitmap defaultBitmap = getDefaultAvatarCall(chatRoom, peerid, true, true);
+        Bitmap defaultBitmap = getDefaultAvatarCall(context, chatRoom, peerid);
         avatarImage.setImageBitmap(defaultBitmap);
 
         /*Avatar*/
