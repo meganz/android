@@ -13,6 +13,7 @@ public class SettingsConstants {
     public static final int REQUEST_MEGA_SECONDARY_MEDIA_FOLDER = 5000;
     public static final String KEY_SET_QUEUE_DIALOG = "KEY_SET_QUEUE_DIALOG";
     public static final String KEY_SET_QUEUE_SIZE = "KEY_SET_QUEUE_SIZE";
+    public final static String SELECTED_MEGA_FOLDER = "SELECT_MEGA_FOLDER";
 
     public static final int DEFAULT_CONVENTION_QUEUE_SIZE = 200;
 
@@ -46,6 +47,7 @@ public class SettingsConstants {
 
     public static final String KEY_CHAT_NESTED_NOTIFICATIONS = "settings_nested_notifications_chat";
 
+    public static final String KEY_STORAGE_DOWNLOAD_CATEGORY = "download_setting";
     public static final String KEY_STORAGE_DOWNLOAD = "settings_nested_download_location";
     public static final String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
     public static final String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";

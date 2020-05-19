@@ -6,7 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.provider.ContactsContract;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -220,8 +220,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
             // create default one if unable to get user pre-set avatar
             if (bitmap == null) {
                 logDebug("create default avatar as unable to get user pre-set one");
-                int color = contact.getAvatarColor();
-                bitmap = getDefaultAvatar(context, color, contact.getName(), AVATAR_SIZE, true, false);
+                bitmap = getDefaultAvatar(contact.getAvatarColor(), contact.getName(), AVATAR_SIZE, true, false);
             }
             contact.setBitmap(bitmap);
             holder.imageView.setImageBitmap(bitmap);

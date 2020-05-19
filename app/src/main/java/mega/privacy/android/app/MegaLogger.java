@@ -15,21 +15,20 @@ import static mega.privacy.android.app.utils.FileUtils.*;
  * Used to display console log from app, SDK and chatSDK,
  * and also save logs to corresponding log file
  */
-
 public abstract class MegaLogger {
-    protected File logFile;
+    private File logFile;
     protected String dir, fileName;
-    protected ConcurrentLinkedDeque<String> fileLogQueue;
+    ConcurrentLinkedDeque<String> fileLogQueue;
 
-    public MegaLogger(String fileName,boolean fileLogger) {
+    public MegaLogger(String fileName) {
         logFile = null;
         dir = getExternalStoragePath(LOG_DIR);
         this.fileName = fileName;
         fileLogQueue = new ConcurrentLinkedDeque<>();
         logToFile();
     }
-    
-    protected boolean isReadyToWriteToFile(boolean enabled) {
+
+    boolean isReadyToWriteToFile(boolean enabled) {
         if (enabled) {
             if (logFile == null || !logFile.exists()) {
                 File dirFile = new File(dir);
@@ -51,7 +50,7 @@ public abstract class MegaLogger {
         return false;
     }
 
-    protected void writeToFile(String appendContents) {
+    private void writeToFile(String appendContents) {
         try {
             if (logFile != null && logFile.canWrite()) {
                 logFile.createNewFile(); // ok if returns false, overwrite
@@ -65,7 +64,7 @@ public abstract class MegaLogger {
     }
 
     //save logs to file in new thread
-    protected void logToFile() {
+    private void logToFile() {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {

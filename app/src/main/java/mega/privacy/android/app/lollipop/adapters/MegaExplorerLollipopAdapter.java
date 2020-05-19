@@ -6,8 +6,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -44,6 +44,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.jobservices.CameraUploadsService.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -51,6 +52,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
 
 public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 	
@@ -286,19 +288,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                     if(mS.getNodeHandle()==node.getHandle()){
                         MegaUser user= megaApi.getContact(mS.getUser());
                         if(user!=null){
-                            MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-                            if(contactDB!=null){
-                                if(!contactDB.getName().equals("")){
-                                    holder.textViewFileSize.setText(contactDB.getName()+" "+contactDB.getLastName());
-                                }
-                                else{
-                                    holder.textViewFileSize.setText(user.getEmail());
-                                }
-                            }
-                            else{
-                                logDebug("The contactDB is null: ");
-                                holder.textViewFileSize.setText(user.getEmail());
-                            }
+                            holder.textViewFileSize.setText(getMegaUserNameDB(user));
                         }
                         else{
                             holder.textViewFileSize.setText(mS.getUser());
@@ -324,7 +314,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.permissionsIcon.setVisibility(View.GONE);
 
             long nodeSize = node.getSize();
-            holder.textViewFileSize.setText(getSizeString(nodeSize));
+            holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
             setImageParams(holder.imageView, 48, 0);
 
@@ -761,7 +751,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				}
 
 			}else{
-				if(n.getName().equals("Camera Uploads")){
+				if(n.getName().equals(context.getString(R.string.section_photo_sync))){
 					if (prefs != null){
 						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
 					}
@@ -772,7 +762,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			}
 
 		}else{
-			if(n.getName().equals("Camera Uploads")){
+			if(n.getName().equals(context.getString(R.string.section_photo_sync))){
 				if (prefs != null){
 					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
 				}
@@ -801,7 +791,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				}
 			}
 		}else{
-			if(n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)){
+			if(n.getName().equals(context.getString(R.string.section_secondary_media_uploads))){
 				if (prefs != null){
 					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
 				}

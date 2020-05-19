@@ -21,14 +21,13 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.OpenableColumns;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -80,12 +79,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -208,7 +207,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
     private String pathNavigation;
 
     NodeController nC;
-    private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
     private RelativeLayout bottomLayout;
@@ -654,6 +653,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         }
         else if (type == ZIP_ADAPTER) {
             ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
+        } else if (type == LINKS_ADAPTER) {
+            LinksFragment.imageDrag.getLocationOnScreen(location);
         }
     }
 
@@ -1233,7 +1234,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         if (!inside){
             propertiesMenuItem.setVisible(false);
             chatMenuItem.setVisible(false);
-            shareMenuItem.setVisible(true);
             downloadMenuItem.setVisible(false);
             getlinkMenuItem.setVisible(false);
             renameMenuItem.setVisible(false);
@@ -1245,8 +1245,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             importMenuItem.setVisible(false);
             saveForOfflineMenuItem.setVisible(false);
             chatRemoveMenuItem.setVisible(false);
-        }
-        else {
+            shareMenuItem.setVisible(true);
+        } else {
             if (nC == null) {
                 nC = new NodeController(this);
             }
@@ -1255,10 +1255,11 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
             }
 
+            shareMenuItem.setVisible(showShareOption(type, isFolderLink, handle));
+
             if (type == OFFLINE_ADAPTER){
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(true);
                 propertiesMenuItem.setVisible(true);
                 downloadMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
@@ -1274,12 +1275,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             else if(type == SEARCH_ADAPTER && !fromIncoming){
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
-                if (isUrl){
-                    shareMenuItem.setVisible(false);
-                }
-                else {
-                    shareMenuItem.setVisible(true);
-                }
                 if(node.isExported()){
                     removelinkMenuItem.setVisible(true);
                     getlinkMenuItem.setVisible(false);
@@ -1315,7 +1310,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             else if (type == FROM_CHAT){
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
                 moveMenuItem.setVisible(false);
@@ -1365,7 +1359,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 logDebug("FILE_LINK_ADAPTER");
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
-                shareMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(true);
                 renameMenuItem.setVisible(false);
@@ -1381,7 +1374,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             else if (type == ZIP_ADAPTER) {
                 propertiesMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
-                shareMenuItem.setVisible(true);
                 downloadMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
@@ -1405,13 +1397,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(true);
-
-                if (isUrl){
-                    shareMenuItem.setVisible(false);
-                }
-                else {
-                    shareMenuItem.setVisible(true);
-                }
 
                 MegaNode node = megaApi.getNodeByHandle(handle);
                 int accessLevel = megaApi.getAccess(node);
@@ -1441,12 +1426,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 chatRemoveMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
-                if (!isUrl) {
-                    shareMenuItem.setVisible(true);
-                }
-                else {
-                    shareMenuItem.setVisible(false);
-                }
                 removelinkMenuItem.setVisible(false);
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
@@ -1471,14 +1450,11 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 }
             }
             else {
-                shareMenuItem.setVisible(true);
-                boolean shareVisible = true;
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if (node == null) {
                     getlinkMenuItem.setVisible(false);
                     removelinkMenuItem.setVisible(false);
-                    shareMenuItem.setVisible(false);
                     propertiesMenuItem.setVisible(false);
                     downloadMenuItem.setVisible(false);
                     renameMenuItem.setVisible(false);
@@ -1492,16 +1468,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     chatRemoveMenuItem.setVisible(false);
                 }
                 else {
-                    if(type==CONTACT_FILE_ADAPTER){
-                        shareMenuItem.setVisible(false);
-                        shareVisible = false;
-                    }
-                    else{
-                        if(isFolderLink){
-                            shareMenuItem.setVisible(false);
-                            shareVisible = false;
-                        }
-                    }
                     copyMenuItem.setVisible(true);
 
                     if(node.isExported()){
@@ -1590,13 +1556,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     }
 
                     downloadMenuItem.setVisible(true);
-                    if (isUrl){
-                        shareMenuItem.setVisible(false);
-                    }
-                    else if (shareVisible){
-                        shareMenuItem.setVisible(true);
-                    }
-
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
                     chatRemoveMenuItem.setVisible(false);
@@ -1618,7 +1577,13 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 break;
             }
             case R.id.pdf_viewer_share: {
-                intentToSendFile();
+                if (type == OFFLINE_ADAPTER || type == ZIP_ADAPTER) {
+                    shareFile(this, new File(uri.toString()));
+                } else if (type == FILE_LINK_ADAPTER) {
+                    shareLink(this, getIntent().getStringExtra(URL_FILE_LINK));
+                } else {
+                    shareNode(this, megaApi.getNodeByHandle(handle));
+                }
                 break;
             }
             case R.id.pdf_viewer_download: {
@@ -1732,12 +1697,12 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder;
+        androidx.appcompat.app.AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         }
         else{
-            builder = new android.support.v7.app.AlertDialog.Builder(this);
+            builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         }
         builder.setMessage(R.string.confirmation_delete_one_attachment);
         builder.setPositiveButton(R.string.context_remove, dialogClickListener)
@@ -2016,7 +1981,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 return false;
             }
         });
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
@@ -2037,7 +2002,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         builder.setView(layout);
         renameDialog = builder.create();
         renameDialog.show();
-        renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+        renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -2107,7 +2072,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
     public void showPropertiesActivity(){
         Intent i = new Intent(this, FileInfoActivityLollipop.class);
         if (isOffLine){
-            i.putExtra("name", pdfFileName);
+            i.putExtra(NAME, pdfFileName);
             i.putExtra("adapterType", OFFLINE_ADAPTER);
             i.putExtra("path", path);
             if (pathNavigation != null){
@@ -2124,7 +2089,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         else {
             MegaNode node = megaApi.getNodeByHandle(handle);
             i.putExtra("handle", node.getHandle());
-            i.putExtra("name", node.getName());
+            i.putExtra(NAME, node.getName());
             if (nC == null) {
                 nC = new NodeController(this);
             }
@@ -2146,8 +2111,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
     }
 
     public void showRemoveLink(){
-        android.support.v7.app.AlertDialog removeLinkDialog;
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog removeLinkDialog;
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
@@ -2209,30 +2174,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         startActivity(linkIntent);
     }
 
-    public void intentToSendFile(){
-        logDebug("intentToSendFile");
-
-        if(uri!=null){
-            if (!isUrl){
-                Intent share = new Intent(android.content.Intent.ACTION_SEND);
-                share.setType("application/pdf");
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    logDebug("Use provider to share");
-                    share.putExtra(Intent.EXTRA_STREAM, uri);
-                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }
-                else{
-                    share.putExtra(Intent.EXTRA_STREAM, uri);
-                }
-                startActivity(Intent.createChooser(share, getString(R.string.context_share)));
-            }
-            else {
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.not_download), -1);
-            }
-        }
-    }
-
     public void updateFile (){
         MegaNode file = null;
         if (pdfFileName != null && handle != -1 ) {
@@ -2258,22 +2199,11 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     fileNameTextView.setText(pdfFileName);
                     supportInvalidateOptionsMenu();
 
+                    String localPath = getLocalFile(this, file.getName(), file.getSize());
 
-                    downloadLocationDefaultPath = getDownloadLocation(this);
-                    boolean isOnMegaDownloads = false;
-                    String localPath = getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
-                    File f = new File(downloadLocationDefaultPath, file.getName());
-                    if(f.exists() && (f.length() == file.getSize())){
-                        isOnMegaDownloads = true;
-                    }
-                    if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+                    if (localPath != null){
                         File mediaFile = new File(localPath);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                            uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
-                        }
-                        else{
-                            uri = Uri.fromFile(mediaFile);
-                        }
+                        uri = getUriForFile(this, mediaFile);
                     }
                     else {
                         if (megaApi == null){
@@ -3003,7 +2933,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         final long sizeC = size;
         final ChatController chatC = new ChatController(this);
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3047,7 +2977,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3096,7 +3026,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);

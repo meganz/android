@@ -11,12 +11,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 //import me.dm7.barcodescanner.zxing.ZXingScannerView;
@@ -418,7 +419,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                     inviteAlertDialog.dismiss();
                 }
                 Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-                intent.putExtra("name", myEmail);
+                intent.putExtra(NAME, myEmail);
                 startActivity(intent);
                 ((QRCodeActivity) context).finish();
                 break;

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -14,23 +15,17 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 
-
 public class WebViewActivityLollipop extends Activity {
 
-    private WebView myWebView;
     private ProgressDialog progressDialog;
-    private Activity activity;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fortumo_payment);
 
-        activity = this;
-
-        myWebView = findViewById(R.id.webview);
-
-
+        WebView myWebView = findViewById(R.id.webview);
         myWebView.getSettings().setJavaScriptEnabled(true);
         myWebView.getSettings().setLoadWithOverviewMode(true);
         myWebView.getSettings().setUseWideViewPort(true);
@@ -44,11 +39,7 @@ public class WebViewActivityLollipop extends Activity {
 
             @Override
             public void onPageFinished(WebView view, final String url) {
-                // Blog pages currently not support mobile website, which would trigger redirecting to mega.nz
-                // We could remove this condition after blog page support mobile web page
-                if (!matchRegexs(url, MEGA_BLOG_LINK_REGEXS)) {
-                    progressDialog.dismiss();
-                }
+                progressDialog.dismiss();
             }
         });
 
@@ -57,10 +48,10 @@ public class WebViewActivityLollipop extends Activity {
             String url = intent.getDataString();
             logDebug("URL: " + url);
             if (matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
-                MegaApplication.getInstance().setIsWebOpenDueToEmailVerification(true);
+                MegaApplication.setIsWebOpenDueToEmailVerification(true);
             }
             myWebView.loadUrl(url);
-            progressDialog = ProgressDialog.show(activity, this.getString(R.string.embed_web_browser_loading_title), this.getString(R.string.embed_web_browser_loading_message), true);
+            progressDialog = ProgressDialog.show(this, this.getString(R.string.embed_web_browser_loading_title), this.getString(R.string.embed_web_browser_loading_message), true);
             progressDialog.setCancelable(false);
         }
     }
@@ -68,6 +59,6 @@ public class WebViewActivityLollipop extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MegaApplication.getInstance().setIsWebOpenDueToEmailVerification(false);
+        MegaApplication.setIsWebOpenDueToEmailVerification(false);
     }
 }

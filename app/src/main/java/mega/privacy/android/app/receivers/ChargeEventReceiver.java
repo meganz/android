@@ -13,6 +13,6 @@ public class ChargeEventReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context,Intent intent) {
         logDebug("ChargeEventReceiver");
-        startCameraUploadService(context);
+        startCameraUploadServiceIgnoreAttr(context);
     }
 }

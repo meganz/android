@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -31,7 +31,6 @@ import nz.mega.sdk.MegaContactRequest;
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -147,8 +146,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
     }
 
     public void setDefaultAvatar(MegaContactGetter.MegaContact contact, ContactViewHolder holder) {
-        int color = getColorAvatar(context, megaApi, contact.getId());
-        Bitmap background = createAvatarBackground(color);
+        Bitmap background = createAvatarBackground(getColorAvatar(contact.getId()));
         holder.avatar.setImageBitmap(background);
 
         String firstLetter = getFirstLetter(contact.getLocalName());

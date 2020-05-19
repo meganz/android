@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -22,9 +21,10 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import androidx.exifinterface.media.ExifInterface;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
@@ -51,6 +51,7 @@ import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_F
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -133,7 +134,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		megaChatApi = app.getMegaChatApi();
-		mapProgressFileTransfers = new HashMap();
+		mapProgressFileTransfers = new HashMap<>();
         mapProgressFolderTransfers = new HashMap<>();
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		isForeground = false;
@@ -143,9 +144,14 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-		lock = wifiManager.createWifiLock(wifiLockMode, "MegaUploadServiceWifiLock");
+		if (wifiManager != null) {
+            lock = wifiManager.createWifiLock(wifiLockMode, "MegaUploadServiceWifiLock");
+        }
+
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaUploadServicePowerLock:");
+		if (pm != null) {
+            wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaUploadServicePowerLock:");
+        }
 
         mBuilder = new Notification.Builder(UploadService.this);
 		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, null);
@@ -240,46 +246,52 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
 
         currentUpload ++;
-		final File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
 
-		if(file!=null){
-			logDebug("File to manage: " + file.getAbsolutePath());
-		}
-
-		long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
-		String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
-		String nameInMEGAEdited = intent.getStringExtra(EXTRA_NAME_EDITED);
-		long lastModified = intent.getLongExtra(EXTRA_LAST_MODIFIED, 0);
-		if(lastModified <= 0){
-		    lastModified = file.lastModified();
+        String filePath = intent.getStringExtra(EXTRA_FILEPATH);
+        if (isTextEmpty(filePath)) {
+            logWarning("Error: File path is NULL or EMPTY");
+            return;
         }
 
+        final File file = new File(filePath);
+        logDebug("File to manage: " + file.getAbsolutePath());
+
+        long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
+        String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
+        String nameInMEGAEdited = intent.getStringExtra(EXTRA_NAME_EDITED);
+        long lastModified = intent.getLongExtra(EXTRA_LAST_MODIFIED, 0);
+        if (lastModified <= 0) {
+            lastModified = file.lastModified();
+        }
+
+        MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+
         acquireLock();
-		if (file.isDirectory()) {
-			// Folder upload
-			totalFolderUploads++;
-			if (nameInMEGA != null) {
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
-			} else {
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
-			}
-		} else {
+        if (file.isDirectory()) {
+            // Folder upload
+            totalFolderUploads++;
+            if (nameInMEGA != null) {
+                megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGA, this);
+            } else {
+                megaApi.startUpload(file.getAbsolutePath(), parentNode, this);
+            }
+        } else {
             totalFileUploads++;
 
-			if (nameInMEGAEdited != null) {
+            if (nameInMEGAEdited != null) {
                 // File upload with edited name
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGAEdited, this);
+                megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGAEdited, this);
             } else if (lastModified == 0) {
                 if (nameInMEGA != null) {
-                    megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
+                    megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGA, this);
                 } else {
-                    megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
+                    megaApi.startUpload(file.getAbsolutePath(), parentNode, this);
                 }
             } else {
                 if (nameInMEGA != null) {
-                    megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, lastModified / 1000, this);
+                    megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGA, lastModified / 1000, this);
                 } else {
-                    megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), lastModified / 1000, this);
+                    megaApi.startUpload(file.getAbsolutePath(), parentNode, lastModified / 1000, this);
                 }
             }
         }
@@ -763,12 +775,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						if (node != null) {
 							try {
 								final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
-								float[] latLong = new float[2];
-								if (exifInterface.getLatLong(latLong)) {
-									logDebug("Latitude: " + latLong[0] + " Longitude: " + latLong[1]);
-									megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
-								}
-
+								double[] latLong = exifInterface.getLatLong();
+								megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
 							} catch (Exception e) {
 								logWarning("Couldn't read exif info: " + transfer.getPath(), e);
 							}
@@ -1005,10 +1013,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	private void acquireLock(){
 		logDebug("acquireLock");
-        if (!wl.isHeld()) {
+        if (wl != null && !wl.isHeld()) {
             wl.acquire();
         }
-        if (!lock.isHeld()) {
+        if (lock != null && !lock.isHeld()) {
             lock.acquire();
         }
     }

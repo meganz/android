@@ -4,15 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +26,7 @@ import android.widget.TextView;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class PlaylistFragment extends Fragment{
     PlayListAdapter adapter;
     public TextView contentText;
     RelativeLayout containerContentText;
-    private SimpleExoPlayerView simpleExoPlayerViewPlaylist;
+    private PlayerView playerViewPlaylist;
     private SimpleExoPlayer player;
     View v;
     RelativeLayout containerPlayer;
@@ -148,14 +148,14 @@ public class PlaylistFragment extends Fragment{
 
         contentText = (TextView) v.findViewById(R.id.content_text);
         containerContentText = (RelativeLayout) v.findViewById(R.id.content_text_layout);
-        simpleExoPlayerViewPlaylist = (SimpleExoPlayerView) v.findViewById(R.id.player_view_playlist);
+        playerViewPlaylist = v.findViewById(R.id.player_view_playlist);
         containerPlayer  =(RelativeLayout) v.findViewById(R.id.player_layout_container);
-        simpleExoPlayerViewPlaylist.setUseController(true);
-        simpleExoPlayerViewPlaylist.setPlayer(player);
-        simpleExoPlayerViewPlaylist.setControllerAutoShow(false);
-        simpleExoPlayerViewPlaylist.setControllerShowTimeoutMs(1999999999);
-        simpleExoPlayerViewPlaylist.setControllerHideOnTouch(false);
-        simpleExoPlayerViewPlaylist.showController();
+        playerViewPlaylist.setUseController(true);
+        playerViewPlaylist.setPlayer(player);
+        playerViewPlaylist.setControllerAutoShow(false);
+        playerViewPlaylist.setControllerShowTimeoutMs(1999999999);
+        playerViewPlaylist.setControllerHideOnTouch(false);
+        playerViewPlaylist.showController();
 
         v.findViewById(R.id.exo_content_frame).setVisibility(View.GONE);
         v.findViewById(R.id.exo_overlay).setVisibility(View.GONE);

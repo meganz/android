@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.preference.PreferenceScreen
+<androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
-    <android.support.v7.preference.SwitchPreferenceCompat
+    <androidx.preference.SwitchPreferenceCompat
         android:key="settings_chat_notifications"
         android:title="@string/title_properties_chat_contact_notifications"
         android:defaultValue="true"
@@ -12,14 +12,14 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <android.support.v7.preference.Preference
+    <androidx.preference.Preference
         android:key="settings_chat_sound"
         android:title="@string/title_properties_chat_contact_message_sound"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <android.support.v7.preference.SwitchPreferenceCompat
+    <androidx.preference.SwitchPreferenceCompat
         android:key="settings_chat_vibrate"
         android:title="@string/settings_chat_vibration"
         android:defaultValue="true"
@@ -27,4 +27,4 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-</android.support.v7.preference.PreferenceScreen>
+</androidx.preference.PreferenceScreen>
