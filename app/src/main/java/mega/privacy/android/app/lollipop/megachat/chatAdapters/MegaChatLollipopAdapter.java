@@ -6347,7 +6347,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
 
                 holder.forwardOwnFile.setVisibility(View.GONE);
-                if (cC.isInAnonymousMode()) {
+                if (cC.isInAnonymousMode() || isMultipleSelect()) {
                     holder.forwardOwnPortrait.setVisibility(View.GONE);
                 }
                 else {
@@ -6401,7 +6401,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 holder.forwardOwnFile.setVisibility(View.GONE);
                 holder.forwardOwnPortrait.setVisibility(View.GONE);
-                if (cC.isInAnonymousMode()) {
+                if (cC.isInAnonymousMode() || isMultipleSelect()) {
                     holder.forwardOwnLandscape.setVisibility(View.GONE);
                 }
                 else {
@@ -6448,7 +6448,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageThumbPort.setVisibility(View.VISIBLE);
 
-            if (cC.isInAnonymousMode()) {
+            if (cC.isInAnonymousMode() || isMultipleSelect()) {
                 holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
             }
             else {
@@ -6520,7 +6520,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageThumbLand.setVisibility(View.VISIBLE);
 
-            if (cC.isInAnonymousMode()) {
+            if (cC.isInAnonymousMode() || isMultipleSelect()) {
                 holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
             }
             else {
@@ -6626,7 +6626,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.previewFramePort.setVisibility(View.VISIBLE);
                                 holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
 
-                                if (cC.isInAnonymousMode()) {
+                                if (cC.isInAnonymousMode() || isMultipleSelect()) {
                                     holder.forwardOwnPortrait.setVisibility(View.GONE);
                                 }
                                 else {
@@ -6687,7 +6687,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.previewFramePort.setVisibility(View.GONE);
                                 holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
 
-                                if (cC.isInAnonymousMode()) {
+                                if (cC.isInAnonymousMode() || isMultipleSelect()) {
                                     holder.forwardOwnLandscape.setVisibility(View.GONE);
                                 }
                                 else {
@@ -6746,7 +6746,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 }
 
                                 holder.contentContactMessageThumbPort.setVisibility(View.VISIBLE);
-                                if (cC.isInAnonymousMode()) {
+                                if (cC.isInAnonymousMode() || isMultipleSelect()) {
                                     holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
                                 }
                                 else {
@@ -6827,7 +6827,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 holder.contentContactMessageThumbLand.setVisibility(View.VISIBLE);
 
-                                if (cC.isInAnonymousMode()) {
+                                if (cC.isInAnonymousMode() || isMultipleSelect()) {
                                     holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
                                 }
                                 else {

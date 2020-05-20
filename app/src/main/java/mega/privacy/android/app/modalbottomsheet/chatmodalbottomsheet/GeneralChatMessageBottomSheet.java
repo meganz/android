@@ -132,7 +132,9 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isDeletable()) {
                     optionDelete.setVisibility(View.GONE);
                 } else {
-                    if (message.getMessage().getType() == MegaChatMessage.TYPE_NORMAL && message.getRichLinkMessage() == null) {
+                    if (message.getMessage().getType() == MegaChatMessage.TYPE_NORMAL ||
+                            (message.getMessage().getType() == MegaChatMessage.TYPE_CONTAINS_META &&
+                                    message.getMessage().getContainsMeta() != null && message.getMessage().getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION)) {
                         textDelete.setText(getString(R.string.delete_button));
                     } else {
                         textDelete.setText(getString(R.string.context_remove));
