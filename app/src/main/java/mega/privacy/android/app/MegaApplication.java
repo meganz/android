@@ -463,10 +463,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
 						removeValues(chatId);
 						break;
-
-					case MegaChatCall.CALL_STATUS_DESTROYED:
-						checkCallDestroyed(chatId);
-						break;
 				}
 			}
 		}
@@ -1293,7 +1289,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		removeChatAudioManager();
 	}
 
-	private void checkCallDestroyed(long chatId) {
+	public void checkCallDestroyed(long chatId, MegaChatCall call) {
 		removeValues(chatId);
 
 		if (shouldNotify(this)) {
@@ -1304,7 +1300,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 			wakeLock.release();
 		}
 
-		MegaChatCall call = megaChatApi.getChatCallByCallId(chatId);
 		if(call == null)
 		    return;
 
@@ -1314,7 +1309,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 			if (((call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))) {
 				logDebug("TERM_CODE_ANSWER_TIMEOUT");
-				if (call.isLocalTermCode() == false) {
+				if (!call.isLocalTermCode()) {
 					logDebug("localTermCodeNotLocal");
 					try {
 						ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
