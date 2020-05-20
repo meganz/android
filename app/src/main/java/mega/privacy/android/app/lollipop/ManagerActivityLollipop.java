@@ -10978,8 +10978,15 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	}
 
 	public void refreshCloudDrive() {
-		MegaNode parentNode = megaApi.getRootNode();
-		if (parentNode == null) return;
+		if (rootNode == null) {
+			rootNode = megaApi.getRootNode();
+			if (rootNode == null) {
+				logWarning("Root node is NULL. Maybe user is not logged in");
+				return;
+			}
+		}
+
+		MegaNode parentNode = rootNode;
 
 		if (isCloudAdded()) {
 			ArrayList<MegaNode> nodes;

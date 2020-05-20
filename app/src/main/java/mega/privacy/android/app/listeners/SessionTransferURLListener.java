@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
+import mega.privacy.android.app.OpenLinkActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -27,7 +27,11 @@ public class SessionTransferURLListener extends BaseListener {
             if (link != null) {
                 Uri uri = Uri.parse(link);
                 if (uri != null) {
-                    context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    if (context instanceof OpenLinkActivity) {
+                        ((OpenLinkActivity) context).openWebLink(link);
+                    } else {
+                        context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    }
                     return;
                 }
             }
