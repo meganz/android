@@ -7079,19 +7079,18 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
 
                 MegaApplication.setOpenChatId(idChat);
 
-                if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
-                    if (megaChatApi.getChatRoom(idChat).isActive()) {
-                        logWarning("ERROR: You are already a participant of the chat link or are trying to open it again");
-                    } else if (initChat()) {
+                if (e.getErrorCode() == MegaChatError.ERROR_EXIST && !megaChatApi.getChatRoom(idChat).isActive()) {
+                    if (initChat()) {
                         //Chat successfully initialized, now can rejoin
                         megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
                     } else {
                         logWarning("Error opening chat before rejoin");
                     }
-                } else {
-                    initAndShowChat(null);
-                    supportInvalidateOptionsMenu();
+                    return;
                 }
+
+                initAndShowChat(null);
+                supportInvalidateOptionsMenu();
             } else {
                 String text;
                 if (e.getErrorCode() == MegaChatError.ERROR_NOENT) {
