@@ -8086,7 +8086,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    showUpgradeAccount();
+                    navigateToUpgradeAccount();
                 }
             });
             builder.setNegativeButton(getString(R.string.general_cancel), new android.content.DialogInterface.OnClickListener() {
@@ -8103,13 +8103,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         chatAlertDialog.show();
-    }
-
-    public void showUpgradeAccount(){
-        logDebug("showUpgradeAccount");
-        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
-        upgradeIntent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
-        startActivity(upgradeIntent);
     }
 
     public void showJumpMessage(){

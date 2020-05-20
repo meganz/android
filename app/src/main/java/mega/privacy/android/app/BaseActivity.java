@@ -1,7 +1,6 @@
 package mega.privacy.android.app;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -32,9 +32,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.listeners.ChatLogoutListener;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
@@ -51,6 +54,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 public class BaseActivity extends AppCompatActivity {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
+    private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
 
     private BaseActivity baseActivity;
 
@@ -70,6 +74,10 @@ public class BaseActivity extends AppCompatActivity {
     private boolean permissionLoggerSDK = false;
     //Indicates if app is requesting the required permissions to enable the Karere logger
     private boolean permissionLoggerKarere = false;
+
+    private boolean isGeneralTransferOverQuotaWarningShown;
+    private boolean currentOverQuota = true;
+    private AlertDialog transferGeneralOverQuotaWarning;
 
     public BaseActivity() {
         app = MegaApplication.getInstance();
@@ -130,12 +138,20 @@ public class BaseActivity extends AppCompatActivity {
             if (isExpiredBusinessAlertShown) {
                 showExpiredBusinessAlert();
             }
+
+            isGeneralTransferOverQuotaWarningShown = savedInstanceState.getBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, false);
+            if (isGeneralTransferOverQuotaWarningShown) {
+                currentOverQuota = savedInstanceState.getBoolean(CURRENT_TRANSFER_OVER_QUOTA, true);
+                showGeneralTransferOverQuotaWarning();
+            }
         }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown);
+        outState.putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown);
+        outState.putBoolean(CURRENT_TRANSFER_OVER_QUOTA, currentOverQuota);
 
         super.onSaveInstanceState(outState);
     }
@@ -687,6 +703,172 @@ public class BaseActivity extends AppCompatActivity {
         builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+    }
+
+    public void showGeneralTransferOverQuotaWarning() {
+        if (transferGeneralOverQuotaWarning != null) return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        View dialogView = this.getLayoutInflater().inflate(R.layout.transfer_overquota_layout, null);
+        builder.setView(dialogView)
+                .setOnDismissListener(dialog -> isGeneralTransferOverQuotaWarningShown = false)
+                .setCancelable(false);
+
+        transferGeneralOverQuotaWarning = builder.create();
+        transferGeneralOverQuotaWarning.setCanceledOnTouchOutside(false);
+
+        TextView text = dialogView.findViewById(R.id.text_transfer_overquota);
+        text.setText(getString(currentOverQuota ? R.string.current_text_depleted_transfer_overquota : R.string.text_depleted_transfer_overquota));
+
+        Button dismissButton = dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
+        dismissButton.setOnClickListener(v -> transferGeneralOverQuotaWarning.dismiss());
+
+        Button paymentButton = dialogView.findViewById(R.id.transfer_overquota_button_payment);
+
+        final boolean isLoggedIn = megaApi.isLoggedIn() != 0 && dbH.getCredentials() != null;
+        if (isLoggedIn) {
+            boolean isFreeAccount = MegaApplication.getInstance().getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE;
+            paymentButton.setText(getString(isFreeAccount ? R.string.my_account_upgrade_pro : R.string.plans_depleted_transfer_overquota));
+        } else {
+            paymentButton.setText(getString(R.string.login_text));
+        }
+
+        paymentButton.setOnClickListener(v -> {
+            transferGeneralOverQuotaWarning.dismiss();
+
+            if (isLoggedIn) {
+                navigateToUpgradeAccount();
+            } else {
+                navigateToLogin();
+            }
+        });
+
+        transferGeneralOverQuotaWarning.show();
+        isGeneralTransferOverQuotaWarningShown = true;
+    }
+
+    protected void navigateToLogin() {
+        Intent intent = new Intent(this, LoginActivityLollipop.class);
+        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+    protected void navigateToUpgradeAccount() {
+        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        intent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+//    private void showTransferOverquotaNotification(){
+//        logDebug("showTransferOverquotaNotification");
+//
+//        long totalSizePendingTransfer = megaApi.getTotalDownloadBytes();
+//        long totalSizeTransferred = megaApi.getTotalDownloadedBytes();
+//
+//        int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
+//        logDebug("Progress: " + progressPercent + "%");
+//
+//        Intent intent;
+//        PendingIntent pendingIntent;
+//
+//        String info = getProgressSize(DownloadService.this, totalSizeTransferred, totalSizePendingTransfer);
+//
+//        Notification notification = null;
+//
+//        String contentText = getString(R.string.download_show_info);
+//        String message = getString(R.string.title_depleted_transfer_overquota);
+//
+//        if(megaApi.isLoggedIn()==0 || dbH.getCredentials()==null){
+//            dbH.clearEphemeral();
+//            intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
+//            intent.setAction(ACTION_OVERQUOTA_TRANSFER);
+//            pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        }
+//        else{
+//            intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
+//            intent.setAction(ACTION_OVERQUOTA_TRANSFER);
+//            pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        }
+//
+//        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+//            channel.setShowBadge(true);
+//            channel.setSound(null, null);
+//            mNotificationManager.createNotificationChannel(channel);
+//
+//            NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+//
+//            mBuilderCompat
+//                    .setSmallIcon(R.drawable.ic_stat_notify)
+//                    .setColor(ContextCompat.getColor(this,R.color.mega))
+//                    .setProgress(100, progressPercent, false)
+//                    .setContentIntent(pendingIntent)
+//                    .setOngoing(true).setContentTitle(message).setSubText(info)
+//                    .setContentText(contentText)
+//                    .setOnlyAlertOnce(true);
+//
+//            notification = mBuilderCompat.build();
+//        }
+//        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            mBuilder
+//                    .setSmallIcon(R.drawable.ic_stat_notify)
+//                    .setColor(ContextCompat.getColor(this,R.color.mega))
+//                    .setProgress(100, progressPercent, false)
+//                    .setContentIntent(pendingIntent)
+//                    .setOngoing(true).setContentTitle(message).setSubText(info)
+//                    .setContentText(contentText)
+//                    .setOnlyAlertOnce(true);
+//
+//            notification = mBuilder.build();
+//        }
+//        else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+//        {
+//            mBuilder
+//                    .setSmallIcon(R.drawable.ic_stat_notify)
+//                    .setProgress(100, progressPercent, false)
+//                    .setContentIntent(pendingIntent)
+//                    .setOngoing(true).setContentTitle(message).setContentInfo(info)
+//                    .setContentText(contentText)
+//                    .setOnlyAlertOnce(true);
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+//                mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+//            }
+//
+//            notification = mBuilder.getNotification();
+//        }
+//        else
+//        {
+//            notification = new Notification(R.drawable.ic_stat_notify, null, 1);
+//            notification.flags |= Notification.FLAG_ONGOING_EVENT;
+//            notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
+//            notification.contentIntent = pendingIntent;
+//            notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
+//            notification.contentView.setTextViewText(R.id.status_text, message);
+//            notification.contentView.setTextViewText(R.id.progress_text, info);
+//            notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
+//        }
+//
+//        if (!isForeground) {
+//            logDebug("Starting foreground");
+//            try {
+//                startForeground(notificationId, notification);
+//                isForeground = true;
+//            }
+//            catch (Exception e){
+//                logError("startForeground exception", e);
+//                isForeground = false;
+//            }
+//        } else {
+//            mNotificationManager.notify(notificationId, notification);
+//        }
+//    }
+
+    public void setCurrentOverQuota(boolean currentOverQuota) {
+        this.currentOverQuota = currentOverQuota;
     }
 
     @Override

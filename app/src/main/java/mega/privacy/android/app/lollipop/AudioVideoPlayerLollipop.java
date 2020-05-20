@@ -3615,20 +3615,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             public void onClick(View v) {
                 alertDialogTransferOverquota.dismiss();
                 transferOverquota = false;
-                showUpgradeAccount();
+                navigateToUpgradeAccount();
             }
         });
 
         alertDialogTransferOverquota.setCancelable(false);
         alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
         alertDialogTransferOverquota.show();
-    }
-
-    public void showUpgradeAccount(){
-        logDebug("showUpgradeAccount");
-        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
-        upgradeIntent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
-        startActivity(upgradeIntent);
     }
 
     @Override

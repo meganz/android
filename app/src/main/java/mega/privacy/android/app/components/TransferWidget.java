@@ -34,7 +34,7 @@ public class TransferWidget {
         megaApi = MegaApplication.getInstance().getMegaApi();
 
         this.transfersWidget = transfersWidget;
-        transfersWidget.setVisibility(GONE);
+        this.transfersWidget.setVisibility(GONE);
         button = transfersWidget.findViewById(R.id.transfers_button);
         progressBar = transfersWidget.findViewById(R.id.transfers_progress);
         status = transfersWidget.findViewById(R.id.transfers_status);
@@ -53,8 +53,8 @@ public class TransferWidget {
                 || (context instanceof ManagerActivityLollipop && ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS)) return;
 
         if (getPendingTransfers() > 0) {
-            updateState();
             setProgress(getProgress(), transferType);
+            updateState();
         } else {
             hide();
         }
@@ -63,6 +63,8 @@ public class TransferWidget {
     public void updateState() {
         if (megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD)) {
             setPausedTransfers();
+        } else if (megaApi.getBandwidthOverquotaDelay() > 0){
+            setOverQuotaTransfers();
         } else {
             status.setVisibility(GONE);
         }
@@ -73,7 +75,13 @@ public class TransferWidget {
         status.setImageDrawable(getDrawable(R.drawable.ic_transfers_paused));
     }
 
-    public void setFailedTransfers() {
+    private void setOverQuotaTransfers() {
+        progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_over_quota_progress_bar));
+        status.setVisibility(VISIBLE);
+        status.setImageDrawable(getDrawable(R.drawable.ic_transfers_overquota));
+    }
+
+    private void setFailedTransfers() {
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_warning_progress_bar));
         status.setVisibility(VISIBLE);
         status.setImageDrawable(getDrawable(R.drawable.ic_transfers_error));
@@ -94,14 +102,9 @@ public class TransferWidget {
         int numPendingUploads = megaApi.getNumPendingUploads();
         boolean pendingDownloads = numPendingDownloads > 0;
         boolean pendingUploads = numPendingUploads > 0;
+        boolean downloadIcon = typeTransfer == TYPE_DOWNLOAD || (pendingDownloads && !pendingUploads) || numPendingDownloads > numPendingUploads;
 
-        if (typeTransfer == TYPE_DOWNLOAD || pendingDownloads && !pendingUploads) {
-            button.setImageDrawable(getDrawable(R.drawable.ic_transfers_download));
-        } else if (typeTransfer == TYPE_UPLOAD || pendingUploads && !pendingDownloads) {
-            button.setImageDrawable(getDrawable(R.drawable.ic_transfers_upload));
-        } else {
-            button.setImageDrawable(getDrawable(numPendingDownloads > numPendingUploads ? R.drawable.ic_transfers_download : R.drawable.ic_transfers_upload));
-        }
+        button.setImageDrawable(getDrawable(downloadIcon ? R.drawable.ic_transfers_download : R.drawable.ic_transfers_upload));
     }
 
     private Drawable getDrawable(int drawable) {

@@ -12,6 +12,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_CALL_UPDATE = "INTENT_CALL_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_SESSION_UPDATE = "INTENT_SESSION_UPDATE";
     public static final String BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE = "INTENT_CU_ATTR_CHANGE";
+    public static final String BROADCAST_ACTION_INTENT_TRANSFER_OVER_QUOTA = "INTENT_TRANSFER_OVER_QUOTA";
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
@@ -44,4 +45,5 @@ public class BroadcastConstants {
     public static final String UPDATE_SESSION_STATUS = "UPDATE_SESSION_STATUS";
     public static final String UPDATE_SESSION_TERM_CODE = "UPDATE_SESSION_TERM_CODE";
     public static final String EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER";
+    public static final String CURRENT_TRANSFER_OVER_QUOTA = "CURRENT_TRANSFER_OVER_QUOTA";
 }

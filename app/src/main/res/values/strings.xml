@@ -1531,7 +1531,8 @@
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Insufficient transfer quota</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Your queued transfer exceeds the current transfer quota available for your IP address and may therefore be interrupted.</string>
+    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Not enough transfer quota available for your IP address.\nUpgrade your account to continue.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">See our plans</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continue without account</string>
 
@@ -2782,7 +2783,7 @@
     <string name="failed_label" context="Label describing some action failed">Failed</string>
     <string name="action_cancel_transfer" context="Action cancel transfer">Cancel transfer</string>
     <string name="title_transfer_over_quota" context="Title of a dialog warning of transfer over quota">Transfer over quota</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account to increased transfer quota.</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted.\nUpgrade your account to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
 </resources>

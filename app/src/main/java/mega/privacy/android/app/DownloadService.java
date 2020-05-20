@@ -1333,112 +1333,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 	}
 
-	private void showTransferOverquotaNotification(){
-		logDebug("showTransferOverquotaNotification");
-
-		long totalSizePendingTransfer = megaApi.getTotalDownloadBytes();
-		long totalSizeTransferred = megaApi.getTotalDownloadedBytes();
-
-		int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
-		logDebug("Progress: " + progressPercent + "%");
-
-		Intent intent;
-		PendingIntent pendingIntent;
-
-		String info = getProgressSize(DownloadService.this, totalSizeTransferred, totalSizePendingTransfer);
-
-		Notification notification = null;
-
-		String contentText = getString(R.string.download_show_info);
-		String message = getString(R.string.title_depleted_transfer_overquota);
-
-		if(megaApi.isLoggedIn()==0 || dbH.getCredentials()==null){
-			dbH.clearEphemeral();
-			intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
-			intent.setAction(ACTION_OVERQUOTA_TRANSFER);
-			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		}
-		else{
-			intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
-			intent.setAction(ACTION_OVERQUOTA_TRANSFER);
-			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		}
-
-		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
-			channel.setShowBadge(true);
-			channel.setSound(null, null);
-			mNotificationManager.createNotificationChannel(channel);
-
-			NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
-
-			mBuilderCompat
-					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setColor(ContextCompat.getColor(this,R.color.mega))
-					.setProgress(100, progressPercent, false)
-					.setContentIntent(pendingIntent)
-					.setOngoing(true).setContentTitle(message).setSubText(info)
-					.setContentText(contentText)
-					.setOnlyAlertOnce(true);
-
-			notification = mBuilderCompat.build();
-		}
-		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			mBuilder
-					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setColor(ContextCompat.getColor(this,R.color.mega))
-					.setProgress(100, progressPercent, false)
-					.setContentIntent(pendingIntent)
-					.setOngoing(true).setContentTitle(message).setSubText(info)
-					.setContentText(contentText)
-					.setOnlyAlertOnce(true);
-
-			notification = mBuilder.build();
-		}
-		else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-		{
-			mBuilder
-					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setProgress(100, progressPercent, false)
-					.setContentIntent(pendingIntent)
-					.setOngoing(true).setContentTitle(message).setContentInfo(info)
-					.setContentText(contentText)
-					.setOnlyAlertOnce(true);
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-				mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
-			}
-
-			notification = mBuilder.getNotification();
-		}
-		else
-		{
-			notification = new Notification(R.drawable.ic_stat_notify, null, 1);
-			notification.flags |= Notification.FLAG_ONGOING_EVENT;
-			notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
-			notification.contentIntent = pendingIntent;
-			notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
-			notification.contentView.setTextViewText(R.id.status_text, message);
-			notification.contentView.setTextViewText(R.id.progress_text, info);
-			notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
-		}
-
-		if (!isForeground) {
-			logDebug("Starting foreground");
-			try {
-				startForeground(notificationId, notification);
-				isForeground = true;
-			}
-			catch (Exception e){
-				logError("startForeground exception", e);
-				isForeground = false;
-			}
-		} else {
-			mNotificationManager.notify(notificationId, notification);
-		}
-	}
-
 	private void cancel() {
 		logDebug("cancel");
 		canceled = true;
@@ -1728,15 +1622,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
 				if (e.getValue() != 0) {
 					logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+					Intent intent = new Intent(BROADCAST_ACTION_INTENT_TRANSFER_OVER_QUOTA);
+					intent.putExtra(CURRENT_TRANSFER_OVER_QUOTA, true);
+					LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
-					UserCredentials credentials = dbH.getCredentials();
-					if(credentials!=null){
-						logDebug("Credentials is NOT null");
-					}
 					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes();
 					isOverquota = true;
-					logDebug("Downloaded bytes to reach overquota: " + downloadedBytesToOverquota);
-					showTransferOverquotaNotification();
 				}
 			}
 		}

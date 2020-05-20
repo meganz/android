@@ -783,6 +783,24 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
+	private BroadcastReceiver transferOverQuotaReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null) return;
+
+			if (transfersWidget != null) {
+				transfersWidget.update();
+			}
+
+			setCurrentOverQuota(intent.getBooleanExtra(CURRENT_TRANSFER_OVER_QUOTA, true));
+			if (drawerItem == DrawerItem.TRANSFERS) {
+				showTransfersTransferOverQuotaWarning();
+			} else {
+				showGeneralTransferOverQuotaWarning();
+			}
+		}
+	};
+
 	private BroadcastReceiver chatArchivedReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -1968,6 +1986,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
 			filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
 			localBroadcastManager.registerReceiver(chatCallUpdateReceiver, filterCall);
+
+			localBroadcastManager.registerReceiver(transferOverQuotaReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_OVER_QUOTA));
 		}
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -2464,7 +2484,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		callInProgressText = findViewById(R.id.call_in_progress_text);
 		callInProgressLayout.setVisibility(View.GONE);
 
-		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_progress_widget);
+		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
 		transfersWidget = new TransferWidget(this, transfersWidgetLayout);
 		transfersWidgetLayout.findViewById(R.id.transfers_button).setOnClickListener(v -> selectDrawerItemLollipop(drawerItem = DrawerItem.TRANSFERS));
 
@@ -2951,23 +2971,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						selectDrawerItemPending=false;
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_UPGRADE_ACCOUNT)){
-						logDebug("Intent from chat - show my account");
-						drawerItemPreUpgradeAccount = drawerItem;
-						drawerItem=DrawerItem.ACCOUNT;
-						accountFragment=UPGRADE_ACCOUNT_FRAGMENT;
-						selectDrawerItemLollipop(drawerItem);
+						navigateToUpgradeAccount();
 						selectDrawerItemPending=false;
-					}
-					else if(getIntent().getAction().equals(ACTION_OVERQUOTA_TRANSFER)){
-						logDebug("Intent overquota transfer alert!!");
-						if(alertDialogTransferOverquota==null){
-							showTransferOverquotaDialog();
-						}
-						else{
-							if(!(alertDialogTransferOverquota.isShowing())){
-								showTransferOverquotaDialog();
-							}
-						}
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_HANDLE_NODE)){
 						String link = getIntent().getDataString();
@@ -3251,9 +3256,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		checkBusinessStatus();
 
-		if (shouldShowTransferOverQuotaWarning()) {
-			showTransferOverQuotaWarning();
-		}
+		showTransfersTransferOverQuotaWarning();
 
 		logDebug("END onCreate");
 	}
@@ -3828,18 +3831,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	    		}
 				else if(intent.getAction().equals(ACTION_PRE_OVERQUOTA_STORAGE)){
 					showOverquotaAlert(true);
-				}
-	    		else if(intent.getAction().equals(ACTION_OVERQUOTA_TRANSFER)){
-					logWarning("Show overquota transfer alert!!");
-
-					if(alertDialogTransferOverquota==null){
-						showTransferOverquotaDialog();
-					}
-					else{
-						if(!(alertDialogTransferOverquota.isShowing())){
-							showTransferOverquotaDialog();
-						}
-					}
 				}
 				else if (intent.getAction().equals(ACTION_CHANGE_AVATAR)){
 					logDebug("Intent CHANGE AVATAR");
@@ -4563,6 +4554,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCUAttrChanged);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(transferOverQuotaReceiver);
 
 		unregisterReceiver(cameraUploadLauncherReceiver);
 
@@ -5726,7 +5718,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	logDebug("Selected DrawerItem: " + item.name());
 
     	drawerItem = item;
-		((MegaApplication)getApplication()).setRecentChatVisible(false);
+		MegaApplication.setRecentChatVisible(false);
 		resetActionBar(aB);
 		transfersWidget.update();
 		setCallWidget();
@@ -6714,7 +6706,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				case TRANSFERS:
 					if (getTabItemTransfers() == PENDING_TAB && getTransfersFragment() != null && transfersInProgress.size() > 0) {
-						pauseTransfersMenuIcon.setVisible(true);
+					    if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+                            playTransfersMenuIcon.setVisible(true);
+                        } else {
+                            pauseTransfersMenuIcon.setVisible(true);
+                        }
 						cancelAllTransfersMenuItem.setVisible(true);
 					} else if (getTabItemTransfers() == COMPLETED_TAB && getCompletedTransfersFragment() != null && completedTFLol.isAnyTransferCompleted()) {
 						clearCompletedTransfers.setVisible(true);
@@ -12460,58 +12456,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		getProLayout.bringToFront();
 	}
 
-	public void showTransferOverquotaDialog(){
-		logDebug("showTransferOverquotaDialog");
-
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-
-		LayoutInflater inflater = this.getLayoutInflater();
-		View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
-		dialogBuilder.setView(dialogView);
-
-		TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
-		title.setText(getString(R.string.title_depleted_transfer_overquota));
-
-		ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
-		icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.transfer_quota_empty));
-
-		TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
-		text.setText(getString(R.string.text_depleted_transfer_overquota));
-
-		Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
-
-		Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
-		if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE){
-			logDebug("USER PRO");
-			paymentButton.setText(getString(R.string.action_upgrade_account));
-		}
-		else{
-			logDebug("FREE USER");
-			paymentButton.setText(getString(R.string.plans_depleted_transfer_overquota));
-		}
-
-		alertDialogTransferOverquota = dialogBuilder.create();
-
-		continueButton.setOnClickListener(new OnClickListener(){
-			public void onClick(View v) {
-				alertDialogTransferOverquota.dismiss();
-			}
-
-		});
-
-		paymentButton.setOnClickListener(new OnClickListener(){
-			public void onClick(View v) {
-				alertDialogTransferOverquota.dismiss();
-				navigateToUpgradeAccount();
-			}
-
-		});
-
-		alertDialogTransferOverquota.setCancelable(false);
-		alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
-		alertDialogTransferOverquota.show();
-	}
-
 	/**
 	 * Check the current storage state.
 	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
@@ -15363,7 +15307,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			secondFabButtonChat.setClickable(true);
 			thirdFabButtonChat.setClickable(true);
 			isFabOpen = true;
-			fabButton.hide();
+			hideFabButton();
 			fabButtonsLayout.setVisibility(View.VISIBLE);
 			logDebug("Open COLLECTION FAB");
 		}
@@ -15373,138 +15317,116 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		fabButton.hide();
 	}
 
-	public void showFabButton(){
-		logDebug("showFabButton");
-		if(drawerItem==null){
+	private void updateFabPositionAndShow(boolean withBottomNavigationView) {
+		fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white));
+
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) fabButton.getLayoutParams();
+
+		if (withBottomNavigationView) {
+			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+		} else {
+			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		}
+
+		fabButton.setLayoutParams(params);
+		fabButton.show();
+	}
+
+	public void showFabButton() {
+		if (drawerItem == null) {
 			return;
 		}
-		RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) fabButton.getLayoutParams();
-		fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white));
-		switch (drawerItem){
-			case CLOUD_DRIVE:{
-				logDebug("Cloud Drive SECTION");
-				lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-				fabButton.show();
-				break;
-			}
-			case RUBBISH_BIN:{
-				fabButton.hide();
-				break;
-			}
-			case SHARED_ITEMS:{
-				logDebug("Shared Items SECTION");
-				int indexShares = getTabItemShares();
 
-				switch (indexShares) {
-					case INCOMING_TAB: {
-						logDebug("showFabButton: INCOMING TAB");
-						if (isIncomingAdded()) {
-							if (deepBrowserTreeIncoming <= 0) {
-								logDebug("showFabButton: fabButton GONE");
-								fabButton.hide();
-							}
-							else {
-								//Check the folder's permissions
-								MegaNode parentNodeInSF = megaApi.getNodeByHandle(parentHandleIncoming);
-								if (parentNodeInSF != null) {
-									int accessLevel = megaApi.getAccess(parentNodeInSF);
-									logDebug("showFabButton: Node: " + parentNodeInSF.getName());
+		switch (drawerItem) {
+			case CLOUD_DRIVE:
+				updateFabPositionAndShow(true);
+				break;
 
-									switch (accessLevel) {
-										case MegaShare.ACCESS_OWNER:
-										case MegaShare.ACCESS_READWRITE:
-										case MegaShare.ACCESS_FULL: {
-											lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-											fabButton.show();
-											break;
-										}
-										case MegaShare.ACCESS_READ: {
-											fabButton.hide();
-											break;
-										}
-									}
-								}
-								else {
-									fabButton.hide();
-								}
-							}
+			case SHARED_ITEMS:
+				switch (getTabItemShares()) {
+					case INCOMING_TAB:
+						if (!isIncomingAdded()) break;
+
+						MegaNode parentNodeInSF = megaApi.getNodeByHandle(parentHandleIncoming);
+						if (deepBrowserTreeIncoming <= 0 || parentNodeInSF == null) {
+							hideFabButton();
+							break;
+						}
+
+						switch (megaApi.getAccess(parentNodeInSF)) {
+							case MegaShare.ACCESS_OWNER:
+							case MegaShare.ACCESS_READWRITE:
+							case MegaShare.ACCESS_FULL:
+								updateFabPositionAndShow(true);
+								break;
+
+							case MegaShare.ACCESS_READ:
+								hideFabButton();
+								break;
 						}
 						break;
-					}
-					case OUTGOING_TAB: {
-						logDebug("showFabButton: OUTGOING TAB");
-						if (isOutgoingAdded()) {
-							if (deepBrowserTreeOutgoing <= 0) {
-								fabButton.hide();
-							}
-							else {
-								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-								fabButton.show();
-							}
+
+					case OUTGOING_TAB:
+						if (!isOutgoingAdded()) break;
+
+						if (deepBrowserTreeOutgoing <= 0) {
+							hideFabButton();
+						} else {
+							updateFabPositionAndShow(true);
 						}
 						break;
-					}
+
 					case LINKS_TAB:
-						if (isLinksAdded()) {
-							if (deepBrowserTreeLinks <= 0) {
-								fabButton.hide();
-							} else {
-								lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-								fabButton.show();
-							}
+						if (!isLinksAdded()) break;
+
+						if (deepBrowserTreeLinks <= 0) {
+							hideFabButton();
+						} else {
+							updateFabPositionAndShow(true);
 						}
 						break;
 
-					default: {
-						fabButton.hide();
+					default:
+						hideFabButton();
 						break;
-					}
 				}
 				break;
-			}
-			case CONTACTS:{
-				int indexContacts = getTabItemContacts();
-				switch(indexContacts){
-					case 0:
-					case 1:{
-						lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-						fabButton.show();
+
+			case CONTACTS:
+				switch (getTabItemContacts()) {
+					case CONTACTS_TAB:
+					case SENT_REQUESTS_TAB:
+						updateFabPositionAndShow(false);
 						break;
-					}
-					default:{
-						fabButton.hide();
+
+					default:
+						hideFabButton();
 						break;
-					}
 				}
 				break;
-			}
-			case CHAT:{
-				if(megaChatApi!=null){
-					fabButton.setImageDrawable(mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
-					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-					fabButton.show();
+
+			case CHAT:
+				if (megaChatApi == null) {
+					hideFabButton();
+					break;
 				}
-				else{
-					fabButton.hide();
-				}
+
+				updateFabPositionAndShow(true);
+				fabButton.setImageDrawable(mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
 				break;
-			}
-			case SEARCH: {
-				if (shouldShowFabWhenSearch()){
-					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-					fabButton.show();
+
+			case SEARCH:
+				if (shouldShowFabWhenSearch()) {
+					updateFabPositionAndShow(false);
 				} else {
-					fabButton.hide();
+					hideFabButton();
 				}
 				break;
-			}
-			default:{
-				logDebug("Default GONE fabButton");
-				fabButton.hide();
+
+			default:
+				hideFabButton();
 				break;
-			}
 		}
-		fabButton.setLayoutParams(lp);
 	}
 
 	private boolean shouldShowFabWhenSearch() {
@@ -16156,31 +16078,24 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void showHideBottomNavigationView(boolean hide) {
+		if (bNV == null) return;
 
 		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-		if (bNV != null) {
-			if (hide && bNV.getVisibility() == View.VISIBLE) {
-				params.setMargins(0, 0, 0, 0);
-				fragmentLayout.setLayoutParams(params);
-				bNV.animate().translationY(220).setDuration(400L).withEndAction(new Runnable() {
-					@Override
-					public void run() {
-						bNV.setVisibility(View.GONE);
-					}
-				}).start();
-			}
-			else if (!hide && bNV.getVisibility() == View.GONE){
-				params.setMargins(0, 0, 0, px2dp(56, outMetrics));
-				bNV.setVisibility(View.VISIBLE);
-				bNV.animate().translationY(0).setDuration(400L).withEndAction(new Runnable() {
-					@Override
-					public void run() {
-						fragmentLayout.setLayoutParams(params);
-					}
-				}).start();
-			}
+		boolean hideBNV;
+		if (hide && bNV.getVisibility() == View.VISIBLE) {
+			params.setMargins(0, 0, 0, 0);
+			fragmentLayout.setLayoutParams(params);
+			bNV.animate().translationY(220).setDuration(400L).withEndAction(() -> bNV.setVisibility(View.GONE)).start();
+			hide = true;
+		} else if (!hide && bNV.getVisibility() == View.GONE) {
+			params.setMargins(0, 0, 0, px2dp(56, outMetrics));
+			bNV.setVisibility(View.VISIBLE);
+			bNV.animate().translationY(0).setDuration(400L).withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
+			hide = false;
 		}
+
+		updateTransfersWidgetPosition(hide);
 	}
 
 	public void markNotificationsSeen(boolean fromAndroidNotification){
@@ -16653,24 +16568,37 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		return storageState;
 	}
 
-	public void showTransferOverQuotaWarning() {
+	public void showTransfersTransferOverQuotaWarning() {
 		if (!shouldShowTransferOverQuotaWarning()) return;
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		transferOverQuotaWarning = builder.setTitle(R.string.title_transfer_over_quota)
 				.setMessage(R.string.warning_transfer_over_quota)
-				.setPositiveButton(R.string.context_delete, (dialog, which) -> {
-					logDebug("Pressed button positive to cancel transfer");
-					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-					cancelAllUploads(ManagerActivityLollipop.this);
-					refreshFragment(FragmentTag.TRANSFERS.getTag());
+				.setPositiveButton(R.string.my_account_upgrade_pro, (dialog, which) -> { navigateToUpgradeAccount();
 				})
 				.setNegativeButton(R.string.general_dismiss, null)
-				.show();
-		isTransferOverQuotaWarningShown = true;
+				.setCancelable(false)
+				.setOnDismissListener(dialog -> isTransferOverQuotaWarningShown = false)
+				.create();
 
-		transferOverQuotaWarning.setOnDismissListener(dialog -> isTransferOverQuotaWarningShown = false);
+		transferOverQuotaWarning.setCanceledOnTouchOutside(false);
+		transferOverQuotaWarning.show();
+		isTransferOverQuotaWarningShown = true;
+	}
+
+	private void updateTransfersWidgetPosition(boolean hide) {
+		RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
+		if (transfersWidgetLayout.getVisibility() == View.GONE) return;
+
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
+
+		if (hide) {
+			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		} else {
+			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+		}
+
+		transfersWidgetLayout.setLayoutParams(params);
 	}
 
 	private RubbishBinFragmentLollipop getRubbishBinFragment() {
