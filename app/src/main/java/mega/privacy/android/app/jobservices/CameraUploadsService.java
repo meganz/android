@@ -87,6 +87,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
@@ -830,6 +831,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             uploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
         }
         long uploadNodeHandle = uploadNode.getHandle();
+        logDebug("Upload to: " + uploadNode.getHandle());
         int type = isVideo ? SyncRecord.TYPE_VIDEO : SyncRecord.TYPE_PHOTO;
 
         while (mediaList.size() > 0) {
@@ -1010,11 +1012,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         secondaryUploadHandle = getSecondaryFolderHandle();
 
         //Prevent checking while app alive because it has been handled by global event
-        logDebug("is primary/secondary attr synced: " + isPrimaryHandleSynced + "/" + isSecondaryHandleSynced + ", ignoreAttr: " + ignoreAttr);
+        logDebug("ignoreAttr: " + ignoreAttr);
         // Check CU attributes sequentially to prevent potential API_EEXPIRED in parallel set CU attributes
         if (!ignoreAttr && !isPrimaryHandleSynced) {
             logDebug("Try to get Camera Uploads primary target folder.");
-            megaApi.getCameraUploadsFolder(getAttrUserListener);
+            megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, getAttrUserListener);
             return CHECKING_USER_ATTRIBUTE;
         }
 
@@ -1363,16 +1365,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     }
 
-    public void onGetPrimaryFolderAttribute(MegaRequest request, MegaError e) {
-        logDebug("onGetPrimaryAttribute: " + request.getNodeHandle() + " -> " + cameraUploadHandle);
+    public void onGetPrimaryFolderAttribute(long handle, MegaError e, boolean shouldStart) {
         if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
             isPrimaryHandleSynced = true;
-            long cuPrimaryHandleInUserAttr = request.getNodeHandle();
-            if (cameraUploadHandle != cuPrimaryHandleInUserAttr) cameraUploadHandle = cuPrimaryHandleInUserAttr;
-
-            // start to get secondary handle.
-            if (!isSecondaryHandleSynced) {
-                megaApi.getCameraUploadsFolderSecondary(getAttrUserListener);
+            if (cameraUploadHandle != handle) cameraUploadHandle = handle;
+            if(shouldStart) {
+                startWorkerThread();
             }
         } else {
             logWarning("Get primary handle faild, finish process.");
@@ -1380,12 +1378,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     }
 
-    public void onGetSecondaryFolderAttribute(MegaRequest request, MegaError e) {
-        logDebug("onGetSecondaryAttribute: " + request.getNodeHandle() + " -> " + secondaryUploadHandle) ;
+    public void onGetSecondaryFolderAttribute(long handle,MegaError e) {
         if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
             isSecondaryHandleSynced = true;
-            long cuSecondaryHandleInUserAttr = request.getNodeHandle();
-            if(cuSecondaryHandleInUserAttr != secondaryUploadHandle) secondaryUploadHandle = cuSecondaryHandleInUserAttr;
+            if(handle != secondaryUploadHandle) secondaryUploadHandle = handle;
             // start to upload.
             startWorkerThread();
         } else {
