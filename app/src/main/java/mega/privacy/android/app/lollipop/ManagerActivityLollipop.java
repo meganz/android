@@ -953,10 +953,18 @@ public class ManagerActivityLollipop extends DownloadableActivity implements Meg
 	private BroadcastReceiver nicknameReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent == null) return;
+			if (intent == null)
+				return;
 			long userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, 0);
 			if (getContactsFragment() != null) {
 				cFLol.updateContact(userHandle);
+			}
+
+			if(getTabItemShares() == INCOMING_TAB && isIncomingAdded() && inSFLol.getItemCount() > 0){
+				inSFLol.updateNicknames(userHandle);
+			}
+			if(getTabItemShares() == OUTGOING_TAB && isOutgoingAdded() && outSFLol.getItemCount() > 0){
+				outSFLol.updateNicknames(userHandle);
 			}
 		}
 	};

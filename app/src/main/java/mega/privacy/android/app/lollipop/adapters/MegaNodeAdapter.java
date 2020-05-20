@@ -468,6 +468,41 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         notifyDataSetChanged();
     }
 
+    /**
+     * Method for updating an item when a nickname is added, updated or removed from a contact.
+     *
+     * @param contactHandle Contact ID.
+     */
+    public void updateItem(long contactHandle) {
+        for (MegaNode node : nodes) {
+            if (node.isFolder()) {
+                if (type == INCOMING_SHARES_ADAPTER) {
+                    ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+                    if (sharesIncoming != null && !sharesIncoming.isEmpty()) {
+                        for (MegaShare share : sharesIncoming) {
+                            MegaUser user = megaApi.getContact(share.getUser());
+                            if (user != null && user.getHandle() == contactHandle) {
+                                int position = nodes.indexOf(node);
+                                notifyItemChanged(position);
+                            }
+                        }
+                    }
+                } else if (type == OUTGOING_SHARES_ADAPTER) {
+                    ArrayList<MegaShare> sharesOutgoing = megaApi.getOutShares(node);
+                    if (sharesOutgoing != null && !sharesOutgoing.isEmpty()) {
+                        for (MegaShare share : sharesOutgoing) {
+                            MegaUser user = megaApi.getContact(share.getUser());
+                            if (user != null && user.getHandle() == contactHandle) {
+                                int position = nodes.indexOf(node);
+                                notifyItemChanged(position);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void setAdapterType(int adapterType) {
         this.adapterType = adapterType;
     }
