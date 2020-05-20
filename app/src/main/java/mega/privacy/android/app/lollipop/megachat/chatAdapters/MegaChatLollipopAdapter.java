@@ -6156,6 +6156,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             for (AndroidMegaChatMessage message : messages) {
                 if (message.getMessage().getMsgId() == messageSelected.getKey()) {
                     returnedMessages.add(message);
+                    break;
                 }
             }
         }
