@@ -337,7 +337,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	}
 
 	/**
-	 * Method for updating an item when a nickname is added, updated or removed from a contact.
+	 * Method to update an item when a nickname is added, updated or removed from a contact.
 	 *
 	 * @param contactHandle Contact ID.
 	 */
