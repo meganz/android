@@ -358,11 +358,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 break;
 
             case R.id.option_remove_layout:
-                if (message != null) {
-                    chatC.deleteMessage(message.getMessage(), chatId);
-                } else {
-                    logWarning("Message is NULL");
-                }
                 if (context instanceof ChatActivityLollipop) {
                     ((ChatActivityLollipop) context).showConfirmationDeleteMessages(messagesSelected, chatRoom);
                 }
