@@ -138,6 +138,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
 
         if (session != null && session.hasVideo() && !callChat.isOnHold() && !((ChatCallActivity) context).isSessionOnHold()) {
             activateVideo();
+            showMuteIcon(this.peerid, this.clientid);
             return;
         }
 
@@ -228,6 +229,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
             return;
 
         deactivateVideo();
+
         showOnHoldImage(this.peerid, this.clientid);
     }
 

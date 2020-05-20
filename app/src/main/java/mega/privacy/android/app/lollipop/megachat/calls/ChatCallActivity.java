@@ -2428,6 +2428,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         }
+
         if(cameraFragmentPeerSelected != null){
             cameraFragmentPeerSelected.changePeerSelected(chatId, callChat.getId(), peerSelected.getPeerId(), peerSelected.getClientId());
         }else{
@@ -2819,7 +2820,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             adapterGrid.updateSessionOnHold(peerid, clientid);
         } else if (!lessThanSevenParticipants() && adapterList != null) {
             adapterList.updateSessionOnHold(peerid, clientid);
-            if (peerSelected != null) {
+            if (peerSelected != null && peerid == peerSelected.getPeerId() && clientid == peerSelected.getClientId()) {
                 updateParticipantSelectedInCallOnHold();
             }
         }

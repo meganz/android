@@ -42,7 +42,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     private static final int MARGIN_MUTE_ICON_LARGE = 16;
     private static final int SIZE_MUTE_ICON_LARGE = 24;
     private static final int MIN_USERS_GRID = 7;
-    private static final int MARGIN_BUTTONS_SMALL = 96;
+    private static final int MARGIN_BUTTONS_SMALL = 150;
     private static final int SIZE_VIDEO_PARTICIPANTS = 90;
     private static final int SIZE_BIG_AVATAR = 88;
     private static final int SIZE_SMALL_AVATAR = 60;
@@ -134,7 +134,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         if (resourceId > 0) {
             statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
         }
-        maxScreenHeight = (int)heightScreenPX - statusBarHeight;
+        maxScreenHeight = (int)heightScreenPX;
         maxScreenWidth = (int)widthScreenPX;
 
         holderGrid = new ViewHolderGroupCallGrid(v);
@@ -293,7 +293,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             width = maxScreenWidth;
             height = maxScreenWidth;
         } else if (numPeersOnCall == 2) {
-            width = maxScreenHeight / numPeersOnCall;
+            width = maxScreenWidth;
             height = maxScreenHeight / numPeersOnCall;
         } else {
             width = maxScreenWidth / 2;
@@ -452,11 +452,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 || (session != null && session.isOnHold());
 
         if (shouldBeShown) {
-            if(peers.size()>= 7){
-                avatarImageCallOnHold.setImageResource(R.drawable.ic_call_hold_medium);
-            }else{
-                avatarImageCallOnHold.setImageResource(R.drawable.ic_call_hold_big);
-            }
+            avatarImageCallOnHold.setImageResource(R.drawable.ic_call_hold_medium);
             avatarImageCallOnHold.setVisibility(View.VISIBLE);
         } else {
             avatarImageCallOnHold.setVisibility(View.GONE);
