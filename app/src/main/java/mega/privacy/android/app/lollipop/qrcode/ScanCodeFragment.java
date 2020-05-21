@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 //import me.dm7.barcodescanner.zxing.ZXingScannerView;
@@ -418,7 +419,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                     inviteAlertDialog.dismiss();
                 }
                 Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-                intent.putExtra("name", myEmail);
+                intent.putExtra(NAME, myEmail);
                 startActivity(intent);
                 ((QRCodeActivity) context).finish();
                 break;

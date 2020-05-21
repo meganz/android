@@ -1004,7 +1004,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.upgrade_business_layout:{
-				megaApi.getSessionTransferURL("registerb", new SessionTransferURLListener(context));
+				megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
 				break;
 			}
 		}
