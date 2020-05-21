@@ -569,7 +569,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         logDebug("Result Code: " + resultCode);
         if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
-            logDebug("REQUEST_ADD_PARTICIPANTS OK");
+            logDebug("Participants successfully added");
             if (intent == null) {
                 logWarning("Return.....");
                 return;
@@ -597,7 +597,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
             }
         } else {
-            logError("Error REQUEST_ADD_PARTICIPANTS");
+            logError("Error adding participants");
         }
 
         super.onActivityResult(requestCode, resultCode, intent);
@@ -998,6 +998,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             updateAdapterHeader();
             participants.clear();
             setParticipants();
+            supportInvalidateOptionsMenu();
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
             logDebug("Change status: CHANGE_TYPE_TITLE");
             updateAdapterHeader();

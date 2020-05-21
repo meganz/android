@@ -409,7 +409,7 @@ public class CallUtil {
      * @return True if cannot start a call, false otherwise
      */
     public static boolean canNotStartCall(Context context, MegaChatRoom chat) {
-        if (chat == null || chat.getPeerCount() + 1 > MAX_PARTICIPANTS_IN_CALL) {
+        if (chat == null || (chat.isPublic() && chat.getPeerCount() + 1 > MAX_PARTICIPANTS_IN_CALL)) {
             showSnackbar(context, context.getString(R.string.call_error_too_many_participants_start));
             return true;
         }

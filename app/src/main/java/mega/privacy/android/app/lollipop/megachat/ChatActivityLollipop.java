@@ -7370,7 +7370,9 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         messagesPlaying.clear();
                     }
 
-                    adapter.notifyDataSetChanged();
+                    if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                    }
                     closeChat(false);
                     MegaApplication.setOpenChatId(-1);
                     initAfterIntent(intent, null);
