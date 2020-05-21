@@ -468,6 +468,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
                         hideReconnecting();
                         updateAVFlags(session);
+                        updateSubtitleNumberOfVideos();
                     }
                 }
             }
@@ -2049,14 +2050,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void updateSubtitleNumberOfVideos() {
-        logDebug("updateSubtitleNumberOfVideos");
-        if (chat == null || callChat == null) return;
+        if (chat == null || getCall() == null)
+            return;
+
         if (!chat.isGroup() || !statusCallInProgress(callChat.getStatus())) {
             linearParticipants.setVisibility(View.GONE);
             return;
         }
 
-        if (getCall() == null) return;
+        logDebug("Updating the number of participants with video");
         int usersWithVideo = callChat.getNumParticipants(MegaChatCall.VIDEO);
         if (usersWithVideo <= 0) {
             linearParticipants.setVisibility(View.GONE);
