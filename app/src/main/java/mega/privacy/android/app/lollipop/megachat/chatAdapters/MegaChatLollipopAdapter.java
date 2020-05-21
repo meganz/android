@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,7 +52,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -6152,7 +6158,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (messagesSelectedInChat == null || messagesSelectedInChat.isEmpty())
             return returnedMessages;
 
-        for (HashMap.Entry<Long, Integer> messageSelected : messagesSelectedInChat.entrySet()) {
+        HashMap<Long, Integer> selectedMessagesSorted = sortByValue(messagesSelectedInChat);
+
+        for (HashMap.Entry<Long, Integer> messageSelected : selectedMessagesSorted.entrySet()) {
             for (AndroidMegaChatMessage message : messages) {
                 if (message.getMessage().getMsgId() == messageSelected.getKey()) {
                     returnedMessages.add(message);
@@ -6160,8 +6168,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
-
         return returnedMessages;
+    }
+
+    /**
+     * Method to sort the selected messages depending on the value.
+     *
+     * @param listMessages HashMap of current selected messages.
+     * @return HashMap of selected messages in order.
+     */
+    private static HashMap<Long, Integer> sortByValue(HashMap<Long, Integer> listMessages) {
+        List<Map.Entry<Long, Integer>> list = new LinkedList<>(listMessages.entrySet());
+        Collections.sort(list, (o1, o2) -> (o1.getValue()).compareTo(o2.getValue()));
+        HashMap<Long, Integer> temp = new LinkedHashMap<>();
+        for (Map.Entry<Long, Integer> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+
+        return temp;
     }
 
     /**
