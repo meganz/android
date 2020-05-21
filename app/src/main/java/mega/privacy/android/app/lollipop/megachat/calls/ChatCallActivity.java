@@ -2058,7 +2058,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        logDebug("Updating the number of participants with video");
+        logDebug("Updating the number of participants with video on");
         int usersWithVideo = callChat.getNumParticipants(MegaChatCall.VIDEO);
         if (usersWithVideo <= 0) {
             linearParticipants.setVisibility(View.GONE);
