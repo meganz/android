@@ -155,7 +155,7 @@
                             android:layout_marginEnd="12dp"
                             android:textColor="@color/white"
                             android:textSize="14sp"
-                            app:emojiSize="18sp"
+                            app:emojiSize="14sp"
                             android:layout_gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
 
@@ -221,7 +221,7 @@
                             android:layout_gravity="center_vertical"
                             android:background="@android:color/transparent">
 
-                            <TextView
+                            <mega.privacy.android.app.components.twemoji.EmojiTextView
                                 android:id="@+id/url_own_message_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -230,6 +230,7 @@
                                 android:maxLines="1"
                                 android:textColor="@color/name_my_account"
                                 android:textSize="16sp"
+                                rounded:emojiSize="16sp"
                                 android:background="@android:color/transparent"
                                 android:layout_gravity="center_vertical"
                                 android:layout_marginTop="12dp"/>
@@ -1415,7 +1416,7 @@
                             android:layout_gravity="center_vertical"
                             android:background="@android:color/transparent">
 
-                            <TextView
+                            <mega.privacy.android.app.components.twemoji.EmojiTextView
                                 android:id="@+id/url_contact_message_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -1423,6 +1424,7 @@
                                 android:text="@string/title_enable_rich_links"
                                 android:textColor="@color/name_my_account"
                                 android:textSize="16sp"
+                                rounded:emojiSize="16sp"
                                 android:ellipsize="end"
                                 android:maxLines="1"
                                 android:background="@android:color/transparent"
