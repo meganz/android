@@ -1623,7 +1623,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if (e.getValue() != 0) {
 					logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 					Intent intent = new Intent(BROADCAST_ACTION_INTENT_TRANSFER_OVER_QUOTA);
-					intent.putExtra(CURRENT_TRANSFER_OVER_QUOTA, true);
 					LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
 					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes();

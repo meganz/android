@@ -792,7 +792,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				transfersWidget.update();
 			}
 
-			setCurrentOverQuota(intent.getBooleanExtra(CURRENT_TRANSFER_OVER_QUOTA, true));
 			if (drawerItem == DrawerItem.TRANSFERS) {
 				showTransfersTransferOverQuotaWarning();
 			} else {

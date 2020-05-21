@@ -76,7 +76,6 @@ public class BaseActivity extends AppCompatActivity {
     private boolean permissionLoggerKarere = false;
 
     private boolean isGeneralTransferOverQuotaWarningShown;
-    private boolean currentOverQuota = true;
     private AlertDialog transferGeneralOverQuotaWarning;
 
     public BaseActivity() {
@@ -141,7 +140,6 @@ public class BaseActivity extends AppCompatActivity {
 
             isGeneralTransferOverQuotaWarningShown = savedInstanceState.getBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, false);
             if (isGeneralTransferOverQuotaWarningShown) {
-                currentOverQuota = savedInstanceState.getBoolean(CURRENT_TRANSFER_OVER_QUOTA, true);
                 showGeneralTransferOverQuotaWarning();
             }
         }
@@ -151,7 +149,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown);
         outState.putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown);
-        outState.putBoolean(CURRENT_TRANSFER_OVER_QUOTA, currentOverQuota);
 
         super.onSaveInstanceState(outState);
     }
@@ -711,14 +708,17 @@ public class BaseActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         View dialogView = this.getLayoutInflater().inflate(R.layout.transfer_overquota_layout, null);
         builder.setView(dialogView)
-                .setOnDismissListener(dialog -> isGeneralTransferOverQuotaWarningShown = false)
+                .setOnDismissListener(dialog -> {
+                    isGeneralTransferOverQuotaWarningShown = false;
+                    transferGeneralOverQuotaWarning = null;
+                })
                 .setCancelable(false);
 
         transferGeneralOverQuotaWarning = builder.create();
         transferGeneralOverQuotaWarning.setCanceledOnTouchOutside(false);
 
         TextView text = dialogView.findViewById(R.id.text_transfer_overquota);
-        text.setText(getString(currentOverQuota ? R.string.current_text_depleted_transfer_overquota : R.string.text_depleted_transfer_overquota));
+        text.setText(getString(R.string.text_depleted_transfer_overquota));
 
         Button dismissButton = dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
         dismissButton.setOnClickListener(v -> transferGeneralOverQuotaWarning.dismiss());
@@ -759,116 +759,6 @@ public class BaseActivity extends AppCompatActivity {
         intent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-    }
-
-//    private void showTransferOverquotaNotification(){
-//        logDebug("showTransferOverquotaNotification");
-//
-//        long totalSizePendingTransfer = megaApi.getTotalDownloadBytes();
-//        long totalSizeTransferred = megaApi.getTotalDownloadedBytes();
-//
-//        int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
-//        logDebug("Progress: " + progressPercent + "%");
-//
-//        Intent intent;
-//        PendingIntent pendingIntent;
-//
-//        String info = getProgressSize(DownloadService.this, totalSizeTransferred, totalSizePendingTransfer);
-//
-//        Notification notification = null;
-//
-//        String contentText = getString(R.string.download_show_info);
-//        String message = getString(R.string.title_depleted_transfer_overquota);
-//
-//        if(megaApi.isLoggedIn()==0 || dbH.getCredentials()==null){
-//            dbH.clearEphemeral();
-//            intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
-//            intent.setAction(ACTION_OVERQUOTA_TRANSFER);
-//            pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        }
-//        else{
-//            intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
-//            intent.setAction(ACTION_OVERQUOTA_TRANSFER);
-//            pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        }
-//
-//        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
-//            channel.setShowBadge(true);
-//            channel.setSound(null, null);
-//            mNotificationManager.createNotificationChannel(channel);
-//
-//            NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
-//
-//            mBuilderCompat
-//                    .setSmallIcon(R.drawable.ic_stat_notify)
-//                    .setColor(ContextCompat.getColor(this,R.color.mega))
-//                    .setProgress(100, progressPercent, false)
-//                    .setContentIntent(pendingIntent)
-//                    .setOngoing(true).setContentTitle(message).setSubText(info)
-//                    .setContentText(contentText)
-//                    .setOnlyAlertOnce(true);
-//
-//            notification = mBuilderCompat.build();
-//        }
-//        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//            mBuilder
-//                    .setSmallIcon(R.drawable.ic_stat_notify)
-//                    .setColor(ContextCompat.getColor(this,R.color.mega))
-//                    .setProgress(100, progressPercent, false)
-//                    .setContentIntent(pendingIntent)
-//                    .setOngoing(true).setContentTitle(message).setSubText(info)
-//                    .setContentText(contentText)
-//                    .setOnlyAlertOnce(true);
-//
-//            notification = mBuilder.build();
-//        }
-//        else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-//        {
-//            mBuilder
-//                    .setSmallIcon(R.drawable.ic_stat_notify)
-//                    .setProgress(100, progressPercent, false)
-//                    .setContentIntent(pendingIntent)
-//                    .setOngoing(true).setContentTitle(message).setContentInfo(info)
-//                    .setContentText(contentText)
-//                    .setOnlyAlertOnce(true);
-//
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-//                mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
-//            }
-//
-//            notification = mBuilder.getNotification();
-//        }
-//        else
-//        {
-//            notification = new Notification(R.drawable.ic_stat_notify, null, 1);
-//            notification.flags |= Notification.FLAG_ONGOING_EVENT;
-//            notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
-//            notification.contentIntent = pendingIntent;
-//            notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
-//            notification.contentView.setTextViewText(R.id.status_text, message);
-//            notification.contentView.setTextViewText(R.id.progress_text, info);
-//            notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
-//        }
-//
-//        if (!isForeground) {
-//            logDebug("Starting foreground");
-//            try {
-//                startForeground(notificationId, notification);
-//                isForeground = true;
-//            }
-//            catch (Exception e){
-//                logError("startForeground exception", e);
-//                isForeground = false;
-//            }
-//        } else {
-//            mNotificationManager.notify(notificationId, notification);
-//        }
-//    }
-
-    public void setCurrentOverQuota(boolean currentOverQuota) {
-        this.currentOverQuota = currentOverQuota;
     }
 
     @Override

@@ -45,5 +45,4 @@ public class BroadcastConstants {
     public static final String UPDATE_SESSION_STATUS = "UPDATE_SESSION_STATUS";
     public static final String UPDATE_SESSION_TERM_CODE = "UPDATE_SESSION_TERM_CODE";
     public static final String EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER";
-    public static final String CURRENT_TRANSFER_OVER_QUOTA = "CURRENT_TRANSFER_OVER_QUOTA";
 }

@@ -63,14 +63,21 @@ public class TransferWidget {
     public void updateState() {
         if (megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD)) {
             setPausedTransfers();
-        } else if (megaApi.getBandwidthOverquotaDelay() > 0){
+        } else if (isOverQuota()){
             setOverQuotaTransfers();
         } else {
-            status.setVisibility(GONE);
+            setProgressTransfers();
         }
     }
 
+    private void setProgressTransfers() {
+        status.setVisibility(GONE);
+        progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_progress_bar));
+    }
+
     private void setPausedTransfers() {
+        if (isOverQuota()) return;
+
         status.setVisibility(VISIBLE);
         status.setImageDrawable(getDrawable(R.drawable.ic_transfers_paused));
     }
@@ -82,6 +89,8 @@ public class TransferWidget {
     }
 
     private void setFailedTransfers() {
+        if (isOverQuota()) return;
+
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_warning_progress_bar));
         status.setVisibility(VISIBLE);
         status.setImageDrawable(getDrawable(R.drawable.ic_transfers_error));
@@ -91,7 +100,7 @@ public class TransferWidget {
         if (transfersWidget.getVisibility() != VISIBLE) {
             transfersWidget.setVisibility(VISIBLE);
         }
-        progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_progress_bar));
+
         progressBar.setProgress(progress);
     }
 
@@ -120,5 +129,9 @@ public class TransferWidget {
         long totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
 
         return (int) Math.round((double) totalSizeTransfered / totalSizePendingTransfer * 100);
+    }
+
+    private boolean isOverQuota() {
+        return megaApi.getBandwidthOverquotaDelay() > 0;
     }
 }

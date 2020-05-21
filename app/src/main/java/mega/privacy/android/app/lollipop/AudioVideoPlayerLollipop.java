@@ -734,14 +734,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
 
-                logDebug("Overquota delay: " + megaApi.getBandwidthOverquotaDelay());
-                if(megaApi.getBandwidthOverquotaDelay()>0){
-                    if(alertDialogTransferOverquota==null){
-                        showTransferOverquotaDialog();
-                    }
-                    else if (!(alertDialogTransferOverquota.isShowing())) {
-                        showTransferOverquotaDialog();
-                    }
+                if (megaApi.getBandwidthOverquotaDelay() > 0) {
+                    showGeneralTransferOverQuotaWarning();
                 }
             }
         }
@@ -3549,15 +3543,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
             if (e.getValue() != 0) {
                 logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
-
-                if(alertDialogTransferOverquota==null){
-                    showTransferOverquotaDialog();
-                }
-                else {
-                    if (!(alertDialogTransferOverquota.isShowing())) {
-                        showTransferOverquotaDialog();
-                    }
-                }
+                showGeneralTransferOverQuotaWarning();
             }
         } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
             showTakenDownAlert(this);
@@ -3567,61 +3553,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
         return false;
-    }
-
-
-    public void showTransferOverquotaDialog(){
-        logDebug("showTransferOverquotaDialog");
-
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
-        dialogBuilder.setView(dialogView);
-
-        TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
-        title.setText(getString(R.string.title_depleted_transfer_overquota));
-
-        ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
-        icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.transfer_quota_empty));
-
-        TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
-        text.setText(getString(R.string.text_depleted_transfer_overquota));
-
-        Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
-
-        Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
-        paymentButton.setText(getString(R.string.action_upgrade_account));
-
-        alertDialogTransferOverquota = dialogBuilder.create();
-
-        alertDialogTransferOverquota.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                transferOverquota = true;
-                showActionStatusBar();
-            }
-        });
-
-        continueButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                alertDialogTransferOverquota.dismiss();
-                transferOverquota = false;
-            }
-
-        });
-
-        paymentButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                alertDialogTransferOverquota.dismiss();
-                transferOverquota = false;
-                navigateToUpgradeAccount();
-            }
-        });
-
-        alertDialogTransferOverquota.setCancelable(false);
-        alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
-        alertDialogTransferOverquota.show();
     }
 
     @Override
