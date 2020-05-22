@@ -32,6 +32,7 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -122,7 +123,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
 
         LinearLayout optionOpenWith = contentView.findViewById(R.id.open_with_layout);
         LinearLayout forwardSeparator = contentView.findViewById(R.id.forward_separator);
+        LinearLayout shareSeparator = contentView.findViewById(R.id.share_separator);
         LinearLayout optionForward = contentView.findViewById(R.id.forward_layout);
+        LinearLayout optionShare = contentView.findViewById(R.id.share_layout);
         LinearLayout selectSeparator = contentView.findViewById(R.id.select_separator);
         LinearLayout optionSelect = contentView.findViewById(R.id.select_layout);
         LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
@@ -142,6 +145,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         optionRemove.setOnClickListener(this);
         optionImport.setOnClickListener(this);
         optionForward.setOnClickListener(this);
+        optionShare.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
         optionSelect.setOnClickListener(this);
 
@@ -179,11 +183,14 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                     ((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview())) {
                 optionForward.setVisibility(View.GONE);
                 optionRemove.setVisibility(View.GONE);
+                optionShare.setVisibility(View.GONE);
             } else {
                 if (!isOnline(context)) {
                     optionForward.setVisibility(View.GONE);
+                    optionShare.setVisibility(View.GONE);
                 } else {
                     optionForward.setVisibility(View.VISIBLE);
+                    optionShare.setVisibility(View.VISIBLE);
                 }
                 if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isDeletable()) {
                     optionRemove.setVisibility(View.GONE);
@@ -203,6 +210,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             titleSeparator.setVisibility(View.VISIBLE);
             optionSelect.setVisibility(View.GONE);
             optionForward.setVisibility(View.GONE);
+            optionShare.setVisibility(View.GONE);
             optionRemove.setVisibility(View.GONE);
             optionOpenWith.setVisibility(View.GONE);
         }
@@ -241,30 +249,14 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             showSingleNodeSelected();
         }
 
-        if(optionView.getVisibility() == View.VISIBLE || optionImport.getVisibility() == View.VISIBLE){
-            separatorInfo.setVisibility(View.VISIBLE);
-        }else{
-            separatorRemove.setVisibility(View.GONE);
-        }
 
-        if ((optionDownload.getVisibility() == View.GONE && optionImport.getVisibility() == View.GONE && optionForward.getVisibility() == View.GONE && optionSaveOffline.getVisibility() == View.GONE)
-                || optionRemove.getVisibility() == View.GONE) {
-            separatorRemove.setVisibility(View.GONE);
-        } else {
-            separatorRemove.setVisibility(View.VISIBLE);
-        }
+        separatorInfo.setVisibility((optionView.getVisibility() == View.VISIBLE || optionImport.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
+        separatorRemove.setVisibility(((optionDownload.getVisibility() == View.GONE && optionImport.getVisibility() == View.GONE && optionForward.getVisibility() == View.GONE && optionSaveOffline.getVisibility() == View.GONE)
+                || optionRemove.getVisibility() == View.GONE) ? View.GONE : View.VISIBLE);
 
-        if (optionOpenWith.getVisibility() == View.VISIBLE && optionForward.getVisibility() == View.VISIBLE) {
-            forwardSeparator.setVisibility(View.VISIBLE);
-        } else {
-            forwardSeparator.setVisibility(View.GONE);
-        }
-
-        if (optionSelect.getVisibility() == View.VISIBLE && (optionForward.getVisibility() == View.VISIBLE || optionOpenWith.getVisibility() == View.VISIBLE)) {
-            selectSeparator.setVisibility(View.VISIBLE);
-        } else {
-            selectSeparator.setVisibility(View.GONE);
-        }
+        forwardSeparator.setVisibility((optionOpenWith.getVisibility() == View.VISIBLE && optionForward.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
+        selectSeparator.setVisibility((optionSelect.getVisibility() == View.VISIBLE && (optionForward.getVisibility() == View.VISIBLE || optionOpenWith.getVisibility() == View.VISIBLE)) ? View.VISIBLE : View.GONE);
+        shareSeparator.setVisibility((optionForward.getVisibility() == View.VISIBLE && optionShare.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
 
         reactionsLayout.setVisibility((shouldReactionOptionsBeVisible(context, chatRoom, message)) ? View.VISIBLE : View.GONE);
 
@@ -338,6 +330,10 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 if (context instanceof ChatActivityLollipop) {
                     ((ChatActivityLollipop) context).forwardMessages(messagesSelected);
                 }
+                break;
+
+            case R.id.share_layout:
+                shareNode(context, node);
                 break;
 
             case R.id.select_layout:

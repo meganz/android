@@ -109,28 +109,25 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             optionSelect.setVisibility(View.VISIBLE);
 
-            if (typeMessage == MegaChatMessage.TYPE_NORMAL ||
+            optionCopy.setVisibility((typeMessage == MegaChatMessage.TYPE_NORMAL ||
                     (typeMessage == MegaChatMessage.TYPE_CONTAINS_META &&
                             message.getMessage().getContainsMeta() != null &&
                             message.getMessage().getContainsMeta().getType() != MegaChatContainsMeta.CONTAINS_META_INVALID &&
-                            message.getMessage().getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW)) {
-                optionCopy.setVisibility(View.VISIBLE);
-            } else {
-                optionCopy.setVisibility(View.GONE);
-            }
+                            message.getMessage().getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW)) ? View.VISIBLE : View.GONE);
+
+
             if (((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview())) {
                 optionForward.setVisibility(View.GONE);
                 optionEdit.setVisibility(View.GONE);
                 optionDelete.setVisibility(View.GONE);
             } else {
-                if (!isOnline(context) || chatC.isInAnonymousMode()) {
-                    optionForward.setVisibility(View.GONE);
-                } else {
-                    optionForward.setVisibility(View.VISIBLE);
-                }
+
+                optionForward.setVisibility((!isOnline(context) || chatC.isInAnonymousMode()) ? View.GONE : View.VISIBLE);
+
                 if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isEditable()) {
                     optionEdit.setVisibility(View.GONE);
                 } else {
+
                     if (typeMessage == MegaChatMessage.TYPE_NORMAL || typeMessage == MegaChatMessage.TYPE_CONTAINS_META) {
                         optionEdit.setVisibility(View.VISIBLE);
                     } else {
