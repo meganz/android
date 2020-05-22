@@ -448,7 +448,6 @@ public class Constants {
     public static final String SELECTED_USERS = "SELECTED_USERS";
     public static final String ID_MESSAGES = "ID_MESSAGES";
     public static final String USER_HANDLES = "USER_HANDLES";
-    public static final String MESSAGE_ID = "MESSAGE_ID";
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
 
@@ -476,7 +475,6 @@ public class Constants {
     public static final int MAX_WIDTH_ADD_CONTACTS = 60;
     public static final int AVATAR_SIZE = 150;
     public static final int AVATAR_SIZE_GRID = 75;
-    public static final int INVALID_POSITION = -1;
 
     public static final String SEPARATOR = File.separator;
 

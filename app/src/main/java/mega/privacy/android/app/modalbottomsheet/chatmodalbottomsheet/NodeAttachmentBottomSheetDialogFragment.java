@@ -95,8 +95,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
-        reactionsLayout = contentView.findViewById(R.id.reactions_layout);
-        reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
+
 
         if (message == null || message.getMessage() == null) {
             logWarning("Message is null");
@@ -112,6 +111,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_attachment_item, null);
         mainLinearLayout = contentView.findViewById(R.id.node_attachment_bottom_sheet);
+        reactionsLayout = contentView.findViewById(R.id.reactions_layout);
+        reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
         items_layout = contentView.findViewById(R.id.items_layout);
 
         nodeThumb = contentView.findViewById(R.id.node_attachment_thumbnail);

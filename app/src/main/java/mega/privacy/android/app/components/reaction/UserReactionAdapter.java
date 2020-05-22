@@ -109,9 +109,8 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
         name.setText(userName);
 
         /*Default Avatar*/
-        int color = getColorAvatar(context, megaApi, userHandle);
-        imageView.setImageBitmap(getDefaultAvatar(context, color, userName, AVATAR_SIZE, true));
-
+        int color = getColorAvatar(userHandle);
+        imageView.setImageBitmap(getDefaultAvatar(color, userName, AVATAR_SIZE, true));
         /*Avatar*/
         if (userHandle == megaChatApi.getMyUserHandle()) {
             File avatar = buildAvatarFile(context, email + ".jpg");
