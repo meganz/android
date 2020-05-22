@@ -936,13 +936,16 @@ public final class ChatAdvancedNotificationBuilder {
             int notificationId = (MegaApiJava.userHandleToBase64(callToAnswer.getId())).hashCode();
 
             Intent ignoreIntent = new Intent(context, CallNotificationIntentService.class);
+            ignoreIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
             ignoreIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
+
             ignoreIntent.setAction(CallNotificationIntentService.IGNORE);
             int requestCodeIgnore = notificationId + 1;
             PendingIntent pendingIntentIgnore = PendingIntent.getService(context, requestCodeIgnore, ignoreIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-
             Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
+            answerIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
             answerIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
+
             answerIntent.setAction(CallNotificationIntentService.ANSWER);
             int requestCodeAnswer = notificationId + 1;
             PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT);

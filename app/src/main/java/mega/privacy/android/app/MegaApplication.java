@@ -165,6 +165,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
 	private PowerManager.WakeLock wakeLock;
 
+	private ArrayList<MegaChatListItem> currentActiveGroupChat = new ArrayList<>();
+
 	private CallListener callListener = new CallListener();
 
     @Override
@@ -1162,9 +1164,52 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		sendBroadcastUpdateAccountDetails();
 	}
 
+	/**
+	 * Method for showing an incoming group call notification.
+	 *
+	 * @param chatId The chat ID of the chat with call.
+	 */
+	private void showGroupCallNotification(long chatId) {
+		try {
+			stopService(new Intent(this, IncomingCallService.class));
+			ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+			notificationBuilder.checkOneGroupCall(chatId);
+		} catch (Exception e) {
+			logError("ERROR Showing the group call notification ", e);
+		}
+	}
+
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+		if (!item.isGroup())
+			return;
 
+		if (item.getChanges() == 0) {
+			if (!currentActiveGroupChat.contains(item)) {
+				currentActiveGroupChat.add(item);
+			}
+		}
+
+		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
+			if (item.getOwnPrivilege() != -1) {
+				if (!currentActiveGroupChat.contains(item)) {
+					currentActiveGroupChat.add(item);
+					MegaChatCall call = megaChatApi.getChatCall(item.getChatId());
+					if (call != null) {
+						if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+							showGroupCallNotification(item.getChatId());
+							return;
+						}
+					}
+				}
+			} else {
+				currentActiveGroupChat.remove(item);
+			}
+		}
+
+		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
+			currentActiveGroupChat.remove(item);
+		}
 	}
 
 	@Override
@@ -1303,14 +1348,8 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 		}
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-		if( callToLaunch.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && chatRoom != null && chatRoom.isGroup() ){
-			try {
-				stopService(new Intent(this, IncomingCallService.class));
-				ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-				notificationBuilder.checkOneGroupCall(chatId);
-			} catch (Exception e) {
-				logError("EXCEPTION", e);
-			}
+		if(callToLaunch.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && chatRoom != null && chatRoom.isGroup() ){
+			showGroupCallNotification(chatId);
 			return;
 		}
 
