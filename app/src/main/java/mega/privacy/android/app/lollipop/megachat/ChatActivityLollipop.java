@@ -1388,7 +1388,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 logDebug("Chat connection (" + idChat + ") is: " + chatConnection);
                 if (adapter == null) {
                     createAdapter();
-                }else {
+                } else {
+                    adapter.setChatRoom(chatRoom);
                     adapter.notifyDataSetChanged();
                 }
                 setPreviewersView();
@@ -6972,13 +6973,8 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                 //getFlag - Returns true if it is a video-audio call or false for audio call
             } else {
                 logError("ERROR WHEN TYPE_START_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
-                if (e.getErrorCode() == MegaChatError.ERROR_TOOMANY) {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), -1);
-                } else {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), -1);
-                }
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
             }
-
         } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug("TYPE_ANSWER_CHAT_CALL finished with success");
@@ -7370,9 +7366,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
                         messagesPlaying.clear();
                     }
 
-                    if (adapter != null) {
-                        adapter.notifyDataSetChanged();
-                    }
                     closeChat(false);
                     MegaApplication.setOpenChatId(-1);
                     initAfterIntent(intent, null);
@@ -7382,7 +7375,6 @@ public class ChatActivityLollipop extends DownloadableActivity implements MegaCh
         }
         super.onNewIntent(intent);
         setIntent(intent);
-        return;
     }
 
     public String getPeerFullName(long userHandle){

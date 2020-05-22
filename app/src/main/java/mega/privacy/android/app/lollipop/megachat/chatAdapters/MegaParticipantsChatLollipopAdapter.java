@@ -619,11 +619,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
      * @param position  participant's position in the adapter without taking into account the header item
      */
     public void updateContactStatus(int position) {
-        logDebug("position: " + position);
+        //Taking into account the header position += 1;
+        position += COUNT_HEADER_POSITION;
 
         if (listFragment.findViewHolderForAdapterPosition(position) instanceof MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList) {
-            //Taking into account the header position += 1;
-            notifyItemChanged(position + COUNT_HEADER_POSITION);
+            notifyItemChanged(position);
         }
     }
 
