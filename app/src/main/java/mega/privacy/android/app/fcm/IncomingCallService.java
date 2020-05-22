@@ -95,13 +95,12 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     }
 
     public void createNotification() {
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         mBuilder.setSmallIcon(R.drawable.ic_call_started).setAutoCancel(true);
         NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_HIGH;
+            int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "NOTIFICATION_CHANNEL_NAME", importance);
-            mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
             if (mNotificationManager != null) {
                 mNotificationManager.createNotificationChannel(notificationChannel);
             }
